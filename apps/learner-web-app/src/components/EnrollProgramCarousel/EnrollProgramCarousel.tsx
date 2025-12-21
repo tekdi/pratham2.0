@@ -21,7 +21,10 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Swiper as SwiperClass } from 'swiper/types';
 import { useTranslation } from '@shared-lib';
-import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
+import {
+  getUserDetails,
+  profileComplitionCheck,
+} from '@learner/utils/API/userService';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
@@ -48,10 +51,10 @@ interface Program {
   }[];
 }
 
-const EnrollProgramCarousel = ({ 
-  userId, 
-  isExplorePrograms = false 
-}: { 
+const EnrollProgramCarousel = ({
+  userId,
+  isExplorePrograms = false,
+}: {
   userId?: string | null;
   isExplorePrograms?: boolean;
 } = {}) => {
@@ -62,7 +65,10 @@ const EnrollProgramCarousel = ({
   const [tenantId, setTenantId] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [signupSuccessModal, setSignupSuccessModal] = useState(false);
-  const [loadingProgram, setLoadingProgram] = useState<{ id: string; action: 'enrolling' | 'accessing' } | null>(null);
+  const [loadingProgram, setLoadingProgram] = useState<{
+    id: string;
+    action: 'enrolling' | 'accessing';
+  } | null>(null);
   const [enrolledProgram, setEnrolledProgram] = useState<Program | null>(null);
 
   const handleSlideChange = (swiper: SwiperClass) => {
@@ -78,12 +84,13 @@ const EnrollProgramCarousel = ({
         const programsData = res?.result || [];
         const visiblePrograms = programsData?.filter(
           (program: any) =>
-            (program?.params?.uiConfig?.showProgram === true  && program?.params?.uiConfig?.showSignup === true)
+            program?.params?.uiConfig?.showProgram === true &&
+            program?.params?.uiConfig?.showSignup === true
           //below code show pragyanpath program in explore programs tab
           // || program?.params?.uiConfig?.sso?.length > 0
         );
         // console.log('visiblePrograms', visiblePrograms);
-        
+
         // If it's Explore Programs tab, exclude enrolled programs
         if (isExplorePrograms) {
           if (userId) {
@@ -91,7 +98,9 @@ const EnrollProgramCarousel = ({
             const data = await getUserDetails(userId, true);
             console.log('data=====>', data?.result?.userData?.tenantData);
             const tenantData = data?.result?.userData?.tenantData || [];
-            const enrolledTenantIds = tenantData.map((item: any) => item.tenantId);
+            const enrolledTenantIds = tenantData.map(
+              (item: any) => item.tenantId
+            );
             // Filter out programs that user is already enrolled in
             const explorePrograms = visiblePrograms?.filter(
               (program: any) => !enrolledTenantIds.includes(program.tenantId)
@@ -107,7 +116,9 @@ const EnrollProgramCarousel = ({
           console.log('data=====>', data?.result?.userData?.tenantData);
           const tenantData = data?.result?.userData?.tenantData;
           const filterIds = tenantData.map((item: any) => item.tenantId);
-          const filteredPrograms = programsData?.filter((program: any) => filterIds.includes(program.tenantId));
+          const filteredPrograms = programsData?.filter((program: any) =>
+            filterIds.includes(program.tenantId)
+          );
           setPrograms(filteredPrograms || []);
         } else {
           console.log('visiblePrograms=====>', visiblePrograms);
@@ -154,7 +165,9 @@ const EnrollProgramCarousel = ({
 
       // Check if user has Learner role
       const roles = tenantData?.roles || [];
-      const hasLearnerRole = roles.some((role: any) => role?.roleName === 'Learner');
+      const hasLearnerRole = roles.some(
+        (role: any) => role?.roleName === 'Learner'
+      );
       if (!hasLearnerRole && roles.length > 0) {
         console.error('User does not have Learner role for this program');
         return;
@@ -163,8 +176,14 @@ const EnrollProgramCarousel = ({
       // Set all localStorage values for the selected program
       localStorage.setItem('userId', storedUserId);
       localStorage.setItem('templtateId', tenantData?.templateId);
-      localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
-      localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
+      localStorage.setItem(
+        'userIdName',
+        userResponse?.result?.userData?.username
+      );
+      localStorage.setItem(
+        'firstName',
+        userResponse?.result?.userData?.firstName || ''
+      );
 
       const tenantId = tenantData?.tenantId;
       const tenantName = tenantData?.tenantName;
@@ -247,7 +266,9 @@ const EnrollProgramCarousel = ({
       // Check if user has Learner role (for MY_PROGRAMS, user should already be enrolled)
       const roles = tenantData?.roles || [];
       console.log('roles=====>', roles);
-      const hasLearnerRole = roles.some((role: any) => role?.roleName === 'Learner');
+      const hasLearnerRole = roles.some(
+        (role: any) => role?.roleName === 'Learner'
+      );
       console.log('hasLearnerRole=====>', hasLearnerRole);
       if (!hasLearnerRole && roles.length > 0) {
         console.error('User does not have Learner role for this program');
@@ -257,8 +278,14 @@ const EnrollProgramCarousel = ({
       // Set localStorage values similar to callBackSwitchDialog
       localStorage.setItem('userId', storedUserId);
       localStorage.setItem('templtateId', tenantData?.templateId);
-      localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
-      localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
+      localStorage.setItem(
+        'userIdName',
+        userResponse?.result?.userData?.username
+      );
+      localStorage.setItem(
+        'firstName',
+        userResponse?.result?.userData?.firstName || ''
+      );
 
       const tenantId = tenantData?.tenantId;
       const tenantName = tenantData?.tenantName;
@@ -299,7 +326,7 @@ const EnrollProgramCarousel = ({
       });
       console.log('enrolledProgram=====>', enrolledProgram);
       // Redirect to landing page
-      if(enrolledProgram){
+      if (enrolledProgram) {
         router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
       }
       router.push(landingPage || '/home');
@@ -337,23 +364,32 @@ const EnrollProgramCarousel = ({
         localStorage.setItem('previousTenantId', currentTenantId || '');
         localStorage.setItem('tenantId', program.tenantId);
         localStorage.setItem('userProgram', program?.name);
-        
+
         // Store uiConfig if available
         if (program?.params?.uiConfig) {
-          localStorage.setItem('uiConfig', JSON.stringify(program.params.uiConfig));
+          localStorage.setItem(
+            'uiConfig',
+            JSON.stringify(program.params.uiConfig)
+          );
         }
-        
+
         // Store landing page if available
         if (program?.params?.uiConfig?.landingPage) {
-          localStorage.setItem('landingPage', program.params.uiConfig.landingPage);
+          localStorage.setItem(
+            'landingPage',
+            program.params.uiConfig.landingPage
+          );
         }
 
         // Store enrolled program data for the profile completion page
-        localStorage.setItem('enrolledProgramData', JSON.stringify({
-          tenantId: program.tenantId,
-          name: program.name,
-          params: program.params,
-        }));
+        localStorage.setItem(
+          'enrolledProgramData',
+          JSON.stringify({
+            tenantId: program.tenantId,
+            name: program.name,
+            params: program.params,
+          })
+        );
       }
 
       // Navigate to enrollment profile completion page
@@ -373,7 +409,7 @@ const EnrollProgramCarousel = ({
 
   const onSigin = async () => {
     setSignupSuccessModal(false);
-    
+
     // If there's an enrolled program, sign in to it
     if (enrolledProgram) {
       await handleAccessProgram(enrolledProgram);
@@ -384,9 +420,8 @@ const EnrollProgramCarousel = ({
     }
   };
 
-
   return (
-    <Container 
+    <Container
       maxWidth="xl"
       sx={{
         px: { xs: 2, sm: 3, md: 2 },
@@ -412,6 +447,13 @@ const EnrollProgramCarousel = ({
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
             <CircularProgress />
+          </Box>
+        ) : programs.length === 0 ? (
+          <Box sx={{ textAlign: 'center', py: 4 }}>
+            <Typography variant="h2" color="textSecondary">
+              {t('LEARNER_APP.HOME.NO_PROGRAMS_FOUND') ||
+                "No programs found."}
+            </Typography>
           </Box>
         ) : !isExplorePrograms && programs.length === 0 ? (
           <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -495,7 +537,8 @@ const EnrollProgramCarousel = ({
                           pagination={{
                             clickable: true,
                             el: `.pagination-${program?.ordering}`,
-                            bulletActiveClass: 'swiper-pagination-bullet-active',
+                            bulletActiveClass:
+                              'swiper-pagination-bullet-active',
                             bulletClass: 'swiper-pagination-bullet',
                           }}
                           loop={true}

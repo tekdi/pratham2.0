@@ -134,7 +134,7 @@
     "SKILLING_CENTERS": "Skilling Centers",
     "SKILLING_CENTERS_NEAR_YOU": "Skilling Center Near You",
     "RETURN_TO_LOGIN": "Return to Login",
-    "GO_TO_HOME":"Go to Home",
+    "GO_TO_HOME": "Go to Home",
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "ACCESS_DENIED": "Access Denied",
     "WELCOME": "Welcome",
@@ -146,7 +146,7 @@
     "Job family": "Job family",
     "Group Membership": "Group Membership",
     "PSU": "PSU",
-    "UNAUTHORIZED":"You are not authorized to access this site",
+    "UNAUTHORIZED": "You are not authorized to access this site",
     "For Children": "For Children",
     "Self": "Self",
     "FINISH_ENROLL": "Finish Enroll",
@@ -201,7 +201,6 @@
       "HOME": "Home",
       "KNOWLEDGE_BANK": "Knowledge Bank",
       "REACHOUT_TO_MENTOR": "Reach out to your mentor"
-
     },
     "COURSE": {
       "COMPLETED_ON": "Completed on",
@@ -211,6 +210,7 @@
       "EXPLORE_MORE_COURSES": "Explore More Courses",
       "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app from {playStoreLink} to access your account also.",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
@@ -236,12 +236,13 @@
       "SIGN_UP": "Sign Up",
       "SIGN_IN": "Sign In",
       "Login with Newton ERP": "Login with Newton ERP",
-      "DISCOVER_LEARNING_OPPORTUNITIES":"Discover learning opportunities and sign up for programs that match your goals",
+      "DISCOVER_LEARNING_OPPORTUNITIES": "Discover learning opportunities and sign up for programs that match your goals",
       "ENROLL": "Enroll",
       "ENROLLING": "Enrolling...",
       "ACCESS_PROGRAM": "Access Program",
       "ACCESSING_PROGRAM": "Accessing Program...",
-      "NO_REGISTERED_PROGRAMS": "You haven't registered for any program."
+      "NO_REGISTERED_PROGRAMS": "You haven't registered for any program.",
+      "NO_PROGRAMS_FOUND": "No programs found."
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -370,7 +371,7 @@
       "CONTINUE": "Continue",
       "INVALID_LINK": "Invalid Link",
       "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
-      "CREATE_ACCOUNT_TO_PROGRAMS":"Create your account to explore and access all our learning programs, Anytime"
+      "CREATE_ACCOUNT_TO_PROGRAMS": "Create your account to explore and access all our learning programs, Anytime"
     },
     "RESET_PASSWORD_FORM": {
       "OLD_PASSWORD": "Old Password",
@@ -846,7 +847,7 @@
     "UPDATE_MARKS": "Update Marks",
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
-    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "NO_ASSESSMENT_TYPE_FOUND": "No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
     "REUPLOAD": "Reupload",
