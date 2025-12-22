@@ -24,7 +24,7 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import { useRouter } from 'next/navigation';
-import { createUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { createUser, sendMessage } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
@@ -313,6 +313,19 @@ const RegisterationFlow = () => {
         if (responseUserData) {
           localStorage.removeItem('localPayload');
           localStorage.removeItem('formData');
+
+          //sent username and password
+          sendMessage({
+            "sms": {
+              "to": [updated_payload.mobile],
+              "body":"Hey",
+              "templateId": "6948f41681326042a2454bb2", 
+              "replacements": {
+                "var1": username,
+                "var2": password
+              }
+            }
+          });
 
           setSignupSuccessModal(true);
         } else {

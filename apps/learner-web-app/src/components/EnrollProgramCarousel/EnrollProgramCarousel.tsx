@@ -89,6 +89,8 @@ const EnrollProgramCarousel = ({
           //below code show pragyanpath program in explore programs tab
           // || program?.params?.uiConfig?.sso?.length > 0
         );
+        localStorage.setItem('programsDataLogin', JSON.stringify(programsData));
+        localStorage.setItem('visibleProgramsLogin', JSON.stringify(visiblePrograms));
         // console.log('visiblePrograms', visiblePrograms);
 
         // If it's Explore Programs tab, exclude enrolled programs

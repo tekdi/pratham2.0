@@ -52,6 +52,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [enrolledPrograms, setEnrolledPrograms] = useState<TenantData[]>([]);
   const [currentProgram, setCurrentProgram] = useState<TenantData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAllProgramRegistred, setIsAllProgramRegistred] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -68,6 +69,15 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
 
         const userResponse = await getUserDetails(userId, true);
         const tenantData = userResponse?.result?.userData?.tenantData || [];
+
+        //set isAllProgramRegistred
+        const programsData = JSON.parse(localStorage.getItem('programsDataLogin') || '[]');
+        const visiblePrograms = JSON.parse(localStorage.getItem('visibleProgramsLogin') || '[]');
+        const filterIds = tenantData.map((item: any) => item.tenantId);
+        const filteredPrograms = programsData?.filter((program: any) =>
+          filterIds.includes(program.tenantId)
+        );
+        setIsAllProgramRegistred(visiblePrograms.length <= filteredPrograms.length ? 'yes' : 'no');
 
         // Find current program
         const current =
@@ -393,6 +403,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           >
             Home
           </Button>
+          {isAllProgramRegistred !== 'yes' && (
           <Button
             variant="outlined"
             fullWidth
@@ -412,6 +423,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           >
             Show All Programs
           </Button>
+          )}
           <Button
             variant="outlined"
             fullWidth
