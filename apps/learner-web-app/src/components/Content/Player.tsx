@@ -75,6 +75,7 @@ const App = ({
     const fetch = async () => {
       const response = await fetchContent(identifier);
       const rt = (await hierarchyAPI(courseId as string)) as any;
+      console.log('rt=======>', rt);
       const currentPath =
         typeof window !== 'undefined' ? window.location.pathname : '';
       const isThematicPath = currentPath.includes('/themantic');
@@ -82,6 +83,7 @@ const App = ({
 
       if (!isThematicPath && !isPosPath && rt?.program) {
         console.log('response=======>', rt?.program);
+        if(localStorage.getItem('channelId')==="pos-channel"){
         if (
           !rt?.program?.includes(localStorage.getItem('userProgram')) &&
           !rt.program.includes('Open School')
@@ -89,6 +91,12 @@ const App = ({
           router.push('/unauthorized');
           return;
         }
+      }
+      }
+      if(localStorage.getItem('channelId')!==rt.channel)
+      {
+        router.push('/unauthorized');
+        return;
       }
 
       const response2 = await ContentSearch({
