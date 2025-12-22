@@ -25,8 +25,7 @@ const ProfilePage = () => {
 
   const [filters] = useState<FilterDetails>({
     status: [ 'viewCertificate'],
-    tenantId:
-      (typeof window !== 'undefined' && localStorage.getItem('tenantId')) || '',
+   
     userId:
       (typeof window !== 'undefined' && localStorage.getItem('userId')) || '',
   });
