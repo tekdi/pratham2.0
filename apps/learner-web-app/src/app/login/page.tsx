@@ -193,7 +193,7 @@ const LoginPage = () => {
       //bug fix for roleid empty issue
       const tenantData = userResponse?.tenantData?.find((tenant: any) => {
         return (
-          tenant?.tenantStatus === 'active' &&
+          (tenant?.tenantStatus === 'active' || tenant?.tenantStatus === 'pending') &&
           tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
         );
       });
