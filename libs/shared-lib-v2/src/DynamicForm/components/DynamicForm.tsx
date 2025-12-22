@@ -310,7 +310,7 @@ const DynamicForm = ({
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                if (item === 'parent_phone') requiredArray.push(item);
+                 requiredArray.push(item);
               }
             });
 
