@@ -353,7 +353,8 @@
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
-      "PTM_NAME": "PTM Name"
+      "PTM_NAME": "PTM Name",
+      "ADDITIONAL_INFORMATION": "Additional Information"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
@@ -724,6 +725,7 @@
     "GRADE_11": "Grade 11",
     "GRADE_12": "Grade 12",
     "hamara_gaon": "hamara gaon",
+    
     "smile_program": "smile program",
     "pratham_read_india_initiative_rii": "pratham readindia initiative rii",
     "government_partnership": "government partnership",
