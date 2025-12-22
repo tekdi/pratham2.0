@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Grid, Checkbox, Button, Chip, Typography } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import AddIcCallOutlinedIcon from '@mui/icons-material/AddIcCallOutlined';
@@ -53,6 +54,7 @@ interface UserCardProps {
 }
 
 const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectChange, onCallLogUpdate }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [callLogModalOpen, setCallLogModalOpen] = useState(false);
   const [editingCallLog, setEditingCallLog] = useState<{ date: string; note: string } | null>(null);
@@ -147,7 +149,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                   )} */}
                </Box>
                <Typography variant="caption" display="block" sx={{ color: '#7C766F', fontSize: '12px', mt: 0.5 }}>
-                  Registered on {user.registeredOn}
+                  {t('USER_REGISTRATION.REGISTERED_ON')} {user.registeredOn}
                </Typography>
 
                {/* Tags Row */}

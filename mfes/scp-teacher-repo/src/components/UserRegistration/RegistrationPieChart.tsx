@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { Box } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import { fetchUserList } from '../../services/ManageUser';
 import { LocationFilters } from './types';
 
@@ -10,6 +11,7 @@ interface RegistrationPieChartProps {
 }
 
 const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFilters, triggerFetch }) => {
+  const { t } = useTranslation();
   const [counts, setCounts] = useState({ pending: 0, archived: 0, mayJoin: 0 });
   
   const totalCount = counts.pending + counts.archived + counts.mayJoin;
@@ -17,18 +19,18 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
   
   // Use actual data or empty state data
   const data = isEmpty 
-    ? [{ name: 'No Data', value: 1, color: '#E0E0E0' }]
+    ? [{ name: t('USER_REGISTRATION.NO_DATA'), value: 1, color: '#E0E0E0' }]
     : [
-        { name: 'Action Pending', value: counts.pending, color: '#9C27B0' },
-        { name: 'Archived/Not Interested', value: counts.archived, color: '#FF4500' },
-        { name: 'May join upcoming year', value: counts.mayJoin, color: '#FFD700' },
+        { name: t('USER_REGISTRATION.ACTION_PENDING'), value: counts.pending, color: '#9C27B0' },
+        { name: t('USER_REGISTRATION.ARCHIVED_NOT_INTERESTED'), value: counts.archived, color: '#FF4500' },
+        { name: t('USER_REGISTRATION.MAY_JOIN_UPCOMING_YEAR'), value: counts.mayJoin, color: '#FFD700' },
       ];
   
   // Legend data always shows actual categories
   const legendData = [
-    { name: 'Action Pending', value: counts.pending, color: '#9C27B0' },
-    { name: 'Archived/Not Interested', value: counts.archived, color: '#FF4500' },
-    { name: 'May join upcoming year', value: counts.mayJoin, color: '#FFD700' },
+    { name: t('USER_REGISTRATION.ACTION_PENDING'), value: counts.pending, color: '#9C27B0' },
+    { name: t('USER_REGISTRATION.ARCHIVED_NOT_INTERESTED'), value: counts.archived, color: '#FF4500' },
+    { name: t('USER_REGISTRATION.MAY_JOIN_UPCOMING_YEAR'), value: counts.mayJoin, color: '#FFD700' },
   ];
 
   const hasLocationFilters =

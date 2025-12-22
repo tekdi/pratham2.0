@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import { useTranslation } from 'next-i18next';
 import Header from '../components/Header';
 import RegistrationPieChart from '../components/UserRegistration/RegistrationPieChart';
 import RegistrationTabs from '../components/UserRegistration/RegistrationTabs';
@@ -19,6 +20,7 @@ import { TENANT_DATA } from '../../app.config';
 import { LocationFilters } from '../components/UserRegistration/types';
 
 const UserRegistrationList = () => {
+  const { t } = useTranslation();
   const [tabValue, setTabValue] = useState('pending');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
@@ -68,7 +70,7 @@ const UserRegistrationList = () => {
     const block = blockField?.selectedValues?.[0]?.value || '';
     const village = villageField?.selectedValues?.[0]?.value || '';
     const modeType = modeField?.selectedValues?.[0]?.value === 'remote' ? 'remote' : 'in-person';
-    const inPersonMode = modeType === 'remote' ? 'Remote mode' : 'In person mode';
+    const inPersonMode = modeType === 'remote' ? t('USER_REGISTRATION.REMOTE_MODE') : t('USER_REGISTRATION.IN_PERSON_MODE');
 
     // Format date
     const registeredOn = apiUser.createdAt 
@@ -447,7 +449,7 @@ const UserRegistrationList = () => {
       }}>
         {/* Location Dropdowns */}
         <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-        Learner Registrations
+        {t('USER_REGISTRATION.LEARNER_REGISTRATIONS')}
       </Typography>
         <Box sx={{   mb: 2, borderRadius: '8px', mt:"20px" }}>
           <LocationDropdowns onLocationChange={handleLocationChange} />
@@ -464,7 +466,7 @@ const UserRegistrationList = () => {
             <Grid item xs={8} sm={9}>
                 <TextField
                     fullWidth
-                    placeholder="Search Learner.."
+                    placeholder={t('USER_REGISTRATION.SEARCH_LEARNER')}
                     variant="outlined"
                     size="small"
                     value={searchQuery}
@@ -507,7 +509,7 @@ const UserRegistrationList = () => {
         {selectedUsers.size === 0 && (
             <Box sx={{ bgcolor: '#EAE0D5', p: 1.5, mb: 2, borderRadius: '8px', textAlign: 'center' }}>
                 <Typography sx={{ fontSize: '14px', color: '#4A4640', fontWeight: 500 }}>
-                    To take action, select at least one learner
+                    {t('USER_REGISTRATION.TO_TAKE_ACTION_SELECT_LEARNER')}
                 </Typography>
             </Box>
         )}
@@ -520,7 +522,7 @@ const UserRegistrationList = () => {
             ) : users.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                     <Typography sx={{ color: '#7C766F', fontSize: '16px' }}>
-                        No learners found
+                        {t('USER_REGISTRATION.NO_LEARNERS_FOUND')}
                     </Typography>
                 </Box>
             ) : (
@@ -552,11 +554,15 @@ const UserRegistrationList = () => {
                         }}>
                             {totalCount > 0 ? (
                                 <>
-                                    Showing {(currentPage - 1) * limit + 1} - {Math.min(currentPage * limit, totalCount)} of {totalCount} learners
-                                    {Math.ceil(totalCount / limit) === 1 && ' (Single Page)'}
+                                    {t('USER_REGISTRATION.SHOWING_LEARNERS', {
+                                        start: (currentPage - 1) * limit + 1,
+                                        end: Math.min(currentPage * limit, totalCount),
+                                        total: totalCount
+                                    })}
+                                    {Math.ceil(totalCount / limit) === 1 && t('USER_REGISTRATION.SINGLE_PAGE')}
                                 </>
                             ) : (
-                                'No records found'
+                                t('USER_REGISTRATION.NO_RECORDS_FOUND')
                             )}
                         </Typography>
                         

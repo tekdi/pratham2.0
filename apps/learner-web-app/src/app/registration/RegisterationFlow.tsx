@@ -316,7 +316,7 @@ const RegisterationFlow = () => {
 
           setSignupSuccessModal(true);
         } else {
-          showToastMessage('Username Already Exist', 'error');
+          showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'), 'error');
         }
 
         console.log(responseUserData);
@@ -356,7 +356,7 @@ const RegisterationFlow = () => {
       const response = await userCheck(payload);
       const users = response?.result || [];
       if (users.length > 0 && isEmailCheck) {
-        showToastMessage('Email already exists', 'error');
+        showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.EMAIL_ALREADY_EXISTS'), 'error');
       } else if (users.length > 0) {
         const usernameList = users.map((user: any) => user.username);
 
@@ -421,10 +421,10 @@ const RegisterationFlow = () => {
 
         // router.push('/reset-Password');
       } else {
-        showToastMessage('Please enter valid otp', 'error');
+        showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error');
       }
     } catch (error) {
-      showToastMessage('Please enter valid otp', 'error');
+      showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error');
     } finally {
       setOtp(['', '', '', '']);
     }
@@ -820,10 +820,10 @@ const RegisterationFlow = () => {
         open={accountExistModal}
         onClose={handleCloseModal}
         showFooter
-        primaryText={'Yes, Create Another Account'}
-        modalTitle={'Account Already Exists'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.YES_CREATE_ANOTHER_ACCOUNT')}
+        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.ACCOUNT_ALREADY_EXISTS')}
         primaryActionHandler={onCreateAnotherAccount}
-        footerText="Are you sure you want to create another account?"
+        footerText={t('LEARNER_APP.REGISTRATION_FLOW.ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT')}
       >
         <AccountExistsCard
           fullName={firstLetterInUpperCase(
@@ -838,8 +838,8 @@ const RegisterationFlow = () => {
         open={otpmodal && mobile ? true : false}
         onClose={handleOTPModal}
         showFooter
-        primaryText={'Verify OTP'}
-        modalTitle={'Verify Your Phone Number'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.VERIFY_OTP')}
+        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.VERIFY_YOUR_PHONE_NUMBER')}
         primaryActionHandler={onVerify}
       >
         <OtpVerificationComponent
@@ -854,7 +854,7 @@ const RegisterationFlow = () => {
         open={verificationSuccessModal}
         onClose={onCloseSuccessModal}
         showFooter={false}
-        primaryText={'Okay'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.OKAY')}
         primaryActionHandler={onCloseSuccessModal}
       >
         <Box p="10px">
@@ -866,7 +866,7 @@ const RegisterationFlow = () => {
         open={signupSuccessModal}
         onClose={onCloseSignupSuccessModal}
         showFooter={true}
-        primaryText={'Start Exploring'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_EXPLORING')}
         primaryActionHandler={onSigin}
       >
         <Box p="10px">
@@ -885,7 +885,7 @@ const RegisterationFlow = () => {
         open={invalidLinkModal}
         onClose={onCloseInvalidLinkModal}
         showFooter={true}
-        primaryText={'Okay'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.OKAY')}
         primaryActionHandler={renderHomePage}
       >
         <Box p="10px">{t('LEARNER_APP.REGISTRATION.INVALID_LINK')}</Box>

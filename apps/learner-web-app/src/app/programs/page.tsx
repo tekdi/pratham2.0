@@ -326,8 +326,9 @@ function ProgramsContent() {
 }
 
 export default function Index() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{t('LEARNER_APP.PROGRAMS.LOADING')}</div>}>
       <ProgramsContent />
     </Suspense>
   );
