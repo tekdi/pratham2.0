@@ -299,25 +299,14 @@ const DynamicForm = ({
 
       if (formData?.dob) {
         let age = calculateAgeFromDate(formData?.dob);
-        let oldFormSchema = (createNew && !isCompleteProfile) 
-          ? { ...schemaa, properties: { ...schemaa.properties }, required: [...(schemaa.required || [])] }
-          : schemaa;
-        let oldFormUiSchema = (createNew && !isCompleteProfile) 
-          ? { ...uischema }
-          : uischema;
-        let requiredArray = (createNew && !isCompleteProfile)
-          ? [...(oldFormSchema?.required || [])]
-          : oldFormSchema?.required;
+        let oldFormSchema = schemaa; // ✅ Use schemaa instead of formSchema
+        let oldFormUiSchema = uischema; // ✅ Use uischema instead of formUiSchema
+        let requiredArray = oldFormSchema?.required;
 
         //if learner form then only apply
         if (oldFormSchema?.properties?.guardian_relation || isCompleteProfile) {
           if (age < 18) {
-            if (createNew && !isCompleteProfile) {
-              // Avoid direct mutation of formData
-            } else {
-              delete formData?.mobile;
-            }
-            
+            delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
@@ -343,7 +332,7 @@ const DynamicForm = ({
 
             // Clone each key's config and set widget to 'CustomTextFieldWidget' with full width
             requiredKeys.forEach((key) => {
-              if (Object.prototype.hasOwnProperty.call(updatedUiSchema, key)) {
+              if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
                   'ui:widget': 'CustomTextFieldWidget',
@@ -355,20 +344,11 @@ const DynamicForm = ({
               }
             });
 
-            //hide mobile
+            //hide mobile - remove from schema completely
             requiredKeys2.forEach((key) => {
-              if (createNew && !isCompleteProfile) {
-                // hide mobile - keep in schema to preserve value
-                updatedUiSchema[key] = {
-                  ...updatedUiSchema[key],
-                  'ui:widget': 'hidden'
-                };
-              } else {
-                // remove from schema completely (legacy behavior)
-                delete updatedUiSchema[key];
-                if (oldFormSchema.properties && oldFormSchema.properties[key]) {
-                  delete oldFormSchema.properties[key];
-                }
+              delete updatedUiSchema[key];
+              if (oldFormSchema.properties && oldFormSchema.properties[key]) {
+                delete oldFormSchema.properties[key];
               }
             });
             
@@ -403,13 +383,9 @@ const DynamicForm = ({
 
             oldFormUiSchema = reorderedUiSchema;
           } else {
-            if (createNew && !isCompleteProfile) {
-              // Avoid direct mutation of formData
-            } else {
-              delete formData?.parent_phone;
-              delete formData?.guardian_relation;
-              delete formData?.guardian_name;
-            }
+            delete formData?.parent_phone;
+            delete formData?.guardian_relation;
+            delete formData?.guardian_name;
 
             // remove from required
             requiredArray = requiredArray.filter(
@@ -427,7 +403,7 @@ const DynamicForm = ({
             const updatedUiSchema = { ...oldFormUiSchema };
             // Clone each key's config and set widget to 'hidden'
             requiredKeys.forEach((key) => {
-              if (Object.prototype.hasOwnProperty.call(updatedUiSchema, key)) {
+              if (updatedUiSchema.hasOwnProperty(key)) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
                   'ui:widget': 'hidden',
@@ -474,13 +450,7 @@ const DynamicForm = ({
             // Remove guardian info note from schema and UI schema
             delete updatedUiSchema['guardian_info_note'];
             if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
-              if (createNew && !isCompleteProfile) {
-                const newProps = { ...oldFormSchema.properties };
-                delete newProps.guardian_info_note;
-                oldFormSchema.properties = newProps;
-              } else {
-                delete oldFormSchema.properties.guardian_info_note;
-              }
+              delete oldFormSchema.properties.guardian_info_note;
             }
             oldFormUiSchema = updatedUiSchema;
           }
@@ -491,66 +461,39 @@ const DynamicForm = ({
         }
       } else {
         //initially hide all
-        let oldFormSchema = (createNew && !isCompleteProfile) 
-          ? { ...schemaa, properties: { ...schemaa.properties }, required: [...(schemaa.required || [])] }
-          : formSchema;
-        let oldFormUiSchema = (createNew && !isCompleteProfile) 
-          ? { ...uischema }
-          : formUiSchema;
+        let oldFormSchema = formSchema;
+        let oldFormUiSchema = formUiSchema;
         let requiredArray = oldFormSchema?.required;
 
         // remove from required
         requiredArray = requiredArray.filter(
           (key) => !requiredKeys.includes(key)
         );
-        
-        if (createNew && !isCompleteProfile) {
-          // keep mobile in schema but hide in UI initially
-        } else {
-          requiredArray = requiredArray.filter(
-            (key) => !requiredKeys2.includes(key)
-          );
-        }
+        requiredArray = requiredArray.filter(
+          (key) => !requiredKeys2.includes(key)
+        );
 
         //set ui schema hide
         const updatedUiSchema = { ...oldFormUiSchema };
         // Clone each key's config and set widget to 'hidden'
         requiredKeys.forEach((key) => {
-          if (Object.prototype.hasOwnProperty.call(updatedUiSchema, key)) {
+          if (updatedUiSchema.hasOwnProperty(key)) {
             updatedUiSchema[key] = {
               ...updatedUiSchema[key],
               'ui:widget': 'hidden',
             };
           }
         });
-
         requiredKeys2.forEach((key) => {
-          if (createNew && !isCompleteProfile) {
-            // hide mobile but keep in schema
-             if (updatedUiSchema[key]) {
-                updatedUiSchema[key] = {
-                  ...updatedUiSchema[key],
-                  'ui:widget': 'CustomTextFieldWidget',
-                };
-             }
-          } else {
-            delete updatedUiSchema[key];
-            if (oldFormSchema.properties && oldFormSchema.properties[key]) {
-              delete oldFormSchema.properties[key];
-            }
+          delete updatedUiSchema[key];
+          if (oldFormSchema.properties && oldFormSchema.properties[key]) {
+            delete oldFormSchema.properties[key];
           }
         });
-
         // Remove guardian info note from schema and UI schema initially
         delete updatedUiSchema['guardian_info_note'];
         if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
-          if (createNew && !isCompleteProfile) {
-             const newProps = { ...oldFormSchema.properties };
-             delete newProps.guardian_info_note;
-             oldFormSchema.properties = newProps;
-          } else {
-            delete oldFormSchema.properties.guardian_info_note;
-          }
+          delete oldFormSchema.properties.guardian_info_note;
         }
         oldFormUiSchema = updatedUiSchema;
         oldFormSchema.required = requiredArray;
@@ -1540,24 +1483,18 @@ const customFields = {
 
     if (hasObjectChanged(prevFormData.current, formData)) {
       console.log('hasObjectChanged in 1 formData', formData);
-      const updatedFormData = (createNew && !isCompleteProfile) ? { ...formData } : formData;
-
       if (changedField) {
         //error set
         console.log('errors', errors);
         setSubmitted(false);
         //find out all dependent keys
         const dependentKeyArray = getDependentKeys(schema, changedField);
-        console.log('hasObjectChanged in 2 formData', updatedFormData);
+        console.log('hasObjectChanged in 2 formData', formData);
         // console.log('hasObjectChanged dependent keys:', dependentKeyArray);
         dependentKeyArray.forEach((key) => {
-          if (createNew && !isCompleteProfile) {
-            delete updatedFormData[key]; // Remove the key from cloned formData
-          } else {
-             delete formData[key]; // Remove the key from formData
-          }
+          delete formData[key]; // Remove the key from formData
         });
-        // console.log('hasObjectChanged formData', updatedFormData);
+        // console.log('hasObjectChanged formData', formData);
 
         setFormSchema((prevSchema) => {
           const updatedProperties = { ...prevSchema.properties };
@@ -1586,14 +1523,14 @@ const customFields = {
           return { ...prevSchema, properties: updatedProperties };
         });
 
-        // // console.log(`Field changed: ${changedField}, New Value: ${updatedFormData[changedField]}`);
+        // // console.log(`Field changed: ${changedField}, New Value: ${formData[changedField]}`);
         // // console.log('dependentSchema', dependentSchema);
         const workingSchema = dependentSchema?.filter(
           (item) => item.api && item.api.dependent === changedField
         );
         // // console.log('workingSchema', workingSchema);
         if (workingSchema.length > 0) {
-          const changedFieldValue = updatedFormData[changedField];
+          const changedFieldValue = formData[changedField];
 
           const getNestedValue = (obj, path) => {
             if (path === '') {
@@ -1743,13 +1680,13 @@ const customFields = {
       const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
       if (isUsernameDisabled && prevFormData.current?.username) {
         // Keep the existing username value when username field is disabled
-        updatedFormData.username = prevFormData.current.username;
+        formData.username = prevFormData.current.username;
       }
       
-      prevFormData.current = updatedFormData;
-      // console.log('Form data changed:', updatedFormData);
+      prevFormData.current = formData;
+      // console.log('Form data changed:', formData);
       // live error
-      setFormData(updatedFormData);
+      setFormData(formData);
 
       function getSkipKeys(skipHideObject, formData) {
         let skipKeys = [];
@@ -1763,7 +1700,7 @@ const customFields = {
         return skipKeys;
       }
 
-      const skipKeys = getSkipKeys(hideAndSkipFields, updatedFormData);
+      const skipKeys = getSkipKeys(hideAndSkipFields, formData);
       // console.log('skipKeys', skipKeys);
       let updatedUISchema = formUiSchemaOriginal;
       function hideFieldsInUISchema(uiSchema, fieldsToHide) {
@@ -1917,7 +1854,7 @@ const customFields = {
 
     const transformedFormData = transformFormData(
       cleanedData,
-      (createNew && !isCompleteProfile) ? formSchema : schema,
+      schema,
       extraFields
     );
 
