@@ -280,6 +280,8 @@ const RegisterationFlow = () => {
           //  delete updated_payload?.mobile;
           updated_payload.mobile = formData?.parent_phone;
         } else {
+          updated_payload.mobile = formData?.mobile;
+
           const fieldIdsToRemove = [
             'd7a56014-0b9a-4f16-b07e-88baea79576d',
             '3a7bf305-6bac-4377-bf09-f38af866105c',

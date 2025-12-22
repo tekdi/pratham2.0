@@ -306,7 +306,7 @@ const DynamicForm = ({
         //if learner form then only apply
         if (oldFormSchema?.properties?.guardian_relation || isCompleteProfile) {
           if (age < 18) {
-            delete formData?.mobile;
+        //    delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
