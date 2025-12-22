@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useTranslation } from 'next-i18next';
 
 interface BottomActionBarProps {
   selectedCount: number;
@@ -17,6 +18,7 @@ const BottomActionBar: React.FC<BottomActionBarProps> = ({
   onMoreOptions,
   showMoreOptions = true
 }) => {
+  const { t } = useTranslation();
   if (selectedCount === 0) return null;
 
   return (
@@ -49,7 +51,7 @@ const BottomActionBar: React.FC<BottomActionBarProps> = ({
     flexShrink: 0   // 🔥 prevents disappearing
   }}
 >
-  {selectedCount} {selectedCount === 1 ? 'learner' : 'learners'}
+  {selectedCount} {selectedCount === 1 ? t('USER_REGISTRATION.LEARNER') : t('USER_REGISTRATION.LEARNERS')}
 </Box>
 
         {/* Action Buttons - Right Side */}
@@ -73,7 +75,7 @@ const BottomActionBar: React.FC<BottomActionBarProps> = ({
             },
           }}
         >
-          Cancel
+          {t('USER_REGISTRATION.CANCEL')}
         </Button>
         <Button
           variant="contained"
@@ -93,7 +95,7 @@ const BottomActionBar: React.FC<BottomActionBarProps> = ({
             },
           }}
         >
-          Assign Batch
+          {t('USER_REGISTRATION.ASSIGN_BATCH')}
         </Button>
         {showMoreOptions && (
           <IconButton

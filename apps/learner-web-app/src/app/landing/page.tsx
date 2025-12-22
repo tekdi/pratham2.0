@@ -1,13 +1,13 @@
 'use client';
 
 import { Box, Button, Card, CardContent, Container, Grid, Typography } from '@mui/material';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '@learner/components/Header/Header';
 import { getTenantInfo, getPrathamTenantId } from '@learner/utils/API/ProgramService';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { useTranslation } from '@shared-lib';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import 'swiper/css/navigation';
@@ -38,6 +38,7 @@ interface Program {
 
 export default function LandingPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -121,8 +122,7 @@ export default function LandingPage() {
     }
   };
 
-  const aboutPrathamText =
-    'Pratham Education Foundation (Pratham) is one of the largest education NGOs in India with a record of innovative, rigorously evaluated programs that have inspired similar programs across three continents. With a history spanning 30 years, Pratham\'s work today extends from programs for early and elementary years to girls and women, and youth skilling.\n\nThrough programs covering 25 states and Union Territories, in an average year, Pratham usually reaches over 6 million children and youth. This is achieved through a combination of efforts: directly working with children and youth in communities, as well as through collaborations with state and district-level governments. Pratham has received notable awards such as the Lui Che Woo Prize, WISE Prize for Innovation, Skoll Award for Social Entrepreneurship, the Henry R Kravis Prize in Leadership and the CNN-IBN Indian of the Year for Public Service. Pratham also received the 2021 Yidan Prize for Education Development and the Yashraj Bharati Samman in 2025.';
+  const aboutPrathamText = t('LANDING.ABOUT_PRATHAM_TEXT');
 
   return (
     <>
@@ -183,7 +183,7 @@ export default function LandingPage() {
                   color: '#fff',
                 }}
               >
-                Welcome to the Pratham Learning Platform!
+                {t('LANDING.WELCOME_TO_PRATHAM_LEARNING_PLATFORM')}
               </Typography>
               <Typography
                 variant="h5"
@@ -198,7 +198,7 @@ export default function LandingPage() {
                   color: '#fff',
                 }}
               >
-                Your Learning Journey Begins here
+                {t('LANDING.YOUR_LEARNING_JOURNEY_BEGINS_HERE')}
               </Typography>
               <Button
                 variant="contained"
@@ -222,7 +222,7 @@ export default function LandingPage() {
                   },
                 }}
               >
-                Get Started!
+                {t('LANDING.GET_STARTED')}
               </Button>
               <Box sx={{ mt: 1 }}>
                 <Typography
@@ -232,7 +232,7 @@ export default function LandingPage() {
                     display: 'inline',
                   }}
                 >
-                  Already signed up?{' '}
+                  {t('LANDING.ALREADY_SIGNED_UP')}{' '}
                   <Typography
                     component="span"
                     variant="body2"
@@ -246,9 +246,9 @@ export default function LandingPage() {
                     }}
                     onClick={handleLogin}
                   >
-                    Click here
+                    {t('LANDING.CLICK_HERE')}
                   </Typography>
-                  {' '}to login
+                  {' '}{t('LANDING.TO_LOGIN')}
                 </Typography>
               </Box>
               <Box sx={{ mt: 1 }}>
@@ -259,7 +259,7 @@ export default function LandingPage() {
                     display: 'inline',
                   }}
                 >
-                  Are you a Pratham Employee?{' '}
+                  {t('LANDING.ARE_YOU_PRATHAM_EMPLOYEE')}{' '}
                   <Typography
                     component="span"
                     variant="body2"
@@ -273,9 +273,9 @@ export default function LandingPage() {
                     }}
                     onClick={handlePragyanpath}
                   >
-                  Click here 
+                  {t('LANDING.CLICK_HERE')}
                   </Typography>
-                  {' '}to get access to Pragyanpath
+                  {' '}{t('LANDING.TO_GET_ACCESS_TO_PRAGYANPATH')}
                 </Typography>
               </Box>
             </Box>
@@ -324,7 +324,7 @@ export default function LandingPage() {
                   color: '#1F1B13',
                 }}
               >
-                About Pratham
+                {t('LANDING.ABOUT_PRATHAM')}
               </Typography>
               <Typography
                 variant="body1"
@@ -364,7 +364,7 @@ export default function LandingPage() {
                 color: '#FFC107',
               }}
             >
-              About Pratham Learning Platform
+              {t('LANDING.ABOUT_PRATHAM_LEARNING_PLATFORM')}
             </Typography>
             <Typography
               variant="body1"
@@ -397,16 +397,16 @@ export default function LandingPage() {
               color: '#1F1B13',
             }}
           >
-            Our Programs
+            {t('LANDING.OUR_PROGRAMS')}
           </Typography>
 
           {loading ? (
             <Box sx={{  py: 4 }}>
-              <Typography>Loading programs...</Typography>
+              <Typography>{t('LANDING.LOADING_PROGRAMS')}</Typography>
             </Box>
           ) : programs.length === 0 ? (
             <Box sx={{  py: 4 }}>
-              <Typography>No programs available at the moment.</Typography>
+              <Typography>{t('LANDING.NO_PROGRAMS_AVAILABLE')}</Typography>
             </Box>
           ) : (
             <Grid container spacing={4}>
@@ -638,7 +638,7 @@ export default function LandingPage() {
                 },
               }}
             >
-              Get Started With Your Learning Journey Now!
+              {t('LANDING.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW')}
             </Button>
           </Container>
         </Box>

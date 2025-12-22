@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Modal, Typography, Button, IconButton, useTheme } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { modalStyles } from '../../styles/modalStyles';
@@ -17,6 +18,7 @@ const AssignBatchSuccessModal: React.FC<AssignBatchSuccessModalProps> = ({
   learnerName,
   batchName,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme<any>();
   return (
     <Modal
@@ -48,13 +50,13 @@ const AssignBatchSuccessModal: React.FC<AssignBatchSuccessModalProps> = ({
               variant="h6"
               sx={{ fontWeight: 600, fontSize: '18px', color: '#1E1B16' }}
             >
-              {learnerName || 'Learner'}
+              {learnerName || t('USER_REGISTRATION.LEARNER_FALLBACK')}
             </Typography>
             <Typography
               variant="body2"
               sx={{ fontSize: '14px', color: '#7C766F', mt: 0.5 }}
             >
-              Assign Batch
+              {t('USER_REGISTRATION.ASSIGN_BATCH')}
             </Typography>
           </Box>
           <IconButton onClick={onClose} sx={{ p: 0.5 }}>
@@ -83,13 +85,13 @@ const AssignBatchSuccessModal: React.FC<AssignBatchSuccessModalProps> = ({
             variant="body1"
             sx={{ fontSize: '16px', color: '#4A4640', mb: 1 }}
           >
-            Learner(s) have been assigned
+            {t('USER_REGISTRATION.LEARNERS_ASSIGNED')}
           </Typography>
           <Typography
             variant="body1"
             sx={{ fontSize: '16px', color: '#4A4640', mb: 1 }}
           >
-            and moved to the batch
+            {t('USER_REGISTRATION.MOVED_TO_BATCH')}
           </Typography>
           <Typography
             variant="body1"
@@ -118,7 +120,7 @@ const AssignBatchSuccessModal: React.FC<AssignBatchSuccessModalProps> = ({
               },
             }}
           >
-            Okay
+            {t('USER_REGISTRATION.OKAY')}
           </Button>
         </Box>
       </Box>

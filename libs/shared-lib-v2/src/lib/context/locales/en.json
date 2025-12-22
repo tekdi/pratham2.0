@@ -415,11 +415,40 @@
     },
     "PROGRAMS": {
       "EXPLORE_PROGRAMS": "Explore Programs",
-      "MY_PROGRAMS": "My Programs"
+      "MY_PROGRAMS": "My Programs",
+      "LOADING": "Loading..."
+    },
+    "REGISTRATION_FLOW": {
+      "USERNAME_ALREADY_EXIST": "Username Already Exist",
+      "EMAIL_ALREADY_EXISTS": "Email already exists",
+      "PLEASE_ENTER_VALID_OTP": "Please enter valid otp",
+      "YES_CREATE_ANOTHER_ACCOUNT": "Yes, Create Another Account",
+      "ACCOUNT_ALREADY_EXISTS": "Account Already Exists",
+      "ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT": "Are you sure you want to create another account?",
+      "VERIFY_OTP": "Verify OTP",
+      "VERIFY_YOUR_PHONE_NUMBER": "Verify Your Phone Number",
+      "OKAY": "Okay",
+      "START_EXPLORING": "Start Exploring"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
-
+  "LANDING": {
+    "WELCOME_TO_PRATHAM_LEARNING_PLATFORM": "Welcome to the Pratham Learning Platform!",
+    "YOUR_LEARNING_JOURNEY_BEGINS_HERE": "Your Learning Journey Begins here",
+    "GET_STARTED": "Get Started!",
+    "ALREADY_SIGNED_UP": "Already signed up?",
+    "CLICK_HERE": "Click here",
+    "TO_LOGIN": "to login",
+    "ARE_YOU_PRATHAM_EMPLOYEE": "Are you a Pratham Employee?",
+    "TO_GET_ACCESS_TO_PRAGYANPATH": "to get access to Pragyanpath",
+    "ABOUT_PRATHAM": "About Pratham",
+    "ABOUT_PRATHAM_LEARNING_PLATFORM": "About Pratham Learning Platform",
+    "OUR_PROGRAMS": "Our Programs",
+    "LOADING_PROGRAMS": "Loading programs...",
+    "NO_PROGRAMS_AVAILABLE": "No programs available at the moment.",
+    "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
+    "ABOUT_PRATHAM_TEXT": "Pratham Education Foundation (Pratham) is one of the largest education NGOs in India with a record of innovative, rigorously evaluated programs that have inspired similar programs across three continents. With a history spanning 30 years, Pratham's work today extends from programs for early and elementary years to girls and women, and youth skilling.\n\nThrough programs covering 25 states and Union Territories, in an average year, Pratham usually reaches over 6 million children and youth. This is achieved through a combination of efforts: directly working with children and youth in communities, as well as through collaborations with state and district-level governments. Pratham has received notable awards such as the Lui Che Woo Prize, WISE Prize for Innovation, Skoll Award for Social Entrepreneurship, the Henry R Kravis Prize in Leadership and the CNN-IBN Indian of the Year for Public Service. Pratham also received the 2021 Yidan Prize for Education Development and the Yashraj Bharati Samman in 2025."
+  },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Drawer, Typography, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -19,6 +20,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
   onNotInterested,
   onMayJoinNextYear,
 }) => {
+  const { t } = useTranslation();
   return (
     <Drawer
       anchor="bottom"
@@ -61,7 +63,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
               fontWeight: 400,
             }}
           >
-            {selectedCount} {selectedCount === 1 ? 'learner' : 'learners'}
+            {selectedCount} {selectedCount === 1 ? t('USER_REGISTRATION.LEARNER') : t('USER_REGISTRATION.LEARNERS')}
           </Typography>
         </Box>
 
@@ -105,7 +107,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
               </Box>
             </ListItemIcon>
             <ListItemText
-              primary="Not interested to join"
+              primary={t('USER_REGISTRATION.NOT_INTERESTED_TO_JOIN')}
               primaryTypographyProps={{
                 fontSize: '16px',
                 fontWeight: 400,
@@ -154,7 +156,7 @@ const MoreOptionsBottomSheet: React.FC<MoreOptionsBottomSheetProps> = ({
               </Box>
             </ListItemIcon>
             <ListItemText
-              primary="Interested, may join next year"
+              primary={t('USER_REGISTRATION.INTERESTED_MAY_JOIN_NEXT_YEAR')}
               primaryTypographyProps={{
                 fontSize: '16px',
                 fontWeight: 400,

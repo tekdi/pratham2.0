@@ -14,6 +14,7 @@ import {
   InputLabel,
   useTheme,
 } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import { modalStyles } from '../../styles/modalStyles';
 import {
@@ -53,6 +54,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
   locationFilters,
   selectedLearnerIds,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme<any>();
   const [mode, setMode] = useState('in-person');
   const [center, setCenter] = useState('');
@@ -121,7 +123,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
       });
     } catch (error) {
       showToastMessage(
-        'Something went wrong while assigning the batch.',
+        t('USER_REGISTRATION.SOMETHING_WENT_WRONG_ASSIGNING_BATCH'),
         'error'
       );
       console.error('Error while assigning batch:', error);
@@ -263,7 +265,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
         const allBatchOptions = batchDetails.map((batch: any) => ({
           label:
             capitalizeFirstChar(batch.name || batch.cohortName) ||
-            'Unnamed batch',
+            t('USER_REGISTRATION.UNNAMED_BATCH'),
           value: batch.cohortId,
           parentId: batch.parentId,
         }));
@@ -415,13 +417,13 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 mb: 0.5,
               }}
             >
-              {selectedLearners.length} Learners Selected
+              {t('USER_REGISTRATION.LEARNERS_SELECTED', { count: selectedLearners.length })}
             </Typography>
             <Typography
               variant="body2"
               sx={{ fontSize: '14px', color: '#7C766F' }}
             >
-              Assign Batch
+              {t('USER_REGISTRATION.ASSIGN_BATCH')}
             </Typography>
           </Box>
           <IconButton onClick={onClose} sx={{ p: 0.5 }}>
@@ -442,7 +444,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 mb: 1,
               }}
             >
-              Learners
+              {t('USER_REGISTRATION.LEARNERS_LABEL')}
             </Typography>
             <Typography
               variant="body1"
@@ -494,7 +496,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 position: 'static',
               }}
             >
-              Center
+              {t('USER_REGISTRATION.CENTER')}
             </InputLabel>
             <Select
               fullWidth
@@ -520,15 +522,15 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
             >
               {loadingCenters ? (
                 <MenuItem value="" disabled>
-                  Loading centers...
+                  {t('USER_REGISTRATION.LOADING_CENTERS')}
                 </MenuItem>
               ) : !hasLocationSelection ? (
                 <MenuItem value="" disabled>
-                  Set location filters first
+                  {t('USER_REGISTRATION.SET_LOCATION_FILTERS_FIRST')}
                 </MenuItem>
               ) : centers.length === 0 ? (
                 <MenuItem value="" disabled>
-                  No centers available
+                  {t('USER_REGISTRATION.NO_CENTERS_AVAILABLE')}
                 </MenuItem>
               ) : (
                 centers.map((centerOption) => (
@@ -551,7 +553,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 position: 'static',
               }}
             >
-              Batch
+              {t('USER_REGISTRATION.BATCH')}
             </InputLabel>
             <Select
               fullWidth
@@ -584,15 +586,15 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
             >
               {loadingBatches ? (
                 <MenuItem value="" disabled>
-                  Loading batches...
+                  {t('USER_REGISTRATION.LOADING_BATCHES')}
                 </MenuItem>
               ) : !center ? (
                 <MenuItem value="" disabled>
-                  Select center first
+                  {t('USER_REGISTRATION.SELECT_CENTER_FIRST')}
                 </MenuItem>
               ) : batches.length === 0 ? (
                 <MenuItem value="" disabled>
-                  No batches available
+                  {t('USER_REGISTRATION.NO_BATCHES_AVAILABLE')}
                 </MenuItem>
               ) : (
                 batches.map((batchOption) => (
@@ -635,7 +637,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
               },
             }}
           >
-            Assign Batch ({selectedLearners.length} learners)
+            {t('USER_REGISTRATION.ASSIGN_BATCH_LEARNERS', { count: selectedLearners.length })}
           </Button>
         </Box>
       </Box>
