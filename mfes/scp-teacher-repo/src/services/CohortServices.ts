@@ -208,9 +208,29 @@ const getChildDataByParentId = (data: any, parentId: string) => {
 };
 
 export const getCohortData = async (
-  userId: string | string[]
+  userId: string | string[],
+  options?: { customField?: boolean; children?: boolean }
 ): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+  let apiUrl: string = API_ENDPOINTS.myCohorts(userId);
+
+  // Build query parameters if options are provided
+  if (options) {
+    const queryParams: { [key: string]: string } = {};
+
+    if (options.customField !== undefined) {
+      queryParams.customField = String(options.customField);
+    }
+
+    if (options.children !== undefined) {
+      queryParams.children = String(options.children);
+    }
+
+    const filterParams = new URLSearchParams(queryParams).toString();
+    if (filterParams) {
+      apiUrl += `?${filterParams}`;
+    }
+  }
+
   try {
     const response = await get(apiUrl);
     return response?.data;

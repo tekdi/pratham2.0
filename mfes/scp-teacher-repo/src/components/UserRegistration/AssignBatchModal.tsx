@@ -78,6 +78,11 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     typeof window !== 'undefined' &&
     localStorage.getItem('role') === Role.TEACHER;
 
+  // Check if user is a Lead
+  const isLead =
+    typeof window !== 'undefined' &&
+    localStorage.getItem('role') === Role.TEAM_LEADER;
+
   const handleAssign = async () => {
     if (!center || !batch || selectedLearnerIds.length === 0) {
       return;
@@ -145,10 +150,10 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
 
   const hasLocationSelection = true;
   //bug fix for location atatch to center dropdown
-    // Boolean(locationFilters.states?.length) &&
-    // Boolean(locationFilters.districts?.length) &&
-    // Boolean(locationFilters.blocks?.length) &&
-    // Boolean(locationFilters.villages?.length);
+  // Boolean(locationFilters.states?.length) &&
+  // Boolean(locationFilters.districts?.length) &&
+  // Boolean(locationFilters.blocks?.length) &&
+  // Boolean(locationFilters.villages?.length);
 
   // const buildCenterFilters = async() => {
   //   const filters: Record<string, string[] | string> = {
@@ -228,110 +233,184 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
     const fetchCenters = async () => {
       setLoadingCenters(true);
       try {
-        // First, fetch all batches to get parentIds using getCohortData
-        const batchResponseData = await getCohortData(
-          localStorage.getItem('userId') || ''
-        );
-        const cohortData = batchResponseData?.result ?? [];
+        if (isLead) {
+          // For Lead role: Use getCohortData with children=true and customField=true
+          const cohortResponseData = await getCohortData(
+            localStorage.getItem('userId') || '',
+            { customField: true, children: true }
+          );
+          const cohortData = cohortResponseData?.result ?? [];
 
-        // Helper function to recursively extract all batches
-        const extractBatches = (cohorts: any[]): any[] => {
-          let batches: any[] = [];
-          cohorts.forEach((cohort: any) => {
-            // Batches are items in childData that have a parentId, or items with type BATCH
-            if (
-              cohort?.parentId ||
-              cohort?.type === 'BATCH' ||
-              cohort?.cohortType === 'BATCH'
-            ) {
-              // Only include active batches
-              if (
-                cohort?.status === 'active' ||
-                cohort?.cohortStatus === 'active'
-              ) {
-                batches.push(cohort);
-              }
-            }
-            // Recursively search in childData
-            if (cohort?.childData && Array.isArray(cohort.childData)) {
-              batches = batches.concat(extractBatches(cohort.childData));
+          // Extract centers (cohorts with type COHORT or no parentId)
+          const centerDetails = cohortData.filter(
+            (cohort: any) =>
+              cohort?.type === 'COHORT' &&
+              (cohort?.cohortStatus === 'active' ||
+                cohort?.status === 'active') &&
+              !cohort?.parentId
+          );
+
+          // Map centers
+          const centerOptions = centerDetails.map((cohort: any) => {
+            const cf = cohort.customField || cohort.customFields;
+            return {
+              label: `${capitalizeFirstChar(
+                cohort.cohortName || cohort.name
+              )} (${capitalizeFirstChar(getField(cf, 'TYPE_OF_CENTER'))})`,
+              value: cohort.cohortId,
+            };
+          });
+
+          setCenters(centerOptions);
+
+          // Extract all batches from childData of all centers
+          const allBatchDetails: any[] = [];
+          centerDetails.forEach((center: any) => {
+            if (center?.childData && Array.isArray(center.childData)) {
+              center.childData.forEach((batch: any) => {
+                // Only include active batches
+                if (
+                  batch?.type === 'BATCH' &&
+                  (batch?.status === 'active' ||
+                    batch?.cohortStatus === 'active')
+                ) {
+                  allBatchDetails.push({
+                    ...batch,
+                    parentId: center.cohortId,
+                  });
+                }
+              });
             }
           });
-          return batches;
-        };
 
-        const batchDetails = extractBatches(cohortData);
-        // Store all batches for later filtering by center
-        const allBatchOptions = batchDetails.map((batch: any) => ({
-          label:
-            capitalizeFirstChar(batch.name || batch.cohortName) ||
-            t('USER_REGISTRATION.UNNAMED_BATCH'),
-          value: batch.cohortId,
-          parentId: batch.parentId,
-        }));
-        setAllBatches(allBatchOptions);
+          // Store all batches for later filtering by center
+          const allBatchOptions = allBatchDetails.map((batch: any) => ({
+            label:
+              capitalizeFirstChar(batch.name || batch.cohortName) ||
+              t('USER_REGISTRATION.UNNAMED_BATCH'),
+            value: batch.cohortId,
+            parentId: batch.parentId,
+          }));
 
-        // Extract all unique parentIds from batches
-        const parentIds = Array.from(
-          new Set(
-            batchDetails
-              .map((batch: any) => batch.parentId)
-              .filter(
-                (id: any) =>
-                  id &&
-                  id !== 'Select' &&
-                  typeof id === 'string' &&
-                  id.trim() !== ''
-              )
-          )
-        );
+          setAllBatches(allBatchOptions);
 
-        if (parentIds.length === 0) {
-          setCenters([]);
-          setCenter('');
-          setBatches([]);
-          setAllBatches([]);
-          setBatch('');
-          return;
-        }
+          // Set the first center as selected if available
+          const centerStillValid = centerOptions.some(
+            (option: any) => option.value === center
+          );
+          if (!centerStillValid) {
+            const nextCenter = centerOptions[0]?.value ?? '';
+            setCenter(nextCenter);
+            setBatch('');
+            setBatches([]);
+          }
+        } else {
+          // For Instructor role: Keep existing logic
+          // First, fetch all batches to get parentIds using getCohortData
+          const batchResponseData = await getCohortData(
+            localStorage.getItem('userId') || ''
+          );
+          const cohortData = batchResponseData?.result ?? [];
 
-        // Fetch centers using parentIds as cohortId filter
-        const centerResponse = await getCohortListService({
-          limit: 200,
-          offset: 0,
-          sort: ['name', 'asc'],
-          filters: {
-            cohortId: parentIds,
-            type: 'COHORT',
-            status: ['active'],
-          },
-        });
-
-        const centerDetails = centerResponse?.results?.cohortDetails ?? [];
-        const centerOptions = centerDetails.map((cohort: any) => {
-          const cf = cohort.customField;
-
-          return {
-            label: isTeacher
-              ? `${capitalizeFirstChar(cohort.name)}`
-              : `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(
-                  getField(cf, 'TYPE_OF_CENTER')
-                )})`,
-            value: cohort.cohortId,
+          // Helper function to recursively extract all batches
+          const extractBatches = (cohorts: any[]): any[] => {
+            let batches: any[] = [];
+            cohorts.forEach((cohort: any) => {
+              // Batches are items in childData that have a parentId, or items with type BATCH
+              if (
+                cohort?.parentId ||
+                cohort?.type === 'BATCH' ||
+                cohort?.cohortType === 'BATCH'
+              ) {
+                // Only include active batches
+                if (
+                  cohort?.status === 'active' ||
+                  cohort?.cohortStatus === 'active'
+                ) {
+                  batches.push(cohort);
+                }
+              }
+              // Recursively search in childData
+              if (cohort?.childData && Array.isArray(cohort.childData)) {
+                batches = batches.concat(extractBatches(cohort.childData));
+              }
+            });
+            return batches;
           };
-        });
 
-        setCenters(centerOptions);
+          const batchDetails = extractBatches(cohortData);
+          // Store all batches for later filtering by center
+          const allBatchOptions = batchDetails.map((batch: any) => ({
+            label:
+              capitalizeFirstChar(batch.name || batch.cohortName) ||
+              t('USER_REGISTRATION.UNNAMED_BATCH'),
+            value: batch.cohortId,
+            parentId: batch.parentId,
+          }));
+          setAllBatches(allBatchOptions);
 
-        // Set the first center as selected if available
-        const centerStillValid = centerOptions.some(
-          (option: any) => option.value === center
-        );
-        if (!centerStillValid) {
-          const nextCenter = centerOptions[0]?.value ?? '';
-          setCenter(nextCenter);
-          setBatch('');
-          setBatches([]);
+          // Extract all unique parentIds from batches
+          const parentIds = Array.from(
+            new Set(
+              batchDetails
+                .map((batch: any) => batch.parentId)
+                .filter(
+                  (id: any) =>
+                    id &&
+                    id !== 'Select' &&
+                    typeof id === 'string' &&
+                    id.trim() !== ''
+                )
+            )
+          );
+
+          if (parentIds.length === 0) {
+            setCenters([]);
+            setCenter('');
+            setBatches([]);
+            setAllBatches([]);
+            setBatch('');
+            return;
+          }
+
+          // Fetch centers using parentIds as cohortId filter
+          const centerResponse = await getCohortListService({
+            limit: 200,
+            offset: 0,
+            sort: ['name', 'asc'],
+            filters: {
+              cohortId: parentIds,
+              type: 'COHORT',
+              status: ['active'],
+            },
+          });
+
+          const centerDetails = centerResponse?.results?.cohortDetails ?? [];
+          const centerOptions = centerDetails.map((cohort: any) => {
+            const cf = cohort.customField;
+
+            return {
+              label: isTeacher
+                ? `${capitalizeFirstChar(cohort.name)}`
+                : `${capitalizeFirstChar(cohort.name)} (${capitalizeFirstChar(
+                    getField(cf, 'TYPE_OF_CENTER')
+                  )})`,
+              value: cohort.cohortId,
+            };
+          });
+
+          setCenters(centerOptions);
+
+          // Set the first center as selected if available
+          const centerStillValid = centerOptions.some(
+            (option: any) => option.value === center
+          );
+          if (!centerStillValid) {
+            const nextCenter = centerOptions[0]?.value ?? '';
+            setCenter(nextCenter);
+            setBatch('');
+            setBatches([]);
+          }
         }
       } catch (error) {
         console.error('Error fetching centers:', error);
@@ -347,7 +426,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
 
     fetchCenters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, locationKey, isTeacher]);
+  }, [open, locationKey, isTeacher, isLead]);
 
   useEffect(() => {
     if (!center) {
@@ -417,7 +496,9 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
                 mb: 0.5,
               }}
             >
-              {t('USER_REGISTRATION.LEARNERS_SELECTED', { count: selectedLearners.length })}
+              {t('USER_REGISTRATION.LEARNERS_SELECTED', {
+                count: selectedLearners.length,
+              })}
             </Typography>
             <Typography
               variant="body2"
@@ -637,7 +718,9 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
               },
             }}
           >
-            {t('USER_REGISTRATION.ASSIGN_BATCH_LEARNERS', { count: selectedLearners.length })}
+            {t('USER_REGISTRATION.ASSIGN_BATCH_LEARNERS', {
+              count: selectedLearners.length,
+            })}
           </Button>
         </Box>
       </Box>
