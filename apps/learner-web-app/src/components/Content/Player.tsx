@@ -92,12 +92,13 @@ const App = ({
           return;
         }
       }
-      }
       if(localStorage.getItem('channelId')!==rt.channel)
-      {
-        router.push('/unauthorized');
-        return;
+        {
+          router.push('/unauthorized');
+          return;
+        }
       }
+     
 
       const response2 = await ContentSearch({
         filters: {

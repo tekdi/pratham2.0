@@ -71,12 +71,14 @@ if(!isThematicPath && !isPosPath && result?.program) {
           router.push('/unauthorized');
           return;
         }
-      }}
-       if(localStorage.getItem('channelId')!==result.channel)
-       {
-        router.push('/unauthorized');
-        return;
-       }
+      } if(localStorage.getItem('channelId')!==result.channel)
+        {
+         router.push('/unauthorized');
+         return;
+        }
+    
+    }
+      
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {
