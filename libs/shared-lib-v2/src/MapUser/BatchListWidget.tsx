@@ -247,10 +247,30 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
   }>({});
 
   // Get available states (not yet selected) - single state selection
-  const availableStates =
-    selectedStates.length > 0
-      ? [] // If a state is already selected, return empty array
-      : states; // Otherwise return all states
+  // Filter by localStorage stateName if it exists
+  const getAvailableStates = () => {
+    if (selectedStates.length > 0) {
+      return []; // If a state is already selected, return empty array
+    }
+
+    // Check if stateName exists in localStorage
+    const stateNameFromStorage =
+      typeof window !== 'undefined' ? localStorage.getItem('stateName') : null;
+
+    if (stateNameFromStorage) {
+      // Filter states to only show the state matching localStorage stateName
+      const filteredStates = states.filter(
+        (state) =>
+          state.name.toLowerCase() === stateNameFromStorage.toLowerCase()
+      );
+      return filteredStates;
+    }
+
+    // If no stateName in localStorage, return all states
+    return states;
+  };
+
+  const availableStates = getAvailableStates();
 
   // Fetch states from API
   useEffect(() => {
@@ -290,6 +310,61 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
 
     fetchStates();
   }, []);
+
+  // Auto-select state from localStorage if stateName exists and no state is selected
+  useEffect(() => {
+    const autoSelectStateFromStorage = async () => {
+      // Only auto-select if:
+      // 1. No state is currently selected
+      // 2. States are loaded
+      // 3. Not currently loading
+      // 4. No value prop is provided (to avoid conflicts)
+      if (
+        selectedStates.length > 0 ||
+        states.length === 0 ||
+        loadingStates ||
+        (value && value.length > 0)
+      ) {
+        return;
+      }
+
+      const stateNameFromStorage =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('stateName')
+          : null;
+
+      if (stateNameFromStorage) {
+        // Find the state matching the localStorage stateName
+        const matchingState = states.find(
+          (state) =>
+            state.name.toLowerCase() === stateNameFromStorage.toLowerCase()
+        );
+
+        if (matchingState) {
+          // Auto-select the state
+          const newState: SelectedState = {
+            stateId: matchingState.id,
+            stateName: matchingState.name,
+            districts: [],
+          };
+          setSelectedStates([newState]);
+          setStateSelectValue('');
+
+          // Fetch districts for the auto-selected state
+          await fetchDistrictsForState(matchingState.id);
+
+          // Trigger onChange callback if provided
+          if (onChange) {
+            onChange([newState]);
+          }
+        }
+      }
+    };
+
+    if (states.length > 0 && !loadingStates) {
+      autoSelectStateFromStorage();
+    }
+  }, [states, loadingStates]);
 
   // Handle initial data - fetch districts, blocks, centers, and batches for pre-selected data
   useEffect(() => {
