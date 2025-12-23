@@ -31,6 +31,8 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
   const isMd = useMediaQuery(theme.breakpoints.only('md'));
   const isLg = useMediaQuery(theme.breakpoints.only('lg'));
   const isXl = useMediaQuery(theme.breakpoints.up('xl'));
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isThematicPath = currentPath.includes('/themantic');
 
   // Calculate items per row based on breakpoints and _grid overrides
   const getItemsPerRow = () => {
@@ -175,8 +177,11 @@ console.log("props.contentData",props.contentData)
             lg={3}
             xl={2.4}
             {..._grid}
-            sx={{ display: 'flex', ...(_grid?.sx ?? {}) }}
-          >
+            sx={{
+              ...(isThematicPath ? { display: 'flex' } : {}),
+              ...(_grid?.sx ?? {}),
+            }}     
+                 >
             <ContentCard
               item={item}
               type={props.type}

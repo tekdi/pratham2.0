@@ -53,6 +53,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [currentProgram, setCurrentProgram] = useState<TenantData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAllProgramRegistred, setIsAllProgramRegistred] = useState<string | null>(null);
+  const [userProgram, setUserProgram] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -61,6 +62,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         const userId = localStorage.getItem('userId');
         const currentTenantId = localStorage.getItem('tenantId');
         const currentProgramName = localStorage.getItem('userProgram');
+        setUserProgram(currentProgramName);
 
         if (!userId) {
           setLoading(false);
@@ -403,7 +405,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           >
             Home
           </Button>
-          {isAllProgramRegistred !== 'yes' && (
+          {(isAllProgramRegistred === 'no' ||
+            (userProgram !== null && userProgram !== 'Pragyanpath')) && (
           <Button
             variant="outlined"
             fullWidth
