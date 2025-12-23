@@ -315,7 +315,7 @@ const DynamicForm = ({
             });
 
             // remove from required mobile
-            requiredArray = requiredArray.filter(
+            requiredArray = requiredArray?.filter(
               (key) => !requiredKeys2.includes(key)
             );
 
@@ -388,7 +388,7 @@ const DynamicForm = ({
             delete formData?.guardian_name;
 
             // remove from required
-            requiredArray = requiredArray.filter(
+            requiredArray = requiredArray?.filter(
               (key) => !requiredKeys.includes(key)
             );
 
@@ -466,10 +466,10 @@ const DynamicForm = ({
         let requiredArray = oldFormSchema?.required;
 
         // remove from required
-        requiredArray = requiredArray.filter(
+        requiredArray = requiredArray?.filter(
           (key) => !requiredKeys.includes(key)
         );
-        requiredArray = requiredArray.filter(
+        requiredArray = requiredArray?.filter(
           (key) => !requiredKeys2.includes(key)
         );
 

@@ -77,8 +77,10 @@ export default function Details(props: DetailsProps) {
           mode: 'edit',
         }) as any;
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-        const isThematicPath = currentPath.includes('/themantic');
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
         const isPosPath = currentPath.includes('/pos');
+        const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
+
         if(!isThematicPath && !isPosPath && resultHierarchyCourse?.program) {
         console.log('rt=======>', resultHierarchyCourse);
         if(localStorage.getItem('channelId')==="pos-channel"){

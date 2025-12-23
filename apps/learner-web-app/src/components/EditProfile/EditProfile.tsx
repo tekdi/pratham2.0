@@ -119,6 +119,18 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             },
           },
         ]);
+        delete responseFormForEnroll?.schema?.properties?.password;
+        delete responseFormForEnroll?.schema?.properties.confirm_password;
+        delete responseFormForEnroll?.schema?.properties?.username;
+        delete responseFormForEnroll?.schema?.properties?.program;
+        delete responseFormForEnroll?.schema?.properties?.batch;
+        delete responseFormForEnroll?.schema?.properties?.center;
+        delete responseFormForEnroll?.schema?.properties?.state;
+        delete responseFormForEnroll?.schema?.properties?.district;
+        delete responseFormForEnroll?.schema?.properties?.block;
+        delete responseFormForEnroll?.schema?.properties?.village;
+        responseFormForEnroll?.schema?.required?.pop('batch');
+
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
         setResponseFormData(responseFormCopy);
         console.log('responseForm===>', responseFormCopy?.schema);
@@ -159,10 +171,10 @@ const [responseFormData, setResponseFormData] = useState<any>({});
 
           setUserFormData(mappedData);
           //unit name is missing from required so handled from frotnend
-          let alterSchema = uponEnrollCompletion?updatedSchemaForEnroll:completeProfile
+          let alterSchema = enrolledProgram?responseFormForEnroll?.schema:completeProfile
             ? updatedSchema
             : responseForm?.schema;
-          let alterUISchema = responseForm?.uiSchema;
+          let alterUISchema =enrolledProgram? responseFormForEnroll?.uiSchema: responseForm?.uiSchema;
           
           // Set mobile field states
           setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
