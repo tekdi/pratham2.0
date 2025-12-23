@@ -58,8 +58,9 @@ const ContentDetails = (props: ContentDetailsProps) => {
 
 console.log('result=======>', result?.program);
 const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 console.log('currentPath=======>', currentPath);
-const isThematicPath = currentPath.includes('/themantic');
+const isThematicPath = currentPath.includes('/themantic') || hostname.includes('experimentoindia');
 const isPosPath = currentPath.includes('/pos');
 console.log('isThematicPath=======>', isThematicPath);
 

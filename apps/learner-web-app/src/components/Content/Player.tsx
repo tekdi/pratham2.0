@@ -78,7 +78,8 @@ const App = ({
       console.log('rt=======>', rt);
       const currentPath =
         typeof window !== 'undefined' ? window.location.pathname : '';
-      const isThematicPath = currentPath.includes('/themantic');
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+      const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
       const isPosPath = currentPath.includes('/pos');
 
       if (!isThematicPath && !isPosPath && rt?.program) {
