@@ -39,7 +39,9 @@ function ProgramsContent() {
           const enrolledTenantIds = tenantData
             .filter(
               (item: any) =>
-                item.tenantStatus === 'active' && item.tenantName !== 'Pratham'
+                (item.tenantStatus === 'active' ||
+                  item.tenantStatus === 'pending') &&
+                item.tenantName !== 'Pratham'
             )
             .map((item: any) => item.tenantId);
           if (enrolledTenantIds.length > 0) {
