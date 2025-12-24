@@ -13,14 +13,14 @@ import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import Loader from '@learner/components/Loader/Loader';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
-import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import Image from 'next/image';
 import playstoreIcon from '../../../public/images/playstore.png';
 import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { logEvent } from '@learner/utils/googleAnalytics';
-import { TenantName } from '../../utils/app.constant';
+import { FilterKey, TenantName } from '../../utils/app.constant';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -197,7 +197,12 @@ const LoginPage = () => {
           tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
         );
       });
-
+      const tenantDataDetails = userResponse?.tenantData?.filter((tenant: any) => {
+        return (
+          (tenant?.tenantStatus === 'active' || tenant?.tenantStatus === 'pending') &&
+          tenant?.roles?.some((role: any) => role?.roleName === 'Learner') && tenant?.tenantName !== "Pratham"
+        );
+      });
       // Extract role information from the matching tenant
       const learnerRole = tenantData?.roles?.find(
         (role: any) => role?.roleName === 'Learner'
@@ -212,7 +217,55 @@ const LoginPage = () => {
       setTenantName(selectedTenantName || '');
       setRoleId(selectedRoleId);
       setRoleName(selectedRoleName);
+      if(tenantDataDetails[0]?.tenantName === "Pragyanpath" && tenantDataDetails.length === 1){
+      setTimeout(async () => {
+        const res = await getUserDetails(userResponse?.userId, true);
+        console.log('response=========>', res?.result);
+        localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(["NA"]));
+        localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(["NA"]));
+        localStorage.setItem(FilterKey.PSU, JSON.stringify(["NA"]));
+        
+        // Store custom fields in localStorage
+        if (res?.result?.userData?.customFields) {
+          res.result.userData.customFields.forEach((field: any) => {
+            const { label, selectedValues } = field;
+            // localStorage.setItem(
+            //   FilterKey[label as keyof typeof FilterKey],
+            //   JSON.stringify(selectedValues)
+            // );
+            if(label === 'EMP_GROUP') {
+              localStorage.setItem(FilterKey.GROUP_MEMBERSHIP, JSON.stringify(selectedValues));
+            }
+            
+            if(label === 'JOB_FAMILY') {
+              localStorage.setItem(FilterKey.JOB_FAMILY, JSON.stringify(selectedValues));
+            }
+           
+            if(label === 'PSU') {
+              localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
+            }
+           
+  
+           
+          });
+        }
+        const uiConfig = userResponse?.tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.params?.uiConfig;
+        console.log('uiConfig', uiConfig);
+        const landingPage =
+          userResponse?.tenantData?.find(
+            (tenant: any) => tenant.tenantName === "Pragyanpath"
+           )?.params?.uiConfig?.landingPage;
+        localStorage.setItem('landingPage', landingPage);
 
+        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+
+      //  setUserResponse(userResponse);
+
+        //setSwitchDialogOpen(true);
+      }, 1000);
+    }
       if (tenantData && selectedRoleName === 'Learner') {
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem('roleId', selectedRoleId);
@@ -265,8 +318,15 @@ const LoginPage = () => {
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
         } else {
-          router.push('/programs');
+        console.log('tenantData', tenantDataDetails);
+        if(tenantDataDetails.length ===1) {
+         router.push(`${landingPage}`)
+         // router.push(`/programs?tenantId=${tenantDataDetails[0]?.tenantId}`);
         }
+        else{
+        router.push('/programs');
+        }
+      }
       } else {
         showToastMessage('Username or password not correct', 'error');
         const telemetryInteract = {

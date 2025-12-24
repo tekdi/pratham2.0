@@ -116,11 +116,11 @@ const EnrollProgramCarousel = ({
           // For My Programs tab, show only enrolled programs
           const data = await getUserDetails(userId, true);
           console.log('data=====>', data?.result?.userData?.tenantData);
-          const tenantData = data?.result?.userData?.tenantData;
+          const tenantData = data?.result?.userData?.tenantData?.filter((item: any) => item?.roles?.some((role: any) => role?.roleName === 'Learner'));
           const filterIds = tenantData.map((item: any) => item.tenantId);
           const filteredPrograms = programsData?.filter((program: any) =>
             filterIds.includes(program.tenantId)
-          );
+          )
           setPrograms(filteredPrograms || []);
         } else {
           console.log('visiblePrograms=====>', visiblePrograms);

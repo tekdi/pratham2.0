@@ -41,7 +41,7 @@ function ProgramsContent() {
               (item: any) =>
                 (item.tenantStatus === 'active' ||
                   item.tenantStatus === 'pending') &&
-                item.tenantName !== 'Pratham'
+                item.tenantName !== 'Pratham' && item?.roles?.some((role: any) => role?.roleName === 'Learner')
             )
             .map((item: any) => item.tenantId);
           if (enrolledTenantIds.length > 0) {
