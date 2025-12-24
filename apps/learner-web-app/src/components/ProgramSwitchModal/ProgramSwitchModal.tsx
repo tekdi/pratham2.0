@@ -94,7 +94,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
 
         // Get other enrolled programs (excluding current)
         const otherPrograms = tenantData.filter(
-          (tenant: TenantData) => tenant.tenantId !== currentTenantId
+          (tenant: TenantData) => (tenant.tenantId !== currentTenantId &&tenant?.roles?.some((role: any) => role?.roleName === 'Learner'))
         );
 
         setEnrolledPrograms(otherPrograms);
@@ -318,7 +318,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
 
       <Box sx={{ p: 2 }}>
         {/* Other Programs */}
-        {enrolledPrograms.length > 0 && (
+        {(enrolledPrograms.length > 0 &&  (userProgram !== null && userProgram !== 'Pragyanpath')) && (
           <>
             <Typography
               variant="body1"

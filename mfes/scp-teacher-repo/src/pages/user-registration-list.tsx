@@ -34,7 +34,7 @@ const UserRegistrationList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
   const [chartTrigger, setChartTrigger] = useState(false);
-  const limit = 5;
+  const limit = 50;
 
   const hasLocationFilters =
     Boolean(locationFilters.states?.length) &&
