@@ -30,7 +30,13 @@ import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { TenantName } from '@learner/utils/app.constant';
 import { logEvent } from '@learner/utils/googleAnalytics';
-
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
 interface Program {
   ordering: number;
   name: string;
@@ -242,7 +248,8 @@ const EnrollProgramCarousel = ({
       router.push('/login');
       return;
     }
-
+   
+      {
     try {
       setLoadingProgram({ id: program.tenantId, action: 'accessing' });
       const storedUserId = localStorage.getItem('userId');
@@ -276,9 +283,25 @@ const EnrollProgramCarousel = ({
         console.error('User does not have Learner role for this program');
         return;
       }
-
+ if(localStorage.getItem('isAndroidApp') === 'true')
+      {
+       // Send message to React Native WebView
+       if (window.ReactNativeWebView) {
+         window.ReactNativeWebView.postMessage(JSON.stringify({
+           type: 'ACCESS_PROGRAM_EVENT', // Event type identifier
+           data: {
+             userId: userId,
+             tenantId: program.tenantId,
+             token: localStorage.getItem('token'),
+             refreshToken: localStorage.getItem('refreshToken'),
+           
+             // Add any data you want to send
+           }
+         }));
+       }
+      }
       // Set localStorage values similar to callBackSwitchDialog
-      localStorage.setItem('userId', storedUserId);
+    else{  localStorage.setItem('userId', storedUserId);
       localStorage.setItem('templtateId', tenantData?.templateId);
       localStorage.setItem(
         'userIdName',
@@ -332,12 +355,13 @@ const EnrollProgramCarousel = ({
         router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
       }
       router.push(landingPage || '/home');
+    }
     } catch (error) {
       console.error('Failed to access program:', error);
       // You can add error handling/toast notification here
     } finally {
       setLoadingProgram(null);
-    }
+    }}
   };
 
   const handleEnroll = async (program: Program) => {
