@@ -78,23 +78,7 @@ const EnrollProfileCompletionInner = () => {
         router.push('/programs');
         return;
       }
-      if(localStorage.getItem('isAndroidApp') === 'true')
-        {
-         // Send message to React Native WebView
-         if (window.ReactNativeWebView) {
-           window.ReactNativeWebView.postMessage(JSON.stringify({
-             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
-             data: {
-               userId: storedUserId,
-               tenantId: program.tenantId,
-               token: localStorage.getItem('token'),
-               refreshToken: localStorage.getItem('refreshToken'),
-             
-               // Add any data you want to send
-             }
-           }));
-         }
-        }
+     
         else{
       // Set localStorage values similar to callBackSwitchDialog
       localStorage.setItem('userId', storedUserId);
@@ -162,8 +146,34 @@ const EnrollProfileCompletionInner = () => {
 
   const onSigin = () => {
     setSignupSuccessModal(false);
+     if(localStorage.getItem('isAndroidApp') === 'true')
+        {
+         // Send message to React Native WebView
+
+               const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+               
+                     const program = JSON.parse(enrolledProgramData || '{}');
+
+
+         if (window.ReactNativeWebView) {
+           window.ReactNativeWebView.postMessage(JSON.stringify({
+             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+             data: {
+               userId: localStorage.getItem('userId'),
+               tenantId: program.tenantId,
+               token: localStorage.getItem('token'),
+               refreshToken: localStorage.getItem('refreshToken'),
+             
+               // Add any data you want to send
+             }
+           }));
+         }
+        }
+        else{
+              router.push(landingPage || '/home');
+
+    }
     // Navigate to landing page
-    router.push(landingPage || '/home');
   };
 
   return (
