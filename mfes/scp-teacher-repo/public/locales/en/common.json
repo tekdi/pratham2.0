@@ -1091,6 +1091,8 @@
     "MOVED_TO_BATCH": "and moved to the batch",
     "OKAY": "Okay",
     "NOT_INTERESTED_TO_JOIN": "Not interested to join",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "Interested, may join next year"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "Interested, may join next year",
+    "SELECT_ALL": "Select All",
+    "DESELECT_ALL": "Deselect All"
   }
 }
