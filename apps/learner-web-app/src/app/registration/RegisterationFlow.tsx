@@ -502,6 +502,8 @@ const RegisterationFlow = () => {
           if (typeof window !== 'undefined' && window.localStorage) {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
+                        localStorage.setItem('refreshTokenForAndroid', refreshToken);
+
             localStorage.setItem('token', token);
 
             const userResponseData = await getUserId();

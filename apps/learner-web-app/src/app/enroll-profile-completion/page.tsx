@@ -146,13 +146,14 @@ const EnrollProfileCompletionInner = () => {
 
   const onSigin = () => {
     setSignupSuccessModal(false);
-     if(localStorage.getItem('isAndroidApp') === 'true')
+    console.log('enroll user to tenant', localStorage.getItem('tenantId'));
+     if(localStorage.getItem('isAndroidApp') == 'yes')
         {
          // Send message to React Native WebView
 
-               const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
                
-                     const program = JSON.parse(enrolledProgramData || '{}');
+              //        const program = JSON.parse(enrolledProgramData || '{}');
 
 
          if (window.ReactNativeWebView) {
@@ -160,9 +161,9 @@ const EnrollProfileCompletionInner = () => {
              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
              data: {
                userId: localStorage.getItem('userId'),
-               tenantId: program.tenantId,
+               tenantId: localStorage.getItem('tenantId'),
                token: localStorage.getItem('token'),
-               refreshToken: localStorage.getItem('refreshToken'),
+               refreshToken: localStorage.getItem('refreshTokenForAndroid'),
              
                // Add any data you want to send
              }
