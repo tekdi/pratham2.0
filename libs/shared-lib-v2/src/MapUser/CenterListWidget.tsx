@@ -31,10 +31,10 @@ interface CenterListWidgetProps {
   multiple?: boolean; // Allow multiple center selection
   initialState?: string; // Initial state ID
   initialDistrict?: string; // Initial district ID
-  initialBlock?: string; // Initial block ID
+  initialBlock?: string | string[]; // Initial block ID(s) - can be string or array
   onStateChange?: (stateId: string | null) => void; // Callback when state is selected/changed
   onDistrictChange?: (districtId: string | null) => void; // Callback when district is selected/changed
-  onBlockChange?: (blockId: string | null) => void; // Callback when block is selected/changed
+  onBlockChange?: (blockId: string | string[] | null) => void; // Callback when block is selected/changed
 }
 
 const CenterListWidget: React.FC<CenterListWidgetProps> = ({
@@ -68,16 +68,29 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
   const [selectedDistrict, setSelectedDistrict] = useState(
     initialDistrict || ''
   );
-  const [selectedBlock, setSelectedBlock] = useState(initialBlock || '');
+  const [selectedBlock, setSelectedBlock] = useState(() => {
+    if (!initialBlock) return [];
+    return Array.isArray(initialBlock) ? initialBlock : [initialBlock];
+  });
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedCenter, setSelectedCenter] = useState(null);
+  const [blockSearchKeyword, setBlockSearchKeyword] = useState('');
+  const [selectedCenter, setSelectedCenter] = useState(() => {
+    if (!value) return [];
+    const centerIds = Array.isArray(value) ? value : [value];
+    return centerIds.map((id) => ({
+      value: id,
+      label: `Center ${id}`, // Will be updated when details are fetched
+    }));
+  });
   const [autocompleteInputValue, setAutocompleteInputValue] = useState('');
+  const [blockAutocompleteInputValue, setBlockAutocompleteInputValue] =
+    useState('');
 
   // Ref to track if we're selecting a center to prevent unnecessary API calls
   const isSelectingCenterRef = useRef(false);
   // Refs to store district and block IDs from prefilled center details
   const pendingDistrictIdRef = useRef(null);
-  const pendingBlockIdRef = useRef(null);
+  const pendingBlockIdRef = useRef<string[] | null>(null);
   // Ref to track if we've already fetched center details for the current value
   const fetchedCenterDetailsRef = useRef(null);
   // Ref to track when filters are changing to prevent sync effect from restoring center
@@ -86,7 +99,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
   const activeFiltersWhenSelectedRef = useRef({
     state: null,
     district: null,
-    block: null,
+    block: null as string[] | null,
   });
 
   // Get user role and state from localStorage
@@ -250,9 +263,8 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
       // Check if we need to fetch the center name
       const needsNameFetch =
         !selectedCenter ||
-        (Array.isArray(selectedCenter)
-          ? selectedCenter.some((c) => c.label?.startsWith('Center '))
-          : selectedCenter.label?.startsWith('Center '));
+        selectedCenter.length === 0 ||
+        selectedCenter.some((c) => c.label?.startsWith('Center '));
 
       // Skip if we've already fetched details for this center ID and don't need name
       if (
@@ -337,62 +349,62 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
           // Only restore block if it was in active filters when center was selected
           if (blockField?.selectedValues?.[0]?.id) {
             const blockId = blockField.selectedValues[0].id.toString();
-            if (activeFilters.block && activeFilters.block === blockId) {
+            if (
+              activeFilters.block &&
+              Array.isArray(activeFilters.block) &&
+              activeFilters.block.some((id) => String(id) === blockId)
+            ) {
               // Block was active when center was selected, restore it
-              pendingBlockIdRef.current = blockId;
+              pendingBlockIdRef.current = [blockId];
             } else {
               // Block was not active, clear it
               pendingBlockIdRef.current = null;
               // Also clear selectedBlock if it's set but wasn't in active filters
               if (
-                selectedBlock &&
-                (!hasActiveFilters || activeFilters.block !== blockId)
+                selectedBlock.length > 0 &&
+                (!hasActiveFilters ||
+                  !activeFilters.block ||
+                  !Array.isArray(activeFilters.block) ||
+                  !activeFilters.block.some((id) => String(id) === blockId))
               ) {
-                setSelectedBlock('');
+                setSelectedBlock([]);
               }
             }
           } else {
             pendingBlockIdRef.current = null;
             // Clear block if no active filters stored (navigation back scenario)
-            if (!hasActiveFilters && selectedBlock) {
-              setSelectedBlock('');
+            if (!hasActiveFilters && selectedBlock.length > 0) {
+              setSelectedBlock([]);
             }
           }
 
           // Set center name in selectedCenter (always update if name is available)
           if (centerDetails.name) {
-            if (multiple) {
-              const currentCenters = Array.isArray(selectedCenter)
-                ? selectedCenter
-                : [];
-              const centerIdStr = centerId.toString();
-              const existingIndex = currentCenters.findIndex(
-                (c) => String(c.value) === centerIdStr
-              );
+            const currentCenters = Array.isArray(selectedCenter)
+              ? selectedCenter
+              : [];
+            const centerIdStr = centerId.toString();
+            const existingIndex = currentCenters.findIndex(
+              (c) => String(c.value) === centerIdStr
+            );
 
-              if (existingIndex >= 0) {
-                // Update existing center
-                const updatedCenters = [...currentCenters];
-                updatedCenters[existingIndex] = {
-                  value: centerId,
-                  label: centerDetails.name,
-                };
-                setSelectedCenter(updatedCenters);
-              } else {
-                // Add new center
-                setSelectedCenter([
-                  {
-                    value: centerId,
-                    label: centerDetails.name,
-                  },
-                  ...currentCenters,
-                ]);
-              }
-            } else {
-              setSelectedCenter({
+            if (existingIndex >= 0) {
+              // Update existing center
+              const updatedCenters = [...currentCenters];
+              updatedCenters[existingIndex] = {
                 value: centerId,
                 label: centerDetails.name,
-              });
+              };
+              setSelectedCenter(updatedCenters);
+            } else {
+              // Add new center
+              setSelectedCenter([
+                {
+                  value: centerId,
+                  label: centerDetails.name,
+                },
+                ...currentCenters,
+              ]);
             }
           }
 
@@ -407,7 +419,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     };
 
     fetchCenterDetails();
-  }, [value, selectedState, multiple, fetchCenterDetailsById]);
+  }, [value, selectedState, fetchCenterDetailsById]);
 
   // Load district options when state changes
   useEffect(() => {
@@ -483,7 +495,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     const loadBlockOptions = async () => {
       if (!selectedDistrict) {
         setBlockOptions([]);
-        setSelectedBlock('');
+        setSelectedBlock([]);
         return;
       }
 
@@ -504,25 +516,42 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
           })) || [];
         setBlockOptions(blocks);
 
-        // Set pending block if available
-        if (pendingBlockIdRef.current && !selectedBlock && !initialBlock) {
-          const pendingBlockId = pendingBlockIdRef.current;
-          const blockExists = blocks.some(
-            (b) => String(b.value) === String(pendingBlockId)
-          );
-          if (blockExists) {
-            setSelectedBlock(pendingBlockId);
+        // Set pending blocks if available
+        if (
+          pendingBlockIdRef.current &&
+          pendingBlockIdRef.current.length > 0 &&
+          selectedBlock.length === 0 &&
+          !initialBlock
+        ) {
+          const pendingBlockIds = pendingBlockIdRef.current;
+          const validBlocks = pendingBlockIds
+            .map((blockId) => String(blockId))
+            .filter((blockId) =>
+              blocks.some((b) => String(b.value) === blockId)
+            );
+          if (validBlocks.length > 0) {
+            setSelectedBlock(validBlocks);
             pendingBlockIdRef.current = null;
             // Call onBlockChange callback if provided
             if (onBlockChange) {
-              onBlockChange(pendingBlockId);
+              onBlockChange(validBlocks);
             }
           }
-        } else if (initialBlock && !selectedBlock) {
-          setSelectedBlock(initialBlock);
-          // Call onBlockChange callback if provided
-          if (onBlockChange) {
-            onBlockChange(initialBlock);
+        } else if (initialBlock && selectedBlock.length === 0) {
+          const initialBlocks = Array.isArray(initialBlock)
+            ? initialBlock
+            : [initialBlock];
+          const validBlocks = initialBlocks
+            .map((blockId) => String(blockId))
+            .filter((blockId) =>
+              blocks.some((b) => String(b.value) === blockId)
+            );
+          if (validBlocks.length > 0) {
+            setSelectedBlock(validBlocks);
+            // Call onBlockChange callback if provided
+            if (onBlockChange) {
+              onBlockChange(validBlocks);
+            }
           }
         }
       } catch (error) {
@@ -560,8 +589,10 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
       if (selectedDistrict) {
         filters.district = [selectedDistrict];
       }
-      if (selectedBlock) {
-        filters.block = [selectedBlock];
+      if (selectedBlock && selectedBlock.length > 0) {
+        filters.block = Array.isArray(selectedBlock)
+          ? selectedBlock
+          : [selectedBlock];
       }
 
       const payload = {
@@ -642,7 +673,13 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     } finally {
       setLoadingStates((prev) => ({ ...prev, centers: false }));
     }
-  }, [selectedState, selectedDistrict, selectedBlock, searchKeyword]);
+  }, [
+    selectedState,
+    selectedDistrict,
+    selectedBlock,
+    searchKeyword,
+    fetchCenterDetailsById,
+  ]);
 
   // Debounced search for centers - load when filters change or when user types
   useEffect(() => {
@@ -684,142 +721,67 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     }
 
     if (!value || (Array.isArray(value) && value.length === 0)) {
-      if (selectedCenter) {
-        setSelectedCenter(null);
+      if (selectedCenter && selectedCenter.length > 0) {
+        setSelectedCenter([]);
       }
       return;
     }
 
     const centerIds = Array.isArray(value) ? value : [value];
 
-    if (multiple) {
-      // For multiple selection
-      if (centerOptions && centerOptions.length > 0) {
-        const foundCenters = centerIds
-          .map((centerId) => {
-            const centerIdStr = String(centerId);
-            const found = centerOptions.find(
-              (center) => center && String(center.value) === centerIdStr
-            );
-            return found || { value: centerId, label: `Center ${centerId}` };
-          })
-          .filter(Boolean);
+    // Always handle as multiple selection
+    if (centerOptions && centerOptions.length > 0) {
+      const foundCenters = centerIds
+        .map((centerId) => {
+          const centerIdStr = String(centerId);
+          const found = centerOptions.find(
+            (center) => center && String(center.value) === centerIdStr
+          );
+          return found || { value: centerId, label: `Center ${centerId}` };
+        })
+        .filter(Boolean);
 
-        // Check if any centers need their names fetched
-        const centersNeedingFetch = foundCenters.filter((center) =>
-          center.label?.startsWith('Center ')
-        );
+      // Check if any centers need their names fetched
+      const centersNeedingFetch = foundCenters.filter((center) =>
+        center.label?.startsWith('Center ')
+      );
 
-        if (centersNeedingFetch.length > 0) {
-          // Fetch details for centers that need names
-          Promise.all(
-            centersNeedingFetch.map((center) =>
-              fetchCenterDetailsById(center.value).then((details) => ({
-                ...center,
-                label: details?.name || center.label,
-              }))
-            )
-          ).then((updatedCenters) => {
-            // Update only the centers that were fetched
-            const updatedFoundCenters = foundCenters.map((center) => {
-              const updated = updatedCenters.find(
-                (uc) => String(uc.value) === String(center.value)
-              );
-              return updated || center;
-            });
-            setSelectedCenter(updatedFoundCenters);
-          });
-        } else {
-          setSelectedCenter(foundCenters);
-        }
-      } else {
-        // Fetch details for all centers
+      if (centersNeedingFetch.length > 0) {
+        // Fetch details for centers that need names
         Promise.all(
-          centerIds.map((centerId) =>
-            fetchCenterDetailsById(String(centerId)).then((details) => ({
-              value: centerId,
-              label: details?.name || `Center ${centerId}`,
+          centersNeedingFetch.map((center) =>
+            fetchCenterDetailsById(center.value).then((details) => ({
+              ...center,
+              label: details?.name || center.label,
             }))
           )
-        ).then((centers) => {
-          setSelectedCenter(centers);
+        ).then((updatedCenters) => {
+          // Update only the centers that were fetched
+          const updatedFoundCenters = foundCenters.map((center) => {
+            const updated = updatedCenters.find(
+              (uc) => String(uc.value) === String(center.value)
+            );
+            return updated || center;
+          });
+          setSelectedCenter(updatedFoundCenters);
         });
+      } else {
+        setSelectedCenter(foundCenters);
       }
     } else {
-      // For single selection
-      const centerId = centerIds[0];
-      const centerIdStr = String(centerId);
-
-      // Check if we already have the correct center selected
-      if (
-        selectedCenter &&
-        !Array.isArray(selectedCenter) &&
-        String(selectedCenter.value) === centerIdStr
-      ) {
-        return;
-      }
-
-      // Find the center object that matches the value
-      if (centerOptions && centerOptions.length > 0) {
-        const foundCenter = centerOptions.find(
-          (center) => center && String(center.value) === centerIdStr
-        );
-
-        if (foundCenter) {
-          setSelectedCenter(foundCenter);
-        } else {
-          // Center not found in current options - fetch details to get the name
-          // Keep the existing selectedCenter if it matches the value and has a proper label
-          if (
-            !selectedCenter ||
-            Array.isArray(selectedCenter) ||
-            String(selectedCenter.value) !== centerIdStr ||
-            selectedCenter.label?.startsWith('Center ')
-          ) {
-            // Fetch center details to get the name
-            fetchCenterDetailsById(centerIdStr).then((centerDetails) => {
-              if (centerDetails && centerDetails.name) {
-                setSelectedCenter({
-                  value: centerId,
-                  label: centerDetails.name,
-                });
-              } else {
-                // Create a placeholder if fetch fails
-                setSelectedCenter({
-                  value: centerId,
-                  label: `Center ${centerId}`,
-                });
-              }
-            });
-          }
-        }
-      } else if (centerId) {
-        // If centerOptions is empty but we have a value, fetch center details
-        if (
-          !selectedCenter ||
-          Array.isArray(selectedCenter) ||
-          String(selectedCenter.value) !== centerIdStr ||
-          selectedCenter.label?.startsWith('Center ')
-        ) {
-          // Fetch center details to get the name
-          fetchCenterDetailsById(centerIdStr).then((centerDetails) => {
-            if (centerDetails && centerDetails.name) {
-              setSelectedCenter({
-                value: centerId,
-                label: centerDetails.name,
-              });
-            } else {
-              // Create a placeholder if fetch fails
-              setSelectedCenter({
-                value: centerId,
-                label: `Center ${centerId}`,
-              });
-            }
-          });
-        }
-      }
+      // Fetch details for all centers
+      Promise.all(
+        centerIds.map((centerId) =>
+          fetchCenterDetailsById(String(centerId)).then((details) => ({
+            value: centerId,
+            label: details?.name || `Center ${centerId}`,
+          }))
+        )
+      ).then((centers) => {
+        setSelectedCenter(centers);
+      });
     }
-  }, [value, centerOptions, selectedCenter, multiple, fetchCenterDetailsById]);
+  }, [value, centerOptions, selectedCenter, fetchCenterDetailsById]);
 
   const handleStateChange = (event) => {
     const newState = String(event.target.value || '');
@@ -827,10 +789,12 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     isFilterChangingRef.current = true;
     setSelectedState(newState);
     setSelectedDistrict('');
-    setSelectedBlock('');
-    setSelectedCenter(null);
+    setSelectedBlock([]);
+    setSelectedCenter([]);
     setSearchKeyword('');
     setAutocompleteInputValue('');
+    setBlockSearchKeyword('');
+    setBlockAutocompleteInputValue('');
     setCenterOptions([]); // Clear center options when state changes
     if (onChange) {
       onChange(null);
@@ -851,10 +815,12 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     // Set flag to prevent sync effect from restoring center
     isFilterChangingRef.current = true;
     setSelectedDistrict(newDistrict);
-    setSelectedBlock('');
-    setSelectedCenter(null);
+    setSelectedBlock([]);
+    setSelectedCenter([]);
     setSearchKeyword('');
     setAutocompleteInputValue('');
+    setBlockSearchKeyword('');
+    setBlockAutocompleteInputValue('');
     setCenterOptions([]); // Clear center options when district changes
     if (onChange) {
       onChange(null);
@@ -870,27 +836,54 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     }, 150);
   };
 
-  const handleBlockChange = (event) => {
-    const newBlock = event.target.value;
+  const handleBlockChange = (event, newValue) => {
     // Set flag to prevent sync effect from restoring center
     isFilterChangingRef.current = true;
-    setSelectedBlock(newBlock);
+
+    const blockIds = Array.isArray(newValue)
+      ? newValue.map((block) => String(block.value))
+      : newValue
+      ? [String(newValue.value)]
+      : [];
+
+    setSelectedBlock(blockIds);
     setSelectedCenter(null);
     setSearchKeyword('');
     setAutocompleteInputValue('');
+    setBlockSearchKeyword('');
+    setBlockAutocompleteInputValue('');
     setCenterOptions([]); // Clear center options when block changes
     if (onChange) {
       onChange(null);
     }
     // Call onBlockChange callback if provided
     if (onBlockChange) {
-      onBlockChange(newBlock || null);
+      onBlockChange(blockIds.length > 0 ? blockIds : null);
     }
     // Reset flag after state updates complete
     // The useEffect will automatically trigger search when selectedBlock changes
     setTimeout(() => {
       isFilterChangingRef.current = false;
     }, 150);
+  };
+
+  const handleBlockInputChange = (event, newInputValue, reason) => {
+    // Handle different input change reasons for block autocomplete
+    if (reason === 'input') {
+      // User is typing - update input value and search keyword
+      setBlockAutocompleteInputValue(newInputValue);
+      setBlockSearchKeyword(newInputValue);
+    } else if (reason === 'clear') {
+      // User clicked clear button
+      setBlockAutocompleteInputValue('');
+      setBlockSearchKeyword('');
+    } else if (reason === 'reset') {
+      // Reset after selection - don't update input value, let it show selected value
+      if (selectedBlock.length === 0) {
+        setBlockAutocompleteInputValue('');
+        setBlockSearchKeyword('');
+      }
+    }
   };
 
   const handleAutocompleteInputChange = (event, newInputValue, reason) => {
@@ -903,7 +896,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
       // User clicked clear button
       setAutocompleteInputValue('');
       setSearchKeyword('');
-      setSelectedCenter(null);
+      setSelectedCenter([]);
       if (onChange) {
         onChange(null);
       }
@@ -921,31 +914,26 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
     // Set flag to prevent API calls during selection
     isSelectingCenterRef.current = true;
 
-    if (newValue) {
+    if (
+      newValue &&
+      (Array.isArray(newValue) ? newValue.length > 0 : newValue)
+    ) {
       // Store which filters were active when center is selected
       activeFiltersWhenSelectedRef.current = {
         state: selectedState || null,
         district: selectedDistrict || null,
-        block: selectedBlock || null,
+        block:
+          selectedBlock && selectedBlock.length > 0 ? [...selectedBlock] : null,
       };
 
-      // Ensure we have a valid center object
-      setSelectedCenter(newValue);
+      // Ensure we have a valid center object (always array)
+      const centersArray = Array.isArray(newValue) ? newValue : [newValue];
+      setSelectedCenter(centersArray);
 
-      if (multiple) {
-        const centerIds = Array.isArray(newValue)
-          ? newValue.map((c) => c.value)
-          : [newValue.value];
-        if (onChange) {
-          onChange(centerIds);
-        }
-      } else {
-        const centerId = Array.isArray(newValue)
-          ? newValue[0]?.value
-          : newValue.value;
-        if (onChange) {
-          onChange(centerId);
-        }
+      // Always return array of center IDs
+      const centerIds = centersArray.map((c) => c.value);
+      if (onChange) {
+        onChange(centerIds);
       }
 
       // Clear search keyword when center is selected to prevent unnecessary API calls
@@ -959,7 +947,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
         district: null,
         block: null,
       };
-      setSelectedCenter(null);
+      setSelectedCenter([]);
       if (onChange) {
         onChange(null);
       }
@@ -1052,29 +1040,74 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
           </FormControl>
         </Grid>
 
-        {/* Block Dropdown */}
+        {/* Block Autocomplete with multiple selection */}
         <Grid item xs={12}>
           <FormControl fullWidth>
-            <InputLabel id="block-label">Block</InputLabel>
-            <Select
-              labelId="block-label"
-              value={selectedBlock}
+            <Autocomplete
+              multiple
+              options={blockOptions}
+              value={
+                selectedBlock.length > 0
+                  ? blockOptions.filter((block) =>
+                      selectedBlock.some(
+                        (selectedId) =>
+                          String(selectedId) === String(block.value)
+                      )
+                    )
+                  : []
+              }
               onChange={handleBlockChange}
-              label="Block"
+              onInputChange={handleBlockInputChange}
+              inputValue={blockAutocompleteInputValue}
+              loading={loadingStates.block}
+              getOptionLabel={(option) => {
+                if (!option) return '';
+                return (
+                  option.label || option?.name || String(option.value || '')
+                );
+              }}
+              isOptionEqualToValue={(option, value) => {
+                if (!option || !value) return false;
+                return String(option.value) === String(value.value);
+              }}
+              filterOptions={(options, state) => {
+                // Filter options safely
+                if (!options || !Array.isArray(options)) return [];
+                const inputValue = state.inputValue || '';
+                if (!inputValue) return options;
+
+                return options.filter((option) => {
+                  if (!option) return false;
+                  const label = option.label || option?.name || '';
+                  return label.toLowerCase().includes(inputValue.toLowerCase());
+                });
+              }}
               disabled={disabled || !selectedDistrict || loadingStates.block}
-            >
-              {loadingStates.block ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} />
-                </MenuItem>
-              ) : (
-                blockOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))
+              freeSolo={false}
+              clearOnBlur={false}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Block"
+                  placeholder={
+                    loadingStates.block
+                      ? 'Loading blocks...'
+                      : 'Type to search blocks...'
+                  }
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingStates.block ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
               )}
-            </Select>
+            />
           </FormControl>
         </Grid>
 
@@ -1082,49 +1115,16 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
         <Grid item xs={12}>
           <FormControl fullWidth required={required} error={error}>
             <Autocomplete
-              multiple={multiple}
-              options={
-                // Ensure selected center is always in options list
-                (() => {
-                  const options = centerOptions || [];
-                  if (
-                    selectedCenter &&
-                    !multiple &&
-                    !Array.isArray(selectedCenter)
-                  ) {
-                    const exists = options.some(
-                      (opt) =>
-                        opt &&
-                        String(opt.value) === String(selectedCenter.value)
-                    );
-                    if (!exists && selectedCenter.value) {
-                      return [selectedCenter, ...options];
-                    }
-                  }
-                  return options;
-                })()
-              }
-              value={
-                multiple
-                  ? Array.isArray(selectedCenter)
-                    ? selectedCenter
-                    : []
-                  : selectedCenter || null
-              }
+              multiple={true}
+              options={centerOptions || []}
+              value={Array.isArray(selectedCenter) ? selectedCenter : []}
               onChange={handleCenterChange}
               onInputChange={handleAutocompleteInputChange}
               inputValue={
                 // Control inputValue based on state:
                 // - When user is typing: show the typed value
-                // - When center is selected and not typing: show the center's label
                 // - When no center selected: show empty string
-                searchKeyword
-                  ? autocompleteInputValue || ''
-                  : selectedCenter &&
-                    !multiple &&
-                    !Array.isArray(selectedCenter)
-                  ? selectedCenter.label || selectedCenter.name || ''
-                  : ''
+                searchKeyword ? autocompleteInputValue || '' : ''
               }
               loading={loadingStates.centers}
               getOptionLabel={(option) => {

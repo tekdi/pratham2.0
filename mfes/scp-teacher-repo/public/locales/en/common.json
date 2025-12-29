@@ -179,7 +179,12 @@
     "REASSIGN_BATCH": "Re-assign Batch",
     "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
     "HI": "Hi, {{name}}",
-    "FAQS": "FAQ's"
+    "FAQS": "FAQ's",
+    "NEXT": "Next",
+    "SELECT_CENTER": "Select Center",
+    "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "Please select at least one batch",
+    "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
+    "PLEASE_SELECT_CENTER": "Please select a center"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -859,7 +864,9 @@
     "RE_ASSIGN_FACILITATOR": "Re-assign Facilitator",
     "FACILITATOR_UPDATED_SUCCESSFULLY": "Facilitator updated successfully",
     "FACILITATOR_CREATED_SUCCESSFULLY": "Facilitator created successfully",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon"
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "User credentials will be sent soon",
+    "MAP_USER_AS_FACILITATOR": "Map User as Facilitator",
+    "MAP_AS_FACILITATOR": "Map as Facilitator"
   },
   "MENTOR": {
     "BACK_TO_FORM": "Back to Form",
@@ -895,6 +902,7 @@
   "last_name": "Last Name",
   "dob": "Date of Birth",
   "WHATS_YOUR_GENDER": "Gender",
+  "WORKING_STATE": "Working State",
   "Male": "Male",
   "Female": "Female",
   "Transgender": "Transgender",

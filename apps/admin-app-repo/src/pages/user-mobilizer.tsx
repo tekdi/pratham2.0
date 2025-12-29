@@ -458,7 +458,7 @@ const Mobilizer = () => {
 
       showToastMessage(t('MOBILIZER.ACTIVATE_USER_SUCCESS'), 'success');
     } catch (error) {
-      console.error('Error updating mobilizer:', error);
+      console.error('Error updating mentor:', error);
     }
   };
   // Define actions

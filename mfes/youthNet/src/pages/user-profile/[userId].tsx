@@ -57,6 +57,7 @@ const UserId = () => {
     village?: string | null;
     userName?: string | null;
     joinedOn?: string | null;
+    workingVillages?: string | null;
   }>({
     userRole: null,
     userID: null,
@@ -73,6 +74,7 @@ const UserId = () => {
     middleName: null,
     userName: null,
     joinedOn: null,
+    workingVillages: null,
   });
 
   // Get current user ID and userProgram from localStorage on mount
@@ -106,7 +108,7 @@ const UserId = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (typeof window === 'undefined' || !window.localStorage) return;
-      
+
       try {
         const tenantId = localStorage.getItem('tenantId');
         const responseForm: any = await fetchForm([
@@ -218,25 +220,88 @@ const UserId = () => {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
       } else if (userId) {
         const data = await getUserDetails(userId, true);
+        console.log('data>>>>', data);
         userData = data?.userData || {};
       }
 
       if (userData) {
         const getFieldValue = (label: string) => {
-          const field = userData?.customFields?.find((item: any) => item.label === label);
+          const field = userData?.customFields?.find(
+            (item: any) => item.label === label
+          );
           const selectedValues = field?.selectedValues;
-          
+
           if (!selectedValues || selectedValues.length === 0) {
             return '';
           }
-          
+
           if (selectedValues.length === 1) {
             return toPascalCase(selectedValues[0]?.value || '');
           }
-          
+
           // If multiple values, return all values as array or concatenated string
-          return selectedValues.map((item: any) => toPascalCase(item?.value || '')).join(', ');
+          return selectedValues
+            .map((item: any) => toPascalCase(item?.value || ''))
+            .join(', ');
         };
+
+        // Function to extract working village names
+        const getWorkingVillages = () => {
+          const workingVillageField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_VILLAGE'
+          );
+          const workingLocationField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_LOCATION'
+          );
+
+          if (!workingVillageField || !workingLocationField) {
+            return '';
+          }
+
+          // Get village IDs from WORKING_VILLAGE field
+          const villageIdsString = workingVillageField?.selectedValues?.[0];
+          if (!villageIdsString) {
+            return '';
+          }
+
+          // Split comma-separated IDs
+          const villageIds = villageIdsString
+            .split(',')
+            .map((id: string) => id.trim());
+
+          // Get working location data - handle both single object and array
+          const workingLocationDataArray =
+            workingLocationField?.selectedValues || [];
+          if (workingLocationDataArray.length === 0) {
+            return '';
+          }
+
+          // Extract all village names from the nested structure
+          const villageNames: string[] = [];
+
+          // Iterate through all state objects in selectedValues
+          workingLocationDataArray.forEach((workingLocationData: any) => {
+            // The structure has districts directly in each state object
+            if (workingLocationData.districts) {
+              workingLocationData.districts.forEach((district: any) => {
+                if (district.blocks) {
+                  district.blocks.forEach((block: any) => {
+                    if (block.villages) {
+                      block.villages.forEach((village: any) => {
+                        if (villageIds.includes(String(village.id))) {
+                          villageNames.push(village.name);
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+
+          return villageNames.map((name) => toPascalCase(name)).join(', ');
+        };
+
         let date;
         let formattedDOBDate;
         if (userData.dob) {
@@ -251,6 +316,51 @@ const UserId = () => {
           formattedDOBDate = date.toLocaleDateString('en-GB', options);
         }
 
+        // Function to extract role based on tenant matching
+        const getRoleFromTenant = () => {
+          const tenantName = localStorage.getItem('tenantName');
+          if (!tenantName || !userData?.tenantData) {
+            return null;
+          }
+
+          // Find the tenant that matches the tenantName from localStorage
+          const matchedTenant = userData.tenantData.find(
+            (tenant: any) => tenant?.tenantName === tenantName
+          );
+
+          if (!matchedTenant || !matchedTenant.roles) {
+            return null;
+          }
+
+          // Filter roles to only include Mobilizer or Lead
+          const allowedRoles = matchedTenant.roles.filter((role: any) => {
+            const roleName = role?.roleName?.toLowerCase();
+            return roleName === 'mobilizer' || roleName === 'lead';
+          });
+
+          if (allowedRoles.length === 0) {
+            return null;
+          }
+
+          // Prefer Lead over Mobilizer if both exist
+          const leadRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'lead'
+          );
+          if (leadRole) {
+            return toPascalCase(leadRole.roleName);
+          }
+
+          // Otherwise use Mobilizer
+          const mobilizerRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'mobilizer'
+          );
+          if (mobilizerRole) {
+            return toPascalCase(mobilizerRole.roleName);
+          }
+
+          return null;
+        };
+
         setUser({
           firstName: toPascalCase(userData?.firstName) || '',
           lastName: toPascalCase(userData?.lastName) || '',
@@ -262,13 +372,20 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-           localStorage.getItem('roleName') || toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
-            toPascalCase(role),
+            userId === localStorage.getItem('userId')
+              ? toPascalCase(role)
+              : (
+                  getRoleFromTenant() ||
+                  localStorage.getItem('roleName') ||
+                  toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
+                  toPascalCase(role)
+                ),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
           state: getFieldValue('STATE'),
           village: getFieldValue('VILLAGE'),
+          workingVillages: getWorkingVillages(),
         });
       }
     };
@@ -390,7 +507,11 @@ const UserId = () => {
             {t('YOUTHNET_PROFILE.PROFILE_DETAILS')}
           </Typography>
           <Profile
-            fullName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.firstName || user.lastName || '')}
+            fullName={
+              user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : user.firstName || user.lastName || ''
+            }
             emailId={user.email || '-'}
             designation={user.userRole || '-'}
             mentorId={user.userID || ''}
@@ -407,6 +528,7 @@ const UserId = () => {
             joinedOn={user.joinedOn || null}
             firstName={user.firstName || ''}
             lastName={user.lastName || ''}
+            workingVillages={user.workingVillages || null}
           />
         </Box>
       </Box>
@@ -414,7 +536,7 @@ const UserId = () => {
         open={editModal}
         onClose={onClose}
         showFooter={true}
-        modalTitle= {t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
+        modalTitle={t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
         //  handleNext={FormSubmitFunction}
         primaryText={'Submit'}
         id="dynamic-form-id"
@@ -450,4 +572,4 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   };
 };
 
-export default  UserId
+export default UserId;

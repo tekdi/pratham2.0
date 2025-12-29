@@ -606,17 +606,17 @@ const CatchmentAreaWidget = ({
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Chip
-                label="State"
+                label= "State"
                 size="small"
                 sx={{
-                  backgroundColor: '#1976d2',
-                  color: 'white',
+                  backgroundColor: '#FFC107',
+                  color: '#000000',
                   fontWeight: 600,
                 }}
               />
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1.15rem' }}
+                sx={{ fontWeight: 600, color: '#000000', fontSize: '1rem' }}
               >
                 {state.stateName}
               </Typography>
@@ -637,7 +637,7 @@ const CatchmentAreaWidget = ({
             <Box
               key={district.districtId}
               sx={{
-                borderLeft: '3px solid #4caf50',
+                borderLeft: '3px solid #e0e0e0',
                 pl: 2,
                 mb: 2,
                 pt: 1,
@@ -656,17 +656,21 @@ const CatchmentAreaWidget = ({
               >
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Chip
-                    label="District"
+                    label= "District"
                     size="small"
                     sx={{
-                      backgroundColor: '#4caf50',
-                      color: 'white',
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
                       fontWeight: 600,
                     }}
                   />
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: 600, fontSize: '1.15rem' }}
+                    sx={{
+                      fontWeight: 600,
+                      color: '#000000',
+                      fontSize: '0.875rem',
+                    }}
                   >
                     {district.districtName}
                   </Typography>
@@ -686,15 +690,21 @@ const CatchmentAreaWidget = ({
               {/* Blocks as Chips */}
               {getSelectedBlocksForDistrict(state.stateId, district.districtId)
                 .length > 0 && (
-                <Box sx={{ mb: 1 }}>
+                <Box
+                  sx={{
+                    mb: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                  }}
+                >
                   <Chip
-                    label="Selected Blocks"
+                    label= "Block"
                     size="small"
                     sx={{
-                      backgroundColor: '#e3f2fd',
-                      color: '#1976d2',
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
                       fontWeight: 600,
-                      mb: 1,
                     }}
                   />
                 </Box>
@@ -715,7 +725,14 @@ const CatchmentAreaWidget = ({
                       )
                     }
                     deleteIcon={<CloseIcon />}
-                    sx={{ backgroundColor: '#e3f2fd', color: '#1976d2' }}
+                    sx={{
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
+                      fontSize: '0.6rem',
+                      '& .MuiChip-label': {
+                        fontSize: '0.7rem',
+                      },
+                    }}
                     disabled={disabled || readonly}
                   />
                 ))}
