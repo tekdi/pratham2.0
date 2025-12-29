@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import { toPascalCase } from '../DynamicForm/utils/Helper';
 
 interface CenterData {
   id: string;
@@ -352,7 +353,7 @@ const CenterBasedBatchListWidget: React.FC<CenterBasedBatchListWidgetProps> = ({
             </MenuItem>
             {getAvailableCenters().map((center) => (
               <MenuItem key={center.id} value={center.id}>
-                {center.name}
+                {toPascalCase(center.name)}
               </MenuItem>
             ))}
           </Select>
@@ -437,7 +438,7 @@ const CenterBasedBatchListWidget: React.FC<CenterBasedBatchListWidgetProps> = ({
                   variant="h6"
                   sx={{ fontWeight: 600, color: '#000000', fontSize: '1rem' }}
                 >
-                  {center.centerName}
+                  {toPascalCase(center.centerName)}
                 </Typography>
               </Box>
               <IconButton
@@ -483,7 +484,7 @@ const CenterBasedBatchListWidget: React.FC<CenterBasedBatchListWidgetProps> = ({
                   {center.batches.map((batch, index) => (
                     <Chip
                       key={`batch-${center.centerId}-${batch.id || index}`}
-                      label={batch.name}
+                      label={toPascalCase(batch.name)}
                       onDelete={() =>
                         handleRemoveBatch(center.centerId, batch.id)
                       }
@@ -573,7 +574,7 @@ const CenterBasedBatchListWidget: React.FC<CenterBasedBatchListWidgetProps> = ({
                             }`}
                             value={batch.id}
                           >
-                            {batch.name}
+                            {toPascalCase(batch.name)}
                           </MenuItem>
                         ))}
                       </Select>

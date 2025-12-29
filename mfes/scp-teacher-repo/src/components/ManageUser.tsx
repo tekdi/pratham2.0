@@ -283,8 +283,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       return false;
     }
 
-    // Check if any center has at least one batch selected
-    return centersStructure.some((center: any) => {
+    // Check if ALL selected centers have at least one batch selected
+    return centersStructure.every((center: any) => {
       return (
         center?.batches &&
         Array.isArray(center.batches) &&
