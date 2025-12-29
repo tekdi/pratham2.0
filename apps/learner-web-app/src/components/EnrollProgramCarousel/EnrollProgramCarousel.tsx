@@ -180,7 +180,25 @@ const EnrollProgramCarousel = ({
         console.error('User does not have Learner role for this program');
         return;
       }
-
+     if(localStorage.getItem('isAndroidApp') == 'yes')
+      {
+       // Send message to React Native WebView
+       if (window.ReactNativeWebView) {
+         window.ReactNativeWebView.postMessage(JSON.stringify({
+           type: 'ACCESS_PROGRAM_EVENT', // Event type identifier
+           data: {
+             userId: userId,
+             tenantId: program.tenantId,
+             token: localStorage.getItem('token'),
+             refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+           
+             // Add any data you want to send
+           }
+         }));
+       }
+       
+      }
+       else{
       // Set all localStorage values for the selected program
       localStorage.setItem('userId', storedUserId);
       localStorage.setItem('templtateId', tenantData?.templateId);
@@ -237,6 +255,7 @@ const EnrollProgramCarousel = ({
 
       // Navigate to landing page to avoid unauthorized issues
       router.push(landingPage || '/home');
+    }
     } catch (error) {
       console.error('Failed to switch program:', error);
     }
@@ -283,7 +302,7 @@ const EnrollProgramCarousel = ({
         console.error('User does not have Learner role for this program');
         return;
       }
- if(localStorage.getItem('isAndroidApp') === 'true')
+ if(localStorage.getItem('isAndroidApp') == 'yes')
       {
        // Send message to React Native WebView
        if (window.ReactNativeWebView) {
@@ -299,6 +318,7 @@ const EnrollProgramCarousel = ({
            }
          }));
        }
+       
       }
       // Set localStorage values similar to callBackSwitchDialog
     else{  localStorage.setItem('userId', storedUserId);
@@ -434,12 +454,39 @@ const EnrollProgramCarousel = ({
   };
 
   const onSigin = async () => {
+    console.log(localStorage.getItem('tenantId'))
     setSignupSuccessModal(false);
 
     // If there's an enrolled program, sign in to it
     if (enrolledProgram) {
-      await handleAccessProgram(enrolledProgram);
+     if(localStorage.getItem('isAndroidApp') == 'yes')
+        {
+         // Send message to React Native WebView
+
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+               
+              //        const program = JSON.parse(enrolledProgramData || '{}');
+
+
+         if (window.ReactNativeWebView) {
+           window.ReactNativeWebView.postMessage(JSON.stringify({
+             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+             data: {
+               userId: localStorage.getItem('userId'),
+               tenantId: enrolledProgram?.tenantId,
+               token: localStorage.getItem('token'),
+               refreshToken: localStorage.getItem('refreshToken'),
+             
+               // Add any data you want to send
+             }
+           }));
+         }
+        }
+      else{
+ await handleAccessProgram(enrolledProgram);
       setEnrolledProgram(null); // Clear the enrolled program
+      }
+     
     } else {
       // Fallback to home if no program is stored
       router.push('/home');

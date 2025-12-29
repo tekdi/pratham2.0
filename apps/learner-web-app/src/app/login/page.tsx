@@ -320,7 +320,7 @@ const LoginPage = () => {
         } else {
         console.log('tenantData', tenantDataDetails);
         if(tenantDataDetails.length ===1) {
-          if(localStorage.getItem('isAndroidApp') === 'true')
+          if(localStorage.getItem('isAndroidApp') == 'yes')
             {
              // Send message to React Native WebView
              if (window.ReactNativeWebView) {
@@ -330,7 +330,7 @@ const LoginPage = () => {
                    userId: userResponse?.userId,
                    tenantId:selectedTenantId,
                    token: localStorage.getItem('token'),
-                   refreshToken: localStorage.getItem('refreshToken'),
+                   refreshToken: localStorage.getItem('refreshTokenForAndroid'),
                  
                    // Add any data you want to send
                  }

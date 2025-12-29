@@ -9,6 +9,7 @@ import Image from 'next/image';
 import appLogo from '../../../public/images/Pratham_Logo.png';
 import { useTranslation } from '@shared-lib';
 import { useRouter } from 'next/navigation';
+import { languages } from '@shared-lib-v2/lib/context/Languages';
 
 const Header = ({ isShowLogout = false }) => {
   const { t, setLanguage } = useTranslation();
@@ -22,6 +23,21 @@ const Header = ({ isShowLogout = false }) => {
     const newLang = event.target.value;
     setLang(newLang);
     setLanguage(newLang);
+   if(localStorage.getItem('isAndroidApp') == 'yes')
+      {
+       // Send message to React Native WebView
+       if (window.ReactNativeWebView) {
+         window.ReactNativeWebView.postMessage(JSON.stringify({
+           type: 'LANGUAGE_CHANGE_EVENT', // Event type identifier
+           data: {
+             language: newLang,
+           
+             // Add any data you want to send
+           }
+         }));
+       }
+       
+      }
   };
 
   const handleLogoutMenuOpen = (event) => {

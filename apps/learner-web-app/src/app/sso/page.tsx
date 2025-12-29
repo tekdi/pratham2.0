@@ -182,6 +182,7 @@ const SSOContent = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = response.access_token;
       const refreshToken = response?.refresh_token;
+      localStorage.setItem('refreshTokenForAndroid', refreshToken);
       localStorage.setItem('token', token);
       data?.remember
         ? localStorage.setItem('refreshToken', refreshToken)
