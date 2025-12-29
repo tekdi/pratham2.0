@@ -887,8 +887,8 @@ const UserLeader = () => {
                       //map user to tenant
                       // Ensure selectedCenterId is a string (handle array case)
                       const cohortId = Array.isArray(selectedCenterId)
-                        ? selectedCenterId[0]
-                        : selectedCenterId;
+                        ? selectedCenterId
+                        : [selectedCenterId];
 
                       console.log('Creating with User ID:', selectedUserId);
                       console.log(
@@ -899,7 +899,7 @@ const UserLeader = () => {
                       // Call the cohortmember/create API
                       const response = await bulkCreateCohortMembers({
                         userId: [selectedUserId],
-                        cohortId: [cohortId],
+                        cohortId: cohortId,
                         // removeCohortId: [],
                       });
 
