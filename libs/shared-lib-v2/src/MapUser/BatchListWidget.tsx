@@ -59,24 +59,24 @@ interface BlockData {
 }
 
 interface CenterData {
-  id: number;
+  id: number | string;
   name: string;
   blockId: number;
 }
 
 interface BatchData {
-  id: number;
+  id: number | string;
   name: string;
-  centerId: number;
+  centerId: number | string;
 }
 
 interface SelectedBatch {
-  id: number;
+  id: number | string;
   name: string;
 }
 
 interface SelectedCenter {
-  centerId: number;
+  centerId: number | string;
   centerName: string;
   batches: SelectedBatch[];
 }
@@ -247,10 +247,30 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
   }>({});
 
   // Get available states (not yet selected) - single state selection
-  const availableStates =
-    selectedStates.length > 0
-      ? [] // If a state is already selected, return empty array
-      : states; // Otherwise return all states
+  // Filter by localStorage stateName if it exists
+  const getAvailableStates = () => {
+    if (selectedStates.length > 0) {
+      return []; // If a state is already selected, return empty array
+    }
+
+    // Check if stateName exists in localStorage
+    const stateNameFromStorage =
+      typeof window !== 'undefined' ? localStorage.getItem('stateName') : null;
+
+    if (stateNameFromStorage) {
+      // Filter states to only show the state matching localStorage stateName
+      const filteredStates = states.filter(
+        (state) =>
+          state.name.toLowerCase() === stateNameFromStorage.toLowerCase()
+      );
+      return filteredStates;
+    }
+
+    // If no stateName in localStorage, return all states
+    return states;
+  };
+
+  const availableStates = getAvailableStates();
 
   // Fetch states from API
   useEffect(() => {
@@ -290,6 +310,61 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
 
     fetchStates();
   }, []);
+
+  // Auto-select state from localStorage if stateName exists and no state is selected
+  useEffect(() => {
+    const autoSelectStateFromStorage = async () => {
+      // Only auto-select if:
+      // 1. No state is currently selected
+      // 2. States are loaded
+      // 3. Not currently loading
+      // 4. No value prop is provided (to avoid conflicts)
+      if (
+        selectedStates.length > 0 ||
+        states.length === 0 ||
+        loadingStates ||
+        (value && value.length > 0)
+      ) {
+        return;
+      }
+
+      const stateNameFromStorage =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('stateName')
+          : null;
+
+      if (stateNameFromStorage) {
+        // Find the state matching the localStorage stateName
+        const matchingState = states.find(
+          (state) =>
+            state.name.toLowerCase() === stateNameFromStorage.toLowerCase()
+        );
+
+        if (matchingState) {
+          // Auto-select the state
+          const newState: SelectedState = {
+            stateId: matchingState.id,
+            stateName: matchingState.name,
+            districts: [],
+          };
+          setSelectedStates([newState]);
+          setStateSelectValue('');
+
+          // Fetch districts for the auto-selected state
+          await fetchDistrictsForState(matchingState.id);
+
+          // Trigger onChange callback if provided
+          if (onChange) {
+            onChange([newState]);
+          }
+        }
+      }
+    };
+
+    if (states.length > 0 && !loadingStates) {
+      autoSelectStateFromStorage();
+    }
+  }, [states, loadingStates]);
 
   // Handle initial data - fetch districts, blocks, centers, and batches for pre-selected data
   useEffect(() => {
@@ -455,11 +530,20 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
         CENTER_API_CONFIG.options?.optionObj || 'result.results.cohortDetails'
       );
       if (centersData && Array.isArray(centersData)) {
-        const formattedCenters = centersData.map((center: any) => ({
-          id: Number(center[CENTER_API_CONFIG.options?.value || 'cohortId']),
-          name: center[CENTER_API_CONFIG.options?.label || 'name'],
-          blockId: blockId,
-        }));
+        const formattedCenters = centersData.map((center: any) => {
+          const centerId =
+            center[CENTER_API_CONFIG.options?.value || 'cohortId'];
+          // Handle both numeric IDs and UUID strings
+          const id =
+            typeof centerId === 'string' && isNaN(Number(centerId))
+              ? centerId
+              : Number(centerId);
+          return {
+            id: id,
+            name: center[CENTER_API_CONFIG.options?.label || 'name'],
+            blockId: blockId,
+          };
+        });
         setCenters((prev) => ({ ...prev, [blockId]: formattedCenters }));
       } else {
         // If no centers found, set empty array
@@ -475,7 +559,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
   };
 
   // Fetch batches when a center is selected
-  const fetchBatchesForCenter = async (centerId: number) => {
+  const fetchBatchesForCenter = async (centerId: number | string) => {
     console.log(
       'fetchBatchesForCenter called with centerId:',
       centerId,
@@ -533,11 +617,22 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
       if (batchesData && Array.isArray(batchesData)) {
         const formattedBatches = batchesData
           .map((batch: any) => {
-            const batchId = Number(
-              batch[BATCH_API_CONFIG.options?.value || 'cohortId']
-            );
-            // Only include batches with valid IDs
-            if (!isNaN(batchId) && batchId > 0) {
+            const batchIdRaw =
+              batch[BATCH_API_CONFIG.options?.value || 'cohortId'];
+            // Handle both numeric IDs and UUID strings
+            const batchId =
+              typeof batchIdRaw === 'string' && isNaN(Number(batchIdRaw))
+                ? batchIdRaw
+                : Number(batchIdRaw);
+            // Only include batches with valid IDs (not null/undefined/empty)
+            if (
+              batchId != null &&
+              batchId !== '' &&
+              !(
+                typeof batchId === 'number' &&
+                (isNaN(batchId) || batchId === 0)
+              )
+            ) {
               return {
                 id: batchId,
                 name:
@@ -665,13 +760,9 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
       return;
     }
 
-    // Convert centerId to number if it's a string
-    const centerIdNum =
-      typeof centerId === 'string' ? Number(centerId) : centerId;
-
-    // Validate that centerIdNum is a valid number
-    if (isNaN(centerIdNum) || centerIdNum === 0) {
-      console.error('Invalid centerId:', centerId, centerIdNum);
+    // Validate that centerId is not empty/null
+    if (centerId == null || centerId === '') {
+      console.error('Invalid centerId:', centerId);
       return;
     }
 
@@ -680,23 +771,38 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
       districtId,
       blockId,
       centerId,
-      centerIdNum,
+      centerIdType: typeof centerId,
       availableCenters: centers[blockId],
       centersCount: centers[blockId]?.length,
     });
 
+    // Find center by exact match first, then fall back to type conversions
+    // This ensures we match the exact center that was selected from the dropdown
     const center = centers[blockId]?.find((center) => {
-      const centerIdAsNum = Number(center.id);
-      return (
-        centerIdAsNum === centerIdNum ||
-        center.id === centerIdNum ||
-        String(center.id) === String(centerIdNum)
-      );
+      // First try exact match (handles both string and number IDs)
+      if (center.id === centerId) {
+        return true;
+      }
+      // Then try string comparison (handles "2" === 2 case)
+      if (String(center.id) === String(centerId)) {
+        return true;
+      }
+      // Finally try number comparison (handles 2 === "2" case, but only if both are valid numbers)
+      const centerIdNum = Number(center.id);
+      const selectedIdNum = Number(centerId);
+      if (
+        !isNaN(centerIdNum) &&
+        !isNaN(selectedIdNum) &&
+        centerIdNum === selectedIdNum
+      ) {
+        return true;
+      }
+      return false;
     });
 
     if (!center) {
       console.error('Center not found:', {
-        centerIdNum,
+        centerId,
         blockId,
         availableCenters: centers[blockId],
         allCenters: centers,
@@ -710,14 +816,21 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
 
     console.log('Center found:', center);
 
-    // Check if center is already selected
+    // Check if center is already selected using the found center's ID
     const isCenterSelected = selectedStates
       .find((s) => s.stateId === stateId)
       ?.districts.find((d) => d.districtId === districtId)
       ?.blocks.find((b) => b.blockId === blockId)
-      ?.centers.some(
-        (c) => Number(c.centerId) === centerIdNum || c.centerId === centerIdNum
-      );
+      ?.centers.some((c) => {
+        // Compare using the found center's ID to ensure exact match
+        return (
+          c.centerId === center.id ||
+          String(c.centerId) === String(center.id) ||
+          (Number(c.centerId) === Number(center.id) &&
+            !isNaN(Number(c.centerId)) &&
+            !isNaN(Number(center.id)))
+        );
+      });
 
     let updatedStates = selectedStates;
 
@@ -763,19 +876,31 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     stateId: number,
     districtId: number,
     blockId: number,
-    centerId: number,
+    centerId: number | string,
     batchId: number | string
   ) => {
-    // Convert batchId to number if it's a string
-    const batchIdNum = typeof batchId === 'string' ? Number(batchId) : batchId;
+    // Normalize batchId (keep as string if UUID, convert to number if numeric)
+    const normalizedBatchId =
+      typeof batchId === 'string' && isNaN(Number(batchId))
+        ? batchId
+        : typeof batchId === 'string'
+        ? Number(batchId)
+        : batchId;
 
-    // Validate batchId
-    if (isNaN(batchIdNum) || batchIdNum === 0) {
-      console.error('Invalid batchId:', batchId, batchIdNum);
+    // Validate batchId is not empty/null
+    if (normalizedBatchId == null || normalizedBatchId === '') {
+      console.error('Invalid batchId:', batchId, normalizedBatchId);
       return;
     }
 
-    const batch = batches[centerId]?.find((batch) => batch.id === batchIdNum);
+    // Find batch by comparing IDs directly (supports both numbers and strings)
+    const batch = batches[centerId]?.find(
+      (batch) =>
+        batch.id === normalizedBatchId ||
+        String(batch.id) === String(normalizedBatchId) ||
+        Number(batch.id) === Number(normalizedBatchId)
+    );
+
     if (batch) {
       const updatedStates = selectedStates.map((state) => {
         if (state.stateId === stateId) {
@@ -784,10 +909,19 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
               const updatedBlocks = district.blocks.map((block) => {
                 if (block.blockId === blockId) {
                   const updatedCenters = block.centers.map((center) => {
-                    if (center.centerId === centerId) {
-                      // Check if batch is already selected
+                    // Compare center IDs directly (supports both numbers and strings)
+                    const isMatchingCenter =
+                      center.centerId === centerId ||
+                      String(center.centerId) === String(centerId) ||
+                      Number(center.centerId) === Number(centerId);
+
+                    if (isMatchingCenter) {
+                      // Check if batch is already selected (compare IDs directly)
                       const isBatchSelected = center.batches.some(
-                        (batch) => batch.id === batchIdNum
+                        (b) =>
+                          b.id === normalizedBatchId ||
+                          String(b.id) === String(normalizedBatchId) ||
+                          Number(b.id) === Number(normalizedBatchId)
                       );
                       if (!isBatchSelected) {
                         const newBatch: SelectedBatch = {
@@ -821,8 +955,8 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     stateId: number,
     districtId: number,
     blockId: number,
-    centerId: number,
-    batchId: number
+    centerId: number | string,
+    batchId: number | string
   ) => {
     const updatedStates = selectedStates.map((state) => {
       if (state.stateId === stateId) {
@@ -831,11 +965,20 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
             const updatedBlocks = district.blocks.map((block) => {
               if (block.blockId === blockId) {
                 const updatedCenters = block.centers.map((center) => {
-                  if (center.centerId === centerId) {
+                  // Compare center IDs directly (supports both numbers and strings)
+                  const isMatchingCenter =
+                    center.centerId === centerId ||
+                    String(center.centerId) === String(centerId) ||
+                    Number(center.centerId) === Number(centerId);
+
+                  if (isMatchingCenter) {
                     return {
                       ...center,
                       batches: center.batches.filter(
-                        (batch) => batch.id !== batchId
+                        (batch) =>
+                          batch.id !== batchId &&
+                          String(batch.id) !== String(batchId) &&
+                          Number(batch.id) !== Number(batchId)
                       ),
                     };
                   }
@@ -861,7 +1004,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     stateId: number,
     districtId: number,
     blockId: number,
-    centerId: number
+    centerId: number | string
   ) => {
     const updatedStates = selectedStates.map((state) => {
       if (state.stateId === stateId) {
@@ -872,7 +1015,10 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                 return {
                   ...block,
                   centers: block.centers.filter(
-                    (center) => center.centerId !== centerId
+                    (center) =>
+                      center.centerId !== centerId &&
+                      String(center.centerId) !== String(centerId) &&
+                      Number(center.centerId) !== Number(centerId)
                   ),
                 };
               }
@@ -974,12 +1120,27 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
       districtId,
       blockId
     );
-    const selectedCenterIds = selectedCenters.map((center) =>
-      Number(center.centerId)
-    );
     return allCenters.filter((center) => {
-      const centerId = Number(center.id);
-      return !selectedCenterIds.includes(centerId) && !isNaN(centerId);
+      if (center.id == null) return false;
+      // Check if this center is already selected using robust comparison
+      const isSelected = selectedCenters.some((selectedCenter) => {
+        // Exact match first
+        if (selectedCenter.centerId === center.id) return true;
+        // String comparison
+        if (String(selectedCenter.centerId) === String(center.id)) return true;
+        // Number comparison (only if both are valid numbers)
+        const selectedNum = Number(selectedCenter.centerId);
+        const centerNum = Number(center.id);
+        if (
+          !isNaN(selectedNum) &&
+          !isNaN(centerNum) &&
+          selectedNum === centerNum
+        ) {
+          return true;
+        }
+        return false;
+      });
+      return !isSelected;
     });
   };
 
@@ -987,7 +1148,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     stateId: number,
     districtId: number,
     blockId: number,
-    centerId: number
+    centerId: number | string
   ) => {
     const allBatches = batches[centerId] || [];
     const selectedBatches = getSelectedBatchesForCenter(
@@ -996,10 +1157,10 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
       blockId,
       centerId
     );
-    const selectedBatchIds = selectedBatches.map((batch) => Number(batch.id));
+    const selectedBatchIds = selectedBatches.map((batch) => batch.id);
     return allBatches.filter((batch) => {
-      const batchId = Number(batch.id);
-      return !selectedBatchIds.includes(batchId) && !isNaN(batchId);
+      // Compare IDs directly (supports both numbers and strings)
+      return !selectedBatchIds.includes(batch.id) && batch.id != null;
     });
   };
 
@@ -1032,7 +1193,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     stateId: number,
     districtId: number,
     blockId: number,
-    centerId: number
+    centerId: number | string
   ) => {
     const state = selectedStates.find((s) => s.stateId === stateId);
     if (!state) return [];
@@ -1040,7 +1201,13 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
     if (!district) return [];
     const block = district.blocks.find((b) => b.blockId === blockId);
     if (!block) return [];
-    const center = block.centers.find((c) => c.centerId === centerId);
+    // Compare center IDs directly (supports both numbers and strings)
+    const center = block.centers.find(
+      (c) =>
+        c.centerId === centerId ||
+        String(c.centerId) === String(centerId) ||
+        Number(c.centerId) === Number(centerId)
+    );
     if (!center) return [];
     return center.batches;
   };
@@ -1174,14 +1341,14 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                 label="State"
                 size="small"
                 sx={{
-                  backgroundColor: '#1976d2',
-                  color: 'white',
+                  backgroundColor: '#FFC107',
+                  color: '#000000',
                   fontWeight: 600,
                 }}
               />
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 600, color: '#1976d2', fontSize: '1.15rem' }}
+                sx={{ fontWeight: 600, color: '#000000', fontSize: '1rem' }}
               >
                 {state.stateName}
               </Typography>
@@ -1202,7 +1369,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
             <Box
               key={district.districtId}
               sx={{
-                borderLeft: '3px solid #4caf50',
+                borderLeft: '3px solid #e0e0e0',
                 pl: 2,
                 mb: 2,
                 pt: 1,
@@ -1224,14 +1391,18 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                     label="District"
                     size="small"
                     sx={{
-                      backgroundColor: '#4caf50',
-                      color: 'white',
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
                       fontWeight: 600,
                     }}
                   />
                   <Typography
                     variant="subtitle1"
-                    sx={{ fontWeight: 600, fontSize: '1.15rem' }}
+                    sx={{
+                      fontWeight: 600,
+                      color: '#000000',
+                      fontSize: '0.875rem',
+                    }}
                   >
                     {district.districtName}
                   </Typography>
@@ -1248,360 +1419,354 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                 </IconButton>
               </Box>
 
-              {/* Blocks as Chips */}
-              {getSelectedBlocksForDistrict(state.stateId, district.districtId)
-                .length > 0 && (
-                <Box sx={{ mb: 1 }}>
-                  <Chip
-                    label="Selected Blocks"
-                    size="small"
+              {/* Blocks */}
+              {getSelectedBlocksForDistrict(
+                state.stateId,
+                district.districtId
+              ).map((block) => (
+                <Box
+                  key={block.blockId}
+                  sx={{
+                    borderLeft: '3px solid #e0e0e0',
+                    pl: 2,
+                    mb: 2,
+                    pt: 1,
+                    pb: 1,
+                    backgroundColor: 'white',
+                  }}
+                >
+                  {/* Block Header */}
+                  <Box
                     sx={{
-                      backgroundColor: '#e3f2fd',
-                      color: '#1976d2',
-                      fontWeight: 600,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                       mb: 1,
                     }}
-                  />
-                </Box>
-              )}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}>
-                {getSelectedBlocksForDistrict(
-                  state.stateId,
-                  district.districtId
-                ).map((block) => (
-                  <Box
-                    key={block.blockId}
-                    sx={{
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '8px',
-                      p: 1.5,
-                      mb: 2,
-                      backgroundColor: '#fafafa',
-                      width: '100%',
-                    }}
                   >
-                    {/* Block Header */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip
+                        label="Block"
+                        size="small"
+                        sx={{
+                          backgroundColor: '#FFC107',
+                          color: '#000000',
+                          fontWeight: 600,
+                        }}
+                      />
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: 600,
+                          color: '#000000',
+                          fontSize: '0.875rem',
+                        }}
+                      >
+                        {block.blockName}
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        handleRemoveBlock(
+                          state.stateId,
+                          district.districtId,
+                          block.blockId
+                        )
+                      }
+                      disabled={disabled || readonly}
+                      sx={{ color: 'error.main' }}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+
+                  {/* Centers */}
+                  {getSelectedCentersForBlock(
+                    state.stateId,
+                    district.districtId,
+                    block.blockId
+                  ).map((center) => (
                     <Box
+                      key={`center-${block.blockId}-${center.centerId}`}
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 1,
+                        borderLeft: '3px solid #e0e0e0',
+                        pl: 2,
+                        mb: 2,
+                        pt: 1,
+                        pb: 1,
+                        backgroundColor: 'white',
                       }}
                     >
+                      {/* Center Header */}
                       <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          mb: 1,
+                        }}
                       >
-                        <Chip
-                          label={block.blockName}
-                          onDelete={() =>
-                            handleRemoveBlock(
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          <Chip
+                            label="Center"
+                            size="small"
+                            sx={{
+                              backgroundColor: '#FFC107',
+                              color: '#000000',
+                              fontWeight: 600,
+                            }}
+                          />
+                          <Typography
+                            variant="subtitle1"
+                            sx={{
+                              fontWeight: 600,
+                              color: '#000000',
+                              fontSize: '0.875rem',
+                            }}
+                          >
+                            {center.centerName}
+                          </Typography>
+                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={() =>
+                            handleRemoveCenter(
                               state.stateId,
                               district.districtId,
-                              block.blockId
+                              block.blockId,
+                              center.centerId
                             )
                           }
-                          deleteIcon={<CloseIcon />}
-                          sx={{
-                            backgroundColor: '#e3f2fd',
-                            color: '#1976d2',
-                            fontWeight: 600,
-                          }}
                           disabled={disabled || readonly}
-                        />
+                          sx={{ color: 'error.main' }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
                       </Box>
-                    </Box>
 
-                    {/* Centers as Chips */}
-                    {getSelectedCentersForBlock(
+                      {/* Batches as Chips */}
+                      {getSelectedBatchesForCenter(
+                        state.stateId,
+                        district.districtId,
+                        block.blockId,
+                        center.centerId
+                      ).length > 0 && (
+                        <Box
+                          sx={{
+                            mb: 1,
+                            mt: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                          }}
+                        >
+                          <Chip
+                            label="Batch"
+                            size="small"
+                            sx={{
+                              backgroundColor: '#FFC107',
+                              color: '#000000',
+                              fontWeight: 600,
+                            }}
+                          />
+                        </Box>
+                      )}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 1,
+                          mb: 1,
+                        }}
+                      >
+                        {getSelectedBatchesForCenter(
+                          state.stateId,
+                          district.districtId,
+                          block.blockId,
+                          center.centerId
+                        ).map((batch, index) => (
+                          <Chip
+                            key={`batch-${center.centerId}-${
+                              batch.id || index
+                            }`}
+                            label={batch.name}
+                            onDelete={() =>
+                              handleRemoveBatch(
+                                state.stateId,
+                                district.districtId,
+                                block.blockId,
+                                center.centerId,
+                                batch.id
+                              )
+                            }
+                            deleteIcon={<CloseIcon />}
+                            sx={{
+                              backgroundColor: '#FFC107',
+                              color: '#000000',
+                              fontSize: '0.6rem',
+                              '& .MuiChip-label': {
+                                fontSize: '0.7rem',
+                              },
+                            }}
+                            disabled={disabled || readonly}
+                          />
+                        ))}
+                      </Box>
+
+                      {/* Available Batches Dropdown */}
+                      {(() => {
+                        const availableBatches = getAvailableBatches(
+                          state.stateId,
+                          district.districtId,
+                          block.blockId,
+                          center.centerId
+                        );
+                        const isLoading =
+                          loadingBatches[center.centerId] || false;
+                        const allBatches = batches[center.centerId];
+
+                        // Show message if center is selected (always show for selected centers)
+                        // Only show if batches have been loaded (not undefined) or are loading
+                        if (isLoading || allBatches !== undefined) {
+                          return (
+                            <FormControl fullWidth size="small">
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  display: 'block',
+                                  mb: 0.5,
+                                  color: '#666',
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Select a Batch:
+                              </Typography>
+                              {isLoading ? (
+                                <Box
+                                  sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    p: 1,
+                                  }}
+                                >
+                                  <CircularProgress size={16} />
+                                  <Typography
+                                    variant="caption"
+                                    sx={{ ml: 1, color: '#666' }}
+                                  >
+                                    Loading batches...
+                                  </Typography>
+                                </Box>
+                              ) : allBatches.length === 0 ? (
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: '#d32f2f',
+                                    fontStyle: 'italic',
+                                    p: 1,
+                                  }}
+                                >
+                                  No batches found
+                                </Typography>
+                              ) : availableBatches.length > 0 ? (
+                                <Select
+                                  value=""
+                                  onChange={(e) => {
+                                    const batchId = e.target.value;
+                                    if (batchId) {
+                                      handleBatchSelect(
+                                        state.stateId,
+                                        district.districtId,
+                                        block.blockId,
+                                        center.centerId,
+                                        batchId
+                                      );
+                                    }
+                                  }}
+                                  displayEmpty
+                                  disabled={disabled || readonly}
+                                  size="small"
+                                  sx={{ backgroundColor: 'white' }}
+                                >
+                                  <MenuItem value="">
+                                    <em>Select Batch</em>
+                                  </MenuItem>
+                                  {availableBatches.map((batch, index) => (
+                                    <MenuItem
+                                      key={`batch-menu-${center.centerId}-${
+                                        batch.id || index
+                                      }`}
+                                      value={batch.id}
+                                    >
+                                      {batch.name}
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              ) : (
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    color: '#666',
+                                    fontStyle: 'italic',
+                                  }}
+                                >
+                                  No more batches available
+                                </Typography>
+                              )}
+                            </FormControl>
+                          );
+                        }
+                        return null;
+                      })()}
+                    </Box>
+                  ))}
+
+                  {/* Available Centers Dropdown */}
+                  {(() => {
+                    const availableCenters = getAvailableCenters(
                       state.stateId,
                       district.districtId,
                       block.blockId
-                    ).length > 0 && (
-                      <Box sx={{ mb: 1, mt: 1 }}>
-                        <Chip
-                          label="Selected Centers"
-                          size="small"
-                          sx={{
-                            backgroundColor: '#fff3e0',
-                            color: '#f57c00',
-                            fontWeight: 600,
-                            mb: 1,
-                          }}
-                        />
-                      </Box>
-                    )}
-                    <Box
-                      sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1 }}
-                    >
-                      {getSelectedCentersForBlock(
-                        state.stateId,
-                        district.districtId,
-                        block.blockId
-                      ).map((center) => (
-                        <Box
-                          key={`center-${block.blockId}-${center.centerId}`}
-                          sx={{
-                            border: '1px solid #e0e0e0',
-                            borderRadius: '8px',
-                            p: 1.5,
-                            mb: 2,
-                            backgroundColor: 'white',
-                            width: '100%',
-                          }}
-                        >
-                          {/* Center Header */}
-                          <Box
+                    );
+                    const isLoading = loadingCenters[block.blockId] || false;
+                    const allCenters = centers[block.blockId];
+
+                    // Show message if no centers found (after loading completes)
+                    if (
+                      !isLoading &&
+                      allCenters !== undefined &&
+                      allCenters.length === 0 &&
+                      availableCenters.length === 0
+                    ) {
+                      return (
+                        <Box sx={{ mt: 1, p: 1 }}>
+                          <Typography
+                            variant="caption"
                             sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              mb: 1.5,
-                              pb: 1,
-                              borderBottom: '1px solid #e0e0e0',
+                              color: '#d32f2f',
+                              fontStyle: 'italic',
                             }}
                           >
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1,
-                              }}
-                            >
-                              <Chip
-                                label="Center"
-                                size="small"
-                                sx={{
-                                  backgroundColor: '#fff3e0',
-                                  color: '#f57c00',
-                                  fontWeight: 600,
-                                }}
-                              />
-                              <Typography
-                                variant="subtitle2"
-                                sx={{ fontWeight: 600, fontSize: '1rem' }}
-                              >
-                                {center.centerName}
-                              </Typography>
-                            </Box>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                handleRemoveCenter(
-                                  state.stateId,
-                                  district.districtId,
-                                  block.blockId,
-                                  center.centerId
-                                )
-                              }
-                              disabled={disabled || readonly}
-                              sx={{ color: 'error.main' }}
-                            >
-                              <CloseIcon fontSize="small" />
-                            </IconButton>
-                          </Box>
-
-                          {/* Batches as Chips */}
-                          {getSelectedBatchesForCenter(
-                            state.stateId,
-                            district.districtId,
-                            block.blockId,
-                            center.centerId
-                          ).length > 0 && (
-                            <Box sx={{ mb: 1, mt: 1 }}>
-                              <Chip
-                                label="Selected Batches"
-                                size="small"
-                                sx={{
-                                  backgroundColor: '#f3e5f5',
-                                  color: '#7b1fa2',
-                                  fontWeight: 600,
-                                  mb: 1,
-                                }}
-                              />
-                            </Box>
-                          )}
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              flexWrap: 'wrap',
-                              gap: 1,
-                              mb: 1,
-                            }}
-                          >
-                            {getSelectedBatchesForCenter(
-                              state.stateId,
-                              district.districtId,
-                              block.blockId,
-                              center.centerId
-                            ).map((batch, index) => (
-                              <Chip
-                                key={`batch-${center.centerId}-${
-                                  batch.id || index
-                                }`}
-                                label={batch.name}
-                                onDelete={() =>
-                                  handleRemoveBatch(
-                                    state.stateId,
-                                    district.districtId,
-                                    block.blockId,
-                                    center.centerId,
-                                    batch.id
-                                  )
-                                }
-                                deleteIcon={<CloseIcon />}
-                                sx={{
-                                  backgroundColor: '#f3e5f5',
-                                  color: '#7b1fa2',
-                                }}
-                                disabled={disabled || readonly}
-                              />
-                            ))}
-                          </Box>
-
-                          {/* Available Batches Dropdown */}
-                          {(() => {
-                            const availableBatches = getAvailableBatches(
-                              state.stateId,
-                              district.districtId,
-                              block.blockId,
-                              center.centerId
-                            );
-                            const isLoading =
-                              loadingBatches[center.centerId] || false;
-                            const allBatches = batches[center.centerId];
-
-                            // Show message if center is selected (always show for selected centers)
-                            // Only show if batches have been loaded (not undefined) or are loading
-                            if (isLoading || allBatches !== undefined) {
-                              return (
-                                <FormControl fullWidth size="small">
-                                  <Typography
-                                    variant="caption"
-                                    sx={{
-                                      display: 'block',
-                                      mb: 0.5,
-                                      color: '#666',
-                                      fontWeight: 600,
-                                    }}
-                                  >
-                                    Select a Batch:
-                                  </Typography>
-                                  {isLoading ? (
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        p: 1,
-                                      }}
-                                    >
-                                      <CircularProgress size={16} />
-                                      <Typography
-                                        variant="caption"
-                                        sx={{ ml: 1, color: '#666' }}
-                                      >
-                                        Loading batches...
-                                      </Typography>
-                                    </Box>
-                                  ) : allBatches.length === 0 ? (
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        color: '#d32f2f',
-                                        fontStyle: 'italic',
-                                        p: 1,
-                                      }}
-                                    >
-                                      No batches found
-                                    </Typography>
-                                  ) : availableBatches.length > 0 ? (
-                                    <Select
-                                      value=""
-                                      onChange={(e) => {
-                                        const batchId = e.target.value;
-                                        if (batchId) {
-                                          handleBatchSelect(
-                                            state.stateId,
-                                            district.districtId,
-                                            block.blockId,
-                                            center.centerId,
-                                            batchId
-                                          );
-                                        }
-                                      }}
-                                      displayEmpty
-                                      disabled={disabled || readonly}
-                                      size="small"
-                                      sx={{ backgroundColor: 'white' }}
-                                    >
-                                      <MenuItem value="">
-                                        <em>Select Batch</em>
-                                      </MenuItem>
-                                      {availableBatches.map((batch, index) => (
-                                        <MenuItem
-                                          key={`batch-menu-${center.centerId}-${
-                                            batch.id || index
-                                          }`}
-                                          value={batch.id}
-                                        >
-                                          {batch.name}
-                                        </MenuItem>
-                                      ))}
-                                    </Select>
-                                  ) : (
-                                    <Typography
-                                      variant="caption"
-                                      sx={{
-                                        color: '#666',
-                                        fontStyle: 'italic',
-                                      }}
-                                    >
-                                      No more batches available
-                                    </Typography>
-                                  )}
-                                </FormControl>
-                              );
-                            }
-                            return null;
-                          })()}
+                            No centers found
+                          </Typography>
                         </Box>
-                      ))}
-                    </Box>
-
-                    {/* Available Centers Dropdown */}
-                    {(() => {
-                      const availableCenters = getAvailableCenters(
-                        state.stateId,
-                        district.districtId,
-                        block.blockId
                       );
-                      const isLoading = loadingCenters[block.blockId] || false;
-                      const allCenters = centers[block.blockId];
+                    }
 
-                      // Show message if no centers found (after loading completes)
-                      if (
-                        !isLoading &&
-                        allCenters !== undefined &&
-                        allCenters.length === 0 &&
-                        availableCenters.length === 0
-                      ) {
-                        return (
-                          <Box sx={{ mt: 1, p: 1 }}>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: '#d32f2f',
-                                fontStyle: 'italic',
-                              }}
-                            >
-                              No centers found
-                            </Typography>
-                          </Box>
-                        );
-                      }
-
-                      return availableCenters.length > 0 ? (
+                    // Show dropdown if loading OR if centers exist (even if all are selected)
+                    if (
+                      isLoading ||
+                      (allCenters !== undefined && allCenters.length > 0)
+                    ) {
+                      return (
                         <FormControl fullWidth size="small" sx={{ mt: 1 }}>
                           <Typography
                             variant="caption"
@@ -1631,7 +1796,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                                 Loading centers...
                               </Typography>
                             </Box>
-                          ) : (
+                          ) : availableCenters.length > 0 ? (
                             <Select
                               value=""
                               onChange={(e) => {
@@ -1671,13 +1836,26 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
                                 </MenuItem>
                               ))}
                             </Select>
+                          ) : (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                color: '#666',
+                                fontStyle: 'italic',
+                                p: 1,
+                              }}
+                            >
+                              All centers have been selected
+                            </Typography>
                           )}
                         </FormControl>
-                      ) : null;
-                    })()}
-                  </Box>
-                ))}
-              </Box>
+                      );
+                    }
+
+                    return null;
+                  })()}
+                </Box>
+              ))}
 
               {/* Available Blocks Dropdown */}
               {(() => {
