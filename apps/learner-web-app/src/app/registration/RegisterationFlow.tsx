@@ -58,6 +58,7 @@ const RegisterationFlow = () => {
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creatingAccount, setCreatingAccount] = useState(false);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
 
@@ -266,6 +267,9 @@ const RegisterationFlow = () => {
     return () => clearTimeout(timer);
   }, [verificationSuccessModal]);
   const handleCreateAccount = async () => {
+    if (creatingAccount) return; // Prevent multiple clicks
+    
+    setCreatingAccount(true);
     try {
       const localPayload = localStorage.getItem('localPayload');
       if (localPayload ) {
@@ -336,7 +340,11 @@ const RegisterationFlow = () => {
 
         console.log(responseUserData);
       }
-    } catch (error) { }
+    } catch (error) {
+      showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.ERROR_CREATING_ACCOUNT'), 'error');
+    } finally {
+      setCreatingAccount(false);
+    }
   };
   // formData.mobile = '8793607919';
   // formData.firstName = 'karan';
@@ -677,6 +685,7 @@ const RegisterationFlow = () => {
               confirmPassword={confirmPassword}
               onConfirmPasswordChange={setConfirmPassword}
               onSubmit={handleCreateAccount}
+              isSubmitDisabled={creatingAccount}
               belowEighteen={formData.guardian_name ? true : false}
               tenantName={tenantName}
             />

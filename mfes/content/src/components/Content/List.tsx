@@ -285,6 +285,7 @@ export default function Content(props: Readonly<ContentProps>) {
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
+
       const content: any[] = [];
       const QuestionSet: any[] = [];
       let count = 0;
@@ -315,7 +316,6 @@ export default function Content(props: Readonly<ContentProps>) {
         // filter.primaryCategory = [
         //     'Learning Resource','Practice Question Set','Activity','Story'];
         console.log("filter====>" , filter);
-
         resultResponse = await ContentSearch({
           ...filter,
           offset: adjustedOffset,
@@ -326,7 +326,9 @@ export default function Content(props: Readonly<ContentProps>) {
       }
       else{    
         const program = searchParams.get('program');
-        if(program)
+        const search = searchParams.get('q');
+        
+        if(program || search)
         {
           resultResponse = await ContentSearch({
             ...filter,

@@ -9,6 +9,7 @@ import {
   Button,
   Alert,
   Link,
+  CircularProgress,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
@@ -345,9 +346,20 @@ const CreateAccountForm = ({
             '&:hover': {
               backgroundColor: '#f2b800',
             },
+            '&:disabled': {
+              backgroundColor: '#E0E0E0',
+              color: '#9E9E9E',
+            },
           }}
         >
-          Create Account
+          {isSubmitDisabled ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={20} sx={{ color: '#9E9E9E' }} />
+              <span>Creating Account...</span>
+            </Box>
+          ) : (
+            'Create Account'
+          )}
         </Button>
       </Box>
     </>
