@@ -246,8 +246,8 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
             ) {
               // Only include active batches
               if (
-                cohort?.status === 'active' ||
-                cohort?.cohortStatus === 'active'
+                ((cohort?.status === 'active' ||
+                cohort?.cohortStatus === 'active')&& cohort?.cohortMemberStatus==="active")
               ) {
                 batches.push(cohort);
               }
