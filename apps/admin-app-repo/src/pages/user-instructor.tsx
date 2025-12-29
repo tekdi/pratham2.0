@@ -4,7 +4,10 @@ import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
-import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import {
+  enhanceUiSchemaWithGrid,
+  splitUserData,
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
@@ -42,7 +45,10 @@ import { Button } from '@mui/material';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import {
+  bulkCreateCohortMembers,
+  updateCohortMemberStatus,
+} from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import restoreIcon from '../../public/images/restore_user.svg';
@@ -75,6 +81,7 @@ import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/Facilitato
 import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
+import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -802,6 +809,40 @@ const Facilitator = () => {
     console.log('########## changed', status);
     setButtonShowState(status);
   };
+
+  // Helper function to extract all batch IDs from the nested structure
+  const extractBatchIds = (nestedStructure: any): string[] => {
+    const batchIds: string[] = [];
+
+    if (!nestedStructure || !Array.isArray(nestedStructure)) {
+      return batchIds;
+    }
+
+    nestedStructure.forEach((state) => {
+      if (state?.districts && Array.isArray(state.districts)) {
+        state.districts.forEach((district) => {
+          if (district?.blocks && Array.isArray(district.blocks)) {
+            district.blocks.forEach((block) => {
+              if (block?.centers && Array.isArray(block.centers)) {
+                block.centers.forEach((center) => {
+                  if (center?.batches && Array.isArray(center.batches)) {
+                    center.batches.forEach((batch) => {
+                      if (batch?.id) {
+                        batchIds.push(String(batch.id));
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+
+    return batchIds;
+  };
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -1171,21 +1212,25 @@ const Facilitator = () => {
                       // telemetryCallbacks(telemetryUpdateKey);
 
                       //map user to tenant
-                      // Ensure selectedCenterId is a string (handle array case)
-                      const cohortId = Array.isArray(selectedCenterId)
-                        ? selectedCenterId[0]
-                        : selectedCenterId;
+                      // Extract all batch IDs from the nested structure
+                      const batchIds = extractBatchIds(selectedCenterId);
 
                       console.log('Creating with User ID:', selectedUserId);
-                      console.log(
-                        'Creating with Center ID (cohortId):',
-                        cohortId
-                      );
+                      console.log('Extracted Batch IDs:', batchIds);
 
-                      // Call the cohortmember/create API
+                      if (batchIds.length === 0) {
+                        showToastMessage(
+                          'Please select at least one batch',
+                          'error'
+                        );
+                        setIsMappingInProgress(false);
+                        return;
+                      }
+
+                      // Call the cohortmember/create API with extracted batch IDs
                       const response = await bulkCreateCohortMembers({
                         userId: [selectedUserId],
-                        cohortId: [cohortId],
+                        cohortId: batchIds,
                         // removeCohortId: [],
                       });
 
