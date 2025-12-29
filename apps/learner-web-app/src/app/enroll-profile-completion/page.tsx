@@ -11,7 +11,13 @@ import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import { Box } from '@mui/material';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
-
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
 const EnrollProfileCompletionInner = () => {
   const router = useRouter();
   const [signupSuccessModal, setSignupSuccessModal] = useState(false);
@@ -72,7 +78,8 @@ const EnrollProfileCompletionInner = () => {
         router.push('/programs');
         return;
       }
-
+     
+        else{
       // Set localStorage values similar to callBackSwitchDialog
       localStorage.setItem('userId', storedUserId);
       localStorage.setItem('templtateId', tenantData?.templateId);
@@ -126,6 +133,7 @@ const EnrollProfileCompletionInner = () => {
 
       // Show success modal instead of redirecting immediately
       setSignupSuccessModal(true);
+    }
     } catch (error) {
       console.error('Failed to access program:', error);
       router.push('/programs');
@@ -138,8 +146,34 @@ const EnrollProfileCompletionInner = () => {
 
   const onSigin = () => {
     setSignupSuccessModal(false);
+     if(localStorage.getItem('isAndroidApp') === 'true')
+        {
+         // Send message to React Native WebView
+
+               const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+               
+                     const program = JSON.parse(enrolledProgramData || '{}');
+
+
+         if (window.ReactNativeWebView) {
+           window.ReactNativeWebView.postMessage(JSON.stringify({
+             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+             data: {
+               userId: localStorage.getItem('userId'),
+               tenantId: program.tenantId,
+               token: localStorage.getItem('token'),
+               refreshToken: localStorage.getItem('refreshToken'),
+             
+               // Add any data you want to send
+             }
+           }));
+         }
+        }
+        else{
+              router.push(landingPage || '/home');
+
+    }
     // Navigate to landing page
-    router.push(landingPage || '/home');
   };
 
   return (

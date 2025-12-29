@@ -320,7 +320,26 @@ const LoginPage = () => {
         } else {
         console.log('tenantData', tenantDataDetails);
         if(tenantDataDetails.length ===1) {
+          if(localStorage.getItem('isAndroidApp') === 'true')
+            {
+             // Send message to React Native WebView
+             if (window.ReactNativeWebView) {
+               window.ReactNativeWebView.postMessage(JSON.stringify({
+                 type: 'LOGIN_INTO_ONLY_ONE_PROGRAM_EVENT', // Event type identifier
+                 data: {
+                   userId: userResponse?.userId,
+                   tenantId:selectedTenantId,
+                   token: localStorage.getItem('token'),
+                   refreshToken: localStorage.getItem('refreshToken'),
+                 
+                   // Add any data you want to send
+                 }
+               }));
+             }
+            }
+            else{
          router.push(`${landingPage}`)
+            }
          // router.push(`/programs?tenantId=${tenantDataDetails[0]?.tenantId}`);
         }
         else{

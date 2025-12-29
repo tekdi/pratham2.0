@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress, Checkbox, FormControlLabel } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { useTranslation } from 'next-i18next';
@@ -433,9 +433,24 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      // Select all users on current page
+      const allUserIds = users.map(user => user.userId);
+      setSelectedUsers(new Set(allUserIds));
+    } else {
+      // Deselect all
+      setSelectedUsers(new Set());
+    }
+  };
+
   const selectedLearnerNames = users
     .filter((user) => selectedUsers.has(user.userId))
     .map((user) => user.name);
+
+  // Determine select all checkbox state
+  const allSelected = users.length > 0 && users.every(user => selectedUsers.has(user.userId));
+  const someSelected = users.some(user => selectedUsers.has(user.userId)) && !allSelected;
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#FBF4E4', pb: selectedUsers.size > 0 ? '80px' : 0, overflowX: 'hidden' }}>
@@ -511,6 +526,33 @@ const UserRegistrationList = () => {
                 <Typography sx={{ fontSize: '14px', color: '#4A4640', fontWeight: 500 }}>
                     {t('USER_REGISTRATION.TO_TAKE_ACTION_SELECT_LEARNER')}
                 </Typography>
+            </Box>
+        )}
+
+        {/* Select All Checkbox */}
+        {users.length > 0 && (
+            <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', bgcolor: '#fff', p: 1.5, borderRadius: '8px' }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={allSelected}
+                            indeterminate={someSelected}
+                            onChange={handleSelectAll}
+                            sx={{ 
+                                '&.Mui-checked': { color: '#1E1B16' },
+                                '&.MuiCheckbox-indeterminate': { color: '#1E1B16' }
+                            }}
+                        />
+                    }
+                    label={
+                        <Typography sx={{ fontSize: '14px', fontWeight: 500, color: '#1E1B16' }}>
+                            {allSelected 
+                                ? t('USER_REGISTRATION.DESELECT_ALL') || 'Deselect All'
+                                : t('USER_REGISTRATION.SELECT_ALL') || 'Select All'}
+                            {selectedUsers.size > 0 && ` (${selectedUsers.size})`}
+                        </Typography>
+                    }
+                />
             </Box>
         )}
 
