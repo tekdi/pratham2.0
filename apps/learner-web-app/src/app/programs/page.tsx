@@ -15,12 +15,17 @@ function ProgramsContent() {
   const { t } = useTranslation();
   const [currentTab, setCurrentTab] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
+  const [isAndroidApp, setIsAndroidApp] = useState(true);
 
   useEffect(() => {
     const processData = async () => {
       // Safely access localStorage only on client side
       const storedUserId = localStorage.getItem('userId');
       setUserId(storedUserId);
+      
+      // Check if user is on Android app
+      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      setIsAndroidApp(isAndroid);
 
       // Read tab from query params on mount
       const tabParam = searchParams.get('tab');
@@ -30,10 +35,9 @@ function ProgramsContent() {
         setCurrentTab(0);
       } else {
         // Default to explore programs if no tab param
-        let userId = storedUserId;
-        if (userId) {
+        if (storedUserId) {
           // Fetch user's enrolled programs to exclude them from explore programs
-          const data = await getUserDetails(userId, true);
+          const data = await getUserDetails(storedUserId, true);
           console.log('data=====>', data?.result?.userData?.tenantData);
           const tenantData = data?.result?.userData?.tenantData || [];
           const enrolledTenantIds = tenantData
@@ -174,7 +178,9 @@ function ProgramsContent() {
         {/* Content Section */}
         <Box
           sx={{
-            marginBottom: { xs: '100px', sm: '90px', md: '80px' }, // More space on mobile for footer
+            marginBottom: isAndroidApp 
+              ? { xs: '20px', sm: '20px', md: '20px' } 
+              : { xs: '100px', sm: '90px', md: '80px' }, // More space on mobile for footer
           }}
         >
           {currentTab === 0 && userId !== null && (
@@ -188,6 +194,7 @@ function ProgramsContent() {
         </Box>
 
         {/* QR and App Download Section - Sticky at bottom */}
+        {!isAndroidApp && (
         <Box
           sx={{
             background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
@@ -322,6 +329,7 @@ function ProgramsContent() {
             </Grid>
           </Container>
         </Box>
+        )}
       </Box>
     </>
   );
