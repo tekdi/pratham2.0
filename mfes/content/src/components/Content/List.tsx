@@ -138,6 +138,8 @@ export default function Content(props: Readonly<ContentProps>) {
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
+  const tab = searchParams.get('tab');
+
   const [contentData, setContentData] = useState<
     ImportedContentSearchResponse[]
   >([]);
@@ -327,8 +329,9 @@ export default function Content(props: Readonly<ContentProps>) {
       else{    
         const program = searchParams.get('program');
         const search = searchParams.get('q');
+
         
-        if(program || search)
+        if(program || (search && tab === '1'))
         {
           resultResponse = await ContentSearch({
             ...filter,
@@ -390,7 +393,7 @@ export default function Content(props: Readonly<ContentProps>) {
         count,
       };
     },
-    [props?._config]
+    [props?._config,tab]
   );
 
   // Memoized track data fetching

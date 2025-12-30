@@ -244,14 +244,14 @@ const UserRegistrationList = () => {
 
   // Fetch users when tab, location, or page changes (skip initial mount)
   useEffect(() => {
-    if (!hasLocationFilters) {
-      return;
-    }
-
     const normalizedSearch = searchQuery.trim();
     const isSearchShort = normalizedSearch.length > 0 && normalizedSearch.length < 3;
 
     if (!isMounted.current) {
+      // Skip initial fetch if location filters are not yet populated
+      if (!hasLocationFilters) {
+        return;
+      }
       isMounted.current = true;
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
