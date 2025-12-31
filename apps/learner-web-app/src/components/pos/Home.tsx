@@ -1,8 +1,10 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@learner/components/pos/Layout';
 
-import { Container, Typography, Grid, Box, useMediaQuery } from '@mui/material';
+import { Container, Typography, Grid, Box, useMediaQuery, Button } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import WhatsNewCarousel from '@learner/components/WhatsNewCarousel';
 import MoreWayCarousel from '@learner/components/MoreWayCarousel';
 import KnwoledgeCarousel from '@learner/components/KnwoledgeCarousel';
@@ -15,6 +17,11 @@ import { useRouter } from 'next/navigation';
 import { SearchButton } from '@learner/components/pos/SearchButton';
 import { ContentSearch, getfilterList } from '@learner/utils/API/contentService';
 import { staticFilterContent } from '@shared-lib-v2/utils/AuthService';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -213,19 +220,128 @@ const rangeLength = contentLanguageField?.range?.length || 0;
   ];
 
   const mediaMD = useMediaQuery('(max-width: 900px)');
+  const prevRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
 
   return (
     <Layout onlyHideElements={['footer']} _topAppBar={{ _config: {} }}>
       <Grid container spacing={4}>
         <Grid item xs={12} md={6}>
-          <Image
-            src="/images/Tab with childrens 7.png"
-            alt="Happy children learning together"
-            layout="responsive"
-            width={1000}
-            height={568}
-            style={{ width: '100%', height: '568px' }}
-          />
+          <Box sx={{ width: '100%', height: '500px', position: 'relative' }}>
+            <Button
+              ref={prevRef}
+              sx={{
+                position: 'absolute',
+                left: 10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                minWidth: '40px',
+                width: '40px',
+                height: '40px',
+                p: 0,
+                borderRadius: '50%',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0px 2px 4px 0px #0000004D',
+                color: '#1F1B13',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                },
+              }}
+            >
+              <ChevronLeftIcon sx={{ fontSize: '28px' }} />
+            </Button>
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={0}
+              slidesPerView={1}
+              loop={true}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false,
+              }}
+              pagination={{
+                clickable: true,
+              }}
+              navigation={{
+                prevEl: prevRef.current,
+                nextEl: nextRef.current,
+              }}
+              onBeforeInit={(swiper) => {
+                if (typeof swiper.params.navigation !== 'boolean') {
+                  if (swiper.params.navigation) {
+                    swiper.params.navigation.prevEl = prevRef.current;
+                    swiper.params.navigation.nextEl = nextRef.current;
+                  }
+                }
+              }}
+              style={{ width: '100%', height: '100%' }}
+            >
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-02.png"
+                  alt="PLP Photos 02"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-03.png"
+                  alt="PLP Photos 03"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-04.png"
+                  alt="PLP Photos 04"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-05.png"
+                  alt="PLP Photos 05"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-06.png"
+                  alt="PLP Photos 06"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+            </Swiper>
+            <Button
+              ref={nextRef}
+              sx={{
+                position: 'absolute',
+                right: 10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 10,
+                minWidth: '40px',
+                width: '40px',
+                height: '40px',
+                p: 0,
+                borderRadius: '50%',
+                backgroundColor: '#FFFFFF',
+                boxShadow: '0px 2px 4px 0px #0000004D',
+                color: '#1F1B13',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                },
+              }}
+            >
+              <ChevronRightIcon sx={{ fontSize: '28px' }} />
+            </Button>
+          </Box>
         </Grid>
         <Grid
           item
@@ -249,6 +365,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 color: '#FDBE16',
                 // position: 'relative',
                 zIndex: 1000,
+                mt: { xs: 4, md: 0 },
                 '@media (min-width: 900px)': {
                   //marginLeft: '-120px',
                 },

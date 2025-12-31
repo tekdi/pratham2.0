@@ -100,6 +100,7 @@ export const fetchAttendanceDetails = async (
         if (newArray.length !== 0) {
           numberOfCohortMembers = newArray.filter(member => member.memberStatus === Status.ACTIVE || member.attendance !== '' ||
             (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
+            (member.memberStatus === "reassigned" && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
             (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))).length;
           cohortMemberList = newArray;
           presentCount = getPresentCount(newArray);
@@ -109,16 +110,19 @@ export const fetchAttendanceDetails = async (
           if (hasDropout) {
             cohortMemberList = newArray.filter((user) => user.memberStatus === Status.ACTIVE ||
             (user.memberStatus === Status.DROPOUT && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
+            (user.memberStatus === "reassigned" && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
             (user.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate))));
             dropoutMemberList = newArray.filter((user) => user.memberStatus === Status.DROPOUT && shortDateFormat(new Date(user.updatedAt)) <= shortDateFormat(new Date(selectedDate)));
             dropoutCount = dropoutMemberList.length;
           }
         } else {
           cohortMemberList = nameUserIdArray.filter((user) => user.memberStatus === Status.ACTIVE ||
+          (user.memberStatus === "reassigned" && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
           (user.memberStatus === Status.DROPOUT && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
           (user.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(user.updatedAt)) > shortDateFormat(new Date(selectedDate))));
           dropoutMemberList = nameUserIdArray.filter((user) => user.memberStatus === Status.DROPOUT && shortDateFormat(new Date(user.updatedAt)) <= shortDateFormat(new Date(selectedDate)));
           numberOfCohortMembers = nameUserIdArray.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
+          (member.memberStatus === "reassigned" && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))||
           (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(selectedDate)))).length;
         }
 

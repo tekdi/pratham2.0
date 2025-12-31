@@ -40,6 +40,17 @@ export const userNameExist = async (userData: any): Promise<any> => {
   }
 };
 
+export const sendMessage = async (messageData: any): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.sendMessage;
+  try {
+    const response = await post(apiUrl, messageData);
+    return response?.data?.result;
+  } catch (error) {
+    console.error('error in sending message', error);
+    throw error;
+  }
+};
+
 export const createCohort = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.cohortCreate;
   try {

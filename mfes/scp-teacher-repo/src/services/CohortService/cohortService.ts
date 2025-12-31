@@ -16,6 +16,8 @@ export interface cohortListData {
   limit?: Number;
   offset?: Number;
   filter?: any;
+  filters?: any;
+  sort?: string[];
   status?: any;
 }
 export interface UpdateCohortMemberStatusParams {

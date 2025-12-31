@@ -138,6 +138,8 @@ export default function Content(props: Readonly<ContentProps>) {
   const [searchValue, setSearchValue] = useState('');
   const [tabValue, setTabValue] = useState<number>(0);
   const [tabs, setTabs] = useState<typeof DEFAULT_TABS>([]);
+  const tab = searchParams.get('tab');
+
   const [contentData, setContentData] = useState<
     ImportedContentSearchResponse[]
   >([]);
@@ -285,6 +287,7 @@ export default function Content(props: Readonly<ContentProps>) {
   // Fetch content with loop to load full data up to offset
   const fetchAllContent = useCallback(
     async (filter: any) => {
+
       const content: any[] = [];
       const QuestionSet: any[] = [];
       let count = 0;
@@ -315,7 +318,6 @@ export default function Content(props: Readonly<ContentProps>) {
         // filter.primaryCategory = [
         //     'Learning Resource','Practice Question Set','Activity','Story'];
         console.log("filter====>" , filter);
-
         resultResponse = await ContentSearch({
           ...filter,
           offset: adjustedOffset,
@@ -324,7 +326,23 @@ export default function Content(props: Readonly<ContentProps>) {
           primaryCategory: ['Course'],
         });
       }
-      else{        
+      else{    
+        const program = searchParams.get('program');
+        const search = searchParams.get('q');
+
+        
+        if(program || (search && tab === '1'))
+        {
+          resultResponse = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+            isPrimaryCategory: true,
+            primaryCategory: [
+              'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive']
+          });        }
+        else{
 
         resultResponse = await ContentSearch({
           ...filter,
@@ -332,7 +350,7 @@ export default function Content(props: Readonly<ContentProps>) {
           limit: adjustedLimit,
           signal: controller.signal,
         });
-
+      }
       }
       
 
@@ -346,7 +364,7 @@ export default function Content(props: Readonly<ContentProps>) {
           offset: adjustedOffset,
           limit: adjustedLimit,
           signal: controller.signal,
-          thematicCount: true,
+          isPrimaryCategory: true,
           primaryCategory: [
             'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
         });
@@ -375,7 +393,7 @@ export default function Content(props: Readonly<ContentProps>) {
         count,
       };
     },
-    [props?._config]
+    [props?._config,tab]
   );
 
   // Memoized track data fetching

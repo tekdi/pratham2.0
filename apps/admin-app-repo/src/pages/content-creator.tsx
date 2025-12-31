@@ -128,7 +128,7 @@ const ContentCreator = () => {
       );
       const staticFilter = {
         role: RoleName.CONTENT_CREATOR,
-        tenantId: storedUserData.tenantData[0].tenantId,
+        // tenantId: storedUserData.tenantData[0].tenantId,
       };
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];

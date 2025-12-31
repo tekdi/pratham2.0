@@ -223,3 +223,21 @@ export const filterOutUserVillages = (
     (village) => !userVillageIdSet.has(village.id)
   );
 };
+
+export const getOverallStatus = (cohortData?: any[]): string => {
+  if (!cohortData || cohortData.length === 0) return '';
+
+  // collect statuses present
+  const has = (s: string) =>
+    cohortData.some((c) => c?.cohortMember?.status === s);
+
+  // priority: active > archived > dropout > fallback (first non-empty)
+  if (has('active')) return 'active';
+  if (has('archived')) return 'archived';
+  if (has('dropout')) return 'dropout';
+
+  // fallback: return the first non-empty known status or empty string
+  const first = cohortData.find((c) => !!c?.cohortMember?.status);
+  return first?.cohortMember?.status ?? '';
+}
+

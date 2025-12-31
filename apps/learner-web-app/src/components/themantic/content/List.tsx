@@ -2,17 +2,16 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import HomeCards from '@learner/app/themantic/HomeCards/HomeCards';
 import {
   Box,
-  Container,
-  Card,
-  CardContent,
   Typography,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
+import { usePageViewCount } from '@learner/hooks/usePageViewCount';
+import { usePathname } from 'next/navigation';
 
 // Dynamic import of Content component with SSR disabled
 const Content = dynamic(() => import('@Content'), {
@@ -35,6 +34,12 @@ const List: React.FC<ListProps> = ({
   // title = 'Content List',
   className = '',
 }) => {
+  const pathname = usePathname();
+  console.log(pathname, 'pathname');
+ const { pageViews, loading, error } = usePageViewCount("/");
+ const { pageViews: pageViewsCount, loading: loadingCount, error: errorCount } = usePageViewCount("/themantic");
+
+
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selectedFilter, setSelectedFilter] = useState<any>('');
 
@@ -102,7 +107,7 @@ const List: React.FC<ListProps> = ({
                     pageName="Course"
                     onTotalCountChange={handleTotalCountChange}
                     filters={{
-                      limit: 3,
+                      limit: 4,
                       filters: {
                         program: 'Experimento India',
                         contentLanguage: [selectedFilter || 'English'],
@@ -113,12 +118,12 @@ const List: React.FC<ListProps> = ({
                       _grid: {
                         xs: 12,
                         sm: 6,
-                        md: 4,
-                        lg: 4,
-                        xl: 4,
+                        md: 3,
+                        lg: 3,
+                        xl: 3,
                       },
                       _containerGrid: {
-                        spacing: { xs: 6, sm: 6, md: 6 },
+                        spacing: { xs: 2, sm: 2, md: 3 },
                       },
                       default_img: '/images/image_ver.png',
                       _card: {
@@ -127,6 +132,7 @@ const List: React.FC<ListProps> = ({
                     }}
                     hasMoreData={false}
                   />
+                
                 </Box>
               </Box>
             </Suspense>
@@ -174,12 +180,19 @@ const List: React.FC<ListProps> = ({
             </Box>
             <Box
               sx={{
+                position: 'relative',
                 '& .css-4oqe9z': {
                   display: 'none !important',
                   marginBottom: '0 !important',
                 },
                 '& .css-17kujh3': {
                   overflowY: 'unset !important',
+                },
+                '& .swiper': {
+                  paddingBottom: '20px',
+                },
+                '& .swiper-slide': {
+                  height: 'auto',
                 },
               }}
             >
@@ -190,7 +203,7 @@ const List: React.FC<ListProps> = ({
                 pageName="content"
                 onTotalCountChange={handleTotalCountChange}
                 filters={{
-                  limit: 3,
+                  limit: 8,
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
@@ -199,15 +212,22 @@ const List: React.FC<ListProps> = ({
                 }}
                 _config={{
                   contentBaseUrl: '/themantic',
-                  _grid: {
-                    xs: 12,
-                    sm: 6,
-                    md: 4,
-                    lg: 4,
-                    xl: 4,
+                  isShowInCarousel: true,
+                  isHideNavigation: false,
+                  _subBox: {
+                    sx: {
+                      position: 'relative',
+                      px: { xs: 0, md: 4 },
+                    },
                   },
-                  _containerGrid: {
-                    spacing: { xs: 6, sm: 6, md: 6 },
+                  _carousel: {
+                    slidesPerView: 1,
+                    autoplay: {
+                      delay: 3000,
+                      disableOnInteraction: false,
+                      pauseOnMouseEnter: true,
+                    },
+                    loop: true,
                   },
                   default_img: '/images/image_ver.png',
                   _card: {
@@ -217,7 +237,22 @@ const List: React.FC<ListProps> = ({
                 hasMoreData={false}
               />
             </Box>
+           
           </Box>
+        {pageViews && pageViewsCount && <Box sx={{ 
+          fontSize: '16px', 
+          color: '#363d47', 
+          fontWeight: 500, 
+          textAlign: 'center', 
+          mt: 4, 
+          p: 2, 
+          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+          borderRadius: '8px',
+          width: 'fit-content',
+          mx: 'auto'
+        }}>
+         Total Visitors: {pageViews+pageViewsCount}
+        </Box>}
         </Box>
       </Box>
     </Layout>
@@ -229,9 +264,13 @@ export default List;
 export const mainCourseCard = (props: any) => (
   <CardComponent
     {...props}
-    titleFontSize="24px"
+    titleFontSize="16px"
     fontWeight={600}
-    minHeight="317px"
+    minHeight="286px"
+    isExplore={false}
+    textTransform="uppercase"
+    titleColor="black"
+    maxTitleLines={1}
   />
 );
 
@@ -244,6 +283,7 @@ export const cardHideExplore = (props: any) => (
     textTransform="uppercase"
     fontWeight={600}
     titleColor="black"
+    maxTitleLines={2}
   />
 );
 export const CardComponent = ({
@@ -257,6 +297,8 @@ export const CardComponent = ({
   textTransform,
   titleColor,
   _card,
+  englishTitle,
+  maxTitleLines = 2,
 }: {
   item: any;
   default_img: any;
@@ -268,6 +310,8 @@ export const CardComponent = ({
   textTransform?: string;
   titleColor?: string;
   _card?: any;
+  englishTitle?: string;
+  maxTitleLines?: number;
 }) => {
   // Extract styling props from _card object if they exist
   const finalTitleFontSize = titleFontSize || _card?.titleFontSize;
@@ -275,6 +319,7 @@ export const CardComponent = ({
   const finalMinHeight = minHeight || _card?.minHeight;
   const finalTextTransform = textTransform || _card?.textTransform;
   const finalTitleColor = titleColor || _card?.titleColor;
+  const finalMaxTitleLines = maxTitleLines || _card?.maxTitleLines || 2;
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -321,30 +366,57 @@ export const CardComponent = ({
         </Box>
 
         {/* Title */}
-        <Typography
-          variant="h6"
-          sx={{
-            fontWeight: finalFontWeight || 400,
-            textAlign: 'center',
-            fontSize: finalTitleFontSize || '16px',
-            letterSpacing: '1px',
-            mt: 0.3,
-            mb: 0.3,
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            color: finalTitleColor || '#212529',
-            px: '16px',
-            textTransform: finalTextTransform || 'uppercase',
-            minHeight: '42px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-        >
-          {item.name || item.title || 'Untitled'}
-        </Typography>
+        <Tooltip title={item.name || item.title || 'Untitled'} arrow>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: finalFontWeight || 400,
+              textAlign: 'center',
+              fontSize: finalTitleFontSize || '16px',
+              letterSpacing: '1px',
+              mt: 0.3,
+              mb: 0.3,
+              display: '-webkit-box',
+              WebkitLineClamp: finalMaxTitleLines,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: finalTitleColor || '#212529',
+              px: '16px',
+              textTransform: finalTextTransform || 'uppercase',
+              minHeight: finalMaxTitleLines === 1 ? '28px' : '42px',
+              wordBreak: 'break-word',
+            }}
+          >
+            {item.name || item.title || 'Untitled'}
+          </Typography>
+        </Tooltip>
+
+        <Tooltip title={englishTitle || ''} arrow>
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: 500,
+              textAlign: 'center',
+              // fontSize: '14px',
+              letterSpacing: '0.5px',
+              display: '-webkit-box',
+              WebkitLineClamp: finalMaxTitleLines,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: finalTitleColor || '#212529',
+              px: '16px',
+              textTransform: 'capitalize',
+              wordBreak: 'break-word',
+              mb: 2,
+              minHeight: finalMaxTitleLines === 1 ? '28px' : '42px',
+              visibility: englishTitle ? 'visible' : 'hidden',
+            }}
+          >
+            {englishTitle || 'Placeholder'}
+          </Typography>
+        </Tooltip>
 
         {/* Explore Button */}
 

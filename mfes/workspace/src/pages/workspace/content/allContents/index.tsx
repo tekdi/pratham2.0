@@ -134,6 +134,7 @@ const AllContentsPage = () => {
     useState<string>(searchTerm);
   const [totalCount, setTotalCount] = useState(0);
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
+  const prevSearchTermRef = useRef(debouncedSearchTerm);
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage - 1);
   };
@@ -237,12 +238,19 @@ const AllContentsPage = () => {
         const sort_by = {
           lastUpdatedOn: order,
         };
-        let offset = debouncedSearchTerm !== '' ? 0 : page * LIMIT;
+        let offset = page * LIMIT;
+        
+        // Reset offset and page only when filter or search term changes
         if (prevFilterRef.current !== filter) {
           offset = 0;
           setPage(0);
-
           prevFilterRef.current = filter;
+        }
+        
+        if (prevSearchTermRef.current !== debouncedSearchTerm) {
+          offset = 0;
+          setPage(0);
+          prevSearchTermRef.current = debouncedSearchTerm;
         }
         console.log('seraching', debouncedSearchTerm);
         const response = await getContent(

@@ -957,5 +957,9 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• यदि उत्तर शीट में कई पृष्ठ हैं, तो प्रत्येक पृष्ठ का अलग से फोटो लें और अपलोड करें",
     "READ_LESS": "कम पढ़ें",
     "READ_MORE": "अधिक पढ़ें"
+  },
+  "USER_REGISTRATION": {
+    "SELECT_ALL": "सभी का चयन करें",
+    "DESELECT_ALL": "सभी का चयन रद्द करें"
   }
 }

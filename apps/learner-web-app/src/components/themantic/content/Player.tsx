@@ -19,6 +19,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
+import { isDownloadContentEnabled } from '@shared-lib-v2/SwitchAccount/DownloadContent.config';
 import {
   ExpandableText,
   findCourseUnitPath,
@@ -446,7 +447,8 @@ const App = ({
               {..._config?.player}
             />
             {item?.content?.artifactUrl &&
-              isDownloadableMimeType(item?.content?.mimeType) && (
+              isDownloadableMimeType(item?.content?.mimeType) &&
+              isDownloadContentEnabled() && (
                 <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                   <Button
                     variant="contained"

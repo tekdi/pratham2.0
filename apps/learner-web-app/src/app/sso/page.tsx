@@ -182,6 +182,7 @@ const SSOContent = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = response.access_token;
       const refreshToken = response?.refresh_token;
+      localStorage.setItem('refreshTokenForAndroid', refreshToken);
       localStorage.setItem('token', token);
       data?.remember
         ? localStorage.setItem('refreshToken', refreshToken)
@@ -190,7 +191,9 @@ const SSOContent = () => {
       const userResponse = await getUserId();
       console.log('userResponse', userResponse);
       localStorage.setItem('userId', userResponse?.userId);
-      localStorage.setItem('tenantId', userResponse?.tenantData[0]?.tenantId);
+      localStorage.setItem('tenantId', userResponse?.tenantData?.find(
+        (tenant: any) => tenant.tenantName === "Pragyanpath"
+       )?.tenantId);
       localStorage.setItem('firstName', userResponse?.firstName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
@@ -244,10 +247,14 @@ const SSOContent = () => {
             // }
           });
         }
-        const uiConfig = userResponse?.tenantData[0]?.params?.uiConfig;
+        const uiConfig = userResponse?.tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.params?.uiConfig;
         console.log('uiConfig', uiConfig);
         const landingPage =
-          userResponse?.tenantData[0]?.params?.uiConfig?.landingPage;
+          userResponse?.tenantData?.find(
+            (tenant: any) => tenant.tenantName === "Pragyanpath"
+           )?.params?.uiConfig?.landingPage;
         localStorage.setItem('landingPage', landingPage);
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
@@ -282,14 +289,21 @@ const SSOContent = () => {
           : '';
       if (roleName === 'Learner') {
         const tenantData = userResponse?.tenantData?.find(
+         (tenant: any) => tenant.tenantName === "Pragyanpath"
+        )?.find(
           (tenant: any) => tenant.tenantId === tenantId
         );
         localStorage.setItem('userId', userResponse?.userId);
-        localStorage.setItem('templtateId', tenantData.templateId);
+        localStorage.setItem('roleId', roleId);
+        localStorage.setItem('templtateId', tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
 
-        const uiConfig = tenantData?.params?.uiConfig;
+        const uiConfig = tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.params?.uiConfig;
 
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
@@ -313,10 +327,14 @@ const SSOContent = () => {
         };
         telemetryFactory.interact(telemetryInteract);
 
-        const channelId = tenantData.channelId;
+        const channelId = tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.channelId;
         localStorage.setItem('channelId', channelId);
 
-        const collectionFramework = tenantData?.collectionFramework;
+        const collectionFramework = tenantData?.find(
+          (tenant: any) => tenant.tenantName === "Pragyanpath"
+         )?.collectionFramework;
         localStorage.setItem('collectionFramework', collectionFramework);
 
         document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;

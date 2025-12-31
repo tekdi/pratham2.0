@@ -54,22 +54,32 @@ const ContentDetails = (props: ContentDetailsProps) => {
     const fetchContentDetails = async () => {
       try {
         const result = await hierarchyAPI(identifier as string)as any;
+        console.log('rt=======>', result);
 
 console.log('result=======>', result?.program);
 const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 console.log('currentPath=======>', currentPath);
-const isThematicPath = currentPath.includes('/themantic');
+const isThematicPath = currentPath.includes('/themantic') || hostname.includes('experimentoindia');
 const isPosPath = currentPath.includes('/pos');
 console.log('isThematicPath=======>', isThematicPath);
 
 if(!isThematicPath && !isPosPath && result?.program) {
+  if(localStorage.getItem('channelId')==="pos-channel"){
 
         if (!result?.program?.includes(localStorage.getItem('userProgram')) && !result.program.includes('Open School'))
         {
           router.push('/unauthorized');
           return;
         }
-      }
+      } if(localStorage.getItem('channelId')!==result.channel)
+        {
+         router.push('/unauthorized');
+         return;
+        }
+    
+    }
+      
         const userId = getUserId(props?._config?.userIdLocalstorageName);
         setCheckLocalAuth(checkAuth(Boolean(userId)));
         if (props?._config?.isEnrollmentRequired !== false) {

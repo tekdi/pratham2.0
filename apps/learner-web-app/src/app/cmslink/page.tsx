@@ -121,11 +121,17 @@ export default function CmsLinkPage() {
       router.push('/');
       return;
     }
-
-    const targetUrl =
-      contentType === 'course'
-        ? `/content-details/${identifier}?activeLink=/courses-contents`
-        : `/player/${identifier}?activeLink=/courses-contents?tab=1`;
+    const landingPage =
+    typeof window !== "undefined"
+      ? localStorage.getItem("landingPage")
+      : "";
+  
+  const targetUrl =
+    contentType === "course"
+      ? `/content-details/${identifier}?activeLink=${landingPage}`
+      : `/player/${identifier}?activeLink=${landingPage}&tab=1`;
+  
+  
 
     if (targetUrl) {
       router.push(targetUrl);

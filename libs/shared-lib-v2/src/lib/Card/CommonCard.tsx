@@ -258,7 +258,11 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                   display: '-webkit-box',
                   WebkitBoxOrient: 'vertical',
                   textTransform: 'capitalize',
-                  WebkitLineClamp: 2,
+                  WebkitLineClamp: 1,
+                  '@media (max-width: 600px)': {
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                  },
                 }}
               >
                 <SpeakableText>{englishTitle}</SpeakableText>
@@ -284,10 +288,14 @@ export const CommonCard: React.FC<CommonCardProps> = ({
                 // lineHeight: '22px',
                 color: '#49454F',
                 display: '-webkit-box',
-                WebkitLineClamp: 4,
+                WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                '@media (max-width: 600px)': {
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                },
                 ..._card?._contentText?.sx,
               }}
             >

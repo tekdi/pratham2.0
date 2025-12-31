@@ -22,6 +22,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
+import { isDownloadContentEnabled } from '@shared-lib-v2/SwitchAccount/DownloadContent.config';
 import {
   ExpandableText,
   findCourseUnitPath,
@@ -74,13 +75,16 @@ const App = ({
     const fetch = async () => {
       const response = await fetchContent(identifier);
       const rt = (await hierarchyAPI(courseId as string)) as any;
+      console.log('rt=======>', rt);
       const currentPath =
         typeof window !== 'undefined' ? window.location.pathname : '';
-      const isThematicPath = currentPath.includes('/themantic');
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+      const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
       const isPosPath = currentPath.includes('/pos');
 
       if (!isThematicPath && !isPosPath && rt?.program) {
         console.log('response=======>', rt?.program);
+        if(localStorage.getItem('channelId')==="pos-channel"){
         if (
           !rt?.program?.includes(localStorage.getItem('userProgram')) &&
           !rt.program.includes('Open School')
@@ -89,6 +93,13 @@ const App = ({
           return;
         }
       }
+      if(localStorage.getItem('channelId')!==rt.channel)
+        {
+          router.push('/unauthorized');
+          return;
+        }
+      }
+     
 
       const response2 = await ContentSearch({
         filters: {
@@ -391,7 +402,8 @@ const App = ({
           {..._config?.player}
         />
         {item?.content?.artifactUrl &&
-          isDownloadableMimeType(item?.content?.mimeType || mimeType) && (
+          isDownloadableMimeType(item?.content?.mimeType || mimeType) &&
+          isDownloadContentEnabled() && (
             <Box
               sx={{
                 my: 3,
@@ -537,7 +549,7 @@ const App = ({
             margin: 0,
             maxHeight: '100vh',
           },
-        }}  
+        }}
         PaperProps={{
           sx: {
             width: {

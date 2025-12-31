@@ -134,7 +134,7 @@
     "SKILLING_CENTERS": "Skilling Centers",
     "SKILLING_CENTERS_NEAR_YOU": "Skilling Center Near You",
     "RETURN_TO_LOGIN": "Return to Login",
-    "GO_TO_HOME":"Go to Home",
+    "GO_TO_HOME": "Go to Home",
     "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "You don't have access to this page",
     "ACCESS_DENIED": "Access Denied",
     "WELCOME": "Welcome",
@@ -146,10 +146,10 @@
     "Job family": "Job family",
     "Group Membership": "Group Membership",
     "PSU": "PSU",
-    "UNAUTHORIZED":"You are not authorized to access this site",
+    "UNAUTHORIZED": "You are not authorized to access this site",
     "For Children": "For Children",
     "Self": "Self",
-
+    "FINISH_ENROLL": "Finish Enroll",
     "STATUS": {
       "completed": "Completed",
       "in_progress": "In Progress",
@@ -178,7 +178,8 @@
       "COMPLETE_PROFILE_TITLE": "Complete Your Profile",
       "BACKGROUND_HELP_TEXT": "Help us with your background & other details",
       "INVALID_LINK": "Invalid Link",
-      "FUTURE_WORK": "What do you want to become?"
+      "FUTURE_WORK": "What do you want to become?",
+      "ENROLL_IN_TO": "Enroll in to"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
@@ -200,15 +201,16 @@
       "HOME": "Home",
       "KNOWLEDGE_BANK": "Knowledge Bank",
       "REACHOUT_TO_MENTOR": "Reach out to your mentor"
-
     },
     "COURSE": {
       "COMPLETED_ON": "Completed on",
       "STARTED_ON": "Started on",
       "GET_STARTED": "Get Started with L1 Courses",
       "GET_STARTED_CLUB_COURSES": "Get Started with Camp to Club Courses/Contents",
-      "EXPLORE_MORE_COURSES":"Explore More Courses",
-      "EXPLORE_ADDITIONAL_RESOURCES":"Explore Additional Resources & Materials",
+      "EXPLORE_MORE_COURSES": "Explore More Courses",
+      "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
+      "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app from {playStoreLink} to access your account also.",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
@@ -233,7 +235,14 @@
       "OUR_PROGRAMS": "Our Programs",
       "SIGN_UP": "Sign Up",
       "SIGN_IN": "Sign In",
-      "Login with Newton ERP": "Login with Newton ERP"
+      "Login with Newton ERP": "Login with Newton ERP",
+      "DISCOVER_LEARNING_OPPORTUNITIES": "Discover learning opportunities and sign up for programs that match your goals",
+      "ENROLL": "Enroll",
+      "ENROLLING": "Enrolling...",
+      "ACCESS_PROGRAM": "Access Program",
+      "ACCESSING_PROGRAM": "Accessing Program...",
+      "NO_REGISTERED_PROGRAMS": "You haven't registered for any program.",
+      "NO_PROGRAMS_FOUND": "No programs found."
     },
     "LOGIN": {
       "welcome_title": "Welcome to Pratham myLearning!",
@@ -344,7 +353,8 @@
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
-      "PTM_NAME": "PTM Name"
+      "PTM_NAME": "PTM Name",
+      "ADDITIONAL_INFORMATION": "Additional Information"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
@@ -360,7 +370,9 @@
       "CLICK_HERE_TO_LOGIN": "Click here to login",
       "TELL_US_ABOUT_YOURSELF": "1/2 Tell us about yourself",
       "CONTINUE": "Continue",
-      "INVALID_LINK": "Invalid Link"
+      "INVALID_LINK": "Invalid Link",
+      "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
+      "CREATE_ACCOUNT_TO_PROGRAMS": "Create your account to explore and access all our learning programs, Anytime"
     },
     "RESET_PASSWORD_FORM": {
       "OLD_PASSWORD": "Old Password",
@@ -401,10 +413,46 @@
       "ERROR_GENERAL": "An error occurred during SSO authentication",
       "ERROR_MISSING_PARAMS": "Missing required parameters",
       "ERROR_AUTH_FAILED": "Authentication failed"
+    },
+    "PROGRAMS": {
+      "EXPLORE_PROGRAMS": "Explore Programs",
+      "MY_PROGRAMS": "My Programs",
+      "LOADING": "Loading..."
+    },
+    "REGISTRATION_FLOW": {
+      "USERNAME_ALREADY_EXIST": "Username Already Exist",
+      "EMAIL_ALREADY_EXISTS": "Email already exists",
+      "PLEASE_ENTER_VALID_OTP": "Please enter valid otp",
+      "YES_CREATE_ANOTHER_ACCOUNT": "Yes, Create Another Account",
+      "ACCOUNT_ALREADY_EXISTS": "Account Already Exists",
+      "ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT": "Are you sure you want to create another account?",
+      "VERIFY_OTP": "Verify OTP",
+      "VERIFY_YOUR_PHONE_NUMBER": "Verify Your Phone Number",
+      "OKAY": "Okay",
+      "START_EXPLORING": "Start Exploring"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
-
+  "LANDING": {
+    "WELCOME_TO_PRATHAM_LEARNING_PLATFORM": "Welcome to the Pratham Learning Platform!",
+    "YOUR_LEARNING_JOURNEY_BEGINS_HERE": "Your Learning Journey Begins here",
+    "GET_STARTED": "Get Started!",
+    "ALREADY_SIGNED_UP": "Already signed up?",
+    "CLICK_HERE": "Click here",
+    "TO_LOGIN": "to login",
+    "ARE_YOU_PRATHAM_EMPLOYEE": "Are you a Pratham Employee?",
+    "TO_GET_ACCESS_TO_PRAGYANPATH": "to get access to Pragyanpath",
+    "LOGIN": "Log in",
+    "FOR_PRATHAM_EMPLOYEES": "For Pratham Employees",
+    "ACCESS_PRAGYANPATH": "Access Pragyanpath",
+    "ABOUT_PRATHAM": "About Pratham",
+    "ABOUT_PRATHAM_LEARNING_PLATFORM": "About Pratham Learning Platform",
+    "OUR_PROGRAMS": "Our Programs",
+    "LOADING_PROGRAMS": "Loading programs...",
+    "NO_PROGRAMS_AVAILABLE": "No programs available at the moment.",
+    "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "Get Started With Your Learning Journey Now!",
+    "ABOUT_PRATHAM_TEXT": "Pratham Education Foundation (Pratham) is one of the largest education NGOs in India with a record of innovative, rigorously evaluated programs that have inspired similar programs across three continents. With a history spanning 30 years, Pratham's work today extends from programs for early and elementary years to girls and women, and youth skilling.\n\nThrough programs covering 25 states and Union Territories, in an average year, Pratham usually reaches over 6 million children and youth. This is achieved through a combination of efforts: directly working with children and youth in communities, as well as through collaborations with state and district-level governments. Pratham has received notable awards such as the Lui Che Woo Prize, WISE Prize for Innovation, Skoll Award for Social Entrepreneurship, the Henry R Kravis Prize in Leadership and the CNN-IBN Indian of the Year for Public Service. Pratham also received the 2021 Yidan Prize for Education Development and the Yashraj Bharati Samman in 2025."
+  },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
@@ -504,6 +552,7 @@
   "family_member_details": "Family Member Details",
   "SPOUSE_NAME": "Spouse Name",
   "FATHER_NAME": "Father Name",
+  "GUARDIAN_INFORMATION_NOTE": "Guardian Information - This section should be filled up by a parent or guardian",
   "FORGOT_PASSWORD": {
     "TITLE": "Trouble with logging in?",
     "SUBTITLE": "No worries, we’ll help you get back to your account",
@@ -677,7 +726,20 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "hamara_gaon": "hamara gaon",
+    
+    "smile_program": "smile program",
+    "pratham_read_india_initiative_rii": "pratham readindia initiative rii",
+    "government_partnership": "government partnership",
+    "summer_camp_volunteer": "summer camp volunteer",
+    "HAMARA_GAON": "Hamara Gaon",
+    "SMILE_PROGRAM": "Smile Program",
+    "PRATHAM_READ_INDIA_INITIATIVE_RII": "Pratham Read India Initiative RII",
+    "GOVERNMENT_PARTNERSHIP": "Government Partnership",
+    "SUMMER_CAMP_VOLUNTEER": "Summer Camp Volunteer",
+    "WHAT_PROGRAM_ARE_YOU_PART_OF": "What Program Are You Part Of",
+    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -703,10 +765,9 @@
   },
   "Assessment Score": "Assessment Score",
   "FILTER_KEY": {
-     "GROUP_MEMBERSHIP": "groupMembership",
-      "JOB_FAMILY": "jobFamily",
-      "PSU":"psu"
-
+    "GROUP_MEMBERSHIP": "groupMembership",
+    "JOB_FAMILY": "jobFamily",
+    "PSU": "psu"
   },
   "AI": {
     "ASSESSMENT_DETAILS": "Assessment Details",
@@ -820,7 +881,7 @@
     "UPDATE_MARKS": "Update Marks",
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
-    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "NO_ASSESSMENT_TYPE_FOUND": "No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
     "REUPLOAD": "Reupload",

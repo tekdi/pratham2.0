@@ -9,6 +9,7 @@ import {
   Button,
   Alert,
   Link,
+  CircularProgress,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import Visibility from '@mui/icons-material/Visibility';
@@ -128,7 +129,7 @@ const CreateAccountForm = ({
         }}
       >
         <Typography variant="h1" fontWeight="bold" gutterBottom>
-          Sign Up for {tenantName}
+          {`${t('LEARNER_APP.REGISTRATION.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW')} `}
         </Typography>
 
         <Typography
@@ -142,11 +143,12 @@ const CreateAccountForm = ({
             p: '5px',
           }}
         >
-          Get vocational training to land
+          {/* Get vocational training to land
           <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
           an entry level job with 2 months of
           <Box component="br" sx={{ display: { xs: 'block', sm: 'none' } }} />
-          training
+          training */}
+          {t('LEARNER_APP.REGISTRATION.CREATE_ACCOUNT_TO_PROGRAMS')}
         </Typography>
 
         <Typography
@@ -344,9 +346,20 @@ const CreateAccountForm = ({
             '&:hover': {
               backgroundColor: '#f2b800',
             },
+            '&:disabled': {
+              backgroundColor: '#E0E0E0',
+              color: '#9E9E9E',
+            },
           }}
         >
-          Create Account
+          {isSubmitDisabled ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={20} sx={{ color: '#9E9E9E' }} />
+              <span>Creating Account...</span>
+            </Box>
+          ) : (
+            'Create Account'
+          )}
         </Button>
       </Box>
     </>

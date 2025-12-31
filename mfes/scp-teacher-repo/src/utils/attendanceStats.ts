@@ -31,7 +31,7 @@ const getTotalStudentCount = async (
           const updatedAt = new Date(member.updatedAt).setHours(0, 0, 0, 0);
           const currentDate = new Date(fromDate).setHours(0, 0, 0, 0);
 
-          if (member.memberStatus === Status.ARCHIVED && updatedAt <= currentDate) {
+          if ((member.memberStatus === Status.ARCHIVED || member.memberStatus === "reassigned") && updatedAt <= currentDate) {
             return false;
           }
           return createdAt <= currentDate;
@@ -45,6 +45,7 @@ const getTotalStudentCount = async (
     );
 
     const totalStudentsCount = filteredEntries.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
+    (member.memberStatus === "reassigned" && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
     (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))).length;
   
     return totalStudentsCount;
@@ -104,7 +105,7 @@ export const calculatePercentage = async (
       response,
       new Date(date)
     );
-    const presentCount = presentStudents[date].present_students;
+    const presentCount = presentStudents[date]?.present_students ?? 0;
     const presentPercentage = parseFloat(
       ((presentCount / totalStudentsCount) * 100).toFixed(2)
     );
