@@ -171,6 +171,7 @@ const EnrollProfileCompletionInner = () => {
          }
         }
         else{
+          localStorage.removeItem('enrollTenantId')
               router.push(landingPage || '/home');
 
     }
