@@ -33,11 +33,8 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
     { name: t('USER_REGISTRATION.MAY_JOIN_UPCOMING_YEAR'), value: counts.mayJoin, color: '#FFD700' },
   ];
 
-  const hasLocationFilters =
-    Boolean(locationFilters.states?.length) &&
-    Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length) &&
-    Boolean(locationFilters.villages?.length);
+  // Only require states to be selected, other levels are optional
+  const hasLocationFilters = Boolean(locationFilters.states?.length);
 
   const buildFilters = (overrides: Record<string, any> = {}) => {
     const filters: Record<string, any> = {
