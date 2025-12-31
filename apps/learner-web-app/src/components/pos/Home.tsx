@@ -279,7 +279,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
             >
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-02.jpg"
+                  src="/images/PLP Photos-02.png"
                   alt="PLP Photos 02"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -287,7 +287,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-03.jpg"
+                  src="/images/PLP Photos-03.png"
                   alt="PLP Photos 03"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -295,7 +295,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-04.jpg"
+                  src="/images/PLP Photos-04.png"
                   alt="PLP Photos 04"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -303,8 +303,16 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-05.jpg"
+                  src="/images/PLP Photos-05.png"
                   alt="PLP Photos 05"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-06.png"
+                  alt="PLP Photos 06"
                   fill
                   style={{ objectFit: 'cover' }}
                 />
