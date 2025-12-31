@@ -1372,6 +1372,7 @@ const AssessmentDetails = () => {
           onApprove={handleApproveClick}
           onScoreEdit={handleScoreClick}
           isApproved={assessmentData?.status === 'Approved'}
+          isLoading={editLoading}
           questionNumberingMap={questionNumberingMap}
           sectionMapping={sectionMapping}
         />

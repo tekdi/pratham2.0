@@ -40,6 +40,7 @@ export interface AnswerSheetProps {
   onApprove: () => void;
   onScoreEdit: (question: ScoreDetail) => void;
   isApproved?: boolean;
+  isLoading?: boolean;
   questionNumberingMap?: Record<string, string>;
   sectionMapping?: Record<string, string>;
 }
@@ -214,7 +215,7 @@ const AISuggestion: React.FC<AISuggestionProps> = React.memo(
     }
 
     // Function to truncate text to 25 words with better handling for Hindi text
-    const truncateText = (text: string, maxWords: number = 25) => {
+    const truncateText = (text: string, maxWords = 25) => {
       if (!text || text.trim() === '') {
         return text;
       }
@@ -497,10 +498,11 @@ ScoreSummary.displayName = 'ScoreSummary';
 interface ApproveButtonProps {
   onApprove: () => void;
   isApproved: boolean;
+  isLoading?: boolean;
 }
 
 const ApproveButton: React.FC<ApproveButtonProps> = React.memo(
-  ({ onApprove, isApproved }) => {
+  ({ onApprove, isApproved, isLoading = false }) => {
     if (isApproved) return null;
 
     return (
@@ -509,6 +511,7 @@ const ApproveButton: React.FC<ApproveButtonProps> = React.memo(
           variant="contained"
           fullWidth
           onClick={onApprove}
+          disabled={isLoading}
           sx={{
             bgcolor: '#FDBE16',
             color: '#4D4639',
@@ -524,6 +527,10 @@ const ApproveButton: React.FC<ApproveButtonProps> = React.memo(
               bgcolor: '#FDBE16',
               transform: 'translateY(-2px)',
               boxShadow: '0 4px 8px rgba(253, 190, 22, 0.3)',
+            },
+            '&:disabled': {
+              bgcolor: '#E0E0E0',
+              color: '#9E9E9E',
             },
           }}
         >
@@ -717,6 +724,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
   onApprove,
   onScoreEdit,
   isApproved = false,
+  isLoading = false,
   questionNumberingMap = {},
   sectionMapping = {},
 }) => {
@@ -737,7 +745,7 @@ const AnswerSheet: React.FC<AnswerSheetProps> = ({
       />
 
       {/* Approve Button */}
-      <ApproveButton onApprove={onApprove} isApproved={isApproved} />
+      <ApproveButton onApprove={onApprove} isApproved={isApproved} isLoading={isLoading} />
 
       {/* Questions List */}
       <QuestionsList
