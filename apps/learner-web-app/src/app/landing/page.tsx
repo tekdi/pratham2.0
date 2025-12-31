@@ -51,8 +51,8 @@ export default function LandingPage() {
         const programsData = res?.result || [];
         const visiblePrograms = programsData?.filter(
           (program: any) =>
-            program?.params?.uiConfig?.showProgram === true ||
-            program?.params?.uiConfig?.sso?.length > 0
+            program?.params?.uiConfig?.showProgram === true 
+           // program?.params?.uiConfig?.sso?.length > 0
         );
         setPrograms(visiblePrograms || []);
       } catch (error) {
@@ -460,7 +460,7 @@ export default function LandingPage() {
             </Box>
           ) : (
             <Grid container spacing={4}>
-              {programs.slice(0, 3).map((program, index) => (
+              {programs?.map((program, index) => (
                 <Grid item xs={12} md={4} key={program.tenantId || index}>
                   <Card
                     sx={{
