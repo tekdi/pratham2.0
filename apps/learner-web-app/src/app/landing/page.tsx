@@ -42,6 +42,7 @@ export default function LandingPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [ssoPrograms, setSsoPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,6 +56,11 @@ export default function LandingPage() {
            // program?.params?.uiConfig?.sso?.length > 0
         );
         setPrograms(visiblePrograms || []);
+        const ssoProgramsData = programsData?.filter(
+          (program: any) =>
+            program?.params?.uiConfig?.sso?.length > 0
+        );
+        setSsoPrograms(ssoProgramsData || []);
       } catch (error) {
         console.error('Failed to fetch programs:', error);
       } finally {
@@ -87,7 +93,7 @@ export default function LandingPage() {
     };
 
   const handlePragyanpath = () => {
-    const program = programs.find((p) =>
+    const program = ssoPrograms.find((p) =>
       p.name.toLowerCase().includes('pragyanpath')
     );
     if (program) {
