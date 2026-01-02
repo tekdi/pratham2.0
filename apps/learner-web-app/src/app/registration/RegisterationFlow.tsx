@@ -378,7 +378,7 @@ const RegisterationFlow = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-          firstName: formData.firstName,
+        //  firstName: formData.firstName,
           mobile: isUnderEighteen(formData.dob)
             ? formData.parent_phone
             : formData.mobile,
