@@ -391,7 +391,7 @@ const Batch = () => {
   const failureUpdateMessage = 'BATCH.BATCH_UPDATE_FAILED';
   const successCreateMessage = 'BATCH.BATCH_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'batch-created-successfully';
-  const failureCreateMessage = 'BATCH.BATCH_UPDATE_FAILED';
+  const failureCreateMessage = 'BATCH.BATCH_CREATE_FAILED';
 
   return (
     <>

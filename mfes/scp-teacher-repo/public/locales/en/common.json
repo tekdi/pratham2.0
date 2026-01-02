@@ -993,7 +993,8 @@
     "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
     "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
     "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
-    "NO_BATCH_FOUND": "No Batch Found"
+    "NO_BATCH_FOUND": "No Batch Found",
+    "BATCH_CREATE_FAILED": "Something went wrong while creating batch"
   },
   "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
   "STATE": "State",
