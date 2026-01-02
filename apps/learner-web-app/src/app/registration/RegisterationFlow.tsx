@@ -416,8 +416,16 @@ const RegisterationFlow = () => {
     }
   };
 
-  const handleLoginClick = () => {
-    router.push('/login');
+  const handleLoginClick = (username?: string) => {
+    // Close the modal first
+    setAccountExistModal(false);
+    
+    // Use hard navigation to ensure it works
+    if (username) {
+      window.location.href = `/login`;
+    } else {
+      window.location.href = '/login';
+    }
   };
   const handleCloseModal = () => {
     setAccountExistModal(false);
