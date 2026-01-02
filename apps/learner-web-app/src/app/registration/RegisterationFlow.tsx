@@ -61,6 +61,8 @@ const RegisterationFlow = () => {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
+  const enroll = searchParams.get('enroll');
+
 
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
@@ -126,6 +128,12 @@ const RegisterationFlow = () => {
     };
     fetchData();
   }, [tenantId]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && enroll)  {
+      localStorage.setItem('enrollTenantId', enroll as string);
+    }
+  }, [enroll]);
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -370,7 +378,7 @@ const RegisterationFlow = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-          firstName: formData.firstName,
+        //  firstName: formData.firstName,
           mobile: isUnderEighteen(formData.dob)
             ? formData.parent_phone
             : formData.mobile,
