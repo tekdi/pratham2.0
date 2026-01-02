@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Grid, Typography, Tabs, Tab } from '@mui/material';
+import { Box, Container, Grid, Typography, Tabs, Tab, CircularProgress } from '@mui/material';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
@@ -8,6 +8,18 @@ import { useTranslation } from '@shared-lib';
 import Header from '@learner/components/Header/Header';
 import EnrollProgramCarousel from '@learner/components/EnrollProgramCarousel/EnrollProgramCarousel';
 import { getUserDetails } from '@learner/utils/API/userService';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import { profileComplitionCheck } from '@learner/utils/API/userService';
+import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
+import { TenantName } from '@learner/utils/app.constant';
+
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
 
 function ProgramsContent() {
   const router = useRouter();
@@ -16,6 +28,7 @@ function ProgramsContent() {
   const [currentTab, setCurrentTab] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [isAndroidApp, setIsAndroidApp] = useState(true);
+  const [isCheckingEnrollTenantId, setIsCheckingEnrollTenantId] = useState(false);
 
   useEffect(() => {
     const processData = async () => {
@@ -26,6 +39,167 @@ function ProgramsContent() {
       // Check if user is on Android app
       const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       setIsAndroidApp(isAndroid);
+
+      // Check if enrollTenantId exists in localStorage
+      const enrollTenantId = localStorage.getItem('enrollTenantId');
+      if (enrollTenantId && storedUserId) {
+        setIsCheckingEnrollTenantId(true);
+        try {
+          // Get user details to check if tenantId is already enrolled
+          const userData = await getUserDetails(storedUserId, true);
+          const tenantData = userData?.result?.userData?.tenantData || [];
+          
+          // Check if tenantId exists in enrolled programs (My Programs)
+          const enrolledTenant = tenantData.find(
+            (item: any) =>
+              item.tenantId === enrollTenantId &&
+              item?.roles?.some((role: any) => role?.roleName === 'Learner')
+          );
+
+          if (enrolledTenant) {
+            // User is already enrolled - redirect to program page
+            const token = localStorage.getItem('token');
+            if (!token) {
+              console.error('Token not found in localStorage');
+              localStorage.removeItem('enrollTenantId');
+              setIsCheckingEnrollTenantId(false);
+              return;
+            }
+
+            // Handle Android app case
+            if (localStorage.getItem('isAndroidApp') === 'yes') {
+              // Send message to React Native WebView
+              if (window.ReactNativeWebView) {
+                window.ReactNativeWebView.postMessage(JSON.stringify({
+                  type: 'ACCESS_PROGRAM_EVENT',
+                  data: {
+                    userId: storedUserId,
+                    tenantId: enrollTenantId,
+                    token: token,
+                    refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+                  }
+                }));
+              }
+              // Remove enrollTenantId from localStorage
+              localStorage.removeItem('enrollTenantId');
+              // Keep loading state true during redirect
+              return;
+            }
+
+            // Set localStorage values for the program
+            localStorage.setItem('userId', storedUserId);
+            localStorage.setItem('templtateId', enrolledTenant?.templateId);
+            localStorage.setItem(
+              'userIdName',
+              userData?.result?.userData?.username
+            );
+            localStorage.setItem(
+              'firstName',
+              userData?.result?.userData?.firstName || ''
+            );
+
+            const tenantId = enrolledTenant?.tenantId;
+            const tenantName = enrolledTenant?.tenantName;
+            const uiConfig = enrolledTenant?.params?.uiConfig;
+            const landingPage = enrolledTenant?.params?.uiConfig?.landingPage;
+
+            localStorage.setItem('landingPage', landingPage);
+            localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+            localStorage.setItem('tenantId', tenantId);
+            localStorage.setItem('userProgram', tenantName);
+
+            // Set channel and collection framework
+            const channelId = enrolledTenant?.channelId;
+            if (channelId) {
+              localStorage.setItem('channelId', channelId);
+            }
+
+            const collectionFramework = enrolledTenant?.collectionFramework;
+            if (collectionFramework) {
+              localStorage.setItem('collectionFramework', collectionFramework);
+            }
+
+            // Set cookie
+            document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+
+            // Check profile completion
+            await profileComplitionCheck();
+
+            // Handle academic year for YOUTHNET
+            if (tenantName === TenantName.YOUTHNET) {
+              const academicYearResponse = await getAcademicYear();
+              if (academicYearResponse?.[0]?.id) {
+                localStorage.setItem('academicYearId', academicYearResponse[0].id);
+              }
+            }
+
+            // Remove enrollTenantId from localStorage
+            localStorage.removeItem('enrollTenantId');
+
+            // Redirect to landing page (keep loading state true during redirect)
+            router.push(landingPage || '/home');
+            return;
+          } else {
+            // User is not enrolled - get program details and redirect to enroll-profile-completion
+            const tenantInfoResponse = await getTenantInfo();
+            const programsData = tenantInfoResponse?.result || [];
+            const program = programsData.find(
+              (p: any) => p.tenantId === enrollTenantId
+            );
+
+            if (program) {
+              // Store program information similar to handleEnroll function
+              const currentTenantId = localStorage.getItem('tenantId');
+              localStorage.setItem('previousTenantId', currentTenantId || '');
+              localStorage.setItem('tenantId', program.tenantId);
+              localStorage.setItem('userProgram', program?.name);
+
+              // Store uiConfig if available
+              if (program?.params?.uiConfig) {
+                localStorage.setItem(
+                  'uiConfig',
+                  JSON.stringify(program.params.uiConfig)
+                );
+              }
+
+              // Store landing page if available
+              if (program?.params?.uiConfig?.landingPage) {
+                localStorage.setItem(
+                  'landingPage',
+                  program.params.uiConfig.landingPage
+                );
+              }
+
+              // Store enrolled program data for the profile completion page
+              localStorage.setItem(
+                'enrolledProgramData',
+                JSON.stringify({
+                  tenantId: program.tenantId,
+                  name: program.name,
+                  params: program.params,
+                })
+              );
+
+              // Remove enrollTenantId from localStorage
+             // localStorage.removeItem('enrollTenantId');
+
+              // Navigate to enrollment profile completion page (keep loading state true during redirect)
+              router.push('/enroll-profile-completion?directEnroll=true');
+              return;
+            } else {
+              console.error('Program not found for enrollTenantId:', enrollTenantId);
+              localStorage.removeItem('enrollTenantId');
+              setIsCheckingEnrollTenantId(false);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to process enrollTenantId:', error);
+          localStorage.removeItem('enrollTenantId');
+          setIsCheckingEnrollTenantId(false);
+        }
+      } else {
+        setIsCheckingEnrollTenantId(false);
+      }
 
       // Read tab from query params on mount
       const tabParam = searchParams.get('tab');
@@ -58,7 +232,7 @@ function ProgramsContent() {
       }
     };
     processData();
-  }, [searchParams]);
+  }, [searchParams, router]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue);
@@ -69,6 +243,25 @@ function ProgramsContent() {
     params.set('tab', tabValue);
     router.push(`/programs?${params.toString()}`, { scroll: false });
   };
+
+  // Show loader while checking enrollTenantId
+  if (isCheckingEnrollTenantId) {
+    return (
+      <>
+        <Header isShowLogout={true} />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '60vh',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </>
+    );
+  }
 
   return (
     <>

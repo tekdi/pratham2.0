@@ -37,6 +37,7 @@ import {
   profileComplitionCheck,
   updateUser,
 } from '@learner/utils/API/userService';
+import Header from '../Header/Header';
 
 type UserAccount = {
   name: string;
@@ -51,7 +52,8 @@ interface EditProfileProps {
 const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }: EditProfileProps) => {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
-
+  const directEnroll = searchParams.get('directEnroll');
+  console.log('directEnroll', directEnroll);
   // let formData: any = {};
   const [loading, setLoading] = useState(true);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
@@ -386,7 +388,9 @@ if (landingPage) {
         </Box>
       ) : (
         <>
-          <Box
+             {directEnroll == 'true' && <Header isShowLogout={true} />}
+
+         {directEnroll != 'true' && (<Box
             sx={{
               //   p: 2,
               mt: 2,
@@ -400,7 +404,7 @@ if (landingPage) {
             <ArrowBackIcon
               sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
             />
-          </Box>
+          </Box>)}
           <Box
             sx={{
               textAlign: 'center',
