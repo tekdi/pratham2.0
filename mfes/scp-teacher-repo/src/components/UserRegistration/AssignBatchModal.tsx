@@ -284,7 +284,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           });
            console.log('allBatchDetails', allBatchDetails);
           // Store all batches for later filtering by center
-          const allBatchOptions = allBatchDetails?.filter((batch: any) => batch.cohortMemberStatus==="active").map((batch: any) => ({
+          const allBatchOptions = allBatchDetails?.map((batch: any) => ({
             label:
               capitalizeFirstChar(batch.name || batch.cohortName) ||
               t('USER_REGISTRATION.UNNAMED_BATCH'),
