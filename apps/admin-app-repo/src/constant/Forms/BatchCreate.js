@@ -108,12 +108,30 @@ export const BatchCreateSchema = {
       field_type: 'text',
       pattern: '^[a-zA-Z][a-zA-Z ]*[a-zA-Z]$',
     },
+    batch_type: {
+      type: 'string',
+      title: 'Type of Batch',
+      coreField: 0,
+      fieldId: '0417d8fd-47ae-4ec4-9b3b-3f8fdca31625',
+      field_type: 'radio',
+      isRequired: true,
+      enum: [
+        'remote',
+        'regular',
+        'contact',
+      ],
+      enumNames: [
+        'REMOTE',
+        'REGULAR',
+        'CONTACT',
+      ],
+    },
   },
-  required: ['board', 'medium', 'grade', 'name'],
+  required: ['board', 'medium', 'grade', 'name', 'batch_type'],
 };
 
 export const BatchCreateUISchema = {
-  'ui:order': ['board', 'medium', 'grade', 'name'],
+  'ui:order': ['board', 'medium', 'grade', 'name', 'batch_type'],
   board: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
@@ -142,6 +160,12 @@ export const BatchCreateUISchema = {
     'ui:widget': 'CustomTextFieldWidget',
     'ui:options': {
       validateOnBlur: true,
+      hideError: true,
+    },
+  },
+  batch_type: {
+    'ui:widget': 'CustomRadioWidget',
+    'ui:options': {
       hideError: true,
     },
   },
