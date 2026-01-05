@@ -262,6 +262,28 @@ function generateSchemaAndUISchema(fields) {
           allowedFormats: ['.jpg', '.png', '.jpeg'],
         },
       };
+    } else if (type === 'file' && schemaField?.isMultiSelect === false) {
+      schemaField.items = { type: 'string', format: 'uri' };
+      uiSchema[name] = {
+        'ui:widget': 'CustomFileUpload',
+        'ui:options': {
+          isRequired: schemaField?.isRequired,
+          isMultiSelect: schemaField?.isMultiSelect,
+          maxSelections: schemaField?.maxSelection,
+          allowedFormats: [
+            '.jpg',
+            '.png',
+            '.jpeg',
+            '.pdf',
+            '.doc',
+            '.docx',
+            '.xls',
+            '.xlsx',
+            '.ppt',
+            '.pptx',
+          ],
+        },
+      };
     }
 
     if (extra) {
