@@ -139,7 +139,8 @@ const CustomDateWidget = ({
               onClose={handleCalendarClose}
               disabled={isDisabled}
               value={selectedDate || null}
-              onChange={(date) => {
+              onChange={handleDateChange}
+              onAccept={(date) => {
                 handleDateChange(date);
                 handleCalendarClose();
               }}
