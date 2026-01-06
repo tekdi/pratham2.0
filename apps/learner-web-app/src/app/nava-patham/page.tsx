@@ -94,20 +94,7 @@ export default function LandingPage() {
   }, []);
 
   const handleGetStarted = async () => {
-    try {
-      const tenantId = await getPrathamTenantId();
-      if (tenantId) {
-        router.push(`/registration?tenantId=${tenantId}`);
-      } else {
-        console.error('Failed to get tenant ID');
-        // Fallback: redirect without tenantId or show error
-        router.push('/registration');
-      }
-    } catch (error) {
-      console.error('Error fetching tenant ID:', error);
-      // Fallback: redirect without tenantId
-      router.push('/registration');
-    }
+    router.push(`/registration?tenantId=Pratham&enroll=Second%20Chance%20Program`);
   };
 
   const handleLogin = () => {
