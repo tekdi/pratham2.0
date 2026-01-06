@@ -354,7 +354,10 @@
       "GUARDIAN_NAME": "Guardian's Name",
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
-      "PTM_NAME": "PTM Name"
+      "PTM_NAME": "PTM Name",
+      "MY_MENTOR_DETAILS": "My Mentor Details",
+      "MENTOR_NAME": "Mentor Name",
+      "MENTOR_EMAIL": "Mentor Email"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
