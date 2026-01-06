@@ -41,7 +41,7 @@ import face from '../../../public/images/Group 3.png';
 
 //build issue fix for  ⨯ useSearchParams() should be wrapped in a suspense boundary at page
 import { useSearchParams } from 'next/navigation';
-import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import { getTenantInfo, getTenantIdByName } from '@learner/utils/API/ProgramService';
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
@@ -62,6 +62,8 @@ const RegisterationFlow = () => {
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
   const enroll = searchParams.get('enroll');
+  const [fetchedTenantId, setFetchedTenantId] = useState<string | null>(null);
+  const [fetchedEnroll, setFetchedEnroll] = useState<string | null>(null);
 
 
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
@@ -119,21 +121,70 @@ const RegisterationFlow = () => {
         const res = await getTenantInfo();
         console.log('res', res?.result);
 
-        const isPresent = checkTenantId(tenantId, res?.result);
-        console.log('isPresent', isPresent);
-        if (!isPresent) {
-          setInvalidLinkModal(true);
+        // Validate tenantId if provided directly, or fetchedTenantId from enroll parameter
+        const idToCheck =  fetchedTenantId;
+        
+        if (idToCheck) {
+          const isPresent = checkTenantId(idToCheck, res?.result);
+          console.log('isPresent', isPresent);
+          if (!isPresent) {
+            setInvalidLinkModal(true);
+          }
         }
-      } catch (error) { }
+      } catch (error) { 
+        console.error('Error fetching tenant info', error);
+      }
     };
     fetchData();
-  }, [tenantId]);
+  }, [ fetchedTenantId]);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && enroll)  {
-      localStorage.setItem('enrollTenantId', enroll as string);
+    if (typeof window !== 'undefined' && fetchedEnroll)  {
+      localStorage.setItem('enrollTenantId', fetchedEnroll as string);
     }
+  }, [fetchedEnroll]);
+
+  // Fetch tenant ID by name when enroll parameter is present
+  useEffect(() => {
+    const fetchTenantIdByName = async () => {
+      if (tenantId) {
+        try {
+          const tenantIdFromName = await getTenantIdByName(tenantId as string);
+          if (tenantIdFromName) {
+            setFetchedTenantId(tenantIdFromName);
+            console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
+          } else {
+            console.log('No tenant found with name:', enroll);
+          }
+        } catch (error) {
+          console.error('Error fetching tenant ID by name:', error);
+        }
+      }
+    };
+    fetchTenantIdByName();
+  }, [tenantId]);
+  
+  useEffect(() => {
+    const fetchTenantIdByName = async () => {
+      if (enroll) {
+        try {
+          const tenantIdFromName = await getTenantIdByName(enroll as string);
+          console.log('tenantIdFromName########', enroll);
+          if (tenantIdFromName) {
+            setFetchedEnroll(tenantIdFromName);
+              console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
+          } else {
+            console.log('No tenant found with name:', enroll);
+          }
+        } catch (error) {
+          console.error('Error fetching tenant ID by name:', error);
+        }
+      }
+    };
+    fetchTenantIdByName();
   }, [enroll]);
+
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -284,7 +335,17 @@ const RegisterationFlow = () => {
         const payloadData = JSON.parse(
           localStorage.getItem('localPayload') || '{}'
         );
-        const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
+        
+        // Use tenantId if directly provided, otherwise use fetchedTenantId from enroll parameter
+        const finalTenantId = fetchedTenantId;
+        
+        if (!finalTenantId) {
+          showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.INVALID_TENANT'), 'error');
+          setCreatingAccount(false);
+          return;
+        }
+        
+        const tenantData = [{ roleId: RoleId.STUDENT, tenantId: finalTenantId }];
 
         //delete mobile or guardian detail from dob
         let updated_payload = payload;

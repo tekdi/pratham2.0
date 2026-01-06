@@ -51,3 +51,35 @@ export const getPrathamTenantId = async (): Promise<string | null> => {
     return null;
   }
 };
+
+
+export const getTenantIdByName = async (name: string): Promise<string | null> => {
+  const apiUrl = API_ENDPOINTS.program;
+  try {
+    const response = await axios.get(apiUrl);
+    let matchingTenants;
+    if(name === 'Pratham') {
+     matchingTenants =
+      response?.data?.result?.filter((tenant: any) =>
+        tenant?.name === name
+      ) || [];
+    }
+    else{
+      const PrathamTenant =
+      response?.data?.result?.filter((tenant: any) =>
+        tenant?.name === 'Pratham'
+      ) || [];
+      matchingTenants =
+      PrathamTenant[0]?.children?.filter((tenant: any) =>
+        tenant?.name === name
+      ) || []; 
+    }
+
+    return matchingTenants[0]?.tenantId || null;
+
+
+  } catch (error) {
+    console.error('Error in fetching tenant info', error);
+    return null;
+  }
+};
