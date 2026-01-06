@@ -69,7 +69,7 @@ export default function LandingPage() {
     try {
       const tenantId = await getPrathamTenantId();
       if (tenantId) {
-        router.push(`/registration?tenantId=${tenantId}`);
+        router.push(`/registration?tenantId=Pratham`);
       } else {
         console.error('Failed to get tenant ID');
         // Fallback: redirect without tenantId or show error
