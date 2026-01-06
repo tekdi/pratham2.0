@@ -17,7 +17,7 @@ import settingImage from '../../../public/images/settings.png';
 import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/navigation';
-import { getUserDetails } from '@learner/utils/API/userService';
+import { getUserDetails, getMentorList } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
 import { isUndefined } from 'lodash';
@@ -43,6 +43,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const { t } = useTranslation();
   const [selectedOption, setSelectedOption] = useState('');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [villageId, setVillageId] = useState<number | null>(null);
+  const [mentorData, setMentorData] = useState<any>(null);
   const tenantName =
     typeof window !== 'undefined'
       ? localStorage.getItem('userProgram') || ''
@@ -65,8 +67,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   if (storedConfig?.isEditProfile) {
     options.push(t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'));
   }
-  if(!storedConfig?.restrictChangePassword)
-  {
+  if (!storedConfig?.restrictChangePassword) {
     options.push(t('LEARNER_APP.USER_PROFILE_CARD.CHANGE_PASSWORD'));
   }
   const isBelow18 = (dob: string): boolean => {
@@ -91,6 +92,12 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         const userId = localStorage.getItem('userId');
         if (userId) {
           const useInfo = await getUserDetails(userId, true);
+          const extractedVillageId =
+            useInfo?.result?.userData?.customFields?.find(
+              (f: any) => f.label === 'VILLAGE'
+            )?.selectedValues?.[0]?.id ?? null;
+          setVillageId(extractedVillageId);
+          // console.log('villageId!!!!!!!!', extractedVillageId);
           console.log('useInfo', useInfo?.result?.userData);
           setUserData(useInfo?.result?.userData);
         }
@@ -101,6 +108,43 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
 
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    const fetchMentorData = async () => {
+      try {
+        if (villageId) {
+          const mentorResponse = await getMentorList({
+            limit: 100,
+            filters: {
+              working_village: [String(villageId)],
+              role: 'Mobilizer',
+            },
+            sort: ['createdAt', 'asc'],
+            offset: 0,
+          });
+
+          // Handle different possible response structures
+          const mentorList =
+            mentorResponse?.getUserDetails ||
+            mentorResponse?.userDetails ||
+            mentorResponse?.results ||
+            [];
+
+          // Get the first mentor from the list if available
+          if (Array.isArray(mentorList) && mentorList.length > 0) {
+            setMentorData(mentorList[0]);
+          } else {
+            setMentorData(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching mentor data:', error);
+        setMentorData(null);
+      }
+    };
+
+    fetchMentorData();
+  }, [villageId]);
 
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -335,42 +379,46 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           maxWidth: { maxWidth },
         }}
       >
-        {!isUnderEighteen(dob)  ? ( 
-          ((mobile !== '-' && mobile)|| (phoneOwnership !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && phoneOwnership !== 'No'))&&
-          <>
-            <Typography sx={sectionTitleStyle}>
-              {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
-            </Typography>
-            <Box sx={sectionCardStyle}>
-              {/* <Box sx={{ mb: 1.5 }}>
+        {!isUnderEighteen(dob) ? (
+          ((mobile !== '-' && mobile) ||
+            (phoneOwnership !== '-' &&
+              tenantName !== TenantName.CAMP_TO_CLUB &&
+              phoneOwnership !== 'No')) && (
+            <>
+              <Typography sx={sectionTitleStyle}>
+                {t('LEARNER_APP.USER_PROFILE_CARD.CONTACT_INFORMATION')}
+              </Typography>
+              <Box sx={sectionCardStyle}>
+                {/* <Box sx={{ mb: 1.5 }}>
             <Typography sx={labelStyle}>
               {t('LEARNER_APP.USER_PROFILE_CARD.EMAIL_ADDRESS')}
             </Typography>
             <Typography sx={valueStyle}>{email || '-'}</Typography>
           </Box> */}
 
-              <Grid container spacing={1.5}>
+                <Grid container spacing={1.5}>
                 {mobile !== '-' && mobile &&  (
-                  <Grid item xs={6}>
-                    <Typography sx={labelStyle}>
-                      {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
-                    </Typography>
-                    <Typography sx={valueStyle}>{mobile}</Typography>
-                  </Grid>
-                )}
+                    <Grid item xs={6}>
+                      <Typography sx={labelStyle}>
+                        {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+                      </Typography>
+                      <Typography sx={valueStyle}>{mobile}</Typography>
+                    </Grid>
+                  )}
                 {phoneOwnership !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
-                  <Grid item xs={6}>
-                    <Typography sx={labelStyle}>
+                      <Grid item xs={6}>
+                        <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_BELONGS_TO_YOU')}
-                    </Typography>
-                    <Typography sx={valueStyle}>
-                      {toPascalCase(phoneOwnership)}
-                    </Typography>
-                  </Grid>
-                )}
-              </Grid>
-            </Box>
-          </>
+                        </Typography>
+                        <Typography sx={valueStyle}>
+                          {toPascalCase(phoneOwnership)}
+                        </Typography>
+                      </Grid>
+                    )}
+                </Grid>
+              </Box>
+            </>
+          )
         ) : (
           <>
             <Typography sx={sectionTitleStyle}>
@@ -510,15 +558,15 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 )}
 
                 {qualification !== '-' && tenantName !== TenantName.CAMP_TO_CLUB && (
-                  <Grid item xs={6}>
-                    <Typography sx={labelStyle}>
+                    <Grid item xs={6}>
+                      <Typography sx={labelStyle}>
                       {t('LEARNER_APP.USER_PROFILE_CARD.HIGHEST_QUALIFICATION')}
-                    </Typography>
-                    <Typography sx={valueStyle}>
+                      </Typography>
+                      <Typography sx={valueStyle}>
                       {t(`FORM.${qualification}`, { defaultValue: qualification })}
-                    </Typography>
-                  </Grid>
-                )}
+                      </Typography>
+                    </Grid>
+                  )}
                 {[state, district, block, village].filter(Boolean).join(', ') !==
                   '-, -, -, -' && (
                   <Grid item xs={12}>
@@ -528,6 +576,50 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     <Typography sx={valueStyle}>
                       {[state, district, block, village].filter(Boolean).join(', ')}
                     </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Box>
+          </>
+        )}
+
+      {/* TODO: Add condition based on smart classroom show mentor details */}
+      {/* My Mentor Details */}
+        {mentorData && (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.MY_MENTOR_DETAILS')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              <Grid container spacing={1.5}>
+                {mentorData.firstName || mentorData.lastName ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_NAME')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {toPascalCase(
+                        [mentorData.firstName, mentorData.lastName]
+                          .filter(Boolean)
+                          .join(' ')
+                      )}
+                    </Typography>
+                  </Grid>
+                ) : null}
+                {mentorData.email && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_EMAIL')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{mentorData.email}</Typography>
+                  </Grid>
+                )}
+                {mentorData.mobile && (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{mentorData.mobile}</Typography>
                   </Grid>
                 )}
               </Grid>

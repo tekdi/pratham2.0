@@ -471,6 +471,7 @@ const Centers = () => {
       callback: async (row: any) => {
         setSelectedCenter(row);
         setOpenBatchModal(true);
+        // console.log('row in view batch', row);
       },
       show: (row) => row.status !== 'archived',
     },
@@ -731,6 +732,11 @@ const Centers = () => {
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'GRADE'
                 )?.selectedValues || []
+              }
+              centerType={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'TYPE_OF_CENTER'
+                )?.selectedValues?.[0]?.value || null
               }
             />
           ) : null}

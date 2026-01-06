@@ -768,7 +768,7 @@ const CentersPage = () => {
           extraFieldsUpdate={{}}
           successCreateMessage="BATCH.BATCH_CREATED_SUCCESSFULLY"
           telemetryCreateKey="batch-created-successfully"
-          failureCreateMessage="BATCH.BATCH_CREATION_FAILED"
+          failureCreateMessage="BATCH.BATCH_CREATE_FAILED"
           successUpdateMessage="BATCH.BATCH_UPDATED_SUCCESSFULLY"
           telemetryUpdateKey="batch-updated-successfully"
           failureUpdateMessage="BATCH.BATCH_UPDATE_FAILED"

@@ -424,7 +424,9 @@
     "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
     "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
     "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
-    "NO_BATCH_FOUND": "No Batch Found"
+    "NO_BATCH_FOUND": "No Batch Found",
+    "TYPE_OF_BATCH": "Type of Batch",
+    "BATCH_CREATE_FAILED": "Something went wrong while creating batch"
   },
   "FORM": {
     "FULL_NAME": "Full Name",
@@ -488,6 +490,7 @@
     "DESIGNATION": "Designation",
     "REGULAR": "Regular",
     "REMOTE": "Remote",
+    "CONTACT": "Contact",
     "NOTE_THIS_WILL_BE_CENTER_NAME": "Note : This will be center name",
     "STATE": "State",
     "DISTRICT": "District",
@@ -721,6 +724,7 @@
   "email": "Email",
   "UNIT_NAME": "Unit Name",
   "TYPE_OF_CENTER": "Type of Center",
+  "TYPE_OF_BATCH": "Type of Batch",
   "MY_MAIN_SUBJECTS": "Main subjects",
   "LIFE_SKILLS": "Life Skills",
   "ENGLISH": "English",
