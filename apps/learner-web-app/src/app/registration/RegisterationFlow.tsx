@@ -65,7 +65,6 @@ const RegisterationFlow = () => {
   const [fetchedTenantId, setFetchedTenantId] = useState<string | null>(null);
   const [fetchedEnroll, setFetchedEnroll] = useState<string | null>(null);
 
-
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
     useState<boolean>(false);
@@ -182,8 +181,7 @@ const RegisterationFlow = () => {
       }
     };
     fetchTenantIdByName();
-  }, [enroll]);  
-
+  }, [enroll]);
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -428,7 +426,19 @@ const RegisterationFlow = () => {
             }
           });
 
-          setSignupSuccessModal(true);
+          // Check if isForNavaPatham is true, skip popup and directly trigger login
+          const isForNavaPatham =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('isForNavaPatham') === 'true'
+              : false;
+
+          if (isForNavaPatham) {
+            // Skip popup and directly trigger start exploring action
+            await onSigin();
+          } else {
+            // Show success popup as usual
+            setSignupSuccessModal(true);
+          }
         } else {
           showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'), 'error');
         }
@@ -510,7 +520,6 @@ const RegisterationFlow = () => {
     // Use hard navigation to ensure it works
 
     window.location.href = `/login`;
-   
   };
   const handleCloseModal = () => {
     setAccountExistModal(false);
