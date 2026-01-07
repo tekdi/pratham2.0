@@ -60,7 +60,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
     if (typeof window === 'undefined' || !window.localStorage) {
       return '';
     }
-    const isForNavaPatham = localStorage.getItem('isForNavaPatham') === 'true';
+    const isForNavaPatham =
+      typeof window !== 'undefined' && window.localStorage
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
     return isForNavaPatham
       ? t('NAVAPATHAM.NAVAPATHAM')
       : localStorage.getItem('userProgram') || '';
@@ -69,11 +72,11 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const [loading, setLoading] = useState(true);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
 
-  const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
+  const localFormData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('formData') || '{}') : {};
   const [userFormData, setUserFormData] = useState<any>(localFormData);
   const [userData, setuserData] = useState<any>({});
   const [responseFormData, setResponseFormData] = useState<any>({});
-  const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
+  const localPayload = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('localPayload') || '{}') : {};
   const uiConfig =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
