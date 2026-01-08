@@ -123,7 +123,7 @@ const RegisterationFlow = () => {
 
         // Validate tenantId if provided directly, or fetchedTenantId from enroll parameter
         const idToCheck =  fetchedTenantId;
-        
+
         if (idToCheck) {
           const isPresent = checkTenantId(idToCheck, res?.result);
           console.log('isPresent', isPresent);
@@ -131,7 +131,7 @@ const RegisterationFlow = () => {
             setInvalidLinkModal(true);
           }
         }
-      } catch (error) { 
+      } catch (error) {
         console.error('Error fetching tenant info', error);
       }
     };
@@ -163,7 +163,7 @@ const RegisterationFlow = () => {
     };
     fetchTenantIdByName();
   }, [tenantId]);
-  
+
   useEffect(() => {
     const fetchTenantIdByName = async () => {
       if (enroll) {
@@ -172,7 +172,7 @@ const RegisterationFlow = () => {
           console.log('tenantIdFromName########', enroll);
           if (tenantIdFromName) {
             setFetchedEnroll(tenantIdFromName);
-              console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
+            console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
           } else {
             console.log('No tenant found with name:', enroll);
           }
@@ -182,7 +182,7 @@ const RegisterationFlow = () => {
       }
     };
     fetchTenantIdByName();
-  }, [enroll]);
+  }, [enroll]);  
 
 
   useEffect(() => {
@@ -281,6 +281,32 @@ const RegisterationFlow = () => {
     fetchData();
   }, []);
 
+  // Set Telangana state (36) as default when isForNavaPatham is true
+  useEffect(() => {
+    if (addSchema && addUiSchema) {
+      const isForNavaPatham =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('isForNavaPatham') === 'true'
+          : false;
+
+      // Only set default if isForNavaPatham is true and state is not already set (respect stored data)
+      if (isForNavaPatham && formData && formData.state === undefined) {
+        // Set Telangana state ID (36) as default
+        const updatedFormData = {
+          ...formData,
+          state: ['36'],
+        };
+        setFormData(updatedFormData);
+
+        // Update localStorage to persist the default state
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('formData', JSON.stringify(updatedFormData));
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addSchema, addUiSchema]);
+
   const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
     const enhancedSchema = { ...uiSchema };
 
@@ -327,7 +353,7 @@ const RegisterationFlow = () => {
   }, [verificationSuccessModal]);
   const handleCreateAccount = async () => {
     if (creatingAccount) return; // Prevent multiple clicks
-    
+
     setCreatingAccount(true);
     try {
       const localPayload = localStorage.getItem('localPayload');
@@ -335,16 +361,16 @@ const RegisterationFlow = () => {
         const payloadData = JSON.parse(
           localStorage.getItem('localPayload') || '{}'
         );
-        
+
         // Use tenantId if directly provided, otherwise use fetchedTenantId from enroll parameter
         const finalTenantId = fetchedTenantId;
-        
+
         if (!finalTenantId) {
           showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.INVALID_TENANT'), 'error');
           setCreatingAccount(false);
           return;
         }
-        
+
         const tenantData = [{ roleId: RoleId.STUDENT, tenantId: finalTenantId }];
 
         //delete mobile or guardian detail from dob
@@ -375,7 +401,7 @@ const RegisterationFlow = () => {
           ...updated_payload,
           username: username,
           password: password,
-        //  program: tenantId,
+          //  program: tenantId,
           tenantCohortRoleMapping: tenantData,
         };
         localStorage.setItem('localPayload', JSON.stringify(createuserPayload));
@@ -439,11 +465,11 @@ const RegisterationFlow = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-        //  firstName: formData.firstName,
-          mobile: isUnderEighteen(formData.dob)
-            ? formData.parent_phone
-            : formData.mobile,
-        };
+            //  firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -480,10 +506,10 @@ const RegisterationFlow = () => {
   const handleLoginClick = (username?: string) => {
     // Close the modal first
     setAccountExistModal(false);
-    
+
     // Use hard navigation to ensure it works
-   
-      window.location.href = `/login`;
+
+    window.location.href = `/login`;
    
   };
   const handleCloseModal = () => {
@@ -509,7 +535,7 @@ const RegisterationFlow = () => {
         hash,
         //  username,
       });
-     console.log('verifyOtp', response);
+      console.log('verifyOtp', response);
       const isValid = response.result.success;
       localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
 
@@ -542,8 +568,8 @@ const RegisterationFlow = () => {
     console.log('onCloseSuccessModal', formData);
     setUsername(
       (formData?.firstName || '') +
-      (formData?.lastName || '') +
-      Math.floor(10 + Math.random() * 90) // random 2-digit number
+        (formData?.lastName || '') +
+        Math.floor(10 + Math.random() * 90) // random 2-digit number
     );
     setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
@@ -585,7 +611,7 @@ const RegisterationFlow = () => {
           if (typeof window !== 'undefined' && window.localStorage) {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
-                        localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            localStorage.setItem('refreshTokenForAndroid', refreshToken);
 
             localStorage.setItem('token', token);
 
@@ -627,7 +653,7 @@ const RegisterationFlow = () => {
         localStorage.setItem('tenantName', selectedTenantName);
         localStorage.setItem('roleId', selectedRoleId);
         localStorage.setItem('roleName', selectedRoleName);
-      localStorage.setItem('tenantId', selectedTenantId);
+        localStorage.setItem('tenantId', selectedTenantId);
 
         // Lookup selected tenant details from response
         const selectedTenant = userResponse?.tenantData?.find(
