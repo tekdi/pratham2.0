@@ -4,6 +4,7 @@ import React from 'react';
 import { Box, Typography, Paper, Stack, Button, Divider } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useTranslation } from '@shared-lib';
 
 type AccountExistsCardProps = {
   fullName: string;
@@ -16,6 +17,8 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
   usernames,
   onLoginClick,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Box
       display="flex"
@@ -41,8 +44,7 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
           verticalAlign: 'middle', // ensures vertical alignment
         }}
       >
-        One or more accounts with this name, email ID, and/or phone number
-        already exist, as listed below
+        {t('NAVAPATHAM.ACCOUNT_ALREADY_EXISTS_MESSAGE')}
       </Typography>
 
       <Typography
@@ -98,7 +100,7 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
                   lineHeight: 1.4,
                 }}
               >
-                Login with this username
+                {t('NAVAPATHAM.LOGIN_WITH_USERNAME')}
               </Typography>
             </Box>
 

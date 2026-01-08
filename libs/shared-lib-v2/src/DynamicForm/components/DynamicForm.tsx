@@ -120,7 +120,7 @@ const DynamicForm = ({
 
   const getInitialUiSchema = () => {
     let initialUiSchema = uiSchema;
-    
+
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedUiSchema = { ...uiSchema };
       delete cleanedUiSchema.mother_name;
@@ -128,7 +128,7 @@ const DynamicForm = ({
       delete cleanedUiSchema.spouse_name;
       initialUiSchema = cleanedUiSchema;
     }
-    
+
     // Add note to lastName field in initial uiSchema
     if (initialUiSchema.lastName && !initialUiSchema.lastName['ui:options']?.note) {
       initialUiSchema = {
@@ -137,12 +137,12 @@ const DynamicForm = ({
           ...initialUiSchema.lastName,
           'ui:options': {
             ...(initialUiSchema.lastName['ui:options'] || {}),
-            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+            note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
           },
         },
       };
     }
-    
+
     return initialUiSchema;
   };
   // Initialize state based on createNewLearner flag
@@ -158,7 +158,7 @@ const DynamicForm = ({
           ...uischema.lastName,
           'ui:options': {
             ...(uischema.lastName['ui:options'] || {}),
-            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+            note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
           },
         },
       };
@@ -193,7 +193,7 @@ const DynamicForm = ({
                 ...prevUiSchema.lastName,
                 'ui:options': {
                   ...(prevUiSchema.lastName['ui:options'] || {}),
-                  note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+                  note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
                 },
               },
             };
@@ -210,7 +210,7 @@ const DynamicForm = ({
     }
   }, [formUiSchema]);
 
-   // Helper function to reorder fields in UI schema
+  // Helper function to reorder fields in UI schema
    const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
     if (!uiSchema['ui:order']) {
       return uiSchema;
@@ -281,7 +281,7 @@ const DynamicForm = ({
         }
       }
 
-     // Store original mobile field configuration
+      // Store original mobile field configuration
       if (schemaa.properties.mobile && !originalMobileSchemaRef.current) {
         originalMobileSchemaRef.current = { ...schemaa.properties.mobile };
       }
@@ -306,11 +306,11 @@ const DynamicForm = ({
         //if learner form then only apply
         if (oldFormSchema?.properties?.guardian_relation || isCompleteProfile) {
           if (age < 18) {
-        //    delete formData?.mobile;
+            //    delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
               if (!requiredArray.includes(item)) {
-                 requiredArray.push(item);
+                requiredArray.push(item);
               }
             });
 
@@ -321,7 +321,7 @@ const DynamicForm = ({
 
             //set ui schema show
             const updatedUiSchema = { ...oldFormUiSchema };
-            
+
             // Add guardian information field to schema as a display-only field
             updatedUiSchema['guardian_info_note'] = {
               'ui:field': 'GuardianInfoField',
@@ -351,7 +351,7 @@ const DynamicForm = ({
                 delete oldFormSchema.properties[key];
               }
             });
-            
+
             // Add guardian info note to schema
             oldFormSchema.properties = {
               ...oldFormSchema.properties,
@@ -413,33 +413,33 @@ const DynamicForm = ({
 
             //show mobile - add back to schema if not present
             requiredKeys2.forEach((key) => {
-            // Add mobile field back to schema using stored original configuration
-            if (!oldFormSchema.properties[key] && key === 'mobile') {
-            if (originalMobileSchemaRef.current) {
-              oldFormSchema.properties[key] = { 
-                ...originalMobileSchemaRef.current,
+              // Add mobile field back to schema using stored original configuration
+              if (!oldFormSchema.properties[key] && key === 'mobile') {
+                if (originalMobileSchemaRef.current) {
+                  oldFormSchema.properties[key] = {
+                    ...originalMobileSchemaRef.current,
                 title: t('phone_number') // Ensure translated title
-              };
-            } else if (Object.keys(mobileSchema).length > 0) {
-              oldFormSchema.properties[key] = { 
-                ...mobileSchema,
+                  };
+                } else if (Object.keys(mobileSchema).length > 0) {
+                  oldFormSchema.properties[key] = {
+                    ...mobileSchema,
                 title: t('phone_number') // Ensure translated title
-              };
-            }
-          }
+                  };
+                }
+              }
 
-          // Add mobile field back to UI schema using stored original configuration
-          if (!updatedUiSchema[key] && key === 'mobile') {
-            if (originalMobileUiSchemaRef.current) {
+              // Add mobile field back to UI schema using stored original configuration
+              if (!updatedUiSchema[key] && key === 'mobile') {
+                if (originalMobileUiSchemaRef.current) {
               updatedUiSchema[key] = { ...originalMobileUiSchemaRef.current };
-            } else if (Object.keys(mobileAddUiSchema).length > 0) {
-              updatedUiSchema[key] = { ...mobileAddUiSchema };
-            } else {
-              updatedUiSchema[key] = {
-                'ui:widget': 'CustomTextFieldWidget',
-              };
-            }
-          } else if (updatedUiSchema[key]) {
+                } else if (Object.keys(mobileAddUiSchema).length > 0) {
+                  updatedUiSchema[key] = { ...mobileAddUiSchema };
+                } else {
+                  updatedUiSchema[key] = {
+                    'ui:widget': 'CustomTextFieldWidget',
+                  };
+                }
+              } else if (updatedUiSchema[key]) {
                 updatedUiSchema[key] = {
                   ...updatedUiSchema[key],
                   'ui:widget': 'CustomTextFieldWidget',
@@ -539,24 +539,36 @@ const DynamicForm = ({
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {
+          // Check if isForNavaPatham is true to add helper text
+          const isForNavaPatham =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('isForNavaPatham') === 'true'
+              : false;
+
+          // Prepare ui:options with helper text if needed
+          const uiOptions: any = {
+            validateOnBlur: true,
+            hideError: true,
+          };
+
+          // Add helper text for CustomTextFieldWidget if isForNavaPatham is true
+          if (isForNavaPatham) {
+            uiOptions.helperText =
+              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+          }
+
           setFormUiSchema((prevUiSchema) => ({
             ...prevUiSchema,
             [fieldKey]: {
               'ui:widget': 'CustomTextFieldWidget',
-              'ui:options': {
-                validateOnBlur: true,
-                hideError: true,
-              },
+              'ui:options': uiOptions,
             },
           }));
           setFormUiSchemaOriginal((prevUiSchema) => ({
             ...prevUiSchema,
             [fieldKey]: {
               'ui:widget': 'CustomTextFieldWidget',
-              'ui:options': {
-                validateOnBlur: true,
-                hideError: true,
-              },
+              'ui:options': uiOptions,
             },
           }));
 
@@ -614,7 +626,7 @@ const DynamicForm = ({
           });
         };
         if (formData.family_member_details === 'mother') {
-          addField('mother_name', 'Mother Name');
+          addField('mother_name', t('FORM.MOTHER_NAME'));
           removeFields(['father_name', 'spouse_name']);
           setFormData((prev) => ({
             ...prev,
@@ -626,7 +638,7 @@ const DynamicForm = ({
           }));
           hasPrefilled.current = true;
         } else if (formData.family_member_details === 'father') {
-          addField('father_name', 'Father Name');
+          addField('father_name', t('FORM.FATHER_NAME'));
           removeFields(['mother_name', 'spouse_name']);
           setFormData((prev) => ({
             ...prev,
@@ -638,7 +650,7 @@ const DynamicForm = ({
           }));
           hasPrefilled.current = true;
         } else if (formData.family_member_details === 'spouse') {
-          addField('spouse_name', 'Spouse Name');
+          addField('spouse_name', t('FORM.SPOUSE_NAME'));
           removeFields(['mother_name', 'father_name']);
           setFormData((prev) => ({
             ...prev,
@@ -742,30 +754,29 @@ const DynamicForm = ({
     CustomFileUpload,
   };
 
-// Custom field for Guardian Information Note
-const GuardianInfoField = () => {
-  return (
-    <Alert 
-      icon={<SecurityIcon />} 
-      severity="info"
-      sx={{
-        backgroundColor: '#E3F2FD',
-        color: '#1E3A8A',
-        mb: 2,
-        '& .MuiAlert-icon': {
+  // Custom field for Guardian Information Note
+  const GuardianInfoField = () => {
+    return (
+      <Alert
+        icon={<SecurityIcon />}
+        severity="info"
+        sx={{
+          backgroundColor: '#E3F2FD',
+          color: '#1E3A8A',
+          mb: 2,
+          '& .MuiAlert-icon': {
           color: '#1E3A8A'
         }
-      }}
-    >
-      {t('GUARDIAN_INFORMATION_NOTE')}
-    </Alert>
-  );
-};
+        }}
+      >
+        {t('GUARDIAN_INFORMATION_NOTE')}
+      </Alert>
+    );
+  };
 
-const customFields = {
-  GuardianInfoField,
-};
-
+  const customFields = {
+    GuardianInfoField,
+  };
 
   useEffect(() => {
     if (isInitialCompleted === true) {
@@ -1682,7 +1693,7 @@ const customFields = {
         // Keep the existing username value when username field is disabled
         formData.username = prevFormData.current.username;
       }
-      
+
       prevFormData.current = formData;
       // console.log('Form data changed:', formData);
       // live error
@@ -1735,7 +1746,7 @@ const customFields = {
       const parts = fieldName.split('.');
       fieldName = parts[parts.length - 1];
     }
-    
+
     // Only proceed if the blurred field is firstName or lastName
     if (fieldName !== 'firstName' && fieldName !== 'lastName') {
       return;
@@ -1746,9 +1757,9 @@ const customFields = {
       formData?.lastName !== undefined &&
       type === 'learner'
     ) {
-     // Check if username field is disabled - don't update if disabled
+      // Check if username field is disabled - don't update if disabled
       const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
-      
+
       if (isUsernameDisabled) {
         // Username is disabled, don't update it
         return;
@@ -1757,7 +1768,7 @@ const customFields = {
       // Only update if firstName or lastName actually changed
       const firstNameChanged = formData.firstName !== prevNameRef.current.firstName;
       const lastNameChanged = formData.lastName !== prevNameRef.current.lastName;
-      
+
       if (firstNameChanged || lastNameChanged) {
         const randomTwoDigit = Math.floor(10 + Math.random() * 90);
         const newUserName = `${formData.firstName}${formData.lastName}${randomTwoDigit}`;

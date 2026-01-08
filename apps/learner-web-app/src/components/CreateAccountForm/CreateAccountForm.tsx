@@ -73,7 +73,7 @@ const CreateAccountForm = ({
         const response = await userCheck({ username: value });
         const users = response?.result || [];
         if (users.length > 0) {
-          setUsernameError('Username already exists');
+          setUsernameError(t('NAVAPATHAM.USERNAME_ALREADY_EXISTS'));
         } else {
           setUsernameError('');
         }
@@ -89,10 +89,19 @@ const CreateAccountForm = ({
     return value.length >= 4;
   };
   const handleConsentform = () => {
-    if (belowEighteen) {
-      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+    const isForNavaPatham =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+
+    if (isForNavaPatham) {
+      window.open('/files/telugu_consent_form.pdf', '_blank');
     } else {
-      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      if (belowEighteen) {
+        window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+      } else {
+        window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      }
     }
   };
   const handlePrivacyGuidelines = () => {
@@ -104,12 +113,15 @@ const CreateAccountForm = ({
 
   const handleSubmit = () => {
     if (!doPasswordsMatch) {
-      showToastMessage('Passwords do not match', 'error');
+      showToastMessage(t('NAVAPATHAM.PASSWORDS_DO_NOT_MATCH'), 'error');
       return;
     }
 
     if (!isPasswordValid) {
-      showToastMessage('Password does not meet requirements', 'error');
+      showToastMessage(
+        t('NAVAPATHAM.PASSWORD_DOES_NOT_MEET_REQUIREMENTS'),
+        'error'
+      );
       return;
     }
 
@@ -163,14 +175,14 @@ const CreateAccountForm = ({
             textAlign: 'center',
           }}
         >
-          Already signed up?{' '}
+          {t('NAVAPATHAM.ALREADY_SIGNED_UP')} ?{' '}
           <Link
             href="/login"
             underline="hover"
             color="secondary"
             sx={{ fontWeight: '500' }}
           >
-            Click here to login
+            {t('NAVAPATHAM.CLICK_HERE_TO_LOGIN')}
           </Link>
         </Typography>
       </Box>
@@ -189,7 +201,7 @@ const CreateAccountForm = ({
         <Box display="flex" alignItems="center" gap={1} mb={2}>
           <Image src={face} alt="Step Icon" />
           <Typography fontWeight={600}>
-            2/2 Create your username & password
+            2/2 {t('NAVAPATHAM.CREATE_USERNAME_PASSWORD')}
           </Typography>
         </Box>
 
@@ -204,27 +216,24 @@ const CreateAccountForm = ({
             mb: 3,
           }}
         >
-          Tip: Note down your credentials somewhere safe so you have it handy!
+          {t('NAVAPATHAM.CREDENTIALS_TIP')}
         </Alert>
 
         {/* Username */}
         <TextField
-          label="Username"
+          label={t('NAVAPATHAM.USERNAME')}
           value={username}
           onChange={(e) => handleUsernameChange(e.target.value)}
           onBlur={(e) => handleUsernameBlur(e.target.value)}
           fullWidth
           margin="normal"
           error={!!usernameError}
-          helperText={
-            usernameError ||
-            'Make it unique! Customise it with your birth date or lucky number'
-          }
+          helperText={usernameError || t('NAVAPATHAM.USERNAME_HELPER')}
         />
 
         {/* Password */}
         <TextField
-          label="Password"
+          label={t('NAVAPATHAM.PASSWORD')}
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={(e) => onPasswordChange(e.target.value)}
@@ -252,7 +261,7 @@ const CreateAccountForm = ({
 
         {/* Confirm Password */}
         <TextField
-          label="Confirm Password"
+          label={t('NAVAPATHAM.CONFIRM_PASSWORD')}
           type={showConfirm ? 'text' : 'password'}
           value={confirmPassword}
           onChange={(e) => onConfirmPasswordChange(e.target.value)}
@@ -279,24 +288,25 @@ const CreateAccountForm = ({
           }
           label={
             <Typography variant="h3">
-              I have read and agree to the
+              {t('NAVAPATHAM.I_HAVE_READ_AND_AGREE_TO_THE')}{' '}
               <Typography
                 component="span"
                 fontWeight="bold"
                 color="#0071E3"
                 onClick={handlePrivacyGuidelines}
+                sx={{ cursor: 'pointer' }}
               >
-                {' '} Privacy Guidelines
+                {t('NAVAPATHAM.PRIVACY_GUIDELINES')}
               </Typography>{' '}
-              and I consent to the collection and use of my personal data as
-              described in the{' '}
+              {t('NAVAPATHAM.AND_I_CONSENT_TO_THE_COLLECTION')}{' '}
               <Typography
                 component="span"
                 fontWeight="bold"
                 color="#0071E3"
                 onClick={handleConsentform}
+                sx={{ cursor: 'pointer' }}
               >
-                Consent Form
+                {t('NAVAPATHAM.CONSENT_FORM')}
               </Typography>
               .
             </Typography>
@@ -314,8 +324,7 @@ const CreateAccountForm = ({
             }
             label={
               <Typography variant="h3">
-                I confirm this checkbox is filled out by the parent/guardian of
-                the learner.
+                {t('NAVAPATHAM.PARENT_GUARDIAN_CONFIRMATION')}
               </Typography>
             }
           />
@@ -355,10 +364,10 @@ const CreateAccountForm = ({
           {isSubmitDisabled ? (
             <Box display="flex" alignItems="center" gap={1}>
               <CircularProgress size={20} sx={{ color: '#9E9E9E' }} />
-              <span>Creating Account...</span>
+              <span>{t('NAVAPATHAM.CREATING_ACCOUNT')}</span>
             </Box>
           ) : (
-            'Create Account'
+            t('NAVAPATHAM.CREATE_ACCOUNT')
           )}
         </Button>
       </Box>

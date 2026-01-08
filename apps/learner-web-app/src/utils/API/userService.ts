@@ -31,9 +31,14 @@ export const userCheck = async ({
     // }
     if (email) {
       response = await post(apiUrl, { email });
-    } else if (mobile && firstName) {
+    }
+    else if (mobile && firstName) {
       response = await post(apiUrl, { mobile, email, firstName });
-    } else if (username) {
+    }
+    else if (mobile) {
+      response = await post(apiUrl, { mobile });
+    }
+    else if (username) {
       response = await post(apiUrl, { username });
     }
 

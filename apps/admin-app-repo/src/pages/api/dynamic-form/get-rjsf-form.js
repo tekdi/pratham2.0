@@ -259,7 +259,43 @@ function generateSchemaAndUISchema(fields) {
           isRequired: schemaField?.isRequired,
           isMultiSelect: schemaField?.isMultiSelect,
           maxSelections: schemaField?.maxSelection,
-          allowedFormats: ['.jpg', '.png', '.jpeg'],
+          allowedFormats:
+            name == 'consent_file'
+              ? [
+                  '.jpg',
+                  '.png',
+                  '.jpeg',
+                  '.pdf',
+                  '.doc',
+                  '.docx',
+                  '.xls',
+                  '.xlsx',
+                  '.ppt',
+                  '.pptx',
+                ]
+              : ['.jpg', '.png', '.jpeg'],
+        },
+      };
+    } else if (type === 'file' && schemaField?.isMultiSelect === false) {
+      schemaField.items = { type: 'string', format: 'uri' };
+      uiSchema[name] = {
+        'ui:widget': 'CustomFileUpload',
+        'ui:options': {
+          isRequired: schemaField?.isRequired,
+          isMultiSelect: schemaField?.isMultiSelect,
+          maxSelections: schemaField?.maxSelection,
+          allowedFormats: [
+            '.jpg',
+            '.png',
+            '.jpeg',
+            '.pdf',
+            '.doc',
+            '.docx',
+            '.xls',
+            '.xlsx',
+            '.ppt',
+            '.pptx',
+          ],
         },
       };
     }

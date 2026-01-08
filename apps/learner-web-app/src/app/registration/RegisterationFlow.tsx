@@ -24,7 +24,10 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import { useRouter } from 'next/navigation';
-import { createUser, sendMessage } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import {
+  createUser,
+  sendMessage,
+} from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import { RoleId } from '@shared-lib-v2/DynamicForm/utils/app.constant';
 import { getUserId, login } from '@learner/utils/API/LoginService';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
@@ -41,7 +44,10 @@ import face from '../../../public/images/Group 3.png';
 
 //build issue fix for  ⨯ useSearchParams() should be wrapped in a suspense boundary at page
 import { useSearchParams } from 'next/navigation';
-import { getTenantInfo } from '@learner/utils/API/ProgramService';
+import {
+  getTenantInfo,
+  getTenantIdByName,
+} from '@learner/utils/API/ProgramService';
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
@@ -61,6 +67,9 @@ const RegisterationFlow = () => {
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
+  const enroll = searchParams.get('enroll');
+  const [fetchedTenantId, setFetchedTenantId] = useState<string | null>(null);
+  const [fetchedEnroll, setFetchedEnroll] = useState<string | null>(null);
 
   const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
@@ -117,15 +126,69 @@ const RegisterationFlow = () => {
         const res = await getTenantInfo();
         console.log('res', res?.result);
 
-        const isPresent = checkTenantId(tenantId, res?.result);
-        console.log('isPresent', isPresent);
-        if (!isPresent) {
-          setInvalidLinkModal(true);
+        // Validate tenantId if provided directly, or fetchedTenantId from enroll parameter
+        const idToCheck = fetchedTenantId;
+
+        if (idToCheck) {
+          const isPresent = checkTenantId(idToCheck, res?.result);
+          console.log('isPresent', isPresent);
+          if (!isPresent) {
+            setInvalidLinkModal(true);
+          }
         }
-      } catch (error) { }
+      } catch (error) {
+        console.error('Error fetching tenant info', error);
+      }
     };
     fetchData();
+  }, [fetchedTenantId]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && fetchedEnroll) {
+      localStorage.setItem('enrollTenantId', fetchedEnroll as string);
+    }
+  }, [fetchedEnroll]);
+
+  // Fetch tenant ID by name when enroll parameter is present
+  useEffect(() => {
+    const fetchTenantIdByName = async () => {
+      if (tenantId) {
+        try {
+          const tenantIdFromName = await getTenantIdByName(tenantId as string);
+          if (tenantIdFromName) {
+            setFetchedTenantId(tenantIdFromName);
+            console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
+          } else {
+            console.log('No tenant found with name:', enroll);
+          }
+        } catch (error) {
+          console.error('Error fetching tenant ID by name:', error);
+        }
+      }
+    };
+    fetchTenantIdByName();
   }, [tenantId]);
+
+  useEffect(() => {
+    const fetchTenantIdByName = async () => {
+      if (enroll) {
+        try {
+          const tenantIdFromName = await getTenantIdByName(enroll as string);
+          console.log('tenantIdFromName########', enroll);
+          if (tenantIdFromName) {
+            setFetchedEnroll(tenantIdFromName);
+            console.log('Fetched tenant ID for enroll name:', tenantIdFromName);
+          } else {
+            console.log('No tenant found with name:', enroll);
+          }
+        } catch (error) {
+          console.error('Error fetching tenant ID by name:', error);
+        }
+      }
+    };
+    fetchTenantIdByName();
+  }, [enroll]);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -143,7 +206,7 @@ const RegisterationFlow = () => {
           //   },
           // },
         ]);
-        console.log('responseForm####', responseForm?.schema?.required);
+        console.log('responseForm####', responseForm);
         delete responseForm?.schema?.properties.password;
         delete responseForm?.schema?.properties.confirm_password;
         delete responseForm?.schema?.properties.username;
@@ -205,11 +268,30 @@ const RegisterationFlow = () => {
         //set 2 grid layout
         alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
+        // Add helper text to all CustomTextFieldWidget fields
+        alterUISchema = addHelperTextToTextFieldWidgets(alterUISchema);
+
         // Reorder fields: guardian fields should appear right after dob
-        let updatedUiSchema = reorderUiSchema(alterUISchema, 'guardian_name', 'dob');
-        updatedUiSchema = reorderUiSchema(updatedUiSchema, 'guardian_relation', 'guardian_name');
-        updatedUiSchema = reorderUiSchema(updatedUiSchema, 'parent_phone', 'guardian_relation');
-        updatedUiSchema = reorderUiSchema(updatedUiSchema, 'mobile', 'parent_phone');
+        let updatedUiSchema = reorderUiSchema(
+          alterUISchema,
+          'guardian_name',
+          'dob'
+        );
+        updatedUiSchema = reorderUiSchema(
+          updatedUiSchema,
+          'guardian_relation',
+          'guardian_name'
+        );
+        updatedUiSchema = reorderUiSchema(
+          updatedUiSchema,
+          'parent_phone',
+          'guardian_relation'
+        );
+        updatedUiSchema = reorderUiSchema(
+          updatedUiSchema,
+          'mobile',
+          'parent_phone'
+        );
 
         setAddSchema(alterSchema);
         setAddUiSchema(updatedUiSchema);
@@ -221,6 +303,32 @@ const RegisterationFlow = () => {
     };
     fetchData();
   }, []);
+
+  // Set Telangana state (36) as default when isForNavaPatham is true
+  useEffect(() => {
+    if (addSchema && addUiSchema) {
+      const isForNavaPatham =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('isForNavaPatham') === 'true'
+          : false;
+
+      // Only set default if isForNavaPatham is true and state is not already set (respect stored data)
+      if (isForNavaPatham && formData && formData.state === undefined) {
+        // Set Telangana state ID (36) as default
+        const updatedFormData = {
+          ...formData,
+          state: ['36'],
+        };
+        setFormData(updatedFormData);
+
+        // Update localStorage to persist the default state
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('formData', JSON.stringify(updatedFormData));
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addSchema, addUiSchema]);
 
   const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
     const enhancedSchema = { ...uiSchema };
@@ -234,6 +342,47 @@ const RegisterationFlow = () => {
 
         // Push grid option
         enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+      }
+    });
+
+    return enhancedSchema;
+  };
+
+  const addHelperTextToTextFieldWidgets = (uiSchema: any): any => {
+    // Check if isForNavaPatham is true in localStorage
+    const isForNavaPatham =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+
+    // If isForNavaPatham is not true, return the schema without modifications
+    if (!isForNavaPatham) {
+      return uiSchema;
+    }
+
+    const enhancedSchema = { ...uiSchema };
+
+    Object.keys(enhancedSchema).forEach((fieldKey) => {
+      // Skip ui:order and other non-field keys
+      if (fieldKey === 'ui:order') return;
+
+      if (
+        typeof enhancedSchema[fieldKey] === 'object' &&
+        enhancedSchema[fieldKey] !== null
+      ) {
+        // Check if this field uses CustomTextFieldWidget
+        if (enhancedSchema[fieldKey]['ui:widget'] === 'CustomTextFieldWidget') {
+          // Ensure ui:options exists
+          if (!enhancedSchema[fieldKey]['ui:options']) {
+            enhancedSchema[fieldKey]['ui:options'] = {};
+          }
+
+          // Add helperText if it doesn't already exist
+          if (!enhancedSchema[fieldKey]['ui:options'].helperText) {
+            enhancedSchema[fieldKey]['ui:options'].helperText =
+              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+          }
+        }
       }
     });
 
@@ -268,15 +417,30 @@ const RegisterationFlow = () => {
   }, [verificationSuccessModal]);
   const handleCreateAccount = async () => {
     if (creatingAccount) return; // Prevent multiple clicks
-    
+
     setCreatingAccount(true);
     try {
       const localPayload = localStorage.getItem('localPayload');
-      if (localPayload ) {
+      if (localPayload) {
         const payloadData = JSON.parse(
           localStorage.getItem('localPayload') || '{}'
         );
-        const tenantData = [{ roleId: RoleId.STUDENT, tenantId: tenantId }];
+
+        // Use tenantId if directly provided, otherwise use fetchedTenantId from enroll parameter
+        const finalTenantId = fetchedTenantId;
+
+        if (!finalTenantId) {
+          showToastMessage(
+            t('LEARNER_APP.REGISTRATION_FLOW.INVALID_TENANT'),
+            'error'
+          );
+          setCreatingAccount(false);
+          return;
+        }
+
+        const tenantData = [
+          { roleId: RoleId.STUDENT, tenantId: finalTenantId },
+        ];
 
         //delete mobile or guardian detail from dob
         let updated_payload = payload;
@@ -306,7 +470,7 @@ const RegisterationFlow = () => {
           ...updated_payload,
           username: username,
           password: password,
-        //  program: tenantId,
+          //  program: tenantId,
           tenantCohortRoleMapping: tenantData,
         };
         localStorage.setItem('localPayload', JSON.stringify(createuserPayload));
@@ -335,13 +499,19 @@ const RegisterationFlow = () => {
 
           setSignupSuccessModal(true);
         } else {
-          showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'), 'error');
+          showToastMessage(
+            t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'),
+            'error'
+          );
         }
 
         console.log(responseUserData);
       }
     } catch (error) {
-      showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.ERROR_CREATING_ACCOUNT'), 'error');
+      showToastMessage(
+        t('LEARNER_APP.REGISTRATION_FLOW.ERROR_CREATING_ACCOUNT'),
+        'error'
+      );
     } finally {
       setCreatingAccount(false);
     }
@@ -370,16 +540,19 @@ const RegisterationFlow = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-          firstName: formData.firstName,
-          mobile: isUnderEighteen(formData.dob)
-            ? formData.parent_phone
-            : formData.mobile,
-        };
+            //  firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
       if (users.length > 0 && isEmailCheck) {
-        showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.EMAIL_ALREADY_EXISTS'), 'error');
+        showToastMessage(
+          t('LEARNER_APP.REGISTRATION_FLOW.EMAIL_ALREADY_EXISTS'),
+          'error'
+        );
       } else if (users.length > 0) {
         const usernameList = users.map((user: any) => user.username);
 
@@ -408,8 +581,13 @@ const RegisterationFlow = () => {
     }
   };
 
-  const handleLoginClick = () => {
-    router.push('/login');
+  const handleLoginClick = (username?: string) => {
+    // Close the modal first
+    setAccountExistModal(false);
+
+    // Use hard navigation to ensure it works
+
+    window.location.href = `/login`;
   };
   const handleCloseModal = () => {
     setAccountExistModal(false);
@@ -434,7 +612,7 @@ const RegisterationFlow = () => {
         hash,
         //  username,
       });
-     console.log('verifyOtp', response);
+      console.log('verifyOtp', response);
       const isValid = response.result.success;
       localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
 
@@ -444,10 +622,16 @@ const RegisterationFlow = () => {
 
         // router.push('/reset-Password');
       } else {
-        showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error');
+        showToastMessage(
+          t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'),
+          'error'
+        );
       }
     } catch (error) {
-      showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error');
+      showToastMessage(
+        t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'),
+        'error'
+      );
     } finally {
       setOtp(['', '', '', '']);
     }
@@ -458,7 +642,7 @@ const RegisterationFlow = () => {
       const response = await sendOTP({ mobile: mobile, reason });
       console.log('sendOTP', response);
       setHash(response?.result?.data?.hash);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   const onCloseSuccessModal = () => {
@@ -467,8 +651,8 @@ const RegisterationFlow = () => {
     console.log('onCloseSuccessModal', formData);
     setUsername(
       (formData?.firstName || '') +
-      (formData?.lastName || '') +
-      Math.floor(10 + Math.random() * 90) // random 2-digit number
+        (formData?.lastName || '') +
+        Math.floor(10 + Math.random() * 90) // random 2-digit number
     );
     setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
@@ -480,7 +664,7 @@ const RegisterationFlow = () => {
     setSignupSuccessModal(false);
     // setUsernamePasswordForm(true);
   };
-  const onCloseInvalidLinkModal = () => { };
+  const onCloseInvalidLinkModal = () => {};
   const renderHomePage = () => {
     router.push('/');
   };
@@ -510,7 +694,7 @@ const RegisterationFlow = () => {
           if (typeof window !== 'undefined' && window.localStorage) {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
-                        localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            localStorage.setItem('refreshTokenForAndroid', refreshToken);
 
             localStorage.setItem('token', token);
 
@@ -537,7 +721,7 @@ const RegisterationFlow = () => {
     selectedRoleName: string
   ) => {
     setSwitchDialogOpen(false);
-    setLoading(true)
+    setLoading(true);
     try {
       if (userResponse) {
         const token = localStorage.getItem('token') || '';
@@ -552,7 +736,7 @@ const RegisterationFlow = () => {
         localStorage.setItem('tenantName', selectedTenantName);
         localStorage.setItem('roleId', selectedRoleId);
         localStorage.setItem('roleName', selectedRoleName);
-      localStorage.setItem('tenantId', selectedTenantId);
+        localStorage.setItem('tenantId', selectedTenantId);
 
         // Lookup selected tenant details from response
         const selectedTenant = userResponse?.tenantData?.find(
@@ -596,8 +780,8 @@ const RegisterationFlow = () => {
           // }
         }
       }
-    } catch (e) { }
-    setLoading(false)
+    } catch (e) {}
+    setLoading(false);
   };
   //   const handleLogin = async () => {
   //     if (formData.email) {
@@ -714,8 +898,9 @@ const RegisterationFlow = () => {
                 textAlign: 'center',
               }}
             >
-              {`${t('LEARNER_APP.REGISTRATION.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW')} `}
-
+              {`${t(
+                'LEARNER_APP.REGISTRATION.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW'
+              )} `}
             </Typography>
 
             <Typography
@@ -846,10 +1031,14 @@ const RegisterationFlow = () => {
         open={accountExistModal}
         onClose={handleCloseModal}
         showFooter
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.YES_CREATE_ANOTHER_ACCOUNT')}
+        primaryText={t(
+          'LEARNER_APP.REGISTRATION_FLOW.YES_CREATE_ANOTHER_ACCOUNT'
+        )}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.ACCOUNT_ALREADY_EXISTS')}
         primaryActionHandler={onCreateAnotherAccount}
-        footerText={t('LEARNER_APP.REGISTRATION_FLOW.ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT')}
+        footerText={t(
+          'LEARNER_APP.REGISTRATION_FLOW.ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT'
+        )}
       >
         <AccountExistsCard
           fullName={firstLetterInUpperCase(
