@@ -44,12 +44,18 @@ const CollectionEditor: React.FC = () => {
     const key = 'onContentReview';
     const url = `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/collection?identifier=${notificationData?.contentId}&contentMode=review`;
     try {
-      const response = await fetchCCTAList();
-      const cctaList = response;
+     
       const ContentDetail = await fetch(
         `/action/content/v3/read/${notificationData?.contentId}`
       );
       const data = await ContentDetail.json();
+      const board = data?.result?.content?.board;
+      const subject = data?.result?.content?.subject;
+      console.log('board=====>', board);
+      console.log('subject=====>', subject);
+      const response = await fetchCCTAList(board, subject);
+      const cctaList = response;
+
 
       const promises = cctaList.map(async (user: any) => {
         const replacements = {

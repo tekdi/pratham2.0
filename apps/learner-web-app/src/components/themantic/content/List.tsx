@@ -124,6 +124,7 @@ const List: React.FC<ListProps> = ({
                       },
                       _containerGrid: {
                         spacing: { xs: 2, sm: 2, md: 3 },
+                        justifyContent: 'center',
                       },
                       default_img: '/images/image_ver.png',
                       _card: {
