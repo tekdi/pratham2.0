@@ -710,10 +710,14 @@
     "CONSENT_FORM": "సమ్మతి ఫారం",
     "I_HAVE_READ_AND_AGREE_TO_THE": "నేను చదివాను మరియు అంగీకరిస్తున్నాను",
     "PRIVACY_GUIDELINES": "గోప్యతా మార్గదర్శకాలు",
-    "AND_I_CONSENT_TO_THE_COLLECTION": "మరియు సమ్మతి ఫారమ్‌లో వివరించిన విధంగా నా వ్యక్తిగత సమాచార సేకరణ మరియు వినియోగానికి నేను సమ్మతిస్తున్నాను",
+    "AND_I_CONSENT_TO_THE_COLLECTION": "మరియు నేను వివరించిన విధంగా నా వ్యక్తిగత డేటాను సేకరించడానికి మరియు ఉపయోగించడానికి సమ్మతిస్తున్నాను",
     "USERNAME_ALREADY_EXISTS": "ఈ యూజర్‌నేమ్ ఇప్పటికే ఉంది",
     "PASSWORDS_DO_NOT_MATCH": "పాస్‌వర్డ్‌లు సరిపోలడం లేదు",
-    "PASSWORD_DOES_NOT_MEET_REQUIREMENTS": "పాస్‌వర్డ్ అవసరాలను తీర్చడం లేదు"
+    "PASSWORD_DOES_NOT_MEET_REQUIREMENTS": "పాస్‌వర్డ్ అవసరాలను తీర్చడం లేదు",
+    "EXPLORE_MORE_COURSES": "ఇంకా మరిన్ని కోర్సులను అన్వేషించండి",
+    "SECOND_CHANCE_PROGRAM": "సెకండ్ ఛాన్స్ కార్యక్రమం",
+    "PARENT_GUARDIAN_PHONE_NO": "తల్లి / తండ్రి / సంరక్షకుడి ఫోన్ నంబర్",
+    "COURSE_COMPLETION_CONGRATULATIONS": "కోర్సును విజయవంతంగా పూర్తి చేసినందుకు అభినందనలు!"
   },
   "GUARDIAN_INFORMATION_NOTE": "సంరక్షకుని సమాచారం – ఈ విభాగాన్ని తల్లిదండ్రులు లేదా సంరక్షకుడు పూరించాలి",
   "ASSESSMENTS": {
