@@ -89,6 +89,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     district: false,
     block: false,
     village: false,
+    centers: false,
   });
 
   const [selectedState, setSelectedState] = useState(() => {
@@ -104,6 +105,12 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     return Array.isArray(initialBlock) ? initialBlock : [initialBlock];
   });
   const [selectedVillage, setSelectedVillage] = useState([]);
+  const [centerOptions, setCenterOptions] = useState([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [selectedCenters, setSelectedCenters] = useState<string[]>(() => {
+    if (!value) return [];
+    return Array.isArray(value) ? value : [value];
+  });
 
   // Refs to store district and block IDs from prefilled center details
   const pendingDistrictIdRef = useRef(null);
@@ -460,6 +467,176 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     loadVillageOptions();
   }, [selectedBlock]);
 
+  // Search centers function
+  const searchCenters = useCallback(async () => {
+    // Only search if we have at least state selected
+    const selectedStates = Array.isArray(selectedState)
+      ? selectedState
+      : selectedState
+      ? [selectedState]
+      : [];
+
+    if (selectedStates.length === 0) {
+      setCenterOptions([]);
+      return;
+    }
+
+    setLoadingStates((prev) => ({ ...prev, centers: true }));
+    try {
+      const tenantId = localStorage.getItem('tenantId') || '';
+      const token = localStorage.getItem('token') || '';
+      const academicYearId = localStorage.getItem('academicYearId') || '';
+
+      const filters = {
+        type: 'COHORT',
+        status: ['active'],
+      };
+
+      if (selectedStates.length > 0) {
+        filters.state = selectedStates;
+      }
+
+      const selectedDistricts = Array.isArray(selectedDistrict)
+        ? selectedDistrict
+        : selectedDistrict
+        ? [selectedDistrict]
+        : [];
+      if (selectedDistricts.length > 0) {
+        filters.district = selectedDistricts;
+      }
+
+      if (selectedBlock.length > 0) {
+        filters.block = selectedBlock;
+      }
+
+      if (selectedVillage.length > 0) {
+        filters.village = selectedVillage;
+      }
+
+      const payload = {
+        limit: 200,
+        offset: 0,
+        filters,
+        ...(searchKeyword && { name: searchKeyword }),
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            tenantId: tenantId,
+            Authorization: `Bearer ${token}`,
+            academicyearid: academicYearId,
+          },
+        }
+      );
+
+      const centers =
+        response?.data?.result?.results?.cohortDetails
+          ?.map((item) => {
+            if (!item || !item.cohortId) return null;
+
+            // Extract location data from customFields
+            const customFields = item.customFields || [];
+            const stateField = customFields.find(
+              (field) => field.label === 'STATE'
+            );
+            const districtField = customFields.find(
+              (field) => field.label === 'DISTRICT'
+            );
+            const blockField = customFields.find(
+              (field) => field.label === 'BLOCK'
+            );
+            const villageField = customFields.find(
+              (field) => field.label === 'VILLAGE'
+            );
+
+            const stateValue =
+              stateField?.selectedValues?.[0]?.value ||
+              stateField?.selectedValues?.[0]?.label ||
+              '';
+            const districtValue =
+              districtField?.selectedValues?.[0]?.value ||
+              districtField?.selectedValues?.[0]?.label ||
+              '';
+            const blockValue =
+              blockField?.selectedValues?.[0]?.value ||
+              blockField?.selectedValues?.[0]?.label ||
+              '';
+            const villageValue =
+              villageField?.selectedValues?.[0]?.value ||
+              villageField?.selectedValues?.[0]?.label ||
+              '';
+
+            return {
+              value: item.cohortId,
+              label: item.name?.trim() || `Center ${item.cohortId}`,
+              state: stateValue,
+              district: districtValue,
+              block: blockValue,
+              village: villageValue,
+            };
+          })
+          .filter((item) => item !== null) || [];
+
+      setCenterOptions(centers);
+    } catch (error) {
+      console.error('Error searching centers:', error);
+      setCenterOptions([]);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, centers: false }));
+    }
+  }, [
+    selectedState,
+    selectedDistrict,
+    selectedBlock,
+    selectedVillage,
+    searchKeyword,
+  ]);
+
+  // Debounced search for centers - load when filters change or when user types
+  useEffect(() => {
+    const selectedStates = Array.isArray(selectedState)
+      ? selectedState
+      : selectedState
+      ? [selectedState]
+      : [];
+
+    if (selectedStates.length === 0) {
+      setCenterOptions([]);
+      return;
+    }
+
+    // Use shorter delay for filter changes, longer delay for typing
+    const delay = searchKeyword ? 500 : 50;
+
+    const timeoutId = setTimeout(() => {
+      searchCenters();
+    }, delay);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    selectedState,
+    selectedDistrict,
+    selectedBlock,
+    selectedVillage,
+    searchKeyword,
+    searchCenters,
+  ]);
+
+  // Sync selectedCenters with value prop
+  useEffect(() => {
+    if (!value) {
+      setSelectedCenters([]);
+      return;
+    }
+
+    const centerIds = Array.isArray(value) ? value : [value];
+    setSelectedCenters(centerIds);
+  }, [value]);
+
   // Handler functions
   const handleStateChange = (event, newValue) => {
     const stateIds = Array.isArray(newValue)
@@ -472,6 +649,8 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     setSelectedDistrict([]);
     setSelectedBlock([]);
     setSelectedVillage([]);
+    setCenterOptions([]); // Clear centers when filter changes
+    setSelectedCenters([]);
     // Call onStateChange callback if provided
     if (onStateChange) {
       onStateChange(stateIds.length > 0 ? stateIds : null);
@@ -488,6 +667,8 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     setSelectedDistrict(districtIds);
     setSelectedBlock([]);
     setSelectedVillage([]);
+    setCenterOptions([]); // Clear centers when filter changes
+    setSelectedCenters([]);
     // Call onDistrictChange callback if provided
     if (onDistrictChange) {
       onDistrictChange(districtIds.length > 0 ? districtIds : null);
@@ -503,6 +684,8 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
 
     setSelectedBlock(blockIds);
     setSelectedVillage([]);
+    setCenterOptions([]); // Clear centers when filter changes
+    setSelectedCenters([]);
     // Call onBlockChange callback if provided
     if (onBlockChange) {
       onBlockChange(blockIds.length > 0 ? blockIds : null);
@@ -517,6 +700,8 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
       : [];
 
     setSelectedVillage(villageIds);
+    setCenterOptions([]); // Clear centers when filter changes
+    setSelectedCenters([]);
   };
 
   const handleClearFilters = () => {
@@ -524,10 +709,57 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
     setSelectedDistrict([]);
     setSelectedBlock([]);
     setSelectedVillage([]);
+    setCenterOptions([]);
+    setSelectedCenters([]);
     if (onStateChange) onStateChange(null);
     if (onDistrictChange) onDistrictChange(null);
     if (onBlockChange) onBlockChange(null);
   };
+
+  // Center selection handlers
+  const handleCenterToggle = (centerId: string) => {
+    setSelectedCenters((prev) => {
+      const isSelected = prev.includes(centerId);
+      const newSelection = isSelected
+        ? prev.filter((id) => id !== centerId)
+        : [...prev, centerId];
+
+      // Call onChange callback
+      if (onChange) {
+        onChange(newSelection.length > 0 ? newSelection : null);
+      }
+
+      return newSelection;
+    });
+  };
+
+  const handleSelectAll = () => {
+    const allCenterIds = centerOptions.map((center) => center.value);
+    const allSelected = allCenterIds.every((id) =>
+      selectedCenters.includes(id)
+    );
+
+    if (allSelected) {
+      // Deselect all
+      setSelectedCenters([]);
+      if (onChange) {
+        onChange(null);
+      }
+    } else {
+      // Select all
+      setSelectedCenters(allCenterIds);
+      if (onChange) {
+        onChange(allCenterIds);
+      }
+    }
+  };
+
+  const isAllSelected = useMemo(() => {
+    if (centerOptions.length === 0) return false;
+    return centerOptions.every((center) =>
+      selectedCenters.includes(center.value)
+    );
+  }, [centerOptions, selectedCenters]);
 
   // Calculate active filters count
   const activeFiltersCount = useMemo(() => {
@@ -937,6 +1169,250 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
             </Box>
           </Grid>
         </Grid>
+      </Paper>
+
+      {/* Section 2: Center List */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          mb: 2,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 2,
+        }}
+      >
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 1,
+                bgcolor: themeColorLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <BusinessIcon sx={{ fontSize: 16, color: themeColor }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600}>
+                Centers
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {centerOptions.length} center
+                {centerOptions.length !== 1 ? 's' : ''} found
+              </Typography>
+            </Box>
+          </Stack>
+          {centerOptions.length > 0 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Checkbox
+                checked={isAllSelected}
+                onChange={handleSelectAll}
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                sx={{
+                  color: themeColor,
+                  '&.Mui-checked': {
+                    color: themeColor,
+                  },
+                }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                Select All
+              </Typography>
+            </Box>
+          )}
+        </Stack>
+
+        {/* Search Bar */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            fullWidth
+            placeholder="Search centers..."
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+              ),
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 1,
+              },
+            }}
+          />
+        </Box>
+
+        {/* Center Cards Grid */}
+        {loadingStates.centers ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              py: 4,
+            }}
+          >
+            <CircularProgress sx={{ color: themeColor }} />
+          </Box>
+        ) : centerOptions.length === 0 ? (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              py: 4,
+            }}
+          >
+            <Typography variant="body2" color="text.secondary">
+              No centers found. Please adjust your filters.
+            </Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={2}>
+            {centerOptions.map((center) => {
+              const isSelected = selectedCenters.includes(center.value);
+              const locationParts = [
+                center.village,
+                center.block,
+                center.district,
+                center.state,
+              ].filter(Boolean);
+
+              return (
+                <Grid item xs={12} sm={6} md={3} key={center.value}>
+                  <Card
+                    sx={{
+                      border: isSelected
+                        ? `2px solid ${themeColor}`
+                        : '1px solid',
+                      borderColor: isSelected ? themeColor : 'divider',
+                      borderRadius: 2,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        boxShadow: 2,
+                        borderColor: themeColor,
+                      },
+                    }}
+                    onClick={() => handleCenterToggle(center.value)}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          onChange={() => handleCenterToggle(center.value)}
+                          onClick={(e) => e.stopPropagation()}
+                          icon={<CheckBoxOutlineBlankIcon />}
+                          checkedIcon={<CheckBoxIcon />}
+                          sx={{
+                            color: themeColor,
+                            '&.Mui-checked': {
+                              color: themeColor,
+                            },
+                            p: 0,
+                            mt: 0.5,
+                          }}
+                        />
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={600}
+                            sx={{
+                              mb: 1,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                            }}
+                          >
+                            {center.label}
+                          </Typography>
+                          {locationParts.length > 0 && (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 0.5,
+                                flexWrap: 'wrap',
+                              }}
+                            >
+                              <LocationOnIcon
+                                sx={{
+                                  fontSize: 14,
+                                  color: 'text.secondary',
+                                  flexShrink: 0,
+                                }}
+                              />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  flexWrap: 'wrap',
+                                }}
+                              >
+                                {locationParts.map((part, index) => (
+                                  <React.Fragment key={index}>
+                                    {index > 0 && (
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          mx: 0.5,
+                                          color: 'text.secondary',
+                                        }}
+                                      >
+                                        •
+                                      </Box>
+                                    )}
+                                    <Box
+                                      component="span"
+                                      sx={{
+                                        color:
+                                          index === locationParts.length - 1
+                                            ? themeColor
+                                            : 'text.secondary',
+                                        fontWeight:
+                                          index === locationParts.length - 1
+                                            ? 500
+                                            : 400,
+                                      }}
+                                    >
+                                      {part}
+                                    </Box>
+                                  </React.Fragment>
+                                ))}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
+          </Grid>
+        )}
       </Paper>
     </Box>
   );
