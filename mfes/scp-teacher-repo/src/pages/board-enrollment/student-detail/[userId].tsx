@@ -553,7 +553,7 @@ const BoardEnrollmentDetail = () => {
                         {t('BOARD_ENROLMENT.CHOOSE_BOARD')}
                       </Box>
                       <Box sx={{ maxHeight: '550px', overflowY: 'auto' }}>
-                        {boardOptions?.map((boardItem) => (
+                        {boardOptions?.filter((boardItem) => boardItem.status !== "Retired").map((boardItem) => (
                           <Box sx={{ mt: 2 }} key={boardItem.code}>
                             <Box
                               sx={{
