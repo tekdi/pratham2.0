@@ -137,7 +137,7 @@ const DynamicForm = ({
           ...initialUiSchema.lastName,
           'ui:options': {
             ...(initialUiSchema.lastName['ui:options'] || {}),
-            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+            note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
           },
         },
       };
@@ -158,7 +158,7 @@ const DynamicForm = ({
           ...uischema.lastName,
           'ui:options': {
             ...(uischema.lastName['ui:options'] || {}),
-            note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+              note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
           },
         },
       };
@@ -193,7 +193,7 @@ const DynamicForm = ({
                 ...prevUiSchema.lastName,
                 'ui:options': {
                   ...(prevUiSchema.lastName['ui:options'] || {}),
-                  note: 'If you do not have a last name, please enter your first name again or use a single dot (.) in this field',
+                  note: t('NAVAPATHAM.NO_LAST_NAME_INSTRUCTION'),
                 },
               },
             };
