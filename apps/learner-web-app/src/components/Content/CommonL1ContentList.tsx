@@ -261,7 +261,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
               title={
                 notab
                   ? 'LEARNER_APP.COURSE.EXPLORE_ADDITIONAL_RESOURCES'
-                  : 'LEARNER_APP.COURSE.EXPLORE_MORE_COURSES'
+                  : 'NAVAPATHAM.EXPLORE_MORE_COURSES'
               }
               _content={{
                 pageName: 'L1_Content',
