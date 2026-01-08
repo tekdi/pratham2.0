@@ -141,7 +141,8 @@ export default function LandingPage() {
     }
   };
 
-  const aboutPrathamText = t('LANDING.ABOUT_PRATHAM_TEXT');
+  const aboutNavaPathamText = t('NAVAPATHAM.ABOUT_NAVAPATHAM_TEXT');
+  const aboutPrathamText = t('NAVAPATHAM.ABOUT_PRATHAM_INFO');
 
   return (
     <>
@@ -352,7 +353,7 @@ export default function LandingPage() {
                   whiteSpace: 'pre-line',
                 }}
               >
-                {aboutPrathamText}
+                {aboutNavaPathamText}
               </Typography>
             </Grid>
           </Grid>
@@ -380,7 +381,7 @@ export default function LandingPage() {
                 color: '#FFC107',
               }}
             >
-              {t('LANDING.ABOUT_PRATHAM_LEARNING_PLATFORM')}
+              {t('NAVAPATHAM.ABOUT_PRATHAM')}
             </Typography>
             <Typography
               variant="body1"

@@ -54,19 +54,33 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const searchParams = useSearchParams();
   const directEnroll = searchParams.get('directEnroll');
   console.log('directEnroll', directEnroll);
+
+  // Helper function to get program name (Navapatham if isForNavaPatham is true, otherwise userProgram)
+  const getProgramName = () => {
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return '';
+    }
+    const isForNavaPatham =
+      typeof window !== 'undefined' && window.localStorage
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+    return isForNavaPatham
+      ? t('NAVAPATHAM.NAVAPATHAM')
+      : localStorage.getItem('userProgram') || '';
+  };
   // let formData: any = {};
   const [loading, setLoading] = useState(true);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
 
-  const localFormData = JSON.parse(localStorage.getItem('formData') || '{}');
+  const localFormData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('formData') || '{}') : {};
   const [userFormData, setUserFormData] = useState<any>(localFormData);
   const [userData, setuserData] = useState<any>({});
-const [responseFormData, setResponseFormData] = useState<any>({});
-  const localPayload = JSON.parse(localStorage.getItem('localPayload') || '{}');
-    const uiConfig =
+  const [responseFormData, setResponseFormData] = useState<any>({});
+  const localPayload = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('localPayload') || '{}') : {};
+  const uiConfig =
     typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
-    : {};
+      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+      : {};
 
   //formData.email = 'a@tekditechnologies.com';
 
@@ -78,11 +92,10 @@ const [responseFormData, setResponseFormData] = useState<any>({});
   // Mobile field states
   const [mobileAddUiSchema, setMobileAddUiSchema] = useState({});
   const [mobileSchema, setMobileSchema] = useState({});
-  
+
   // Parent data states (parent_phone, guardian_relation, guardian_name)
   const [parentDataAddUiSchema, setParentDataAddUiSchema] = useState({});
   const [parentDataSchema, setParentDataSchema] = useState({});
-
 
   console.log('addSchema', addSchema);
 
@@ -113,7 +126,6 @@ const [responseFormData, setResponseFormData] = useState<any>({});
         ]);
 
         const responseFormForEnroll: any = await fetchForm([
-
           {
             fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
             header: {
@@ -177,11 +189,11 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             ? updatedSchema
             : responseForm?.schema;
           let alterUISchema =enrolledProgram? responseFormForEnroll?.uiSchema: responseForm?.uiSchema;
-          
+
           // Set mobile field states
           setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
           setMobileSchema(responseFormCopy?.schema?.properties?.mobile);
-          
+
           // Set parent data states (grouping parent_phone, guardian_relation, guardian_name)
           setParentDataAddUiSchema({
             parent_phone: responseForm?.uiSchema?.parent_phone,
@@ -193,9 +205,13 @@ const [responseFormData, setResponseFormData] = useState<any>({});
             guardian_relation: responseFormCopy?.schema?.properties?.guardian_relation,
             guardian_name: responseFormCopy?.schema?.properties?.guardian_name
           });
-          
+
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+          // Add helper text to all CustomTextFieldWidget fields if isForNavaPatham is true
+          alterUISchema = addHelperTextToTextFieldWidgets(alterUISchema);
+
           console.log('alterUISchema', alterUISchema);
           if (!completeProfile) {
             alterUISchema = {
@@ -252,6 +268,47 @@ const [responseFormData, setResponseFormData] = useState<any>({});
     return enhancedSchema;
   };
 
+  const addHelperTextToTextFieldWidgets = (uiSchema: any): any => {
+    // Check if isForNavaPatham is true in localStorage
+    const isForNavaPatham =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+
+    // If isForNavaPatham is not true, return the schema without modifications
+    if (!isForNavaPatham) {
+      return uiSchema;
+    }
+
+    const enhancedSchema = { ...uiSchema };
+
+    Object.keys(enhancedSchema).forEach((fieldKey) => {
+      // Skip ui:order and other non-field keys
+      if (fieldKey === 'ui:order') return;
+
+      if (
+        typeof enhancedSchema[fieldKey] === 'object' &&
+        enhancedSchema[fieldKey] !== null
+      ) {
+        // Check if this field uses CustomTextFieldWidget
+        if (enhancedSchema[fieldKey]['ui:widget'] === 'CustomTextFieldWidget') {
+          // Ensure ui:options exists
+          if (!enhancedSchema[fieldKey]['ui:options']) {
+            enhancedSchema[fieldKey]['ui:options'] = {};
+          }
+
+          // Add helperText if it doesn't already exist
+          if (!enhancedSchema[fieldKey]['ui:options'].helperText) {
+            enhancedSchema[fieldKey]['ui:options'].helperText =
+              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+          }
+        }
+      }
+    });
+
+    return enhancedSchema;
+  };
+
   // formData.mobile = '8793607919';
   // formData.firstName = 'karan';
   // formData.lastName = 'patil';
@@ -276,16 +333,16 @@ const [responseFormData, setResponseFormData] = useState<any>({});
       value: 'pending'
     }
     const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+    const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
 if(enrolledProgram && userTenantStatus){
-  customFields.push(data);
-}
+      customFields.push(data);
+    }
 
     // Ensure "WHAT PROGRAM ARE YOU PART OF" is explicitly sent even when empty
     const programSchema =
       responseFormData?.schema?.properties?.what_program_are_you_part_of;
     const programFieldId = programSchema?.fieldId;
-    
+
     const programFieldIndex = customFields.findIndex(
       (field: any) =>
         field?.fieldId === programFieldId ||
@@ -294,8 +351,8 @@ if(enrolledProgram && userTenantStatus){
 
     if (programFieldIndex === -1) {
       if(programFieldId) {
-      customFields.push({
-        fieldId: programFieldId,
+        customFields.push({
+          fieldId: programFieldId,
           value: [],
         });
       }
@@ -335,29 +392,26 @@ if(enrolledProgram && userTenantStatus){
         return;
       }
       if (completeProfile) {
-          const uiConfig =
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
-      : {};
-//  const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
-              
-//                 if (hasBothContentCoursetab) {
-//                   router.push('/courses-contents');
-//                 }
-//                  else
-//                 router.push('/content');     
-              
-const landingPage = localStorage.getItem('landingPage') || '';
+        const uiConfig =
+          typeof window !== 'undefined'
+            ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+            : {};
+        //  const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
 
-if (landingPage) {
-  router.push(landingPage);
-} else {
-  router.push('/content');
-}
-              }
+        //                 if (hasBothContentCoursetab) {
+        //                   router.push('/courses-contents');
+        //                 }
+        //                  else
+        //                 router.push('/content');
 
+        const landingPage = localStorage.getItem('landingPage') || '';
 
-      
+        if (landingPage) {
+          router.push(landingPage);
+        } else {
+          router.push('/content');
+        }
+      }
     }
 
     console.log(payload);
@@ -388,22 +442,22 @@ if (landingPage) {
         </Box>
       ) : (
         <>
-             {directEnroll == 'true' && <Header isShowLogout={true} />}
+          {directEnroll == 'true' && <Header isShowLogout={true} />}
 
          {directEnroll != 'true' && (<Box
-            sx={{
-              //   p: 2,
-              mt: 2,
-              ml: 2,
-              cursor: 'pointer',
-              width: 'fit-content',
-              background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
-            }}
-            onClick={() => router.back()}
-          >
-            <ArrowBackIcon
-              sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
-            />
+              sx={{
+                //   p: 2,
+                mt: 2,
+                ml: 2,
+                cursor: 'pointer',
+                width: 'fit-content',
+                background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+              }}
+              onClick={() => router.back()}
+            >
+              <ArrowBackIcon
+                sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
+              />
           </Box>)}
           <Box
             sx={{
@@ -429,27 +483,36 @@ if (landingPage) {
                 textAlign: 'center',
               }}
             >
-              {enrolledProgram && typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram')
-                ? `${t('LEARNER_APP.EDIT_PROFILE.ENROLL_IN_TO')} ${localStorage.getItem('userProgram')}`
+              {enrolledProgram &&
+              typeof window !== 'undefined' &&
+              window.localStorage &&
+              localStorage.getItem('userProgram')
+                ? `${t(
+                    'LEARNER_APP.EDIT_PROFILE.ENROLL_IN_TO'
+                  )} ${getProgramName()}`
                 : completeProfile
                 ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
                 : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
             </Typography>
 
-            {enrolledProgram && typeof window !== 'undefined' && window.localStorage && uiConfig.registrationdescription && (<Typography
-             sx={{
-              fontFamily: 'Poppins, sans-serif',
-              fontWeight: 400,
-              fontSize: '16px',
-              lineHeight: '24px',
-              letterSpacing: '0.5px',
-              textAlign: 'center',
-              p: '5px',
-            }}
-          >
-            {uiConfig?.registrationdescription}
-          </Typography>)
-}
+            {enrolledProgram &&
+              typeof window !== 'undefined' &&
+              window.localStorage &&
+              uiConfig.registrationdescription && (
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins, sans-serif',
+                    fontWeight: 400,
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0.5px',
+                    textAlign: 'center',
+                    p: '5px',
+                  }}
+                >
+                  {uiConfig?.registrationdescription}
+                </Typography>
+              )}
           </Box>
           <Box
             sx={{
@@ -473,14 +536,19 @@ if (landingPage) {
                 </Typography>
               </Box>
             )}
-            {enrolledProgram && typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') && (
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
-              <Image src={face} alt="Step Icon" />
-              <Typography fontWeight={600}>
-              Great that you’ve joined {localStorage.getItem('userProgram')}!<br />
-              Let’s begin this exciting journey together. Help us with a few additional details                </Typography>
-            </Box>
-          )}
+            {enrolledProgram &&
+              typeof window !== 'undefined' &&
+              window.localStorage &&
+              localStorage.getItem('userProgram') && (
+                <Box display="flex" alignItems="center" gap={1} mb={2}>
+                  <Image src={face} alt="Step Icon" />
+                  <Typography fontWeight={600}>
+                    Great that you've joined {getProgramName()}!<br />
+                    Let's begin this exciting journey together. Help us with a
+                    few additional details{' '}
+                  </Typography>
+                </Box>
+              )}
             {addSchema && addUiSchema && (
               <DynamicForm
                 schema={addSchema}
