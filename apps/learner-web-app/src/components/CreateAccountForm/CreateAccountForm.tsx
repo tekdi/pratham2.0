@@ -73,7 +73,7 @@ const CreateAccountForm = ({
         const response = await userCheck({ username: value });
         const users = response?.result || [];
         if (users.length > 0) {
-          setUsernameError('Username already exists');
+          setUsernameError(t('NAVAPATHAM.USERNAME_ALREADY_EXISTS'));
         } else {
           setUsernameError('');
         }
@@ -113,12 +113,15 @@ const CreateAccountForm = ({
 
   const handleSubmit = () => {
     if (!doPasswordsMatch) {
-      showToastMessage('Passwords do not match', 'error');
+      showToastMessage(t('NAVAPATHAM.PASSWORDS_DO_NOT_MATCH'), 'error');
       return;
     }
 
     if (!isPasswordValid) {
-      showToastMessage('Password does not meet requirements', 'error');
+      showToastMessage(
+        t('NAVAPATHAM.PASSWORD_DOES_NOT_MEET_REQUIREMENTS'),
+        'error'
+      );
       return;
     }
 
@@ -213,7 +216,7 @@ const CreateAccountForm = ({
             mb: 3,
           }}
         >
-        {t('NAVAPATHAM.CREDENTIALS_TIP')}
+          {t('NAVAPATHAM.CREDENTIALS_TIP')}
         </Alert>
 
         {/* Username */}
@@ -225,10 +228,7 @@ const CreateAccountForm = ({
           fullWidth
           margin="normal"
           error={!!usernameError}
-          helperText={
-            usernameError ||
-            t('NAVAPATHAM.USERNAME_HELPER')
-          }
+          helperText={usernameError || t('NAVAPATHAM.USERNAME_HELPER')}
         />
 
         {/* Password */}
@@ -244,7 +244,7 @@ const CreateAccountForm = ({
               <InputAdornment position="end">
                 <IconButton onClick={togglePassword} edge="end">
                   {showPassword ? <Visibility /> : <VisibilityOff />}
-                </IconButton> 
+                </IconButton>
               </InputAdornment>
             ),
           }}
@@ -288,22 +288,23 @@ const CreateAccountForm = ({
           }
           label={
             <Typography variant="h3">
-              I have read and agree to the
+              {t('NAVAPATHAM.I_HAVE_READ_AND_AGREE_TO_THE')}{' '}
               <Typography
                 component="span"
                 fontWeight="bold"
                 color="#0071E3"
                 onClick={handlePrivacyGuidelines}
+                sx={{ cursor: 'pointer' }}
               >
-                {' '} Privacy Guidelines
+                {t('NAVAPATHAM.PRIVACY_GUIDELINES')}
               </Typography>{' '}
-              and I consent to the collection and use of my personal data as
-              described in the{' '}
+              {t('NAVAPATHAM.AND_I_CONSENT_TO_THE_COLLECTION')}{' '}
               <Typography
                 component="span"
                 fontWeight="bold"
                 color="#0071E3"
                 onClick={handleConsentform}
+                sx={{ cursor: 'pointer' }}
               >
                 {t('NAVAPATHAM.CONSENT_FORM')}
               </Typography>

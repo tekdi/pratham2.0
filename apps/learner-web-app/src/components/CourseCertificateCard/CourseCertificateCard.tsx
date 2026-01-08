@@ -36,6 +36,22 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
 }) => {
   const [courseDetails, setCourseDetails] = useState<CourseDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCertificateRestricted, setIsCertificateRestricted] = useState(false);
+
+  // Check certificate restriction from uiconfig in localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const uiconfig = localStorage.getItem('uiConfig');
+        if (uiconfig) {
+          const parsedConfig = JSON.parse(uiconfig);
+          setIsCertificateRestricted(parsedConfig.certificateRestriction === true);
+        }
+      } catch (error) {
+        console.error('Error parsing uiconfig:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -80,6 +96,11 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
   if (isLoading) {
     return <CardShimmer />;
   }
+
+  // Don't render if certificate is restricted
+  // if (isCertificateRestricted) {
+  //   return null;
+  // }
 
   return (
     <Card
@@ -195,7 +216,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
           </Typography>
         </Box>
 
-        <Button
+       {!isCertificateRestricted && (<Button
           variant="text"
           onClick={onPreviewCertificate}
           sx={{
@@ -220,7 +241,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
           endIcon={<ArrowForwardIcon sx={{ fontSize: '18px' }} />}
         >
           Preview Certificate
-        </Button>
+        </Button>)}
       </CardContent>
     </Card>
   );

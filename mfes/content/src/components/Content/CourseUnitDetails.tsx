@@ -64,11 +64,29 @@ export default function Details(props: DetailsProps) {
   const [effectiveUnitId, setEffectiveUnitId] = useState<string | undefined>(
     Array.isArray(unitId) ? unitId[0] : unitId
   );
+  const [isCertificateRestricted, setIsCertificateRestricted] = useState(false);
+  
   let activeLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
   }
+
+  // Check certificate restriction from uiconfig in localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const uiconfig = localStorage.getItem('uiConfig');
+        if (uiconfig) {
+          const parsedConfig = JSON.parse(uiconfig);
+          console.log('parsedConfig=====>', parsedConfig);
+          setIsCertificateRestricted(parsedConfig.certificateRestriction === true);
+        }
+      } catch (error) {
+        console.error('Error parsing uiconfig:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const getDetails = async (identifier: string) => {
@@ -253,7 +271,6 @@ export default function Details(props: DetailsProps) {
                     setCertificateId(
                       resultCertificate?.result?.credentialSchemaId
                     );
-                  } else {
                   }
                 }
               }
@@ -424,12 +441,12 @@ export default function Details(props: DetailsProps) {
           ...props?._box,
         }}
       >
-        {certificateId && !effectiveUnitId && (
+        {!isCertificateRestricted && certificateId && !effectiveUnitId && (
           <CourseCompletionBanner certificateId={certificateId} />
         )}
         
         {/* Show completion banner for completed courses */}
-        {!unitId && courseItem?.children?.length === 1 && courseItem?.issuedOn && (
+        {!isCertificateRestricted && !unitId && courseItem?.children?.length === 1 && courseItem?.issuedOn && (
           <CourseCompletionBanner certificateId={certificateId || ''} />
         )}
         {props?.type === 'collapse' ? (
