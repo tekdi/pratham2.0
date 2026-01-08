@@ -63,7 +63,7 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
-import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import MultipleCenterListWidgetNew from '@shared-lib-v2/MapUser/MultipleCenterListWidgetNew';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { updateUser } from '@/services/CreateUserService';
@@ -805,7 +805,7 @@ const UserLeader = () => {
           )}
           {formStep === 1 && (
             <Box sx={{ mb: 3 }}>
-              <CenterListWidget
+              <MultipleCenterListWidgetNew
                 value={selectedCenterId}
                 onChange={(centerId) => {
                   setSelectedCenterId(centerId);
