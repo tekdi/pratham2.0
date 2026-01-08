@@ -539,24 +539,36 @@ const DynamicForm = ({
       } else {
         // Helper to add a field
         const addField = (fieldKey, title) => {
+          // Check if isForNavaPatham is true to add helper text
+          const isForNavaPatham =
+            typeof window !== 'undefined'
+              ? localStorage.getItem('isForNavaPatham') === 'true'
+              : false;
+
+          // Prepare ui:options with helper text if needed
+          const uiOptions: any = {
+            validateOnBlur: true,
+            hideError: true,
+          };
+
+          // Add helper text for CustomTextFieldWidget if isForNavaPatham is true
+          if (isForNavaPatham) {
+            uiOptions.helperText =
+              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+          }
+
           setFormUiSchema((prevUiSchema) => ({
             ...prevUiSchema,
             [fieldKey]: {
               'ui:widget': 'CustomTextFieldWidget',
-              'ui:options': {
-                validateOnBlur: true,
-                hideError: true,
-              },
+              'ui:options': uiOptions,
             },
           }));
           setFormUiSchemaOriginal((prevUiSchema) => ({
             ...prevUiSchema,
             [fieldKey]: {
               'ui:widget': 'CustomTextFieldWidget',
-              'ui:options': {
-                validateOnBlur: true,
-                hideError: true,
-              },
+              'ui:options': uiOptions,
             },
           }));
 
