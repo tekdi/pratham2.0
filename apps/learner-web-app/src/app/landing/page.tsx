@@ -63,6 +63,9 @@ export default function LandingPage() {
     };
 
     fetchPrograms();
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.removeItem('isForNavaPatham');
+  }
   }, []);
 
   const handleGetStarted = async () => {
