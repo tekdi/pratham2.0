@@ -487,8 +487,18 @@
     "NAVAPATHAM": "NavaPatham",
     "PARENT_GUARDIAN_CONFIRMATION": "I confirm this checkbox is filled out by the parent/guardian of the learner.",
     "CREATING_ACCOUNT": "Creating Account...",
-    "CONSENT_FORM": "Consent Form"
-},
+    "CONSENT_FORM": "Consent Form",
+    "I_HAVE_READ_AND_AGREE_TO_THE": "I have read and agree to the",
+    "PRIVACY_GUIDELINES": "Privacy Guidelines",
+    "AND_I_CONSENT_TO_THE_COLLECTION": "and I consent to the collection and use of my personal data as described in the",
+    "USERNAME_ALREADY_EXISTS": "Username already exists",
+    "PASSWORDS_DO_NOT_MATCH": "Passwords do not match",
+    "PASSWORD_DOES_NOT_MEET_REQUIREMENTS": "Password does not meet requirements",
+    "EXPLORE_MORE_COURSES": "Explore More Courses",
+    "SECOND_CHANCE_PROGRAM": "Second Chance Program",
+    "PARENT_GUARDIAN_PHONE_NO": "Parent Guardian Phone No",
+    "COURSE_COMPLETION_CONGRATULATIONS": "Congratulations on completing the course!"
+  },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
@@ -764,7 +774,7 @@
     "GRADE_11": "Grade 11",
     "GRADE_12": "Grade 12",
     "hamara_gaon": "hamara gaon",
-    
+
     "smile_program": "smile program",
     "pratham_read_india_initiative_rii": "pratham readindia initiative rii",
     "government_partnership": "government partnership",

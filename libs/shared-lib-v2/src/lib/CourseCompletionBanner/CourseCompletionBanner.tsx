@@ -6,15 +6,19 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Image from 'next/image';
 import tada from '../../../images/tada.gif';
 import CertificateModal from '../CertificateModal/CertificateModal';
+import { useTranslation } from '../context/LanguageContext';
 interface CourseCompletionBannerProps {
   certificateId: string;
 }
 export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
   certificateId,
 }) => {
+  const { t } = useTranslation();
   const [showCertificate, setShowCertificate] = useState(false);
 
- const tenantName =      (typeof window !== 'undefined' && localStorage.getItem('userProgram')) || '';
+  const tenantName =
+    (typeof window !== 'undefined' && localStorage.getItem('userProgram')) ||
+    '';
   const handlePreviewClick = () => {
     setShowCertificate(true);
   };
@@ -51,30 +55,31 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
             style={{ marginBottom: '16px' }}
           />{' '}
           <Typography fontWeight="500">
-            Congratulations on completing the course!
+            {t('NAVAPATHAM.COURSE_COMPLETION_CONGRATULATIONS')}
           </Typography>
         </Paper>
 
         {/* Right box with button */}
-        {(<Button
-          variant="contained"
-          onClick={handlePreviewClick}
-          endIcon={<ArrowForwardIcon />}
-          sx={{
-            backgroundColor: '#ffd600',
-            color: 'black',
-            borderRadius: 999,
-            px: 3,
-            py: 1.5,
-            textTransform: 'none',
-            fontWeight: 500,
-            '&:hover': {
-              backgroundColor: '#ffcc00',
-            },
-          }}
-        >
-          Preview Certificate
-        </Button>)
+        {
+          <Button
+            variant="contained"
+            onClick={handlePreviewClick}
+            endIcon={<ArrowForwardIcon />}
+            sx={{
+              backgroundColor: '#ffd600',
+              color: 'black',
+              borderRadius: 999,
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              fontWeight: 500,
+              '&:hover': {
+                backgroundColor: '#ffcc00',
+              },
+            }}
+          >
+            Preview Certificate
+          </Button>
         }
       </Box>
       <CertificateModal
