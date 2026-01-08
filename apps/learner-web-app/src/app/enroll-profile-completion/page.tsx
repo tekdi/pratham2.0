@@ -127,23 +127,11 @@ const EnrollProfileCompletionInner = () => {
         localStorage.removeItem('previousTenantId');
 
         // Store landing page for later navigation
-        const finalLandingPage = landingPage || '/home';
-        setLandingPage(finalLandingPage);
+    setLandingPage(landingPage || '/home');
 
-        // Check if isForNavaPatham is true, skip popup and directly trigger start learning action
-        const isForNavaPatham =
-          typeof window !== 'undefined'
-            ? localStorage.getItem('isForNavaPatham') === 'true'
-            : false;
-
-        if (isForNavaPatham) {
-          // Skip popup and directly trigger start learning action
-          onSigin(finalLandingPage);
-        } else {
-          // Show success modal instead of redirecting immediately
-          setSignupSuccessModal(true);
-        }
-      }
+    // Show success modal instead of redirecting immediately
+    setSignupSuccessModal(true);
+  }
     } catch (error) {
       console.error('Failed to access program:', error);
       router.push('/programs');
@@ -154,36 +142,35 @@ const EnrollProfileCompletionInner = () => {
     setSignupSuccessModal(false);
   };
 
-  const onSigin = (customLandingPage?: string) => {
+  const onSigin = () => {
     setSignupSuccessModal(false);
     console.log('enroll user to tenant', localStorage.getItem('tenantId'));
-    const targetLandingPage = customLandingPage || landingPage || '/home';
+    if(localStorage.getItem('isAndroidApp') == 'yes')
+      {
+       // Send message to React Native WebView
 
-    if (localStorage.getItem('isAndroidApp') == 'yes') {
-      // Send message to React Native WebView
+            //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
 
-      //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+            //        const program = JSON.parse(enrolledProgramData || '{}');
 
-      //        const program = JSON.parse(enrolledProgramData || '{}');
 
-      if (window.ReactNativeWebView) {
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
-            data: {
-              userId: localStorage.getItem('userId'),
-              tenantId: localStorage.getItem('tenantId'),
-              token: localStorage.getItem('token'),
-              refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+       if (window.ReactNativeWebView) {
+         window.ReactNativeWebView.postMessage(JSON.stringify({
+           type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+           data: {
+             userId: localStorage.getItem('userId'),
+             tenantId: localStorage.getItem('tenantId'),
+             token: localStorage.getItem('token'),
+             refreshToken: localStorage.getItem('refreshTokenForAndroid'),
 
-              // Add any data you want to send
-            },
-          })
-        );
+             // Add any data you want to send
+           }
+         }));
+       }
       }
-    } else {
-      localStorage.removeItem('enrollTenantId');
-      router.push(targetLandingPage);
+      else{
+        localStorage.removeItem('enrollTenantId')
+            router.push(landingPage || '/home');
     }
     // Navigate to landing page
   };
