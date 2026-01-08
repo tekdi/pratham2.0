@@ -97,7 +97,6 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const [parentDataAddUiSchema, setParentDataAddUiSchema] = useState({});
   const [parentDataSchema, setParentDataSchema] = useState({});
 
-
   console.log('addSchema', addSchema);
 
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
@@ -127,7 +126,6 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         ]);
 
         const responseFormForEnroll: any = await fetchForm([
-
           {
             fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.learner.context}&contextType=${FormContext.learner.contextType}`,
             header: {
@@ -210,6 +208,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+          // Add helper text to all CustomTextFieldWidget fields if isForNavaPatham is true
+          alterUISchema = addHelperTextToTextFieldWidgets(alterUISchema);
+
           console.log('alterUISchema', alterUISchema);
           if (!completeProfile) {
             alterUISchema = {
@@ -260,6 +262,47 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
         // Push grid option
         enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+      }
+    });
+
+    return enhancedSchema;
+  };
+
+  const addHelperTextToTextFieldWidgets = (uiSchema: any): any => {
+    // Check if isForNavaPatham is true in localStorage
+    const isForNavaPatham =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+
+    // If isForNavaPatham is not true, return the schema without modifications
+    if (!isForNavaPatham) {
+      return uiSchema;
+    }
+
+    const enhancedSchema = { ...uiSchema };
+
+    Object.keys(enhancedSchema).forEach((fieldKey) => {
+      // Skip ui:order and other non-field keys
+      if (fieldKey === 'ui:order') return;
+
+      if (
+        typeof enhancedSchema[fieldKey] === 'object' &&
+        enhancedSchema[fieldKey] !== null
+      ) {
+        // Check if this field uses CustomTextFieldWidget
+        if (enhancedSchema[fieldKey]['ui:widget'] === 'CustomTextFieldWidget') {
+          // Ensure ui:options exists
+          if (!enhancedSchema[fieldKey]['ui:options']) {
+            enhancedSchema[fieldKey]['ui:options'] = {};
+          }
+
+          // Add helperText if it doesn't already exist
+          if (!enhancedSchema[fieldKey]['ui:options'].helperText) {
+            enhancedSchema[fieldKey]['ui:options'].helperText =
+              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+          }
+        }
       }
     });
 
@@ -369,9 +412,6 @@ if(enrolledProgram && userTenantStatus){
           router.push('/content');
         }
       }
-
-
-      
     }
 
     console.log(payload);
