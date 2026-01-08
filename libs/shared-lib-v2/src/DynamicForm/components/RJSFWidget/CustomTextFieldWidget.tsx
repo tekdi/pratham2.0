@@ -34,28 +34,18 @@ const CustomTextFieldWidget = ({
     (error) => !error.toLowerCase().includes('required')
   );
 
-  // Get note/helper text from options (RJSF merges ui:options into options prop)
+  // Get helper text from options (RJSF merges ui:options into options prop)
   // Also check uiSchema directly as fallback
-  const note = options?.note || options?.helperText || uiSchema?.['ui:options']?.note || uiSchema?.['ui:options']?.helperText || '';
-  
-  // Debug: log to see if note is being received
-  if (id && id.includes('lastName')) {
-    console.log('CustomTextFieldWidget - lastName:', {
-      id,
-      note,
-      options,
-      uiSchema,
-      'options.note': options?.note,
-      'uiSchema[ui:options]': uiSchema?.['ui:options']
-    });
-  }
+  const helperTextFromOptions =
+    options?.helperText ||
+    options?.note ||
+    uiSchema?.['ui:options']?.helperText ||
+    uiSchema?.['ui:options']?.note ||
+    '';
 
-  // Combine error and note in helperText
-  // Show error if exists, otherwise show note
-  // If both exist, prioritize error but could show both
-  const helperText = displayErrors.length > 0 
-    ? displayErrors[0] 
-    : (note || '');
+  // Combine error and helper text - show error if exists, otherwise show helper text
+  const helperText =
+    displayErrors.length > 0 ? displayErrors[0] : helperTextFromOptions;
 
   return (
     <TextField
@@ -72,7 +62,7 @@ const CustomTextFieldWidget = ({
       error={displayErrors.length > 0}
       helperText={helperText}
       variant="outlined"
-    //   margin="normal"
+      //   margin="normal"
     />
   );
 };

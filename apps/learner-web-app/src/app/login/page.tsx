@@ -168,6 +168,7 @@ const LoginPage = () => {
   const [tenantName, setTenantName] = useState<string>('');
   const [roleId, setRoleId] = useState<string>('');
   const [roleName, setRoleName] = useState<string>('');
+  const [isAndroidApp, setIsAndroidApp] = useState(true);
 
   const handleSuccessfulLogin = useCallback(
     async (
@@ -366,6 +367,8 @@ const LoginPage = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+        setIsAndroidApp(isAndroid);
         // localStorage.clear();()
         preserveLocalStorage();
 
@@ -513,7 +516,7 @@ const LoginPage = () => {
             />
 
             {/* App Download Section - Only visible on mobile */}
-            <Box
+           { !isAndroidApp && (<Box
               display={{ xs: 'flex', sm: 'none' }}
               justifyContent="center"
               alignItems="center"
@@ -521,7 +524,8 @@ const LoginPage = () => {
               mt={4}
             >
               <AppDownloadSection />
-            </Box>
+            </Box>)
+}
           </Box>
         </Box>
       </Box>

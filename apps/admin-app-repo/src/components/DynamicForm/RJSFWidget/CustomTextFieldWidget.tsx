@@ -15,6 +15,8 @@ const CustomTextFieldWidget = ({
   onFocus,
   rawErrors = [],
   placeholder,
+  options = {},
+  uiSchema = {},
 }: WidgetProps) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
@@ -32,6 +34,19 @@ const CustomTextFieldWidget = ({
     (error) => !error.toLowerCase().includes('required')
   );
 
+  // Get helper text from options (RJSF merges ui:options into options prop)
+  // Also check uiSchema directly as fallback
+  const helperTextFromOptions =
+    options?.helperText ||
+    options?.note ||
+    uiSchema?.['ui:options']?.helperText ||
+    uiSchema?.['ui:options']?.note ||
+    '';
+
+  // Combine error and helper text - show error if exists, otherwise show helper text
+  const helperText =
+    displayErrors.length > 0 ? displayErrors[0] : helperTextFromOptions;
+
   return (
     <TextField
       fullWidth
@@ -45,9 +60,9 @@ const CustomTextFieldWidget = ({
       onFocus={handleFocus}
       placeholder={placeholder}
       error={displayErrors.length > 0}
-      helperText={displayErrors.length > 0 ? displayErrors[0] : ''}
+      helperText={helperText}
       variant="outlined"
-    //   margin="normal"
+      //   margin="normal"
     />
   );
 };
