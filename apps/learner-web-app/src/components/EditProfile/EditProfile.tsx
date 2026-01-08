@@ -487,9 +487,7 @@ if(enrolledProgram && userTenantStatus){
               typeof window !== 'undefined' &&
               window.localStorage &&
               localStorage.getItem('userProgram')
-                ? `${t(
-                    'LEARNER_APP.EDIT_PROFILE.ENROLL_IN_TO'
-                  )} ${getProgramName()}`
+                ? `${t('NAVAPATHAM.ENROLL_INTO')} ${getProgramName()}`
                 : completeProfile
                 ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
                 : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
@@ -543,9 +541,8 @@ if(enrolledProgram && userTenantStatus){
                 <Box display="flex" alignItems="center" gap={1} mb={2}>
                   <Image src={face} alt="Step Icon" />
                   <Typography fontWeight={600}>
-                    Great that you've joined {getProgramName()}!<br />
-                    Let's begin this exciting journey together. Help us with a
-                    few additional details{' '}
+                    {t('NAVAPATHAM.WELCOME_JOINED')} {getProgramName()}!<br />
+                    {t('NAVAPATHAM.ENROLLMENT_INTRO')}
                   </Typography>
                 </Box>
               )}
@@ -579,7 +576,9 @@ if(enrolledProgram && userTenantStatus){
               form="dynamic-form-id"
               type="submit"
             >
-              { enrolledProgram ? t('COMMON.FINISH_ENROLL') : t('COMMON.SUBMIT')}
+              {enrolledProgram
+                ? t('NAVAPATHAM.FINISH_ENROLL')
+                : t('COMMON.SUBMIT')}
             </Button>
           </Box>
         </>
