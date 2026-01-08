@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useRef } from 'react';
+import React, { memo, useEffect, useRef, useMemo } from 'react';
 import {
   Box,
   Grid,
@@ -33,6 +33,40 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
   const isXl = useMediaQuery(theme.breakpoints.up('xl'));
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
   const isThematicPath = currentPath.includes('/themantic');
+
+  // Priority map for sorting
+  const priorityMap: Record<string, number> = {
+    energy: 0,
+    environment: 1,
+    health: 2,
+  };
+
+  // Map Hindi + English names to a common key
+  const normalizeName = (item: any) => {
+    const name = item.name?.toLowerCase();
+
+    if (['energy', 'ऊर्जा'].includes(name)) return 'energy';
+    if (['environment', 'पर्यावरण'].includes(name)) return 'environment';
+    if (['health', 'स्वास्थ्य', 'आरोग्य'].includes(name)) return 'health';
+
+    return null; // not in priority list
+  };
+
+  // Sort contentData based on priority
+  const sortedContentData = useMemo(() => {
+    if (!props.contentData) return [];
+    
+    return [...props.contentData].sort((a, b) => {
+      const keyA = normalizeName(a);
+      const keyB = normalizeName(b);
+
+      if (!keyA && !keyB) return 0; // keep original order
+      if (!keyA) return 1;
+      if (!keyB) return -1;
+
+      return priorityMap[keyA] - priorityMap[keyB];
+    });
+  }, [props.contentData]);
 
   // Calculate items per row based on breakpoints and _grid overrides
   const getItemsPerRow = () => {
@@ -163,10 +197,11 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
     props.contentData?.length,
   ]);
 console.log("props.contentData",props.contentData)
+console.log("sortedContentData", sortedContentData)
   return (
     <Box {..._subBox} sx={{ ...(_subBox?.sx ?? {}) }}>
       <Grid container spacing={{ xs: 2, sm: 2, md: 2 }} {..._containerGrid}>
-        {props.contentData?.map((item: any, index: number) => (
+        {sortedContentData?.map((item: any, index: number) => (
           <Grid
             key={item?.identifier}
             id={`${props?.pageName}-${item?.identifier}`}
@@ -201,7 +236,7 @@ console.log("props.contentData",props.contentData)
         )}
         {props.isLoadingMoreData && <CircularProgress size={20} />}
       </Box>
-      {!props.contentData?.length && (
+      {!sortedContentData?.length && (
         <Typography
           variant="body1"
           sx={{
