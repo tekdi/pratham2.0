@@ -486,30 +486,18 @@ const RegisterationFlow = () => {
 
           //sent username and password
           sendMessage({
-            sms: {
-              to: [updated_payload.mobile],
-              body: 'Hey',
-              templateId: '6948f41681326042a2454bb2',
-              replacements: {
-                var1: username,
-                var2: password,
-              },
-            },
+            "sms": {
+              "to": [updated_payload.mobile],
+              "body":"Hey",
+              "templateId": "6948f41681326042a2454bb2", 
+              "replacements": {
+                "var1": username,
+                "var2": password
+              }
+            }
           });
 
-          // Check if isForNavaPatham is true, skip popup and directly trigger login
-          const isForNavaPatham =
-            typeof window !== 'undefined'
-              ? localStorage.getItem('isForNavaPatham') === 'true'
-              : false;
-
-          if (isForNavaPatham) {
-            // Skip popup and directly trigger start exploring action
-            await onSigin();
-          } else {
-            // Show success popup as usual
-            setSignupSuccessModal(true);
-          }
+          setSignupSuccessModal(true);
         } else {
           showToastMessage(
             t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'),
