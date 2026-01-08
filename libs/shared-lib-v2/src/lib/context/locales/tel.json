@@ -582,7 +582,11 @@
     "GRADE_10": "10వ తరగతి",
     "GRADE_11": "11వ తరగతి",
     "GRADE_12": "12వ తరగతి",
-    "TYPE_OF_PHONE_ACCESSIBLE": "అందుబాటులో ఉన్న ఫోన్ రకం"
+    "TYPE_OF_PHONE_ACCESSIBLE": "అందుబాటులో ఉన్న ఫోన్ రకం",
+    "WHATS_YOUR_GENDER":"మీ లింగం ఏమిటి",
+    "dob":"పుట్టిన తేదీ",
+    "PARENT_GUARDIAN_PHONE_NO": "తల్లిదండ్రులు/సంరక్షకుడి ఫోన్ నంబర్",
+    "phone_number":"ఫోన్ నంబర్"
   },
   "Assessment Score": "పరీక్ష స్కోర్",
   "CENTER:": "కేంద్రం",

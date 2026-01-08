@@ -557,7 +557,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         {otherSectionFields.length > 0 && (
           <>
             <Typography sx={sectionTitleStyle}>
-              {t('LEARNER_APP.USER_PROFILE_CARD.ADDITIONAL_INFORMATION')}
+              {t('NAVAPATHAM.ADDITIONAL_INFORMATION')}
             </Typography>
             <Box sx={sectionCardStyle}>
               <Grid container spacing={1.5}>
