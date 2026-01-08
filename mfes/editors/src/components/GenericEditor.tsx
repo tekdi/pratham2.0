@@ -48,9 +48,9 @@ const GenericEditor: React.FC = () => {
   };
   const sendReviewNotification = async (notificationData: any) => {
     try{
-    const response = await fetchCCTAList();
-    const cctaList = response;
-    console.log("response", response);
+    // const response = await fetchCCTAList();
+    // const cctaList = response;
+    // console.log("response", response);
     const isQueue = false;
     const context = "CMS";
     const key = "onContentReview";
@@ -59,7 +59,10 @@ const GenericEditor: React.FC = () => {
         `/action/content/v3/read/${notificationData?.contentId}`
       );
       const data = await ContentDetail.json();
-
+      const board = data?.result?.content?.board;
+      const subject = data?.result?.content?.subject;
+      const response = await fetchCCTAList(board, subject);
+      const cctaList = response;
     cctaList?.map(async (user: any) => {
       const replacements = {
         "{reviewerName}": user?.name,

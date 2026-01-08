@@ -70,10 +70,16 @@ export const getUserDetailsInfo = async (
   }
 };
 
- export const fetchCCTAList = async() => {
+ export const fetchCCTAList = async(board?: any, subject?: any) => {
     try{
         const filter: any = {
             role: Role.CCTA
+        }
+        if (board) {
+          filter.board = [board];
+        }
+        if (subject) {
+          filter.subject = subject;
         }
         const tenantId = localStorage.getItem('tenantId');
         if (tenantId) {
