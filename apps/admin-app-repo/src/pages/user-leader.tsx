@@ -576,6 +576,7 @@ const UserLeader = () => {
   const [selectedCenterId, setSelectedCenterId] = useState<
     string | string[] | null
   >(null);
+  const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -716,6 +717,7 @@ const UserLeader = () => {
           if (reason !== 'backdropClick') {
             setMapModalOpen(false);
             setSelectedCenterId(null); // Reset center selection when dialog closes
+            setSelectedCenterList([]); // Reset center list when dialog closes
             setSelectedUserId(null); // Reset user selection when dialog closes
             setUserDetails(null);
           }
@@ -811,6 +813,11 @@ const UserLeader = () => {
                   setSelectedCenterId(centerId);
                   console.log('Selected Center ID:', centerId);
                 }}
+                onCenterList={(centerList) => {
+                  setSelectedCenterList(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterList}
                 label="Select Center"
                 required={true}
                 multiple={false}
@@ -915,6 +922,7 @@ const UserLeader = () => {
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
+                        setSelectedCenterList([]);
                         setSelectedUserId(null);
                         // Refresh the data
                         searchData(prefilledFormData, 0);
