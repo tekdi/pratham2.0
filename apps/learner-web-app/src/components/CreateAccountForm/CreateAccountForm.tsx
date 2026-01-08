@@ -89,10 +89,19 @@ const CreateAccountForm = ({
     return value.length >= 4;
   };
   const handleConsentform = () => {
-    if (belowEighteen) {
-      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+    const isForNavaPatham =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('isForNavaPatham') === 'true'
+        : false;
+
+    if (isForNavaPatham) {
+      window.open('/files/telugu_consent_form.pdf', '_blank');
     } else {
-      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      if (belowEighteen) {
+        window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+      } else {
+        window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      }
     }
   };
   const handlePrivacyGuidelines = () => {
