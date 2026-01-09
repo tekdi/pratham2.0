@@ -56,10 +56,12 @@ export default function handler(req, res) {
                 } else if (selectedvalue != '') {
                   // Transform terms into options
                   // console.log('in initial state');
-                  options = categories?.terms.map((term) => ({
-                    label: term.name,
-                    value: term.name,
-                  }));
+                  options = categories?.terms
+                    .filter((term) => term.status !== "Retired") // Filter out retired boards
+                    .map((term) => ({
+                      label: term.name,
+                      value: term.name,
+                    }));
                 }
                 // console.log('option', options);
               }
