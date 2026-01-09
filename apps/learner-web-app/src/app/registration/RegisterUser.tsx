@@ -343,11 +343,11 @@ const RegisterUser = () => {
       const payload = isEmailCheck
         ? { email: formData.email }
         : {
-          firstName: formData.firstName,
-          mobile: isUnderEighteen(formData.dob)
-            ? formData.parent_phone
-            : formData.mobile,
-        };
+            firstName: formData.firstName,
+            mobile: isUnderEighteen(formData.dob)
+              ? formData.parent_phone
+              : formData.mobile,
+          };
 
       const response = await userCheck(payload);
       const users = response?.result || [];
@@ -440,8 +440,8 @@ const RegisterUser = () => {
     console.log('onCloseSuccessModal', formData);
     setUsername(
       (formData?.firstName || '') +
-      (formData?.lastName || '') +
-      Math.floor(10 + Math.random() * 90) // random 2-digit number
+        (formData?.lastName || '') +
+        Math.floor(10 + Math.random() * 90) // random 2-digit number
     );
     setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
@@ -863,7 +863,7 @@ const RegisterUser = () => {
         open={signupSuccessModal}
         onClose={onCloseSignupSuccessModal}
         showFooter={true}
-        primaryText={'Start learning'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_LEARNING')}
         primaryActionHandler={onSigin}
       >
         <Box p="10px">
