@@ -429,7 +429,9 @@
       "VERIFY_OTP": "Verify OTP",
       "VERIFY_YOUR_PHONE_NUMBER": "Verify Your Phone Number",
       "OKAY": "Okay",
-      "START_EXPLORING": "Start Exploring"
+      "START_EXPLORING": "Start Exploring",
+      "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "You have successfully signed up for",
+      "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
@@ -497,7 +499,8 @@
     "EXPLORE_MORE_COURSES": "Explore More Courses",
     "SECOND_CHANCE_PROGRAM": "Second Chance Program",
     "PARENT_GUARDIAN_PHONE_NO": "Parent Guardian Phone No",
-    "COURSE_COMPLETION_CONGRATULATIONS": "Congratulations on completing the course!"
+    "COURSE_COMPLETION_CONGRATULATIONS": "Congratulations on completing the course!",
+    "HURRAY": "Hurray!"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
