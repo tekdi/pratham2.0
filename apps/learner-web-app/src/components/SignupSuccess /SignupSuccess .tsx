@@ -5,7 +5,14 @@ import { Box, Typography, Button, Paper } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Image from 'next/image';
 import tada from '../../../public/images/tada.gif';
-const SignupSuccess = ({withProgramName = false}: {withProgramName?: boolean}) => {
+import { useTranslation } from '@shared-lib';
+
+const SignupSuccess = ({
+  withProgramName = false,
+}: {
+  withProgramName?: boolean;
+}) => {
+  const { t } = useTranslation();
   return (
     <Box
       display="flex"
@@ -33,24 +40,31 @@ const SignupSuccess = ({withProgramName = false}: {withProgramName?: boolean}) =
           mb: 3,
         }}
       >
-        Hurray!
+        {t('NAVAPATHAM.HURRAY')}
       </Typography>
       {typeof window !== 'undefined' && window.localStorage && (
-  <Typography
-    sx={{
-      fontWeight: 200,
-      fontSize: '22px',
-      lineHeight: '28px',
-      letterSpacing: '0px',
-      textAlign: 'center',
-      verticalAlign: 'middle',
-      mb: 3,
-    }}
-  >
-    {withProgramName ? `You have successfully signed up for ${localStorage.getItem('userProgram')}.` : 'Great job!You have taken the first step in your learning journey with Pratham'}
-  </Typography>
-)}
-
+        <Typography
+          sx={{
+            fontWeight: 200,
+            fontSize: '22px',
+            lineHeight: '28px',
+            letterSpacing: '0px',
+            textAlign: 'center',
+            verticalAlign: 'middle',
+            mb: 3,
+          }}
+        >
+          {withProgramName
+            ? `${t(
+                'LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR'
+              )} ${
+                localStorage.getItem('isForNavaPatham') === 'true'
+                  ? t('NAVAPATHAM.NAVAPATHAM')
+                  : localStorage.getItem('userProgram')
+              }.`
+            : t('LEARNER_APP.REGISTRATION_FLOW.LEARNING_JOURNEY_FIRST_STEP')}
+        </Typography>
+      )}
     </Box>
   );
 };

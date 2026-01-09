@@ -496,8 +496,12 @@ const RegisterationFlow = () => {
               }
             }
           });
-
-          setSignupSuccessModal(true);
+          // Added condition to hide popup based on enroll present or not
+          if (enroll) {
+            onSigin();
+          } else {  
+            setSignupSuccessModal(true);
+          }
         } else {
           showToastMessage(
             t('LEARNER_APP.REGISTRATION_FLOW.USERNAME_ALREADY_EXIST'),
