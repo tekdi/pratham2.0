@@ -815,6 +815,8 @@ const Facilitator = () => {
 
   // Helper function to extract all batch IDs from the nested structure
   const extractBatchIds = (nestedStructure: any): string[] => {
+    return nestedStructure;
+
     const batchIds: string[] = [];
 
     if (!nestedStructure || !Array.isArray(nestedStructure)) {

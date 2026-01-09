@@ -180,6 +180,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       district?: string;
       block?: string;
       village?: string;
+      stateId?: string | number | null;
+      districtId?: string | number | null;
+      blockId?: string | number | null;
+      villageId?: string | number | null;
     }>
   >(selectedBatchList || []);
   const [batchSearchKeyword, setBatchSearchKeyword] = useState('');
@@ -958,8 +962,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       setSelectedCenters([]);
       setBatches({});
       setLoadingBatches({});
+      // onChange now sends batch IDs - call it with current selected batch IDs
+      const batchIds = selectedBatches.map((b) => b.id);
       if (onChange) {
-        onChange(null);
+        onChange(batchIds.length > 0 ? batchIds : null);
       }
       if (onCenterList) {
         onCenterList([]);
@@ -1099,8 +1105,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     // When filters are cleared and center list is empty, also clear selected centers
     // This resets the parentId list to prevent API calls with stale center IDs
     setSelectedCenters([]);
+    // onChange now sends batch IDs - call it with current selected batch IDs
+    const batchIds = selectedBatches.map((b) => b.id);
     if (onChange) {
-      onChange(null);
+      onChange(batchIds.length > 0 ? batchIds : null);
     }
     if (onCenterList) {
       onCenterList([]);
@@ -1153,11 +1161,9 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         newSelection = [...prev, center];
       }
 
-      // Call onChange callback with IDs
-      const centerIds = newSelection.map((c) => c.value);
-      if (onChange) {
-        onChange(centerIds.length > 0 ? centerIds : null);
-      }
+      // onChange now sends batch IDs instead of center IDs
+      // So we only call it when batches are selected, not when centers are selected
+      // Call onCenterList callback with center list
       if (onCenterList) {
         onCenterList(newSelection);
       }
@@ -1195,13 +1201,23 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
+            stateId: center?.stateId || null,
+            districtId: center?.districtId || null,
+            blockId: center?.blockId || null,
+            villageId: center?.villageId || null,
           },
         ];
       }
 
-      // Call onBatchList callback if provided
+      // Call onBatchList callback with full batch details including IDs
       if (onBatchList) {
         onBatchList(newSelection);
+      }
+
+      // Call onChange with batch IDs instead of center IDs
+      const batchIds = newSelection.map((b) => b.id);
+      if (onChange) {
+        onChange(batchIds.length > 0 ? batchIds : null);
       }
 
       return newSelection;
@@ -1223,6 +1239,11 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       if (onBatchList) {
         onBatchList(updatedBatches);
       }
+      // Call onChange with batch IDs
+      const batchIds = updatedBatches.map((b) => b.id);
+      if (onChange) {
+        onChange(batchIds.length > 0 ? batchIds : null);
+      }
     } else {
       // Select all visible batches
       setSelectedBatches((prev) => {
@@ -1240,11 +1261,20 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
+            stateId: center?.stateId || null,
+            districtId: center?.districtId || null,
+            blockId: center?.blockId || null,
+            villageId: center?.villageId || null,
           };
         });
         const updatedBatches = [...prev, ...newBatches];
         if (onBatchList) {
           onBatchList(updatedBatches);
+        }
+        // Call onChange with batch IDs
+        const batchIds = updatedBatches.map((b) => b.id);
+        if (onChange) {
+          onChange(batchIds.length > 0 ? batchIds : null);
         }
         return updatedBatches;
       });
@@ -1255,6 +1285,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     setSelectedBatches([]);
     if (onBatchList) {
       onBatchList([]);
+    }
+    // Call onChange with null when batches are cleared
+    if (onChange) {
+      onChange(null);
     }
   };
 
@@ -1270,10 +1304,7 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         const newSelection = prev.filter(
           (c) => !centerIdsToRemove.includes(c.value)
         );
-        const centerIds = newSelection.map((c) => c.value);
-        if (onChange) {
-          onChange(centerIds.length > 0 ? centerIds : null);
-        }
+        // onChange now sends batch IDs, not center IDs
         if (onCenterList) {
           onCenterList(newSelection);
         }
@@ -1287,10 +1318,7 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
           (c) => !existingIds.includes(c.value)
         );
         const newSelection = [...prev, ...centersToAdd];
-        const centerIds = newSelection.map((c) => c.value);
-        if (onChange) {
-          onChange(centerIds.length > 0 ? centerIds : null);
-        }
+        // onChange now sends batch IDs, not center IDs
         if (onCenterList) {
           onCenterList(newSelection);
         }
@@ -1313,8 +1341,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     // But keep selected batches (so Section 4 still shows them)
     setBatches({});
     setLoadingBatches({});
+    // onChange now sends batch IDs - call it with current selected batch IDs
+    const batchIds = selectedBatches.map((b) => b.id);
     if (onChange) {
-      onChange(null);
+      onChange(batchIds.length > 0 ? batchIds : null);
     }
     if (onCenterList) {
       onCenterList([]);
@@ -1432,6 +1462,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         district?: string;
         block?: string;
         village?: string;
+        stateId?: string | number | null;
+        districtId?: string | number | null;
+        blockId?: string | number | null;
+        villageId?: string | number | null;
       }>
     > = {};
 
