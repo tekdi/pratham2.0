@@ -28,17 +28,17 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: { 
-    xs: '95vw', 
-    sm: '90vw', 
-    md: '85vw', 
-    lg: '100vw',
-    '@media (orientation: landscape)': '100vw'
+    xs: '90vw', 
+    sm: '85vw', 
+    md: '80vw', 
+    lg: '85vw',
+    '@media (orientation: landscape)': '90vw'
   },
   height: {
-    xs: '90vh',
-    '@media (orientation: landscape)': '95vh'
+    xs: '99vh',
+    '@media (orientation: landscape)': '99vh'
   },
-  maxHeight: '95vh',
+  maxHeight: '99vh',
   bgcolor: 'background.paper',
   borderRadius: { xs: 2, '@media (orientation: landscape)': 0 },
   boxShadow: 24,
@@ -226,8 +226,8 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 ? '1000px'
                 : window.innerHeight > window.innerWidth
                 ? '1200px'
-                : '80vh',
-            minHeight: '600px',
+                : '90vh',
+            minHeight: '700px',
             border: 'none',
             backgroundColor: 'white',
           }}
@@ -320,11 +320,11 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               flex: 1,
               position: 'relative',
               width: '100%',
-              minHeight: '500px',
-              height: {
-                xs: 'calc(90vh - 120px)',
-                '@media (orientation: landscape)': 'calc(95vh - 120px)',
-              },
+            minHeight: '700px',
+            height: {
+              xs: 'calc(95vh - 100px)',
+              '@media (orientation: landscape)': 'calc(98vh - 100px)',
+            },
               overflow: 'hidden',
               backgroundColor: 'background.paper',
               display: 'flex',
