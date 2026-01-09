@@ -54,6 +54,7 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import restoreIcon from '../../public/images/restore_user.svg';
 import CloseIcon from '@mui/icons-material/Close';
 import BatchListWidget from '@shared-lib-v2/MapUser/BatchListWidget';
+import MultipleBatchListWidget from '@shared-lib-v2/MapUser/MultipleBatchListWidget';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -799,6 +800,8 @@ const Facilitator = () => {
   const [selectedCenterId, setSelectedCenterId] = useState<
     string | string[] | null
   >(null);
+  const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
+  const [selectedBatchList, setSelectedBatchList] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -812,6 +815,8 @@ const Facilitator = () => {
 
   // Helper function to extract all batch IDs from the nested structure
   const extractBatchIds = (nestedStructure: any): string[] => {
+    return nestedStructure;
+
     const batchIds: string[] = [];
 
     if (!nestedStructure || !Array.isArray(nestedStructure)) {
@@ -1043,6 +1048,8 @@ const Facilitator = () => {
           if (reason !== 'backdropClick') {
             setMapModalOpen(false);
             setSelectedCenterId(null); // Reset center selection when dialog closes
+            setSelectedCenterList(null); // Reset center list selection when dialog closes
+            setSelectedBatchList(null); // Reset batch selection when dialog closes
             setSelectedUserId(null); // Reset user selection when dialog closes
             setUserDetails(null);
           }
@@ -1132,13 +1139,23 @@ const Facilitator = () => {
           )}
           {formStep === 1 && (
             <Box sx={{ mb: 3 }}>
-              <BatchListWidget
+              <MultipleBatchListWidget
                 value={selectedCenterId}
                 onChange={(centerId) => {
                   setSelectedCenterId(centerId);
                   console.log('Selected Center ID:', centerId);
                 }}
-                label="Select Center"
+                onCenterList={(centerList) => {
+                  setSelectedCenterList(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterList}
+                onBatchList={(batchList) => {
+                  setSelectedBatchList(batchList || []);
+                  console.log('############# batchList', batchList);
+                }}
+                selectedBatchList={selectedBatchList}
+                label="Select Batch"
                 required={true}
                 multiple={false}
               />
@@ -1243,6 +1260,8 @@ const Facilitator = () => {
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
+                        setSelectedCenterList(null);
+                        setSelectedBatchList(null);
                         setSelectedUserId(null);
                         // Refresh the data
                         searchData(prefilledFormData, 0);
