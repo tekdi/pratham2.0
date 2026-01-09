@@ -63,7 +63,7 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
-import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import MultipleCenterListWidgetNew from '@shared-lib-v2/MapUser/MultipleCenterListWidgetNew';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { updateUser } from '@/services/CreateUserService';
@@ -576,6 +576,7 @@ const UserLeader = () => {
   const [selectedCenterId, setSelectedCenterId] = useState<
     string | string[] | null
   >(null);
+  const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -716,6 +717,7 @@ const UserLeader = () => {
           if (reason !== 'backdropClick') {
             setMapModalOpen(false);
             setSelectedCenterId(null); // Reset center selection when dialog closes
+            setSelectedCenterList([]); // Reset center list when dialog closes
             setSelectedUserId(null); // Reset user selection when dialog closes
             setUserDetails(null);
           }
@@ -805,12 +807,17 @@ const UserLeader = () => {
           )}
           {formStep === 1 && (
             <Box sx={{ mb: 3 }}>
-              <CenterListWidget
+              <MultipleCenterListWidgetNew
                 value={selectedCenterId}
                 onChange={(centerId) => {
                   setSelectedCenterId(centerId);
                   console.log('Selected Center ID:', centerId);
                 }}
+                onCenterList={(centerList) => {
+                  setSelectedCenterList(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterList}
                 label="Select Center"
                 required={true}
                 multiple={false}
@@ -915,6 +922,7 @@ const UserLeader = () => {
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
+                        setSelectedCenterList([]);
                         setSelectedUserId(null);
                         // Refresh the data
                         searchData(prefilledFormData, 0);
