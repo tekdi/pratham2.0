@@ -50,6 +50,7 @@ const Centers = () => {
   const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+  const [originalAddUiSchema, setOriginalAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -164,6 +165,7 @@ const Centers = () => {
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
       setAddUiSchema(alterUISchema);
+      setOriginalAddUiSchema(alterUISchema);
 
       // Uncomment for remote center changes
       // // console.log('####1:', alterSchema);
@@ -495,6 +497,32 @@ const Centers = () => {
       callback: (row: any) => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         console.log('######## images value tempFormData', tempFormData);
+        // console.log('######## images value row', row);
+        // console.log('######## images value addSchema', addSchema);
+
+        // Hide address and google_map_link fields when center_type is 'remote'
+        if (tempFormData.center_type === 'remote') {
+          const modifiedUiSchema = JSON.parse(
+            JSON.stringify(originalAddUiSchema || addUiSchema)
+          );
+          if (modifiedUiSchema.address) {
+            modifiedUiSchema.address = {
+              ...modifiedUiSchema.address,
+              'ui:widget': 'hidden',
+            };
+          }
+          if (modifiedUiSchema.google_map_link) {
+            modifiedUiSchema.google_map_link = {
+              ...modifiedUiSchema.google_map_link,
+              'ui:widget': 'hidden',
+            };
+          }
+          setAddUiSchema(modifiedUiSchema);
+        } else {
+          // Restore original UI schema for non-remote centers
+          setAddUiSchema(originalAddUiSchema || addUiSchema);
+        }
+
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
@@ -577,6 +605,10 @@ const Centers = () => {
   const handleOpenModal = () => setOpenModal(true);
 
   const handleCloseModal = () => {
+    // Restore original UI schema when closing modal
+    if (originalAddUiSchema) {
+      setAddUiSchema(originalAddUiSchema);
+    }
     setOpenModal(false);
   };
 
@@ -622,6 +654,10 @@ const Centers = () => {
               width: '200px',
             }}
             onClick={() => {
+              // Restore original UI schema when creating new center
+              if (originalAddUiSchema) {
+                setAddUiSchema(originalAddUiSchema);
+              }
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
