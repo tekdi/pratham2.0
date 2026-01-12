@@ -149,7 +149,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {
       if (centerType === 'remote') {
-        // For remote center: set default to "remote" and disable the field
+        // For remote center: show only "remote" option
+        alterSchema.properties.batch_type.enum = ['remote'];
+        alterSchema.properties.batch_type.enumNames = ['REMOTE'];
         alterSchema.properties.batch_type.default = 'remote';
         if (alterUiSchema?.batch_type) {
           alterUiSchema.batch_type['ui:disabled'] = true;
