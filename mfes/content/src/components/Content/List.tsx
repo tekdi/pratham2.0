@@ -243,11 +243,13 @@ export default function Content(props: Readonly<ContentProps>) {
       );
       setCurrentLimit(dynamicLimit);
 
-      const filteredTabs = DEFAULT_TABS.filter((tab) =>
-        config?.contentTabs?.length
-          ? config.contentTabs.includes(tab.label.toLowerCase())
-          : true
-      );
+      const filteredTabs = config?.contentTabs?.length
+    ? config.contentTabs
+        .map((tabLabel: string) =>
+          DEFAULT_TABS.find((tab) => tab.label.toLowerCase() === tabLabel)
+        )
+        .filter((tab): tab is { label: string; type: string } => Boolean(tab))
+    : DEFAULT_TABS;
       
     
       // Use filtered tabs for initial type setting
@@ -271,7 +273,8 @@ export default function Content(props: Readonly<ContentProps>) {
           loadOld: false,
         }));
       }
-      
+      console.log("filteredTabs===>",filteredTabs)
+     
       setTabs(filteredTabs);
       setTabValue(savedTab);
       setIsPageLoading(false);
@@ -331,7 +334,7 @@ export default function Content(props: Readonly<ContentProps>) {
         const search = searchParams.get('q');
 
         
-        if(program || (search && tab === '1'))
+        if(program || (search && (tab === '0' || tab === null)))
         {
           resultResponse = await ContentSearch({
             ...filter,
