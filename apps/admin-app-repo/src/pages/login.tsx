@@ -71,6 +71,8 @@ const LoginPage = () => {
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
+  const isFetchingTenantInfo = useRef<boolean>(false);
+  const isFetchingUserDetail = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -180,6 +182,12 @@ const LoginPage = () => {
   };
 
   const fetchUserDetail = async () => {
+    // Prevent multiple simultaneous calls
+    if (isFetchingUserDetail.current) {
+      return;
+    }
+
+    isFetchingUserDetail.current = true;
     let userId;
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -373,7 +381,7 @@ const LoginPage = () => {
               ) {
                 window.location.href = '/central-head';
                 router.push('/central-head');
-              } 
+              }
             }
           }
         } else {
@@ -474,6 +482,8 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      isFetchingUserDetail.current = false;
     }
   };
 
@@ -545,7 +555,7 @@ const LoginPage = () => {
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
-    setLoading(true)
+    setLoading(true);
 
     // Set the state values
     setTenantId(tenantId);
@@ -585,10 +595,16 @@ const LoginPage = () => {
     }
 
     await fetchUserDetail();
-    setLoading(false)
+    setLoading(false);
   };
 
   const fetchTenantInfo = async () => {
+    // Prevent multiple simultaneous calls
+    if (isFetchingTenantInfo.current) {
+      return;
+    }
+
+    isFetchingTenantInfo.current = true;
     const storedTenantId = localStorage.getItem('tenantId');
     try {
       const res = await getTenantInfo();
@@ -607,6 +623,8 @@ const LoginPage = () => {
       console.log('programsData++++', programsData);
     } catch (error) {
       console.error('Failed to fetch tenant info:', error);
+    } finally {
+      isFetchingTenantInfo.current = false;
     }
   };
 
@@ -861,7 +879,8 @@ const LoginPage = () => {
                       logEvent({
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
-                        label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
+                        label: `Remember Me ${
+                          rememberMe ? 'Checked' : 'Unchecked'
                         }`,
                       });
                     }}
