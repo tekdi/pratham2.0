@@ -651,7 +651,7 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   // Return the mapped terms
   return category?.terms?.filter((term: any) => {
-    if (term.status === 'Live') {
+    if (term.status === 'Live' &&  term.status !== "Retired") {
       return {
         name: term?.name,
         code: term?.code,
