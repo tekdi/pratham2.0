@@ -86,6 +86,9 @@ const Mobilizer = () => {
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
+  const [workingVillageId, setWorkingVillageId] = useState('');
+  const [workingLocationId, setWorkingLocationId] = useState('');
+  // const [workingVillageValues, setWorkingVillageValues] = useState([]);
 
   const searchStoreKey = 'mobilizer';
   const initialFormDataSearch =
@@ -137,6 +140,20 @@ const Mobilizer = () => {
       // console.log('responseForm', responseForm);
       let alterSchema = responseForm?.schema;
       let alterUISchema = responseForm?.uiSchema;
+      console.log('alterSchema@@@', alterSchema);
+      if (alterSchema) {
+        setWorkingVillageId(alterSchema?.properties?.working_village?.fieldId);
+        setWorkingLocationId(
+          alterSchema?.properties?.working_location?.fieldId
+        );
+      }
+      const keysToRemove = ['working_village'];
+      keysToRemove.forEach((key) => delete alterSchema.properties[key]);
+      keysToRemove.forEach((key) => delete alterUISchema[key]);
+      //also remove from required if present
+      alterSchema.required =
+        alterSchema.required?.filter((key) => !keysToRemove.includes(key)) ||
+        [];
       if (alterUISchema?.firstName) {
         alterUISchema.firstName['ui:disabled'] = true;
       }
@@ -178,6 +195,38 @@ const Mobilizer = () => {
     setRoleID(RoleId.MOBILIZER);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
+
+  const extractVillageIdsFromWorkingLocation = (
+    workingLocation: any
+  ): string[] | null => {
+    if (!workingLocation || !Array.isArray(workingLocation)) {
+      return null;
+    }
+
+    const villageIds: string[] = [];
+
+    // Iterate through all states -> districts -> blocks -> villages
+    for (const state of workingLocation) {
+      if (state.districts && Array.isArray(state.districts)) {
+        for (const district of state.districts) {
+          if (district.blocks && Array.isArray(district.blocks)) {
+            for (const block of district.blocks) {
+              if (block.villages && Array.isArray(block.villages)) {
+                for (const village of block.villages) {
+                  if (village.id) {
+                    villageIds.push(String(village.id));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Return null if no villages found, otherwise return array of IDs
+    return villageIds.length > 0 ? villageIds : null;
+  };
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -1024,6 +1073,24 @@ const Mobilizer = () => {
                   // window.alert('userDetails' + userDetails);
                   // window.alert('selectedUserId' + selectedUserId);
                   if (selectedUserId && userDetails) {
+                    const workingLocation = userDetails?.customFields?.find(
+                      (field) => field.fieldId === workingLocationId
+                    );
+                    const workingLocationValue = workingLocation?.value;
+                    // console.log(
+                    //   'workingLocationValue@@@',
+                    //   workingLocationValue
+                    // );
+                    // console.log('workingLocationValue@@@Id', workingLocationId);
+                    const villageIds =
+                      extractVillageIdsFromWorkingLocation(
+                        workingLocationValue
+                      );
+                    // setWorkingVillageValues(villageIds);
+                    // console.log(
+                    //   'workingLocationValue@@@villageIds@@@',
+                    //   villageIds
+                    // );
                     // Validate that villages are selected for EVERY block in working_location
                     const validationResult =
                       validateVillagesSelected(userDetails);
@@ -1083,9 +1150,43 @@ const Mobilizer = () => {
 
                       delete userData.email;
 
+                      // Extract village IDs from working location right before using them
+                      const workingLocation = userDetails?.customFields?.find(
+                        (field: any) => field.fieldId === workingLocationId
+                      );
+                      const workingLocationValue = workingLocation?.value;
+                      const villageIds =
+                        extractVillageIdsFromWorkingLocation(
+                          workingLocationValue
+                        );
+
+                      // Modify customFields to add/update workingVillageId with villageIds
+                      const updatedCustomFields = [...customFields];
+                      const workingVillageIndex = updatedCustomFields.findIndex(
+                        (field: any) => field.fieldId === workingVillageId
+                      );
+
+                      if (
+                        workingVillageId &&
+                        villageIds &&
+                        villageIds.length > 0
+                      ) {
+                        if (workingVillageIndex !== -1) {
+                          // Update existing field
+                          updatedCustomFields[workingVillageIndex].value =
+                            villageIds;
+                        } else {
+                          // Add new field
+                          updatedCustomFields.push({
+                            fieldId: workingVillageId,
+                            value: villageIds,
+                          });
+                        }
+                      }
+
                       const object = {
                         userData: userData,
-                        customField: customFields,
+                        customField: updatedCustomFields,
                       };
 
                       //update user details
@@ -1093,7 +1194,7 @@ const Mobilizer = () => {
                         userId: selectedUserId,
                         tenantId: tenantId,
                         roleId: roleId,
-                        customField: customFields,
+                        customField: updatedCustomFields,
                         userData: userData,
                       });
                       console.log(
