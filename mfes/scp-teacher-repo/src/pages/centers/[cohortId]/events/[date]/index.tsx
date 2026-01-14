@@ -213,17 +213,18 @@ const EventMonthView: React.FC<any> = () => {
             const medium = cohortData.customField.find(
               (item: CustomField) => item.label === 'MEDIUM'
             );
-            setMedium(medium?.selectedValues?.[0]?.value || '');
+            console.log("medium=====>", medium?.selectedValues[0]);
+            setMedium(medium?.selectedValues?.[0] || '');
 
             const grade = cohortData.customField.find(
               (item: CustomField) => item.label === 'GRADE'
             );
-            setGrade(grade?.selectedValues?.[0]?.value || '');
+            setGrade(grade?.selectedValues?.[0] || '');
 
             const board = cohortData.customField.find(
               (item: CustomField) => item.label === 'BOARD'
             );
-            setBoard(board?.selectedValues?.[0]?.value || '');
+            setBoard(board?.selectedValues?.[0] || '');
           }
           // setCohortDetails(cohortData);
           // setCohortName(cohortData?.name);

@@ -74,6 +74,8 @@ const App = ({
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
+      setItem({ content: response });
+
       const rt = (await hierarchyAPI(courseId as string)) as any;
       console.log('rt=======>', rt);
       const currentPath =
@@ -117,7 +119,8 @@ const App = ({
       console.log('response2=======>', mimeType);
 
       setMemetype(mimeType);
-      setItem({ content: response });
+      console.log('setItem=======>', response);
+
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
         const breadcrum = findCourseUnitPath({
