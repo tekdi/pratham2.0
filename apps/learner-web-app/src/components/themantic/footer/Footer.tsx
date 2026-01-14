@@ -214,7 +214,7 @@ const Footer = () => {
               textAlign: 'center',
             }}
           >
-            © 2025 Pratham
+            © {new Date().getFullYear()} Pratham
           </Typography>
         </Box>
       </Box>
