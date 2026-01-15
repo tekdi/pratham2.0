@@ -292,6 +292,7 @@ const AllContentsPage = () => {
   ]);
 
   useEffect(() => {
+    console.log('contentList=======>', contentList);
     const filteredArray = contentList.map((item: any) => ({
       image: item?.appIcon,
       contentType: item.primaryCategory,
@@ -301,7 +302,8 @@ const AllContentsPage = () => {
       englishName: item?.englishName,
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
-      lastUpdatedBy: item.lastUpdatedBy,
+      lastUpdatedBy: item.lastUpdatedBy || item.createdBy,
+      lastPublishedBy: item.lastPublishedBy || item.createdBy,
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,
