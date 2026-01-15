@@ -175,6 +175,8 @@ const Index = () => {
   const [mobilizerPrefilledState, setMobilizerPrefilledState] = useState({});
   const [mobilizerAddSchema, setMobilizerAddSchema] = useState(null);
   const [mobilizerAddUiSchema, setMobilizerAddUiSchema] = useState(null);
+  const [workingVillageId, setWorkingVillageId] = useState('');
+  const [workingLocationId, setWorkingLocationId] = useState('');
 
   const [selectedValue, setSelectedValue] = useState<any>();
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>(
@@ -697,6 +699,19 @@ const Index = () => {
       ]);
       let alterSchema = responseForm?.schema;
       let alterUISchema = responseForm?.uiSchema;
+      if (alterSchema) {
+        setWorkingVillageId(alterSchema?.properties?.working_village?.fieldId);
+        setWorkingLocationId(
+          alterSchema?.properties?.working_location?.fieldId
+        );
+        const keysToRemove = ['working_village'];
+        keysToRemove.forEach((key) => delete alterSchema.properties[key]);
+        keysToRemove.forEach((key) => delete alterUISchema[key]);
+        //also remove from required if present
+        alterSchema.required =
+          alterSchema.required?.filter((key) => !keysToRemove.includes(key)) ||
+          [];
+      }
       if (alterUISchema?.firstName) {
         alterUISchema.firstName['ui:disabled'] = true;
       }
@@ -1320,6 +1335,36 @@ const Index = () => {
     };
   };
 
+  const extractVillageIdsFromWorkingLocation = (
+    workingLocation: any
+  ): string[] | null => {
+    if (!workingLocation || !Array.isArray(workingLocation)) {
+      return null;
+    }
+
+    const villageIds: string[] = [];
+
+    for (const state of workingLocation) {
+      if (state.districts && Array.isArray(state.districts)) {
+        for (const district of state.districts) {
+          if (district.blocks && Array.isArray(district.blocks)) {
+            for (const block of district.blocks) {
+              if (block.villages && Array.isArray(block.villages)) {
+                for (const village of block.villages) {
+                  if (village.id) {
+                    villageIds.push(String(village.id));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return villageIds.length > 0 ? villageIds : null;
+  };
+
   const handleOpenMobilizerModal = () => {
     setMobilizerPrefilledState({});
     setMobilizerFormStep(0);
@@ -1757,6 +1802,71 @@ const Index = () => {
 
                             delete userData.email;
 
+                            let workingLocationValue =
+                              userDetails?.working_location;
+                            if (
+                              !workingLocationValue &&
+                              userDetails?.customFields &&
+                              Array.isArray(userDetails.customFields)
+                            ) {
+                              const workingLocationById = workingLocationId
+                                ? userDetails.customFields.find(
+                                    (field: any) =>
+                                      field.fieldId === workingLocationId
+                                  )
+                                : null;
+                              const workingLocationField =
+                                workingLocationById ||
+                                userDetails.customFields.find((field: any) => {
+                                  if (
+                                    field.value &&
+                                    Array.isArray(field.value) &&
+                                    field.value.length > 0
+                                  ) {
+                                    const firstItem = field.value[0];
+                                    return (
+                                      firstItem &&
+                                      typeof firstItem === 'object' &&
+                                      'stateId' in firstItem &&
+                                      'stateName' in firstItem &&
+                                      'districts' in firstItem
+                                    );
+                                  }
+                                  return false;
+                                });
+                              if (workingLocationField?.value) {
+                                workingLocationValue =
+                                  workingLocationField.value;
+                              }
+                            }
+
+                            const villageIds =
+                              extractVillageIdsFromWorkingLocation(
+                                workingLocationValue
+                              );
+
+                            const updatedCustomFields = [...customFields];
+                            const workingVillageIndex =
+                              updatedCustomFields.findIndex(
+                                (field: any) =>
+                                  field.fieldId === workingVillageId
+                              );
+                            if (
+                              workingVillageId &&
+                              villageIds &&
+                              villageIds.length > 0
+                            ) {
+                              if (workingVillageIndex !== -1) {
+                                updatedCustomFields[workingVillageIndex].value =
+                                  villageIds;
+                              } else {
+                                updatedCustomFields.push({
+                                  fieldId: workingVillageId,
+                                  value: villageIds,
+                                });
+                              }
+                            }
+
                             const mobilizerRoleId =
                               'a4694781-65c1-4b92-8ff1-ad490ab6d140'; // RoleId.MOBILIZER
 
@@ -1764,7 +1874,7 @@ const Index = () => {
                               userId: selectedMobilizerUserId,
                               tenantId: tenantId,
                               roleId: mobilizerRoleId,
-                              customField: customFields,
+                              customField: updatedCustomFields,
                               userData: userData,
                             });
                             console.log(
