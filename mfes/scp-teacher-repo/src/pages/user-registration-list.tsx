@@ -121,6 +121,8 @@ const UserRegistrationList = () => {
       },
       phoneNumber: apiUser.mobile || '',
       email: apiUser.email || '',
+
+      username: apiUser.username || '',
       birthDate,
       callLogs:
         Array.isArray(callLogsField?.selectedValues) && callLogsField.selectedValues.length > 0

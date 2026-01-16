@@ -59,7 +59,8 @@ const RegisterationFlow = () => {
   const searchParams = useSearchParams();
   const newAccount = searchParams.get('newAccount');
   // const tenantId = searchParams.get('tenantId');
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  console.log('language', language);
 
   // let formData: any = {};
   const [usernames, setUsernames] = useState<any[]>([]);
@@ -302,7 +303,7 @@ const RegisterationFlow = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [language]);
 
   // Set Telangana state (36) as default when isForNavaPatham is true
   useEffect(() => {

@@ -40,6 +40,7 @@ interface User {
   isNew?: boolean;
   preTestStatus?: string;
   modeType?: 'in-person' | 'remote';
+  username?: string;
 }
 
 interface UserCardProps {
@@ -124,24 +125,28 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
             <Grid item xs>
                {/* Name and Date Row */}
                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      fontWeight: 600,
-                      color: '#2E65F3',
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      mr: 1,
-                      fontSize: '16px',
-                    }}
-                    onClick={() => {
-                      if (user.userId) {
-                        router.push(`/learner/${user.userId}?source=user-registration`);
-                      }
-                    }}
-                  >
-                    {user.name}
-                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: 600,
+                        color: '#2E65F3',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                      }}
+                      onClick={() => {
+                        if (user.userId) {
+                          router.push(`/learner/${user.userId}?source=user-registration`);
+                        }
+                      }}
+                    >
+                      {user.name}
+                    </Typography>
+                    <Typography sx={{ fontSize: '13px', fontWeight: '450',  color: '#FFA726' }}>
+                      {user.username}
+                    </Typography>
+                  </Box>
                   {/* {user.isNew && (
                       <Typography component="span" sx={{ color: '#2E7D32', fontWeight: 'bold', fontSize: '10px', bgcolor: '#E8F5E9', px: 0.5, borderRadius: '4px' }}>
                           NEW

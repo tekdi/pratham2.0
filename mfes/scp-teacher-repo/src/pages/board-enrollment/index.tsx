@@ -273,6 +273,7 @@ const BoardEnrollment = () => {
       memberStatus: entry.status,
       statusReason: entry.statusReason,
       customField: entry.customField,
+      username: entry.username,
     }));
   };
 
@@ -644,15 +645,32 @@ const BoardEnrollment = () => {
                     >
                       <Box
                         sx={{
-                          fontSize: '16px',
-                          fontWeight: '400',
-                          color:
-                            item?.memberStatus === Status.DROPOUT
-                              ? theme.palette.warning['400']
-                              : theme.palette.warning['300'],
+                          display: 'flex',
+                          flexDirection: 'column',
+                          flex: 1,
                         }}
                       >
-                        {item?.name}
+                        <Box
+                          sx={{
+                            fontSize: '16px',
+                            fontWeight: '400',
+                            color:
+                              item?.memberStatus === Status.DROPOUT
+                                ? theme.palette.warning['400']
+                                : theme.palette.warning['300'],
+                          }}
+                        >
+                          {item?.name}
+                        </Box>
+                        <Box
+                          sx={{
+                            fontSize: '14px',
+                            color: '#FFA726',
+                            mt: 0.5,
+                          }}
+                        >
+                          {item?.username}
+                        </Box>
                       </Box>
                       <EastIcon
                         sx={{

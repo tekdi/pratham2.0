@@ -667,6 +667,7 @@ const Assessments = () => {
                 classId={classId}
                 assessmentType={assessmentType}
                 board={centerData?.board}
+                username={member.username}
               />
             ))}
           </Grid>
