@@ -994,16 +994,23 @@ const AssessmentDetails: React.FC = () => {
                         flex: 1,
                       }}
                       primary={
-                        <Typography
-                          sx={{
-                            fontWeight: 500,
-                            fontSize: '16px',
-                            color: '#1F1B13',
-                            lineHeight: '24px',
-                          }}
-                        >
-                          {toPascalCase(learner?.name)}
-                        </Typography>
+                        <>
+                          <Typography
+                            sx={{
+                              fontWeight: 500,
+                              fontSize: '16px',
+                              color: '#1F1B13',
+                              lineHeight: '24px',
+                            }}
+                          >
+                            {toPascalCase(learner?.name)}
+                          </Typography>
+                          {learner.username && (
+                            <Typography sx={{ fontSize: '12px', fontWeight: '400', color: '#FFA726' }}>
+                              {learner.username}
+                            </Typography>
+                          )}
+                        </>
                       }
                       secondary={
                         <Box>
