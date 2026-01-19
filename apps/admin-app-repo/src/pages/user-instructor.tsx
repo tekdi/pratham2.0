@@ -53,7 +53,6 @@ import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import restoreIcon from '../../public/images/restore_user.svg';
 import CloseIcon from '@mui/icons-material/Close';
-import BatchListWidget from '@shared-lib-v2/MapUser/BatchListWidget';
 import MultipleBatchListWidget from '@shared-lib-v2/MapUser/MultipleBatchListWidget';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
