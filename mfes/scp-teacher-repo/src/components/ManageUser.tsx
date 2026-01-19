@@ -10,6 +10,7 @@ import {
   IconButton,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import BottomDrawer from '@/components/BottomDrawer';
 import ConfirmationModal from '@/components/ConfirmationModal';
@@ -64,10 +65,12 @@ import {
   bulkCreateCohortMembers,
 } from '@/services/CohortService/cohortService';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
-import CenterBasedBatchListWidget from '@shared-lib-v2/MapUser/CenterBasedBatchListWidget';
+// import CenterBasedBatchListWidget from '@shared-lib-v2/MapUser/CenterBasedBatchListWidget';
+import LMPMultipleBatchListWidget from '@shared-lib-v2/MapUser/LMPMultipleBatchListWidget';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { splitUserData } from '@/components/DynamicForm/DynamicFormCallback';
 import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
+import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 
 interface Cohort {
   cohortId: string;
@@ -173,7 +176,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   // New facilitator mapping modal states
   const [mapModalOpen, setMapModalOpen] = useState(false);
   const [formStep, setFormStep] = useState(0);
+  const [myCenterIds, setMyCenterIds] = useState<any>([]);
+  const [myCenterList, setMyCenterList] = useState<any[]>([]);
   const [selectedCenterId, setSelectedCenterId] = useState<any>([]);
+  const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
+  const [selectedBatchList, setSelectedBatchList] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
@@ -193,6 +200,118 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       setReloadState(false);
     }
   }, [reloadState, setReloadState]);
+
+  // Fetch centers on mount using mycohorts API
+  const [temp_variable, setTemp_variable] = useState([]);
+  useEffect(() => {
+    const fetchCenters = async () => {
+      try {
+        setLoading(true);
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('UserId not found in localStorage');
+          setLoading(false);
+          return;
+        }
+        console.log('#############testlogs userId', userId);
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/plain, */*',
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+        console.log('#############testlogs headers', headers);
+
+        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/mycohorts/${userId}?customField=true&children=true`;
+        console.log('#############testlogs apiUrl', apiUrl);
+        const response = await axios.get(apiUrl, { headers });
+        console.log('#############testlogs response', response);
+
+        // Extract centers from response
+        // Response structure: response.data.result is an array of cohorts
+        const cohortsData = response?.data?.result || [];
+
+        console.log(
+          '#############testlogs API Response - cohortsData:',
+          cohortsData
+        );
+        console.log(
+          '#############testlogs Number of cohorts:',
+          cohortsData.length
+        );
+
+        // Filter for active centers (type COHORT, status active, cohortMemberStatus active)
+        const filteredCohorts = cohortsData.filter((cohort: any) => {
+          const isActiveCohort =
+            cohort?.type === 'COHORT' &&
+            cohort?.cohortStatus === 'active' &&
+            cohort?.cohortMemberStatus === 'active';
+          console.log('Cohort filter:', {
+            cohortName: cohort?.cohortName,
+            type: cohort?.type,
+            cohortStatus: cohort?.cohortStatus,
+            cohortMemberStatus: cohort?.cohortMemberStatus,
+            isActiveCohort,
+          });
+          return isActiveCohort;
+        });
+
+        // Helper function to extract custom field value by label
+        const getCustomFieldValue = (
+          customField: any[],
+          label: string,
+          property: 'value' | 'id' = 'value'
+        ): any => {
+          const field = customField?.find((f: any) => f?.label === label);
+          if (
+            !field ||
+            !field.selectedValues ||
+            field.selectedValues.length === 0
+          ) {
+            return property === 'id' ? null : '';
+          }
+          const selectedValue = field.selectedValues[0];
+          if (typeof selectedValue === 'object' && selectedValue !== null) {
+            return selectedValue[property] ?? (property === 'id' ? null : '');
+          }
+          return property === 'id' ? null : selectedValue;
+        };
+
+        // Extract center IDs
+        const centerIds = filteredCohorts.map(
+          (cohort: any) => cohort.cohortId || cohort.id
+        );
+        setMyCenterIds(centerIds);
+
+        // Map to the required structure
+        const centersList = filteredCohorts.map((cohort: any) => {
+          const customField = cohort.customField || [];
+          return {
+            value: cohort.cohortId || cohort.id,
+            label: cohort.cohortName || cohort.name || '',
+            state: getCustomFieldValue(customField, 'STATE', 'value'),
+            district: getCustomFieldValue(customField, 'DISTRICT', 'value'),
+            block: getCustomFieldValue(customField, 'BLOCK', 'value'),
+            village: getCustomFieldValue(customField, 'VILLAGE', 'value'),
+            stateId: getCustomFieldValue(customField, 'STATE', 'id'),
+            districtId: getCustomFieldValue(customField, 'DISTRICT', 'id'),
+            blockId: getCustomFieldValue(customField, 'BLOCK', 'id'),
+            villageId: getCustomFieldValue(customField, 'VILLAGE', 'id'),
+          };
+        });
+        setMyCenterList(centersList);
+      } catch (error) {
+        console.error('Error fetching centers:', error);
+        setMyCenterIds([]);
+        setMyCenterList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCenters();
+  }, [temp_variable]);
 
   // Fetch facilitator form schema
   useEffect(() => {
@@ -247,6 +366,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         }
         alterSchema.required = requiredArray;
 
+        //set 2 grid layout
+        alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
         setAddFacilitatorSchema(alterSchema);
         setAddFacilitatorUiSchema(alterUISchema);
       }
@@ -257,6 +379,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   // Helper function to extract all batch IDs from the centers structure
   const extractBatchIds = (centersStructure: any): string[] => {
+    return centersStructure;
     const batchIds: string[] = [];
 
     if (!centersStructure || !Array.isArray(centersStructure)) {
@@ -803,13 +926,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     setFormStep(0);
     setSelectedUserId(null);
     setUserDetails(null);
-    setSelectedCenterId([]);
+    setSelectedCenterId(null);
+    setSelectedCenterList(null);
+    setSelectedBatchList(null);
     setMapModalOpen(true);
   };
 
   const handleCloseAddFaciModal = () => {
     setMapModalOpen(false);
-    setSelectedCenterId([]);
+    setSelectedCenterId(null);
+    setSelectedCenterList(null);
+    setSelectedBatchList(null);
     setSelectedUserId(null);
     setUserDetails(null);
     setFormStep(0);
@@ -1579,14 +1706,27 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 )}
                 {formStep === 1 && (
                   <Box sx={{ mb: 3 }}>
-                    <CenterBasedBatchListWidget
+                    <LMPMultipleBatchListWidget
                       value={selectedCenterId}
-                      onChange={(centers) => {
-                        setSelectedCenterId(centers);
-                        console.log('Selected Centers:', centers);
+                      onChange={(centerId) => {
+                        setSelectedCenterId(centerId);
+                        console.log('Selected Center ID:', centerId);
                       }}
+                      onCenterList={(centerList) => {
+                        setSelectedCenterList(centerList || []);
+                        console.log('############# centerList', centerList);
+                      }}
+                      selectedCenterList={selectedCenterList}
+                      onBatchList={(batchList) => {
+                        setSelectedBatchList(batchList || []);
+                        console.log('############# batchList', batchList);
+                      }}
+                      selectedBatchList={selectedBatchList}
                       label={t('COMMON.SELECT_CENTER')}
                       required={true}
+                      multiple={false}
+                      centerIds={myCenterIds}
+                      centerList={myCenterList}
                     />
                   </Box>
                 )}
@@ -1636,7 +1776,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             userId: selectedUserId,
                             tenantId: tenantId,
                             roleId: RoleId.TEACHER,
-                            customFields: customFields,
+                            customField: customFields,
                             userData: userData,
                           });
                           console.log(
@@ -1732,8 +1872,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     disabled={
                       !selectedUserId ||
                       !selectedCenterId ||
-                      selectedCenterId.length === 0 ||
-                      !hasAtLeastOneBatchSelected(selectedCenterId) ||
                       isMappingInProgress
                     }
                   >

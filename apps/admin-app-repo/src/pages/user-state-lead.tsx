@@ -646,7 +646,7 @@ const StateLead = () => {
                         userId: selectedUserId,
                         tenantId: tenantId,
                         roleId: roleId,
-                        customFields: customFields,
+                        customField: customFields,
                         userData: userData,
                       });
                       console.log(
