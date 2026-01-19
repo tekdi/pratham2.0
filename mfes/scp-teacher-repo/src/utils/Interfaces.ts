@@ -58,6 +58,7 @@ export interface user {
   name: string;
   attendance?: string;
   key?: string;
+  username?: string;
 }
 
 export interface BulkAttendanceParams {
