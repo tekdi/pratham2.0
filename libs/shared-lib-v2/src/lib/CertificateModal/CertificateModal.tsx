@@ -38,6 +38,7 @@ const style = {
     xs: '99vh',
     '@media (orientation: landscape)': '99vh'
   },
+  maxWidth: '99vw',
   maxHeight: '99vh',
   bgcolor: 'background.paper',
   borderRadius: { xs: 2, '@media (orientation: landscape)': 0 },
@@ -210,8 +211,10 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         sx={{
           width: '100%',
           height: '100%',
-          display: 'flex',
-          overflow: deviceType === 'mobile' ? 'auto' : 'hidden',
+          minWidth: 0,
+          minHeight: 0,
+          display: 'block',
+          overflow: 'visible',
         }}
       >
         <iframe
@@ -219,17 +222,16 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
           src={dataUri}
           title="Certificate"
           onLoad={onLoad}
+          scrolling="auto"
           style={{
             width: '100%',
-            height:
-              deviceType === 'mobile'
-                ? '1000px'
-                : window.innerHeight > window.innerWidth
-                ? '1200px'
-                : '90vh',
-            minHeight: '700px',
+            height: '100%',
+            minWidth: '100%',
+            minHeight: '100%',
             border: 'none',
             backgroundColor: 'white',
+            display: 'block',
+            boxSizing: 'border-box',
           }}
         />
       </Box>
@@ -288,6 +290,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
+            boxSizing: 'border-box',
           }}
         >
           {/* Top Bar */}
@@ -320,16 +323,14 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
               flex: 1,
               position: 'relative',
               width: '100%',
-            minHeight: '700px',
-            height: {
-              xs: 'calc(95vh - 100px)',
-              '@media (orientation: landscape)': 'calc(98vh - 100px)',
-            },
+              maxWidth: '100%',
+              minHeight: 0,
               overflow: 'hidden',
               backgroundColor: 'background.paper',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              boxSizing: 'border-box',
             }}
           >
             {/* ✅ Fixed Loader */}
@@ -358,8 +359,26 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                   transition: 'opacity 0.3s ease-in-out',
                   width: '100%',
                   height: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100%',
                   zIndex: isIframeLoaded ? 1 : 0,
-                  overflowY: 'auto',
+                  overflow: 'auto',
+                  WebkitOverflowScrolling: 'touch',
+                  boxSizing: 'border-box',
+                  '&::-webkit-scrollbar': {
+                    width: '12px',
+                    height: '12px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: '#888',
+                    borderRadius: '6px',
+                    '&:hover': {
+                      background: '#555',
+                    },
+                  },
                 }}
               >
                 <CertificatePage
