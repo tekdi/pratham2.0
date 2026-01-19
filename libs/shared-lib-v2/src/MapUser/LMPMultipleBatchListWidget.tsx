@@ -120,6 +120,7 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
   }, [centerList]);
 
   // Store selected centers as objects with full details
+  // Use selectedCenterList prop as initial selection if provided, otherwise start empty
   const [selectedCenters, setSelectedCenters] = useState<
     Array<{
       value: string;
@@ -133,7 +134,11 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
       blockId: string | number | null;
       villageId: string | number | null;
     }>
-  >(selectedCenterList || []);
+  >(
+    selectedCenterList && selectedCenterList.length > 0
+      ? selectedCenterList
+      : []
+  );
 
   // Batch-related state
   const [batches, setBatches] = useState<{
@@ -165,20 +170,32 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
   >(selectedBatchList || []);
   const [batchSearchKeyword, setBatchSearchKeyword] = useState('');
 
-  // Sync selectedCenters with centerIds prop or selectedCenterList
+  // Track if we've initialized from selectedCenterList prop to prevent overriding user selections
+  const hasInitializedFromProp = useRef(false);
+
+  // Sync with selectedCenterList prop only once when centerOptions are available
+  // This handles the case where centerOptions might not be ready on initial mount
+  // This allows prop to set initial selection, but user can then freely select/unselect
   useEffect(() => {
-    if (centerIds) {
-      const idsArray = Array.isArray(centerIds) ? centerIds : [centerIds];
-      const centersToSelect = centerOptions.filter((center) =>
-        idsArray.includes(String(center.value))
-      );
-      if (centersToSelect.length > 0) {
-        setSelectedCenters(centersToSelect);
-      }
-    } else if (selectedCenterList && selectedCenterList.length > 0) {
+    // Only sync once when:
+    // 1. We haven't initialized yet
+    // 2. centerOptions are available
+    // 3. selectedCenterList prop is provided
+    // 4. Current selection is empty (meaning user hasn't made changes yet)
+    if (
+      !hasInitializedFromProp.current &&
+      centerOptions.length > 0 &&
+      selectedCenterList &&
+      selectedCenterList.length > 0 &&
+      selectedCenters.length === 0
+    ) {
       setSelectedCenters(selectedCenterList);
+      hasInitializedFromProp.current = true;
+    } else if (selectedCenterList && selectedCenterList.length > 0) {
+      // Mark as initialized if prop was provided (even if we used it in useState)
+      hasInitializedFromProp.current = true;
     }
-  }, [centerIds, centerOptions, selectedCenterList]);
+  }, [centerOptions, selectedCenterList, selectedCenters.length]);
 
   // Fetch batches for multiple centers in a single API call
   const fetchBatchesForCenters = async (centerIds: (string | number)[]) => {
