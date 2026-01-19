@@ -977,6 +977,11 @@ const AssessmentDetails: React.FC = () => {
                           }}
                         >
                           {learner.name}
+                          {learner.username && (
+                            <Typography sx={{ fontSize: '12px', fontWeight: '400', color: '#FFA726' }}>
+                              {learner.username}
+                            </Typography>
+                          )}
                         </Typography>
                       }
                       secondary={
