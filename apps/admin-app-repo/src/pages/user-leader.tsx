@@ -27,6 +27,7 @@ import {
   DialogActions,
   IconButton,
   Button,
+  CircularProgress,
 } from '@mui/material';
 import { debounce, set } from 'lodash';
 import { Numbers } from '@mui/icons-material';
@@ -37,7 +38,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { bulkCreateCohortMembers, updateCohortMemberStatus } from '@/services/CohortService/cohortService';
+import {
+  bulkCreateCohortMembers,
+  updateCohortMemberStatus,
+} from '@/services/CohortService/cohortService';
 import editIcon from '../../public/images/editIcon.svg';
 import apartment from '../../public/images/apartment.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
@@ -190,7 +194,7 @@ const UserLeader = () => {
     },
   };
   const SubmitaFunction = async (formData: any) => {
-    // console.log('###### debug issue formData', formData);
+    console.log('###### debug issue formData', formData);
     if (Object.keys(formData).length > 0) {
       setPrefilledFormData(formData);
       //set prefilled search data on refresh
@@ -376,6 +380,15 @@ const UserLeader = () => {
       },
     },
     {
+      keys: ['CENTER'],
+      label: 'Center',
+      render: (row: any) => {
+        const centerList =
+          row?.cohortData?.map((item: any) => item?.centerName) || [];
+        return centerList.join(', ');
+      },
+    },
+    {
       key: 'status',
       label: 'Status',
       render: (row: any) => transformLabel(row.status),
@@ -385,36 +398,36 @@ const UserLeader = () => {
 
   // Define actions
   const actions = [
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Edit Team Leader"
-    //     >
-    //       <Image src={editIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: (row) => {
-    //     // console.log('row:', row);
-    //     // console.log('AddSchema', addSchema);
-    //     // console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(true);
-    //     setIsReassign(false);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Team Leader"
+        >
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: (row) => {
+        // console.log('row:', row);
+        // console.log('AddSchema', addSchema);
+        // console.log('AddUISchema', addUiSchema);
+        let tempFormData = extractMatchingKeys(row, addSchema);
+        setPrefilledAddFormData(tempFormData);
+        setIsEdit(true);
+        setIsReassign(false);
+        setEditableUserId(row?.userId);
+        handleOpenModal();
+      },
+      show: (row) => row.status !== 'archived',
+    },
     // {
     //   icon: (
     //     <Box
@@ -449,36 +462,79 @@ const UserLeader = () => {
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reassign Team Leader"
-    //     >
-    //       <Image src={apartment} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: (row) => {
-    //     // console.log('row:', row);
-    //     // console.log('AddSchema', addSchema);
-    //     // console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(false);
-    //     setIsReassign(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reassign Team Leader"
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        setReassignModalOpen(true);
+        setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+        setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+        setSelectedCenterListReassign([]); // Reset center list when dialog closes
+        setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+        setIsReassignModelProgress(true);
+
+        //load prefilled value
+        //call geographical data api
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/plain, */*',
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+        const userId = row?.userId;
+        setSelectedUserIdReassign(userId);
+        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
+        const response = await axios.get(apiUrl, { headers });
+        const geographicalData = response?.data?.result || [];
+
+        // Transform geographicalData into centerList
+        const centerList = [];
+        const centerIdArray = [];
+
+        geographicalData.forEach((state) => {
+          state.districts?.forEach((district) => {
+            district.blocks?.forEach((block) => {
+              block.centers?.forEach((center) => {
+                const centerObject = {
+                  value: center.centerId,
+                  label: center.centerName,
+                  state: state.stateName,
+                  district: district.districtName,
+                  block: block.blockName,
+                  village: null, // villageName might not exist in the structure
+                  stateId: state.stateId,
+                  districtId: district.districtId,
+                  blockId: block.blockId,
+                  villageId: null, // villageId might not exist in the structure
+                };
+                centerList.push(centerObject);
+                centerIdArray.push(center.centerId);
+              });
+            });
+          });
+        });
+        setSelectedCenterIdReassign(centerIdArray.length > 0 ? centerIdArray : null);
+        setOriginalCenterIdReassign(centerIdArray.length > 0 ? centerIdArray : null);
+        setSelectedCenterListReassign(centerList);
+        setIsReassignModelProgress(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     // {
     //   icon: (
     //     <Box
@@ -581,6 +637,22 @@ const UserLeader = () => {
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
 
+  //reassign modal variables
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [selectedCenterIdReassign, setSelectedCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [originalCenterIdReassign, setOriginalCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [selectedCenterListReassign, setSelectedCenterListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedUserIdReassign, setSelectedUserIdReassign] = useState<
+    string | null
+  >(null);
+  const [isReassignInProgress, setReassignInProgress] = useState(false);
+  const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -878,17 +950,17 @@ const UserLeader = () => {
                       customField: customFields,
                       userData: userData,
                     });
-                    console.log('######### updatedResponse', updateUserResponse);
+                    console.log(
+                      '######### updatedResponse',
+                      updateUserResponse
+                    );
 
                     if (
                       updateUserResponse &&
                       updateUserResponse?.params?.err === null
                     ) {
                       // getNotification(editableUserId, profileUpdateNotificationKey);
-                      showToastMessage(
-                        t(successUpdateMessage),
-                        'success'
-                      );
+                      showToastMessage(t(successUpdateMessage), 'success');
                       // telemetryCallbacks(telemetryUpdateKey);
 
                       //map user to tenant
@@ -915,10 +987,7 @@ const UserLeader = () => {
                         response?.data?.responseCode === 201 ||
                         response?.status === 201
                       ) {
-                        showToastMessage(
-                          t(successCreateMessage),
-                          'success'
-                        );
+                        showToastMessage(t(successCreateMessage), 'success');
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
@@ -935,10 +1004,7 @@ const UserLeader = () => {
                       }
                     } else {
                       // console.error('Error update user:', error);
-                      showToastMessage(
-                        t(failureUpdateMessage),
-                        'error'
-                      );
+                      showToastMessage(t(failureUpdateMessage), 'error');
                     }
                   } catch (error) {
                     console.error('Error creating cohort member:', error);
@@ -963,6 +1029,164 @@ const UserLeader = () => {
               {t('COMMON.MAP')}
             </Button>
           )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Reassign Modal Dialog */}
+      <Dialog
+        open={reassignModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setReassignModalOpen(false);
+            setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+            setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+            setSelectedCenterListReassign([]); // Reset center list when dialog closes
+            setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Reassign Lead to Center')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setReassignModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isReassignModelProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '150px',
+                }}
+              >
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Loading...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <MultipleCenterListWidgetNew
+                value={selectedCenterIdReassign}
+                onChange={(centerId) => {
+                  setSelectedCenterIdReassign(centerId);
+                  console.log('Selected Center ID:', centerId);
+                }}
+                onCenterList={(centerList) => {
+                  setSelectedCenterListReassign(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterListReassign}
+                label="Select Center"
+                required={true}
+                multiple={false}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            onClick={async () => {
+              if (selectedUserIdReassign && selectedCenterIdReassign) {
+                setReassignInProgress(true);
+                try {
+                  //map user to tenant
+                  // Ensure selectedCenterId is a string (handle array case)
+                  const cohortId = Array.isArray(selectedCenterIdReassign)
+                    ? selectedCenterIdReassign
+                    : [selectedCenterIdReassign];
+
+                  console.log('Creating with User ID:', selectedUserId);
+                  console.log('Creating with Center ID (cohortId):', cohortId);
+
+                  const removedIds = originalCenterIdReassign?.filter((item: any) => !cohortId.includes(item));
+
+                  // Call the cohortmember/create API
+                  const response = await bulkCreateCohortMembers({
+                    userId: [selectedUserIdReassign],
+                    cohortId: cohortId,
+                    //add remove cohort id check
+                    ...(removedIds?.length > 0 ? { removeCohortId: removedIds } : {}),
+                  });
+
+                  if (
+                    response?.responseCode === 201 ||
+                    response?.data?.responseCode === 201 ||
+                    response?.status === 201
+                  ) {
+                    showToastMessage(t(successCreateMessage), 'success');
+                    // Close dialog
+                    setReassignModalOpen(false);
+                    setSelectedCenterIdReassign(null);
+                    setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+                    setSelectedCenterListReassign([]);
+                    setSelectedUserIdReassign(null);
+                    // Refresh the data
+                    searchData(prefilledFormData, 0);
+                  } else {
+                    showToastMessage(
+                      response?.data?.params?.errmsg || t(failureCreateMessage),
+                      'error'
+                    );
+                  }
+                } catch (error) {
+                  console.error('Error creating cohort member:', error);
+                  showToastMessage(
+                    error?.response?.data?.params?.errmsg ||
+                      t(failureCreateMessage),
+                    'error'
+                  );
+                } finally {
+                  setReassignInProgress(false);
+                }
+              } else if (!selectedUserId) {
+                showToastMessage('Please search and select a user', 'error');
+              } else {
+                showToastMessage('Please select a center', 'error');
+              }
+            }}
+            disabled={
+              !selectedUserIdReassign ||
+              !selectedCenterIdReassign ||
+              isReassignInProgress 
+            }
+          >
+            {t('COMMON.REASSIGN')}
+          </Button>
         </DialogActions>
       </Dialog>
     </>
