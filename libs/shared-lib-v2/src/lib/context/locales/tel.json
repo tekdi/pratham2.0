@@ -325,7 +325,10 @@
       "VERIFY_OTP": "ఓటీపీని ధృవీకరించండి",
       "VERIFY_YOUR_PHONE_NUMBER": "మీ ఫోన్ నంబర్‌ను ధృవీకరించండి",
       "OKAY": "సరే",
-      "START_EXPLORING": "అన్వేషించడం ప్రారంభించండి"
+      "START_EXPLORING": "అన్వేషించడం ప్రారంభించండి",
+      "START_LEARNING": "అభ్యాసం ప్రారంభించండి",
+      "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "మీరు విజయవంతంగా నమోదు చేసుకున్నారు",
+      "LEARNING_JOURNEY_FIRST_STEP": "చాలా బాగా చేసారు! ప్రథమ్ తో మీ అభ్యాస ప్రయాణంలో మీరు మొదటి అడుగు వేశారు."
     }
   },
   "LOGIN_PAGE": {
@@ -583,10 +586,10 @@
     "GRADE_11": "11వ తరగతి",
     "GRADE_12": "12వ తరగతి",
     "TYPE_OF_PHONE_ACCESSIBLE": "అందుబాటులో ఉన్న ఫోన్ రకం",
-    "WHATS_YOUR_GENDER":"మీ లింగం ఏమిటి",
-    "dob":"పుట్టిన తేదీ",
+    "WHATS_YOUR_GENDER": "మీ లింగం ఏమిటి",
+    "dob": "పుట్టిన తేదీ",
     "PARENT_GUARDIAN_PHONE_NO": "తల్లిదండ్రులు/సంరక్షకుడి ఫోన్ నంబర్",
-    "phone_number":"ఫోన్ నంబర్"
+    "phone_number": "ఫోన్ నంబర్"
   },
   "Assessment Score": "పరీక్ష స్కోర్",
   "CENTER:": "కేంద్రం",
@@ -721,7 +724,8 @@
     "EXPLORE_MORE_COURSES": "మరిన్ని కోర్సులను అన్వేషించండి",
     "SECOND_CHANCE_PROGRAM": "సెకండ్ ఛాన్స్ కార్యక్రమం",
     "PARENT_GUARDIAN_PHONE_NO": "తల్లి / తండ్రి / సంరక్షకుడి ఫోన్ నంబర్",
-    "COURSE_COMPLETION_CONGRATULATIONS": "కోర్సును విజయవంతంగా పూర్తి చేసినందుకు అభినందనలు!"
+    "COURSE_COMPLETION_CONGRATULATIONS": "కోర్సును విజయవంతంగా పూర్తి చేసినందుకు అభినందనలు!",
+    "HURRAY": "వాహ్!"
   },
   "GUARDIAN_INFORMATION_NOTE": "సంరక్షకుని సమాచారం – ఈ విభాగాన్ని తల్లిదండ్రులు లేదా సంరక్షకుడు పూరించాలి",
   "ASSESSMENTS": {

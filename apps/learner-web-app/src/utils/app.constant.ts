@@ -45,7 +45,12 @@ export enum TenantName {
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
  LEARNING_AND_DEVELOPMENT ="Learning and Development",
- CREATIVITY_CLUB ="Creativity Club"
+ CREATIVITY_CLUB ="Creativity Club",
+ EARLY_CHILDHOOD_EDUCATION ="Early Childhood Education",
+ INCLUSIVE_EDUCATION ="Inclusive Education (ENABLE)",
+ ELEMENTARY ="Elementary",
+ ANNUAL_STATUS_OF_EDUCATION_REPORT ="Annual Status of Education Report"
+
 
 }
 export enum FilterKey {

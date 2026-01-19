@@ -90,8 +90,42 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
       setIsExpanded((prev) => !prev);
     }, []);
 
+    // Function to convert URLs in text to clickable links
+    const renderTextWithLinks = useCallback((text: string) => {
+      if (!text) return '';
+      
+      // Regular expression to match URLs
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const parts = text.split(urlRegex);
+      
+      return parts.map((part, index) => {
+        if (part.match(urlRegex)) {
+          return (
+            <a
+              key={index}
+              href={part}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: '#1976d2',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {part}
+            </a>
+          );
+        }
+        return part;
+      });
+    }, []);
+
     // Determine which text to display
     const displayText = needsTruncation && !isExpanded ? truncatedText : text;
+    const capitalizedText = displayText
+      ? capitalize(displayText[0]) + displayText.slice(1)
+      : '';
 
     return (
       <Box>
@@ -118,9 +152,7 @@ export const ExpandableText: React.FC<ExpandableTextProps> = memo(
           }}
         >
           <SpeakableText>
-            {displayText
-              ? capitalize(displayText[0]) + displayText.slice(1)
-              : ''}
+            {renderTextWithLinks(capitalizedText)}
           </SpeakableText>
         </Typography>
 
