@@ -131,7 +131,7 @@ export const BatchCreateSchema = {
 };
 
 export const BatchCreateUISchema = {
-  'ui:order': ['board', 'medium', 'grade', 'name', 'batch_type'],
+  'ui:order': ['name', 'batch_type', 'board', 'medium', 'grade'],
   board: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {

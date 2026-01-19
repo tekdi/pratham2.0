@@ -550,7 +550,8 @@
     "WAS_BELONG_TO": "was archived in the below location",
     "CONFIRM_TO_ACTIVATE": "Are you sure you want to activate this user again?",
     "WORKING_LOCATION": "Working Location",
-    "CATCHMENT_AREA": "Catchment Area"
+    "CATCHMENT_AREA": "Catchment Area",
+    "TYPE_OF_BATCH": "Type of Batch"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
