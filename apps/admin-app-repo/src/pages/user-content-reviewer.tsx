@@ -20,6 +20,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  CircularProgress
 } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
@@ -46,11 +47,13 @@ import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 import {
   enhanceUiSchemaWithGrid,
   splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
+import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 const ContentReviewer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
@@ -199,6 +202,14 @@ const ContentReviewer = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
+
+  //edit modal variables
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<
+    string | null
+  >(null);
+  const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
 
   const searchData = async (formData: any, newPage: any) => {
     if (formData) {
@@ -360,37 +371,32 @@ const ContentReviewer = () => {
   };
   // Define actions
   const actions = [
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Edit Content Reviewer"
-    //     >
-    //       <Image src={editIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: (row: any) => {
-    //     console.log('row:', row);
-    //     console.log('AddSchema', addSchema);
-    //     console.log('AddUISchema', addUiSchema);
-
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
-    //     console.log('tempFormData', tempFormData);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.tenantStatus !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Content Reviewer"
+        >
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: (row: any) => {
+        setIsEditInProgress(true);
+        setEditModalOpen(true);
+        setSelectedUserIdEdit(row?.userId);
+        setSelectedUserRow(row);
+        setIsEditInProgress(false);
+      },
+      show: (row) => row.tenantStatus !== 'archived',
+    },
     // {
     //   icon: (
     //     <Box
@@ -790,7 +796,7 @@ const ContentReviewer = () => {
                 }}
                 roleId={roleId}
                 tenantId={tenantId}
-                type="leader"
+                type="content-reviewer"
               />
             </Box>
           )}
@@ -823,6 +829,153 @@ const ContentReviewer = () => {
           )}
         </DialogActions>
       </Dialog>
+
+      {/* Edit Modal Dialog */}
+      <Dialog
+        open={editModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setSelectedUserIdEdit(null); // Reset user selection when dialog closes
+            setSelectedUserRow(null); // Reset user row selection when dialog closes
+            setIsEditInProgress(true);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Edit User as Content Reviewer')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setEditModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Saving...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <EditSearchUser
+                onUserDetails={async(userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  if (selectedUserIdEdit) {
+                    setIsEditInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+  
+                      delete userData.email;
+  
+                      const object = {
+                        userData: userData,
+                        customFields: customFields,
+                      };
+  
+                      //update user details
+                      const updateUserResponse = await updateUser(selectedUserIdEdit, object);
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
+                      );
+  
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.status == 200
+                      ) {
+                        // getNotification(editableUserId, profileUpdateNotificationKey);
+                        showToastMessage(t(successUpdateMessage), 'success');
+                        // telemetryCallbacks(telemetryUpdateKey);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        // console.error('Error update user:', error);
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error creating cohort member:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureCreateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsEditInProgress(false);
+                      setEditModalOpen(false);
+                    }
+                  } else if (!selectedUserIdEdit) {
+                    showToastMessage('Please search and select a user', 'error');
+                  } else {
+                    showToastMessage('Please select a center', 'error');
+                  }
+                }}
+                selectedUserRow={selectedUserRow}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                userId={selectedUserIdEdit}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="content-reviewer"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserIdEdit || isEditInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.SAVE')}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   );
 };

@@ -63,6 +63,7 @@ const API_ENDPOINTS = {
   forgotPassword: `${baseurl}/user/forgot-password`,
   passwordResetLink: `${baseurl}/user/password-reset-link`,
   userReadWithField: (userId: string | string[]) => `${baseurl}/user/read/${userId}?fieldvalue=false`,
+  userReadWithFieldTrue: (userId: string | string[]) => `${baseurl}/user/read/${userId}?fieldvalue=true`,
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
   updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`
