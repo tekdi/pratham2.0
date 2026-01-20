@@ -854,7 +854,10 @@ const flattenObject = (obj: any, parentKey = "", res: any = {}): any => {
 };
 
 // Recursive task extractor (handles children + learningResources)
-export const extractTasks = (tasks: any[], parentId: string | null = null): any[] => {
+export const extractTasks = (
+  tasks: any[],
+  parentId: string | null = null
+): any[] => {
   let rows: any[] = [];
 
   tasks.forEach((task) => {
@@ -865,7 +868,7 @@ export const extractTasks = (tasks: any[], parentId: string | null = null): any[
     // learning resources
     if (task.learningResources?.length) {
       task.learningResources.forEach((lr: any) => {
-        let lrRow = { ...flatTask, ...flattenObject(lr, "learningResource") };
+        let lrRow = { ...flatTask, ...flattenObject(lr, 'learningResource') };
         rows.push(lrRow);
       });
     }
@@ -877,4 +880,40 @@ export const extractTasks = (tasks: any[], parentId: string | null = null): any[
   });
 
   return rows;
+};
+
+export const extractWorkingLocationVillages = (row: any) => {
+  if (!row?.customFields) return [];
+
+  // Find WORKING_LOCATION field
+  const workingLocation = row.customFields.find(
+    (f: any) => f.label === 'WORKING_LOCATION'
+  );
+
+  if (!workingLocation?.selectedValues?.length) return [];
+
+  // Parse all JSON strings safely
+  const parsedLocations = workingLocation.selectedValues
+    .map((item: any) => {
+      try {
+        return typeof item === 'string' ? JSON.parse(item) : item;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+
+  const villages: string[] = [];
+
+  parsedLocations.forEach((loc: { districts: any[] }) => {
+    loc?.districts?.forEach((dist: any) => {
+      dist?.blocks?.forEach((block: any) => {
+        block?.villages?.forEach((v: any) => {
+          if (v?.name) villages.push(v.name);
+        });
+      });
+    });
+  });
+
+  return villages.join(', ');
 };

@@ -22,7 +22,6 @@ import VillageNewRegistration from '../components/youthNet/VillageNewRegistratio
 import { UserList } from '../components/youthNet/UserCard';
 import Dropdown from '../components/youthNet/DropDown';
 import {
-  fetchUserData,
   fetchUserList,
   getUserDetails,
   getVillages,
@@ -31,6 +30,8 @@ import {
 import Loader from '../components/Loader';
 import { filterUsersByAge, getLoggedInUserRole } from '../utils/Helper';
 import { Role, Status } from '../utils/app.constant';
+import { getCohortList } from '../services/GetCohortList';
+import { fetchCohortMemberList } from '../services/MyClassDetailsService';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -49,6 +50,58 @@ const Index = () => {
   const [vilmodalOpen, setVilModalOpen] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>([]);
   const [selectedMentorId, setSelectedMentorId] = useState<any>('');
+  const [cohortDataLoaded, setCohortDataLoaded] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchCohortData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          const response = await getCohortList(userId, true, true);
+          const cohortDataArray = response?.result || [];
+
+          if (cohortDataArray.length > 0) {
+            localStorage.setItem('cohortData', JSON.stringify(response.result));
+          }
+
+          // Find the first center (not BLOCK type) and store its cohortId as workingLocationCenterId
+          if (cohortDataArray.length > 0) {
+            const centerCohort = cohortDataArray.find(
+              (cohort: any) =>
+                cohort.type === 'COHORT' &&
+                cohort.cohortMemberStatus?.toLowerCase() === 'active' &&
+                cohort.cohortStatus?.toLowerCase() === 'active' &&
+                cohort.cohortId
+            );
+
+            if (centerCohort?.cohortId) {
+              localStorage.setItem(
+                'workingLocationCenterId',
+                centerCohort.cohortId
+              );
+            } else {
+              // Fallback: use first cohort with cohortId if no center found
+              const firstCohort = cohortDataArray.find(
+                (cohort: any) => cohort.cohortId
+              );
+              if (firstCohort?.cohortId) {
+                localStorage.setItem(
+                  'workingLocationCenterId',
+                  firstCohort.cohortId
+                );
+              }
+            }
+          }
+          setCohortDataLoaded(true);
+        }
+      } catch (error) {
+        console.error('Error fetching cohort list:', error);
+        setCohortDataLoaded(true);
+      }
+    };
+
+    fetchCohortData();
+  }, []);
 
   useEffect(() => {
     const getSurveyData = async () => {
@@ -60,43 +113,35 @@ const Index = () => {
     getSurveyData();
   }, []);
 
-  useEffect(() => {
-    const getMentorData = async () => {
-      const filters = {
-        role: Role.INSTRUCTOR,
-        status: [Status.ACTIVE],
-      };
-      const data = await fetchUserData();
-      //  setUserData(data);
-    };
-    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()) getMentorData();
-  }, []);
-  const getMentorDistrictData = async () => {
-    const userId = localStorage.getItem('userId');
-    if (userId) {
-      const data = await getUserDetails(userId, true);
-      const result = data?.userData?.customFields?.find(
-        (item: any) => item.label === 'DISTRICT'
-      );
-      const districtId = result?.selectedValues?.[0]?.id;
-      const filters = {
-        role: Role?.INSTRUCTOR,
-        tenantStatus: [Status.ACTIVE],
-        district: [districtId],
-      };
-      const responce = await fetchUserList({ filters });
-      const transformedData = responce?.getUserDetails?.map((user: any) => ({
+  const getMobilizersList = async () => {
+    const workingLocationCenterId = localStorage.getItem(
+      'workingLocationCenterId'
+    );
+
+    if (workingLocationCenterId) {
+      const response = await fetchCohortMemberList({
+        // limit: 10,
+        // offset: 0,
+        filters: {
+          cohortId: workingLocationCenterId,
+          role: Role.MOBILIZER,
+          status: [Status.ACTIVE]
+        },
+      });
+
+      const userDetails = response?.result?.userDetails || [];
+      const transformedData = userDetails.map((user: any) => ({
         id: user.userId,
         name: user.lastName
           ? `${user.firstName} ${user.lastName}`
           : user.firstName,
       }));
+
       setUserData(transformedData);
-      let userDataString = localStorage.getItem('userData');
-      let userData: any = userDataString ? JSON.parse(userDataString) : null;
-      userData.customFields = data.userData.customFields;
-      localStorage.setItem('userData', JSON.stringify(userData));
-      setSelectedMentorId(responce?.getUserDetails?.[0]?.userId);
+
+      if (transformedData?.length > 0) {
+        setSelectedMentorId(transformedData?.[0]?.id);
+      }
     }
   };
   // setUserData(data);
@@ -104,19 +149,21 @@ const Index = () => {
     router.push(`/user-profile/${userId}`);
   };
   useEffect(() => {
-    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole())
-      getMentorDistrictData();
-  }, []);
+    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && cohortDataLoaded) {
+      getMobilizersList();
+    }
+  }, [cohortDataLoaded]);
   useEffect(() => {
     const getYouthData = async (userId: any) => {
       try {
         const villages = await getVillages(userId);
-        console.log(villages);
+        // console.log('villages#######',villages);
 
+        //for mobilizer
         if (userId === localStorage.getItem('userId')) {
-          const updatedData = villages?.map(({ id, value }: any) => ({
+          const updatedData = villages?.map(({ id, name }: any) => ({
             Id: id,
-            name: value,
+            name: name,
           }));
 
           localStorage.setItem('villageData', JSON.stringify(updatedData));
@@ -214,7 +261,7 @@ const Index = () => {
       }
       // setUserData(data);
     };
-    if (YOUTHNET_USER_ROLE.INSTRUCTOR === getLoggedInUserRole())
+    if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
       getYouthData(localStorage.getItem('userId'));
     if (
       YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() &&
@@ -264,18 +311,28 @@ const Index = () => {
             mt: '15px',
           }}
         >
-          {true ? (
+          {userData && userData?.length > 0 ? (
             <Dropdown
-              name={'Mentor'}
+              name={t('MOBILIZER.MOBILIZER')}
               values={userData}
               defaultValue={userData?.[0]?.id}
               onSelect={(value) => {
                 localStorage.setItem('selectedMentoruserId', value);
+                localStorage.setItem('selectedMentorId', value);
+                localStorage.setItem('selectedMentorData', JSON.stringify(userData.find((user: any) => user.id === value)));
                 setSelectedMentorId(value);
               }}
             />
           ) : (
-            <Loader showBackdrop={true} />
+            <Typography
+              sx={{
+                mt: 1,
+                color: 'text.secondary',
+                fontSize: '16px',
+              }}
+            >
+              {t('MOBILIZER.NO_MOBILIZER_FOUND') || 'No mobilizer found'}
+            </Typography>
           )}
         </Box>
       )}

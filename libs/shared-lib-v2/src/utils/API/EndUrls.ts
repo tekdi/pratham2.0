@@ -21,6 +21,8 @@ export const API_ENDPOINTS = {
   verifyOTP: `${baseurl}/user/verify-otp`,
   courseWiseLernerList: `${baseurl}/tracking/user_certificate/status/search`,
   getCourseName: `${baseurl}/action/composite/v3/search`,
+  usersHierarchyView: `${baseurl}/user/users-hierarchy-view`,
+  enrollUserTenant: `${baseurl}/user-tenant`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;

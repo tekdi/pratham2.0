@@ -12,12 +12,13 @@ import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
-import MapIcon from '@mui/icons-material/Map';
+// import MapIcon from '@mui/icons-material/Map';
 import Image from 'next/image';
 import {
   extractMatchingKeys,
   fetchForm,
   searchListData,
+  enhanceUiSchemaWithGrid,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
@@ -49,6 +50,7 @@ const Centers = () => {
   const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
+  const [originalAddUiSchema, setOriginalAddUiSchema] = useState(null);
   const [prefilledAddFormData, setPrefilledAddFormData] = useState({});
   const [pageLimit, setPageLimit] = useState<number>(10);
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -76,11 +78,11 @@ const Centers = () => {
   const searchStoreKey = 'centers';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-      localStorage.getItem(searchStoreKey) != '{}'
+    localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-        ? { state: [localStorage.getItem('stateId')] }
-        : {};
+      ? { state: [localStorage.getItem('stateId')] }
+      : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -110,7 +112,14 @@ const Centers = () => {
       //unit name is missing from required so handled from frotnend
       let alterSchema = responseForm?.schema;
       let requiredArray = alterSchema?.required;
-      const mustRequired = ['name', 'state', 'district', 'block', 'village'];
+      const mustRequired = [
+        'name',
+        'state',
+        'district',
+        'block',
+        'village',
+        'catchment_area',
+      ];
       if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
@@ -150,7 +159,29 @@ const Centers = () => {
       // }
 
       setAddSchema(alterSchema);
-      setAddUiSchema(responseForm?.uiSchema);
+
+      //set 2 grid layout
+      let alterUISchema = responseForm?.uiSchema;
+      alterUISchema['ui:order'] = [
+        "name",
+        "center_type",
+        "state",
+        "district",
+        "block",
+        "village",
+        "address",
+        "image",
+        "google_map_link",
+        'industry',
+        "catchment_area",
+        "board",
+        "medium",
+        "grade",
+      ];
+      alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+      setAddUiSchema(alterUISchema);
+      setOriginalAddUiSchema(alterUISchema);
 
       // Uncomment for remote center changes
       // // console.log('####1:', alterSchema);
@@ -193,7 +224,7 @@ const Centers = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
-      const staticFilter = { type: CohortTypes.COHORT };
+      const staticFilter = { type: CohortTypes.COHORT, tenantId: tenantId };
       const { sortBy } = formData;
       const staticSort = ['name', sortBy || 'asc'];
       await searchListData(
@@ -409,35 +440,35 @@ const Centers = () => {
 
   // Define actions
   const actions = [
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Google Map Link"
-        >
-          <MapIcon />
-        </Box>
-      ),
-      callback: async (row: any) => {
-        window.open(
-          row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
-            ?.selectedValues,
-          '_blank',
-          'noopener,noreferrer'
-        );
-      },
-      show: (row) =>
-        row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
-          ?.selectedValues,
-    },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Google Map Link"
+    //     >
+    //       <MapIcon />
+    //     </Box>
+    //   ),
+    //   callback: async (row: any) => {
+    //     window.open(
+    //       row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
+    //         ?.selectedValues,
+    //       '_blank',
+    //       'noopener,noreferrer'
+    //     );
+    //   },
+    //   show: (row) =>
+    //     row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
+    //       ?.selectedValues,
+    // },
     {
       icon: (
         <Box
@@ -458,8 +489,9 @@ const Centers = () => {
       callback: async (row: any) => {
         setSelectedCenter(row);
         setOpenBatchModal(true);
+        // console.log('row in view batch', row);
       },
-      show: (row) => storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -481,6 +513,32 @@ const Centers = () => {
       callback: (row: any) => {
         let tempFormData = extractMatchingKeys(row, addSchema);
         console.log('######## images value tempFormData', tempFormData);
+        // console.log('######## images value row', row);
+        // console.log('######## images value addSchema', addSchema);
+
+        // Hide address and google_map_link fields when center_type is 'remote'
+        if (tempFormData.center_type === 'remote') {
+          const modifiedUiSchema = JSON.parse(
+            JSON.stringify(originalAddUiSchema || addUiSchema)
+          );
+          if (modifiedUiSchema.address) {
+            modifiedUiSchema.address = {
+              ...modifiedUiSchema.address,
+              'ui:widget': 'hidden',
+            };
+          }
+          if (modifiedUiSchema.google_map_link) {
+            modifiedUiSchema.google_map_link = {
+              ...modifiedUiSchema.google_map_link,
+              'ui:widget': 'hidden',
+            };
+          }
+          setAddUiSchema(modifiedUiSchema);
+        } else {
+          // Restore original UI schema for non-remote centers
+          setAddUiSchema(originalAddUiSchema || addUiSchema);
+        }
+
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
@@ -563,6 +621,10 @@ const Centers = () => {
   const handleOpenModal = () => setOpenModal(true);
 
   const handleCloseModal = () => {
+    // Restore original UI schema when closing modal
+    if (originalAddUiSchema) {
+      setAddUiSchema(originalAddUiSchema);
+    }
     setOpenModal(false);
   };
 
@@ -608,6 +670,10 @@ const Centers = () => {
               width: '200px',
             }}
             onClick={() => {
+              // Restore original UI schema when creating new center
+              if (originalAddUiSchema) {
+                setAddUiSchema(originalAddUiSchema);
+              }
               setPrefilledAddFormData(initialFormData);
               setIsEdit(false);
               setEditableUserId('');
@@ -627,6 +693,8 @@ const Centers = () => {
           modalTitle={
             isEdit ? t('COMMON.UPDATE_CENTER') : t('CENTERS.NEW_CENTER')
           }
+          isFullwidth={false}
+          modalWidth="90%"
         >
           <AddEditUser
             SuccessCallback={() => {
@@ -661,7 +729,7 @@ const Centers = () => {
         {response != null ? (
           <>
             {response &&
-              response?.result?.results?.cohortDetails?.length > 0 ? (
+            response?.result?.results?.cohortDetails?.length > 0 ? (
               <Box sx={{ mt: 1 }}>
                 <PaginatedTable
                   count={response?.result?.count}
@@ -694,8 +762,8 @@ const Centers = () => {
           open={openBatchModal}
           onClose={() => setOpenBatchModal(false)}
           showFooter={false}
-          modalTitle={t("CENTERS.BATCHES_FOR_CENTER", {
-            centerName: transformLabel(selectedCenter?.name || "")
+          modalTitle={t('CENTERS.BATCHES_FOR_CENTER', {
+            centerName: transformLabel(selectedCenter?.name || ''),
           })}
           isFullwidth={true}
         >
@@ -716,6 +784,11 @@ const Centers = () => {
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'GRADE'
                 )?.selectedValues || []
+              }
+              centerType={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'TYPE_OF_CENTER'
+                )?.selectedValues?.[0]?.value || null
               }
             />
           ) : null}

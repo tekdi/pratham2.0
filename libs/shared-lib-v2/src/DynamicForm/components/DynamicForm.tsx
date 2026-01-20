@@ -17,6 +17,10 @@ import CustomSingleSelectWidget from './RJSFWidget/CustomSingleSelectWidget';
 import CustomRadioWidget from './RJSFWidget/CustomRadioWidget';
 import CustomTextFieldWidget from './RJSFWidget/CustomTextFieldWidget';
 import CustomFileUpload from './RJSFWidget/CustomFileUpload';
+import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
+import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
+import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
+
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -25,6 +29,7 @@ import {
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 import { useTranslation } from '../../lib/context/LanguageContext';
 import SecurityIcon from '@mui/icons-material/Security';
+import { showToastMessage } from './Toastify';
 
 // import { useTranslation } from '@shared-lib'; // Updated import
 const DynamicForm = ({
@@ -130,7 +135,10 @@ const DynamicForm = ({
     }
 
     // Add note to lastName field in initial uiSchema
-    if (initialUiSchema.lastName && !initialUiSchema.lastName['ui:options']?.note) {
+    if (
+      initialUiSchema.lastName &&
+      !initialUiSchema.lastName['ui:options']?.note
+    ) {
       initialUiSchema = {
         ...initialUiSchema,
         lastName: {
@@ -186,7 +194,10 @@ const DynamicForm = ({
         console.log('Adding note to lastName field', formUiSchema.lastName);
         setFormUiSchema((prevUiSchema) => {
           // Check again to avoid unnecessary updates
-          if (prevUiSchema?.lastName && !prevUiSchema.lastName['ui:options']?.note) {
+          if (
+            prevUiSchema?.lastName &&
+            !prevUiSchema.lastName['ui:options']?.note
+          ) {
             const updatedUiSchema = {
               ...prevUiSchema,
               lastName: {
@@ -197,7 +208,10 @@ const DynamicForm = ({
                 },
               },
             };
-            console.log('Updated uiSchema with note:', updatedUiSchema.lastName);
+            console.log(
+              'Updated uiSchema with note:',
+              updatedUiSchema.lastName
+            );
             return updatedUiSchema;
           }
           return prevUiSchema;
@@ -326,8 +340,8 @@ const DynamicForm = ({
             updatedUiSchema['guardian_info_note'] = {
               'ui:field': 'GuardianInfoField',
               'ui:options': {
-                grid: { xs: 12, sm: 12, md: 12 }
-              }
+                grid: { xs: 12, sm: 12, md: 12 },
+              },
             };
 
             // Clone each key's config and set widget to 'CustomTextFieldWidget' with full width
@@ -338,8 +352,8 @@ const DynamicForm = ({
                   'ui:widget': 'CustomTextFieldWidget',
                   'ui:options': {
                     ...updatedUiSchema[key]?.['ui:options'],
-                    grid: { xs: 12, sm: 12, md: 12 } // Full width for guardian fields
-                  }
+                    grid: { xs: 12, sm: 12, md: 12 }, // Full width for guardian fields
+                  },
                 };
               }
             });
@@ -358,16 +372,17 @@ const DynamicForm = ({
               guardian_info_note: {
                 type: 'string',
                 title: '',
-              }
+              },
             };
 
             // Reorder guardian fields to appear right after DOB
             let reorderedUiSchema = updatedUiSchema;
+            
             // Ensure ui:order exists and add guardian_info_note to it if not present
             if (!reorderedUiSchema['ui:order']) {
               reorderedUiSchema['ui:order'] = Object.keys(oldFormSchema.properties);
             }
-
+            
             // Only add guardian_info_note to ui:order if it's not already there
             if (!reorderedUiSchema['ui:order'].includes('guardian_info_note')) {
               const dobIndex = reorderedUiSchema['ui:order'].indexOf('dob');
@@ -377,6 +392,7 @@ const DynamicForm = ({
                 reorderedUiSchema['ui:order'].push('guardian_info_note');
               }
             }
+            
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
@@ -418,12 +434,12 @@ const DynamicForm = ({
                 if (originalMobileSchemaRef.current) {
                   oldFormSchema.properties[key] = {
                     ...originalMobileSchemaRef.current,
-                title: t('phone_number') // Ensure translated title
+                    title: t('phone_number'), // Ensure translated title
                   };
                 } else if (Object.keys(mobileSchema).length > 0) {
                   oldFormSchema.properties[key] = {
                     ...mobileSchema,
-                title: t('phone_number') // Ensure translated title
+                    title: t('phone_number'), // Ensure translated title
                   };
                 }
               }
@@ -431,7 +447,9 @@ const DynamicForm = ({
               // Add mobile field back to UI schema using stored original configuration
               if (!updatedUiSchema[key] && key === 'mobile') {
                 if (originalMobileUiSchemaRef.current) {
-              updatedUiSchema[key] = { ...originalMobileUiSchemaRef.current };
+                  updatedUiSchema[key] = {
+                    ...originalMobileUiSchemaRef.current,
+                  };
                 } else if (Object.keys(mobileAddUiSchema).length > 0) {
                   updatedUiSchema[key] = { ...mobileAddUiSchema };
                 } else {
@@ -449,7 +467,10 @@ const DynamicForm = ({
 
             // Remove guardian info note from schema and UI schema
             delete updatedUiSchema['guardian_info_note'];
-            if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
+            if (
+              oldFormSchema.properties &&
+              oldFormSchema.properties.guardian_info_note
+            ) {
               delete oldFormSchema.properties.guardian_info_note;
             }
             oldFormUiSchema = updatedUiSchema;
@@ -492,7 +513,10 @@ const DynamicForm = ({
         });
         // Remove guardian info note from schema and UI schema initially
         delete updatedUiSchema['guardian_info_note'];
-        if (oldFormSchema.properties && oldFormSchema.properties.guardian_info_note) {
+        if (
+          oldFormSchema.properties &&
+          oldFormSchema.properties.guardian_info_note
+        ) {
           delete oldFormSchema.properties.guardian_info_note;
         }
         oldFormUiSchema = updatedUiSchema;
@@ -752,6 +776,10 @@ const DynamicForm = ({
     CustomRadioWidget,
     CustomTextFieldWidget,
     CustomFileUpload,
+    CustomCenterListWidget,
+    //custom widget
+    CatchmentAreaWidget,
+    WorkingLocationWidget,
   };
 
   // Custom field for Guardian Information Note
@@ -765,8 +793,8 @@ const DynamicForm = ({
           color: '#1E3A8A',
           mb: 2,
           '& .MuiAlert-icon': {
-          color: '#1E3A8A'
-        }
+            color: '#1E3A8A',
+          },
         }}
       >
         {t('GUARDIAN_INFORMATION_NOTE')}
@@ -987,6 +1015,39 @@ const DynamicForm = ({
     return Object.entries(schema.properties)
       .filter(([_, value]) => value.api && value.api.callType === callType)
       .map(([key, value]) => ({ key, ...value }));
+  };
+
+  // Function to extract village IDs from working_location data structure
+  const extractVillageIdsFromWorkingLocation = (
+    workingLocation: any
+  ): string[] | null => {
+    if (!workingLocation || !Array.isArray(workingLocation)) {
+      return null;
+    }
+
+    const villageIds: string[] = [];
+
+    // Iterate through all states -> districts -> blocks -> villages
+    for (const state of workingLocation) {
+      if (state.districts && Array.isArray(state.districts)) {
+        for (const district of state.districts) {
+          if (district.blocks && Array.isArray(district.blocks)) {
+            for (const block of district.blocks) {
+              if (block.villages && Array.isArray(block.villages)) {
+                for (const village of block.villages) {
+                  if (village.id) {
+                    villageIds.push(String(village.id));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Return null if no villages found, otherwise return array of IDs
+    return villageIds.length > 0 ? villageIds : null;
   };
 
   const renderPrefilledForm = () => {
@@ -1305,6 +1366,16 @@ const DynamicForm = ({
       // Call the function
       fetchDependentApis();
 
+      // Sync working_village with working_location if present in prefilled data
+      if (temp_prefilled_form?.working_location !== undefined) {
+        const villageIds = extractVillageIdsFromWorkingLocation(
+          temp_prefilled_form?.working_location
+        );
+        // Convert array to comma-separated string for backend
+        temp_prefilled_form.working_village =
+          villageIds && villageIds.length > 0 ? villageIds.join(', ') : null;
+      }
+
       //setFormData
       setFormData(temp_prefilled_form);
 
@@ -1480,6 +1551,16 @@ const DynamicForm = ({
     formData: any;
     errors: any;
   }) => {
+    // Sync working_village with working_location changes
+    if (formData?.working_location !== undefined) {
+      const villageIds = extractVillageIdsFromWorkingLocation(
+        formData.working_location
+      );
+      // Convert array to comma-separated string for backend
+      formData.working_village =
+        villageIds && villageIds.length > 0 ? villageIds.join(',') : null;
+    }
+
     // const changedField = Object.keys(formData).find(
     //   (key) => formData[key] !== prevFormData.current[key]
     // );
@@ -1688,7 +1769,8 @@ const DynamicForm = ({
 
       // Protect username from being updated if it's disabled
       // Preserve the existing username value if username field is disabled
-      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      const isUsernameDisabled =
+        formUiSchema?.username?.['ui:disabled'] === true;
       if (isUsernameDisabled && prevFormData.current?.username) {
         // Keep the existing username value when username field is disabled
         formData.username = prevFormData.current.username;
@@ -1758,7 +1840,8 @@ const DynamicForm = ({
       type === 'learner'
     ) {
       // Check if username field is disabled - don't update if disabled
-      const isUsernameDisabled = formUiSchema?.username?.['ui:disabled'] === true;
+      const isUsernameDisabled =
+        formUiSchema?.username?.['ui:disabled'] === true;
 
       if (isUsernameDisabled) {
         // Username is disabled, don't update it
@@ -1766,8 +1849,10 @@ const DynamicForm = ({
       }
 
       // Only update if firstName or lastName actually changed
-      const firstNameChanged = formData.firstName !== prevNameRef.current.firstName;
-      const lastNameChanged = formData.lastName !== prevNameRef.current.lastName;
+      const firstNameChanged =
+        formData.firstName !== prevNameRef.current.firstName;
+      const lastNameChanged =
+        formData.lastName !== prevNameRef.current.lastName;
 
       if (firstNameChanged || lastNameChanged) {
         const randomTwoDigit = Math.floor(10 + Math.random() * 90);
@@ -1912,38 +1997,43 @@ const DynamicForm = ({
       const field = formSchema.properties[key];
       const value = formData[key];
 
-      // Ensure errors[key] is defined
-      if (!errors[key]) {
-        errors[key] = {};
-      }
-      // ✅ Clear error if field is empty or invalid
-      if (!value || value === '' || value === null || value === undefined) {
-        if (errors[key]?.__errors) {
-          console.log('####### field', field);
-          console.log('####### value', value);
-          console.log('####### key', key);
-          errors[key].__errors = []; // ✅ Clear existing errors
+      // Skip clearing errors for working_village - it's handled by custom validation
+      if (key === 'working_village') {
+        // Don't clear working_village errors here, let custom validation handle it
+      } else {
+        // Ensure errors[key] is defined
+        if (!errors[key]) {
+          errors[key] = {};
         }
-        delete errors[key]; // ✅ Completely remove errors if empty
-      } else if (field.pattern) {
-        // ✅ Validate pattern only if the field has a value
-        const patternRegex = new RegExp(field.pattern);
-        if (!patternRegex.test(value)) {
-          const errorMessage =
-            t(patternErrorMessages?.[field.pattern]) ||
-            `Invalid format for ${field.title || key}.`;
-
-          // ✅ Add only if pattern does not match
-          if (!errors[key].__errors) {
-            errors[key].__errors = [];
-          }
-          errors[key].__errors = [errorMessage];
-        } else {
-          // ✅ Clear errors if pattern matches
+        // ✅ Clear error if field is empty or invalid
+        if (!value || value === '' || value === null || value === undefined) {
           if (errors[key]?.__errors) {
-            errors[key].__errors = [];
+            console.log('####### field', field);
+            console.log('####### value', value);
+            console.log('####### key', key);
+            errors[key].__errors = []; // ✅ Clear existing errors
           }
-          delete errors[key]; // ✅ Remove errors if valid
+          delete errors[key]; // ✅ Completely remove errors if empty
+        } else if (field.pattern) {
+          // ✅ Validate pattern only if the field has a value
+          const patternRegex = new RegExp(field.pattern);
+          if (!patternRegex.test(value)) {
+            const errorMessage =
+              t(patternErrorMessages?.[field.pattern]) ||
+              `Invalid format for ${field.title || key}.`;
+
+            // ✅ Add only if pattern does not match
+            if (!errors[key].__errors) {
+              errors[key].__errors = [];
+            }
+            errors[key].__errors = [errorMessage];
+          } else {
+            // ✅ Clear errors if pattern matches
+            if (errors[key]?.__errors) {
+              errors[key].__errors = [];
+            }
+            delete errors[key]; // ✅ Remove errors if valid
+          }
         }
       }
     });
@@ -1985,8 +2075,16 @@ const DynamicForm = ({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Filter errors for UI display, but keep working_village errors for onSubmit handler
+    // Note: transformErrors affects UI display, but onSubmit receives original errors
+    return updatedError.filter(
+      (err) =>
+        !err?.property?.startsWith?.('.catchment_area') &&
+        !err?.property?.startsWith?.('.working_location')
+      // Don't filter working_village errors - we need them in onSubmit for toast
+    );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
-    return updatedError;
+    // return updatedError;
   };
 
   return (
@@ -2002,9 +2100,9 @@ const DynamicForm = ({
           // onSubmit={handleSubmit}
           onSubmit={({ formData, errors }) => {
             // console.log("########### issue debug SUBMIT", formData);
-            // console.log("########### issue debug ERRORS", errors); // 👈 this will be empty if validation passed
+            // console.log("########### issue debug ERRORS", errors);
             if (errors.length > 0) {
-              // Block submission if needed
+              // Block submission if there are validation errors
               return;
             }
             handleSubmit({ formData });
