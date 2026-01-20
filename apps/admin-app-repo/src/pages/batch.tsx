@@ -391,7 +391,7 @@ const Batch = () => {
   const failureUpdateMessage = 'BATCH.BATCH_UPDATE_FAILED';
   const successCreateMessage = 'BATCH.BATCH_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'batch-created-successfully';
-  const failureCreateMessage = 'BATCH.BATCH_UPDATE_FAILED';
+  const failureCreateMessage = 'BATCH.BATCH_CREATE_FAILED';
 
   return (
     <>
@@ -410,7 +410,9 @@ const Batch = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+
+        {/* TODO: Add add new button back in future */}
+        {/* <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
@@ -430,7 +432,7 @@ const Batch = () => {
           >
             {t('COMMON.ADD_NEW')}{' '}
           </Button>
-        </Box>
+        </Box> */}
 
         <SimpleModal
           open={openModal}

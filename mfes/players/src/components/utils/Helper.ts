@@ -56,7 +56,7 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
   );
 
   // Return the mapped terms
-  return category.terms.map((term: any) => ({
+  return category.terms.filter((term: any) => term.status !== "Retired").map((term: any) => ({
     name: term.name,
     code: term.code,
     associations: term.associations,

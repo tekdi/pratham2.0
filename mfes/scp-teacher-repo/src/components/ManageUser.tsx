@@ -1,6 +1,16 @@
 // @ts-nocheck
-import { Button, Grid, Typography } from '@mui/material';
+import {
+  Button,
+  Grid,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+} from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 import BottomDrawer from '@/components/BottomDrawer';
 import ConfirmationModal from '@/components/ConfirmationModal';
@@ -14,13 +24,23 @@ import {
 } from '@/services/MyClassDetailsService';
 import reassignLearnerStore from '@/store/reassignLearnerStore';
 import useStore from '@/store/store';
-import { QueryKeys, Role, Status, Telemetry } from '@/utils/app.constant';
+import {
+  QueryKeys,
+  Role,
+  RoleId,
+  Status,
+  Telemetry,
+  FormContext,
+  FormContextType,
+} from '@/utils/app.constant';
 import { fetchUserData, getUserFullName, toPascalCase } from '@/utils/Helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
@@ -32,7 +52,6 @@ import { useRouter } from 'next/router';
 import { setTimeout } from 'timers';
 import { useDirection } from '../hooks/useDirection';
 import manageUserStore from '../store/manageUserStore';
-import AddFacilitatorModal from './AddFacilitator';
 import CustomPagination from './CustomPagination';
 import DeleteUserModal from './DeleteUserModal';
 import Loader from './Loader';
@@ -41,7 +60,17 @@ import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
 import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';
 import { customFields } from './GeneratedSchemas';
-import { fetchCohortMemberList } from '@/services/CohortService/cohortService';
+import {
+  fetchCohortMemberList,
+  bulkCreateCohortMembers,
+} from '@/services/CohortService/cohortService';
+import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+// import CenterBasedBatchListWidget from '@shared-lib-v2/MapUser/CenterBasedBatchListWidget';
+import LMPMultipleBatchListWidget from '@shared-lib-v2/MapUser/LMPMultipleBatchListWidget';
+import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
+import { splitUserData } from '@/components/DynamicForm/DynamicFormCallback';
+import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
+import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 
 interface Cohort {
   cohortId: string;
@@ -143,6 +172,22 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const setReassignFacilitatorUserId = reassignLearnerStore(
     (state) => state.setReassignFacilitatorUserId
   );
+
+  // New facilitator mapping modal states
+  const [mapModalOpen, setMapModalOpen] = useState(false);
+  const [formStep, setFormStep] = useState(0);
+  const [myCenterIds, setMyCenterIds] = useState<any>([]);
+  const [myCenterList, setMyCenterList] = useState<any[]>([]);
+  const [selectedCenterId, setSelectedCenterId] = useState<any>([]);
+  const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
+  const [selectedBatchList, setSelectedBatchList] = useState<any[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [isMappingInProgress, setIsMappingInProgress] = useState(false);
+  const [userDetails, setUserDetails] = useState<any>(null);
+  const [prefilledState, setPrefilledState] = useState({});
+  const [addFacilitatorSchema, setAddFacilitatorSchema] = useState<any>(null);
+  const [addFacilitatorUiSchema, setAddFacilitatorUiSchema] =
+    useState<any>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState(users || []);
@@ -155,6 +200,221 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       setReloadState(false);
     }
   }, [reloadState, setReloadState]);
+
+  // Fetch centers on mount using mycohorts API
+  const [temp_variable, setTemp_variable] = useState([]);
+  useEffect(() => {
+    const fetchCenters = async () => {
+      try {
+        setLoading(true);
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          console.error('UserId not found in localStorage');
+          setLoading(false);
+          return;
+        }
+        console.log('#############testlogs userId', userId);
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/plain, */*',
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+        console.log('#############testlogs headers', headers);
+
+        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/mycohorts/${userId}?customField=true&children=true`;
+        console.log('#############testlogs apiUrl', apiUrl);
+        const response = await axios.get(apiUrl, { headers });
+        console.log('#############testlogs response', response);
+
+        // Extract centers from response
+        // Response structure: response.data.result is an array of cohorts
+        const cohortsData = response?.data?.result || [];
+
+        console.log(
+          '#############testlogs API Response - cohortsData:',
+          cohortsData
+        );
+        console.log(
+          '#############testlogs Number of cohorts:',
+          cohortsData.length
+        );
+
+        // Filter for active centers (type COHORT, status active, cohortMemberStatus active)
+        const filteredCohorts = cohortsData.filter((cohort: any) => {
+          const isActiveCohort =
+            cohort?.type === 'COHORT' &&
+            cohort?.cohortStatus === 'active' &&
+            cohort?.cohortMemberStatus === 'active';
+          console.log('Cohort filter:', {
+            cohortName: cohort?.cohortName,
+            type: cohort?.type,
+            cohortStatus: cohort?.cohortStatus,
+            cohortMemberStatus: cohort?.cohortMemberStatus,
+            isActiveCohort,
+          });
+          return isActiveCohort;
+        });
+
+        // Helper function to extract custom field value by label
+        const getCustomFieldValue = (
+          customField: any[],
+          label: string,
+          property: 'value' | 'id' = 'value'
+        ): any => {
+          const field = customField?.find((f: any) => f?.label === label);
+          if (
+            !field ||
+            !field.selectedValues ||
+            field.selectedValues.length === 0
+          ) {
+            return property === 'id' ? null : '';
+          }
+          const selectedValue = field.selectedValues[0];
+          if (typeof selectedValue === 'object' && selectedValue !== null) {
+            return selectedValue[property] ?? (property === 'id' ? null : '');
+          }
+          return property === 'id' ? null : selectedValue;
+        };
+
+        // Extract center IDs
+        const centerIds = filteredCohorts.map(
+          (cohort: any) => cohort.cohortId || cohort.id
+        );
+        setMyCenterIds(centerIds);
+
+        // Map to the required structure
+        const centersList = filteredCohorts.map((cohort: any) => {
+          const customField = cohort.customField || [];
+          return {
+            value: cohort.cohortId || cohort.id,
+            label: cohort.cohortName || cohort.name || '',
+            state: getCustomFieldValue(customField, 'STATE', 'value'),
+            district: getCustomFieldValue(customField, 'DISTRICT', 'value'),
+            block: getCustomFieldValue(customField, 'BLOCK', 'value'),
+            village: getCustomFieldValue(customField, 'VILLAGE', 'value'),
+            stateId: getCustomFieldValue(customField, 'STATE', 'id'),
+            districtId: getCustomFieldValue(customField, 'DISTRICT', 'id'),
+            blockId: getCustomFieldValue(customField, 'BLOCK', 'id'),
+            villageId: getCustomFieldValue(customField, 'VILLAGE', 'id'),
+          };
+        });
+        setMyCenterList(centersList);
+      } catch (error) {
+        console.error('Error fetching centers:', error);
+        setMyCenterIds([]);
+        setMyCenterList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCenters();
+  }, [temp_variable]);
+
+  // Fetch facilitator form schema
+  useEffect(() => {
+    const fetchFacilitatorFormSchema = async () => {
+      const responseForm: any = await fetchForm([
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.USERS}&contextType=${FormContextType.TEACHER}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.USERS}&contextType=${FormContextType.TEACHER}`,
+          header: {
+            tenantid: localStorage.getItem('tenantId'),
+          },
+        },
+      ]);
+
+      if (responseForm?.schema && responseForm?.uiSchema) {
+        let alterSchema = responseForm?.schema;
+        let alterUISchema = responseForm?.uiSchema;
+
+        // Disable certain fields
+        if (alterUISchema?.firstName) {
+          alterUISchema.firstName['ui:disabled'] = true;
+        }
+        if (alterUISchema?.lastName) {
+          alterUISchema.lastName['ui:disabled'] = true;
+        }
+        if (alterUISchema?.dob) {
+          alterUISchema.dob['ui:disabled'] = true;
+        }
+        if (alterUISchema?.email) {
+          alterUISchema.email['ui:disabled'] = true;
+        }
+        if (alterUISchema?.mobile) {
+          alterUISchema.mobile['ui:disabled'] = true;
+        }
+        if (alterUISchema?.designation) {
+          alterUISchema = {
+            ...alterUISchema,
+            designation: {
+              ...alterUISchema.designation,
+              'ui:disabled': true,
+            },
+          };
+        }
+
+        // Remove duplicates from required array
+        let requiredArray = alterSchema?.required;
+        if (Array.isArray(requiredArray)) {
+          requiredArray = Array.from(new Set(requiredArray));
+        }
+        alterSchema.required = requiredArray;
+
+        //set 2 grid layout
+        alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+        setAddFacilitatorSchema(alterSchema);
+        setAddFacilitatorUiSchema(alterUISchema);
+      }
+    };
+
+    fetchFacilitatorFormSchema();
+  }, []);
+
+  // Helper function to extract all batch IDs from the centers structure
+  const extractBatchIds = (centersStructure: any): string[] => {
+    return centersStructure;
+    const batchIds: string[] = [];
+
+    if (!centersStructure || !Array.isArray(centersStructure)) {
+      return batchIds;
+    }
+
+    // New structure: SelectedCenter[] with nested batches
+    centersStructure.forEach((center: any) => {
+      if (center?.batches && Array.isArray(center.batches)) {
+        center.batches.forEach((batch: any) => {
+          if (batch?.id) {
+            batchIds.push(String(batch.id));
+          }
+        });
+      }
+    });
+
+    return batchIds;
+  };
+
+  // Helper function to check if at least one batch is selected across all centers
+  const hasAtLeastOneBatchSelected = (centersStructure: any): boolean => {
+    if (!centersStructure || !Array.isArray(centersStructure)) {
+      return false;
+    }
+
+    // Check if ALL selected centers have at least one batch selected
+    return centersStructure.every((center: any) => {
+      return (
+        center?.batches &&
+        Array.isArray(center.batches) &&
+        center.batches.length > 0
+      );
+    });
+  };
 
   useEffect(() => {
     const getFacilitator = async () => {
@@ -662,12 +922,24 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   };
 
   const handleOpenAddFaciModal = () => {
-    setOpenFacilitatorModal(true);
+    setPrefilledState({});
+    setFormStep(0);
+    setSelectedUserId(null);
+    setUserDetails(null);
+    setSelectedCenterId(null);
+    setSelectedCenterList(null);
+    setSelectedBatchList(null);
+    setMapModalOpen(true);
   };
 
   const handleCloseAddFaciModal = () => {
-    console.log('clickedddddddddddddddddd');
-    setOpenFacilitatorModal(false);
+    setMapModalOpen(false);
+    setSelectedCenterId(null);
+    setSelectedCenterList(null);
+    setSelectedBatchList(null);
+    setSelectedUserId(null);
+    setUserDetails(null);
+    setFormStep(0);
   };
 
   const handleDeleteUser = () => {};
@@ -1340,14 +1612,274 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 </Box>
               </SimpleModal>
             )}
-            {openAddFacilitatorModal && (
-              <FacilitatorManage
-                key={openAddFacilitatorModal === true ? 'render1' : 'render2'}
-                open={openAddFacilitatorModal}
-                onClose={handleCloseAddFaciModal}
-                onFacilitatorAdded={handleFacilitatorAdded}
-              />
-            )}
+            {/* Map Facilitator Modal Dialog */}
+            <Dialog
+              open={mapModalOpen}
+              onClose={(event, reason) => {
+                // Prevent closing on backdrop click
+                if (reason !== 'backdropClick') {
+                  handleCloseAddFaciModal();
+                }
+              }}
+              maxWidth={false}
+              fullWidth={true}
+              PaperProps={{
+                sx: {
+                  width: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100vh',
+                },
+              }}
+            >
+              <DialogTitle
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid #eee',
+                  p: 2,
+                }}
+              >
+                {formStep === 1 ? (
+                  <Button
+                    sx={{
+                      backgroundColor: '#FFC107',
+                      color: '#000',
+                      fontFamily: 'Poppins',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      height: '40px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      '&:hover': {
+                        backgroundColor: '#ffb300',
+                      },
+                      p: 2,
+                    }}
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => setFormStep(0)}
+                  >
+                    {t('COMMON.BACK')}
+                  </Button>
+                ) : (
+                  <Typography variant="h1" component="div"></Typography>
+                )}
+                <Typography variant="h1" component="div">
+                  {t('FACILITATORS.MAP_USER_AS_FACILITATOR')}
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={handleCloseAddFaciModal}
+                  sx={{
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+                {formStep === 0 && (
+                  <Box sx={{ mb: 3 }}>
+                    <EmailSearchUser
+                      onUserSelected={(userId) => {
+                        setSelectedUserId(userId || null);
+                        console.log('Selected User ID:', userId);
+                      }}
+                      onUserDetails={(userDetails) => {
+                        console.log('############# userDetails', userDetails);
+                        setUserDetails(userDetails);
+                        setFormStep(1);
+                      }}
+                      schema={addFacilitatorSchema}
+                      uiSchema={addFacilitatorUiSchema}
+                      prefilledState={prefilledState}
+                      onPrefilledStateChange={(prefilledState) => {
+                        setPrefilledState(prefilledState || {});
+                      }}
+                      roleId={RoleId.TEACHER}
+                      tenantId={tenantId}
+                      type="instructor"
+                    />
+                  </Box>
+                )}
+                {formStep === 1 && (
+                  <Box sx={{ mb: 3 }}>
+                    <LMPMultipleBatchListWidget
+                      value={selectedCenterId}
+                      onChange={(centerId) => {
+                        setSelectedCenterId(centerId);
+                        console.log('Selected Center ID:', centerId);
+                      }}
+                      onCenterList={(centerList) => {
+                        setSelectedCenterList(centerList || []);
+                        console.log('############# centerList', centerList);
+                      }}
+                      selectedCenterList={selectedCenterList}
+                      onBatchList={(batchList) => {
+                        setSelectedBatchList(batchList || []);
+                        console.log('############# batchList', batchList);
+                      }}
+                      selectedBatchList={selectedBatchList}
+                      label={t('COMMON.SELECT_CENTER')}
+                      required={true}
+                      multiple={false}
+                      centerIds={myCenterIds}
+                      centerList={myCenterList}
+                    />
+                  </Box>
+                )}
+              </DialogContent>
+              <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                {formStep === 0 && (
+                  <Button
+                    sx={{
+                      backgroundColor: '#FFC107',
+                      color: '#000',
+                      fontFamily: 'Poppins',
+                      fontWeight: 500,
+                      fontSize: '14px',
+                      height: '40px',
+                      lineHeight: '20px',
+                      letterSpacing: '0.1px',
+                      textAlign: 'center',
+                      verticalAlign: 'middle',
+                      '&:hover': {
+                        backgroundColor: '#ffb300',
+                      },
+                      width: '100%',
+                    }}
+                    disabled={!selectedUserId || isMappingInProgress}
+                    form="dynamic-form-id"
+                    type="submit"
+                  >
+                    {t('COMMON.NEXT')}
+                  </Button>
+                )}
+                {formStep === 1 && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={async () => {
+                      if (selectedUserId && selectedCenterId) {
+                        setIsMappingInProgress(true);
+                        try {
+                          const { userData, customFields } =
+                            splitUserData(userDetails);
+
+                          delete userData.email;
+
+                          // Update user details
+                          const updateUserResponse = await enrollUserTenant({
+                            userId: selectedUserId,
+                            tenantId: tenantId,
+                            roleId: RoleId.TEACHER,
+                            customField: customFields,
+                            userData: userData,
+                          });
+                          console.log(
+                            '######### updatedResponse',
+                            updateUserResponse
+                          );
+
+                          if (
+                            updateUserResponse &&
+                            updateUserResponse?.params?.err === null
+                          ) {
+                            showToastMessage(
+                              t(
+                                'FACILITATORS.FACILITATOR_UPDATED_SUCCESSFULLY'
+                              ),
+                              'success'
+                            );
+
+                            // Extract all batch IDs from the nested structure
+                            const batchIds = extractBatchIds(selectedCenterId);
+
+                            console.log(
+                              'Creating with User ID:',
+                              selectedUserId
+                            );
+                            console.log('Extracted Batch IDs:', batchIds);
+
+                            if (batchIds.length === 0) {
+                              showToastMessage(
+                                t('COMMON.PLEASE_SELECT_AT_LEAST_ONE_BATCH'),
+                                'error'
+                              );
+                              setIsMappingInProgress(false);
+                              return;
+                            }
+
+                            // Call the cohortmember/create API with extracted batch IDs
+                            const response = await bulkCreateCohortMembers({
+                              userId: [selectedUserId],
+                              cohortId: batchIds,
+                            });
+
+                            if (
+                              response?.responseCode === 201 ||
+                              response?.data?.responseCode === 201 ||
+                              response?.status === 201
+                            ) {
+                              showToastMessage(
+                                t(
+                                  'FACILITATORS.FACILITATOR_CREATED_SUCCESSFULLY'
+                                ),
+                                'success'
+                              );
+                              // Close dialog
+                              handleCloseAddFaciModal();
+                              // Refresh the data
+                              handleFacilitatorAdded();
+                            } else {
+                              showToastMessage(
+                                response?.data?.params?.errmsg ||
+                                  t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
+                                'error'
+                              );
+                            }
+                          } else {
+                            showToastMessage(
+                              t('COMMON.NOT_ABLE_UPDATE_FACILITATOR'),
+                              'error'
+                            );
+                          }
+                        } catch (error: any) {
+                          console.error('Error creating cohort member:', error);
+                          showToastMessage(
+                            error?.response?.data?.params?.errmsg ||
+                              t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
+                            'error'
+                          );
+                        } finally {
+                          setIsMappingInProgress(false);
+                        }
+                      } else if (!selectedUserId) {
+                        showToastMessage(
+                          t('COMMON.PLEASE_SEARCH_AND_SELECT_USER'),
+                          'error'
+                        );
+                      } else {
+                        showToastMessage(
+                          t('COMMON.PLEASE_SELECT_CENTER'),
+                          'error'
+                        );
+                      }
+                    }}
+                    disabled={
+                      !selectedUserId ||
+                      !selectedCenterId ||
+                      isMappingInProgress
+                    }
+                  >
+                    {t('FACILITATORS.MAP_AS_FACILITATOR')}
+                  </Button>
+                )}
+              </DialogActions>
+            </Dialog>
           </>
         )}
       </Box>

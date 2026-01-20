@@ -8,7 +8,19 @@ const API_ENDPOINTS = {
   formRead: `${baseurl}/form/read`,
   accountCreate: `${baseurl}/account/create`,
   userUpdate: (userId: string | string[]) => `${baseurl}/user/update/${userId}`,
-  myCohorts: (userId: string | string[]) => `${baseurl}/cohort/mycohorts/${userId}`,
+  myCohorts: (
+    userId: string | string[],
+    children?: boolean,
+    customField?: boolean
+  ) => {
+    const url = `${baseurl}/cohort/mycohorts/${userId}`;
+    const params = new URLSearchParams();
+    if (children !== undefined) params.append('children', String(children));
+    if (customField !== undefined)
+      params.append('customField', String(customField));
+    const queryString = params.toString();
+    return queryString ? `${url}?${queryString}` : url;
+  },
   accountLogin: `${baseurl}/account/login`,
   authRefresh: `${baseurl}/account/auth/refresh`,
   authLogout: `${baseurl}/account/auth/logout`,
@@ -27,9 +39,9 @@ const API_ENDPOINTS = {
   tenantSearch: `${baseurl}/tenant/search`,
   userList: `${baseurl}/user/list`,
   cohortMemberList: `${baseurl}/cohortmember/list`,
-  userRead: (userId: string | string[], fieldValue?: boolean) => 
-  fieldValue !== undefined 
-    ? `${baseurl}/user/read/${userId}?fieldvalue=${fieldValue}`
+  userRead: (userId: string | string[], fieldValue?: boolean) =>
+    fieldValue !== undefined
+      ? `${baseurl}/user/read/${userId}?fieldvalue=${fieldValue}`
     : `${baseurl}/user/read/${userId}`,  suggestUsername: `${baseurl}/user/suggestUsername`,
   cohortUpdateUser: (userId: string | string[]) => `${baseurl}/cohort/update/${userId}`,
   formReadWithContext: (context: string, contextType: string) => `${baseurl}/form/read?context=${context}&contextType=${contextType}`,
@@ -51,6 +63,7 @@ const API_ENDPOINTS = {
   forgotPassword: `${baseurl}/user/forgot-password`,
   passwordResetLink: `${baseurl}/user/password-reset-link`,
   userReadWithField: (userId: string | string[]) => `${baseurl}/user/read/${userId}?fieldvalue=false`,
+  userReadWithFieldTrue: (userId: string | string[]) => `${baseurl}/user/read/${userId}?fieldvalue=true`,
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
   updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`,

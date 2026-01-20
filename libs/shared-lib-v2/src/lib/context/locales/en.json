@@ -5,7 +5,7 @@
   "MARATHI": "Marathi",
   "URDU": "Urdu",
   "UNIT_NAME": "Unit Name",
-  "TYPE_OF_CENTER": "Type Of Center",
+  "TYPE_OF_CENTER": "Type of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
   "MY_MAIN_SUBJECTS": "Main subjects",
   "LIFE_SKILLS": "Life Skills",
@@ -68,6 +68,9 @@
   "PHONE_TYPE_ACCESSIBLE": "Type of Phone Accessible",
   "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
   "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
+  "WORKING_LOCATION": "Working Location",
+  "CATCHMENT_AREA": "Catchment Area",
+  "TYPE_OF_BATCH": "Type of Batch",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",
@@ -155,7 +158,10 @@
       "in_progress": "In Progress",
       "enrolled_not_started": "Enrolled, not started",
       "not_started": "Not Started"
-    }
+    },
+    "CHANGE_USER": "Change User",
+    "FETCH_USER": "Fetch User",
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "Search for an existing user by email and allocate working village to them"
   },
   "SWITCH_ACCOUNT": {
     "TITLE": "Select Account",
@@ -354,7 +360,10 @@
       "GUARDIAN_DETAILS": "Guardian Details",
       "I_WANT_TO_BECOME": "I want to become {futureWork}",
       "PTM_NAME": "PTM Name",
-      "ADDITIONAL_INFORMATION": "Additional Information"
+      "ADDITIONAL_INFORMATION": "Additional Information",
+      "MY_MENTOR_DETAILS": "My Mentor Details",
+      "MENTOR_NAME": "Mentor Name",
+      "MENTOR_EMAIL": "Mentor Email"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
@@ -567,6 +576,7 @@
   "phone_number": "Phone Number",
   "dob": "Date of Birth",
   "WHATS_YOUR_GENDER": "What's Your Gender",
+  "WORKING_STATE": "Working State",
   "MALE": "Male",
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
@@ -668,7 +678,7 @@
     "EMAIL": "Email",
     "YEAR_OF_JOINING_SCP": "Year of joining SCP",
     "ASSIGN_CENTERS": "Assign Centers",
-    "TYPE_OF_COHORT": "Type Of Center",
+    "TYPE_OF_COHORT": "Type of Center",
     "UNIT_NAME": "Unit Name",
     "SUBJECTS_I_TEACH": "Subject I Teach",
     "MY_MAIN_SUBJECTS": "Main subjects",
@@ -789,7 +799,8 @@
     "GOVERNMENT_PARTNERSHIP": "Government Partnership",
     "SUMMER_CAMP_VOLUNTEER": "Summer Camp Volunteer",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "What Program Are You Part Of",
-    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of"
+    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of",
+    "CATCHMENT_AREA": "Catchment Area"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

@@ -23,6 +23,7 @@ interface SimpleModalProps {
   onClose: () => void;
   modalTitle: string;
   isFullwidth?: boolean;
+  modalWidth?: string;
   id?: any;
 }
 
@@ -37,7 +38,8 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   footer,
   children,
   modalTitle,
-  isFullwidth = false,
+  isFullwidth = true,
+  modalWidth = '40%',
   id = '',
 }) => {
   const theme = useTheme<any>();
@@ -47,18 +49,19 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   const modalStyle: SxProps<Theme> = {
     display: 'flex',
     flexDirection: 'column',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: isFullwidth ? '96%' : '40%',
-    maxWidth: isFullwidth ? '96%' : '40%',
-    height: isFullwidth ? '96vh' : 'auto',
-    maxHeight: isFullwidth ? '96vh' : '80vh',
+    position: isFullwidth ? 'fixed' : 'absolute',
+    top: isFullwidth ? 0 : '50%',
+    left: isFullwidth ? 0 : '50%',
+    transform: isFullwidth ? 'none' : 'translate(-50%, -50%)',
+    width: isFullwidth ? '100vw' : modalWidth,
+    maxWidth: isFullwidth ? '100vw' : modalWidth,
+    height: isFullwidth ? '100vh' : 'auto',
+    maxHeight: isFullwidth ? '100vh' : '80vh',
     backgroundColor: 'rgb(255, 255, 255)',
-    borderRadius: '8px',
+    borderRadius: isFullwidth ? 0 : '8px',
     boxShadow:
       'rgba(0, 0, 0, 0.2) 0px 3px 5px -1px, rgba(0, 0, 0, 0.14) 0px 5px 8px 0px, rgba(0, 0, 0, 0.12) 0px 1px 14px 0px',
+    overflow: 'hidden',
   };
 
   const titleStyle = isFullwidth
