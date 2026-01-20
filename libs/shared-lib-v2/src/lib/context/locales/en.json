@@ -70,6 +70,7 @@
   "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "Unemployed, Housewife or Domestic Work",
   "WORKING_LOCATION": "Working Location",
   "CATCHMENT_AREA": "Catchment Area",
+  "TYPE_OF_BATCH": "Type of Batch",
   "SURVEYS": {
     "SURVEYS": "Surveys",
     "ACTIVE_SURVEYS": "Active Surveys",

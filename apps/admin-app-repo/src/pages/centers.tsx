@@ -12,7 +12,7 @@ import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
-import MapIcon from '@mui/icons-material/Map';
+// import MapIcon from '@mui/icons-material/Map';
 import Image from 'next/image';
 import {
   extractMatchingKeys,
@@ -162,6 +162,22 @@ const Centers = () => {
 
       //set 2 grid layout
       let alterUISchema = responseForm?.uiSchema;
+      alterUISchema['ui:order'] = [
+        "name",
+        "center_type",
+        "state",
+        "district",
+        "block",
+        "village",
+        "address",
+        "image",
+        "google_map_link",
+        'industry',
+        "catchment_area",
+        "board",
+        "medium",
+        "grade",
+      ];
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
       setAddUiSchema(alterUISchema);
@@ -424,35 +440,35 @@ const Centers = () => {
 
   // Define actions
   const actions = [
-    {
-      icon: (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: 'pointer',
-            // backgroundColor: 'rgb(227, 234, 240)',
-            justifyContent: 'center',
-            padding: '10px',
-          }}
-          title="Google Map Link"
-        >
-          <MapIcon />
-        </Box>
-      ),
-      callback: async (row: any) => {
-        window.open(
-          row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
-            ?.selectedValues,
-          '_blank',
-          'noopener,noreferrer'
-        );
-      },
-      show: (row) =>
-        row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
-          ?.selectedValues,
-    },
+    // {
+    //   icon: (
+    //     <Box
+    //       sx={{
+    //         display: 'flex',
+    //         flexDirection: 'column',
+    //         alignItems: 'center',
+    //         cursor: 'pointer',
+    //         // backgroundColor: 'rgb(227, 234, 240)',
+    //         justifyContent: 'center',
+    //         padding: '10px',
+    //       }}
+    //       title="Google Map Link"
+    //     >
+    //       <MapIcon />
+    //     </Box>
+    //   ),
+    //   callback: async (row: any) => {
+    //     window.open(
+    //       row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
+    //         ?.selectedValues,
+    //       '_blank',
+    //       'noopener,noreferrer'
+    //     );
+    //   },
+    //   show: (row) =>
+    //     row.customFields.find((field) => field.label === 'GOOGLE_MAP_LINK')
+    //       ?.selectedValues,
+    // },
     {
       icon: (
         <Box
