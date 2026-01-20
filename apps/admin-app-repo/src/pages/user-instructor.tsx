@@ -35,6 +35,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import { debounce, forEach } from 'lodash';
 import { Numbers } from '@mui/icons-material';
@@ -55,6 +56,7 @@ import restoreIcon from '../../public/images/restore_user.svg';
 import CloseIcon from '@mui/icons-material/Close';
 import MultipleBatchListWidget from '@shared-lib-v2/MapUser/MultipleBatchListWidget';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import Image from 'next/image';
@@ -82,6 +84,7 @@ import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
+import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -325,54 +328,57 @@ const Facilitator = () => {
       render: (row) => transformLabel(row?.customfield?.village) || '-',
     },
     {
-      key: 'center',
-      label: 'Center',
+      key: 'centerBatch',
+      label: 'Center : Batch',
       render: (row) => {
-        // let centerArray = row?.customfield?.find(
-        //   (field) => field.label === 'CENTER'
-        // )?.selectedValues
-        // return (
-        //   <>
-        //     {centerArray && (
-        //       <>
-        //         {centerArray.map((centerId) => (
-        //           <>
-        //             <CenterLabel parentId={centerId} />,{' '}
-        //           </>
-        //         ))}
-        //       </>
-        //     )}
-        //   </>
-        // );
-        const centers =
-          row.cohortData
-            ?.filter(
-              (c: any) =>
-                c.centerStatus === 'active' &&
-                c.cohortMember?.status === 'active'
-            )
-            .map((c: any) => transformLabel(c.centerName))
-            .filter(Boolean) || [];
+        // Filter by active cohortMember status, centerStatus, and batchStatus
+        const activeCohorts =
+          row.cohortData?.filter(
+            (c: any) =>
+              c.cohortMember?.status === 'active' &&
+              c.centerStatus === 'active' &&
+              c.batchStatus === 'active'
+          ) || [];
 
-        return centers.join(', ');
-      },
-    },
-    {
-      key: 'batch',
-      label: 'Batch',
-      render: (row) => {
-        // console.log('BacthRow', row?.cohortData)
-        const batches =
-          row.cohortData
-            ?.filter(
-              (c: any) =>
-                c.batchStatus === 'active' &&
-                c.cohortMember?.status === 'active'
-            )
-            .map((c: any) => transformLabel(c.batchName))
-            .filter(Boolean) || [];
+        // Group by centerId and collect unique batches for each center
+        const centerBatchMap = new Map<
+          string,
+          { centerName: string; batches: Set<string> }
+        >();
 
-        return batches.join(', ');
+        activeCohorts.forEach((c: any) => {
+          const centerId = c.centerId;
+          const centerName = transformLabel(c.centerName);
+          const batchName = transformLabel(c.batchName);
+
+          // Only process if both centerName and batchName exist
+          if (centerId && centerName && batchName) {
+            if (!centerBatchMap.has(centerId)) {
+              centerBatchMap.set(centerId, {
+                centerName: centerName,
+                batches: new Set<string>(),
+              });
+            }
+            centerBatchMap.get(centerId)?.batches.add(batchName);
+          }
+        });
+
+        // Format as "centerName : batch1, batch2, batch3" with each center on a new line
+        const result = Array.from(centerBatchMap.values()).map((item) => {
+          const batches = Array.from(item.batches).join(', ');
+          return `${item.centerName} : ${batches}`;
+        });
+
+        return (
+          <>
+            {result.map((item, index) => (
+              <React.Fragment key={index}>
+                {item}
+                {index < result.length - 1 && <br />}
+              </React.Fragment>
+            ))}
+          </>
+        );
       },
     },
     {
@@ -550,52 +556,32 @@ const Facilitator = () => {
   );
   // Define actions
   const actions = [
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Edit Facilitator"
-    //     >
-    //       <Image src={editIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     console.log('row:', row);
-    //     //extract id from row and make api call for user/read
-    //     // console.log('AddSchema', addSchema);
-    //     // console.log('AddUISchema', addUiSchema);
-    //     const selectedUserId = row?.userId;
-    //     const selectedUserDetails = await getUserDetailsInfo(
-    //       selectedUserId,
-    //       true
-    //     );
-    //     // console.log('selectedUserDetails:', selectedUserDetails);
-    //     const updatedUserDetails = {
-    //       ...selectedUserDetails,
-    //       userData: {
-    //         ...selectedUserDetails.userData,
-    //         mobile: String(selectedUserDetails.userData.mobile),
-    //       },
-    //     };
-    //     let tempFormData = extractMatchingKeys(updatedUserDetails?.userData, addSchema);
-    //     // console.log('tempFormData', tempFormData);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(true);
-    //     setIsReassign(false);
-    //     setButtonShow(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Facilitator"
+        >
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        setIsEditInProgress(true);
+        setEditModalOpen(true);
+        setSelectedUserIdEdit(row?.userId);
+        setSelectedUserRow(row);
+        setIsEditInProgress(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     // {
     //   icon: (
     //     <Box
@@ -654,50 +640,115 @@ const Facilitator = () => {
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reassign Facilitator"
-    //     >
-    //       <Image src={apartment} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     console.log('row:', row);
-    //     // console.log('AddSchema', addSchema);
-    //     // console.log('AddUISchema', addUiSchema);
-    //     let batchList = await fetchUserData(row?.userId);
-    //     console.log('######## batchList', batchList);
-    //     const selectedUserId = row?.userId;
-    //     const selectedUserDetails = await getUserDetailsInfo(
-    //       selectedUserId,
-    //       true
-    //     );
-    //     // console.log('selectedUserDetails:', selectedUserDetails);
-    //     let tempFormData = extractMatchingKeys(selectedUserDetails?.userData, addSchema);
-    //     tempFormData = {
-    //       ...tempFormData,
-    //       batch: batchList,
-    //     };
-    //     console.log(tempFormData, ' tempFormData');
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(false);
-    //     setIsReassign(true);
-    //     setButtonShow(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reassign Facilitator"
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row) => {
+        
+        setReassignModalOpen(true);
+        setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+        setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+        setSelectedCenterListReassign([]); // Reset center list when dialog closes
+        setSelectedBatchListReassign([]); // Reset batch list when dialog closes
+        setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+        setIsReassignModelProgress(true);
+
+        //load prefilled value
+        //call geographical data api
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json, text/plain, */*',
+          tenantId: localStorage.getItem('tenantId') || '',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          academicyearid: localStorage.getItem('academicYearId') || '',
+        };
+        const userId = row?.userId;
+        const cohortData = row?.cohortData;
+        setSelectedUserIdReassign(userId);
+        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
+        const response = await axios.get(apiUrl, { headers });
+        const geographicalData = response?.data?.result || [];
+
+        // Transform geographicalData into centerList
+        const centerList = [];
+        const batchList = [];
+        const centerIdArray = [];
+
+        geographicalData.forEach((state) => {
+          state.districts?.forEach((district) => {
+            district.blocks?.forEach((block) => {
+              block.centers?.forEach((center) => {
+                center.batches?.forEach((batch) => {
+                // Check if centerId exists in cohortData with active status
+                const cohortCenterBatch = cohortData?.find(
+                  (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
+                );
+                const isActiveCenterBatch =
+                cohortCenterBatch?.cohortMember?.status === 'active' && cohortCenterBatch?.centerStatus === 'active' && cohortCenterBatch?.batchStatus === 'active';
+
+                // Only push if center has active cohortMember status
+                if (isActiveCenterBatch) {
+                  const centerObject = {
+                    value: center.centerId,
+                    label: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  centerList.push(centerObject);
+                  const centerBatchObject = {
+                    id: batch.batchId,
+                    name: batch.batchName,
+                    centerId: center.centerId,
+                    centerName: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  batchList.push(centerBatchObject);
+                  centerIdArray.push(batch.batchId);
+                }
+                });
+              });
+            });
+          });
+        });
+        setSelectedCenterIdReassign(
+          centerIdArray.length > 0 ? centerIdArray : null
+        );
+        setOriginalCenterIdReassign(
+          centerIdArray.length > 0 ? centerIdArray : null
+        );
+        setSelectedCenterListReassign(centerList);
+        setSelectedBatchListReassign(batchList);
+        setIsReassignModelProgress(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     // {
     //   icon: (
     //     <Box
@@ -804,6 +855,34 @@ const Facilitator = () => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [isMappingInProgress, setIsMappingInProgress] = useState(false);
   const [userDetails, setUserDetails] = useState<any>(null);
+
+  //reassign modal variables
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [selectedCenterIdReassign, setSelectedCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [originalCenterIdReassign, setOriginalCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [selectedCenterListReassign, setSelectedCenterListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedBatchListReassign, setSelectedBatchListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedUserIdReassign, setSelectedUserIdReassign] = useState<
+    string | null
+  >(null);
+  const [isReassignInProgress, setReassignInProgress] = useState(false);
+  const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
+
+  //edit modal variables
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<
+    string | null
+  >(null);
+  const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
 
   const [buttonShow, setButtonShowState] = useState(true);
 
@@ -1300,6 +1379,329 @@ const Facilitator = () => {
           )}
         </DialogActions>
       </Dialog>
+
+      {/* Reassign Modal Dialog */}
+      <Dialog
+        open={reassignModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setReassignModalOpen(false);
+            setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+            setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+            setSelectedCenterListReassign(null); // Reset center list selection when dialog closes
+            setSelectedBatchListReassign(null); // Reset batch selection when dialog closes
+            setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Reassign Instructor to Batch')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setReassignModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+        {isReassignModelProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '150px',
+                }}
+              >
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Loading...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <MultipleBatchListWidget
+                value={selectedCenterIdReassign}
+                onChange={(centerId) => {
+                  setSelectedCenterIdReassign(centerId);
+                  console.log('Selected Center ID:', centerId);
+                }}
+                onCenterList={(centerList) => {
+                  setSelectedCenterListReassign(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterListReassign}
+                onBatchList={(batchList) => {
+                  setSelectedBatchListReassign(batchList || []);
+                  console.log('############# batchList', batchList);
+                }}
+                selectedBatchList={selectedBatchListReassign}
+                label="Select Batch"
+                required={true}
+                multiple={false}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={async () => {
+                if (selectedUserIdReassign && selectedCenterIdReassign) {
+                  setReassignInProgress(true);
+                  try {
+                      //map user to tenant
+                      // Extract all batch IDs from the nested structure
+                      const batchIds = extractBatchIds(selectedCenterIdReassign);
+
+                      console.log('Creating with User ID:', selectedUserIdReassign);
+                      console.log('Extracted Batch IDs:', batchIds);
+
+                      if (batchIds.length === 0) {
+                        showToastMessage(
+                          'Please select at least one batch',
+                          'error'
+                        );
+                        setReassignInProgress(false);
+                        return;
+                      }
+
+
+                  const removedIds = originalCenterIdReassign?.filter(
+                    (item: any) => !batchIds.includes(item)
+                  );
+
+                      // Call the cohortmember/create API with extracted batch IDs
+                      const response = await bulkCreateCohortMembers({
+                        userId: [selectedUserIdReassign],
+                        cohortId: batchIds,
+                        //add remove cohort id check
+                        ...(removedIds?.length > 0
+                          ? { removeCohortId: removedIds }
+                          : {}),
+                      });
+
+                      if (
+                        response?.responseCode === 201 ||
+                        response?.data?.responseCode === 201 ||
+                        response?.status === 201
+                      ) {
+                        showToastMessage(t(successCreateMessage), 'success');
+                        // Close dialog
+                        setReassignModalOpen(false);
+                        setSelectedCenterIdReassign(null);
+                        setOriginalCenterIdReassign(null);
+                        setSelectedCenterListReassign(null);
+                        setSelectedBatchListReassign(null);
+                        setSelectedUserIdReassign(null);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        showToastMessage(
+                          response?.data?.params?.errmsg ||
+                            t(failureCreateMessage),
+                          'error'
+                        );
+                      }
+                  } catch (error) {
+                    console.error('Error creating cohort member:', error);
+                    showToastMessage(
+                      error?.response?.data?.params?.errmsg ||
+                        t(failureCreateMessage),
+                      'error'
+                    );
+                  } finally {
+                    setReassignInProgress(false);
+                  }
+                } else if (!selectedUserIdReassign) {
+                  showToastMessage('Please search and select a user', 'error');
+                } else {
+                  showToastMessage('Please select a center', 'error');
+                }
+              }}
+              disabled={
+                !selectedUserIdReassign || !selectedCenterIdReassign || isReassignInProgress
+              }
+            >
+              {t('COMMON.REASSIGN')}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Modal Dialog */}
+      <Dialog
+        open={editModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setSelectedUserIdEdit(null); // Reset user selection when dialog closes
+            setSelectedUserRow(null); // Reset user row selection when dialog closes
+            setIsEditInProgress(true);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Edit User as Instructor')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setEditModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Saving...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <EditSearchUser
+                onUserDetails={async(userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  if (selectedUserIdEdit) {
+                    setIsEditInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+  
+                      delete userData.email;
+  
+                      const object = {
+                        userData: userData,
+                        customFields: customFields,
+                      };
+  
+                      //update user details
+                      const updateUserResponse = await updateUser(selectedUserIdEdit, object);
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
+                      );
+  
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.status == 200
+                      ) {
+                        // getNotification(editableUserId, profileUpdateNotificationKey);
+                        showToastMessage(t(successUpdateMessage), 'success');
+                        // telemetryCallbacks(telemetryUpdateKey);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        // console.error('Error update user:', error);
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error creating cohort member:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureCreateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsEditInProgress(false);
+                      setEditModalOpen(false);
+                    }
+                  } else if (!selectedUserIdEdit) {
+                    showToastMessage('Please search and select a user', 'error');
+                  } else {
+                    showToastMessage('Please select a center', 'error');
+                  }
+                }}
+                selectedUserRow={selectedUserRow}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                userId={selectedUserIdEdit}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="instructor"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserIdEdit || isEditInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.SAVE')}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   );
 };

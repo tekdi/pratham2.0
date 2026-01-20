@@ -69,6 +69,7 @@ import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
 import MultipleCenterListWidgetNew from '@shared-lib-v2/MapUser/MultipleCenterListWidgetNew';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { updateUser } from '@/services/CreateUserService';
 import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
@@ -384,7 +385,9 @@ const UserLeader = () => {
       label: 'Center',
       render: (row: any) => {
         const centerList =
-          row?.cohortData?.map((item: any) => item?.centerName) || [];
+          row?.cohortData
+            ?.filter((item: any) => item?.cohortMember?.status === 'active' && item?.centerStatus === 'active')
+            ?.map((item: any) => item?.centerName) || [];
         return centerList.join(', ');
       },
     },
@@ -416,15 +419,11 @@ const UserLeader = () => {
         </Box>
       ),
       callback: (row) => {
-        // console.log('row:', row);
-        // console.log('AddSchema', addSchema);
-        // console.log('AddUISchema', addUiSchema);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        setPrefilledAddFormData(tempFormData);
-        setIsEdit(true);
-        setIsReassign(false);
-        setEditableUserId(row?.userId);
-        handleOpenModal();
+        setIsEditInProgress(true);
+        setEditModalOpen(true);
+        setSelectedUserIdEdit(row?.userId);
+        setSelectedUserRow(row);
+        setIsEditInProgress(false);
       },
       show: (row) => row.status !== 'archived',
     },
@@ -497,6 +496,7 @@ const UserLeader = () => {
           academicyearid: localStorage.getItem('academicYearId') || '',
         };
         const userId = row?.userId;
+        const cohortData = row?.cohortData;
         setSelectedUserIdReassign(userId);
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
         const response = await axios.get(apiUrl, { headers });
@@ -510,26 +510,40 @@ const UserLeader = () => {
           state.districts?.forEach((district) => {
             district.blocks?.forEach((block) => {
               block.centers?.forEach((center) => {
-                const centerObject = {
-                  value: center.centerId,
-                  label: center.centerName,
-                  state: state.stateName,
-                  district: district.districtName,
-                  block: block.blockName,
-                  village: null, // villageName might not exist in the structure
-                  stateId: state.stateId,
-                  districtId: district.districtId,
-                  blockId: block.blockId,
-                  villageId: null, // villageId might not exist in the structure
-                };
-                centerList.push(centerObject);
-                centerIdArray.push(center.centerId);
+                // Check if centerId exists in cohortData with active status
+                const cohortCenter = cohortData?.find(
+                  (item: any) => item?.centerId === center.centerId
+                );
+                const isActiveCenter =
+                  cohortCenter?.cohortMember?.status === 'active' && cohortCenter?.centerStatus === 'active';
+
+                // Only push if center has active cohortMember status
+                if (isActiveCenter) {
+                  const centerObject = {
+                    value: center.centerId,
+                    label: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  centerList.push(centerObject);
+                  centerIdArray.push(center.centerId);
+                }
               });
             });
           });
         });
-        setSelectedCenterIdReassign(centerIdArray.length > 0 ? centerIdArray : null);
-        setOriginalCenterIdReassign(centerIdArray.length > 0 ? centerIdArray : null);
+        setSelectedCenterIdReassign(
+          centerIdArray.length > 0 ? centerIdArray : null
+        );
+        setOriginalCenterIdReassign(
+          centerIdArray.length > 0 ? centerIdArray : null
+        );
         setSelectedCenterListReassign(centerList);
         setIsReassignModelProgress(false);
       },
@@ -653,6 +667,15 @@ const UserLeader = () => {
   >(null);
   const [isReassignInProgress, setReassignInProgress] = useState(false);
   const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
+
+  //edit modal variables
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<
+    string | null
+  >(null);
+  const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
+
   return (
     <>
       <Box display={'flex'} flexDirection={'column'} gap={2}>
@@ -1133,14 +1156,18 @@ const UserLeader = () => {
                   console.log('Creating with User ID:', selectedUserId);
                   console.log('Creating with Center ID (cohortId):', cohortId);
 
-                  const removedIds = originalCenterIdReassign?.filter((item: any) => !cohortId.includes(item));
+                  const removedIds = originalCenterIdReassign?.filter(
+                    (item: any) => !cohortId.includes(item)
+                  );
 
                   // Call the cohortmember/create API
                   const response = await bulkCreateCohortMembers({
                     userId: [selectedUserIdReassign],
                     cohortId: cohortId,
                     //add remove cohort id check
-                    ...(removedIds?.length > 0 ? { removeCohortId: removedIds } : {}),
+                    ...(removedIds?.length > 0
+                      ? { removeCohortId: removedIds }
+                      : {}),
                   });
 
                   if (
@@ -1173,7 +1200,7 @@ const UserLeader = () => {
                 } finally {
                   setReassignInProgress(false);
                 }
-              } else if (!selectedUserId) {
+              } else if (!selectedUserIdReassign) {
                 showToastMessage('Please search and select a user', 'error');
               } else {
                 showToastMessage('Please select a center', 'error');
@@ -1182,13 +1209,160 @@ const UserLeader = () => {
             disabled={
               !selectedUserIdReassign ||
               !selectedCenterIdReassign ||
-              isReassignInProgress 
+              isReassignInProgress
             }
           >
             {t('COMMON.REASSIGN')}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Edit Modal Dialog */}
+      <Dialog
+        open={editModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setSelectedUserIdEdit(null); // Reset user selection when dialog closes
+            setSelectedUserRow(null); // Reset user row selection when dialog closes
+            setIsEditInProgress(true);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Edit User as Leader')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setEditModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Saving...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <EditSearchUser
+                onUserDetails={async(userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  if (selectedUserIdEdit) {
+                    setIsEditInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+  
+                      delete userData.email;
+  
+                      const object = {
+                        userData: userData,
+                        customFields: customFields,
+                      };
+  
+                      //update user details
+                      const updateUserResponse = await updateUser(selectedUserIdEdit, object);
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
+                      );
+  
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.status == 200
+                      ) {
+                        // getNotification(editableUserId, profileUpdateNotificationKey);
+                        showToastMessage(t(successUpdateMessage), 'success');
+                        // telemetryCallbacks(telemetryUpdateKey);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        // console.error('Error update user:', error);
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error creating cohort member:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureCreateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsEditInProgress(false);
+                      setEditModalOpen(false);
+                    }
+                  } else if (!selectedUserIdEdit) {
+                    showToastMessage('Please search and select a user', 'error');
+                  } else {
+                    showToastMessage('Please select a center', 'error');
+                  }
+                }}
+                selectedUserRow={selectedUserRow}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                userId={selectedUserIdEdit}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="leader"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserIdEdit || isEditInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.SAVE')}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   );
 };
