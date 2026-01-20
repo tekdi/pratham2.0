@@ -118,6 +118,18 @@ export const readUserId = async (
   }
 };
 
+export const readUserIdTrue = async (
+  userId: string | string[]
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.userReadWithFieldTrue(userId)
+  try {
+    const response = await get(apiUrl);
+    return response?.data;
+  } catch (error) {
+    console.error('error in fetching user details', error);
+    return error;
+  }
+};
 
 export const sendNotification = async ({
   isQueue,
