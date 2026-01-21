@@ -168,7 +168,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           console.log('useInfo', useInfo?.result?.userData);
           setuserData(useInfo?.result?.userData);
           const mappedData = mapUserData(useInfo?.result?.userData);
-          console.log(mappedData);
+          
+          // console.log("responseFormForEnroll", responseFormForEnroll?.schema?.properties)
+          const keyNames = Object.keys(responseFormForEnroll?.schema?.properties);
+
+          
+          const filteredData = Object.fromEntries(
+            Object.entries(mappedData).filter(([key]) => keyNames.includes(key))
+          );
+          
           if (isUnderEighteen(useInfo?.result?.userData?.dob)) {
             delete responseForm?.schema.properties.mobile;
           }
@@ -182,8 +190,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             useInfo?.result?.userData
           );
           console.log(updatedSchema);
-
-          setUserFormData(mappedData);
+           if(enrolledProgram)
+          setUserFormData(filteredData);
+           else
+           setUserFormData(mappedData);
           //unit name is missing from required so handled from frotnend
           let alterSchema = enrolledProgram?responseFormForEnroll?.schema:completeProfile
             ? updatedSchema
@@ -239,6 +249,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           }
           setAddSchema(alterSchema);
           alterUISchema.mobile=responseForm?.uiSchema?.mobile
+          console.log("alterUISchema", alterUISchema);
           setAddUiSchema(alterUISchema);
         }
       } catch (error) {
@@ -249,7 +260,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
     };
     fetchData();
   }, []);
-
+console.log("addSchema", addSchema);
+console.log("addUiSchema", addUiSchema);
   const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
     const enhancedSchema = { ...uiSchema };
 
@@ -556,7 +568,7 @@ if(enrolledProgram && userTenantStatus){
                 parentDataSchema={parentDataSchema}
                 forEditedschema={responseFormData?.schema?.properties}
                 FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={completeProfile ? {} : userFormData}
+                prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
                 hideSubmit={true}
                 type="learner"
                 isCompleteProfile={completeProfile}

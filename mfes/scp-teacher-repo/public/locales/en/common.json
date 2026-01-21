@@ -144,7 +144,7 @@
     "DUPLICATED_USER": "Duplicated User",
     "RESIGNATION": "Resignation",
     "SUPPORT_REQUEST": "Support Request",
-    "WE_ARE_HERE_TO_HELP": "We're Here to Help",
+    "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "INSTALL": "Install Now",
     "INSTALL_APP_MESSAGE": "For Easy Access, Install the App Now",
@@ -166,7 +166,6 @@
     "BATCH_SESSIONS": "Batch Sessions",
     "NOT_ABLE_CREATE_LEARNER": "Not able to create learner",
     "NOT_ABLE_CREATE_FACILITATOR": "Not Able To Create Facilitator",
-    "SURE_REASSIGN_CENTER": "Are you sure you want to re-assign center of this user?",
     "LEARNER_CREATED_SUCCESSFULLY": "Leaner has been Successfully Created!",
     "FACILITATOR_COUNT": "Facilitators Total count: {{count}}",
     "LEARNER_COUNT": "Learners Total count: {{count}}",
@@ -175,13 +174,19 @@
     "BETWEEN": "Between {{lowerLimit}} - {{upperLimit}} %",
     "LESS_THAN": "Less than {{range}} %",
     "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance",
+    "SURE_REASSIGN_CENTER": "Are you sure you want to re-assign center of this user?",
+    "TEST_REPORT": "Test Report",
+    "REASSIGN_BLOCKS": "Reassign Blocks",
+    "SELECT_CENTER": "Select Center",
+    "NO_VILLAGES": "No Villages",
+    "ALL_VILLAGES": "All Villages",
+    "USERS_&VILLAGES": "Users & Villages",
     "NEW_BATCH": "New Batch",
     "REASSIGN_BATCH": "Re-assign Batch",
     "NOT_ABLE_UPDATE_FACILITATOR": "Not Able To Update Facilitator",
     "HI": "Hi, {{name}}",
     "FAQS": "FAQ's",
     "NEXT": "Next",
-    "SELECT_CENTER": "Select Center",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "Please select at least one batch",
     "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
     "PLEASE_SELECT_CENTER": "Please select a center"
@@ -204,7 +209,7 @@
     "NEW_PASSWORD": "New Password",
     "CONFIRM_NEW_PASSWORD": "Confirm New Password",
     "TROUBLE_LOGIN": "Trouble with logging in?",
-    "ENTER_USERNAME_TO_GET_LINK": "Enter your username, we'll send you a link to get back into your account.",
+    "ENTER_USERNAME_TO_GET_LINK": "Enter your username, we’ll send you a link to get back into your account.",
     "ENTER_USERNAME": "Enter Username",
     "BACK_TO_LOGIN": "Back to Login",
     "CREATE_STRONG_PASSWORD": "Create a strong password",
@@ -216,13 +221,14 @@
     "OTHER_SETTING": "Other settings",
     "WELCOME": "Welcome!",
     "PLEASE_RESET_YOUR_PASSWORD": "Please reset your password to ensure your account is secure",
-    "DO_IT_LATER": "I'll do it later",
+    "DO_IT_LATER": "I’ll do it later",
     "SUCCESSFULLY_RESET": "Your password has been successfully reset",
     "LINK_EXPIRED": "Link has been expired",
     "WE_SEND_AN_EMAIL": "We sent an email to {{maskEmail}} with a link to reset your password",
     "NO_USERNAME": "Username not found",
     "PASSWORD_SAME_AS_OLD": "Password same as old",
-    "CURRENT_PASSWORD_NOT": "Current Password Not Matched"
+    "CURRENT_PASSWORD_NOT": "Current Password Not Matched",
+    "learningResources2-app": "Learning Resources 2 App"
   },
   "DASHBOARD": {
     "DASHBOARD": "Dashboard",
@@ -261,7 +267,9 @@
     "USERS_&_VILLAGES": "Users & Villages",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
-    "SEARCH_VILLAGES": "Search Villages"
+    "SEARCH_VILLAGES": "Search Villages",
+    "BLOCK_AVERAGE_ATTENDANCE": "Block Average Attendance",
+    "USERS_&VILLAGES": "Users & Villages"
   },
   "ATTENDANCE": {
     "TOTAL_STUDENTS": "Total: {{count}}",
@@ -297,7 +305,8 @@
     "MANUAL_ATTENDANCE_INFO": "Attendance is usually auto-marked after the first session of the day. Use manual marking only for technical issues, sessions on other platforms, or if not conducted online.",
     "MANUAL_ATTENDANCE_NOTE": "Note: Manually marked attendance will override auto-attendance if it is later recorded.",
     "NO_BATCHES_ASSIGNED": "No Batches Assigned",
-    "ABSENT_STUDENTS": "Absent: {{count}}"
+    "ABSENT_STUDENTS": "Absent: {{count}}",
+    "N/A": "N/A"
   },
   "PROFILE": {
     "EDIT_PROFILE": "Edit Profile",
@@ -331,8 +340,8 @@
     "AT_REQUIRED_LETTER": "At least one letter or underscore is required",
     "ENTER_NUMBER": "Please enter a number",
     "ENTER_CHARACTER": "Please enter at least one character",
-    "CONTACT_NUMBER": "Phone Number",
-    "ENROLLMENT_NUMBER": "User Name",
+    "CONTACT_NUMBER": "Phone Number",   
+     "ENROLLMENT_NUMBER": "User Name",
     "SELECT_OPTION": "Select Option",
     "HINDI": "Hindi",
     "MOCK_TEST": "Mock Test",
@@ -352,7 +361,7 @@
     "STATE_NAME": "State Name",
     "SUPPORT_NEEDED": "Support needed",
     "CLASS": "Class (Last passed grade)",
-    "FATHER_NAME": "Father's Name",
+    "FATHER_NAME": "Father’s Name",
     "MARITAL_STATUS": "Marital Status",
     "OWN_PHONE_CHECK": "Does the Learner Own the Phone?",
     "PHONE_TYPE_AVAILABLE": "Type of Phone Available",
@@ -363,6 +372,8 @@
     "MONTH_MOBILISATION": "Month of Mobilisation",
     "DROP_OUT_REASON": "Reason for Drop Out From School",
     "NUMBER_OF_CLUSTERS_I_TEACH": "Number of Clusters I Teach",
+    "NO_OF_CLUSTERS": "Number of Clusters",
+    "SUBJECT_TAUGHT": "Subject Taught",
     "MY_MAIN_SUBJECTS": "My Main Subjects"
   },
   "DROPOUT_REASONS": {
@@ -378,7 +389,7 @@
     "SCHOOL_ADMISSION": "School admission"
   },
   "GUIDE_TOUR": {
-    "STEP_1": "Welcome! Let's take a quick tour to understand the key features that will help you with your daily tasks.",
+    "STEP_1": "Welcome! Let’s take a quick tour to understand the key features that will help you with your daily tasks.",
     "STEP_2": "This section provides a quick overview of attendance trends to help you spot key insights for each center. You can mark attendance, check daily attendance percentages, and modify previous attendance for the last 7 days.",
     "STEP_3": "Access the full calendar to track learners' attendance for any month and see who was present or absent each day.",
     "STEP_4": "Use this button to view a detailed overview of center attendance and see a list of learners categorized by low, average, and good attendance for any custom date range.",
@@ -389,9 +400,9 @@
     "SKIP": "Skip",
     "STEP_7": "Access your teaching centers and manage tasks like adding, editing, or removing learners, marking dropouts, and reassigning centers or blocks. You can also easily schedule online or offline sessions for your subjects.",
     "STEP_8": "Fill out surveys for individual learners, facilitators, or centers within their due date",
-    "STEP_9": "Access the full academic year's course plan for each subject, along with resources like videos and documents for every topic. Track your teaching progress by updating topic completion status.",
+    "STEP_9": "Access the full academic year’s course plan for each subject, along with resources like videos and documents for every topic. Track your teaching progress by updating topic completion status.",
     "STEP_10": "View detailed scores and summaries of Pre and Post tests for each learner. Track which students have completed, are in progress or yet to start the test.",
-    "STEP_11": "Track and update each learner's board exam enrollment status",
+    "STEP_11": "Track and update each learner’s board exam enrollment status",
     "FINISH": "Finish",
     "LEARN_HOW_TO_USE": "Learn How to Use",
     "STEP_12": "Whenever you run into a problem while using the app, raise a support request by describing the problem and adding screenshots or attachments. Our team will review and take action."
@@ -457,7 +468,7 @@
     "TOPIC": "Topic",
     "SUBTOPIC": "Sub Topic",
     "FACILITATORS": "Facilitators Prepare",
-    "LEARNERS": "Learners Prepare",
+"LEARNERS": "Learners Prepare",
     "DELETE_SESSION": "Delete Session",
     "SCHEDULE": "Schedule",
     "PLANNED_SESSIONS": "Planned Sessions",
@@ -488,7 +499,7 @@
     "TOPIC_SUBTOPIC_ADDED_SUCCESSFULLY": "Topic and Subtopic added successfully!",
     "TOPIC_SUBTOPIC_REMOVED_SUCCESSFULLY": "Topic and Subtopic removed successfully!",
     "FACILITATOR_REQUISITES": "Facilitator's Requisites",
-    "PREREQUISITES": "Prepare",
+   "PREREQUISITES": "Prepare",
     "POST_REQUISITES": "Practice",
     "DURING_COURSE": "Learn",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "Can not select topic and subtopic as event is already passed or live.",
@@ -519,7 +530,9 @@
     "END_TIME_ERROR": "End time cannot be earlier than start time",
     "START_DATE_ERROR": "Start date cannot be later than end date",
     "END_DATE_ERROR": "End date cannot be earlier than start date",
-    "DELETE_THIS_SESSION": "Delete this session"
+    "DELETE_THIS_SESSION": "Delete this session",
+    "LEARNER_PREREQUISITES": "Learner Prerequisites",
+    "LEARNER_POSTREQUISITES": "Learner Postrequisites"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "Center requested successfully",
@@ -586,7 +599,7 @@
     "STATE_NAME": "State Name",
     "SUPPORT_NEEDED": "Support needed",
     "CLASS": "Class (Last passed grade)",
-    "FATHER_NAME": "Father's Name",
+    "FATHER_NAME": "Father’s Name",
     "MARITAL_STATUS": "Marital Status",
     "OWN_PHONE_CHECK": "Does the Learner Own the Phone?",
     "PHONE_TYPE_AVAILABLE": "Type of Phone Available",
@@ -638,6 +651,9 @@
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate",
     "REASON_FOR_DROP_OUT_FROM_SCHOOL": "Reason for drop out from School",
+    "NO_OF_CLUSTERS": "Number of Clusters",
+    "MAIN_SUBJECT": "Main Subject",
+    "SUBJECT_TAUGHT": "Subject Taught",
     "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
     "CENTER": "Center",
     "BATCH": "Batch",
@@ -699,13 +715,11 @@
     "COURSE_TYPE": "Course Type",
     "SUBTOPICS_SELECTED": "subtopics selected",
     "NO_RESOURCES_FOUND": "No resources found",
-    "INVALID_RESOURCE": "Invalid Resource"
+    "INVALID_RESOURCE": "Invalid Resource",
+    "COURSE_PLANNER_NOT_AVAILABLE": "Course Planner Not Available\n"
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "Assessments",
-    "AI_ASSESSMENT": "AI Assessment",
-    "ASSESSMENT_LIST": "Assessment List",
-    "AI_ASSESSMENT_LIST": "AI Assessment List",
     "CENTER": "Center",
     "ASSESSMENT_TYPE": "Assessment Type",
     "COMPLETED_THE_ASSESSMENT": "completed the assessment",
@@ -715,6 +729,7 @@
     "SEARCH_STUDENT": "Search student",
     "NO_ASSESSMENTS_FOUND": "No assessments found",
     "ASSESSMENTS_FOUND": "{{count}} assessment found",
+
     "ASSESSMENT_STATUS": "Assessment Status",
     "NOT_STARTED": "Not Started",
     "IN_PROGRESS": "In Progress",
@@ -722,11 +737,14 @@
     "MARKS_OBTAINED": "Marks Obtained",
     "OVERALL_SCORE": "Overall Score",
     "ASSESSMENT_NOT_STARTED_YET": "Assessment not started yet",
-    "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} out of {{totalCount}} completed",
     "NO_SUBTOPIC_SELECTED": "No Subtopic selected",
     "NO_SUBJECT_FOUND": "No Subject found",
     "NO_ASSIGNED": "No assigned",
     "OUT_OF": "Out of",
+    "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} out of {{totalCount}} completed",
+    "AI_ASSESSMENT": "AI Assessment",
+    "ASSESSMENT_LIST": "Assessment List",
+    "AI_ASSESSMENT_LIST": "AI Assessment List",
     "ASSESSMENT_DETAILS": "Assessment Details",
     "MID_TERM_EXAM": "Mid Term Exam",
     "MATHEMATICS_ASSESSMENT": "Mathematics Assessment - Algebra & Geometry",
@@ -771,6 +789,7 @@
     "BOARD_ENROLLMENT_NUMBER": "Board Enrollment Number",
     "EXAM_FEES_PAID": "Exam Fees Paid?",
     "SAVE_AND_NEXT": "\"Save & Next\" to save your progress. You can come back and change it anytime.",
+    "TO_SAVE_YOUR_PROGRESS": "“Save & Next” to save your progress. You can come back and change it anytime.",
     "MANDATORY": "Mandatory for {{FeesStepBoards}} only. For other Boards, this step is automatically marked completed. Please click on Save to submit the data.",
     "COMPLETED": "Completed",
     "MARK_AS_COMPLETE": "Mark as Complete",
@@ -783,7 +802,8 @@
     "EDIT": "Edit",
     "SURE_GO_BACK": "Are you sure you want to go back? Your progress might be lost.",
     "FILTER_BY_CURRENT_STAGES": "Filter by Current Stages",
-    "SUBJECTS_ENROLLED": "Subjects Enrolled"
+    "SUBJECTS_ENROLLED": "Subjects Enrolled",
+    "REGISTRATION_COMPLETED": "Registration completed"
   },
   "OBSERVATION": {
     "OBSERVATION_START": "Start Survey",
@@ -848,8 +868,9 @@
     "SELECT_DISTRICT": "Select District",
     "SELECT": "Select",
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
-    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on 'Finish'.",
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
+
   },
   "SURVEYS": {
     "SURVEYS": "Surveys",
@@ -902,7 +923,6 @@
   "last_name": "Last Name",
   "dob": "Date of Birth",
   "WHATS_YOUR_GENDER": "Gender",
-  "WORKING_STATE": "Working State",
   "Male": "Male",
   "Female": "Female",
   "Transgender": "Transgender",
@@ -959,22 +979,25 @@
   "SELF_EMPLOYMENT": "Self-employment",
   "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
   "YOUTHNET_SURVEY": {
-    "SURVEY": "Surveys",
     "NEW_SURVEY": "New Survey",
     "ASSIGN_VOLUNTEERS_NOW": "Assign Volunteers Now",
     "REMIND_ME_LATER": "Remind Me Later",
     "NEW_SURVEY_HAS_BEEN_ADDED": "A new survey '{{surveyName}}' has been added and has been assigned to {{villageCount}} villages",
-    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey"
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "Assign Volunteers to ensure they can access the survey",
+    "SURVEY": "Surveys"
   },
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "Villages Managed by you : {{totalVillageCount}}",
-    "MANAGES": "Manages",
     "VILLAGES": "Villages",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "Monthly Registrations Overview",
     "CLOSED_ON": "Closed on",
+    "MANAGES": "Manages",
     "ABOVE_18": "Over 18 Registrations",
     "BELOW_18": "Under 18 Registrations",
-    "VLLAGE_18": "Today's New Registrations"
+    "VLLAGE": "गाव",
+    "YOUTH_VOLUNTEERS": "Youth / Volunteer",
+    "VILLAGES_AND_YOUTH": "Village and Youth",
+     "VLLAGE_18": "Today's New Registrations"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "Entries",
@@ -984,17 +1007,33 @@
     "SUBMISSION": "Submission",
     "SUMMARY": "Summary"
   },
-  "BATCH": {
-    "NEW_BATCH": "New Batch",
-    "UPDATE_BATCH": "Update Batch",
-    "SURE_DELETE_BATCH": "Are you sure you want to delete",
-    "BATCH_UPDATE_SUCCESSFULLY": "Batch has been successfully updated",
-    "BATCH_DELETE_SUCCESSFULLY": "Batch has been successfully deleted",
-    "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
-    "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
-    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
-    "NO_BATCH_FOUND": "No Batch Found",
-    "BATCH_CREATE_FAILED": "Something went wrong while creating batch"
+  "YOUTHNET_PROFILE": {
+    "MY_PROFILE": "My Profile",
+    "ACTIVITIES_CONDUCTED": "Activities Conducted",
+    "PROFILE_DETAILS": "Profile Details",
+    "FULL_NAME": "Full Name",
+    "EMAIL_ID": "Email ID",
+    "STATE_DISTRICT_BLOCK": "State / District / Block",
+    "DESIGNATION": "Designation",
+    "JOINED_ON": "Joined On",
+    "PHONE_NUMBER": "Phone Number",
+    "MENTOR_ID": "Mentor ID",
+    "GENDER": "Gender",
+    "AGE": "Age"
+  },
+  "YOUTHNET": {
+    "SURVEY": "Survey",
+    "DASHBOARD": "Dashboard"
+  },
+  "VOLUNTEERLIST": {
+    "ENTRIES": "Entries",
+    "VOLUNTEERS_ASSIGNED": "Volunteers Assigned"
+  },
+  "YOUTHNET_DASHlBOARD": {
+    "MANAGES": "Manages",
+    "ABOVE_18": "Above 18",
+    "BELOW_18": "Below 18",
+    "VLLAGE_18": "Village (18+)"
   },
   "WHAT_IS_YOUR_PRIMARY_WORK": "What is Your Primary Work?",
   "STATE": "State",
@@ -1004,6 +1043,17 @@
   "BOARD": "Board",
   "MEDIUM": "Medium",
   "GRADE": "Grade",
+  "BATCH": {
+    "NEW_BATCH": "New Batch",
+    "UPDATE_BATCH": "Update Batch",
+    "SURE_DELETE_BATCH": "Are you sure you want to delete",
+    "BATCH_UPDATE_SUCCESSFULLY": "Batch has been successfully updated",
+    "BATCH_DELETE_SUCCESSFULLY": "Batch has been successfully deleted",
+    "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
+    "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
+    "NO_BATCH_FOUND": "No Batch Found"
+  },
   "AI": {
     "ASSESSMENT_DETAILS": "Assessment Details",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "Sample Answer Sheet",
