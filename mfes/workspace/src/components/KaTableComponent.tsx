@@ -24,7 +24,8 @@ import QrModal from './QrModal';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { table } from 'console';
 import Checkbox from '@mui/material/Checkbox';
-import { TENANT_DATA } from '@workspace/utils/app.constant';
+import { Role, TENANT_DATA } from '@workspace/utils/app.constant';
+import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
 
 interface CustomTableProps {
   data: any[]; // Define a more specific type for your data if needed
@@ -126,7 +127,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         mode =
           content?.status === 'Draft' || content?.status === 'Live'
             ? 'edit'
-            : 'review';
+            : getLocalStoredUserRole() === Role.SCTA ? 'read' : 'review';
         break;
 
       default:
