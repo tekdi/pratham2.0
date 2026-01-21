@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -194,6 +195,26 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [TotalCount, setTotalCount] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
   const [allFacilitatorsData, setAllFacilitatorsData] = useState<any>([]);
+
+  //reassign modal variables
+  // const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [selectedCenterIdReassign, setSelectedCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [originalCenterIdReassign, setOriginalCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [selectedCenterListReassign, setSelectedCenterListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedBatchListReassign, setSelectedBatchListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedUserIdReassign, setSelectedUserIdReassign] = useState<
+    string | null
+  >(null);
+  const [isReassignInProgress, setReassignInProgress] = useState(false);
+  const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
 
   useEffect(() => {
     if (reloadState) {
@@ -416,6 +437,26 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     });
   };
 
+  // Helper function to transform cohorts array into cohortData format
+  const transformCohortsToCohortData = (cohorts: any[]): any[] => {
+    if (!cohorts || !Array.isArray(cohorts)) {
+      return [];
+    }
+
+    return cohorts.map((cohort: any) => ({
+      centerId: cohort.parentId || null,
+      centerName: null,
+      centerStatus: 'active',
+      batchId: cohort.cohortId || null,
+      batchName: cohort.cohortName || null,
+      batchStatus: cohort.cohortStatus || null,
+      cohortMember: {
+        status: cohort.cohortMemberStatus || null,
+        membershipId: cohort.cohortMembershipId || null,
+      },
+    }));
+  };
+
   useEffect(() => {
     const getFacilitator = async () => {
       if (!isMobile) {
@@ -514,6 +555,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             (user: any, index: number) => {
               const cohorts = cohortDetails[index] || [];
 
+
+
               const batches = cohorts.flatMap((cohort: any) =>
                 (cohort.childData || []).filter(
                   (child: any) => child.type === 'BATCH'
@@ -546,10 +589,12 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 cohortNames: cohortNames || null,
                 batchNames: batchNames || null,
                 customFields: user?.customFields,
+                cohorts: cohorts,
               };
             }
           );
 
+          console.log('##############ddffdfdf extractedData', extractedData);
           setUsers(extractedData);
           // setLoading(false);
           if (isMobile) {
@@ -649,9 +694,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
               cohortNames: cohortNames || null,
               batchNames: batchNames || null,
               customFields: user?.customField,
+              cohorts: cohorts,
             };
           }
         );
+        console.log('##############ddffdfdf extractedData', extractedData);
         setFilteredUsers(extractedData);
       }
     };
@@ -764,48 +811,99 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         ? teacherUserId
         : selectedUser?.userId;
 
-      const matchingUser = allFacilitatorsData?.find(
-        (user) => user.userId === reassignuserId
-      );
-      console.log('****userlist', users);
-      console.log('****reassignuserId', reassignuserId);
-      setSelectedUserData(matchingUser);
-      console.log('$$$$$$$', matchingUser);
-      setReassignFacilitatorUserId(
-        isFromFLProfile ? teacherUserId : selectedUser?.userId
-      );
+      //reassign data fetch code
 
-      const fetchCohortList = async () => {
-        if (!selectedUser?.userId) {
-          console.warn('User ID is undefined');
-          return;
-        }
-
-        try {
-          const cohortList = await getCohortList(
-            isFromFLProfile ? teacherUserId ?? '' : selectedUser.userId
-          );
-          if (cohortList && cohortList?.length > 0) {
-            const cohortDetails = cohortList?.map(
-              (cohort: {
-                cohortName: any;
-                cohortId: any;
-                cohortStatus: any;
-              }) => ({
-                name: cohort?.cohortName,
-                id: cohort?.cohortId,
-                status: cohort?.cohortStatus,
-              })
-            );
-            setReassignCohortNames(cohortDetails);
-          }
-        } catch (error) {
-          console.error('Error fetching cohort list:', error);
-        }
-      };
-
-      fetchCohortList();
       setReassignModalOpen(true);
+      setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+      setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+      setSelectedCenterListReassign([]); // Reset center list when dialog closes
+      setSelectedBatchListReassign([]); // Reset batch list when dialog closes
+      setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+      setIsReassignModelProgress(true);
+
+      //load prefilled value
+      //call geographical data api
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/plain, */*',
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+      const userId = reassignuserId;
+      // Transform cohorts to cohortData format
+      const cohortData = selectedUser?.cohorts
+        ? transformCohortsToCohortData(selectedUser.cohorts)
+        : [];
+      setSelectedUserIdReassign(userId);
+      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
+      const response = await axios.get(apiUrl, { headers });
+      const geographicalData = response?.data?.result || [];
+
+      // Transform geographicalData into centerList
+      const centerList = [];
+      const batchList = [];
+      const centerIdArray = [];
+
+      geographicalData.forEach((state) => {
+        state.districts?.forEach((district) => {
+          district.blocks?.forEach((block) => {
+            block.centers?.forEach((center) => {
+              center.batches?.forEach((batch) => {
+              // Check if centerId exists in cohortData with active status
+              const cohortCenterBatch = cohortData?.find(
+                (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
+              );
+              const isActiveCenterBatch =
+              cohortCenterBatch?.cohortMember?.status === 'active' && cohortCenterBatch?.centerStatus === 'active' && cohortCenterBatch?.batchStatus === 'active';
+
+              // Only push if center has active cohortMember status
+              if (isActiveCenterBatch) {
+                const centerObject = {
+                  value: center.centerId,
+                  label: center.centerName,
+                  state: state.stateName,
+                  district: district.districtName,
+                  block: block.blockName,
+                  village: null, // villageName might not exist in the structure
+                  stateId: state.stateId,
+                  districtId: district.districtId,
+                  blockId: block.blockId,
+                  villageId: null, // villageId might not exist in the structure
+                };
+                centerList.push(centerObject);
+                const centerBatchObject = {
+                  id: batch.batchId,
+                  name: batch.batchName,
+                  centerId: center.centerId,
+                  centerName: center.centerName,
+                  state: state.stateName,
+                  district: district.districtName,
+                  block: block.blockName,
+                  village: null, // villageName might not exist in the structure
+                  stateId: state.stateId,
+                  districtId: district.districtId,
+                  blockId: block.blockId,
+                  villageId: null, // villageId might not exist in the structure
+                };
+                batchList.push(centerBatchObject);
+                centerIdArray.push(batch.batchId);
+              }
+              });
+            });
+          });
+        });
+      });
+      setSelectedCenterIdReassign(
+        centerIdArray.length > 0 ? centerIdArray : null
+      );
+      setOriginalCenterIdReassign(
+        centerIdArray.length > 0 ? centerIdArray : null
+      );
+      setSelectedCenterListReassign(centerList);
+      setSelectedBatchListReassign(batchList);
+      setIsReassignModelProgress(false);
+
       const telemetryInteract = {
         context: {
           env: 'teaching-center',
@@ -819,7 +917,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         },
       };
       telemetryFactory.interact(telemetryInteract);
-      setReloadState(true);
     }
     if (name === 'reassign-centers') {
       setOpenCentersModal(true);
@@ -1554,18 +1651,199 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
             {reassignModalOpen && (
               //TODO: Add new reassign popup here
-              <FacilitatorManage
-                open={reassignModalOpen}
-                onClose={handleCloseReassignModal}
-                isReassign={true}
-                reassignuserId={
-                  isFromFLProfile ? teacherUserId : selectedUser?.userId
-                }
-                selectedUserData={
-                  isFromCenterDetailPage ? selectedUser : selectedUserData
-                }
-                // onFacilitatorAdded={handleFacilitatorAdded}
+              //new reassign flow
+
+      
+      <Dialog
+        open={reassignModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setReassignModalOpen(false);
+            setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+            setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+            setSelectedCenterListReassign(null); // Reset center list selection when dialog closes
+            setSelectedBatchListReassign(null); // Reset batch selection when dialog closes
+            setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('Reassign Instructor to Batch')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setReassignModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+        {isReassignModelProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '150px',
+                }}
+              >
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('Loading...')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <LMPMultipleBatchListWidget
+                value={selectedCenterIdReassign}
+                onChange={(centerId) => {
+                  setSelectedCenterIdReassign(centerId);
+                  console.log('Selected Center ID:', centerId);
+                }}
+                onCenterList={(centerList) => {
+                  setSelectedCenterListReassign(centerList || []);
+                  console.log('############# centerList', centerList);
+                }}
+                selectedCenterList={selectedCenterListReassign}
+                onBatchList={(batchList) => {
+                  setSelectedBatchListReassign(batchList || []);
+                  console.log('############# batchList', batchList);
+                }}
+                selectedBatchList={selectedBatchListReassign}
+                label="Select Batch"
+                required={true}
+                multiple={false}
+                centerIds={myCenterIds}
+                centerList={myCenterList}
               />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={async () => {
+                if (selectedUserIdReassign && selectedCenterIdReassign) {
+                  setReassignInProgress(true);
+                  try {
+                      //map user to tenant
+                      // Extract all batch IDs from the nested structure
+                      const batchIds = extractBatchIds(selectedCenterIdReassign);
+
+                      console.log('Creating with User ID:', selectedUserIdReassign);
+                      console.log('Extracted Batch IDs:', batchIds);
+
+                      if (batchIds.length === 0) {
+                        showToastMessage(
+                          'Please select at least one batch',
+                          'error'
+                        );
+                        setReassignInProgress(false);
+                        return;
+                      }
+
+
+                  const removedIds = originalCenterIdReassign?.filter(
+                    (item: any) => !batchIds.includes(item)
+                  );
+
+                      // Call the cohortmember/create API with extracted batch IDs
+                      const response = await bulkCreateCohortMembers({
+                        userId: [selectedUserIdReassign],
+                        cohortId: batchIds,
+                        //add remove cohort id check
+                        ...(removedIds?.length > 0
+                          ? { removeCohortId: removedIds }
+                          : {}),
+                      });
+
+                      if (
+                        response?.responseCode === 201 ||
+                        response?.data?.responseCode === 201 ||
+                        response?.status === 201
+                      ) {
+                        showToastMessage(t(successCreateMessage), 'success');
+                        // Close dialog
+                        setReassignModalOpen(false);
+                        setSelectedCenterIdReassign(null);
+                        setOriginalCenterIdReassign(null);
+                        setSelectedCenterListReassign(null);
+                        setSelectedBatchListReassign(null);
+                        setSelectedUserIdReassign(null);
+                        // Refresh the data
+                        searchData(prefilledFormData, 0);
+                      } else {
+                        showToastMessage(
+                          response?.data?.params?.errmsg ||
+                            t(failureCreateMessage),
+                          'error'
+                        );
+                      }
+                  } catch (error) {
+                    console.error('Error creating cohort member:', error);
+                    showToastMessage(
+                      error?.response?.data?.params?.errmsg ||
+                        t(failureCreateMessage),
+                      'error'
+                    );
+                  } finally {
+                    setReassignInProgress(false);
+                  }
+                } else if (!selectedUserIdReassign) {
+                  showToastMessage('Please search and select a user', 'error');
+                } else {
+                  showToastMessage('Please select a center', 'error');
+                }
+              }}
+              disabled={
+                !selectedUserIdReassign || !selectedCenterIdReassign || isReassignInProgress
+              }
+            >
+              {t('COMMON.REASSIGN')}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
+
+              // <FacilitatorManage
+              //   open={reassignModalOpen}
+              //   onClose={handleCloseReassignModal}
+              //   isReassign={true}
+              //   reassignuserId={
+              //     isFromFLProfile ? teacherUserId : selectedUser?.userId
+              //   }
+              //   selectedUserData={
+              //     isFromCenterDetailPage ? selectedUser : selectedUserData
+              //   }
+              //   // onFacilitatorAdded={handleFacilitatorAdded}
+              // />
 
               //Old Reassign flow
               // <ReassignModal
@@ -1579,6 +1857,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
               //   buttonNames={{ primary: t('COMMON.SAVE') }}
               //   selectedUser={selectedUser}
               // />
+
             )}
 
             {openDeleteUserModal && (
