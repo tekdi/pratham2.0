@@ -166,7 +166,6 @@
     "BATCH_SESSIONS": "બેચ સત્રો",
     "NOT_ABLE_CREATE_LEARNER": "શીખનાર બનાવવામાં અસમર્થ",
     "NOT_ABLE_CREATE_FACILITATOR": "સુવિધાકર્તા બનાવવામાં અસમર્થ",
-    "SURE_REASSIGN_CENTER": "શું તમે ખરેખર આ વપરાશકર્તાનું કેન્દ્ર ફરીથી સોંપવા માંગો છો?",
     "LEARNER_CREATED_SUCCESSFULLY": "લર્નર  સફળતાપૂર્વક બનાવવામાં આવ્યું છે",
     "FACILITATOR_COUNT": "સુવિધાકર્તાઓ કુલ સંખ્યા: {{count}}",
     "LEARNER_COUNT": "શીખનારાઓ કુલ સંખ્યા: {{count}}",
@@ -175,11 +174,18 @@
     "BETWEEN": "{{lowerLimit}} - {{upperLimit}} % ની વચ્ચે",
     "LESS_THAN": "{{range}} % કરતા ઓછો",
     "MODIFY_CENTER_ATTENDANCE": "કેન્દ્ર હાજરીમાં ફેરફાર કરો",
+    "SURE_REASSIGN_CENTER": "શું તમે ખરેખર આ વપરાશકર્તાનું કેન્દ્ર ફરીથી સોંપવા માંગો છો?",
     "TEST_REPORT": "ટેસ્ટ રિપોર્ટ",
     "REASSIGN_BLOCKS": "સેન્ટર્સ ઉમેરો અથવા ફરીથી સોંપો",
-    "NO_VILLAGES": "કોઈ ગામડા નથી",
-    "ALL_VILLAGES": "બધા ગામડાઓ",
-    "USERS_&VILLAGES": "વપરાશકર્તાઓ અને ગામો"
+    "SELECT_CENTER": "સેન્ટર પસંદ કરો",
+    "NO_VILLAGES": "કોઈ ગામ નથી",
+    "ALL_VILLAGES": "બધા ગામ",
+    "USERS_&VILLAGES": "વપરાશકર્તાઓ અને ગામો",
+    "NEW_BATCH": "નવો બેચ",
+    "REASSIGN_BATCH": "બેચ ફરીથી નિયુક્ત કરો",
+    "NOT_ABLE_UPDATE_FACILITATOR": "ફેસિલિટેટર અપડેટ થઈ શકતા નથી",
+    "HI": "નમસ્તે, {{name}}",
+    "FAQS": "વારંવાર પૂછાતા પ્રશ્નો (FAQ's)"
   },
   "LOGIN_PAGE": {
     "USERNAME": "વપરાશકર્તા નામ",
@@ -254,10 +260,11 @@
     "BLOCK": "બ્લોક",
     "ATTENDANCE": "હાજરી (%)",
     "VILLAGES_AND_YOUTH": "ગામો અને યુવાનો",
+    "USERS_&_VILLAGES": "\tવપરાશકર્તાઓ અને ગામો",
     "VILLAGES": "ગામો",
     "YOUTH_VOLUNTEERS": "યુવા/સ્વયંસેવકો",
     "SEARCH_VILLAGES": "ગામો શોધો",
-    "BLOCK_AVERAGE_ATTENDANCE": "બ્લોક સરેરાશ હાજરી",
+    "BLOCK_AVERAGE_ATTENDANCE": "બ્લોકની સરેરાશ હાજરી",
     "USERS_&VILLAGES": "વપરાશકર્તાઓ અને ગામો"
   },
   "ATTENDANCE": {
@@ -294,6 +301,7 @@
     "MANUAL_ATTENDANCE_INFO": "હાજરી સામાન્ય રીતે દિવસના પ્રથમ સત્ર પછી આપમેળે ચિહ્નિત થાય છે. મેન્યુઅલ માર્કિંગનો ઉપયોગ ફક્ત ટેકનિકલ સમસ્યાઓ, અન્ય પ્લેટફોર્મ પર સત્રો, અથવા ઓનલાઇન ન યોજાયેલ હોય ત્યારે જ કરો.",
     "MANUAL_ATTENDANCE_NOTE": "નોંધ: મેન્યુઅલી ચિહ્નિત હાજરી આપમેળે હાજરીને ઓવરરાઇડ કરશે જો તે પછીથી નોંધાય.",
     "NO_BATCHES_ASSIGNED": "કોઈ બેચ નિયુક્ત નથી",
+    "ABSENT_STUDENTS": "ગેરહાજર લર્નર {{count}}",
     "N/A": "N/A"
   },
   "PROFILE": {
@@ -358,8 +366,9 @@
     "MONTH_MOBILISATION": "મોબીલાઈઝેશન નો મહિનો",
     "DROP_OUT_REASON": "સ્કૂલ માંથી ડ્રોપઆઉટ થવાનું કારણ",
     "NUMBER_OF_CLUSTERS_I_TEACH": "મારા દ્વારા શિખવેલ ક્લસ્ટરોની સંખ્યા",
-    "NO_OF_CLUSTERS": "મેં ભણાવેલ ક્લસ્ટર ની સંખ્યા",
-    "SUBJECT_TAUGHT": "મારો ભણાવેલ વિષય"
+    "NO_OF_CLUSTERS": "મારા ધ્વારા ભણાવવામાં આવતા ક્લસ્ટર ની સંખ્યા",
+    "SUBJECT_TAUGHT": "મારા દ્વારા ભણાવવામાં આવતો વિષય",
+    "MY_MAIN_SUBJECTS": "મારા મુખ્ય વિષયો"
   },
   "DROPOUT_REASONS": {
     "UNABLE_TO_COPE_WITH_STUDIES": "અભ્યાસનો સામનો કરવામાં અસમર્થ",
@@ -389,7 +398,8 @@
     "STEP_10": "દરેક શીખનાર માટે પૂર્વ અને પોસ્ટ પરીક્ષણોના વિગતવાર સ્કોર્સ અને સારાંશ જુઓ. કયા વિદ્યાર્થીઓએ પરીક્ષા પૂર્ણ કરી છે, પ્રગતિમાં છે અથવા હજુ સુધી શરૂ કરવાની બાકી છે તે ટ્રૅક કરો.",
     "STEP_11": "દરેક શીખનારની બોર્ડ પરીક્ષા નોંધણી સ્થિતિને ટ્રૅક કરો અને અપડેટ કરો",
     "FINISH": "સમાપ્ત કરો",
-    "LEARN_HOW_TO_USE": "કેવી રીતે ઉપયોગ કરવો તે જાણો"
+    "LEARN_HOW_TO_USE": "કેવી રીતે ઉપયોગ કરવો તે જાણો",
+    "STEP_12": "જ્યારે તમે એપ્લિકેશનનો ઉપયોગ કરતી વખતે કોઈ સમસ્યાનો સામનો કરો, ત્યારે કૃપા કરીને સમસ્યાનું વર્ણન કરો અને સ્ક્રીનશૉટ અથવા અન્ય અટેચમેન્ટ સાથે સપોર્ટ રિક્વેસ્ટ મોકલો. અમારી ટીમ સમીક્ષા કરીને જરૂરી પગલાં ભરશે"
   },
   "BLOCKS": {
     "TEACHING_BLOCKS": "ટીચિંગ બ્લોકસ",
@@ -506,16 +516,16 @@
     "NOTSTARTED": "શરૂ નથી",
     "START_DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "પ્રારંભ તારીખ આજે અથવા ભવિષ્યની તારીખ હોવી જોઈએ",
     "DATE_MUST_BE_TODAY_OR_FUTURE_DATE": "તારીખ આજે અથવા ભવિષ્યની તારીખ હોવી જોઈએ",
-    "TITLE": "શીર્ષક  ",
+    "TITLE": "શીર્ષક",
     "COURSE_PLANNER_NOT_AVAILABLE": "કોર્સ પ્લાનર હજુ સુધી {{વિષય}} માટે અપલોડ કરવામાં આવ્યો નથી!",
     "BOARD_MEDIUM_GRADE_NOT_ASSIGNED": "બોર્ડ, મધ્યમ, ગ્રેડ સેન્ટર ને  સોંપવામાં આવ્યા નથી.",
     "START_TIME_ERROR": "પ્રારંભ સમય સમાપ્તિ સમય કરતાં પાછળનો ન હોઈ શકે.",
     "END_TIME_ERROR": "સમાપ્તિ સમય પ્રારંભ સમય કરતાં વહેલો ન હોઈ શકે",
     "START_DATE_ERROR": "પ્રારંભ તારીખ સમાપ્તિ તારીખ કરતાં પાછળની ન હોઈ શકે",
     "END_DATE_ERROR": "સમાપ્તિ તારીખ પ્રારંભ તારીખ કરતા પહેલાની ન હોઈ શકે",
+    "DELETE_THIS_SESSION": "આ સત્ર કાઢી નાખો",
     "LEARNER_PREREQUISITES": "લર્નર ની પૂર્વજરૂરીયાતો",
-    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા",
-    "DELETE_THIS_SESSION": "આ સત્ર કાઢી નાખો"
+    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "સેન્ટર એ સફળતાપૂર્વક વિનંતી કરી",
@@ -636,7 +646,10 @@
     "REASON_FOR_DROP_OUT_FROM_SCHOOL": "શાળા છોડવાનું કારણ",
     "NO_OF_CLUSTERS": "મારા દ્વારા શીખવવામાં આવેલ ક્લસ્ટરોની સંખ્યા",
     "MAIN_SUBJECT": "મારા મુખ્ય વિષયો",
-    "SUBJECT_TAUGHT": "મારા દ્વારા શિખવેલ વિષયો"
+    "SUBJECT_TAUGHT": "મારા દ્વારા શિખવેલ વિષયો",
+    "WHAT_IS_YOUR_PRIMARY_WORK": "તમારું મુખ્ય કાર્ય શું છે?",
+    "CENTER": "સેન્ટર",
+    "BATCH": "બેચ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઇનપુટ.",
@@ -659,7 +672,7 @@
     "DATE_MUST_BE_ON_OR_AFTER": "તારીખ {{date}} ના રોજ અથવા તે પછી હોવી જોઈએ"
   },
   "COURSE_PLANNER": {
-    "COURSE_PLANNER": "કોર્ષ પ્લાન",
+    "COURSE_PLANNER": "પાઠ્યક્રમ યોજના",
     "FOUNDATION_COURSE": "ફાઉન્ડેશન કોર્ષ",
     "MAIN_COURSE": "મેન કોર્ષ",
     "COLLAPSE_ALL": "બધાને સંકુચિત કરો",
@@ -669,13 +682,13 @@
     "COURSE_TYPE": "પાઠ્યક્રમનો પ્રકાર",
     "SUBTOPICS_SELECTED": "પસંદ કરેલ ઉપવિષયો",
     "NO_RESOURCES_FOUND": "કોઈ સંસાધનો મળ્યા નથી",
-    "INVALID_RESOURCE": "અમાન્ય સંસાધન"
+    "INVALID_RESOURCE": "અમાન્ય સંસાધન",
+    "COURSE_PLANNER_NOT_AVAILABLE": "અભ્યાસક્રમ નું પ્લાનર ઉપલભ્ધ નથી"
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "અસેસમેન્ટસ",
     "CENTER": "સેન્ટર",
     "ASSESSMENT_TYPE": "અસેસમેન્ટ ના પ્રકાર",
-    "AI_ASSESSMENT_LIST": "AI અસેસમેન્ટ યાદી",
     "COMPLETED_THE_ASSESSMENT": "અસેસમેન્ટ પૂર્ણ કરી",
     "SUBMITTED_ON": "પર સબમિટ કર્યું",
     "CORRECT_ANSWER": "સાચા જવાબો",
@@ -717,7 +730,7 @@
     "EDIT": "સંપાદિત કરો",
     "SURE_GO_BACK": "શું તમે ખરેખર પાછા જવા માંગો છો? તમારી પ્રગતિ ખોવાઈ શકે છે.",
     "FILTER_BY_CURRENT_STAGES": "વર્તમાન તબક્કાઓ દ્વારા ફિલ્ટર કરો",
-    "SUBJECTS_ENROLLED": "વિષયો નોંધાયેલા",
+    "SUBJECTS_ENROLLED": "નોંધાયેલ વિષયો",
     "REGISTRATION_COMPLETED": "નોંધણી પૂર્ણ"
   },
   "OBSERVATION": {
@@ -794,14 +807,27 @@
     "SUMMARY": "સારાંશ"
   },
   "FACILITATORS": {
-    "NEW_FACILITATOR": "નવું સુવિધાકર્તા"
+    "NEW_FACILITATOR": "નવું સુવિધાકર્તા",
+    "RE_ASSIGN_FACILITATOR": "ફેસિલિટેટર ફરીથી અસાઇન  કરો",
+    "FACILITATOR_UPDATED_SUCCESSFULLY": "ફેસિલિટેટર સફળતાપૂર્વક અપડેટ થયા ",
+    "FACILITATOR_CREATED_SUCCESSFULLY": "ફેસિલિટેટર સફળતાપૂર્વક બનાવાયો",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તાના ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે"
   },
   "MENTOR": {
     "BACK_TO_FORM": "ફોર્મ પર પાછા જાઓ",
-    "FINISH_ASSIGN": "સમાપ્ત કરો અને નિયુક્ત કરો"
+    "FINISH_ASSIGN": "સમાપ્ત કરો અને નિયુક્ત કરો",
+    "BACK": "પાછળ ફરો",
+    "SAVE_SELECTION": "પસંદગી સાચવો"
   },
   "LEARNERS": {
-    "NEW_LEARNER": "નવું શીખનાર"
+    "NEW_LEARNER": "નવું શીખનાર",
+    "EDIT_LEARNER": "લર્નર સંપાદિત(edit) કરો",
+    "RE_ASSIGN_LEARNER": "લર્નર ફરી અસાઇન કરો",
+    "LEARNER_UPDATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક અપડેટ થયા ",
+    "NOT_ABLE_UPDATE_LEARNER": "લર્નર અપડેટ કરી શકાયો નથી",
+    "LEARNER_CREATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક બનાવાયા ",
+    "NOT_ABLE_CREATE_LEARNER": "લર્નર બનાવી શકાતા નથી",
+    "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તા ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે"
   },
   "VILLAGE": "ગામ",
   "first_name": "પ્રથમ નામ",
@@ -809,7 +835,6 @@
   "last_name": "અટક",
   "dob": "જન્મ તારીખ",
   "WHATS_YOUR_GENDER": "લિંગ",
-  "WORKING_STATE": "કામ કરતું રાજ્ય",
   "Male": "પુરુષ",
   "Female": "સ્ત્રી",
   "Transgender": "ટ્રાન્સજેન્ડર",
@@ -870,23 +895,75 @@
     "ASSIGN_VOLUNTEERS_NOW": "હમણાં સ્વયંસેવકો સોંપો",
     "REMIND_ME_LATER": "મને પછી યાદ કરાવો",
     "NEW_SURVEY_HAS_BEEN_ADDED": "એક નવો સર્વે '{{surveyName}}' ઉમેરવામાં આવ્યો છે અને {{villageCount}} ગામોને સોંપવામાં આવ્યો છે",
-    "ASSIGN_VOLUNTEERS_TO_ENSURE": "સ્વયંસેવકોને સોંપો જેથી તેઓ સર્વેક્ષણનો લાભ લઈ શકે"
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "સ્વયંસેવકોને સોંપો જેથી તેઓ સર્વેક્ષણનો લાભ લઈ શકે",
+    "SURVEY": "સર્વેક્ષણ"
   },
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "તમારા દ્વારા સંચાલિત ગામો: {{totalVillageCount}}",
-    "MANAGES": "સંચાલન કરે છે",
     "VILLAGES": "ગામડાઓ",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "માસિક નોંધણીઓનો ઝાંખી",
     "CLOSED_ON": "બંધ",
-    "ABOVE_18": "18 થી ઉપર",
-    "BELOW_18": "18 થી નીચે",
-    "VLLAGE_18": "ગામ 18",
+    "MANAGES": "સંચાલન કરે છે",
+    "ABOVE_18": "18 વર્ષથી ઉપરની નોંધણી",
+    "BELOW_18": "18 વર્ષથી નીચે ની નોંધણી",
+    "VLLAGE": "ગામ",
     "YOUTH_VOLUNTEERS": "યુવાનો/સ્વયંસેવકો",
     "VILLAGES_AND_YOUTH": "ગામડા અને યુવાનો"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "પ્રવેશો",
     "VOLUNTEERS_ASSIGNED": "સ્વયંસેવકો સોંપવામાં આવ્યા"
+  },
+  "YOUTHNET_CAMP_DETAILS": {
+    "SUBMISSION": "સબમિશન",
+    "SUMMARY": "સારાંશ"
+  },
+  "YOUTHNET_PROFILE": {
+    "MY_PROFILE": "મારી પ્રોફાઇલ",
+    "ACTIVITIES_CONDUCTED": "કરેલ પ્રવૃત્તિઓ",
+    "PROFILE_DETAILS": "પ્રોફાઇલ વિગતો",
+    "FULL_NAME": "પૂરું નામ",
+    "EMAIL_ID": "ઈમેઇલ ID",
+    "STATE_DISTRICT_BLOCK": "રાજ્ય / જિલ્લા / બ્લોક",
+    "DESIGNATION": "હોદ્દો",
+    "JOINED_ON": "જોડાયા તારીખે",
+    "PHONE_NUMBER": "ફોન નંબર",
+    "MENTOR_ID": "મેંટર ID",
+    "GENDER": "લિંગ",
+    "AGE": "ઉમર"
+  },
+  "YOUTHNET": {
+    "SURVEY": "સર્વેક્ષણ",
+    "DASHBOARD": "ડેશબોર્ડ"
+  },
+  "VOLUNTEERLIST": {
+    "ENTRIES": "એન્ટ્રીઓ",
+    "VOLUNTEERS_ASSIGNED": "અસાઇન થયેલ સ્વયંસેવકો "
+  },
+  "YOUTHNET_DASHlBOARD": {
+    "MANAGES": "સંચાલન કરે છે",
+    "ABOVE_18": "ઉંમર 18 થી ઉપર",
+    "BELOW_18": "ઉંમર 18 થી નીચે",
+    "VLLAGE_18": "ગામ (18+)"
+  },
+  "WHAT_IS_YOUR_PRIMARY_WORK": "તમારું મુખ્ય કાર્ય શું છે?",
+  "STATE": "રાજ્ય",
+  "DISTRICT": "જિલ્લો",
+  "BLOCK": "બ્લોક",
+  "CENTER": "સેન્ટર",
+  "BOARD": "બોર્ડ",
+  "MEDIUM": "માધ્યમ",
+  "GRADE": "ધોરણ",
+  "BATCH": {
+    "NEW_BATCH": "નવો બેચ",
+    "UPDATE_BATCH": "બેચ અપડેટ કરો",
+    "SURE_DELETE_BATCH": "શું તમે ખરેખર બેચ ડિલીટ કરવા માંગો છો?",
+    "BATCH_UPDATE_SUCCESSFULLY": "બેચ સફળતાપૂર્વક અપડેટ થયો છે",
+    "BATCH_DELETE_SUCCESSFULLY": "બેચ સફળતાપૂર્વક ડિલીટ થયો છે",
+    "BATCH_CREATED_SUCCESSFULLY": "બેચ સફળતાપૂર્વક બનાવાઇ  છે",
+    "BATCH_UPDATE_FAILED": "બેચ અપડેટ કરતી વખતે કંઈક ખોટું થયું છે",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "તમે બેચ ડિલીટ કરી શકતા નથી કારણ કે તેમાં {{activeMembers}} સક્રિય લર્નર્સ છે",
+    "NO_BATCH_FOUND": "કોઈ બેચ મળતી નથી"
   },
   "AI": {
     "ASSESSMENT_DETAILS": "મૂલ્યાંકન વિગતો",

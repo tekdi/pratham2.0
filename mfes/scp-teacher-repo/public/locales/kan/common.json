@@ -166,7 +166,6 @@
     "BATCH_SESSIONS": "ಬ್ಯಾಚ್ ಸೆಷನ್‌ಗಳು",
     "NOT_ABLE_CREATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     "NOT_ABLE_CREATE_FACILITATOR": "ಸುಗಮಕಾರರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
-    "SURE_REASSIGN_CENTER": "ಈ ಬಳಕೆದಾರರ ಕೇಂದ್ರವನ್ನು ಮರು ನಿಯೋಜಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
     "LEARNER_CREATED_SUCCESSFULLY": "ವಿದ್ಯಾರ್ಥಿ ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!",
     "FACILITATOR_COUNT": "ಅನುಕೂಲಕರು ಒಟ್ಟು ಸಂಖ್ಯೆ: {{count}}",
     "LEARNER_COUNT": "ಕಲಿಕಾದಾರರು ಒಟ್ಟು ಸಂಖ್ಯೆ: {{count}}",
@@ -175,11 +174,18 @@
     "BETWEEN": "{{lowerLimit}} ನಡುವೆ - {{upperLimit}} %",
     "LESS_THAN": "{{range}} ಕ್ಕಿಂತ ಕಡಿಮೆ %",
     "MODIFY_CENTER_ATTENDANCE": "ಕೇಂದ್ರ ಹಾಜರಾತಿಯನ್ನು ಮಾರ್ಪಡಿಸಿ",
+    "SURE_REASSIGN_CENTER": "ಈ ಬಳಕೆದಾರರ ಕೇಂದ್ರವನ್ನು ಮರು ನಿಯೋಜಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
     "TEST_REPORT": "ಪರೀಕ್ಷಾ ವರದಿ",
     "REASSIGN_BLOCKS": "ಸೆಂಟರ್ ಗಳನ್ನು ಸೇರಿಸಿ ಅಥವಾ ಮರು ನಿಯೋಜಿಸಿ",
+    "SELECT_CENTER": "ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
     "NO_VILLAGES": "ಗ್ರಾಮಗಳಿಲ್ಲ",
     "ALL_VILLAGES": "ಎಲ್ಲಾ ಗ್ರಾಮಗಳು",
-    "USERS_&VILLAGES": "ಬಳಕೆದಾರರು ಮತ್ತು ಗ್ರಾಮಗಳು"
+    "USERS_&VILLAGES": "ಬಳಕೆದಾರರು ಮತ್ತು ಗ್ರಾಮಗಳು",
+    "NEW_BATCH": "ಹೊಸ ಬ್ಯಾಚ್",
+    "REASSIGN_BATCH": "ಬ್ಯಾಚ್ ಮರುನಿಯೋಜಿಸಿ",
+    "NOT_ABLE_UPDATE_FACILITATOR": "ಫೆಸಿಲಿಟೇಟರ್ ಅನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
+    "HI": "ನಮಸ್ಕಾರ, {{name}}",
+    "FAQS": "ಪದೇ ಪದೇ ಕೇಳಲಾಗುವ ಪ್ರಶ್ನೆಗಳು (FAQ)"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ಬಳಕೆದಾರಹೆಸರು",
@@ -254,6 +260,7 @@
     "BLOCK": "ಬ್ಲಾಕ್",
     "ATTENDANCE": "ಹಾಜರಾತಿ (%)",
     "VILLAGES_AND_YOUTH": "ಗ್ರಾಮಗಳು ಮತ್ತು ಯುವಕರು",
+    "USERS_&_VILLAGES": "ಬಳಕೆದಾರರು ಮತ್ತು ಗ್ರಾಮಗಳು ",
     "VILLAGES": "ಗ್ರಾಮಗಳು",
     "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು",
     "SEARCH_VILLAGES": "ಗ್ರಾಮಗಳನ್ನು ಹುಡುಕಿ",
@@ -294,7 +301,8 @@
     "MANUAL_ATTENDANCE_INFO": "ಹಾಜರಾತಿಯನ್ನು ಸಾಮಾನ್ಯವಾಗಿ ದಿನದ ಮೊದಲ ಸೆಷನ್‌ನ ನಂತರ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಗುರುತಿಸಲಾಗುತ್ತದೆ। ತಾಂತ್ರಿಕ ಸಮಸ್ಯೆಗಳು, ಇತರ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್‌ಗಳಲ್ಲಿ ಸೆಷನ್‌ಗಳು, ಅಥವಾ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ನಡೆಯದಿದ್ದರೆ ಮಾತ್ರ ಕೈಯಾರೆ ಗುರುತಿಸುವಿಕೆಯನ್ನು ಬಳಸಿ।",
     "MANUAL_ATTENDANCE_NOTE": "ಗಮನಿಸಿ: ಕೈಯಾರೆ ಗುರುತಿಸಿದ ಹಾಜರಾತಿಯು ಸ್ವಯಂಚಾಲಿತ ಹಾಜರಾತಿಯನ್ನು ಮೀರಿಸುತ್ತದೆ, ಒಂದು ವೇಳೆ ಇದನ್ನು ನಂತರ ದಾಖಲಿಸಿದರೆ।",
     "NO_BATCHES_ASSIGNED": "ಯಾವುದೇ ಬ್ಯಾಚ್‌ಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ",
-    "N/A": "ಪ್ರಕಟಣೆ ಇಲ್ಲ"
+    "ABSENT_STUDENTS": "ಹಾಜರಿರದ ವಿದ್ಯಾರ್ಥಿಗಳು: {{count}}",
+    "N/A": "ಉಪಲಬ್ಧ ಇಲ್ಲ"
   },
   "PROFILE": {
     "EDIT_PROFILE": "ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ",
@@ -359,7 +367,8 @@
     "DROP_OUT_REASON": "ಶಾಲೆಯಿಂದ ಹೊರಗುಳಿಯಲು ಕಾರಣ",
     "NUMBER_OF_CLUSTERS_I_TEACH": "ನಾನು ಕಲಿಸುವ ಕ್ಲಸ್ಟರ್‌ಗಳ ಸಂಖ್ಯೆ",
     "NO_OF_CLUSTERS": "ನಾನು ಕಲಿಸುವ ಕ್ಲಸ್ಟರ್‌ಗಳ ಸಂಖ್ಯೆ",
-    "SUBJECT_TAUGHT": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು"
+    "SUBJECT_TAUGHT": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು",
+    "MY_MAIN_SUBJECTS": "ನನ್ನ ಮುಖ್ಯ ವಿಷಯಗಳು"
   },
   "DROPOUT_REASONS": {
     "UNABLE_TO_COPE_WITH_STUDIES": "ಅಧ್ಯಯನವನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
@@ -389,7 +398,8 @@
     "STEP_10": "ಪ್ರತಿ ಕಲಿಯುವವರ ಪೂರ್ವ ಮತ್ತು ನಂತರದ ಪರೀಕ್ಷೆಗಳ ವಿವರವಾದ ಅಂಕಗಳು ಮತ್ತು ಸಾರಾಂಶಗಳನ್ನು ವೀಕ್ಷಿಸಿ. ಯಾವ ವಿದ್ಯಾರ್ಥಿಗಳು ಪೂರ್ಣಗೊಳಿಸಿದ್ದಾರೆ, ಪ್ರಗತಿಯಲ್ಲಿದ್ದಾರೆ ಅಥವಾ ಇನ್ನೂ ಪರೀಕ್ಷೆಯನ್ನು ಪ್ರಾರಂಭಿಸಬೇಕಾಗಿದೆ ಎಂಬುದನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.",
     "STEP_11": "ಪ್ರತಿಯೊಬ್ಬ ಕಲಿಯುವವರ ಬೋರ್ಡ್ ಪರೀಕ್ಷೆಯ ದಾಖಲಾತಿ ಸ್ಥಿತಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ ಮತ್ತು ನವೀಕರಿಸಿ",
     "FINISH": "ಮುಗಿಸು",
-    "LEARN_HOW_TO_USE": "ಹೇಗೆ ಬಳಸಬೇಕೆಂದು ತಿಳಿಯಿರಿ"
+    "LEARN_HOW_TO_USE": "ಹೇಗೆ ಬಳಸಬೇಕೆಂದು ತಿಳಿಯಿರಿ",
+    "STEP_12": "ಅಪ್ಲಿಕೇಶನ್ ಬಳಸುವಾಗ ನೀವು ಸಮಸ್ಯೆಯನ್ನು ಎದುರಿಸಿದಾಗಲೆಲ್ಲಾ, ಸಮಸ್ಯೆಯನ್ನು ವಿವರಿಸುವ ಮೂಲಕ ಮತ್ತು ಸ್ಕ್ರೀನ್‌ಶಾಟ್‌ಗಳು ಅಥವಾ ಲಗತ್ತುಗಳನ್ನು ಸೇರಿಸುವ ಮೂಲಕ ಬೆಂಬಲ ವಿನಂತಿಯನ್ನು ಸಲ್ಲಿಸಿ. ನಮ್ಮ ತಂಡವು ಪರಿಶೀಲಿಸಿ ಕ್ರಮ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ."
   },
   "BLOCKS": {
     "TEACHING_BLOCKS": "ಬೋಧನಾ ಬ್ಲಾಕ್‌ಗಳು",
@@ -513,9 +523,9 @@
     "END_TIME_ERROR": "ಅಂತ್ಯ ಸಮಯವು ಪ್ರಾರಂಭ ಸಮಯಕ್ಕಿಂತ ಮುಂಚಿತವಾಗಿರಬಾರದು.",
     "START_DATE_ERROR": "ಆರಂಭದ ದಿನಾಂಕವು ಅಂತಿಮ ದಿನಾಂಕಕ್ಕಿಂತ ನಂತರ ಇರಬಾರದು.",
     "END_DATE_ERROR": "ಅಂತಿಮ ದಿನಾಂಕವು ಪ್ರಾರಂಭ ದಿನಾಂಕಕ್ಕಿಂತ ಮೊದಲು ಇರಬಾರದು.",
+    "DELETE_THIS_SESSION": "ಈ ಸೆಷನ್ ಅಳಿಸಿ",
     "LEARNER_PREREQUISITES": "ಕಲಿಯುವವರ ಪೂರ್ವಾಪೇಕ್ಷಿತಗಳು",
-    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು",
-    "DELETE_THIS_SESSION": "ಈ ಸೆಷನ್ ಅಳಿಸಿ"
+    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "ಕೇಂದ್ರವು ಯಶಸ್ವಿಯಾಗಿ ವಿನಂತಿಸಿದೆ",
@@ -636,7 +646,10 @@
     "REASON_FOR_DROP_OUT_FROM_SCHOOL": "ಶಾಲೆಯಿಂದ ಹೊರಗುಳಿಯಲು ಕಾರಣ",
     "NO_OF_CLUSTERS": "ನಾನು ಕಲಿಸುವ ಕ್ಲಸ್ಟರ್‌ಗಳ ಸಂಖ್ಯೆ",
     "MAIN_SUBJECT": "ನನ್ನ ಮುಖ್ಯ ವಿಷಯಗಳು",
-    "SUBJECT_TAUGHT": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು"
+    "SUBJECT_TAUGHT": "ನಾನು ಕಲಿಸುವ ವಿಷಯಗಳು",
+    "WHAT_IS_YOUR_PRIMARY_WORK": "ನಿಮ್ಮ ಪ್ರಾಥಮಿಕ ಕೆಲಸವೇನು?",
+    "CENTER": "ಕೇಂದ್ರ",
+    "BATCH": "ಬ್ಯಾಚ್"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಇನ್ ವ್ಯಾಲಿಡ್ ಇನ್‌ಪುಟ್.",
@@ -659,7 +672,7 @@
     "DATE_MUST_BE_ON_OR_AFTER": "ದಿನಾಂಕವು {{date}} ರಂದು ಅಥವಾ ಅದಕ್ಕಿಂತ ನಂತರ ಇರಬೇಕು"
   },
   "COURSE_PLANNER": {
-    "COURSE_PLANNER": "ಕೋರ್ಸ್ ಯೋಜನೆ",
+    "COURSE_PLANNER": "ಪಾಠ್ಯಕ್ರಮ ಯೋಜನೆ",
     "FOUNDATION_COURSE": "ಫೌಂಡೇಶನ್ ಕೋರ್ಸ್",
     "MAIN_COURSE": "ಮೇನ್ ಕೋರ್ಸ್",
     "COLLAPSE_ALL": "ಎಲ್ಲವನ್ನೂ ಕುಗ್ಗಿಸಿ",
@@ -669,13 +682,13 @@
     "COURSE_TYPE": "ಕೋರ್ಸ್ ಪ್ರಕಾರ",
     "SUBTOPICS_SELECTED": "ಆಯ್ಕೆಮಾಡಿದ ಉಪವಿಷಯಗಳು",
     "NO_RESOURCES_FOUND": "ಯಾವುದೇ ಸಂಪನ್ಮೂಲಗಳು ಕಂಡುಬಂದಿಲ್ಲ",
-    "INVALID_RESOURCE": "ಅಮಾನ್ಯ ಸಂಪನ್ಮೂಲ"
+    "INVALID_RESOURCE": "ಅಮಾನ್ಯ ಸಂಪನ್ಮೂಲ",
+    "COURSE_PLANNER_NOT_AVAILABLE": "ಪಠ್ಯ ಯೋಜಕ ಲಭ್ಯವಿಲ್ಲ"
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "ಮೌಲ್ಯಮಾಪನಗಳು",
     "CENTER": "ಕೇಂದ್ರ",
     "ASSESSMENT_TYPE": "ಮೌಲ್ಯಮಾಪನ ಪ್ರಕಾರ",
-    "AI_ASSESSMENT_LIST": "AI ಮೌಲ್ಯಮಾಪನ ಯಾವುದು",
     "COMPLETED_THE_ASSESSMENT": "ಮೌಲ್ಯಮಾಪನವನ್ನು ಪೂರ್ಣಗೊಳಿಸಿದೆ",
     "SUBMITTED_ON": "ಸಲ್ಲಿಸಲಾಗಿದೆ",
     "CORRECT_ANSWER": "ಸರಿಯಾದ ಉತ್ತರಗಳು",
@@ -794,14 +807,27 @@
     "SUMMARY": "ಸಾರಾಂಶ"
   },
   "FACILITATORS": {
-    "NEW_FACILITATOR": "ಹೊಸ ಸುಗಮಕಾರ"
+    "NEW_FACILITATOR": "ಹೊಸ ಸುಗಮಕಾರ",
+    "RE_ASSIGN_FACILITATOR": "ಫೆಸಿಲಿಟೇಟರ್ ಅನ್ನು ಮರುನಿಯೋಜಿಸಿ",
+    "FACILITATOR_UPDATED_SUCCESSFULLY": "ಫೆಸಿಲಿಟೇಟರ್ ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ",
+    "FACILITATOR_CREATED_SUCCESSFULLY": "ಫೆಸಿಲಿಟೇಟರ್  ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ಬಳಕೆದಾರರ ಮಾನ್ಯತೆಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸಲಾಗುತ್ತದೆ"
   },
   "MENTOR": {
     "BACK_TO_FORM": "ಫಾರ್ಮ್‌ಗೆ ಹಿಂತಿರುಗಿ",
-    "FINISH_ASSIGN": "ಮುಗಿಸಿ ಮತ್ತು ನಿಯೋಜಿಸಿ"
+    "FINISH_ASSIGN": "ಮುಗಿಸಿ ಮತ್ತು ನಿಯೋಜಿಸಿ",
+    "BACK": "ಹಿಂದಕ್ಕೆ",
+    "SAVE_SELECTION": "ಆಯ್ಕೆಯನ್ನು ಉಳಿಸಿ"
   },
   "LEARNERS": {
-    "NEW_LEARNER": "ಹೊಸ ಕಲಿಯುವವ"
+    "NEW_LEARNER": "ಹೊಸ ಕಲಿಯುವವ",
+    "EDIT_LEARNER": " ಕಲಿಯುವವರನ್ನು ಸಂಪಾದಿಸಿ",
+    "RE_ASSIGN_LEARNER": " ಕಲಿಯುವವರನ್ನು ಮರು ನಿಯೋಜಿಸಿ",
+    "LEARNER_UPDATED_SUCCESSFULLY": "ಕಲಿಯುವವರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ",
+    "NOT_ABLE_UPDATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ",
+    "LEARNER_CREATED_SUCCESSFULLY": "ಕಲಿಯುವವರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ",
+    "NOT_ABLE_CREATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.",
+    "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "ಬಳಕೆದಾರರ ಮಾನ್ಯತೆಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸಲಾಗುತ್ತದೆ"
   },
   "VILLAGE": "ಗ್ರಾಮ",
   "first_name": "ಮೊದಲ ಹೆಸರು",
@@ -809,7 +835,6 @@
   "last_name": "ಕೊನೆಯ ಹೆಸರು",
   "dob": "ಜನ್ಮ ದಿನಾಂಕ",
   "WHATS_YOUR_GENDER": "ನಿಮ್ಮ ಲಿಂಗ",
-  "WORKING_STATE": "ಕೆಲಸ ಮಾಡುವ ರಾಜ್ಯ",
   "Male": "ಪುರುಷ",
   "Female": "ಸ್ತ್ರೀ",
   "Transgender": "ಟ್ರಾನ್ಸ್‌ಜೆಂಡರ್",
@@ -870,23 +895,75 @@
     "ASSIGN_VOLUNTEERS_NOW": "ಈಗ ಸ್ವಯಂಸೇವಕರನ್ನು ನಿಯೋಜಿಸಿ",
     "REMIND_ME_LATER": "ನಂತರ ನನಗೆ ನೆನಪಿಸಿ",
     "NEW_SURVEY_HAS_BEEN_ADDED": "{{surveyName}}' ಎಂಬ ಹೊಸ ಸಮೀಕ್ಷೆಯನ್ನು ಸೇರಿಸಲಾಗಿದೆ ಮತ್ತು ಅದನ್ನು {{villageCount}} ಗ್ರಾಮಗಳಿಗೆ ನಿಯೋಜಿಸಲಾಗಿದೆ",
-    "ASSIGN_VOLUNTEERS_TO_ENSURE": "ಸಮೀಕ್ಷೆಯನ್ನು ಪ್ರವೇಶಿಸಲು ಸ್ವಯಂಸೇವಕರನ್ನು ನಿಯೋಜಿಸಿ"
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "ಸಮೀಕ್ಷೆಯನ್ನು ಪ್ರವೇಶಿಸಲು ಸ್ವಯಂಸೇವಕರನ್ನು ನಿಯೋಜಿಸಿ",
+    "SURVEY": "ಸಮೀಕ್ಷೆಗಳು"
   },
   "YOUTHNET_DASHBOARD": {
     "VILLAGES_MANAGED_BY_YOU": "ನೀವು ನಿರ್ವಹಿಸುವ ಹಳ್ಳಿಗಳು : {{totalVillageCount}}",
-    "MANAGES": "ನಿರ್ವಹಿಸುತ್ತದೆ",
     "VILLAGES": "ಗ್ರಾಮಗಳು",
     "MONTHLY_REGISTRATIONS_OVERVIEW": "ಮಾಸಿಕ ನೋಂದಣಿಗಳ ಅವಲೋಕನ",
     "CLOSED_ON": "ಮುಗಿದ ದಿನಾಂಕ",
-    "ABOVE_18": "18ಕ್ಕಿಂತ ಮೇಲೆ",
-    "BELOW_18": "18ಕ್ಕಿಂತ ಕೆಳಗೆ",
-    "VLLAGE_18": "ಗ್ರಾಮ 18",
-    "YOUTH_VOLUNTEERS": "ಯುವಕರು/ಸ್ವಯಂಸೇವಕರು",
-    "VILLAGES_AND_YOUTH": "ಗ್ರಾಮಗಳು ಮತ್ತು ಯುವಕರು"
+    "MANAGES": "ನಿರ್ವಹಿಸುತ್ತದೆ",
+    "ABOVE_18": "18 ವರ್ಷ ಮೇಲ್ಪಟ್ಟವರ ನೋಂದಣಿಗಳು",
+    "BELOW_18": "18 ವರ್ಷದೊಳಗಿನವರ ನೋಂದಣಿಗಳು",
+    "VLLAGE": "ಗ್ರಾಮ",
+    "YOUTH_VOLUNTEERS": "ಯುವತ್  /ಸ್ವಯಂಸೇವಕರು",
+    "VILLAGES_AND_YOUTH": "        ಗ್ರಾಮ ಮತ್ತು ಯುವತ್ "
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "ನಮೂದುಗಳು",
     "VOLUNTEERS_ASSIGNED": "ಸ್ವಯಂಸೇವಕರನ್ನು ನಿಯೋಜಿಸಲಾಗಿದೆ"
+  },
+  "YOUTHNET_CAMP_DETAILS": {
+    "SUBMISSION": "ಸಲ್ಲಿಸು",
+    "SUMMARY": "ಸಾರಾಂಶ"
+  },
+  "YOUTHNET_PROFILE": {
+    "MY_PROFILE": "ನನ್ನ ಪ್ರೊಫೈಲ್",
+    "ACTIVITIES_CONDUCTED": "ನಿರ್ವಹಿಸಲಾದ ಚಟುವಟಿಕೆಗಳು",
+    "PROFILE_DETAILS": "ಪ್ರೊಫೈಲ್ ವಿವರಗಳು",
+    "FULL_NAME": "ಪೂರ್ಣ ಹೆಸರು",
+    "EMAIL_ID": "ಇಮೇಲ್ ಐಡಿ",
+    "STATE_DISTRICT_BLOCK": "ರಾಜ್ಯ / ಜಿಲ್ಲೆ / ಬ್ಲಾಕ್",
+    "DESIGNATION": "ಹುದ್ದೆ",
+    "JOINED_ON": "ಸೇರಿದ  ದಿನಾಂಕ",
+    "PHONE_NUMBER": "ದೂರವಾಣಿ ಸಂಖ್ಯೆ",
+    "MENTOR_ID": "ಮೆಂಟರ್ ಐಡಿ",
+    "GENDER": "ಲಿಂಗ",
+    "AGE": "ವಯಸ್ಸು"
+  },
+  "YOUTHNET": {
+    "SURVEY": "ಸಮೀಕ್ಷೆ",
+    "DASHBOARD": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್"
+  },
+  "VOLUNTEERLIST": {
+    "ENTRIES": "ನಮೂನೆಗಳು",
+    "VOLUNTEERS_ASSIGNED": "ನಿಯೋಜಿತ ಸ್ವಯಂಸೇವಕರು"
+  },
+  "YOUTHNET_DASHlBOARD": {
+    "MANAGES": "ನಿರ್ವಹಿಸುತ್ತಾರೆ",
+    "ABOVE_18": "18 ಕ್ಕಿಂತ ಮೇಲ್ಪಟ್ಟವರು",
+    "BELOW_18": "18 ಕ್ಕಿಂತ ಕಡಿಮೆ ವಯಸ್ಸಿನವರು",
+    "VLLAGE_18": "ಗ್ರಾಮ (18+)"
+  },
+  "WHAT_IS_YOUR_PRIMARY_WORK": "ನಿಮ್ಮ ಪ್ರಾಥಮಿಕ ಕೆಲಸವೇನು?",
+  "STATE": "ರಾಜ್ಯ",
+  "DISTRICT": "ಜಿಲ್ಲೆ",
+  "BLOCK": "ತಾಲೂಕು",
+  "CENTER": "ಕೇಂದ್ರ",
+  "BOARD": "ಬೋರ್ಡ್",
+  "MEDIUM": "ಮಾಧ್ಯಮ",
+  "GRADE": "ತರಗತಿ",
+  "BATCH": {
+    "NEW_BATCH": "ಹೊಸ ಬ್ಯಾಚ್",
+    "UPDATE_BATCH": "ಬ್ಯಾಚ್ ನವೀಕರಿಸಿ",
+    "SURE_DELETE_BATCH": "ನೀವು ಖಚಿತವಾಗಿ ಅಳಿಸಬೇಕೆಂದು ಬಯಸುತ್ತೀರಾ?",
+    "BATCH_UPDATE_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ",
+    "BATCH_DELETE_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
+    "BATCH_CREATED_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ",
+    "BATCH_UPDATE_FAILED": "ಬ್ಯಾಚ್ ನವೀಕರಿಸುವಲ್ಲಿ ಏನೋ ತಪ್ಪಾಗಿದೆ",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "{{activeMembers}} ಸಕ್ರಿಯ ವಿದ್ಯಾರ್ಥಿಗಳಿದ್ದಾರೆ ಆದ್ದರಿಂದ ಬ್ಯಾಚ್ ಅನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
+    "NO_BATCH_FOUND": "ಯಾವುದೇ ಬ್ಯಾಚ್ ಕಂಡುಬಂದಿಲ್ಲ"
   },
   "AI": {
     "ASSESSMENT_DETAILS": "ಮೌಲ್ಯಮಾಪನ ವಿವರಗಳು",
