@@ -26,7 +26,7 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -358,8 +358,11 @@ const ContentCreator = () => {
 
   const archiveToactive = async () => {
     try {
-      const resp = await deleteUser(editableUserId, {
-        userData: { status: 'active' },
+      const resp = await deleteUser({
+        userId: editableUserId,
+        roleId: roleId,
+        tenantId: tenantId,
+        status: 'active',
       });
       setArchiveToActiveOpen(false);
       searchData(prefilledFormData, currentPage);
@@ -397,73 +400,85 @@ const ContentCreator = () => {
       },
       show: (row) => row.tenantStatus !== 'archived',
     },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Delete Content Creator"
-    //     >
-    //       {' '}
-    //       <Image src={deleteIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row: any) => {
-    //     console.log('row:', row);
-    //     setEditableUserId(row?.userId);
-    //     const userId = row?.userId;
-    //     const response = await updateUserTenantStatus(userId, tenantId, {
-    //       status: 'archived'
-    //     });
-    //     setPrefilledFormData({});
-    //     searchData(prefilledFormData, currentPage);
-    //     setOpenModal(false);
-    //   },
-    //   show: (row) => row.tenantStatus !== 'archived',
-    // },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reactivate Content Creator"
-    //     >
-    //       {' '}
-    //       <Image src={restoreIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row: any) => {
-    //     const findState = row?.customFields.find((item) => {
-    //       if (item.label === 'STATE') {
-    //         return item;
-    //       }
-    //     });
-    //     setState(findState?.selectedValues[0]?.value);
-    //     console.log('row:', findState);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
-    //     setEditableUserId(row?.userId);
-    //     const userId = row?.userId;
-    //     // const response = await archiveToactive(userId);
-    //     setArchiveToActiveOpen(true);
-    //     setPrefilledFormData({});
-    //   },
-    //   show: (row) => row.tenantStatus !== 'active',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Delete Content Creator"
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        console.log('row:', row);
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        try {
+          const response = await deleteUser({
+            userId,
+            roleId,
+            tenantId,
+          });
+          if (response?.responseCode === 200) {
+            showToastMessage(t('COMMON.USER_DELETE_SUCCSSFULLY'), 'success');
+            setPrefilledFormData({});
+            searchData(prefilledFormData, currentPage);
+          } else {
+            showToastMessage(t('COMMON.FAILED_TO_DELETE_USER'), 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting user:', error);
+          showToastMessage(t('COMMON.FAILED_TO_DELETE_USER'), 'error');
+        }
+        setOpenModal(false);
+      },
+      show: (row) => row.tenantStatus !== 'archived',
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reactivate Content Creator"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        const findState = row?.customFields.find((item) => {
+          if (item.label === 'STATE') {
+            return item;
+          }
+        });
+        setState(findState?.selectedValues[0]?.value);
+        console.log('row:', findState);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setEditableUserId(row?.userId);
+        const userId = row?.userId;
+        // const response = await archiveToactive(userId);
+        setArchiveToActiveOpen(true);
+        setPrefilledFormData({});
+      },
+      show: (row) => row.tenantStatus !== 'active',
+    },
   ];
 
   // Pagination handlers

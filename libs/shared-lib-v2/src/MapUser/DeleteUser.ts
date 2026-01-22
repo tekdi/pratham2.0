@@ -8,6 +8,7 @@ type DeleteUserParams = {
   roleId: string;
   tenantId: string;
   reason?: string;
+  status?: string;
 };
 
 // adjust these based on your actual role ids/constants
@@ -18,6 +19,7 @@ export const deleteUser = async ({
   roleId,
   tenantId,
   reason,
+  status = 'archived',
 }: DeleteUserParams) => {
   try {
     const shouldHandleCohorts = ROLES_ASSIGNED_TO_COHORTS.includes(roleId as RoleId);
@@ -37,7 +39,7 @@ export const deleteUser = async ({
         for (const membershipId of membershipIds) {
           try {
             const updateResponse = await updateCohortMemberStatus({
-              memberStatus: 'archived',
+              memberStatus: status,
               statusReason: reason,
               membershipId,
             });
@@ -64,7 +66,7 @@ export const deleteUser = async ({
      * 2. Always archive user from tenant
      */
     const resp = await updateUserTenantStatus(userId, tenantId, {
-      status: 'archived',
+      status: status,
       ...(reason && { reason }),
     });
 
