@@ -119,6 +119,7 @@ const Facilitator = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
   const [selectedBatches, setSelectedBatches] = useState<any[]>([]);
   const [availableBatches, setAvailableBatches] = useState<any[]>([]);
+  const [availableCenters, setAvailableCenters] = useState<any[]>([]);
   const [loadingBatches, setLoadingBatches] = useState(false);
 
   const [open, setOpen] = useState(false);
@@ -540,6 +541,19 @@ const Facilitator = () => {
             ?.map((item: any) => item.centerName)
             ?.filter(Boolean)
         )];
+        setAvailableCenters(centerNames.join(', '));
+        
+        // Extract batchNames where cohortMember.status === 'active' and batchStatus === 'active'
+        const batchNames = row.cohortData
+          ?.filter((item: any) => 
+            item.cohortMember?.status === 'active' && 
+            item.batchStatus === 'active'
+          )
+          ?.map((item: any) => item.batchName)
+          ?.filter(Boolean) || [];
+        
+        setAvailableBatches(batchNames);
+        
         const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
           if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
             return item;
@@ -1045,7 +1059,8 @@ const Facilitator = () => {
           reason={reason}
           setReason={setReason}
           isForFacilitator={true}
-          center={userData.village}
+          center={availableCenters}
+          customLabel={t('COMMON.DELETE_FROM_BATCH_WARNING')}
         />
       </ConfirmationPopup>
       <ConfirmationPopup

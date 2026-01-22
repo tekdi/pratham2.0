@@ -28,9 +28,13 @@ import {
   IconButton,
   Button,
   CircularProgress,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { debounce, set } from 'lodash';
 import { Numbers } from '@mui/icons-material';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -54,12 +58,13 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import {
   calculateAge,
   calculateAgeFromDate,
   transformLabel,
 } from '@/utils/Helper';
+import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -74,6 +79,7 @@ import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { updateUser } from '@/services/CreateUserService';
 import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
+import { updateUserTenantStatus } from '@/services/UserService';
 
 const UserLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +99,9 @@ const UserLeader = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [isReassign, setIsReassign] = useState(false);
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+  const [selectedCenters, setSelectedCenters] = useState<any[]>([]);
+  const [availableCenters, setAvailableCenters] = useState<any[]>([]);
+  const [loadingCenters, setLoadingCenters] = useState(false);
 
   const [editableUserId, setEditableUserId] = useState('');
   const [roleId, setRoleID] = useState('');
@@ -216,106 +225,75 @@ const UserLeader = () => {
     });
   };
 
-  const userDelete = async () => {
-    try {
-      const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
-      });
-      if (resp?.responseCode === 200) {
-        // setResponse((prev) => ({
-        //   ...prev, // Preserve other properties in `prev`
-        //   result: {
-        //     ...prev?.result, // Preserve other properties in `result`
-        //     getUserDetails: prev?.result?.getUserDetails?.filter(
-        //       (item) => item?.userId !== userID
-        //     ),
-        //   },
-        // }));
-        searchData(prefilledFormData, currentPage);
-        console.log('Team leader successfully archived.');
-      } else {
-        console.error('Failed to archive team leader:', resp);
-      }
-
-      return resp;
-    } catch (error) {
-      console.error('Error updating team leader:', error);
-    }
-  };
   const archiveToactive = async () => {
     try {
-      let membershipIds = null;
-
-      // Attempt to get the cohort list
-      try {
-        const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
-        } else {
-          console.warn('No cohort data found for the user.');
-        }
-      } catch (error) {
-        console.error('Failed to fetch cohort list:', error);
+      // Validate that at least one center is selected
+      if (!selectedCenters || selectedCenters.length === 0) {
+        showToastMessage('Please select at least one center', 'error');
+        return;
       }
 
-      // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipIds && Array.isArray(membershipIds)) {
-        for (const membershipId of membershipIds) {
-          try {
-            const updateResponse = await updateCohortMemberStatus({
-              memberStatus: 'active',
-              //   statusReason: reason,
-              membershipId,
-            });
+      // Update cohort member status for each selected center
+      const membershipIds = selectedCenters.map((center) => center.cohortMembershipId);
+      
+      for (const membershipId of membershipIds) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: 'active',
+            membershipId,
+          });
 
-            if (updateResponse?.responseCode !== 200) {
-              console.error(
-                `Failed to archive user with membershipId ${membershipId}:`,
-                updateResponse
-              );
-            } else {
-              console.log(
-                `User with membershipId ${membershipId} successfully archived.`
-              );
-            }
-          } catch (error) {
+          if (updateResponse?.responseCode !== 200) {
             console.error(
-              `Error archiving user with membershipId ${membershipId}:`,
-              error
+              `Failed to activate user with membershipId ${membershipId}:`,
+              updateResponse
+            );
+            showToastMessage(
+              `Failed to activate center membership ${membershipId}`,
+              'error'
+            );
+            return;
+          } else {
+            console.log(
+              `User with membershipId ${membershipId} successfully activated.`
             );
           }
+        } catch (error) {
+          console.error(
+            `Error activating user with membershipId ${membershipId}:`,
+            error
+          );
+          showToastMessage(
+            `Error activating center membership ${membershipId}`,
+            'error'
+          );
+          return;
         }
       }
 
-      // Always attempt to delete the user
-      console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { status: 'active' },
+      // After successful center activation, update user status
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
       });
-      showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
-
+      
       if (resp?.responseCode === 200) {
-        // setResponse((prev) => ({
-        //   ...prev,
-        //   result: {
-        //     ...prev?.result,
-        //     getUserDetails: prev?.result?.getUserDetails?.filter(
-        //       (item) => item?.userId !== userID
-        //     ),
-        //   },
-        // }));
+        showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+        // Reset state
+        setSelectedCenters([]);
+        setAvailableCenters([]);
+        setArchiveToActiveOpen(false);
+        // Refresh the list
         searchData(prefilledFormData, currentPage);
-
-        console.log('learner successfully aactive.');
+        console.log('User successfully activated.');
       } else {
-        console.error('Failed to archive team leader:', resp);
+        console.error('Failed to activate user:', resp);
+        showToastMessage('Failed to activate user', 'error');
       }
 
       return resp;
     } catch (error) {
-      console.error('Error updating team leader:', error);
+      console.error('Error activating user:', error);
+      showToastMessage('Error activating user', 'error');
     }
   };
   const searchData = async (formData, newPage) => {
@@ -427,40 +405,43 @@ const UserLeader = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Delete Team Leader"
-    //     >
-    //       {' '}
-    //       <Image src={deleteIcon} alt="" />{' '}
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     const findVillage = row?.customFields.find((item) => {
-    //       if (item.label === 'BLOCK') {
-    //         return item;
-    //       }
-    //     });
-    //     setVillage(findVillage?.selectedValues[0]?.value);
-    //     setUserId(row?.userId);
-    //     setOpen(true);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
-    //     setReason('');
-    //     setChecked(false);
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Delete Team Leader"
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        console.log('row>>>>>', row);
+        // Extract centerName from cohortData where cohortMember.status === 'active'
+        const centerNames = row?.cohortData
+          ?.filter((item: any) => item?.cohortMember?.status === 'active')
+          ?.map((item: any) => item?.centerName)
+          ?.filter(Boolean) || [];
+        const centerNamesString = centerNames.length > 0 ? centerNames.join(', ') : '';
+        setAvailableCenters(centerNamesString);
+        setVillage(centerNamesString || row?.customfield?.block || row?.customfield?.village || '');
+        setUserId(row?.userId);
+        setOpen(true);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setReason('');
+        setChecked(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     {
       icon: (
         <Box
@@ -549,48 +530,57 @@ const UserLeader = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reactivate Team Leader"
-    //     >
-    //       {' '}
-    //       <Image src={restoreIcon} alt="" />{' '}
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     const findVillage = row?.customFields.find((item) => {
-    //       if (item.label === 'VILLAGE') {
-    //         return item;
-    //       }
-    //     });
-    //     // console.log('row:', row?.customFields[2].selectedValues[0].value);
-    //     setEditableUserId(row?.userId);
-    //     setArchiveToActiveOpen(true);
-    //     setUserId(row?.userId);
-    //     const findVillagename = row?.customFields.find((item) => {
-    //       if (item.label === 'BLOCK') {
-    //         return item;
-    //       }
-    //     });
-    //     setVillage(findVillagename?.selectedValues[0]?.value);
-    //     setUserId(row?.userId);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
-    //     // setReason('');
-    //     // setChecked(false);
-    //   },
-    //   show: (row) => row.status !== 'active',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reactivate Team Leader"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        const selectedUserId = row?.userId;
+        setEditableUserId(row?.userId);
+        setUserId(row?.userId);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setSelectedCenters([]);
+        setAvailableCenters([]);
+        setLoadingCenters(true);
+        setArchiveToActiveOpen(true);
+        
+        try {
+          // Fetch cohort list for the user
+          const cohortResponse = await getCohortList(selectedUserId);
+          const cohortList = cohortResponse?.result || [];
+          
+          // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
+          const filteredCenters = cohortList.filter((cohort: any) => 
+            cohort.cohortMemberStatus === 'archived' &&
+            cohort.cohortStatus === 'active' &&
+            (cohort.type === 'CENTER' || cohort.type === 'COHORT')
+          );
+          
+          setAvailableCenters(filteredCenters);
+        } catch (error) {
+          console.error('Error fetching cohort list:', error);
+          showToastMessage('Failed to load centers', 'error');
+        } finally {
+          setLoadingCenters(false);
+        }
+      },
+      show: (row) => row.status !== 'active',
+    },
   ];
 
   // Pagination handlers
@@ -764,7 +754,25 @@ const UserLeader = () => {
         primary={t('COMMON.DELETE_USER_WITH_REASON')}
         secondary={t('COMMON.CANCEL')}
         reason={reason}
-        onClickPrimary={userDelete}
+        onClickPrimary={async () => {
+          try {
+            const resp = await deleteUser({
+              userId: userID,
+              roleId: roleId,
+              tenantId: tenantId,
+              reason: reason,
+            });
+
+            if (resp?.responseCode === 200) {
+              searchData(prefilledFormData, currentPage);
+              console.log('Team leader successfully archived.');
+            } else {
+              console.error('Failed to archive team leader:', resp);
+            }
+          } catch (error) {
+            console.error('Error deleting team leader:', error);
+          }
+        }}
       >
         <DeleteDetails
           firstName={firstName}
@@ -774,16 +782,21 @@ const UserLeader = () => {
           setChecked={setChecked}
           reason={reason}
           setReason={setReason}
+          center={availableCenters}
         />
       </ConfirmationPopup>
       <ConfirmationPopup
         checked={true}
         open={archiveToActiveOpen}
-        onClose={() => setArchiveToActiveOpen(false)}
+        onClose={() => {
+          setArchiveToActiveOpen(false);
+          setSelectedCenters([]);
+          setAvailableCenters([]);
+        }}
         title={t('COMMON.ACTIVATE_USER')}
         primary={t('COMMON.ACTIVATE')}
         secondary={t('COMMON.CANCEL')}
-        reason={'yes'}
+        reason={selectedCenters.length > 0 ? 'yes' : ''}
         onClickPrimary={archiveToactive}
       >
         <Box
@@ -797,7 +810,59 @@ const UserLeader = () => {
           <Typography>
             {firstName} {lastName} {t('FORM.WAS_BELONG_TO')}
           </Typography>
-          <TextField fullWidth value={village} disabled sx={{ mt: 1 }} />
+          {loadingCenters ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Autocomplete
+              multiple
+              options={availableCenters}
+              value={selectedCenters}
+              onChange={(event, newValue) => {
+                setSelectedCenters(newValue);
+              }}
+              getOptionLabel={(option) => option.cohortName || ''}
+              isOptionEqualToValue={(option, value) =>
+                option.cohortMembershipId === value.cohortMembershipId
+              }
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.cohortName}
+                    {...getTagProps({ index })}
+                    key={option.cohortMembershipId}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Centers"
+                  placeholder="Select centers to activate"
+                  sx={{ mt: 1 }}
+                />
+              )}
+              renderOption={(props, option, { selected }) => (
+                <li {...props} key={option.cohortMembershipId}>
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.cohortName}
+                </li>
+              )}
+              disableCloseOnSelect
+              disabled={loadingCenters || availableCenters.length === 0}
+            />
+          )}
+          {!loadingCenters && availableCenters.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              No archived centers found for this user
+            </Typography>
+          )}
         </Box>
         <Typography fontWeight="bold">
           {t('FORM.CONFIRM_TO_ACTIVATE')}
