@@ -36,9 +36,13 @@ import {
   DialogActions,
   IconButton,
   CircularProgress,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { debounce, forEach } from 'lodash';
 import { Numbers } from '@mui/icons-material';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -68,7 +72,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import {
   transformLabel,
   fetchUserData,
@@ -85,6 +89,7 @@ import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButt
 import { showToastMessage } from '@/components/Toastify';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { updateUserTenantStatus } from '@/services/UserService';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -112,6 +117,9 @@ const Facilitator = () => {
   const [districtFieldId, setDistrictFieldId] = useState('');
   const [villageFieldId, setVillageFieldId] = useState('');
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+  const [selectedBatches, setSelectedBatches] = useState<any[]>([]);
+  const [availableBatches, setAvailableBatches] = useState<any[]>([]);
+  const [loadingBatches, setLoadingBatches] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
@@ -399,155 +407,75 @@ const Facilitator = () => {
     },
   ];
 
-  const userDelete = async () => {
-    try {
-      let membershipIds = null;
-
-      // Attempt to get the cohort list
-      try {
-        const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
-        } else {
-          console.warn('No cohort data found for the user.');
-        }
-      } catch (error) {
-        console.error('Failed to fetch cohort list:', error);
-      }
-
-      // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipIds && Array.isArray(membershipIds)) {
-        for (const membershipId of membershipIds) {
-          try {
-            const updateResponse = await updateCohortMemberStatus({
-              memberStatus: 'archived',
-              statusReason: reason,
-              membershipId,
-            });
-
-            if (updateResponse?.responseCode !== 200) {
-              console.error(
-                `Failed to archive user with membershipId ${membershipId}:`,
-                updateResponse
-              );
-            } else {
-              console.log(
-                `User with membershipId ${membershipId} successfully archived.`
-              );
-            }
-          } catch (error) {
-            console.error(
-              `Error archiving user with membershipId ${membershipId}:`,
-              error
-            );
-          }
-        }
-      }
-
-      // Always attempt to delete the user
-      console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { reason: reason, status: 'archived' },
-      });
-
-      if (resp?.responseCode === 200) {
-        // setResponse((prev) => ({
-        //   ...prev,
-        //   result: {
-        //     ...prev?.result,
-        //     getUserDetails: prev?.result?.getUserDetails?.filter(
-        //       (item) => item?.userId !== userID
-        //     ),
-        //   },
-        // }));
-        searchData(prefilledFormData, currentPage);
-        console.log('Team leader successfully archived.');
-      } else {
-        console.error('Failed to archive team leader:', resp);
-      }
-
-      return resp;
-    } catch (error) {
-      console.error('Error updating team leader:', error);
-    }
-  };
-
   const archiveToactive = async () => {
     try {
-      let membershipIds = null;
-
-      // Attempt to get the cohort list
-      try {
-        const userCohortResp = await getCohortList(userID);
-        if (userCohortResp?.result?.length) {
-          membershipIds = userCohortResp?.result?.map(
-            (item) => item.cohortMembershipId
-          );
-        } else {
-          console.warn('No cohort data found for the user.');
-        }
-      } catch (error) {
-        console.error('Failed to fetch cohort list:', error);
+      // Validate that at least one batch is selected
+      if (!selectedBatches || selectedBatches.length === 0) {
+        showToastMessage('Please select at least one batch', 'error');
+        return;
       }
 
-      // Attempt to update cohort member status only if we got a valid membershipId
-      if (membershipIds && Array.isArray(membershipIds)) {
-        for (const membershipId of membershipIds) {
-          try {
-            const updateResponse = await updateCohortMemberStatus({
-              memberStatus: 'active',
-              //   statusReason: reason,
-              membershipId,
-            });
+      // Update cohort member status for each selected batch
+      const membershipIds = selectedBatches.map((batch) => batch.cohortMembershipId);
+      
+      for (const membershipId of membershipIds) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: 'active',
+            membershipId,
+          });
 
-            if (updateResponse?.responseCode !== 200) {
-              console.error(
-                `Failed to archive user with membershipId ${membershipId}:`,
-                updateResponse
-              );
-            } else {
-              console.log(
-                `User with membershipId ${membershipId} successfully archived.`
-              );
-            }
-          } catch (error) {
+          if (updateResponse?.responseCode !== 200) {
             console.error(
-              `Error archiving user with membershipId ${membershipId}:`,
-              error
+              `Failed to activate user with membershipId ${membershipId}:`,
+              updateResponse
+            );
+            showToastMessage(
+              `Failed to activate batch membership ${membershipId}`,
+              'error'
+            );
+            return;
+          } else {
+            console.log(
+              `User with membershipId ${membershipId} successfully activated.`
             );
           }
+        } catch (error) {
+          console.error(
+            `Error activating user with membershipId ${membershipId}:`,
+            error
+          );
+          showToastMessage(
+            `Error activating batch membership ${membershipId}`,
+            'error'
+          );
+          return;
         }
       }
 
-      // Always attempt to delete the user
-      console.log('Proceeding to self-delete...');
-      const resp = await deleteUser(userID, {
-        userData: { status: 'active' },
+      // After successful batch activation, update user status
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
       });
-      showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
-
+      
       if (resp?.responseCode === 200) {
-        // setResponse((prev) => ({
-        //   ...prev,
-        //   result: {
-        //     ...prev?.result,
-        //     getUserDetails: prev?.result?.getUserDetails?.filter(
-        //       (item) => item?.userId !== userID
-        //     ),
-        //   },
-        // }));
+        showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+        // Reset state
+        setSelectedBatches([]);
+        setAvailableBatches([]);
+        setArchiveToActiveOpen(false);
+        // Refresh the list
         searchData(prefilledFormData, currentPage);
-
-        console.log('learner successfully aactive.');
+        console.log('User successfully activated.');
       } else {
-        console.error('Failed to archive team leader:', resp);
+        console.error('Failed to activate user:', resp);
+        showToastMessage('Failed to activate user', 'error');
       }
 
       return resp;
     } catch (error) {
-      console.error('Error updating team leader:', error);
+      console.error('Error activating user:', error);
+      showToastMessage('Error activating user', 'error');
     }
   };
   console.log(
@@ -582,64 +510,69 @@ const Facilitator = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Delete Facilitator"
-    //     >
-    //       {' '}
-    //       <Image src={deleteIcon} alt="" />{' '}
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     console.log('row.cohortData:', row.cohortData); // Check what data is available
-    //     const selectedUserId = row?.userId;
-    //     const selectedUserDetails = await getUserDetailsInfo(selectedUserId, true);
-    //     const cohortResponse = await getCohortList(selectedUserId);
-    //     console.log('cohortResponse:', cohortResponse);
-    //     const centerNames = [...new Set(row.cohortData.map(item => item.centerName))];
-    //     const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
-    //       if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
-    //         return item;
-    //       }
-    //     });
-    //     // Option 1: Get village from cohortData if available
-    //     const villagesFromCohort = row.cohortData
-    //       ?.filter((c: any) => c.cohortMember?.status === 'active')
-    //       .map((c: any) => c.villageName || c.village) // adjust property name as per your data
-    //       .filter(Boolean);
-    //     setUserData({
-    //       firstName: row?.firstName || '',
-    //       lastName: row?.lastName || '',
-    //       village: centerNames.length!==0 ?centerNames :"-"  ,
-    //     });
-    //     setOpen(true);
-    //     setUserId(row?.userId);
-    //     setReason('');
-    //     setChecked(false);
-    //     // setEditableUserId(row?.userId);
-    //     // const memberStatus = Status.ARCHIVED;
-    //     // const statusReason = '';
-    //     // const membershipId = row?.userId;
-    //     // const response = await updateCohortMemberStatus({
-    //     //   memberStatus,
-    //     //   statusReason,
-    //     //   membershipId,
-    //     // });
-    //     // setPrefilledFormData({});
-    //     // searchData(prefilledFormData, currentPage);
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Delete Facilitator"
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        console.log('row.cohortData:', row.cohortData); // Check what data is available
+        const selectedUserId = row?.userId;
+        const selectedUserDetails = await getUserDetailsInfo(selectedUserId, true);
+        const cohortResponse = await getCohortList(selectedUserId);
+        console.log('cohortResponse:', cohortResponse);
+        const centerNames = [...new Set(
+          row.cohortData
+            ?.filter((item: any) => item.cohortMember?.status === 'active')
+            ?.map((item: any) => item.centerName)
+            ?.filter(Boolean)
+        )];
+        const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
+          if (item.label === 'VILLAGE' || item.label === 'BLOCK') {
+            return item;
+          }
+        });
+        // Option 1: Get village from cohortData if available
+        const villagesFromCohort = row.cohortData
+          ?.filter((c: any) => c.cohortMember?.status === 'active')
+          .map((c: any) => c.villageName || c.village) // adjust property name as per your data
+          .filter(Boolean);
+        setUserData({
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: centerNames.length!==0 ?centerNames :"-"  ,
+        });
+        setOpen(true);
+        setUserId(row?.userId);
+        setReason('');
+        setChecked(false);
+        // setEditableUserId(row?.userId);
+        // const memberStatus = Status.ARCHIVED;
+        // const statusReason = '';
+        // const membershipId = row?.userId;
+        // const response = await updateCohortMemberStatus({
+        //   memberStatus,
+        //   statusReason,
+        //   membershipId,
+        // });
+        // setPrefilledFormData({});
+        // searchData(prefilledFormData, currentPage);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     {
       icon: (
         <Box
@@ -749,49 +682,60 @@ const Facilitator = () => {
       },
       show: (row) => row.status !== 'archived',
     },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reactivate Facilitator"
-    //     >
-    //       {' '}
-    //       <Image src={restoreIcon} alt="" />{' '}
-    //     </Box>
-    //   ),
-    //   callback: async (row) => {
-    //     const selectedUserId = row?.userId;
-    //     const selectedUserDetails = await getUserDetailsInfo(
-    //       selectedUserId,
-    //       true
-    //     );
-    //     const findVillage = selectedUserDetails?.userData?.customFields.find((item) => {
-    //       if (item.label === 'VILLAGE') {
-    //         return item;
-    //       }
-    //     });
-    //     // console.log('row:', row?.customFields[2].selectedValues[0].value);
-    //     setEditableUserId(row?.userId);
-    //     setArchiveToActiveOpen(true);
-    //     setUserId(row?.userId);
-    //     setUserData({
-    //       firstName: row?.firstName || '',
-    //       lastName: row?.lastName || '',
-    //       village: findVillage?.selectedValues?.[0]?.value || '',
-    //     });
-    //     // setReason('');
-    //     // setChecked(false);
-    //   },
-    //   show: (row) => row.status !== 'active',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reactivate Facilitator"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row) => {
+        const selectedUserId = row?.userId;
+        setEditableUserId(row?.userId);
+        setUserId(row?.userId);
+        setUserData({
+          firstName: row?.firstName || '',
+          lastName: row?.lastName || '',
+          village: '',
+        });
+        setSelectedBatches([]);
+        setAvailableBatches([]);
+        setLoadingBatches(true);
+        setArchiveToActiveOpen(true);
+        
+        try {
+          // Fetch cohort list for the user
+          const cohortResponse = await getCohortList(selectedUserId);
+          const cohortList = cohortResponse?.result || [];
+          
+          // Filter batches where cohortMemberStatus = "archived", cohortStatus = "active", and type = "BATCH"
+          const filteredBatches = cohortList.filter((cohort: any) => 
+            cohort.cohortMemberStatus === 'archived' &&
+            cohort.cohortStatus === 'active' &&
+            cohort.type === 'BATCH'
+          );
+          
+          setAvailableBatches(filteredBatches);
+        } catch (error) {
+          console.error('Error fetching cohort list:', error);
+          showToastMessage('Failed to load batches', 'error');
+        } finally {
+          setLoadingBatches(false);
+        }
+      },
+      show: (row) => row.status !== 'active',
+    },
   ];
 
   // Pagination handlers
@@ -1072,7 +1016,25 @@ const Facilitator = () => {
         primary={t('COMMON.DELETE_USER_WITH_REASON')}
         secondary={t('COMMON.CANCEL')}
         reason={reason}
-        onClickPrimary={userDelete}
+        onClickPrimary={async () => {
+          try {
+            const resp = await deleteUser({
+              userId: userID,
+              roleId: roleId,
+              tenantId: tenantId,
+              reason: reason,
+            });
+
+            if (resp?.responseCode === 200) {
+              searchData(prefilledFormData, currentPage);
+              console.log('User successfully archived.');
+            } else {
+              console.error('Failed to archive user:', resp);
+            }
+          } catch (error) {
+            console.error('Error deleting user:', error);
+          }
+        }}
       >
         <DeleteDetails
           firstName={userData.firstName}
@@ -1083,16 +1045,21 @@ const Facilitator = () => {
           reason={reason}
           setReason={setReason}
           isForFacilitator={true}
+          center={userData.village}
         />
       </ConfirmationPopup>
       <ConfirmationPopup
         checked={true}
         open={archiveToActiveOpen}
-        onClose={() => setArchiveToActiveOpen(false)}
+        onClose={() => {
+          setArchiveToActiveOpen(false);
+          setSelectedBatches([]);
+          setAvailableBatches([]);
+        }}
         title={t('COMMON.ACTIVATE_USER')}
         primary={t('COMMON.ACTIVATE')}
         secondary={t('COMMON.CANCEL')}
-        reason={'yes'}
+        reason={selectedBatches.length > 0 ? 'yes' : ''}
         onClickPrimary={archiveToactive}
       >
         <Box
@@ -1106,12 +1073,59 @@ const Facilitator = () => {
           <Typography>
             {userData.firstName} {userData.lastName} {t('FORM.WAS_BELONG_TO')}
           </Typography>
-          <TextField
-            fullWidth
-            value={userData.village}
-            disabled
-            sx={{ mt: 1 }}
-          />
+          {loadingBatches ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Autocomplete
+              multiple
+              options={availableBatches}
+              value={selectedBatches}
+              onChange={(event, newValue) => {
+                setSelectedBatches(newValue);
+              }}
+              getOptionLabel={(option) => option.cohortName || ''}
+              isOptionEqualToValue={(option, value) =>
+                option.cohortMembershipId === value.cohortMembershipId
+              }
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    label={option.cohortName}
+                    {...getTagProps({ index })}
+                    key={option.cohortMembershipId}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Batches"
+                  placeholder="Select batches to activate"
+                  sx={{ mt: 1 }}
+                />
+              )}
+              renderOption={(props, option, { selected }) => (
+                <li {...props} key={option.cohortMembershipId}>
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.cohortName}
+                </li>
+              )}
+              disableCloseOnSelect
+              disabled={loadingBatches || availableBatches.length === 0}
+            />
+          )}
+          {!loadingBatches && availableBatches.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              No archived batches found for this user
+            </Typography>
+          )}
         </Box>
         <Typography fontWeight="bold">
           {t('FORM.CONFIRM_TO_ACTIVATE')}

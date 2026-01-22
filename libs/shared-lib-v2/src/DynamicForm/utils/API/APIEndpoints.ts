@@ -42,9 +42,14 @@ const API_ENDPOINTS = {
   userRead: (userId: string | string[], fieldValue?: boolean) =>
     fieldValue !== undefined
       ? `${baseurl}/user/read/${userId}?fieldvalue=${fieldValue}`
-    : `${baseurl}/user/read/${userId}`,  suggestUsername: `${baseurl}/user/suggestUsername`,
-  cohortUpdateUser: (userId: string | string[]) => `${baseurl}/cohort/update/${userId}`,
-  formReadWithContext: (context: string, contextType: string) => `${baseurl}/form/read?context=${context}&contextType=${contextType}`,
+      : `${baseurl}/user/read/${userId}`,
+  suggestUsername: `${baseurl}/user/suggestUsername`,
+  userTenantStatus: (userId: string, tenantId: string) =>
+    `${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
+  cohortUpdateUser: (userId: string | string[]) =>
+    `${baseurl}/cohort/update/${userId}`,
+  formReadWithContext: (context: string, contextType: string) =>
+    `${baseurl}/form/read?context=${context}&contextType=${contextType}`,
   cohortCreate: `${baseurl}/cohort/create`,
   cohortMemberBulkCreate: `${baseurl}/cohortmember/bulkCreate`,
   cohortMemberUpdate: (membershipId: string | number) => `${baseurl}/cohortmember/update/${membershipId}`,
