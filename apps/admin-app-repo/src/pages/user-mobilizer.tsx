@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
-import { userList } from '@/services/UserList';
+import { HierarchicalSearchUserList, userList } from '@/services/UserList';
 import {
   Box,
   TextField,
@@ -21,12 +21,17 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Autocomplete,
+  Chip,
+  Checkbox,
+  CircularProgress,
 } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import SimpleModal from '@/components/SimpleModal';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { deleteUser } from '@/services/UserService';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
+import DeleteDetails from '@/components/DeleteDetails';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
@@ -54,7 +59,14 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import axios from 'axios';
-import { bulkCreateCohortMembers } from '@/services/CohortService/cohortService';
+import {
+  bulkCreateCohortMembers,
+  updateCohortMemberStatus,
+} from '@/services/CohortService/cohortService';
+import { getCohortList } from '@/services/GetCohortList';
+import { updateUserTenantStatus } from '@/services/UserService';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 const Mobilizer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
@@ -86,6 +98,11 @@ const Mobilizer = () => {
   const [open, setOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
+  const [village, setVillage] = useState('');
+  const [reason, setReason] = useState('');
+  const [selectedCenters, setSelectedCenters] = useState<any[]>([]);
+  const [availableCenters, setAvailableCenters] = useState<any[]>([]);
+  const [loadingCenters, setLoadingCenters] = useState(false);
   const [workingVillageId, setWorkingVillageId] = useState('');
   const [workingLocationId, setWorkingLocationId] = useState('');
   // const [workingVillageValues, setWorkingVillageValues] = useState([]);
@@ -242,6 +259,18 @@ const Mobilizer = () => {
       localStorage.setItem(searchStoreKey, JSON.stringify(formData));
       await searchData(formData, 0);
     }
+  };
+  const HierarchicalSearchUserListCustom = async (data) => {
+    const { role, tenantId, ...filteredFilters } = data.filters;
+    const newData = {
+      ...data,
+      filters: filteredFilters,
+    };
+    return await HierarchicalSearchUserList({
+      ...newData,
+      role: [RoleName.MOBILIZER],
+      customfields: ['state', 'district', 'block', 'village'],
+    });
   };
 
   //new variables
@@ -421,7 +450,7 @@ const Mobilizer = () => {
         setPageOffset,
         setCurrentPage,
         setResponse,
-        userList,
+        HierarchicalSearchUserListCustom,
         staticSort
       );
     }
@@ -451,30 +480,10 @@ const Mobilizer = () => {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
       label: t('TABLE_TITLE.LOCATION'),
       render: (row: any) => {
-        const state =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'STATE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const district =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'DISTRICT'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const block =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'BLOCK'
-            )?.selectedValues?.[0]?.value
-          ) || '';
-        const village =
-          transformLabel(
-            row.customFields.find(
-              (field: { label: string }) => field.label === 'VILLAGE'
-            )?.selectedValues?.[0]?.value
-          ) || '';
+        const state = transformLabel(row?.customfield?.state) || '';
+        const district = transformLabel(row?.customfield?.district) || '';
+        const block = transformLabel(row?.customfield?.block) || '';
+        const village = transformLabel(row?.customfield?.village) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
         }${block == '' ? '' : `, ${block}`}${
@@ -499,15 +508,73 @@ const Mobilizer = () => {
 
   const archiveToactive = async () => {
     try {
-      const resp = await deleteUser(editableUserId, {
-        userData: { status: 'active' },
-      });
-      setArchiveToActiveOpen(false);
-      searchData(prefilledFormData, currentPage);
+      // Validate that at least one center is selected
+      if (!selectedCenters || selectedCenters.length === 0) {
+        showToastMessage('Please select at least one center', 'error');
+        return;
+      }
 
-      showToastMessage(t('MOBILIZER.ACTIVATE_USER_SUCCESS'), 'success');
+      // Update cohort member status for each selected center
+      const membershipIds = selectedCenters.map((center) => center.cohortMembershipId);
+      
+      for (const membershipId of membershipIds) {
+        try {
+          const updateResponse = await updateCohortMemberStatus({
+            memberStatus: 'active',
+            membershipId,
+          });
+
+          if (updateResponse?.responseCode !== 200) {
+            console.error(
+              `Failed to activate user with membershipId ${membershipId}:`,
+              updateResponse
+            );
+            showToastMessage(
+              `Failed to activate center membership ${membershipId}`,
+              'error'
+            );
+            return;
+          } else {
+            console.log(
+              `User with membershipId ${membershipId} successfully activated.`
+            );
+          }
+        } catch (error) {
+          console.error(
+            `Error activating user with membershipId ${membershipId}:`,
+            error
+          );
+          showToastMessage(
+            `Error activating center membership ${membershipId}`,
+            'error'
+          );
+          return;
+        }
+      }
+
+      // After successful center activation, update user status
+      const resp = await updateUserTenantStatus(userID, tenantId, {
+        status: 'active',
+      });
+      
+      if (resp?.responseCode === 200) {
+        showToastMessage(t('MOBILIZER.ACTIVATE_USER_SUCCESS'), 'success');
+        // Reset state
+        setSelectedCenters([]);
+        setAvailableCenters([]);
+        setArchiveToActiveOpen(false);
+        // Refresh the list
+        searchData(prefilledFormData, currentPage);
+        console.log('Mobilizer successfully activated.');
+      } else {
+        console.error('Failed to activate mobilizer:', resp);
+        showToastMessage('Failed to activate mobilizer', 'error');
+      }
+
+      return resp;
     } catch (error) {
-      console.error('Error updating mentor:', error);
+      console.error('Error activating mobilizer:', error);
+      showToastMessage('Error activating mobilizer', 'error');
     }
   };
   // Define actions
@@ -542,75 +609,94 @@ const Mobilizer = () => {
     //   },
     //   show: (row) => row.status !== 'archived',
     // },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Delete State Lead"
-    //     >
-    //       {' '}
-    //       <Image src={deleteIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row: any) => {
-    //     console.log('row:', row);
-    //     setEditableUserId(row?.userId);
-    //     const userId = row?.userId;
-    //     const response = await deleteUser(userId, {
-    //       userData: {
-    //         status: Status.ARCHIVED,
-    //       },
-    //     });
-    //     setPrefilledFormData({});
-    //     searchData(prefilledFormData, currentPage);
-    //     setOpenModal(false);
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Reactivate State Lead"
-    //     >
-    //       {' '}
-    //       <Image src={restoreIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: async (row: any) => {
-    //     const findState = row?.customFields.find((item) => {
-    //       if (item.label === 'STATE') {
-    //         return item;
-    //       }
-    //     });
-    //     setState(findState?.selectedValues[0]?.value);
-    //     console.log('row:', findState);
-    //     setFirstName(row?.firstName);
-    //     setLastName(row?.lastName);
-    //     setEditableUserId(row?.userId);
-    //     const userId = row?.userId;
-    //     // const response = await archiveToactive(userId);
-    //     setArchiveToActiveOpen(true);
-    //     setPrefilledFormData({});
-    //   },
-    //   show: (row) => row.status !== 'active',
-    // }
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Delete State Lead"
+        >
+          {' '}
+          <Image src={deleteIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        console.log('row>>>>>', row);
+        // Extract centerName from cohortData where cohortMember.status === 'active'
+        const centerNames = row?.cohortData
+          ?.filter((item: any) => item?.cohortMember?.status === 'active')
+          ?.map((item: any) => item?.centerName)
+          ?.filter(Boolean) || [];
+        const centerNamesString = centerNames.length > 0 ? centerNames.join(', ') : '';
+        setAvailableCenters(centerNamesString);
+        setVillage(centerNamesString || row?.customfield?.block || row?.customfield?.village || '');
+        setUserId(row?.userId);
+        setOpen(true);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setReason('');
+        setChecked(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reactivate Mobilizer"
+        >
+          {' '}
+          <Image src={restoreIcon} alt="" />{' '}
+        </Box>
+      ),
+      callback: async (row: any) => {
+        const selectedUserId = row?.userId;
+        setEditableUserId(row?.userId);
+        setUserId(row?.userId);
+        setFirstName(row?.firstName);
+        setLastName(row?.lastName);
+        setSelectedCenters([]);
+        setAvailableCenters([]);
+        setLoadingCenters(true);
+        setArchiveToActiveOpen(true);
+        
+        try {
+          // Fetch cohort list for the user
+          const cohortResponse = await getCohortList(selectedUserId);
+          const cohortList = cohortResponse?.result || [];
+          
+          // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
+          const filteredCenters = cohortList.filter((cohort: any) => 
+            cohort.cohortMemberStatus === 'archived' &&
+            cohort.cohortStatus === 'active' &&
+            (cohort.type === 'CENTER' || cohort.type === 'COHORT')
+          );
+          
+          setAvailableCenters(filteredCenters);
+        } catch (error) {
+          console.error('Error fetching cohort list:', error);
+          showToastMessage('Failed to load centers', 'error');
+        } finally {
+          setLoadingCenters(false);
+        }
+      },
+      show: (row) => row.status !== 'active',
+    }
   ];
 
   // Pagination handlers
@@ -874,13 +960,57 @@ const Mobilizer = () => {
         )}
 
         <ConfirmationPopup
+          checked={checked}
+          open={open}
+          onClose={() => setOpen(false)}
+          title={t('COMMON.DELETE_USER')}
+          primary={t('COMMON.DELETE_USER_WITH_REASON')}
+          secondary={t('COMMON.CANCEL')}
+          reason={reason}
+          onClickPrimary={async () => {
+            try {
+              const resp = await deleteUser({
+                userId: userID,
+                roleId: roleId,
+                tenantId: tenantId,
+                reason: reason,
+              });
+
+              if (resp?.responseCode === 200) {
+                searchData(prefilledFormData, currentPage);
+                console.log('Mobilizer successfully archived.');
+                setOpen(false);
+              } else {
+                console.error('Failed to archive mobilizer:', resp);
+              }
+            } catch (error) {
+              console.error('Error deleting mobilizer:', error);
+            }
+          }}
+        >
+          <DeleteDetails
+            firstName={firstName}
+            lastName={lastName}
+            village={village}
+            checked={checked}
+            setChecked={setChecked}
+            reason={reason}
+            setReason={setReason}
+            center={availableCenters}
+          />
+        </ConfirmationPopup>
+        <ConfirmationPopup
           checked={true}
           open={archiveToActiveOpen}
-          onClose={() => setArchiveToActiveOpen(false)}
+          onClose={() => {
+            setArchiveToActiveOpen(false);
+            setSelectedCenters([]);
+            setAvailableCenters([]);
+          }}
           title={t('COMMON.ACTIVATE_USER')}
           primary={t('COMMON.ACTIVATE')}
           secondary={t('COMMON.CANCEL')}
-          reason={'yes'}
+          reason={selectedCenters.length > 0 ? 'yes' : ''}
           onClickPrimary={archiveToactive}
         >
           <Box
@@ -894,7 +1024,59 @@ const Mobilizer = () => {
             <Typography>
               {firstName} {lastName} {t('FORM.WAS_BELONG_TO')}
             </Typography>
-            <TextField fullWidth value={state} disabled sx={{ mt: 1 }} />
+            {loadingCenters ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            ) : (
+              <Autocomplete
+                multiple
+                options={availableCenters}
+                value={selectedCenters}
+                onChange={(event, newValue) => {
+                  setSelectedCenters(newValue);
+                }}
+                getOptionLabel={(option) => option.cohortName || ''}
+                isOptionEqualToValue={(option, value) =>
+                  option.cohortMembershipId === value.cohortMembershipId
+                }
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      label={option.cohortName}
+                      {...getTagProps({ index })}
+                      key={option.cohortMembershipId}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Centers"
+                    placeholder="Select centers to activate"
+                    sx={{ mt: 1 }}
+                  />
+                )}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props} key={option.cohortMembershipId}>
+                    <Checkbox
+                      icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                      checkedIcon={<CheckBoxIcon fontSize="small" />}
+                      style={{ marginRight: 8 }}
+                      checked={selected}
+                    />
+                    {option.cohortName}
+                  </li>
+                )}
+                disableCloseOnSelect
+                disabled={loadingCenters || availableCenters.length === 0}
+              />
+            )}
+            {!loadingCenters && availableCenters.length === 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                No archived centers found for this user
+              </Typography>
+            )}
           </Box>
           <Typography fontWeight="bold">
             {t('FORM.CONFIRM_TO_ACTIVATE')}

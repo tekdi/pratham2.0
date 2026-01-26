@@ -12,7 +12,7 @@ type DeleteUserParams = {
 };
 
 // adjust these based on your actual role ids/constants
-const ROLES_ASSIGNED_TO_COHORTS = [RoleId.TEACHER, RoleId.TEAM_LEADER, RoleId.STUDENT];
+const ROLES_ASSIGNED_TO_COHORTS = [RoleId.TEACHER, RoleId.TEAM_LEADER, RoleId.STUDENT, RoleId.MOBILIZER];
 
 export const deleteUser = async ({
   userId,
