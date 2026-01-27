@@ -229,7 +229,7 @@ const RegisterationFlow = () => {
           'district',
           'block',
           'village',
-          'family_member_details',
+        //  'family_member_details',
           // 'center',
           // 'batch',
           // 'username',

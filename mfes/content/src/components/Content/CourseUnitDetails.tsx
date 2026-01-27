@@ -91,12 +91,18 @@ export default function Details(props: DetailsProps) {
   useEffect(() => {
     const getDetails = async (identifier: string) => {
       try {
-        const resultHierarchyCourse = await hierarchyAPI(courseId as string, {
-          mode: 'edit',
-        }) as any;
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-        const isPosPath = currentPath.includes('/pos');
+        const isPosPath = currentPath.includes('/pos');        let resultHierarchyCourse;
+        if(isPosPath) {
+          resultHierarchyCourse = await hierarchyAPI(courseId as string) as any;
+        } else {
+          resultHierarchyCourse = await hierarchyAPI(courseId as string, {
+            mode: 'edit',
+          }) as any;
+        }
+       
+     
         const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
 
         if(!isThematicPath && !isPosPath && resultHierarchyCourse?.program) {
