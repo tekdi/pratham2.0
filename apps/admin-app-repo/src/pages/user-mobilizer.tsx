@@ -269,7 +269,7 @@ const Mobilizer = () => {
     return await HierarchicalSearchUserList({
       ...newData,
       role: [RoleName.MOBILIZER],
-      customfields: ['state', 'district', 'block', 'village'],
+      customfields: ['state', 'district', 'block', 'village', 'working_location', 'working_village'],
     });
   };
 
