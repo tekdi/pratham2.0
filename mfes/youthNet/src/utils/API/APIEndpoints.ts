@@ -1,6 +1,7 @@
 const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 const API_ENDPOINTS = {
+  resetPassword: `${baseurl}/user/reset-password`,
   userRead: (userId: string | string[]) => `${baseurl}/user/read/${userId}`,
   userUpdate: (userId: string | string[]) => `${baseurl}/user/update/${userId}`,
   userAuth: `${baseurl}/user/auth`,
@@ -12,6 +13,7 @@ const API_ENDPOINTS = {
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   accountCreate: `${baseurl}/account/create`,
   assessmentList: `${baseurl}/tracking/assessment/list`,
+  accountLogin: `${baseurl}/account/login`,
 
   cohortMemberList: `${baseurl}/cohortmember/list`,
   myCohorts: (

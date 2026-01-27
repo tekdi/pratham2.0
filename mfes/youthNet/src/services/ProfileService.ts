@@ -1,7 +1,10 @@
 import axios from 'axios';
-import { get, patch } from '@shared-lib';
+import { get, patch, post } from '@shared-lib';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
-
+interface LoginParams {
+  username: string;
+  password: string;
+}
 export const getUserId = async (): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.userAuth;
 
@@ -51,5 +54,31 @@ export const getUserDetails = async (
   } catch (error) {
     console.error('error in fetching user details', error);
     return error;
+  }
+};
+export const resetPassword = async (
+  newPassword: any, username?:string): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.resetPassword
+  try {
+    const payload = username ? { newPassword, username } : { newPassword };
+    const response = await post(apiUrl, payload);
+    return response?.data;
+  } catch (error) {
+    console.error('error in reset', error);
+   // throw error;
+  }
+};
+export const login = async ({
+  username,
+  password,
+}: LoginParams): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.accountLogin
+
+  try {
+    const response = await post(apiUrl, { username, password });
+    return response?.data;
+  } catch (error) {
+    console.error('error in login', error);
+    throw error;
   }
 };

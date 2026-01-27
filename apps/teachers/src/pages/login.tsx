@@ -126,9 +126,34 @@ const LoginComponent = () => {
         : '';
     const userId = receivedToken?.userId;
 
+    // Find the tenant data for the selected tenant
+    const tenantData = receivedToken?.tenantData?.find(
+      (tenant: any) => tenant.tenantId === tenantId
+    );
+
     if (receivedToken.tenantData && receivedToken.tenantData.length > 0) {
       localStorage.setItem('tenantName', tenantName);
       localStorage.setItem('tenantId', tenantId);
+      
+      // Set templateId from tenant data
+      localStorage.setItem('templtateId', tenantData?.templateId || '');
+      
+      // Set channelId
+      if (tenantData?.channelId) {
+        localStorage.setItem('channelId', tenantData.channelId);
+      }
+      
+      // Set collectionFramework
+      if (tenantData?.collectionFramework) {
+        localStorage.setItem('collectionFramework', tenantData.collectionFramework);
+      }
+      
+      // Set uiConfig
+      const uiConfig = tenantData?.params?.uiConfig;
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+      
+      // Set userProgram
+      localStorage.setItem('userProgram', tenantName);
     } else {
       console.error('Tenant data not found in user response.');
     }
@@ -136,6 +161,8 @@ const LoginComponent = () => {
     setUserId(userId);
 
     if (token && userId) {
+      // Set token cookie
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
       document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
       document.cookie = `userId=${userId}; path=/; secure; SameSite=Strict`;
 
@@ -166,9 +193,11 @@ const LoginComponent = () => {
       }
 
       localStorage.setItem('role', roleName);
+      localStorage.setItem('roleName', roleName);
       localStorage.setItem('roleId', roleId || '');
       localStorage.setItem('userEmail', receivedToken?.email);
       localStorage.setItem('userName', receivedToken?.firstName);
+      localStorage.setItem('firstName', receivedToken?.firstName || '');
       localStorage.setItem('userIdName', receivedToken?.username);
       localStorage.setItem(
         'temporaryPassword',
@@ -183,7 +212,8 @@ const LoginComponent = () => {
         tenant?.toLocaleLowerCase() ===
           TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
-        tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()
       ) {
         const userDetails = await getUserDetails(userId, true);
         console.log(userDetails);
@@ -193,12 +223,14 @@ const LoginComponent = () => {
           const customFields = userDetails?.result?.userData?.customFields;
           if (customFields?.length) {
             // set customFields in userData
-            let userDataString = localStorage.getItem('userData');
-            let userData: any = userDataString
+            const userDataString = localStorage.getItem('userData');
+            const userData: any = userDataString
               ? JSON.parse(userDataString)
               : null;
-            userData.customFields = customFields;
-            localStorage.setItem('userData', JSON.stringify(userData));
+            if (userData) {
+              userData.customFields = customFields;
+              localStorage.setItem('userData', JSON.stringify(userData));
+            }
             const state = customFields.find(
               (field: any) => field?.label === 'STATE'
             );
@@ -232,10 +264,38 @@ const LoginComponent = () => {
             }
           }
 
+          // Check for temporary password first
+          
           if (activeSessionId && tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase()) {
-            router.push('/teacher');
-          }else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()){
+           {
+              router.push('/teacher');
+            }
+          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
             router.push('/youth');
+         
+          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
+            
+            if (activeSessionId) {
+              localStorage.setItem('academicYearId', activeSessionId);
+            }
+            
+            // Check if user has Lead role for PRAGYANPATH
+            const hasLead = receivedToken?.tenantData?.some((tenant: any) => 
+              tenant.roles.some((role: any) => role.roleName.toLowerCase().includes("lead"))
+            );
+            
+            if (hasLead && roleName.toLowerCase().includes('lead')) {
+              // For Lead role, set managrUserId for manager dashboard
+              localStorage.setItem('managrUserId', userId);
+              
+              // Redirect to manager dashboard in youthNet MFE
+                {
+                router.push('/youthnet/manager-dashboard');
+              }
+            } else {
+              // For other roles, redirect to youthNet MFE
+              router.push('/youthnet');
+            }
           }
           console.log('userDetails', userDetails);
         }
@@ -247,7 +307,7 @@ const LoginComponent = () => {
           localStorage.getItem('role') === RoleNames.TEACHER ||
           localStorage.getItem('role') === RoleNames.TEAM_LEADER
         )
-          router.push('/youth');
+          router.push('/youthnet');
         else router.push('/unauthorized');
       }
     }

@@ -127,7 +127,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         mode =
           content?.status === 'Draft' || content?.status === 'Live'
             ? 'edit'
-            : getLocalStoredUserRole() === Role.CCTA ? 'read' : 'review';
+            : getLocalStoredUserRole() === Role.SCTA ? 'read' : 'review';
         break;
 
       default:
