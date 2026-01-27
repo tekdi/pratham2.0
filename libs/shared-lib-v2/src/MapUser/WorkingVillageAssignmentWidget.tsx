@@ -763,6 +763,122 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
     setVillageSearchKeyword(''); // Clear search keyword
   };
 
+  // Handler for Confirm Assignment button
+  const handleConfirmAssignment = () => {
+    if (!selectedCenter || selectedVillages.size === 0) {
+      return;
+    }
+
+    const center = centerOptions.find((c) => c.id === selectedCenter);
+    if (!center || !center.customFields) {
+      console.error('Center or customFields not found');
+      return;
+    }
+
+    // Find CATCHMENT_AREA field in customFields
+    const catchmentAreaField = center.customFields.find(
+      (field: any) => field.label === 'CATCHMENT_AREA'
+    );
+
+    if (!catchmentAreaField || !catchmentAreaField.selectedValues) {
+      console.error('CATCHMENT_AREA not found');
+      return;
+    }
+
+    // Create a map of selected villages by block ID
+    const selectedVillagesByBlock: Record<string, Array<{ id: number; name: string }>> = {};
+    
+    // Iterate through all villages and group selected ones by block
+    Object.entries(villagesByBlock).forEach(([blockId, villages]) => {
+      const selectedInBlock = villages.filter((village) => selectedVillages.has(village.id));
+      if (selectedInBlock.length > 0) {
+        selectedVillagesByBlock[blockId] = selectedInBlock.map((v) => ({
+          id: Number(v.id),
+          name: v.name,
+        }));
+      }
+    });
+
+    // Build payload structure from CATCHMENT_AREA
+    const payload: Array<{
+      stateId: number;
+      stateName: string;
+      districts: Array<{
+        districtId: number;
+        districtName: string;
+        blocks: Array<{
+          id: number;
+          name: string;
+          villages: Array<{ id: number; name: string }>;
+        }>;
+      }>;
+    }> = [];
+
+    // Iterate through catchment area structure
+    catchmentAreaField.selectedValues.forEach((stateData: any) => {
+      const stateId = Number(stateData.stateId);
+      const stateName = stateData.stateName || '';
+
+      const districts: Array<{
+        districtId: number;
+        districtName: string;
+        blocks: Array<{
+          id: number;
+          name: string;
+          villages: Array<{ id: number; name: string }>;
+        }>;
+      }> = [];
+
+      if (stateData.districts && Array.isArray(stateData.districts)) {
+        stateData.districts.forEach((district: any) => {
+          const districtId = Number(district.districtId);
+          const districtName = district.districtName || '';
+
+          const blocks: Array<{
+            id: number;
+            name: string;
+            villages: Array<{ id: number; name: string }>;
+          }> = [];
+
+          if (district.blocks && Array.isArray(district.blocks)) {
+            district.blocks.forEach((block: any) => {
+              const blockId = String(block.id);
+              
+              // Only include blocks that have selected villages
+              if (selectedVillagesByBlock[blockId] && selectedVillagesByBlock[blockId].length > 0) {
+                blocks.push({
+                  id: Number(block.id),
+                  name: block.name || '',
+                  villages: selectedVillagesByBlock[blockId],
+                });
+              }
+            });
+          }
+
+          // Only include districts that have blocks with selected villages
+          if (blocks.length > 0) {
+            districts.push({
+              districtId,
+              districtName,
+              blocks,
+            });
+          }
+        });
+      }
+
+      // Only include states that have districts with selected villages
+      if (districts.length > 0) {
+        payload.push({
+          stateId,
+          stateName,
+          districts,
+        });
+      }
+    });
+
+    console.log('Confirm Assignment Payload:', JSON.stringify(payload, null, 2));
+  };
+
   return (
     <Box sx={{ width: '100%' }}>
       {/* Header Section */}
@@ -820,6 +936,7 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
             <Button
               variant="contained"
               disabled={selectedVillagesCount === 0}
+              onClick={handleConfirmAssignment}
               fullWidth={false}
               sx={{
                 bgcolor: themeColor,
