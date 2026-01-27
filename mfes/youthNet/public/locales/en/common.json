@@ -618,7 +618,10 @@
     "AVAILABLE_SUGGESTIONS": "Available suggestions:",
     "USERNAME_ALREADY_EXIST": "This username already exists",
     "GRADUATE": "Graduate",
-    "POST_GRADUATE": "Post Graduate"
+    "POST_GRADUATE": "Post Graduate",
+    "BELONG_TO": "belongs to",
+    "WAS_BELONG_TO": "was belonging to",
+    "DO_YOU_WANT_TO_DELETE": "Do you want to delete this user?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

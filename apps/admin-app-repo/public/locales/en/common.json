@@ -169,7 +169,9 @@
     "MOVED_TO_DIFFERENT_ROLE": "Moved to a different role",
     "NO_MOBILIZER_FOUND": "No Mentor Found",
     "MAP": "Map",
-    "NEXT": "Next"
+    "NEXT": "Next",
+    "USER_BATCHES": "{{name}} belongs to below batches",
+    "DELETE_FROM_BATCH_WARNING": "Do you want to delete user from above center's batches?"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -554,7 +556,10 @@
     "CONFIRM_TO_ACTIVATE": "Are you sure you want to activate this user again?",
     "WORKING_LOCATION": "Working Location",
     "CATCHMENT_AREA": "Catchment Area",
-    "TYPE_OF_BATCH": "Type of Batch"
+    "TYPE_OF_BATCH": "Type of Batch",
+    "BELONG_TO_MULTIPLE_CENTERS": "belongs to below centers",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete user from all centers?",
+    "DO_YOU_WANT_TO_DELETE_FROM_LOCATION": "Do you want to delete user from this location?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

@@ -16,6 +16,8 @@ import {
   Tabs,
   TextField,
   Typography,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -89,10 +91,11 @@ import {
   splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { RoleId } from '@/utils/app.constant';
-import { deleteUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { bulkCreateCohortMembers } from '../../services/CohortService';
+import { getCohortList } from '../../services/GetCohortList';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -153,6 +156,14 @@ const Index = () => {
   const [filteredyouthList, setFilteredYouthList] = useState<any>([]);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
+  const [open, setOpen] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [reason, setReason] = useState('');
+  const [village, setVillage] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [userID, setUserId] = useState('');
+  const [availableCenters, setAvailableCenters] = useState<string>('');
   const [stateData, setStateData] = useState<any>(null);
   const [districtData, setDistrictData] = useState<any>(null);
   const [blockData, setBlockData] = useState<any>(null);
@@ -1140,7 +1151,53 @@ const Index = () => {
 
       case BOTTOM_DRAWER_CONSTANTS.DELETE:
         setOpenMentorDrawer(false);
-        setOpenDelete(true);
+        // Extract village/center information from selectedMentor
+        if (selectedMentor) {
+          const mentorUserId = selectedMentor?.Id || selectedMentor?.userId || '';
+          setUserId(mentorUserId);
+          setFirstName(selectedMentor?.firstName || '');
+          setLastName(selectedMentor?.lastName || '');
+          setReason('');
+          setChecked(false);
+          
+          // Fetch active centers/villages for the mentor
+          const fetchMentorCenters = async () => {
+            try {
+              if (mentorUserId) {
+                const cohortResponse = await getCohortList(mentorUserId);
+                const cohortList = cohortResponse?.result || [];
+                
+                // Filter active centers where cohortMemberStatus = "active" and cohortStatus = "active"
+                const activeCenters = cohortList.filter((cohort: any) => 
+                  cohort.cohortMemberStatus === 'active' &&
+                  cohort.cohortStatus === 'active' &&
+                  (cohort.type === 'CENTER' || cohort.type === 'COHORT')
+                );
+                
+                // Extract center names
+                const centerNames = activeCenters
+                  .map((cohort: any) => cohort.cohortName || cohort.name)
+                  .filter(Boolean)
+                  .join(', ');
+                
+                setAvailableCenters(centerNames);
+                setVillage(centerNames);
+                setOpen(true);
+              } else {
+                setAvailableCenters('');
+                setVillage('');
+                setOpen(true);
+              }
+            } catch (error) {
+              console.error('Error fetching mentor centers:', error);
+              setAvailableCenters('');
+              setVillage('');
+              setOpen(true);
+            }
+          };
+          
+          fetchMentorCenters();
+        }
         break;
 
       default:
@@ -1173,11 +1230,12 @@ const Index = () => {
   ];
 
   const mentorActions = [
-    {
-      label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
-      action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
-      icon: <HolidayVillageIcon />,
-    },
+    // TODO: Uncomment after reassign functionality implementation is complete
+    // {
+    //   label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
+    //   action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
+    //   icon: <HolidayVillageIcon />,
+    // },
     // {
     //   label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
     //   action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
@@ -1204,6 +1262,7 @@ const Index = () => {
 
   const handleRadioChange = (value: string) => {
     setSelectedValue(value);
+    setReason(value);
   };
 
   const formFields = [
@@ -1380,23 +1439,37 @@ const Index = () => {
 
   // Mentor delete logic
   const handleDeleteMentor = async () => {
+    if (!checked) {
+      showToastMessage(t('COMMON.PLEASE_CONFIRM_DELETION'), 'error');
+      return;
+    }
+    if (!reason) {
+      showToastMessage(t('COMMON.PLEASE_SELECT_REASON'), 'error');
+      return;
+    }
+    
     try {
-      // 1. Delete user
-      const resp = await updateUserTenantStatus(selectedMentor?.Id, tenantId, {
-        status: 'archived',
-        reason: selectedValue,
+      const resp = await deleteUser({
+        userId: userID,
+        roleId: roleId,
+        tenantId: tenantId,
+        reason: reason,
       });
-      // 2. Update UI
-      if (resp?.responseCode === 200 || resp?.responseCode === 'OK') {
-        setOpenDelete(false);
+
+      if (resp?.responseCode === 200) {
+        setOpen(false);
+        setChecked(false);
+        setReason('');
         showToastMessage(t('MENTORS.MENTOR_DELETED_SUCCESSFULLY'), 'success');
         await getMobilizersList();
+        console.log('Mentor successfully archived.');
       } else {
+        console.error('Failed to archive mentor:', resp);
         showToastMessage(t('MENTORS.MENTOR_DELETE_FAIL'), 'error');
       }
     } catch (error) {
+      console.error('Error deleting mentor:', error);
       showToastMessage('Error deleting mentor', 'error');
-      console.error(error);
     }
   };
 
@@ -1556,7 +1629,10 @@ const Index = () => {
               {filteredmentorList.length !== 0 ? (
                 <UserList
                   layout="list"
-                  users={filteredmentorList}
+                  users={filteredmentorList.map((user: any) => ({
+                    ...user,
+                    showMore: true,
+                  }))}
                   onUserClick={handleUserClick}
                   onToggleUserClick={handleToggledMentorClick}
                 />
@@ -1586,51 +1662,89 @@ const Index = () => {
             />
 
             <SimpleModal
-              open={openDelete}
-              onClose={onClose}
+              open={open}
+              onClose={() => {
+                setOpen(false);
+                setChecked(false);
+                setReason('');
+              }}
               showFooter={true}
-              modalTitle={t(
-                'YOUTHNET_USERS_AND_VILLAGES.DELETE_USER_PERMANENTLY'
-              )}
+              modalTitle={t('COMMON.DELETE_USER')}
               primaryText={t('COMMON.DELETE_USER_WITH_REASON')}
+              secondaryText={t('COMMON.CANCEL')}
               primaryActionHandler={handleDeleteMentor}
+              secondaryActionHandler={() => {
+                setOpen(false);
+                setChecked(false);
+                setReason('');
+              }}
             >
               <Box>
-                <Box mt={2}>
-                  <Typography sx={{ fontSize: '14px' }}>
-                    {t('COMMON.REASON_FOR_DELETION')}
+                <Box
+                  sx={{
+                    border: '1px solid #ddd',
+                    borderRadius: 2,
+                    mb: 2,
+                    p: 1,
+                  }}
+                >
+                  <Typography fontWeight="bold">
+                    {firstName} {lastName} {availableCenters || village ? t('FORM.BELONG_TO') : t('FORM.WAS_BELONG_TO')}
                   </Typography>
+                  <TextField 
+                    fullWidth 
+                    value={availableCenters || village || ''} 
+                    disabled 
+                    sx={{ mt: 1 }} 
+                    placeholder={availableCenters || village ? '' : 'No center/village assigned'}
+                  />
                 </Box>
-                <Box>
-                  {reasons.map((option, index) => (
-                    <>
-                      <Box
-                        display={'flex'}
-                        justifyContent={'space-between'}
-                        alignItems={'center'}
-                      >
-                        <Typography
-                          sx={{
-                            color: theme.palette.warning['A200'],
-                            fontSize: '16px',
-                            fontWeight: 400,
-                          }}
-                          component="h2"
-                        >
-                          {option.label}
-                        </Typography>
 
-                        <Radio
-                          sx={{ pb: '20px' }}
-                          onChange={() => handleRadioChange(option.value)}
-                          value={option.value}
-                          checked={selectedValue === option.value}
-                        />
-                      </Box>
-                      {reasons?.length - 1 !== index && <Divider />}
-                    </>
-                  ))}
-                </Box>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={checked}
+                      onChange={(e) => setChecked(e.target.checked)}
+                    />
+                  }
+                  label={t('FORM.DO_YOU_WANT_TO_DELETE')}
+                  sx={{ mb: checked ? 2 : 0 }}
+                />
+
+                {checked && (
+                  <Box mt={2}>
+                    <Typography sx={{ fontSize: '14px', mb: 1 }}>
+                      {t('COMMON.REASON_FOR_DELETION')}
+                    </Typography>
+                    {reasons.map((option, index) => (
+                      <React.Fragment key={index}>
+                        <Box
+                          display={'flex'}
+                          justifyContent={'space-between'}
+                          alignItems={'center'}
+                        >
+                          <Typography
+                            sx={{
+                              color: theme.palette.warning['A200'],
+                              fontSize: '16px',
+                              fontWeight: 400,
+                            }}
+                            component="h2"
+                          >
+                            {option.label}
+                          </Typography>
+                          <Radio
+                            sx={{ pb: '20px' }}
+                            onChange={() => setReason(option.value)}
+                            value={option.value}
+                            checked={reason === option.value}
+                          />
+                        </Box>
+                        {reasons?.length - 1 !== index && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </Box>
+                )}
               </Box>
             </SimpleModal>
             <SimpleModal

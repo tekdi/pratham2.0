@@ -261,15 +261,44 @@ const UserId = () => {
           }
 
           // Get village IDs from WORKING_VILLAGE field
-          const villageIdsString = workingVillageField?.selectedValues?.[0];
-          if (!villageIdsString) {
+          const villageIdsData = workingVillageField?.selectedValues;
+          if (!villageIdsData || villageIdsData.length === 0) {
             return '';
           }
 
-          // Split comma-separated IDs - ensure it's a string before splitting
-          const villageIds : any = typeof villageIdsString === 'string' 
-            ? villageIdsString.split(',').map((id: string) => id.trim()) 
-            : [];
+          // Handle different formats: object with id/value, array of objects, or comma-separated string
+          console.log('villageIdsData', villageIdsData);
+          let villageIds: string[] = [];
+          
+          // Process all selectedValues
+          villageIdsData.forEach((item: any) => {
+            if (typeof item === 'string') {
+              // If it's a string, split by comma and add all IDs
+              const ids = item.split(',').map((id: string) => id.trim());
+              villageIds.push(...ids);
+            } else if (item && typeof item === 'object') {
+              // If it's an object with id property
+              if (item.id !== undefined) {
+                villageIds.push(String(item.id));
+              } else if (typeof item.value === 'string') {
+                // If value is a comma-separated string
+                const ids = item.value.split(',').map((id: string) => id.trim());
+                villageIds.push(...ids);
+              } else if (Array.isArray(item.value)) {
+                // If value is an array
+                item.value.forEach((val: any) => {
+                  if (val?.id !== undefined) {
+                    villageIds.push(String(val.id));
+                  } else if (typeof val === 'string') {
+                    villageIds.push(val.trim());
+                  }
+                });
+              }
+            }
+          });
+          
+          // Remove duplicates and filter out empty values
+          villageIds = [...new Set(villageIds.filter(Boolean))];
 
           // Get working location data - handle both single object and array
           const workingLocationDataArray =
