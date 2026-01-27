@@ -26,6 +26,7 @@ import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormCo
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import SimpleModal from '../../components/SimpleModal';
 import { showToastMessage } from '../../components/Toastify';
+import EditIcon from '@mui/icons-material/Edit';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -218,6 +219,7 @@ const UserId = () => {
 
       if (userId === storedUserId) {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        console.log('userData====>', userData);
       } else if (userId) {
         const data = await getUserDetails(userId, true);
         console.log('data>>>>', data);
@@ -264,10 +266,10 @@ const UserId = () => {
             return '';
           }
 
-          // Split comma-separated IDs
-          const villageIds = villageIdsString
-            .split(',')
-            .map((id: string) => id.trim());
+          // Split comma-separated IDs - ensure it's a string before splitting
+          const villageIds : any = typeof villageIdsString === 'string' 
+            ? villageIdsString.split(',').map((id: string) => id.trim()) 
+            : [];
 
           // Get working location data - handle both single object and array
           const workingLocationDataArray =
@@ -288,7 +290,7 @@ const UserId = () => {
                   district.blocks.forEach((block: any) => {
                     if (block.villages) {
                       block.villages.forEach((village: any) => {
-                        if (villageIds.includes(String(village.id))) {
+                        if (villageIds?.includes(String(village.id))) {
                           villageNames.push(village.name);
                         }
                       });
@@ -392,7 +394,11 @@ const UserId = () => {
 
     fetchData();
   }, [userId, updatedUser]);
-
+  console.log('user====>', user);
+  const handleEditPassword = () => {
+ //   handleClose4(); // Close the menu first
+    router.push('/edit-password'); // Then navigate to the edit password page
+  };
   return (
     <>
       <Box minHeight="100vh">
@@ -531,6 +537,26 @@ const UserId = () => {
             workingVillages={user.workingVillages || null}
           />
         </Box>
+        <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={handleEditPassword}
+              sx={{
+                fontSize: '16px',
+                backgroundColor: 'white',
+                border: '0.6px solid #1E1B16',
+                my: '20px',
+                marginLeft: '16px',
+                width: '408px',
+                '@media (max-width: 434px)': { width: '100%' },
+              }}
+              endIcon={<EditIcon />}
+            >
+              {typeof window !== 'undefined' && localStorage.getItem('temporaryPassword') === 'true'
+                ? t('LOGIN_PAGE.SET_PASSWORD')
+                : t('LOGIN_PAGE.RESET_PASSWORD')}
+            </Button>
       </Box>
       <SimpleModal
         open={editModal}
