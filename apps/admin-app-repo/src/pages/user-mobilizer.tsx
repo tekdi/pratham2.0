@@ -54,6 +54,7 @@ import ConfirmationPopup from '@/components/ConfirmationPopup';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
 import WorkingVillageAssignmentWidget from '@shared-lib-v2/MapUser/WorkingVillageAssignmentWidget';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 import {
   enhanceUiSchemaWithGrid,
   splitUserData,
@@ -66,6 +67,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import { getCohortList } from '@/services/GetCohortList';
 import { updateUserTenantStatus } from '@/services/UserService';
+import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
@@ -297,6 +299,12 @@ const Mobilizer = () => {
   const [selectedVillagesSet, setSelectedVillagesSet] = useState<Set<string>>(new Set());
   const [villagesByBlockData, setVillagesByBlockData] = useState<Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>>({});
   const [centerOptionsData, setCenterOptionsData] = useState<any[]>([]);
+
+  // Edit modal variables
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<string | null>(null);
+  const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
 
   // Function to check if villages are selected in working_location
   // Returns { isValid: boolean, missingBlocks: Array<{state, district, block}>, isWorkingLocationMissing?: boolean }
@@ -588,36 +596,32 @@ const Mobilizer = () => {
   };
   // Define actions
   const actions = [
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Edit State Lead"
-    //     >
-    //       <Image src={editIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: (row: any) => {
-    //     console.log('row:', row);
-    //     console.log('AddSchema', addSchema);
-    //     console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
-    //     console.log('tempFormData', tempFormData);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Mobilizer"
+        >
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        setIsEditInProgress(true);
+        setEditModalOpen(true);
+        setSelectedUserIdEdit(row?.userId);
+        setSelectedUserRow(row);
+        setIsEditInProgress(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     {
       icon: (
         <Box
@@ -1561,6 +1565,147 @@ const Mobilizer = () => {
               {t('COMMON.MAP')}
             </Button>
           )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Modal Dialog */}
+      <Dialog
+        open={editModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setSelectedUserIdEdit(null); // Reset user selection when dialog closes
+            setSelectedUserRow(null); // Reset user row selection when dialog closes
+            setIsEditInProgress(true);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('MOBILIZER.EDIT_MOBILIZER')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setEditModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('COMMON.SAVING')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <EditSearchUser
+                onUserDetails={async (userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  if (selectedUserIdEdit) {
+                    setIsEditInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+  
+                      delete userData.email;
+  
+                      const object = {
+                        userData: userData,
+                        customFields: customFields,
+                      };
+  
+                      //update user details
+                      const updateUserResponse = await updateUser(selectedUserIdEdit, object);
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
+                      );
+  
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.status == 200
+                      ) {
+                        showToastMessage(t(successUpdateMessage), 'success');
+                        // Refresh the data
+                        searchData(prefilledFormData, currentPage);
+                      } else {
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error updating user:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureUpdateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsEditInProgress(false);
+                      setEditModalOpen(false);
+                    }
+                  } else if (!selectedUserIdEdit) {
+                    showToastMessage('Please search and select a user', 'error');
+                  }
+                }}
+                selectedUserRow={selectedUserRow}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                userId={selectedUserIdEdit}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="leader"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserIdEdit || isEditInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.SAVE')}
+            </Button>
         </DialogActions>
       </Dialog>
     </>
