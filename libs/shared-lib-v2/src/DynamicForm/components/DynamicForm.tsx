@@ -725,7 +725,7 @@ const DynamicForm = ({
       };
       if (formData.phone_type_accessible === 'nophone') {
         removeFields(['own_phone_check']);
-      } else {
+      } else if (formData.phone_type_accessible) {
         // 1. Add back to schema if missing
         setFormSchema((prevSchema) => {
           if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
