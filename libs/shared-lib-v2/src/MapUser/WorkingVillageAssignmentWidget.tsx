@@ -29,8 +29,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import axios from 'axios';
-import { Role } from '@shared-lib-v2/utils/app.constant';
-import { extractVillageIds } from '@shared-lib-v2/utils/helper';
+import { Role } from '../utils/app.constant';
+import { extractWorkingVillageIds } from '../utils/helper';
 
 // Helper function to filter villages by search keyword
 const filterVillagesBySearch = (
@@ -52,7 +52,23 @@ const getSelectedCountInBlock = (
   return blockVillages.filter((v) => selectedVillages.has(v.id)).length;
 };
 
-const WorkingVillageAssignmentWidget: React.FC = () => {
+interface WorkingVillageAssignmentWidgetProps { 
+  userId?: string;
+  onCenterChange?: (centerId: string) => void;
+  onAssignmentComplete?: (centerId: string, workingLocation: any) => void;
+  onSelectionChange?: (centerId: string, selectedVillages: Set<string>, villagesByBlock: Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>) => void;
+  hideConfirmButton?: boolean; // Hide the Confirm Assignment button
+  onCenterOptionsChange?: (centerOptions: any[]) => void; // Callback to get center options
+}
+
+const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetProps> = ({
+  userId,
+  onCenterChange,
+  onAssignmentComplete,
+  onSelectionChange,
+  hideConfirmButton = false,
+  onCenterOptionsChange,
+}) => {
   // Theme color
   const themeColor = '#FDBE16';
   const themeColorLight = 'rgba(253, 190, 22, 0.1)'; // 10% opacity
@@ -189,10 +205,11 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
           const payload = {
             sort: ['createdAt', 'asc'],
             filters: {
-              role: Role.TEACHER,
-              village: allVillageIds,
+              role: Role.MOBILIZER,
+              working_village: allVillageIds,
             },
           };
+          // console.log("payload>>>>",payload);
 
           const userListResponse = await axios.post(
             `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/list`,
@@ -210,7 +227,17 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
           // Extract assigned village IDs
           const assignedVillageIds = new Set<number>();
           if (userListResponse?.data?.result?.getUserDetails) {
-            const extractedIds = extractVillageIds(userListResponse.data.result.getUserDetails);
+            const filteredResponse = userListResponse.data.result.getUserDetails;
+            // console.log("filteredResponse>>>>", filteredResponse);
+            
+            // Filter out the current user's data to avoid marking their own villages as assigned
+            const filteredResponseExcludingCurrentUser = userId
+              ? filteredResponse.filter((user: any) => user.userId !== userId)
+              : filteredResponse;
+            
+            // console.log("filteredResponseExcludingCurrentUser>>>>", filteredResponseExcludingCurrentUser);
+            
+            const extractedIds = extractWorkingVillageIds(filteredResponseExcludingCurrentUser);
             extractedIds.forEach((id) => assignedVillageIds.add(id));
           }
 
@@ -244,6 +271,20 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
   useEffect(() => {
     loadVillagesForBlocks();
   }, [loadVillagesForBlocks]);
+
+  // Notify parent of selection changes
+  useEffect(() => {
+    if (onSelectionChange && selectedCenter) {
+      onSelectionChange(selectedCenter, selectedVillages, villagesByBlock);
+    }
+  }, [selectedCenter, selectedVillages, villagesByBlock, onSelectionChange]);
+
+  // Notify parent of center options changes
+  useEffect(() => {
+    if (onCenterOptionsChange) {
+      onCenterOptionsChange(centerOptions);
+    }
+  }, [centerOptions, onCenterOptionsChange]);
 
   // Transform catchment blocks to match UI structure
   // Uses blocks extracted from selected center's CATCHMENT_AREA
@@ -724,10 +765,15 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
   };
 
   const handleCenterChange = (event: any) => {
-    setSelectedCenter(event.target.value);
+    const centerId = event.target.value;
+    setSelectedCenter(centerId);
     // Clear selected villages when center changes
     setSelectedVillages(new Set());
     setMaxLimitMessage('');
+    // Call callback if provided
+    if (onCenterChange && centerId) {
+      onCenterChange(centerId);
+    }
     // Clear villages data - will be reloaded when catchment blocks are available
     setVillagesByBlock({});
     // Clear display limits
@@ -877,6 +923,11 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
     });
 
     console.log('Confirm Assignment Payload:', JSON.stringify(payload, null, 2));
+    
+    // Call callback if provided
+    if (onAssignmentComplete) {
+      onAssignmentComplete(selectedCenter, payload);
+    }
   };
 
   return (
@@ -933,28 +984,30 @@ const WorkingVillageAssignmentWidget: React.FC = () => {
                 }}
               />
             </Stack>
-            <Button
-              variant="contained"
-              disabled={selectedVillagesCount === 0}
-              onClick={handleConfirmAssignment}
-              fullWidth={false}
-              sx={{
-                bgcolor: themeColor,
-                color: '#fff',
-                textTransform: 'none',
-                px: 3,
-                width: { xs: '100%', sm: 'auto' },
-                '&:hover': {
-                  bgcolor: '#e0a812',
-                },
-                '&:disabled': {
-                  bgcolor: 'grey.300',
-                  color: 'grey.500',
-                },
-              }}
-            >
-              Confirm Assignment
-            </Button>
+            {!hideConfirmButton && (
+              <Button
+                variant="contained"
+                disabled={selectedVillagesCount === 0}
+                onClick={handleConfirmAssignment}
+                fullWidth={false}
+                sx={{
+                  bgcolor: themeColor,
+                  color: '#fff',
+                  textTransform: 'none',
+                  px: 3,
+                  width: { xs: '100%', sm: 'auto' },
+                  '&:hover': {
+                    bgcolor: '#e0a812',
+                  },
+                  '&:disabled': {
+                    bgcolor: 'grey.300',
+                    color: 'grey.500',
+                  },
+                }}
+              >
+                Confirm Assignment
+              </Button>
+            )}
           </Stack>
         </Stack>
       </Paper>
