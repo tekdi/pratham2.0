@@ -621,6 +621,7 @@ const PlayerBox = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false);
 
   // Determine aspectRatio based on mimeType and mobile mode
   const getAspectRatio = () => {
@@ -629,6 +630,25 @@ const PlayerBox = ({
     }
     return '16/9';
   };
+
+  // Check if device is in portrait mode (width < height)
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsPortrait(window.innerWidth < window.innerHeight);
+    };
+
+    // Check on mount
+    checkOrientation();
+
+    // Listen for resize and orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
 
   useEffect(() => {
     if (checkAuth() || userIdLocalstorageName) {
@@ -696,6 +716,9 @@ const PlayerBox = ({
             width: isShowMoreContent
               ? '100%'
               : { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
+            p:0,
+            ml:-10,
+            mr:-5,
           }}
         >
           <iframe
@@ -718,8 +741,8 @@ const PlayerBox = ({
               aspectRatio: getAspectRatio(),
             }}
             allowFullScreen
-            width="100%"
-            height="100%"
+            width={"110%"}
+            height={isPortrait ? '300%' : '100%'}
             title="Embedded Localhost"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
             frameBorder="0"
