@@ -65,6 +65,7 @@ export enum Role {
   TEACHER = 'Instructor',
   TEAM_LEADER = 'Lead',
   ADMIN = 'State Lead',
+  MOBILIZER = 'Mobilizer',
 }
 
 export enum Status {

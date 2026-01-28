@@ -882,38 +882,33 @@ export const extractTasks = (
   return rows;
 };
 
-export const extractWorkingLocationVillages = (row: any) => {
-  if (!row?.customFields) return [];
+export const extractWorkingLocationVillages = (row: any): string => {
+  if (!row?.customfield?.working_location) return '';
 
-  // Find WORKING_LOCATION field
-  const workingLocation = row.customFields.find(
-    (f: any) => f.label === 'WORKING_LOCATION'
-  );
+  let parsedLocation;
 
-  if (!workingLocation?.selectedValues?.length) return [];
-
-  // Parse all JSON strings safely
-  const parsedLocations = workingLocation.selectedValues
-    .map((item: any) => {
-      try {
-        return typeof item === 'string' ? JSON.parse(item) : item;
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
+  try {
+    parsedLocation =
+      typeof row.customfield.working_location === 'string'
+        ? JSON.parse(row.customfield.working_location)
+        : row.customfield.working_location;
+  } catch (error) {
+    console.error('Invalid working_location JSON', error);
+    return '';
+  }
 
   const villages: string[] = [];
 
-  parsedLocations.forEach((loc: { districts: any[] }) => {
-    loc?.districts?.forEach((dist: any) => {
-      dist?.blocks?.forEach((block: any) => {
-        block?.villages?.forEach((v: any) => {
-          if (v?.name) villages.push(v.name);
-        });
+  parsedLocation?.districts?.forEach((district: any) => {
+    district?.blocks?.forEach((block: any) => {
+      block?.villages?.forEach((village: any) => {
+        if (village?.name) {
+          villages.push(village.name);
+        }
       });
     });
   });
 
   return villages.join(', ');
 };
+
