@@ -164,7 +164,7 @@ const ImportCsv = () => {
       const userProjectDetailsResponse = await getUserProjectDetails({
         id: courseId,
       });
-      setUserProjectDetails(userProjectDetailsResponse?.result?.tasks);
+      setUserProjectDetails(userProjectDetailsResponse?.result?.tasks?.filter((task: any) => task !== null && task !== undefined) || []);
       if (userProjectDetails?.length) {
       }
       setLoading(false);
