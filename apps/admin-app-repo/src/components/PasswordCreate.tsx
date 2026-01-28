@@ -25,13 +25,15 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
   const [oldPasswordError, setOldPasswordError] = useState(false);
   const [samePasswordError, setSamePasswordError] = useState(false);
   const [showValidationMessages, setShowValidationMessages] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const isEditPassword = router.pathname === '/edit-password';
   const [visibility, setVisibility] = useState({
     oldPassword: false,
     password: false,
     confirmPassword: false,
   });
+  const [loading, setLoading] = useState(false);
+  const isEditPassword = router.pathname === '/edit-password';
+  const isTemporaryPassword = typeof window !== 'undefined' && localStorage.getItem('temporaryPassword') === 'true';
+  const username = typeof window !== 'undefined' ? localStorage.getItem('userIdName') || '' : '';
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -75,7 +77,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
     !samePasswordError &&
     password &&
     confirmPassword &&
-    (!editPassword || (editPassword && oldPassword));
+    (!editPassword || (editPassword && (isTemporaryPassword || oldPassword)));
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -83,6 +85,12 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
     setSamePasswordError(false);
 
     if (editPassword) {
+      // Skip old password check if temporary password is set
+      if (isTemporaryPassword) {
+        handleResetPassword(password, username);
+        return;
+      }
+
       if (oldPassword === password) {
         setSamePasswordError(true);
         return;
@@ -103,12 +111,6 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
         });
         if (response) {
           handleResetPassword(password);
-          const username = localStorage.getItem('userEmail');
-          // if (username) {
-          //   await successfulNotification(false, 'USER', 'OnPasswordReset', {
-          //     receipients: [username],
-          //   });
-          // }
         } else {
           setOldPasswordError(true);
         }
@@ -122,14 +124,68 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
       handleResetPassword(password);
     }
   };
-
   const handleToggleVisibility = (field: keyof typeof visibility) => {
     setVisibility((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   return (
     <form autoComplete="off" onSubmit={handleFormSubmit}>
-      {editPassword && (
+      {editPassword && isTemporaryPassword && (
+        <Box
+          sx={{
+            width: '100%',
+            marginBottom: '1.8rem',
+          }}
+        >
+       <TextField
+  id="username"
+  name="username-field"
+  label={t('LOGIN_PAGE.USERNAME') || 'Username'}
+  value={username}
+  disabled
+  fullWidth
+  InputLabelProps={{ shrink: true }}
+  sx={{
+    position: 'relative',
+
+    '& .MuiInputBase-root.Mui-disabled': {
+      backgroundColor: theme.palette.action.hover,
+      borderRadius: '8px',
+      cursor: 'not-allowed',
+    },
+
+    '& .MuiInputBase-input.Mui-disabled': {
+      WebkitTextFillColor: theme.palette.text.primary,
+      opacity: 0.75,
+      cursor: 'not-allowed',      // 🚫 no text arrow
+      caretColor: 'transparent',  // 🚫 no blinking cursor
+    },
+
+    '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+      borderColor: theme.palette.action.disabled,
+    },
+
+    '& .MuiInputLabel-root.Mui-disabled': {
+      color: theme.palette.text.secondary,
+    },
+
+    /* 🔒 Lock icon on hover */
+    '&:hover::after': {
+      position: 'absolute',
+      right: '12px',
+      top: '50%',
+      transform: 'translateY(-50%)',
+      fontSize: '1rem',
+      opacity: 0.6,
+      pointerEvents: 'none',
+    },
+  }}
+/>
+
+
+        </Box>
+      )}
+      {editPassword && !isTemporaryPassword && (
         <Box
           sx={{
             width: '100%',
@@ -149,7 +205,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
                     onClick={() => handleToggleVisibility('oldPassword')}
                     edge="end"
                   >
-                    {visibility.oldPassword ? <VisibilityOff /> : <Visibility />}
+                    {visibility.oldPassword ? <Visibility /> : <VisibilityOff />}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -166,6 +222,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
             helperText={
               oldPasswordError && t('LOGIN_PAGE.CURRENT_PASSWORD_NOT')
             }
+            
             label={t('LOGIN_PAGE.OLD_PASSWORD')}
             fullWidth
             sx={{
@@ -197,7 +254,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
                   onClick={() => handleToggleVisibility('password')}
                   edge="end"
                 >
-                  {visibility.password ? <VisibilityOff /> : <Visibility />}
+                  {visibility.password ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),
@@ -333,7 +390,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
                   onClick={() => handleToggleVisibility('confirmPassword')}
                   edge="end"
                 >
-                  {visibility.confirmPassword ? <VisibilityOff /> : <Visibility />}
+                  {visibility.confirmPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               </InputAdornment>
             ),
@@ -372,7 +429,7 @@ const PasswordCreate: React.FC<PasswordCreateProps> = ({
             className="one-line-text"
             disabled={!isFormValid || loading}
           >
-            {t('LOGIN_PAGE.RESET_PASSWORD')}
+            {isTemporaryPassword ? t('LOGIN_PAGE.SET_PASSWORD') : t('LOGIN_PAGE.RESET_PASSWORD')}
           </Button>
         </Box>
       </Box>

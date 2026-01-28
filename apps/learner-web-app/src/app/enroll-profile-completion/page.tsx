@@ -127,9 +127,12 @@ const EnrollProfileCompletionInner = () => {
         localStorage.removeItem('previousTenantId');
 
         // Store landing page for later navigation
-    setLandingPage(landingPage || '/home');
+    const finalLandingPage = landingPage || '/home';
+    console.log('Setting landing page to:', finalLandingPage);
+    setLandingPage(finalLandingPage);
 
     // Show success modal instead of redirecting immediately
+    console.log('Opening signup success modal');
     setSignupSuccessModal(true);
   }
     } catch (error) {
@@ -143,45 +146,66 @@ const EnrollProfileCompletionInner = () => {
   };
 
   const onSigin = () => {
-    setSignupSuccessModal(false);
-    console.log('enroll user to tenant', localStorage.getItem('tenantId'));
-    if(localStorage.getItem('isAndroidApp') == 'yes')
-      {
-       // Send message to React Native WebView
+    try {
+      console.log('========== onSigin CALLED ==========');
+      console.log('isAndroidApp:', localStorage.getItem('isAndroidApp'));
+      console.log('tenantId:', localStorage.getItem('tenantId'));
+      console.log('landingPage from state:', landingPage);
+      console.log('landingPage from localStorage:', localStorage.getItem('landingPage'));
+      
+      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      console.log('isAndroid check:', isAndroid);
+      
+      if(isAndroid)
+        {
+         console.log('Android path - sending message to WebView');
+         // Send message to React Native WebView
 
-            //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
 
-            //        const program = JSON.parse(enrolledProgramData || '{}');
+              //        const program = JSON.parse(enrolledProgramData || '{}');
 
 
-       if (window.ReactNativeWebView) {
-         window.ReactNativeWebView.postMessage(JSON.stringify({
-           type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
-           data: {
-             userId: localStorage.getItem('userId'),
-             tenantId: localStorage.getItem('tenantId'),
-             token: localStorage.getItem('token'),
-             refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+         if (window.ReactNativeWebView) {
+           window.ReactNativeWebView.postMessage(JSON.stringify({
+             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+             data: {
+               userId: localStorage.getItem('userId'),
+               tenantId: localStorage.getItem('tenantId'),
+               token: localStorage.getItem('token'),
+               refreshToken: localStorage.getItem('refreshTokenForAndroid'),
 
-             // Add any data you want to send
-           }
-         }));
-       }
-      }
-      else{
-        localStorage.removeItem('enrollTenantId')
+               // Add any data you want to send
+             }
+           }));
+         }
+         setSignupSuccessModal(false);
+        }
+        else{
+          console.log('Web path - navigating to:', landingPage || '/home');
+          localStorage.removeItem('enrollTenantId');
+          // Close modal first, then navigate
+          setSignupSuccessModal(false);
+          // Use setTimeout to ensure modal closes before navigation
+          setTimeout(() => {
+            console.log('Executing router.push to:', landingPage || '/home');
             router.push(landingPage || '/home');
+          }, 100);
+      }
+    } catch (error) {
+      console.error('Error in onSigin:', error);
     }
-    // Navigate to landing page
   };
 
   return (
     <>
-      <EditProfile
-        completeProfile={true}
-        enrolledProgram={true}
-        uponEnrollCompletion={handleAccessProgram}
-      />
+      {!signupSuccessModal && (
+        <EditProfile
+          completeProfile={true}
+          enrolledProgram={true}
+          uponEnrollCompletion={handleAccessProgram}
+        />
+      )}
 
       <SimpleModal
         open={signupSuccessModal}

@@ -53,6 +53,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const directEnroll = searchParams.get('directEnroll');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   console.log('directEnroll', directEnroll);
 
   // Helper function to get program name (Navapatham if isForNavaPatham is true, otherwise userProgram)
@@ -172,6 +173,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           // console.log("responseFormForEnroll", responseFormForEnroll?.schema?.properties)
           const keyNames = Object.keys(responseFormForEnroll?.schema?.properties);
 
+          // Add family member fields to keyNames if they exist in user data
+          // These fields will be added to the schema later
+          const familyMemberFields = ['father_name', 'mother_name', 'spouse_name'];
+          familyMemberFields.forEach(field => {
+            if (mappedData[field] && !keyNames.includes(field)) {
+              keyNames.push(field);
+            }
+          });
           
           const filteredData = Object.fromEntries(
             Object.entries(mappedData).filter(([key]) => keyNames.includes(key))
@@ -245,6 +254,61 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             if (!alterSchema?.required?.includes('family_member_details')) {
                         alterSchema?.required?.push('family_member_details')
 
+            }
+            // Add family member fields to schema if they exist in responseFormCopy
+            // But DON'T add them as required - DynamicForm will handle that based on selection
+            if (responseFormCopy?.schema?.properties?.father_name) {
+              alterSchema.properties.father_name = responseFormCopy.schema.properties.father_name;
+              // Remove from required if present
+              if (alterSchema.required) {
+                alterSchema.required = alterSchema.required.filter((f: string) => f !== 'father_name');
+              }
+            }
+            if (responseFormCopy?.schema?.properties?.mother_name) {
+              alterSchema.properties.mother_name = responseFormCopy.schema.properties.mother_name;
+              // Remove from required if present
+              if (alterSchema.required) {
+                alterSchema.required = alterSchema.required.filter((f: string) => f !== 'mother_name');
+              }
+            }
+            if (responseFormCopy?.schema?.properties?.spouse_name) {
+              alterSchema.properties.spouse_name = responseFormCopy.schema.properties.spouse_name;
+              // Remove from required if present
+              if (alterSchema.required) {
+                alterSchema.required = alterSchema.required.filter((f: string) => f !== 'spouse_name');
+              }
+            }
+            
+            // Add family member fields to uiSchema but set them as hidden initially
+            // DynamicForm will show the appropriate one based on selection
+            if (responseForm?.uiSchema?.father_name) {
+              alterUISchema.father_name = {
+                ...responseForm.uiSchema.father_name,
+                'ui:widget': 'hidden'
+              };
+            }
+            if (responseForm?.uiSchema?.mother_name) {
+              alterUISchema.mother_name = {
+                ...responseForm.uiSchema.mother_name,
+                'ui:widget': 'hidden'
+              };
+            }
+            if (responseForm?.uiSchema?.spouse_name) {
+              alterUISchema.spouse_name = {
+                ...responseForm.uiSchema.spouse_name,
+                'ui:widget': 'hidden'
+              };
+            }
+            
+            // Add family member fields to ui:order if it exists
+            // They will be hidden initially and DynamicForm will show the appropriate one
+            if (alterUISchema['ui:order']) {
+              const fieldsToAdd = ['father_name', 'mother_name', 'spouse_name'];
+              fieldsToAdd.forEach((field) => {
+                if (!alterUISchema['ui:order'].includes(field)) {
+                  alterUISchema['ui:order'].push(field);
+                }
+              });
             }
           }
           setAddSchema(alterSchema);
@@ -331,6 +395,13 @@ console.log("addUiSchema", addUiSchema);
   };
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
+    // Prevent double submission
+    if (isSubmitting) {
+      console.log('Already submitting, ignoring duplicate submission');
+      return;
+    }
+    
+    setIsSubmitting(true);
     console.log('formData', formData);
     console.log(userFormData);
     if (userFormData.email == payload.email) {
@@ -388,41 +459,53 @@ if(enrolledProgram && userTenantStatus){
       customFields: customFields,
     };
     if (userId) {
-      const updateUserResponse = await updateUser(userId, object);
-      // console.log('updatedResponse', updateUserResponse);
+      try {
+        const updateUserResponse = await updateUser(userId, object);
+        // console.log('updatedResponse', updateUserResponse);
 
-      if (
-        updateUserResponse &&
-        updateUserResponse?.data?.params?.err === null
-        && !enrolledProgram
-      ) {
-        showToastMessage('Profile Updated succeessfully', 'success');
-      }
-      if(enrolledProgram){
-        uponEnrollCompletion?.();
-        // Don't redirect here - let the callback handle navigation after showing modal
-        return;
-      }
-      if (completeProfile) {
-        const uiConfig =
-          typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
-            : {};
-        //  const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
-
-        //                 if (hasBothContentCoursetab) {
-        //                   router.push('/courses-contents');
-        //                 }
-        //                  else
-        //                 router.push('/content');
-
-        const landingPage = localStorage.getItem('landingPage') || '';
-
-        if (landingPage) {
-          router.push(landingPage);
-        } else {
-          router.push('/content');
+        if (
+          updateUserResponse &&
+          updateUserResponse?.data?.params?.err === null
+          && !enrolledProgram
+        ) {
+          showToastMessage('Profile Updated succeessfully', 'success');
         }
+        
+        if(enrolledProgram){
+          // Don't reset isSubmitting here - we're navigating away
+          uponEnrollCompletion?.();
+          // Don't redirect here - let the callback handle navigation after showing modal
+          return;
+        }
+        
+        if (completeProfile) {
+          const uiConfig =
+            typeof window !== 'undefined'
+              ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
+              : {};
+          //  const hasBothContentCoursetab = uiConfig?.showContent?.includes("courses") && uiConfig?.showContent?.includes("contents");
+
+          //                 if (hasBothContentCoursetab) {
+          //                   router.push('/courses-contents');
+          //                 }
+          //                  else
+          //                 router.push('/content');
+
+          const landingPage = localStorage.getItem('landingPage') || '';
+
+          if (landingPage) {
+            router.push(landingPage);
+          } else {
+            router.push('/content');
+          }
+          return;
+        }
+        
+        // Reset submitting state for non-redirect cases
+        setIsSubmitting(false);
+      } catch (error) {
+        console.error('Error updating user:', error);
+        setIsSubmitting(false);
       }
     }
 
