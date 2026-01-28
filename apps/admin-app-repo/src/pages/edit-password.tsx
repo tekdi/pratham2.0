@@ -27,14 +27,19 @@ const EditForgotPassword = () => {
     window.history.back();
   };
 
-  const handleResetPassword = async (newPassword: string) => {
-
+  const handleResetPassword = async (newPassword: string, username?: string) => {
+    
     try {
-      const response = await resetPassword(newPassword); 
+      const response = await resetPassword(newPassword, username);
+      if(response) {
+      localStorage.setItem('temporaryPassword', 'false');
+      
       setForgotPassword(true);
+     
+    }
     }
 
-    catch (error: any) {
+     catch (error: any) {
       console.error('Error resetting password:', error);
       setForgotPassword(false);
       showToastMessage(error.response.data.params.err, 'error');
@@ -70,7 +75,7 @@ const EditForgotPassword = () => {
           router.push("/centers", undefined, { locale: locale });
         } else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
                     storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
-          router.push("/mentor", undefined, { locale: locale });
+          router.push("/user-mobilizer", undefined, { locale: locale });
       }
    
       } 
@@ -86,7 +91,7 @@ const EditForgotPassword = () => {
         }
         else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
                     storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
-          router.push("/mentor", undefined, { locale: locale });
+          router.push("/user-mobilizer", undefined, { locale: locale });
         }
 
     }
