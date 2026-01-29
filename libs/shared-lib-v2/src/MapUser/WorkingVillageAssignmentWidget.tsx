@@ -63,6 +63,9 @@ interface WorkingVillageAssignmentWidgetProps {
   centerId?: string; // Center ID to pre-select in reassign flow
   existingWorkingVillageIds?: string; // Comma-separated string of existing village IDs (e.g., "648579, 648570")
   isForReassign?: boolean; // Flag to indicate reassign mode
+  // LMP props: no state/district/block dropdowns, load centers directly from centerIds
+  isForLmp?: boolean;
+  centerIds?: string[]; // Array of center IDs (e.g. from cohortData); when isForLmp, load these centers directly
 }
 
 const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetProps> = ({
@@ -75,6 +78,8 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   centerId: propCenterId,
   existingWorkingVillageIds,
   isForReassign = false,
+  isForLmp = false,
+  centerIds: propCenterIds,
 }) => {
   // Theme color
   const themeColor = '#FDBE16';
@@ -473,8 +478,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const isCentralAdmin =
     userRole === 'Central Lead' || userRole === 'Central Admin';
 
-  // Load state options on mount
+  // Load state options on mount (skip when isForLmp - no state dropdown)
   useEffect(() => {
+    if (isForLmp) return;
     let isMounted = true;
 
     const loadStateOptions = async () => {
@@ -521,7 +527,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     return () => {
       isMounted = false;
     };
-  }, []); // Only run on mount
+  }, [isForLmp]); // Only run on mount; skip when isForLmp
 
   // Note: In reassign mode, state/district/block dropdowns follow normal flow
   // They are NOT initialized from CATCHMENT_AREA - user selects them normally
@@ -613,6 +619,58 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
       const tenantId = localStorage.getItem('tenantId') || '';
       const token = localStorage.getItem('token') || '';
       const academicYearId = localStorage.getItem('academicYearId') || '';
+
+      // LMP mode: load centers directly from centerIds (no state/district/block)
+      const centerIdsToLoad = Array.isArray(propCenterIds) ? propCenterIds : (propCenterIds ? [propCenterIds] : []);
+      if (isForLmp && centerIdsToLoad.length > 0) {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+          {
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'COHORT',
+              status: ['active'],
+              cohortId: centerIdsToLoad,
+            },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              tenantId: tenantId,
+              Authorization: `Bearer ${token}`,
+              academicyearid: academicYearId,
+            },
+          }
+        );
+        const centers =
+          response?.data?.result?.results?.cohortDetails
+            ?.map((item: any) => {
+              if (!item || !item.cohortId) return null;
+              const customFields = item.customFields || [];
+              const stateField = customFields.find((field: any) => field.label === 'STATE');
+              const districtField = customFields.find((field: any) => field.label === 'DISTRICT');
+              const blockField = customFields.find((field: any) => field.label === 'BLOCK');
+              const villageField = customFields.find((field: any) => field.label === 'VILLAGE');
+              return {
+                id: String(item.cohortId),
+                name: item.name?.trim() || `Center ${item.cohortId}`,
+                stateId: stateField?.selectedValues?.[0]?.id || null,
+                districtId: districtField?.selectedValues?.[0]?.id || null,
+                blockId: blockField?.selectedValues?.[0]?.id || null,
+                villageId: villageField?.selectedValues?.[0]?.id || null,
+                villages: 0,
+                blocks: 0,
+                customFields: item.customFields || [],
+              };
+            })
+            .filter((item: any) => item !== null) || [];
+        setCenterOptions(centers);
+        if (centers.length === 1 && !selectedCenter) {
+          setSelectedCenter(centers[0].id);
+        }
+        return;
+      }
 
       // In reassign mode with propCenterId, load that specific center directly ONLY on initial load
       // (when no state/district/block is selected - user hasn't changed geography yet)
@@ -792,7 +850,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     } finally {
       setLoadingStates((prev) => ({ ...prev, centers: false }));
     }
-  }, [selectedState, selectedDistrict, selectedBlock, isForReassign, propCenterId, selectedCenter]);
+  }, [selectedState, selectedDistrict, selectedBlock, isForReassign, isForLmp, propCenterId, propCenterIds, selectedCenter]);
 
   // Load centers whenever state/district/block changes
   useEffect(() => {
@@ -1316,7 +1374,8 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           </Stack>
         </Stack>
 
-        {/* State, District, Block Dropdowns */}
+        {/* State, District, Block Dropdowns - hidden when isForLmp */}
+        {!isForLmp && (
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} sm={6} md={3}>
             <Box>
@@ -1470,6 +1529,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             </Stack>
           </Grid>
         </Grid>
+        )}
 
         {/* Center Selection and Summary Badges */}
         <Grid container spacing={2} alignItems="flex-start">
@@ -1494,13 +1554,13 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                     value={selectedCenter}
                     onChange={handleCenterChange}
                     displayEmpty
-                    disabled={!selectedState}
+                    disabled={!isForLmp && !selectedState}
                     sx={{
                       borderRadius: 1,
                     }}
                   >
                     <MenuItem value="" disabled>
-                      {!selectedState
+                      {!isForLmp && !selectedState
                         ? 'Select state first...'
                         : centerOptions.length === 0
                         ? 'No centers found'
@@ -1515,49 +1575,6 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                 </FormControl>
               )}
             </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Stack direction="row" spacing={1} sx={{ mt: 4 }}>
-              {selectedCenterDetails ? (
-                <>
-                  <Chip
-                    label={`${selectedCenterDetails.villages || 0} villages`}
-                    sx={{
-                      bgcolor: 'grey.200',
-                      color: 'text.primary',
-                      fontWeight: 500,
-                    }}
-                  />
-                  <Chip
-                    label={`${selectedCenterDetails.blocks || 0} blocks`}
-                    sx={{
-                      bgcolor: 'grey.200',
-                      color: 'text.primary',
-                      fontWeight: 500,
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <Chip
-                    label="0 villages"
-                    sx={{
-                      bgcolor: 'grey.200',
-                      color: 'text.primary',
-                      fontWeight: 500,
-                    }}
-                  />
-                  <Chip
-                    label="0 blocks"
-                    sx={{
-                      bgcolor: 'grey.200',
-                      color: 'text.primary',
-                      fontWeight: 500,
-                    }}
-                  />
-                </>
-              )}
-            </Stack>
           </Grid>
         </Grid>
       </Paper>
