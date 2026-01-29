@@ -171,7 +171,9 @@
     "MAP": "Map",
     "NEXT": "Next",
     "USER_BATCHES": "{{name}} belongs to below batches",
-    "DELETE_FROM_BATCH_WARNING": "Do you want to delete user from above center's batches?"
+    "DELETE_FROM_BATCH_WARNING": "Do you want to delete user from above center's batches?",
+    "SAVE": "Save",
+    "SAVING": "Saving..."
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -881,6 +883,7 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
-    "MOBILIZER_NAME": "Mentor Name"
+    "MOBILIZER_NAME": "Mentor Name",
+    "EDIT_MOBILIZER": "Edit Mobilizer"
   }
 }

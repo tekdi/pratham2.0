@@ -53,6 +53,8 @@ import { showToastMessage } from '@/components/Toastify';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import CenterListWidget from '@shared-lib-v2/MapUser/CenterListWidget';
+import WorkingVillageAssignmentWidget from '@shared-lib-v2/MapUser/WorkingVillageAssignmentWidget';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 import {
   enhanceUiSchemaWithGrid,
   splitUserData,
@@ -65,6 +67,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import { getCohortList } from '@/services/GetCohortList';
 import { updateUserTenantStatus } from '@/services/UserService';
+import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
@@ -160,11 +163,14 @@ const Mobilizer = () => {
       console.log('alterSchema@@@', alterSchema);
       if (alterSchema) {
         setWorkingVillageId(alterSchema?.properties?.working_village?.fieldId);
+        // Store working_location fieldId before removing it
         setWorkingLocationId(
           alterSchema?.properties?.working_location?.fieldId
         );
       }
-      const keysToRemove = ['working_village'];
+      // Remove working_village and working_location from schema and uiSchema
+      // working_location will come from WorkingVillageAssignmentWidget (step 1)
+      const keysToRemove = ['working_village', 'working_location'];
       keysToRemove.forEach((key) => delete alterSchema.properties[key]);
       keysToRemove.forEach((key) => delete alterUISchema[key]);
       //also remove from required if present
@@ -269,7 +275,7 @@ const Mobilizer = () => {
     return await HierarchicalSearchUserList({
       ...newData,
       role: [RoleName.MOBILIZER],
-      customfields: ['state', 'district', 'block', 'village'],
+      customfields: ['state', 'district', 'block', 'village', 'working_location', 'working_village'],
     });
   };
 
@@ -288,6 +294,17 @@ const Mobilizer = () => {
     null
   ); // Track selected district
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null); // Track selected block
+  const [workingVillageAssignmentCenterId, setWorkingVillageAssignmentCenterId] = useState<string | null>(null);
+  const [workingVillageAssignmentLocation, setWorkingVillageAssignmentLocation] = useState<any>(null);
+  const [selectedVillagesSet, setSelectedVillagesSet] = useState<Set<string>>(new Set());
+  const [villagesByBlockData, setVillagesByBlockData] = useState<Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>>({});
+  const [centerOptionsData, setCenterOptionsData] = useState<any[]>([]);
+
+  // Edit modal variables
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<string | null>(null);
+  const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
 
   // Function to check if villages are selected in working_location
   // Returns { isValid: boolean, missingBlocks: Array<{state, district, block}>, isWorkingLocationMissing?: boolean }
@@ -579,36 +596,32 @@ const Mobilizer = () => {
   };
   // Define actions
   const actions = [
-    // {
-    //   icon: (
-    //     <Box
-    //       sx={{
-    //         display: 'flex',
-    //         flexDirection: 'column',
-    //         alignItems: 'center',
-    //         cursor: 'pointer',
-    //         // backgroundColor: 'rgb(227, 234, 240)',
-    //         justifyContent: 'center',
-    //         padding: '10px',
-    //       }}
-    //       title="Edit State Lead"
-    //     >
-    //       <Image src={editIcon} alt="" />
-    //     </Box>
-    //   ),
-    //   callback: (row: any) => {
-    //     console.log('row:', row);
-    //     console.log('AddSchema', addSchema);
-    //     console.log('AddUISchema', addUiSchema);
-    //     let tempFormData = extractMatchingKeys(row, addSchema);
-    //     console.log('tempFormData', tempFormData);
-    //     setPrefilledAddFormData(tempFormData);
-    //     setIsEdit(true);
-    //     setEditableUserId(row?.userId);
-    //     handleOpenModal();
-    //   },
-    //   show: (row) => row.status !== 'archived',
-    // },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Edit Mobilizer"
+        >
+          <Image src={editIcon} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        setIsEditInProgress(true);
+        setEditModalOpen(true);
+        setSelectedUserIdEdit(row?.userId);
+        setSelectedUserRow(row);
+        setIsEditInProgress(false);
+      },
+      show: (row) => row.status !== 'archived',
+    },
     {
       icon: (
         <Box
@@ -876,6 +889,8 @@ const Mobilizer = () => {
               setSelectedStateId(null);
               setSelectedDistrictId(null);
               setSelectedBlockId(null);
+              setWorkingVillageAssignmentCenterId(null);
+              setWorkingVillageAssignmentLocation(null);
               setMapModalOpen(true);
             }}
           >
@@ -1142,9 +1157,7 @@ const Mobilizer = () => {
               startIcon={<ArrowBackIcon />}
               onClick={() => {
                 setFormStep(0);
-                setSelectedUserId(null);
-                setUserDetails(null);
-                // Keep center selection, state, district, block, and catchment area data when going back
+                // Keep user selection when going back
               }}
             >
               {t('COMMON.BACK')}
@@ -1168,6 +1181,8 @@ const Mobilizer = () => {
               setSelectedStateId(null);
               setSelectedDistrictId(null);
               setSelectedBlockId(null);
+              setWorkingVillageAssignmentCenterId(null);
+              setWorkingVillageAssignmentLocation(null);
             }}
             sx={{
               color: (theme) => theme.palette.grey[500],
@@ -1179,295 +1194,54 @@ const Mobilizer = () => {
         <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
           {formStep === 0 && (
             <Box sx={{ mb: 3 }}>
-              <CenterListWidget
-                value={selectedCenterId}
-                onChange={(centerId) => {
-                  const centerIdStr = Array.isArray(centerId)
-                    ? centerId[0]
-                    : centerId;
-                  setSelectedCenterId(centerIdStr);
-                  console.log('Selected Center ID:', centerIdStr);
-
-                  // Extract CATCHMENT_AREA when center is selected
-                  // Note: CenterListWidget will handle fetching center details and
-                  // calling onStateChange, onDistrictChange, onBlockChange callbacks
-                  if (centerIdStr) {
-                    extractCatchmentAreaFromCenter(centerIdStr);
-                  } else {
-                    setCatchmentAreaData(null);
-                  }
-                }}
-                label="Select Center"
-                required={true}
-                multiple={false}
-                initialState={selectedStateId || undefined}
-                initialDistrict={selectedDistrictId || undefined}
-                initialBlock={selectedBlockId || undefined}
-                onStateChange={(stateId) => {
-                  console.log('State changed to:', stateId);
-                  setSelectedStateId(stateId);
-                  // Clear dependent selections when state changes
-                  if (!stateId) {
-                    setSelectedDistrictId(null);
-                    setSelectedBlockId(null);
-                    setSelectedCenterId(null);
-                    setCatchmentAreaData(null);
-                  }
-                }}
-                onDistrictChange={(districtId) => {
-                  console.log('District changed to:', districtId);
-                  setSelectedDistrictId(districtId);
-                  // Clear dependent selections when district changes
-                  if (!districtId) {
-                    setSelectedBlockId(null);
-                    setSelectedCenterId(null);
-                    setCatchmentAreaData(null);
-                  }
-                }}
-                onBlockChange={(blockId) => {
-                  // Handle block change - fetch cohort list
-                  // Note: CenterListWidget's handleBlockChange already clears center selection
-                  // when user manually changes block, so we don't need to clear it here
-                  console.log('Block changed to:', blockId);
-                  setSelectedBlockId(blockId);
-
-                  if (blockId) {
-                    fetchCohortListByBlock(blockId);
-                  } else {
-                    setCohortResponse(null);
-                    setCatchmentAreaData(null);
-                  }
-                }}
-              />
-            </Box>
-          )}
-          {formStep === 1 && (
-            <Box sx={{ mb: 3 }}>
               <EmailSearchUser
-                // catchmentArea={catchmentAreaData}
                 onUserSelected={(userId) => {
                   setSelectedUserId(userId || null);
-                  console.log('Selected User ID:', userId);
+                  // console.log('Selected User ID:', userId);
                 }}
                 onUserDetails={async (userDetails) => {
-                  console.log('############# userDetails', userDetails);
+                  // console.log('############# userDetails', userDetails);
                   setUserDetails(userDetails);
-                  // window.alert('userDetails' + userDetails);
-                  // window.alert('selectedUserId' + selectedUserId);
+                  // Store user details but don't trigger mapping yet
+                  // Mapping will be triggered after WorkingVillageAssignmentWidget completes
+                  // Auto-advance to next step after form submission (similar to user-leader.tsx)
                   if (selectedUserId && userDetails) {
-                    const workingLocation = userDetails?.customFields?.find(
-                      (field) => field.fieldId === workingLocationId
-                    );
-                    const workingLocationValue = workingLocation?.value;
-                    // console.log(
-                    //   'workingLocationValue@@@',
-                    //   workingLocationValue
-                    // );
-                    // console.log('workingLocationValue@@@Id', workingLocationId);
-                    const villageIds =
-                      extractVillageIdsFromWorkingLocation(
-                        workingLocationValue
-                      );
-                    // setWorkingVillageValues(villageIds);
-                    // console.log(
-                    //   'workingLocationValue@@@villageIds@@@',
-                    //   villageIds
-                    // );
-                    // Validate that villages are selected for EVERY block in working_location
-                    const validationResult =
-                      validateVillagesSelected(userDetails);
-                    console.log(
-                      '############# validationResult',
-                      validationResult
-                    );
-                    if (!validationResult.isValid) {
-                      const missingCount =
-                        validationResult.missingBlocks.length;
-                      let errorMessage = '';
-
-                      if (missingCount > 0) {
-                        // Show first few missing blocks in the error message
-                        const firstFew = validationResult.missingBlocks
-                          .slice(0, 3)
-                          .map(
-                            (block) =>
-                              `${block.blockName} (${block.districtName}, ${block.stateName})`
-                          )
-                          .join(', ');
-
-                        if (missingCount > 3) {
-                          errorMessage = t(
-                            'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES',
-                            {
-                              blocks: firstFew,
-                              count: missingCount - 3,
-                            }
-                          );
-                        } else {
-                          errorMessage = t(
-                            'MOBILIZER.WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE',
-                            {
-                              blocks: firstFew,
-                            }
-                          );
-                        }
-                      } else if (validationResult.isWorkingLocationMissing) {
-                        // working_location itself is missing or invalid
-                        errorMessage = t('MOBILIZER.WORKING_LOCATION_REQUIRED');
-                      } else {
-                        // No missing blocks but validation failed - this shouldn't happen, but handle it
-                        errorMessage = t(
-                          'MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'
-                        );
-                      }
-
-                      showToastMessage(errorMessage, 'error');
-                      return;
-                    }
-
-                    setIsMappingInProgress(true);
-                    try {
-                      const { userData, customFields } =
-                        splitUserData(userDetails);
-
-                      delete userData.email;
-
-                      // Extract village IDs from working location right before using them
-                      const workingLocation = userDetails?.customFields?.find(
-                        (field: any) => field.fieldId === workingLocationId
-                      );
-                      const workingLocationValue = workingLocation?.value;
-                      const villageIds =
-                        extractVillageIdsFromWorkingLocation(
-                          workingLocationValue
-                        );
-
-                      // Modify customFields to add/update workingVillageId with villageIds
-                      const updatedCustomFields = [...customFields];
-                      const workingVillageIndex = updatedCustomFields.findIndex(
-                        (field: any) => field.fieldId === workingVillageId
-                      );
-
-                      if (
-                        workingVillageId &&
-                        villageIds &&
-                        villageIds.length > 0
-                      ) {
-                        if (workingVillageIndex !== -1) {
-                          // Update existing field
-                          updatedCustomFields[workingVillageIndex].value =
-                            villageIds;
-                        } else {
-                          // Add new field
-                          updatedCustomFields.push({
-                            fieldId: workingVillageId,
-                            value: villageIds,
-                          });
-                        }
-                      }
-
-                      const object = {
-                        userData: userData,
-                        customField: updatedCustomFields,
-                      };
-
-                      //update user details
-                      const updateUserResponse = await enrollUserTenant({
-                        userId: selectedUserId,
-                        tenantId: tenantId,
-                        roleId: roleId,
-                        customField: updatedCustomFields,
-                        userData: userData,
-                      });
-                      console.log(
-                        '######### updatedResponse',
-                        updateUserResponse
-                      );
-
-                      if (
-                        updateUserResponse &&
-                        updateUserResponse?.params?.err === null
-                      ) {
-                        // Ensure selectedCenterId is a string (handle array case)
-                        const cohortId = Array.isArray(selectedCenterId)
-                          ? selectedCenterId[0]
-                          : selectedCenterId;
-
-                        // Call bulkCreateCohortMembers to map user to center
-                        if (cohortId && selectedUserId) {
-                          try {
-                            const cohortMemberResponse =
-                              await bulkCreateCohortMembers({
-                                userId: [selectedUserId],
-                                cohortId: [cohortId],
-                              });
-
-                            if (
-                              cohortMemberResponse?.responseCode === 201 ||
-                              cohortMemberResponse?.params?.err === null
-                            ) {
-                              console.log(
-                                'Successfully mapped user to center:',
-                                cohortMemberResponse
-                              );
-                            } else {
-                              console.error(
-                                'Error mapping user to center:',
-                                cohortMemberResponse
-                              );
-                            }
-                          } catch (cohortError) {
-                            console.error(
-                              'Error in bulkCreateCohortMembers:',
-                              cohortError
-                            );
-                            // Don't fail the entire flow if cohort mapping fails
-                          }
-                        }
-
-                        showToastMessage(t(successUpdateMessage), 'success');
-
-                        // Close dialog
-                        setMapModalOpen(false);
-                        setSelectedCenterId(null);
-                        setSelectedUserId(null);
-                        setCohortResponse(null);
-                        setCatchmentAreaData(null);
-                        setSelectedStateId(null);
-                        setSelectedDistrictId(null);
-                        setSelectedBlockId(null);
-                        setFormStep(0);
-                        // Refresh the data
-                        searchData(prefilledFormData, 0);
-                      } else {
-                        showToastMessage(t(failureUpdateMessage), 'error');
-                      }
-                    } catch (error) {
-                      console.error('Error creating cohort member:', error);
-                      showToastMessage(
-                        error?.response?.data?.params?.errmsg ||
-                          t(failureCreateMessage),
-                        'error'
-                      );
-                    } finally {
-                      setIsMappingInProgress(false);
-                    }
-                  } else if (!selectedUserId) {
-                    showToastMessage(
-                      t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
-                      'error'
-                    );
+                    setFormStep(1);
                   }
                 }}
                 schema={addSchema}
                 uiSchema={addUiSchema}
-                prefilledState={{}}
+                prefilledState={prefilledState}
                 onPrefilledStateChange={(prefilledState) => {
                   setPrefilledState(prefilledState || {});
                 }}
                 roleId={roleId}
                 tenantId={tenantId}
                 type="leader"
+              />
+            </Box>
+          )}
+          {formStep === 1 && (
+            <Box sx={{ mb: 3 }}>
+              <WorkingVillageAssignmentWidget
+                userId={selectedUserId}
+                hideConfirmButton={true}
+                onCenterChange={(centerId) => {
+                  setWorkingVillageAssignmentCenterId(centerId);
+                  localStorage.setItem('workingLocationCenterId', centerId);
+                  // Reset villages when center changes
+                  setSelectedVillagesSet(new Set());
+                  setVillagesByBlockData({});
+                }}
+                onSelectionChange={(centerId, selectedVillages, villagesByBlock) => {
+                  setWorkingVillageAssignmentCenterId(centerId);
+                  setSelectedVillagesSet(selectedVillages);
+                  setVillagesByBlockData(villagesByBlock);
+                  localStorage.setItem('workingLocationCenterId', centerId);
+                }}
+                onCenterOptionsChange={(centerOptions) => {
+                  setCenterOptionsData(centerOptions);
+                }}
               />
             </Box>
           )}
@@ -1491,18 +1265,9 @@ const Mobilizer = () => {
                 },
                 width: '100%',
               }}
-              disabled={!selectedCenterId || isMappingInProgress}
-              onClick={() => {
-                if (selectedCenterId) {
-                  setFormStep(1);
-                  localStorage.setItem(
-                    'workingLocationCenterId',
-                    selectedCenterId
-                  );
-                } else {
-                  showToastMessage('Please select a center', 'error');
-                }
-              }}
+              disabled={!selectedUserId || isMappingInProgress}
+              form="dynamic-form-id"
+              type="submit"
             >
               {t('COMMON.NEXT')}
             </Button>
@@ -1512,16 +1277,435 @@ const Mobilizer = () => {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={!selectedUserId || isMappingInProgress}
-              form="dynamic-form-id"
-              type="submit"
-              // onClick={async () => {
+              disabled={!selectedUserId || !userDetails || !workingVillageAssignmentCenterId || selectedVillagesSet.size === 0 || isMappingInProgress}
+              onClick={async () => {
+                if (!selectedUserId || !userDetails) {
+                  showToastMessage(
+                    t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
+                    'error'
+                  );
+                  return;
+                }
 
-              // }}
+                // Get center ID from state or localStorage (set by WorkingVillageAssignmentWidget)
+                const centerIdToUse = workingVillageAssignmentCenterId || localStorage.getItem('workingLocationCenterId');
+                if (!centerIdToUse) {
+                  showToastMessage('Please select a center and assign villages', 'error');
+                  return;
+                }
+
+                if (selectedVillagesSet.size === 0) {
+                  showToastMessage('Please select at least one village', 'error');
+                  return;
+                }
+
+                // Get center details to extract CATCHMENT_AREA structure
+                const center = centerOptionsData.find((c: any) => c.id === centerIdToUse);
+                if (!center || !center.customFields) {
+                  showToastMessage('Center details not found. Please select a center again.', 'error');
+                  return;
+                }
+
+                // Find CATCHMENT_AREA field in customFields
+                const catchmentAreaField = center.customFields.find(
+                  (field: any) => field.label === 'CATCHMENT_AREA'
+                );
+
+                if (!catchmentAreaField || !catchmentAreaField.selectedValues) {
+                  showToastMessage('CATCHMENT_AREA not found for selected center', 'error');
+                  return;
+                }
+
+                // Create a map of selected villages by block ID
+                const selectedVillagesByBlock: Record<string, Array<{ id: number; name: string }>> = {};
+                
+                // Iterate through all villages and group selected ones by block
+                Object.entries(villagesByBlockData).forEach(([blockId, villages]) => {
+                  const selectedInBlock = villages.filter((village) => selectedVillagesSet.has(village.id));
+                  if (selectedInBlock.length > 0) {
+                    selectedVillagesByBlock[blockId] = selectedInBlock.map((v) => ({
+                      id: Number(v.id),
+                      name: v.name,
+                    }));
+                  }
+                });
+
+                // Build working location structure from CATCHMENT_AREA (similar to handleConfirmAssignment)
+                const workingLocationStructure: Array<{
+                  stateId: number;
+                  stateName: string;
+                  districts: Array<{
+                    districtId: number;
+                    districtName: string;
+                    blocks: Array<{
+                      id: number;
+                      name: string;
+                      villages: Array<{ id: number; name: string }>;
+                    }>;
+                  }>;
+                }> = [];
+
+                // Iterate through catchment area structure
+                catchmentAreaField.selectedValues.forEach((stateData: any) => {
+                  const stateId = Number(stateData.stateId);
+                  const stateName = stateData.stateName || '';
+
+                  const districts: Array<{
+                    districtId: number;
+                    districtName: string;
+                    blocks: Array<{
+                      id: number;
+                      name: string;
+                      villages: Array<{ id: number; name: string }>;
+                    }>;
+                  }> = [];
+
+                  if (stateData.districts && Array.isArray(stateData.districts)) {
+                    stateData.districts.forEach((district: any) => {
+                      const districtId = Number(district.districtId);
+                      const districtName = district.districtName || '';
+
+                      const blocks: Array<{
+                        id: number;
+                        name: string;
+                        villages: Array<{ id: number; name: string }>;
+                      }> = [];
+
+                      if (district.blocks && Array.isArray(district.blocks)) {
+                        district.blocks.forEach((block: any) => {
+                          const blockId = String(block.id);
+                          
+                          // Only include blocks that have selected villages
+                          if (selectedVillagesByBlock[blockId] && selectedVillagesByBlock[blockId].length > 0) {
+                            blocks.push({
+                              id: Number(block.id),
+                              name: block.name || '',
+                              villages: selectedVillagesByBlock[blockId],
+                            });
+                          }
+                        });
+                      }
+
+                      // Only include districts that have blocks with selected villages
+                      if (blocks.length > 0) {
+                        districts.push({
+                          districtId,
+                          districtName,
+                          blocks,
+                        });
+                      }
+                    });
+                  }
+
+                  // Only include states that have districts with selected villages
+                  if (districts.length > 0) {
+                    workingLocationStructure.push({
+                      stateId,
+                      stateName,
+                      districts,
+                    });
+                  }
+                });
+
+                // Extract village IDs from working location structure
+                const villageIds: string[] = [];
+                workingLocationStructure.forEach((state) => {
+                  state.districts.forEach((district) => {
+                    district.blocks.forEach((block) => {
+                      block.villages.forEach((village) => {
+                        villageIds.push(String(village.id));
+                      });
+                    });
+                  });
+                });
+
+                if (villageIds.length === 0) {
+                  showToastMessage('Please select at least one village', 'error');
+                  return;
+                }
+
+                setIsMappingInProgress(true);
+                try {
+                  const { userData, customFields } =
+                    splitUserData(userDetails);
+
+                  delete userData.email;
+
+                  // Modify customFields to add/update working_location and workingVillageId
+                  // Remove existing working_location and working_village fields if present
+                  const filteredCustomFields = customFields.filter(
+                    (field: any) => field.fieldId !== workingLocationId && field.fieldId !== workingVillageId
+                  );
+                  
+                  // Add working_location field with value from built structure
+                  // The value should be an array containing the working location structure (as per API requirement)
+                  filteredCustomFields.push({
+                    fieldId: workingLocationId,
+                    value: workingLocationStructure // This is already an array
+                  });
+                  
+                  // Add working_village field with village IDs array
+                  filteredCustomFields.push({
+                    fieldId: workingVillageId,
+                    value: villageIds // Array of village ID strings
+                  });
+                  
+                  const updatedCustomFields = filteredCustomFields;
+
+                  // Build payload for user-tenant API
+                  const userTenantPayload = {
+                    userId: selectedUserId,
+                    tenantId: tenantId,
+                    roleId: roleId,
+                    customField: updatedCustomFields,
+                    userData: userData,
+                  };
+
+                  console.log('######### userTenantPayload', JSON.stringify(userTenantPayload, null, 2));
+
+                  // Call user-tenant API first
+                  const updateUserResponse = await enrollUserTenant({
+                    userId: selectedUserId,
+                    tenantId: tenantId,
+                    roleId: roleId,
+                    customField: updatedCustomFields,
+                    userData: userData,
+                  });
+                  
+                  console.log(
+                    '######### updatedResponse',
+                    updateUserResponse
+                  );
+
+                  if (
+                    updateUserResponse &&
+                    updateUserResponse?.params?.err === null
+                  ) {
+                    // Ensure centerId is a string (handle array case)
+                    const cohortId = Array.isArray(centerIdToUse)
+                      ? centerIdToUse[0]
+                      : centerIdToUse;
+
+                    // Call bulkCreateCohortMembers to map user to center
+                    if (cohortId && selectedUserId) {
+                      try {
+                        const cohortMemberResponse =
+                          await bulkCreateCohortMembers({
+                            userId: [selectedUserId],
+                            cohortId: [cohortId],
+                          });
+
+                        if (
+                          cohortMemberResponse?.responseCode === 201 ||
+                          cohortMemberResponse?.params?.err === null ||
+                          cohortMemberResponse?.status === 201
+                        ) {
+                          console.log(
+                            'Successfully mapped user to center:',
+                            cohortMemberResponse
+                          );
+                          showToastMessage(t(successCreateMessage), 'success');
+                        } else {
+                          console.error(
+                            'Error mapping user to center:',
+                            cohortMemberResponse
+                          );
+                          showToastMessage(
+                            cohortMemberResponse?.data?.params?.errmsg ||
+                              t(failureCreateMessage),
+                            'error'
+                          );
+                        }
+                      } catch (cohortError) {
+                        console.error(
+                          'Error in bulkCreateCohortMembers:',
+                          cohortError
+                        );
+                        showToastMessage(
+                          cohortError?.response?.data?.params?.errmsg ||
+                            t(failureCreateMessage),
+                          'error'
+                        );
+                      }
+                    }
+
+                    // Close dialog
+                    setMapModalOpen(false);
+                    setSelectedCenterId(null);
+                    setSelectedUserId(null);
+                    setCohortResponse(null);
+                    setCatchmentAreaData(null);
+                    setSelectedStateId(null);
+                    setSelectedDistrictId(null);
+                    setSelectedBlockId(null);
+                    setFormStep(0);
+                    setUserDetails(null);
+                    setWorkingVillageAssignmentCenterId(null);
+                    setWorkingVillageAssignmentLocation(null);
+                    setSelectedVillagesSet(new Set());
+                    setVillagesByBlockData({});
+                    setCenterOptionsData([]);
+                    // Refresh the data
+                    searchData(prefilledFormData, 0);
+                  } else {
+                    showToastMessage(t(failureUpdateMessage), 'error');
+                  }
+                } catch (error) {
+                  console.error('Error creating cohort member:', error);
+                  showToastMessage(
+                    error?.response?.data?.params?.errmsg ||
+                      t(failureCreateMessage),
+                    'error'
+                  );
+                } finally {
+                  setIsMappingInProgress(false);
+                }
+              }}
             >
               {t('COMMON.MAP')}
             </Button>
           )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Modal Dialog */}
+      <Dialog
+        open={editModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setSelectedUserIdEdit(null); // Reset user selection when dialog closes
+            setSelectedUserRow(null); // Reset user row selection when dialog closes
+            setIsEditInProgress(true);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('MOBILIZER.EDIT_MOBILIZER')}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => setEditModalOpen(false)}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ mb: 3 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+                <CircularProgress />
+                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                  {t('COMMON.SAVING')}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Box sx={{ mb: 3 }}>
+              <EditSearchUser
+                onUserDetails={async (userDetails) => {
+                  console.log('############# userDetails', userDetails);
+                  if (selectedUserIdEdit) {
+                    setIsEditInProgress(true);
+                    try {
+                      const { userData, customFields } =
+                        splitUserData(userDetails);
+  
+                      delete userData.email;
+  
+                      const object = {
+                        userData: userData,
+                        customFields: customFields,
+                      };
+  
+                      //update user details
+                      const updateUserResponse = await updateUser(selectedUserIdEdit, object);
+                      console.log(
+                        '######### updatedResponse',
+                        updateUserResponse
+                      );
+  
+                      if (
+                        updateUserResponse &&
+                        updateUserResponse?.status == 200
+                      ) {
+                        showToastMessage(t(successUpdateMessage), 'success');
+                        // Refresh the data
+                        searchData(prefilledFormData, currentPage);
+                      } else {
+                        showToastMessage(t(failureUpdateMessage), 'error');
+                      }
+                    } catch (error) {
+                      console.error('Error updating user:', error);
+                      showToastMessage(
+                        error?.response?.data?.params?.errmsg ||
+                          t(failureUpdateMessage),
+                        'error'
+                      );
+                    } finally {
+                      setIsEditInProgress(false);
+                      setEditModalOpen(false);
+                    }
+                  } else if (!selectedUserIdEdit) {
+                    showToastMessage('Please search and select a user', 'error');
+                  }
+                }}
+                selectedUserRow={selectedUserRow}
+                schema={addSchema}
+                uiSchema={addUiSchema}
+                userId={selectedUserIdEdit}
+                roleId={roleId}
+                tenantId={tenantId}
+                type="leader"
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              sx={{
+                backgroundColor: '#FFC107',
+                color: '#000',
+                fontFamily: 'Poppins',
+                fontWeight: 500,
+                fontSize: '14px',
+                height: '40px',
+                lineHeight: '20px',
+                letterSpacing: '0.1px',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                '&:hover': {
+                  backgroundColor: '#ffb300',
+                },
+                width: '100%',
+              }}
+              disabled={!selectedUserIdEdit || isEditInProgress}
+              form="dynamic-form-id"
+              type="submit"
+            >
+              {t('COMMON.SAVE')}
+            </Button>
         </DialogActions>
       </Dialog>
     </>
