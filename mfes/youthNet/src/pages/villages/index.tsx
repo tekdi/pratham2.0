@@ -90,7 +90,7 @@ import {
   enhanceUiSchemaWithGrid,
   splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
-import { RoleId } from '@/utils/app.constant';
+import { RoleId } from '@shared-lib-v2/utils/app.constant';
 import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import EmailSearchUser from '@shared-lib-v2/MapUser/EmailSearchUser';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
@@ -684,7 +684,7 @@ const Index = () => {
     });
     console.log('####', selectedStateValue, selectedDistrictValue);
     setPrefilledFormData({});
-    setRoleID(RoleId.TEACHER);
+    setRoleID(RoleId.MOBILIZER);
     setTenantId(localStorage.getItem('tenantId') || '');
     fetchData();
   }, [selectedStateValue, selectedDistrictValue]);
@@ -1982,7 +1982,7 @@ const Index = () => {
                             }
 
                             const mobilizerRoleId =
-                              'a4694781-65c1-4b92-8ff1-ad490ab6d140'; // RoleId.MOBILIZER
+                              RoleId.MOBILIZER; // RoleId.MOBILIZER
 
                             const updateUserResponse = await enrollUserTenant({
                               userId: selectedMobilizerUserId,
@@ -2077,7 +2077,7 @@ const Index = () => {
                       onPrefilledStateChange={(prefilledState) => {
                         setMobilizerPrefilledState(prefilledState || {});
                       }}
-                      roleId={'a4694781-65c1-4b92-8ff1-ad490ab6d140'} // RoleId.MOBILIZER
+                      roleId={RoleId.MOBILIZER} // RoleId.MOBILIZER
                       tenantId={tenantId}
                       type="leader"
                     />
