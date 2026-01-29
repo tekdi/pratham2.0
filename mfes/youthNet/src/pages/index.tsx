@@ -58,10 +58,15 @@ const Index = () => {
         const userId = localStorage.getItem('userId');
         if (userId) {
           const response = await getCohortList(userId, true, true);
-          const cohortDataArray = response?.result || [];
+          // console.log('response', response);
+          const cohortDataArray = (response?.result || []).filter(
+            (cohort: any) =>
+              cohort.cohortStatus?.toLowerCase() === 'active' &&
+              cohort.cohortMemberStatus?.toLowerCase() === 'active'
+          );
 
           if (cohortDataArray.length > 0) {
-            localStorage.setItem('cohortData', JSON.stringify(response.result));
+            localStorage.setItem('cohortData', JSON.stringify(cohortDataArray));
           }
 
           // Find the first center (not BLOCK type) and store its cohortId as workingLocationCenterId
