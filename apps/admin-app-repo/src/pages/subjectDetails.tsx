@@ -320,16 +320,16 @@ console.log('matchingSubjects', matchingSubjects);
   };
 
   useEffect(() => {
-    if (selectedmedium) {
+    if (selectedmedium && mediumOptions.length > 0 && boardAssociations.length > 0) {
       fetchAndSetGradeData(selectedmedium);
     }
-  }, [selectedmedium]);
+  }, [selectedmedium, mediumOptions, boardAssociations]);
 
   useEffect(() => {
-    if (selectedgrade) {
+    if (selectedgrade && gradeOptions.length > 0) {
       fetchAndSetTypeData(selectedgrade);
     }
-  }, [selectedgrade]);
+  }, [selectedgrade, gradeOptions]);
 
   useEffect(() => {
     if (!tenantConfig) return;
@@ -337,6 +337,36 @@ console.log('matchingSubjects', matchingSubjects);
       fetchAndSetSubData(selectedtype);
     }
   }, [tenantConfig, selectedtype]);
+
+  // Auto-select medium if only one option is available
+  useEffect(() => {
+    if (medium.length === 1 && (!selectedmedium || selectedmedium === "")) {
+      const autoSelectedMedium = medium[0].name;
+      setSelectedmedium(autoSelectedMedium);
+      setTaxonomyMedium(autoSelectedMedium);
+      localStorage.setItem("selectedMedium", autoSelectedMedium);
+    }
+  }, [medium, selectedmedium]);
+
+  // Auto-select grade if only one option is available
+  useEffect(() => {
+    if (grade.length === 1 && (!selectedgrade || selectedgrade === "") && selectedmedium && selectedmedium !== "") {
+      const autoSelectedGrade = grade[0].name;
+      setSelectedgrade(autoSelectedGrade);
+      setTaxonomyGrade(autoSelectedGrade);
+      localStorage.setItem("selectedGrade", autoSelectedGrade);
+    }
+  }, [grade, selectedgrade, selectedmedium]);
+
+  // Auto-select type if only one option is available
+  useEffect(() => {
+    if (type.length === 1 && (!selectedtype || selectedtype === "") && selectedgrade && selectedgrade !== "") {
+      const autoSelectedType = type[0].name;
+      setSelectedtype(autoSelectedType);
+      setTaxonomyType(autoSelectedType);
+      localStorage.setItem("selectedType", autoSelectedType);
+    }
+  }, [type, selectedtype, selectedgrade]);
 
   if (loading) {
     return <Loader showBackdrop={true} loadingText="Loading" />;
@@ -368,9 +398,15 @@ console.log('matchingSubjects', matchingSubjects);
     const medium = event.target.value;
     setSelectedmedium(medium);
     setTaxonomyMedium(medium);
-    // setSelectedgrade([null]);
-    // setSelectedtype([null]);
-    // setSubject([null]);
+    
+    // Clear dependent selections when medium changes
+    setSelectedgrade("");
+    setSelectedtype("");
+    setSubject([]);
+    localStorage.removeItem("selectedGrade");
+    localStorage.removeItem("selectedType");
+    setTaxonomyGrade("");
+    setTaxonomyType("");
 
     const windowUrl = window.location.pathname;
     const cleanedUrl = windowUrl.replace(/^\//, "");
@@ -397,6 +433,12 @@ console.log('matchingSubjects', matchingSubjects);
     const grade = event.target.value;
     setTaxonomyGrade(grade);
     setSelectedgrade(grade);
+    
+    // Clear dependent selection when grade changes
+    setSelectedtype("");
+    setSubject([]);
+    localStorage.removeItem("selectedType");
+    setTaxonomyType("");
 
     const windowUrl = window.location.pathname;
     const cleanedUrl = windowUrl.replace(/^\//, "");
@@ -448,7 +490,14 @@ console.log('matchingSubjects', matchingSubjects);
     setSelectedmedium("");
     setSelectedgrade("");
     setSelectedtype("");
-    setSubject([""]);
+    setSubject([]);
+    localStorage.removeItem("selectedMedium");
+    localStorage.removeItem("selectedGrade");
+    localStorage.removeItem("selectedType");
+    localStorage.removeItem("overallCommonSubjects");
+    setTaxonomyMedium("");
+    setTaxonomyGrade("");
+    setTaxonomyType("");
   };
 
   return (

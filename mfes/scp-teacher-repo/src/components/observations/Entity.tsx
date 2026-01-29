@@ -13,11 +13,13 @@ interface MemberProps {
   entityMemberValue?: string;
   status?: string;
   onClick?: any;
+  username?: string;
 }
 
 const Entity: React.FC<MemberProps> = ({
   entityMemberValue,
   status,
+  username,
   onClick,
 }) => {
   const { t } = useTranslation();
@@ -56,7 +58,7 @@ const Entity: React.FC<MemberProps> = ({
             display: 'flex',
             gap: '10px',
             background: '#fff',
-            height: '56px',
+            height: '60px',
             borderRadius: '8px',
           }}
         >
@@ -110,7 +112,12 @@ const Entity: React.FC<MemberProps> = ({
               >
                 {entityMemberValue}
               </Typography>
-              <Typography variant="h5" color={'#4D4639'}>
+              {username && (
+                <Typography variant="h5" sx={{  color: '#FFA726' , mb:"1.5px"}}>
+                  {username}
+                </Typography>
+              )}
+              <Typography variant="h5" color={'#4D4639'} >
                 {observationStatus}
               </Typography>
             </Box>
