@@ -723,9 +723,11 @@ const DynamicForm = ({
           return updatedSchema;
         });
       };
-      if (formData.phone_type_accessible === 'nophone') {
+      
+      if(formSchema.properties?.own_phone_check){ 
+        if (formData.phone_type_accessible === 'nophone') {
         removeFields(['own_phone_check']);
-      } else if (formData.phone_type_accessible) {
+      } else if (formData.phone_type_accessible ) {
         // 1. Add back to schema if missing
         setFormSchema((prevSchema) => {
           if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
@@ -763,7 +765,8 @@ const DynamicForm = ({
           },
         }));
       }
-    }
+      
+    }}
   }, [formData]);
 
   const widgets = {

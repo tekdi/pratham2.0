@@ -51,6 +51,7 @@ interface EntityData {
   userId?: string;
   status?: string;
   _id?: string;
+  username?: string;
 }
 
 const ObservationDetails = () => {
@@ -311,6 +312,7 @@ const ObservationDetails = () => {
           submissionsCount: submission.submissionsCount || 0,
           submissionId: submission.submissionId || null,
           status: submission.status || ObservationStatus.NOT_STARTED,
+          username: user?.username,
         };
       });
     } else {
@@ -327,6 +329,7 @@ const ObservationDetails = () => {
             submissionsCount: submission.submissionsCount || 0,
             submissionId: submission.submissionId || null,
             status: submission.status || ObservationStatus.NOT_STARTED,
+            username: cohort?.username,
           };
         }) || [];
 
@@ -443,6 +446,7 @@ const ObservationDetails = () => {
               cohortMembershipId: user?.cohortMembershipId,
               enrollmentNumber: user?.username,
               age: ageField ? ageField.value : null,
+              username: user?.username,
             };
           });
 
@@ -526,6 +530,7 @@ const ObservationDetails = () => {
       <Entity
         key={item.cohortId || index} // Use a unique key here
         entityMemberValue={toPascalCase(item?.name)}
+        username={item?.username}
         status={
           item?.status === ObservationStatus?.STARTED
             ? ObservationStatus.NOT_STARTED
