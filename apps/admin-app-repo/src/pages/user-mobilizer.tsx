@@ -9,6 +9,7 @@ import {
 } from '../constant/Forms/MobilizerSearch';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import apartment from '../../public/images/apartment.svg';
 
 import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { HierarchicalSearchUserList, userList } from '@/services/UserList';
@@ -305,6 +306,17 @@ const Mobilizer = () => {
   const [selectedUserIdEdit, setSelectedUserIdEdit] = useState<string | null>(null);
   const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
   const [isEditInProgress, setIsEditInProgress] = useState(false);
+
+  // Reassign modal variables
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [reassignUserId, setReassignUserId] = useState<string | null>(null);
+  const [reassignRow, setReassignRow] = useState<any>(null);
+  const [reassignCenterId, setReassignCenterId] = useState<string | null>(null);
+  const [reassignWorkingVillageIds, setReassignWorkingVillageIds] = useState<string>('');
+  const [reassignSelectedVillages, setReassignSelectedVillages] = useState<Set<string>>(new Set());
+  const [reassignVillagesByBlock, setReassignVillagesByBlock] = useState<Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>>({});
+  const [reassignCenterOptions, setReassignCenterOptions] = useState<any[]>([]);
+  const [isReassignInProgress, setIsReassignInProgress] = useState(false);
 
   // Function to check if villages are selected in working_location
   // Returns { isValid: boolean, missingBlocks: Array<{state, district, block}>, isWorkingLocationMissing?: boolean }
@@ -614,6 +626,7 @@ const Mobilizer = () => {
         </Box>
       ),
       callback: async (row: any) => {
+        // console.log('row>>>>', row);
         setIsEditInProgress(true);
         setEditModalOpen(true);
         setSelectedUserIdEdit(row?.userId);
@@ -658,6 +671,39 @@ const Mobilizer = () => {
         setChecked(false);
       },
       show: (row) => row.status !== 'archived',
+    },
+    {
+      icon: (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            // backgroundColor: 'rgb(227, 234, 240)',
+            justifyContent: 'center',
+            padding: '10px',
+          }}
+          title="Reassign Villages"
+        >
+          <Image src={apartment} alt="" />
+        </Box>
+      ),
+      callback: async (row: any) => {
+        // Extract reassign data from row
+        const { centerId, workingVillageIds } = extractReassignData(row);
+        
+        // Set state for reassign modal
+        setReassignUserId(row?.userId);
+        setReassignRow(row);
+        setReassignCenterId(centerId);
+        setReassignWorkingVillageIds(workingVillageIds);
+        setReassignSelectedVillages(new Set());
+        setReassignVillagesByBlock({});
+        setReassignCenterOptions([]);
+        setReassignModalOpen(true);
+      },
+      show: (row) => row.status === 'active' && row?.cohortData?.some((item: any) => item?.cohortMember?.status === 'active'),
     },
     {
       icon: (
@@ -773,6 +819,23 @@ const Mobilizer = () => {
       setCohortResponse(null);
       setCatchmentAreaData(null);
     }
+  };
+
+  // Helper function to extract reassign data from row
+  const extractReassignData = (row: any) => {
+    // Extract centerId from active cohort
+    const activeCenter = row?.cohortData?.find(
+      (item: any) => item?.cohortMember?.status === 'active'
+    );
+    const centerId = activeCenter?.centerId || null;
+    
+    // Extract working_village IDs
+    const workingVillageIds = row?.customfield?.working_village || '';
+    
+    return {
+      centerId,
+      workingVillageIds,
+    };
   };
 
   // Function to extract CATCHMENT_AREA from selected center
@@ -1706,6 +1769,373 @@ const Mobilizer = () => {
             >
               {t('COMMON.SAVE')}
             </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reassign Modal Dialog */}
+      <Dialog
+        open={reassignModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setReassignModalOpen(false);
+            setReassignUserId(null);
+            setReassignRow(null);
+            setReassignCenterId(null);
+            setReassignWorkingVillageIds('');
+            setReassignSelectedVillages(new Set());
+            setReassignVillagesByBlock({});
+            setReassignCenterOptions([]);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            Reassign Working Villages
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              setReassignModalOpen(false);
+              setReassignUserId(null);
+              setReassignRow(null);
+              setReassignCenterId(null);
+              setReassignWorkingVillageIds('');
+              setReassignSelectedVillages(new Set());
+              setReassignVillagesByBlock({});
+              setReassignCenterOptions([]);
+            }}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          <Box sx={{ mb: 3 }}>
+            <WorkingVillageAssignmentWidget
+              userId={reassignUserId || undefined}
+              centerId={reassignCenterId || undefined}
+              existingWorkingVillageIds={reassignWorkingVillageIds || undefined}
+              isForReassign={true}
+              hideConfirmButton={true}
+              onCenterChange={(centerId) => {
+                setReassignCenterId(centerId);
+              }}
+              onSelectionChange={(centerId, selectedVillages, villagesByBlock) => {
+                setReassignCenterId(centerId);
+                setReassignSelectedVillages(selectedVillages);
+                setReassignVillagesByBlock(villagesByBlock);
+              }}
+              onCenterOptionsChange={(centerOptions) => {
+                setReassignCenterOptions(centerOptions);
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            variant="contained"
+            fullWidth
+            disabled={
+              !reassignUserId ||
+              !reassignCenterId ||
+              reassignSelectedVillages.size === 0 ||
+              isReassignInProgress
+            }
+            onClick={async () => {
+              if (!reassignUserId) {
+                showToastMessage('Please select a user', 'error');
+                return;
+              }
+
+              // Get center ID from state
+              const centerIdToUse = reassignCenterId;
+              if (!centerIdToUse) {
+                showToastMessage('Please select a center and assign villages', 'error');
+                return;
+              }
+
+              if (reassignSelectedVillages.size === 0) {
+                showToastMessage('Please select at least one village', 'error');
+                return;
+              }
+
+              // Get center details to extract CATCHMENT_AREA structure
+              const center = reassignCenterOptions.find((c: any) => c.id === centerIdToUse);
+              if (!center || !center.customFields) {
+                showToastMessage('Center details not found. Please select a center again.', 'error');
+                return;
+              }
+
+              // Find CATCHMENT_AREA field in customFields
+              const catchmentAreaField = center.customFields.find(
+                (field: any) => field.label === 'CATCHMENT_AREA'
+              );
+
+              if (!catchmentAreaField || !catchmentAreaField.selectedValues) {
+                showToastMessage('Catchment Area not found for selected center', 'error');
+                return;
+              }
+
+              // Create a map of selected villages by block ID
+              const selectedVillagesByBlock: Record<string, Array<{ id: number; name: string }>> = {};
+              
+              // Iterate through all villages and group selected ones by block
+              Object.entries(reassignVillagesByBlock).forEach(([blockId, villages]) => {
+                const selectedInBlock = villages.filter((village) => reassignSelectedVillages.has(village.id));
+                if (selectedInBlock.length > 0) {
+                  selectedVillagesByBlock[blockId] = selectedInBlock.map((v) => ({
+                    id: Number(v.id),
+                    name: v.name,
+                  }));
+                }
+              });
+
+              // Build working location structure from CATCHMENT_AREA
+              const workingLocationStructure: Array<{
+                stateId: number;
+                stateName: string;
+                districts: Array<{
+                  districtId: number;
+                  districtName: string;
+                  blocks: Array<{
+                    id: number;
+                    name: string;
+                    villages: Array<{ id: number; name: string }>;
+                  }>;
+                }>;
+              }> = [];
+
+              // Iterate through catchment area structure
+              catchmentAreaField.selectedValues.forEach((stateData: any) => {
+                const stateId = Number(stateData.stateId);
+                const stateName = stateData.stateName || '';
+
+                const districts: Array<{
+                  districtId: number;
+                  districtName: string;
+                  blocks: Array<{
+                    id: number;
+                    name: string;
+                    villages: Array<{ id: number; name: string }>;
+                  }>;
+                }> = [];
+
+                if (stateData.districts && Array.isArray(stateData.districts)) {
+                  stateData.districts.forEach((district: any) => {
+                    const districtId = Number(district.districtId);
+                    const districtName = district.districtName || '';
+
+                    const blocks: Array<{
+                      id: number;
+                      name: string;
+                      villages: Array<{ id: number; name: string }>;
+                    }> = [];
+
+                    if (district.blocks && Array.isArray(district.blocks)) {
+                      district.blocks.forEach((block: any) => {
+                        const blockId = String(block.id);
+                        
+                        // Only include blocks that have selected villages
+                        if (selectedVillagesByBlock[blockId] && selectedVillagesByBlock[blockId].length > 0) {
+                          blocks.push({
+                            id: Number(block.id),
+                            name: block.name || '',
+                            villages: selectedVillagesByBlock[blockId],
+                          });
+                        }
+                      });
+                    }
+
+                    // Only include districts that have blocks with selected villages
+                    if (blocks.length > 0) {
+                      districts.push({
+                        districtId,
+                        districtName,
+                        blocks,
+                      });
+                    }
+                  });
+                }
+
+                // Only include states that have districts with selected villages
+                if (districts.length > 0) {
+                  workingLocationStructure.push({
+                    stateId,
+                    stateName,
+                    districts,
+                  });
+                }
+              });
+
+              // Validate required field IDs
+              if (!workingLocationId || !workingVillageId) {
+                showToastMessage('Field IDs not loaded. Please refresh the page and try again.', 'error');
+                return;
+              }
+
+              // Extract village IDs from selected villages
+              const villageIds = Array.from(reassignSelectedVillages).map((id) => String(id));
+
+              setIsReassignInProgress(true);
+              try {
+                // Get original centerId from reassignRow
+                const originalCenterData = extractReassignData(reassignRow);
+                const originalCenterId = originalCenterData?.centerId;
+
+                // API Call 1: Update cohort membership if center changed
+                if (originalCenterId && centerIdToUse && originalCenterId !== centerIdToUse) {
+                  try {
+                    const cohortMemberResponse = await bulkCreateCohortMembers({
+                      userId: [reassignUserId],
+                      cohortId: [centerIdToUse],
+                      removeCohortId: [originalCenterId],
+                    });
+
+                    if (
+                      cohortMemberResponse?.responseCode !== 201 &&
+                      cohortMemberResponse?.params?.err !== null &&
+                      cohortMemberResponse?.status !== 201
+                    ) {
+                      console.error('Error updating cohort membership:', cohortMemberResponse);
+                      showToastMessage(
+                        cohortMemberResponse?.data?.params?.errmsg ||
+                          'Failed to update center assignment',
+                        'error'
+                      );
+                      return;
+                    }
+                    console.log('Successfully updated cohort membership:', cohortMemberResponse);
+                  } catch (cohortError) {
+                    console.error('Error in bulkCreateCohortMembers:', cohortError);
+                    showToastMessage(
+                      cohortError?.response?.data?.params?.errmsg ||
+                        'Failed to update center assignment',
+                      'error'
+                    );
+                    return;
+                  }
+                }
+
+                // API Call 2: Update user with working_location and working_village
+                // Get user details first to extract existing customFields
+                const tenantId = localStorage.getItem('tenantId') || '';
+                const token = localStorage.getItem('token') || '';
+                
+                // Fetch current user data to get existing customFields
+                let existingCustomFields: any[] = [];
+                try {
+                  const userResponse = await axios.get(
+                    `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/read/${reassignUserId}`,
+                    {
+                      headers: {
+                        'Content-Type': 'application/json',
+                        tenantId: tenantId,
+                        Authorization: `Bearer ${token}`,
+                      },
+                    }
+                  );
+                  
+                  const userDetails = userResponse?.data?.result;
+                  if (userDetails?.customFields) {
+                    existingCustomFields = userDetails.customFields;
+                  }
+                } catch (fetchError) {
+                  console.error('Error fetching user details:', fetchError);
+                  // Continue with empty customFields if fetch fails
+                }
+
+                // Filter out existing working_location and working_village fields
+                const filteredCustomFields = existingCustomFields.filter(
+                  (field: any) => field.fieldId !== workingLocationId && field.fieldId !== workingVillageId
+                );
+
+                // Add working_location field
+                filteredCustomFields.push({
+                  fieldId: workingLocationId,
+                  value: workingLocationStructure, // Array containing the working location structure
+                });
+
+                // Add working_village field
+                filteredCustomFields.push({
+                  fieldId: workingVillageId,
+                  value: villageIds, // Array of village ID strings
+                });
+
+                // Call updateUser API
+                const updateUserResponse = await updateUser(reassignUserId, {
+                  userData: {}, // Empty userData as we're only updating customFields
+                  customFields: filteredCustomFields,
+                });
+
+                if (updateUserResponse && updateUserResponse?.status === 200) {
+                  showToastMessage('Villages reassigned successfully', 'success');
+                  searchData(prefilledFormData, currentPage);
+                  setReassignModalOpen(false);
+                  
+                  // Reset all reassign state
+                  setReassignUserId(null);
+                  setReassignRow(null);
+                  setReassignCenterId(null);
+                  setReassignWorkingVillageIds('');
+                  setReassignSelectedVillages(new Set());
+                  setReassignVillagesByBlock({});
+                  setReassignCenterOptions([]);
+                } else {
+                  showToastMessage(
+                    updateUserResponse?.response?.data?.params?.errmsg ||
+                      'Failed to update user villages',
+                    'error'
+                  );
+                }
+              } catch (error) {
+                console.error('Error reassigning villages:', error);
+                showToastMessage(
+                  error?.response?.data?.params?.errmsg || 'Failed to reassign villages',
+                  'error'
+                );
+              } finally {
+                setIsReassignInProgress(false);
+              }
+            }}
+            sx={{
+              backgroundColor: '#FFC107',
+              color: '#000',
+              fontFamily: 'Poppins',
+              fontWeight: 500,
+              fontSize: '14px',
+              height: '40px',
+              lineHeight: '20px',
+              letterSpacing: '0.1px',
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              '&:hover': {
+                backgroundColor: '#ffb300',
+              },
+              width: '100%',
+            }}
+          >
+            {isReassignInProgress ? 'Reassigning...' : 'Reassign Villages'}
+          </Button>
         </DialogActions>
       </Dialog>
     </>

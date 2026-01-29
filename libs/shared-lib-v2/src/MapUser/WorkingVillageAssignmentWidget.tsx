@@ -59,6 +59,10 @@ interface WorkingVillageAssignmentWidgetProps {
   onSelectionChange?: (centerId: string, selectedVillages: Set<string>, villagesByBlock: Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>) => void;
   hideConfirmButton?: boolean; // Hide the Confirm Assignment button
   onCenterOptionsChange?: (centerOptions: any[]) => void; // Callback to get center options
+  // Reassign props
+  centerId?: string; // Center ID to pre-select in reassign flow
+  existingWorkingVillageIds?: string; // Comma-separated string of existing village IDs (e.g., "648579, 648570")
+  isForReassign?: boolean; // Flag to indicate reassign mode
 }
 
 const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetProps> = ({
@@ -68,6 +72,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   onSelectionChange,
   hideConfirmButton = false,
   onCenterOptionsChange,
+  centerId: propCenterId,
+  existingWorkingVillageIds,
+  isForReassign = false,
 }) => {
   // Theme color
   const themeColor = '#FDBE16';
@@ -79,6 +86,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const [selectedDistrict, setSelectedDistrict] = useState<string>(''); // Selected district ID
   const [selectedBlock, setSelectedBlock] = useState<string>('');     // Selected block ID
   const [selectedCenter, setSelectedCenter] = useState<string>('');   // Selected center ID
+  const [villageIdToSelect, setVillageIdToSelect] = useState<any>(existingWorkingVillageIds); // Village ID to select
 
   // Options state for dropdowns
   const [stateOptions, setStateOptions] = useState<Array<{ value: string; label: string }>>([]);
@@ -131,6 +139,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     stateId: string | number;
     stateName: string;
   }>>([]);
+
+  // Store center's CATCHMENT_AREA fetched via API in reassign mode
+  const [reassignCenterCatchmentArea, setReassignCenterCatchmentArea] = useState<any>(null);
 
   // Load villages for all catchment blocks
   const loadVillagesForBlocks = useCallback(async () => {
@@ -258,6 +269,38 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
 
       setVillagesByBlock(villagesData);
       setVillagesDisplayLimit(displayLimits);
+
+      // In reassign mode, pre-select existing villages only when showing the initial center (propCenterId).
+      // When user changes to a different center, do NOT preselect so selection resets immediately.
+      if (
+        isForReassign &&
+        Object.keys(villagesData).length > 0 &&
+        selectedCenter === propCenterId &&
+        selectedVillages.size === 0
+      ) {
+        const existingVillageIdSet = new Set<string>();
+
+        if (villageIdToSelect) {
+          const idsFromString = villageIdToSelect
+            .split(',')
+            .map((id) => id.trim())
+            .filter((id) => id.length > 0);
+          idsFromString.forEach((id) => existingVillageIdSet.add(id));
+        }
+
+        const villagesToSelect = new Set<string>();
+        Object.values(villagesData).forEach((villages) => {
+          villages.forEach((village) => {
+            if (existingVillageIdSet.has(village.id)) {
+              villagesToSelect.add(village.id);
+            }
+          });
+        });
+
+        if (villagesToSelect.size > 0) {
+          setSelectedVillages(villagesToSelect);
+        }
+      }
     } catch (error) {
       console.error('Error loading villages:', error);
       setVillagesByBlock({});
@@ -265,7 +308,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     } finally {
       setLoadingStates((prev) => ({ ...prev, villages: false }));
     }
-  }, [selectedCenter, catchmentBlocks]);
+  }, [selectedCenter, catchmentBlocks, isForReassign, villageIdToSelect, selectedVillages, propCenterId]);
 
   // Load villages when catchment blocks are available
   useEffect(() => {
@@ -480,6 +523,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     };
   }, []); // Only run on mount
 
+  // Note: In reassign mode, state/district/block dropdowns follow normal flow
+  // They are NOT initialized from CATCHMENT_AREA - user selects them normally
+  // Only the center dropdown is pre-filled with propCenterId
+
   // Load district options when state changes
   useEffect(() => {
     const loadDistrictOptions = async () => {
@@ -561,17 +608,100 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
 
   // Load centers when state/district/block changes
   const loadCenters = useCallback(async () => {
-    // No state selected: return empty array
-    if (!selectedState) {
-      setCenterOptions([]);
-      return;
-    }
-
     setLoadingStates((prev) => ({ ...prev, centers: true }));
     try {
       const tenantId = localStorage.getItem('tenantId') || '';
       const token = localStorage.getItem('token') || '';
       const academicYearId = localStorage.getItem('academicYearId') || '';
+
+      // In reassign mode with propCenterId, load that specific center directly ONLY on initial load
+      // (when no state/district/block is selected - user hasn't changed geography yet)
+      // Once user changes state/district/block, follow normal flow
+      if (isForReassign && propCenterId && !selectedState && !selectedDistrict && !selectedBlock) {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+          {
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'COHORT',
+              status: ['active'],
+              cohortId: [propCenterId],
+            },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              tenantId: tenantId,
+              Authorization: `Bearer ${token}`,
+              academicyearid: academicYearId,
+            },
+          }
+        );
+
+        const centers =
+          response?.data?.result?.results?.cohortDetails
+            ?.map((item: any) => {
+              if (!item || !item.cohortId) return null;
+
+              // Extract location data from customFields
+              const customFields = item.customFields || [];
+              const stateField = customFields.find(
+                (field: any) => field.label === 'STATE'
+              );
+              const districtField = customFields.find(
+                (field: any) => field.label === 'DISTRICT'
+              );
+              const blockField = customFields.find(
+                (field: any) => field.label === 'BLOCK'
+              );
+              const villageField = customFields.find(
+                (field: any) => field.label === 'VILLAGE'
+              );
+
+              const stateIdValue = stateField?.selectedValues?.[0]?.id || null;
+              const districtIdValue =
+                districtField?.selectedValues?.[0]?.id || null;
+              const blockIdValue = blockField?.selectedValues?.[0]?.id || null;
+              const villageIdValue =
+                villageField?.selectedValues?.[0]?.id || null;
+
+              // Count villages and blocks (placeholder - would need actual API call for accurate counts)
+              const villages = 0; // TODO: Get actual village count from API
+              const blocks = 0; // TODO: Get actual block count from API
+
+              return {
+                id: String(item.cohortId),
+                name: item.name?.trim() || `Center ${item.cohortId}`,
+                stateId: stateIdValue,
+                districtId: districtIdValue,
+                blockId: blockIdValue,
+                villageId: villageIdValue,
+                villages,
+                blocks,
+                customFields: item.customFields || [], // Store customFields for CATCHMENT_AREA extraction
+              };
+            })
+            .filter((item: any) => item !== null) || [];
+
+        setCenterOptions(centers);
+
+        // Pre-select center if propCenterId is provided
+        if (propCenterId && centers.length > 0) {
+          const centerExists = centers.some((c) => c.id === propCenterId);
+          if (centerExists && !selectedCenter) {
+            setSelectedCenter(propCenterId);
+          }
+        }
+        return;
+      }
+
+      // Normal flow: Load centers based on state/district/block filters
+      // No state selected: return empty array
+      if (!selectedState) {
+        setCenterOptions([]);
+        return;
+      }
 
       const filters: any = {
         type: 'COHORT',
@@ -662,15 +792,128 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     } finally {
       setLoadingStates((prev) => ({ ...prev, centers: false }));
     }
-  }, [selectedState, selectedDistrict, selectedBlock]);
+  }, [selectedState, selectedDistrict, selectedBlock, isForReassign, propCenterId, selectedCenter]);
 
   // Load centers whenever state/district/block changes
   useEffect(() => {
     loadCenters();
   }, [loadCenters]);
 
-  // Extract catchment blocks from selected center's CATCHMENT_AREA
+  // Fetch center's CATCHMENT_AREA via API in reassign mode when centerId is provided
   useEffect(() => {
+    if (!isForReassign || !propCenterId) {
+      setReassignCenterCatchmentArea(null);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchCenterCatchmentArea = async () => {
+      try {
+        const tenantId = localStorage.getItem('tenantId') || '';
+        const token = localStorage.getItem('token') || '';
+        const academicYearId = localStorage.getItem('academicYearId') || '';
+
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+          {
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'COHORT',
+              status: ['active'],
+              cohortId: [propCenterId],
+            },
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              tenantId: tenantId,
+              Authorization: `Bearer ${token}`,
+              academicyearid: academicYearId,
+            },
+          }
+        );
+
+        if (!isMounted) return;
+
+        const cohortDetails = response?.data?.result?.results?.cohortDetails || [];
+        const center = cohortDetails.find((c: any) => c.cohortId === propCenterId);
+
+        if (center && center.customFields) {
+          const catchmentAreaField = center.customFields.find(
+            (field: any) => field.label === 'CATCHMENT_AREA'
+          );
+
+          if (catchmentAreaField && catchmentAreaField.selectedValues) {
+            setReassignCenterCatchmentArea(catchmentAreaField.selectedValues);
+          } else {
+            setReassignCenterCatchmentArea(null);
+          }
+        } else {
+          setReassignCenterCatchmentArea(null);
+        }
+      } catch (error) {
+        console.error('Error fetching center CATCHMENT_AREA:', error);
+        if (isMounted) {
+          setReassignCenterCatchmentArea(null);
+        }
+      }
+    };
+
+    fetchCenterCatchmentArea();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isForReassign, propCenterId]);
+
+  // Extract catchment blocks from selected center's CATCHMENT_AREA or fetched CATCHMENT_AREA (in reassign mode)
+  useEffect(() => {
+    // Priority 1: In reassign mode with centerId, use fetched center's CATCHMENT_AREA from API
+    if (isForReassign && propCenterId && reassignCenterCatchmentArea) {
+      // Extract blocks from fetched center's CATCHMENT_AREA
+      const extractedBlocks: Array<{
+        id: string | number;
+        name: string;
+        districtId: string | number;
+        districtName: string;
+        stateId: string | number;
+        stateName: string;
+      }> = [];
+
+      if (Array.isArray(reassignCenterCatchmentArea) && reassignCenterCatchmentArea.length > 0) {
+        reassignCenterCatchmentArea.forEach((stateData: any) => {
+          const stateId = stateData.stateId;
+          const stateName = stateData.stateName || '';
+
+          if (stateData.districts && Array.isArray(stateData.districts)) {
+            stateData.districts.forEach((district: any) => {
+              const districtId = district.districtId;
+              const districtName = district.districtName || '';
+
+              if (district.blocks && Array.isArray(district.blocks)) {
+                district.blocks.forEach((block: any) => {
+                  extractedBlocks.push({
+                    id: block.id,
+                    name: block.name || '',
+                    districtId: districtId,
+                    districtName: districtName,
+                    stateId: stateId,
+                    stateName: stateName,
+                  });
+                });
+              }
+            });
+          }
+        });
+      }
+
+      setCatchmentBlocks(extractedBlocks);
+      return;
+    }
+
+    // Normal flow: Extract blocks from center's CATCHMENT_AREA
     if (!selectedCenter) {
       setCatchmentBlocks([]);
       setVillagesByBlock({});
@@ -734,8 +977,18 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
       }
     });
 
-    setCatchmentBlocks(extractedBlocks);
-  }, [selectedCenter, centerOptions]);
+      setCatchmentBlocks(extractedBlocks);
+  }, [selectedCenter, centerOptions, isForReassign, propCenterId, reassignCenterCatchmentArea]);
+
+  // Clear villages when center is reset to empty
+  useEffect(() => {
+    if (!selectedCenter) {
+      setSelectedVillages(new Set());
+      setVillagesByBlock({});
+      setVillagesDisplayLimit({});
+      setMaxLimitMessage('');
+    }
+  }, [selectedCenter]);
 
   // Get selected center details for summary badges
   const selectedCenterDetails = useMemo(() => {
@@ -749,6 +1002,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     setSelectedDistrict('');
     setSelectedBlock('');
     setSelectedCenter('');
+    // Clear villages when center is reset
+    setSelectedVillages(new Set());
+    setVillagesByBlock({});
+    setVillagesDisplayLimit({});
   };
 
   const handleDistrictChange = (event: any) => {
@@ -756,28 +1013,36 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     setSelectedDistrict(value);
     setSelectedBlock('');
     setSelectedCenter('');
+    // Clear villages when center is reset
+    setSelectedVillages(new Set());
+    setVillagesByBlock({});
+    setVillagesDisplayLimit({});
   };
 
   const handleBlockChange = (event: any) => {
     const value = event.target.value;
     setSelectedBlock(value);
     setSelectedCenter('');
+    // Clear villages when center is reset
+    setSelectedVillages(new Set());
+    setVillagesByBlock({});
+    setVillagesDisplayLimit({});
   };
 
   const handleCenterChange = (event: any) => {
     const centerId = event.target.value;
-    setSelectedCenter(centerId);
-    // Clear selected villages when center changes
+    // Clear catchment blocks and villages first so counts and preselect don't use old center data
+    setCatchmentBlocks([]);
     setSelectedVillages(new Set());
+    setVillagesByBlock({});
+    setVillagesDisplayLimit({});
     setMaxLimitMessage('');
-    // Call callback if provided
+    setSelectedCenter(centerId);
+    setVillageIdToSelect('');
+    // Call callback if provided (only when center is selected, not when reset)
     if (onCenterChange && centerId) {
       onCenterChange(centerId);
     }
-    // Clear villages data - will be reloaded when catchment blocks are available
-    setVillagesByBlock({});
-    // Clear display limits
-    setVillagesDisplayLimit({});
     // Catchment blocks will be updated by useEffect when selectedCenter changes
   };
 
@@ -966,7 +1231,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Chip
                 icon={<LocationOnIcon sx={{ fontSize: 16 }} />}
-                label={`${selectedVillagesCount}/${MAX_VILLAGES} villages`}
+                label={`${selectedVillagesCount}/${totalVillages} selected`}
                 size="small"
                 sx={{
                   bgcolor: themeColor,
