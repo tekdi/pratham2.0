@@ -458,6 +458,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   };
 
   useEffect(() => {
+    console.log("newtest############# cohortData",cohortData)
+    console.log("newtest############# isFromCenterDetailPage",isFromCenterDetailPage)
     const getFacilitator = async () => {
       if (!isMobile) {
         setLoading(true);
@@ -468,7 +470,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             return block?.blockId;
           })
           .join('');
-        if (cohortId) {
+          if (cohortId) {
+            console.log("newtest############# cohortId",cohortId)
+
+            
+
           const limit = 10;
           const page = offset;
           let stateIds = [];
@@ -618,6 +624,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     };
 
     const fetchFacilitators = async () => {
+      //new api call for cohort member list for hierarchy search api
+
       const cohortId = cohortData;
       const page = 0;
       const filters = {
