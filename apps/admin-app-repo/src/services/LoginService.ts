@@ -72,14 +72,15 @@ export const getUserId = async (): Promise<any> => {
   }
 };
 export const resetPassword = async (
-  newPassword: any): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.resetPassword;
+  newPassword: any, username?:string): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.resetPassword
   try {
-    const response = await post(apiUrl, { newPassword });
+    const payload = username ? { newPassword, username } : { newPassword };
+    const response = await post(apiUrl, payload);
     return response?.data;
   } catch (error) {
     console.error('error in reset', error);
-    throw error;
+   // throw error;
   }
 };
 
