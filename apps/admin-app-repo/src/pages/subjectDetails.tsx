@@ -89,6 +89,30 @@ const SubjectDetails = () => {
   );
   const setBoards = coursePlannerStore((state) => state.setBoards);
 
+  // Clear filters and subjects when board changes to prevent showing data from previous board
+  useEffect(() => {
+    if (boardDetails || boardName) {
+      // Clear all selections
+      setSelectedmedium("");
+      setSelectedgrade("");
+      setSelectedtype("");
+      setSubject([]);
+      setGrade([]);
+      setType([]);
+      
+      // Clear localStorage
+      localStorage.removeItem("selectedMedium");
+      localStorage.removeItem("selectedGrade");
+      localStorage.removeItem("selectedType");
+      localStorage.removeItem("overallCommonSubjects");
+      
+      // Clear taxonomy store
+      setTaxonomyMedium("");
+      setTaxonomyGrade("");
+      setTaxonomyType("");
+    }
+  }, [boardDetails, boardName]);
+
   useEffect(() => {
     const savedMedium = localStorage.getItem("selectedMedium") || "";
     const savedGrade = localStorage.getItem("selectedGrade") || "";
@@ -337,6 +361,14 @@ console.log('matchingSubjects', matchingSubjects);
       fetchAndSetSubData(selectedtype);
     }
   }, [tenantConfig, selectedtype]);
+
+  // Clear subjects if any required filter is missing
+  // This ensures subjects are ONLY shown when all 3 filters are selected
+  useEffect(() => {
+    if (!selectedmedium || !selectedgrade || !selectedtype) {
+      setSubject([]);
+    }
+  }, [selectedmedium, selectedgrade, selectedtype]);
 
   // Auto-select medium if only one option is available
   useEffect(() => {

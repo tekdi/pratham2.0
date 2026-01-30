@@ -33,7 +33,7 @@ export const mapUserData = (userData: any) => {
     const getSingleSelectedValue = (label: any) =>
       userData.customFields
         .find((f: any) => f.label === label)
-        ?.selectedValues[0]?.id?.toString() || '';
+        ?.selectedValues[0]?.id?.toString() || userData.customFields.find((f: any) => f.label === label)?.selectedValues[0]?.value?.toString() || '';
 
     const getSingleTextValue = (label: any) =>
       userData.customFields.find((f: any) => f.label === label)
@@ -54,11 +54,13 @@ export const mapUserData = (userData: any) => {
                             spouse_name: getSingleTextValue('SPOUSE_NAME'),
 
 
+
       marital_status: getSelectedValue('MARITAL_STATUS'),
       phone_type_accessible
 : getSingleSelectedValue('TYPE_OF_PHONE_ACCESSIBLE'),
     family_member_details
 : getSingleSelectedValue('FAMILY_MEMBER_DETAILS'),
+training_check: getSingleSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING'),
       own_phone_check: getSingleSelectedValue('DOES_THIS_PHONE_BELONG_TO_YOU'),
       state: getSelectedValue('STATE'),
       district: getSelectedValue('DISTRICT'),
@@ -74,8 +76,7 @@ export const mapUserData = (userData: any) => {
         getSelectedValue(
           'WHAT_IS_YOUR_PRIMARY_WORK'
         ) || [],
-      training_check:
-        getSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING') || [],
+   
       what_do_you_want_to_become: getSingleTextValue(
         'WHAT_DO_YOU_WANT_TO_BECOME'
       ),

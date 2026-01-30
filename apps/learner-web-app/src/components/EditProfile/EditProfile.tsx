@@ -302,13 +302,34 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             
             // Add family member fields to ui:order if it exists
             // They will be hidden initially and DynamicForm will show the appropriate one
+            // Insert them right after family_member_details for proper ordering
             if (alterUISchema['ui:order']) {
               const fieldsToAdd = ['father_name', 'mother_name', 'spouse_name'];
-              fieldsToAdd.forEach((field) => {
-                if (!alterUISchema['ui:order'].includes(field)) {
-                  alterUISchema['ui:order'].push(field);
-                }
-              });
+              const familyMemberDetailsIndex = alterUISchema['ui:order'].indexOf('family_member_details');
+              
+              if (familyMemberDetailsIndex !== -1) {
+                // First, remove the fields if they already exist in the order
+                fieldsToAdd.forEach((field) => {
+                  const existingIndex = alterUISchema['ui:order'].indexOf(field);
+                  if (existingIndex !== -1) {
+                    alterUISchema['ui:order'].splice(existingIndex, 1);
+                  }
+                });
+                
+                // Then insert fields right after family_member_details in the correct order
+                let insertPosition = alterUISchema['ui:order'].indexOf('family_member_details') + 1;
+                fieldsToAdd.forEach((field) => {
+                  alterUISchema['ui:order'].splice(insertPosition, 0, field);
+                  insertPosition++; // Increment position for next field
+                });
+              } else {
+                // Fallback: add at the end if family_member_details not found in order
+                fieldsToAdd.forEach((field) => {
+                  if (!alterUISchema['ui:order'].includes(field)) {
+                    alterUISchema['ui:order'].push(field);
+                  }
+                });
+              }
             }
           }
           setAddSchema(alterSchema);
