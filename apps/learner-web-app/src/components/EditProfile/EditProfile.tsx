@@ -143,6 +143,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.district;
         delete responseFormForEnroll?.schema?.properties?.block;
         delete responseFormForEnroll?.schema?.properties?.village;
+        delete responseFormForEnroll?.schema?.properties?.consent_file;
         responseFormForEnroll?.schema?.required?.pop('batch');
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));

@@ -661,7 +661,8 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "CONSENT_FILE": "Consent File"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

@@ -31,6 +31,7 @@ interface DocumentViewerProps {
   width?: string | number;
   height?: string | number;
   showError?: boolean;
+  showDownloadButton?: boolean;
 }
 
 const DocumentViewer: React.FC<DocumentViewerProps> = ({
@@ -38,6 +39,7 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
   width = '100%',
   height = '600px',
   showError = true,
+  showDownloadButton = true,
 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -626,16 +628,18 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({
               </>
             )}
           </Box>
-          <IconButton
-            size="small"
-            href={url}
-            download
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Download"
-          >
-            <Download />
-          </IconButton>
+          {showDownloadButton && (
+            <IconButton
+              size="small"
+              href={url}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Download"
+            >
+              <Download />
+            </IconButton>
+          )}
         </Box>
       )}
 

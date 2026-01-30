@@ -789,7 +789,8 @@
     "GOVERNMENT_PARTNERSHIP": "Government Partnership",
     "SUMMER_CAMP_VOLUNTEER": "Summer Camp Volunteer",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "What Program Are You Part Of",
-    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of"
+    "WHAT PROGRAM ARE YOU PART OF": "What Program Are You Part Of",
+    "CONSENT_FILE": "Consent File"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -814,6 +815,11 @@
     "DATE_MUST_BE_ON_OR_AFTER": "Date must be on or after {{date}}"
   },
   "Assessment Score": "Assessment Score",
+  "CONSENT_FILE": "Consent File",
+  "VIEW_FILE": "View File",
+  "FILE_PREVIEW": "File Preview",
+
+  
   "FILTER_KEY": {
     "GROUP_MEMBERSHIP": "groupMembership",
     "JOB_FAMILY": "jobFamily",
