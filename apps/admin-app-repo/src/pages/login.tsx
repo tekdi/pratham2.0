@@ -214,6 +214,10 @@ const LoginPage = () => {
         const program = tenantName;
 
         const response = await getUserDetailsInfo(userId, fieldValue);
+        localStorage.setItem(
+          'temporaryPassword',
+          response?.userData?.temporaryPassword ?? 'false'
+        );
 
         const userInfo = response?.userData;
         // Override role with selected role from SwitchAccount (ensures correct redirect)

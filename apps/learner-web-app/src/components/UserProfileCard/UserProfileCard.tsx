@@ -199,16 +199,38 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
     } else if (
       option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
-      dob &&
-      isBelow18(String(dob))
+      dob
     ) {
-      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
-    } else if (
-      option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
-      dob &&
-      !isBelow18(String(dob))
-    ) {
-      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      // Get the selected language from localStorage (same key as Header.jsx uses)
+      const selectedLanguage =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('lang') || 'en'
+          : 'en';
+
+      // Map language codes to lowercase language names for PDF file naming
+      const languageFileMap: { [key: string]: string } = {
+        en: 'english',
+        hi: 'hindi',
+        mr: 'marathi',
+        bn: 'bengali',
+        as: 'assamese',
+        guj: 'gujarati',
+        kan: 'kannada',
+        odi: 'odia',
+        tam: 'tamil',
+        tel: 'telugu',
+        ur: 'urdu',
+      };
+
+      // Get the language name from the map, default to 'hindi'
+      const languageName = languageFileMap[selectedLanguage] || 'hindi';
+
+      // Open appropriate consent form based on age
+      if (isBelow18(String(dob))) {
+        window.open(`/files/consent_form_below_18_${languageName}.pdf`, '_blank');
+      } else {
+        window.open(`/files/consent_form_above_18_${languageName}.pdf`, '_blank');
+      }
     } else if (option === t('COMMON.FAQS')) {
       router.push('/faqs');
     } else if (option === t('COMMON.SUPPORT_REQUEST')) {
