@@ -3,7 +3,7 @@
 import withRole from '../../components/withRole';
 import React, { useEffect, useState } from 'react';
 import { TENANT_DATA } from '../../utils/app.config';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Header from '../../components/Header';
@@ -21,12 +21,15 @@ import {
   updateUser,
 } from '../../services/youthNet/Dashboard/UserServices';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
-import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import {
+  fetchForm,
+  splitUserData,
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import SimpleModal from '../../components/SimpleModal';
 import { showToastMessage } from '../../components/Toastify';
 import EditIcon from '@mui/icons-material/Edit';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -34,7 +37,6 @@ const UserId = () => {
   const router = useRouter();
   const { userId } = router.query;
   const [schema, setSchema] = useState(null);
-  const [formData, setFormData] = useState<any>();
   const [editModal, setEditModal] = useState<boolean>(false);
   const [updatedUser, setUpdatedUser] = useState<boolean>(false);
   const { tab, blockId, villageId } = router.query;
@@ -42,6 +44,7 @@ const UserId = () => {
   const [uiSchema, setUiSchema] = useState(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [userProgram, setUserProgram] = useState<string | null>(null);
+  const [tenantId, setTenantId] = useState<string>('');
   const [user, setUser] = React.useState<{
     userRole: string | null;
     userID: string | null;
@@ -83,6 +86,7 @@ const UserId = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
       setCurrentUserId(localStorage.getItem('userId'));
       setUserProgram(localStorage.getItem('userProgram'));
+      setTenantId(localStorage.getItem('tenantId') || '');
     }
   }, []);
   const handleOpenEditModal = () => {
@@ -106,70 +110,99 @@ const UserId = () => {
 
     return parsedDate.toISOString().split('T')[0];
   }
-  useEffect(() => {
-    const fetchData = async () => {
-      if (typeof window === 'undefined' || !window.localStorage) return;
+  const fetchData = async () => {
+    if (typeof window === 'undefined' || !window.localStorage) return;
 
-      try {
-        const tenantId = localStorage.getItem('tenantId');
-        const responseForm: any = await fetchForm([
-          {
-            fetchUrl: `${
-              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-            }/form/read?context=${
-              FormContext.mentor.context
-            }&contextType=${user?.userRole?.toUpperCase()}`,
-            header: {},
-          },
-          {
-            fetchUrl: `${
-              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-            }/form/read?context=${
-              FormContext.mentor.context
-            }&contextType=${user?.userRole?.toUpperCase()}`,
-            header: { tenantid: tenantId },
-          },
-        ]);
-        console.log('responseForm', responseForm);
-        const { newSchema, extractedFields } = filterSchema(responseForm);
-        console.log(newSchema?.schema);
-        console.log(newSchema?.uiSchema);
+    try {
+      const tenantId = localStorage.getItem('tenantId');
+      const responseForm: any = await fetchForm([
+        {
+          fetchUrl: `${
+            process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+          }/form/read?context=${
+            FormContext.mentor.context
+          }&contextType=${user?.userRole?.toUpperCase()}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${
+            process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+          }/form/read?context=${
+            FormContext.mentor.context
+          }&contextType=${user?.userRole?.toUpperCase()}`,
+          header: { tenantid: tenantId },
+        },
+      ]);
+      console.log('responseForm', responseForm);
+      const { newSchema, extractedFields } = filterSchema(responseForm);
+      console.log(newSchema?.schema);
+      console.log(newSchema?.uiSchema);
 
-        const extractUserInfo = (({
-          firstName,
-          lastName,
-          middleName,
-          gender,
-          phone: mobile,
-          dob,
-          email,
-        }: any) => ({
-          firstName,
-          lastName,
-          middleName,
-          gender,
-          mobile,
-          dob,
-          email,
-        }))(user);
-        extractUserInfo.dob = formatDate(extractUserInfo?.dob);
-        extractUserInfo.mobile = extractUserInfo?.mobile?.toString();
+      const extractUserInfo = (({
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        phone: mobile,
+        dob,
+        email,
+      }: any) => ({
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        mobile,
+        dob,
+        email,
+      }))(user);
+      extractUserInfo.dob = formatDate(extractUserInfo?.dob);
+      extractUserInfo.mobile = extractUserInfo?.mobile?.toString();
 
-        console.log(extractUserInfo);
-        setFormData(extractUserInfo);
-        setSchema(newSchema?.schema);
-        const updatedUiSchema = {
-          ...newSchema?.uiSchema,
-          'ui:submitButtonOptions': {
-            norender: true,
-          },
-        };
-        setUiSchema(updatedUiSchema);
-      } catch (e) {
-        console.log(e);
+      console.log(extractUserInfo);
+      const keysToRemove = ['working_village', 'working_location'];
+
+      const alterSchema: any = newSchema?.schema
+        ? JSON.parse(JSON.stringify(newSchema.schema))
+        : null;
+      let alterUiSchema: any = newSchema?.uiSchema
+        ? JSON.parse(JSON.stringify(newSchema.uiSchema))
+        : null;
+
+      if (alterSchema?.properties && alterUiSchema) {
+        // Keep editable fields aligned with admin-app user-mobilizer edit flow:
+        // Disable identity fields + contact fields.
+        const fieldsToDisable = ['firstName', 'lastName', 'dob', 'email', 'mobile', 'phone'];
+        fieldsToDisable.forEach((fieldKey) => {
+          if (alterUiSchema?.[fieldKey]) {
+            alterUiSchema[fieldKey]['ui:disabled'] = true;
+          }
+        });
+
+        keysToRemove.forEach((key) => {
+          delete alterSchema.properties[key];
+          delete alterUiSchema[key];
+        });
+        alterSchema.required =
+          alterSchema.required?.filter((key: string) => !keysToRemove.includes(key)) ||
+          [];
       }
-      // setSdbvFieldData(extractedFields);
-    };
+
+      setSchema(alterSchema);
+      const updatedUiSchema = {
+        ...alterUiSchema,
+        'ui:submitButtonOptions': {
+          norender: true,
+        },
+      };
+
+      setUiSchema(updatedUiSchema);
+    } catch (e) {
+      console.log(e);
+    }
+    // setSdbvFieldData(extractedFields);
+  };
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedUserId = localStorage.getItem('userId');
       if (userId === storedUserId && user?.userRole) {
@@ -177,27 +210,47 @@ const UserId = () => {
       }
     }
   }, [user, userId]);
+
+  useEffect(() => {
+    if (!editModal) return;
+    const canRenderEditContent = Boolean(schema && uiSchema && userId);
+  }, [editModal, schema, uiSchema, userId]);
+
+  useEffect(() => {
+    if (!editModal) return;
+    if (schema && uiSchema) return;
+    if (!userId || !user?.userRole) return;
+    fetchData().catch(() => {});
+  }, [editModal, schema, uiSchema, userId, user?.userRole]);
   const onClose = () => {
     setEditModal(false);
   };
-  const FormSubmitFunction = async (formData: any, payload: any) => {
+  const handleProfileUpdate = async (payload: any) => {
     try {
-      const object = {
-        userData: formData,
-      };
-      if (user?.email == formData?.email) {
-        delete formData?.email;
-      }
       if (userId) {
-        const updateUserResponse = await updateUser(userId.toString(), object);
+        const { userData, customFields } =
+          payload && typeof payload === 'object' && 'userData' in payload
+            ? payload
+            : splitUserData(payload);
+
+        if (user?.email && userData?.email && user?.email === userData?.email) {
+          delete userData.email;
+        }
+
+        const updateUserResponse = await updateUser(userId.toString(), {
+          userData,
+          customFields,
+        });
         if (typeof window !== 'undefined' && window.localStorage) {
           const userlocalData = localStorage.getItem('userData');
-          const userData = userlocalData ? JSON.parse(userlocalData) : {};
-          // let userlocalData = JSON.parse(localStorage.getItem("userData")) || {};
+          const existingUserData = userlocalData ? JSON.parse(userlocalData) : {};
 
-          // Merge existing data with updated values
-          const updatedUserData = { ...userData, ...formData };
-          console.log(updatedUserData);
+          const updatedUserData = {
+            ...existingUserData,
+            ...(userData || {}),
+            ...(customFields ? { customFields } : {}),
+          };
+
           localStorage.setItem('userData', JSON.stringify(updatedUserData));
         }
 
@@ -463,8 +516,8 @@ const UserId = () => {
             }}
           />
         </Box>
-        {/* TODO: Add edit profile button */}
-        {/* {userId === currentUserId && userProgram !== 'Pragyanpath' && (
+        {userId?.toString() !== currentUserId &&
+          userProgram !== TENANT_DATA.PRAGYANPATH && (
           <Box
             sx={{
               marginLeft: '30%',
@@ -504,7 +557,7 @@ const UserId = () => {
               </Box>
             </Button>
           </Box>
-        )} */}
+        )}
         {/* <Box ml={2}>
         {' '}
         <Typography
@@ -597,13 +650,31 @@ const UserId = () => {
         id="dynamic-form-id"
         // secondaryText={count === 1 ? 'Save Progress' : ''}
       >
-        {schema && uiSchema && (
-          <DynamicForm
-            hideSubmit={true}
+        {editModal && (!schema || !uiSchema) && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '200px',
+              gap: 2,
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body2">{t('COMMON.LOADING')}</Typography>
+          </Box>
+        )}
+        {schema && uiSchema && userId && (
+          <EditSearchUser
+            onUserDetails={handleProfileUpdate}
             schema={schema}
             uiSchema={uiSchema}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={formData || {}}
+            userId={userId.toString()}
+            roleId={''}
+            tenantId={tenantId}
+            type={'mentor'}
+            selectedUserRow={updatedUser}
           />
         )}
       </SimpleModal>
