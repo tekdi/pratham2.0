@@ -927,7 +927,7 @@ const Facilitator = () => {
               setMapModalOpen(true);
             }}
           >
-            {t('COMMON.ADD_NEW')}{' '}
+            {t('COMMON.MAP_NEW')}{' '}
           </Button>
         </Box>
 

@@ -1682,7 +1682,7 @@ const Index = () => {
                 endIcon={<AddIcon />}
                 onClick={handleOpenMobilizerModal}
               >
-                {t('COMMON.ADD_MOBILIZER')}
+                {t('COMMON.MAP_NEW')}
               </Button>
             </Box>
 
