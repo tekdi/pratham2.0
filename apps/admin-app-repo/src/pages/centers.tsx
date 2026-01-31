@@ -69,7 +69,11 @@ const Centers = () => {
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [totalCountBatch, setTotalCountBatch] = useState(0);
-  const storedProgram = localStorage.getItem('program');
+
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -491,7 +495,9 @@ const Centers = () => {
         setOpenBatchModal(true);
         // console.log('row in view batch', row);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) =>
+        row.status !== 'archived' &&
+        storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
     },
     {
       icon: (
