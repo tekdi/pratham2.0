@@ -1889,7 +1889,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                 return (
                   <Accordion
                     key={block.id}
-                    defaultExpanded
+                    defaultExpanded={false}
                     sx={{
                       border: '1px solid',
                       borderColor: 'divider',
