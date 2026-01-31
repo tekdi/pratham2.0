@@ -221,6 +221,10 @@ const Index = () => {
   const [isVolunteerFieldId, setIsVolunteerFieldId] = useState<any>('');
 
   const [loading, setLoading] = useState<boolean>(false);
+  // Mobilizer list loader (esp. during center change) to avoid showing stale list
+  const [mobilizerListLoading, setMobilizerListLoading] =
+    useState<boolean>(false);
+  const mobilizerListFetchIdRef = React.useRef(0);
 
   const mobilizerCenterIds = useMemo(() => {
     if (typeof window === 'undefined') return [];
@@ -638,56 +642,61 @@ const Index = () => {
   }, [value, selectedVillageValue]);
 
   const getMobilizersList = async () => {
+    if (value !== 1) return;
+    const fetchId = ++mobilizerListFetchIdRef.current;
     try {
-      if (value === 1) {
-        setLoading(true);
-        // For Lead: use selected center from dropdown only; otherwise use workingLocationCenterId from localStorage
-        const workingLocationCenterId =
-          YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
-            ? selectedMobilizerCenterId
-            : localStorage.getItem('workingLocationCenterId');
+      setLoading(true);
+      setMobilizerListLoading(true);
+      // For Lead: use selected center from dropdown only; otherwise use workingLocationCenterId from localStorage
+      const workingLocationCenterId =
+        YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
+          ? selectedMobilizerCenterId
+          : localStorage.getItem('workingLocationCenterId');
 
-        if (workingLocationCenterId) {
-          const response = await fetchCohortMemberList({
-            filters: {
-              cohortId: workingLocationCenterId,
-              role: Role.MOBILIZER,
-              status: [Status.ACTIVE],
-            },
-          });
+      if (workingLocationCenterId) {
+        const response = await fetchCohortMemberList({
+          filters: {
+            cohortId: workingLocationCenterId,
+            role: Role.MOBILIZER,
+            status: [Status.ACTIVE],
+          },
+        });
 
-          const userDetails = response?.result?.userDetails || [];
-          const transformedData = userDetails.map((user: any) => {
-            let name = user.firstName || '';
-            if (user.lastName) {
-              name += ` ${user.lastName}`;
-            }
-            return {
-              Id: user.userId,
-              name: name.trim(),
-              firstName: user?.firstName,
-              lastName: user?.lastName,
-              // showMore: true,
-              customFields: user?.customField,
-            };
-          });
+        const userDetails = response?.result?.userDetails || [];
+        const transformedData = userDetails.map((user: any) => {
+          let name = user.firstName || '';
+          if (user.lastName) {
+            name += ` ${user.lastName}`;
+          }
+          return {
+            Id: user.userId,
+            name: name.trim(),
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            // showMore: true,
+            customFields: user?.customField,
+          };
+        });
 
-          const ascending = [...transformedData].sort((a, b) =>
-            a.name.localeCompare(b.name)
-          );
-          setMentorList(ascending);
-          setFilteredmentorList(ascending);
-          setMentorCount(transformedData.length);
-        } else {
-          setMentorList([]);
-          setFilteredmentorList([]);
-          setMentorCount(0);
-        }
+        const ascending = [...transformedData].sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setMentorList(ascending);
+        setFilteredmentorList(ascending);
+        setMentorCount(transformedData.length);
+      } else {
+        setMentorList([]);
+        setFilteredmentorList([]);
+        setMentorCount(0);
       }
     } catch (e) {
       console.log(e);
     } finally {
-      setLoading(false);
+      // Only stop the loader if this is the latest request (handles rapid center switching)
+      if (fetchId === mobilizerListFetchIdRef.current) {
+        setLoading(false);
+        setMobilizerListLoading(false);
+      }
     }
   };
 
@@ -1694,7 +1703,9 @@ const Index = () => {
                 px: '20px',
               }}
             >
-              {filteredmentorList.length !== 0 ? (
+              {mobilizerListLoading ? (
+                <Loader showBackdrop={true} />
+              ) : filteredmentorList.length !== 0 ? (
                 <UserList
                   layout="list"
                   users={filteredmentorList.map((user: any) => ({
@@ -1704,22 +1715,18 @@ const Index = () => {
                   onUserClick={handleUserClick}
                   onToggleUserClick={handleToggledMentorClick}
                 />
-              ) : filteredmentorList.length === 0 && !loading ? (
-                <>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      color: theme.palette.warning['300'],
-                      marginTop: '10px',
-                      marginLeft: '15%',
-                    }}
-                  >
-                    {t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}
-                  </Typography>
-                </>
               ) : (
-                <Loader showBackdrop={true} />
+                <Typography
+                  sx={{
+                    fontSize: '14px',
+                    fontWeight: 400,
+                    color: theme.palette.warning['300'],
+                    marginTop: '10px',
+                    marginLeft: '15%',
+                  }}
+                >
+                  {t('YOUTHNET_USERS_AND_VILLAGES.NO_DATA_FOUND')}
+                </Typography>
               )}
             </Box>
             <BottomDrawer
