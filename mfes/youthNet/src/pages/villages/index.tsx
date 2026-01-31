@@ -97,6 +97,7 @@ import WorkingVillageAssignmentWidget from '@shared-lib-v2/MapUser/WorkingVillag
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { bulkCreateCohortMembers } from '../../services/CohortService';
 import { getCohortList } from '../../services/GetCohortList';
+import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -195,6 +196,19 @@ const Index = () => {
   const [workingVillageAssignmentCenterId, setWorkingVillageAssignmentCenterId] = useState<string>('');
   const [centerOptionsData, setCenterOptionsData] = useState<any[]>([]);
 
+  // Reassign modal state
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [reassignCohortData, setReassignCohortData] = useState<any[]>([]);
+  const [reassignCenterIds, setReassignCenterIds] = useState<string[]>([]);
+  const [reassignWorkingVillageIds, setReassignWorkingVillageIds] = useState<string>('');
+  const [reassignUserId, setReassignUserId] = useState<string>('');
+  const [reassignSelectedVillages, setReassignSelectedVillages] = useState<Set<string>>(new Set());
+  const [reassignVillagesByBlock, setReassignVillagesByBlock] = useState<Record<string, Array<{ id: string; name: string; blockId: string; unavailable: boolean; assigned: boolean }>>>({});
+  const [reassignCenterId, setReassignCenterId] = useState<string>('');
+  const [originalReassignCenterId, setOriginalReassignCenterId] = useState<string>('');
+  const [reassignCenterOptions, setReassignCenterOptions] = useState<any[]>([]);
+  const [isReassignInProgress, setIsReassignInProgress] = useState(false);
+
   const [selectedValue, setSelectedValue] = useState<any>();
   const [selectedBlockValue, setSelectedBlockValue] = useState<any>(
     blockId ? blockId : ''
@@ -221,6 +235,21 @@ const Index = () => {
     centerType: '',
     sortOrder: '',
   });
+
+  // Lead role: selected center in mobilizer tab (data from cohortData in localStorage)
+  const [selectedMobilizerCenterId, setSelectedMobilizerCenterId] = useState<string>('');
+
+  // Center dropdown options for mobilizer tab (Lead) - from cohortData in localStorage
+  const mobilizerCenterOptions = useMemo(() => {
+    if (typeof window === 'undefined' || value !== 1) return [];
+    const cohortDataString = localStorage.getItem('cohortData');
+    const cohortData = cohortDataString ? JSON.parse(cohortDataString) : [];
+    if (!Array.isArray(cohortData)) return [];
+    return cohortData.map((cohort: any) => ({
+      id: cohort.cohortId,
+      name: cohort.cohortName || cohort.name || cohort.cohortId || '',
+    })).filter((o: { id: string; name: string }) => o.id && o.name);
+  }, [value]);
 
   // Helper function to extract states, districts and blocks from catchment_area
   // Supports multiple centers by merging catchment areas from all active cohorts
@@ -612,9 +641,11 @@ const Index = () => {
     try {
       if (value === 1) {
         setLoading(true);
-        const workingLocationCenterId = localStorage.getItem(
-          'workingLocationCenterId'
-        );
+        // For Lead: use selected center from dropdown only; otherwise use workingLocationCenterId from localStorage
+        const workingLocationCenterId =
+          YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
+            ? selectedMobilizerCenterId
+            : localStorage.getItem('workingLocationCenterId');
 
         if (workingLocationCenterId) {
           const response = await fetchCohortMemberList({
@@ -637,7 +668,7 @@ const Index = () => {
               firstName: user?.firstName,
               lastName: user?.lastName,
               // showMore: true,
-              customFields: user?.customFields,
+              customFields: user?.customField,
             };
           });
 
@@ -660,11 +691,23 @@ const Index = () => {
     }
   };
 
+  // Initialize selected center for Lead when opening mobilizer tab (first option from cohortData)
+  useEffect(() => {
+    if (
+      value === 1 &&
+      YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() &&
+      mobilizerCenterOptions.length > 0 &&
+      !selectedMobilizerCenterId
+    ) {
+      setSelectedMobilizerCenterId(mobilizerCenterOptions[0].id);
+    }
+  }, [value, mobilizerCenterOptions, selectedMobilizerCenterId]);
+
   useEffect(() => {
     if (value === 1) {
       getMobilizersList();
     }
-  }, [value, submittedButtonStatus]);
+  }, [value, submittedButtonStatus, selectedMobilizerCenterId]);
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -1073,65 +1116,60 @@ const Index = () => {
 
   const handleVillageReassign = async () => {
     if (!selectedMentor) return;
-    let tempFormData = extractMatchingKeys(selectedMentor, originalSchema);
-    console.log('tempFormData+++', tempFormData);
-    console.log('selectedMentor', selectedMentor);
-    console.log('addschema', originalSchema);
-    let blockIds: any = [];
-    let villageIds: any = [];
-    selectedMentor?.customFields?.forEach((field: any) => {
-      if (field.label === 'BLOCK') {
-        blockIds = field.selectedValues.map((item: any) => item.id);
-      }
-      if (field.label === 'VILLAGE') {
-        villageIds = field.selectedValues.map((item: any) => item.id);
-      }
-    });
-    // console.log('blockIds', blockIds);
-    // console.log('villageIds', villageIds);
-    // console.log('tempFormData>>>>', tempFormData);
-    const getVillageMapByBlock = async () => {
-      const result: Record<number, number[]> = {};
-
-      for (const blockId of blockIds) {
-        console.log('Processing blockId:', blockId); // Debug log
-
-        if (!blockId) continue;
-
-        try {
-          const villageResponse = await getStateBlockDistrictList({
-            controllingfieldfk: [blockId],
-            fieldName: 'village',
-          });
-
-          const villages = villageResponse?.result?.values || [];
-
-          const matchedVillages = villages
-            .filter((item: any) => villageIds.includes(item?.value))
-            .map((item: any) => item?.value);
-
-          if (matchedVillages.length > 0) {
-            result[blockId] = matchedVillages;
-          }
-        } catch (error) {
-          console.error(
-            `Error fetching villages for blockId ${blockId}:`,
-            error
-          );
-        }
-      }
-      return result;
-    };
-
-    // Call the function
-    const villageMap = await getVillageMapByBlock();
-    // console.log('Final block-village map:', villageMap);
-    setBlockVillageMap(villageMap);
-    setPrefilledAddFormData(tempFormData);
-    setIsReassign(true);
-    setButtonShow(true);
-    setEditableUserId(selectedMentor?.Id);
-    handleOpenNew();
+    
+    try {
+      setLoading(true);
+      const userId = selectedMentor?.Id;
+      
+      // Extract WORKING_VILLAGE from customFields
+      const workingVillageField = selectedMentor?.customFields?.find(
+        (field: any) => field.label === 'WORKING_VILLAGE'
+      );
+      const workingVillageIds = workingVillageField?.selectedValues
+        ?.map((item: any) => item.id)
+        .join(', ') || '';
+      
+      // Call mycohorts API for user's cohort data (used for working villages etc.)
+      const cohortResponse = await getCohortList(userId, true, true);
+      const cohortList = cohortResponse?.result || [];
+      
+      // Center dropdown: use cohortData from localStorage (all centers for the lead) so user can reassign to any center
+      const cohortDataString = typeof window !== 'undefined' ? localStorage.getItem('cohortData') : null;
+      const cohortData = cohortDataString ? JSON.parse(cohortDataString) : [];
+      const centerIds = Array.isArray(cohortData) ? cohortData.map((cohort: any) => cohort.cohortId) : [];
+      
+      // Preselect center should match the center used to fetch the mobilizer list (UI-selected for Lead).
+      // Fallback to mobilizer's first cohort center if UI center is unavailable.
+      const centerUsedForList =
+        YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
+          ? selectedMobilizerCenterId
+          : localStorage.getItem('workingLocationCenterId') || '';
+      const mobilizerCurrentCenterId = cohortList[0]?.cohortId || '';
+      const preselectCenterId = centerUsedForList || mobilizerCurrentCenterId;
+      
+      // Set state for reassign modal
+      setReassignUserId(userId);
+      setReassignCohortData(cohortList);
+      setReassignCenterIds(centerIds.length > 0 ? centerIds : cohortList.map((cohort: any) => cohort.cohortId));
+      setReassignWorkingVillageIds(workingVillageIds);
+      setReassignSelectedVillages(new Set());
+      setReassignVillagesByBlock({});
+      setReassignCenterId(preselectCenterId);
+      // Capture original center once (used to decide whether to call bulkCreateCohortMembers on save)
+      setOriginalReassignCenterId(preselectCenterId);
+      setReassignCenterOptions([]);
+      
+      // Open reassign modal
+      setReassignModalOpen(true);
+    } catch (error) {
+      console.error('Error in handleVillageReassign:', error);
+      showToastMessage(
+        t('COMMON.SOMETHING_WENT_WRONG'),
+        'error'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onClose = () => {
@@ -1253,11 +1291,11 @@ const Index = () => {
 
   const mentorActions = [
     // TODO: Uncomment after reassign functionality implementation is complete
-    // {
-    //   label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
-    //   action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
-    //   icon: <HolidayVillageIcon />,
-    // },
+    {
+      label: t('YOUTHNET_USERS_AND_VILLAGES.ADD_OR_REASSIGN_VILLAGES'),
+      action: BOTTOM_DRAWER_CONSTANTS.ADD_REASSIGN,
+      icon: <HolidayVillageIcon />,
+    },
     // {
     //   label: t('YOUTHNET_USERS_AND_VILLAGES.REQUEST_TO_REASSIGN_DISTRICT'),
     //   action: BOTTOM_DRAWER_CONSTANTS.REQUEST_REASSIGN,
@@ -1567,7 +1605,8 @@ const Index = () => {
               flexDirection={'row'}
               alignItems={'center'}
               sx={{
-                pr: '20px',
+                px: '20px',
+                pb: '20px',
               }}
             >
               <SearchBar
@@ -1584,13 +1623,39 @@ const Index = () => {
             </Box>
 
             <Box
-              mt={'18px'}
-              px={'18px'}
-              ml={'10px'}
-              display={'flex'}
-              justifyContent={'flex-end'}
-              gap={2}
+              sx={{
+                px: '20px',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 2,
+                mb: '20px',
+              }}
             >
+              <Box
+                sx={{
+                  minWidth: 220,
+                  '& .MuiFormControl-root': {
+                    minHeight: 56,
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '14px',
+                    fontWeight: 500,
+                  },
+                }}
+              >
+                <Dropdown
+                  name="center"
+                  label={t('COMMON.CENTER')}
+                  values={mobilizerCenterOptions}
+                  defaultValue={selectedMobilizerCenterId}
+                  onSelect={(cohortId) => {
+                    setSelectedMobilizerCenterId(cohortId);
+                    localStorage.setItem('workingLocationCenterId', cohortId);
+                  }}
+                />
+              </Box>
               <Button
                 sx={{
                   border: `1px solid ${theme.palette.error.contrastText}`,
@@ -1598,6 +1663,7 @@ const Index = () => {
                   height: '40px',
                   width: '10rem',
                   color: theme.palette.error.contrastText,
+                  flexShrink: 0,
                   '& .MuiButton-endIcon': {
                     marginLeft: isRTL ? '0px !important' : '8px !important',
                     marginRight: isRTL ? '8px !important' : '-2px !important',
@@ -1611,41 +1677,17 @@ const Index = () => {
               </Button>
             </Box>
 
-            <Box>
-              <Box display={'flex'} justifyContent={'space-between'}>
-                <Typography
-                  sx={{
-                    fontSize: '16px',
-                    color: 'black',
-                    margin: '0 20px',
-                  }}
-                >
-                  {mentorCount} {''}
-                  {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
-                </Typography>
-
-                {/* <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    pr: '20px',
-                    color: '#0D599E',
-                    '&:hover': {
-                      color: '#074d82',
-                    },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: '16px',
-                    }}
-                  >
-                    {t('YOUTHNET_USERS_AND_VILLAGES.CSV')}
-                  </Typography>
-                  <DownloadIcon />
-                </Box> */}
-              </Box>
+            <Box sx={{ px: '20px', pt: '4px', pb: '16px' }}>
+              <Typography
+                sx={{
+                  fontSize: '16px',
+                  fontWeight: 500,
+                  color: 'text.primary',
+                  margin: 0,
+                }}
+              >
+                {mentorCount} {t('YOUTHNET_USERS_AND_VILLAGES.MENTORS')}
+              </Typography>
             </Box>
             <Box
               sx={{
@@ -2234,6 +2276,378 @@ const Index = () => {
                     {t('COMMON.MAP')}
                   </Button>
                 )}
+              </DialogActions>
+            </Dialog>
+
+            {/* Reassign Villages Modal Dialog */}
+            <Dialog
+              open={reassignModalOpen}
+              onClose={(event, reason) => {
+                if (reason !== 'backdropClick') {
+                  setReassignModalOpen(false);
+                  setReassignSelectedVillages(new Set());
+                  setReassignVillagesByBlock({});
+                  setReassignCenterId('');
+                  setOriginalReassignCenterId('');
+                  setReassignCenterOptions([]);
+                }
+              }}
+              maxWidth={false}
+              fullWidth={true}
+              PaperProps={{
+                sx: {
+                  width: '100%',
+                  maxWidth: '100%',
+                  maxHeight: '100vh',
+                },
+              }}
+            >
+              <DialogTitle
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderBottom: '1px solid #eee',
+                  p: 2,
+                }}
+              >
+                <Typography variant="h1" component="div">
+                  {t('MENTOR.RE_ASSIGN_VILLAGES')}
+                </Typography>
+                <IconButton
+                  aria-label="close"
+                  onClick={() => {
+                    setReassignModalOpen(false);
+                    setReassignSelectedVillages(new Set());
+                    setReassignVillagesByBlock({});
+                    setReassignCenterId('');
+                    setOriginalReassignCenterId('');
+                    setReassignCenterOptions([]);
+                  }}
+                  sx={{
+                    color: (theme) => theme.palette.grey[500],
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+                <Box sx={{ mb: 3 }}>
+                  <WorkingVillageAssignmentWidget
+                    userId={reassignUserId || undefined}
+                    hideConfirmButton={true}
+                    isForLmp={true}
+                    isForReassign={true}
+                    centerIds={reassignCenterIds}
+                    centerId={reassignCenterId || originalReassignCenterId || reassignCenterIds?.[0] || undefined}
+                    existingWorkingVillageIds={reassignWorkingVillageIds}
+                    onCenterChange={(centerId) => {
+                      setReassignCenterId(centerId);
+                    }}
+                    onSelectionChange={(centerId, selectedVillages, villagesByBlock) => {
+                      setReassignCenterId(centerId);
+                      setReassignSelectedVillages(selectedVillages);
+                      setReassignVillagesByBlock(villagesByBlock);
+                    }}
+                    onCenterOptionsChange={(centerOptions) => {
+                      setReassignCenterOptions(centerOptions);
+                    }}
+                  />
+                </Box>
+              </DialogContent>
+              <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                <Button
+                  sx={{
+                    backgroundColor: '#FFC107',
+                    color: '#000',
+                    fontFamily: 'Poppins',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    height: '40px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    '&:hover': {
+                      backgroundColor: '#ffb300',
+                    },
+                    width: '100%',
+                  }}
+                  disabled={
+                    !reassignUserId ||
+                    !reassignCenterId ||
+                    reassignSelectedVillages.size === 0 ||
+                    isReassignInProgress
+                  }
+                  onClick={async () => {
+                    if (!reassignUserId) {
+                      showToastMessage(
+                        t('MOBILIZER.PLEASE_SEARCH_AND_SELECT_USER'),
+                        'error'
+                      );
+                      return;
+                    }
+                    const centerIdToUse = reassignCenterId;
+                    if (!centerIdToUse) {
+                      showToastMessage(
+                        t('MOBILIZER.WORKING_LOCATION_REQUIRED'),
+                        'error'
+                      );
+                      return;
+                    }
+                    if (reassignSelectedVillages.size === 0) {
+                      showToastMessage(
+                        t('MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'),
+                        'error'
+                      );
+                      return;
+                    }
+                    const center = reassignCenterOptions.find(
+                      (c: any) => c.id === centerIdToUse
+                    );
+                    if (!center || !center.customFields) {
+                      showToastMessage(
+                        t('MOBILIZER.WORKING_LOCATION_REQUIRED'),
+                        'error'
+                      );
+                      return;
+                    }
+                    const catchmentAreaField = center.customFields.find(
+                      (field: any) => field.label === 'CATCHMENT_AREA'
+                    );
+                    if (
+                      !catchmentAreaField ||
+                      !catchmentAreaField.selectedValues
+                    ) {
+                      showToastMessage(
+                        t('MOBILIZER.WORKING_LOCATION_REQUIRED'),
+                        'error'
+                      );
+                      return;
+                    }
+                    const selectedVillagesByBlock: Record<
+                      string,
+                      Array<{ id: number; name: string }>
+                    > = {};
+                    Object.entries(reassignVillagesByBlock).forEach(
+                      ([blockId, villages]) => {
+                        const selectedInBlock = villages.filter((village) =>
+                          reassignSelectedVillages.has(village.id)
+                        );
+                        if (selectedInBlock.length > 0) {
+                          selectedVillagesByBlock[blockId] =
+                            selectedInBlock.map((v) => ({
+                              id: Number(v.id),
+                              name: v.name,
+                            }));
+                        }
+                      }
+                    );
+                    const workingLocationStructure: Array<{
+                      stateId: number;
+                      stateName: string;
+                      districts: Array<{
+                        districtId: number;
+                        districtName: string;
+                        blocks: Array<{
+                          id: number;
+                          name: string;
+                          villages: Array<{ id: number; name: string }>;
+                        }>;
+                      }>;
+                    }> = [];
+                    catchmentAreaField.selectedValues.forEach(
+                      (stateData: any) => {
+                        const stateId = Number(stateData.stateId);
+                        const stateName = stateData.stateName || '';
+                        const districts: Array<{
+                          districtId: number;
+                          districtName: string;
+                          blocks: Array<{
+                            id: number;
+                            name: string;
+                            villages: Array<{
+                              id: number;
+                              name: string;
+                            }>;
+                          }>;
+                        }> = [];
+                        if (
+                          stateData.districts &&
+                          Array.isArray(stateData.districts)
+                        ) {
+                          stateData.districts.forEach((district: any) => {
+                            const districtId = Number(district.districtId);
+                            const districtName =
+                              district.districtName || '';
+                            const blocks: Array<{
+                              id: number;
+                              name: string;
+                              villages: Array<{
+                                id: number;
+                                name: string;
+                              }>;
+                            }> = [];
+                            if (
+                              district.blocks &&
+                              Array.isArray(district.blocks)
+                            ) {
+                              district.blocks.forEach((block: any) => {
+                                const blockId = String(block.id);
+                                if (
+                                  selectedVillagesByBlock[blockId] &&
+                                  selectedVillagesByBlock[blockId].length > 0
+                                ) {
+                                  blocks.push({
+                                    id: Number(block.id),
+                                    name: block.name || '',
+                                    villages:
+                                      selectedVillagesByBlock[blockId],
+                                  });
+                                }
+                              });
+                            }
+                            if (blocks.length > 0) {
+                              districts.push({
+                                districtId,
+                                districtName,
+                                blocks,
+                              });
+                            }
+                          });
+                        }
+                        if (districts.length > 0) {
+                          workingLocationStructure.push({
+                            stateId,
+                            stateName,
+                            districts,
+                          });
+                        }
+                      }
+                    );
+                    const villageIds: string[] = [];
+                    workingLocationStructure.forEach((state) => {
+                      state.districts.forEach((district) => {
+                        district.blocks.forEach((block) => {
+                          block.villages.forEach((village) => {
+                            villageIds.push(String(village.id));
+                          });
+                        });
+                      });
+                    });
+                    if (villageIds.length === 0) {
+                      showToastMessage(
+                        t('MOBILIZER.WORKING_LOCATION_REQUIRED_AT_LEAST_ONE'),
+                        'error'
+                      );
+                      return;
+                    }
+                    setIsReassignInProgress(true);
+                    try {
+                      const originalCenterId =
+                        originalReassignCenterId || reassignCenterIds?.[0];
+                      if (originalCenterId && centerIdToUse && originalCenterId !== centerIdToUse) {
+                        try {
+                          const cohortMemberResponse = await bulkCreateCohortMembers({
+                            userId: [reassignUserId],
+                            cohortId: [centerIdToUse],
+                            removeCohortId: [originalCenterId],
+                          });
+                          if (
+                            !cohortMemberResponse ||
+                            (cohortMemberResponse.responseCode !== 201 &&
+                              cohortMemberResponse.responseCode !== 200 &&
+                              cohortMemberResponse.params?.err != null)
+                          ) {
+                            showToastMessage(
+                              cohortMemberResponse?.params?.errmsg ||
+                                t('COMMON.SOMETHING_WENT_WRONG'),
+                              'error'
+                            );
+                            return;
+                          }
+                        } catch (cohortError) {
+                          console.error('Error in bulkCreateCohortMembers:', cohortError);
+                          showToastMessage(
+                            (cohortError as any)?.response?.data?.params?.errmsg ||
+                              t('COMMON.SOMETHING_WENT_WRONG'),
+                            'error'
+                          );
+                          return;
+                        }
+                      }
+
+                      // Fetch current user data to get existing customFields
+                      const token = localStorage.getItem('token') || '';
+                      const userResponse = await fetch(
+                        `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/read/${reassignUserId}`,
+                        {
+                          headers: {
+                            'Content-Type': 'application/json',
+                            tenantId: tenantId,
+                            Authorization: `Bearer ${token}`,
+                          },
+                        }
+                      );
+                      const userDataResponse = await userResponse.json();
+                      const userDetails = userDataResponse?.result;
+                      
+                      let existingCustomFields: any[] = [];
+                      if (userDetails?.customFields) {
+                        existingCustomFields = userDetails.customFields;
+                      }
+                      
+                      const filteredCustomFields = existingCustomFields.filter(
+                        (field: any) => field.fieldId !== workingLocationId && field.fieldId !== workingVillageId
+                      );
+                      filteredCustomFields.push({
+                        fieldId: workingLocationId,
+                        value: workingLocationStructure,
+                      });
+                      filteredCustomFields.push({
+                        fieldId: workingVillageId,
+                        value: villageIds,
+                      });
+                      
+                      const updateUserResponse = await updateUser(reassignUserId, {
+                        userData: {},
+                        customFields: filteredCustomFields,
+                      });
+
+                      if (updateUserResponse && updateUserResponse?.status === 200) {
+                        showToastMessage(
+                          t('MENTOR.VILLAGES_REASSIGNED_SUCCESSFULLY') || 'Villages reassigned successfully',
+                          'success'
+                        );
+                        setReassignModalOpen(false);
+                        setReassignSelectedVillages(new Set());
+                        setReassignVillagesByBlock({});
+                        setReassignCenterId('');
+                        setOriginalReassignCenterId('');
+                        setReassignCenterOptions([]);
+                        await getMobilizersList();
+                      } else {
+                        showToastMessage(
+                          updateUserResponse?.response?.data?.params?.errmsg ||
+                            t('MENTOR.VILLAGES_REASSIGN_FAILED') ||
+                            'Failed to reassign villages',
+                          'error'
+                        );
+                      }
+                    } catch (error) {
+                      console.error('Error reassigning villages:', error);
+                      showToastMessage(
+                        t('MENTOR.VILLAGES_REASSIGN_FAILED') ||
+                          'Failed to reassign villages',
+                        'error'
+                      );
+                    } finally {
+                      setIsReassignInProgress(false);
+                    }
+                  }}
+                >
+                  {t('COMMON.SAVE')}
+                </Button>
               </DialogActions>
             </Dialog>
           </>

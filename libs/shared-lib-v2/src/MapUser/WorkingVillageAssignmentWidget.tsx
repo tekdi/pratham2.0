@@ -92,6 +92,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const [selectedBlock, setSelectedBlock] = useState<string>('');     // Selected block ID
   const [selectedCenter, setSelectedCenter] = useState<string>('');   // Selected center ID
   const [villageIdToSelect, setVillageIdToSelect] = useState<any>(existingWorkingVillageIds); // Village ID to select
+  // Sync villageIdToSelect when existingWorkingVillageIds prop changes (e.g. reassign modal opens after parent state updates)
+  React.useEffect(() => {
+    if (existingWorkingVillageIds !== undefined && existingWorkingVillageIds !== villageIdToSelect) {
+      setVillageIdToSelect(existingWorkingVillageIds);
+    }
+  }, [existingWorkingVillageIds]);
 
   // Options state for dropdowns
   const [stateOptions, setStateOptions] = useState<Array<{ value: string; label: string }>>([]);
@@ -288,7 +294,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         if (villageIdToSelect) {
           const idsFromString = villageIdToSelect
             .split(',')
-            .map((id) => id.trim())
+            .map((id) => String(id).trim())
             .filter((id) => id.length > 0);
           idsFromString.forEach((id) => existingVillageIdSet.add(id));
         }
@@ -296,12 +302,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         const villagesToSelect = new Set<string>();
         Object.values(villagesData).forEach((villages) => {
           villages.forEach((village) => {
-            if (existingVillageIdSet.has(village.id)) {
+            const vid = String(village.id);
+            if (existingVillageIdSet.has(vid)) {
               villagesToSelect.add(village.id);
             }
           });
         });
-
         if (villagesToSelect.size > 0) {
           setSelectedVillages(villagesToSelect);
         }
@@ -666,7 +672,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             })
             .filter((item: any) => item !== null) || [];
         setCenterOptions(centers);
-        if (centers.length === 1 && !selectedCenter) {
+        // Reassign flow: preselect mobilizer's current center when propCenterId is provided
+        if (propCenterId && centers.some((c) => c.id === propCenterId)) {
+          setSelectedCenter(propCenterId);
+        } else if (centers.length === 1 && !selectedCenter) {
           setSelectedCenter(centers[0].id);
         }
         return;
@@ -857,14 +866,17 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     loadCenters();
   }, [loadCenters]);
 
-  // Fetch center's CATCHMENT_AREA via API in reassign mode when centerId is provided
+  // Fetch selected center's CATCHMENT_AREA via API in reassign mode (so villages update when user changes center)
   useEffect(() => {
-    if (!isForReassign || !propCenterId) {
+    if (!isForReassign || !selectedCenter) {
       setReassignCenterCatchmentArea(null);
       return;
     }
 
+    setReassignCenterCatchmentArea(null); // Clear previous center's catchment while loading
+    setSelectedVillages(new Set()); // Clear village selection when center changes so new center's list is fresh
     let isMounted = true;
+    const centerIdToFetch = selectedCenter;
 
     const fetchCenterCatchmentArea = async () => {
       try {
@@ -880,7 +892,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             filters: {
               type: 'COHORT',
               status: ['active'],
-              cohortId: [propCenterId],
+              cohortId: [centerIdToFetch],
             },
           },
           {
@@ -896,7 +908,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         if (!isMounted) return;
 
         const cohortDetails = response?.data?.result?.results?.cohortDetails || [];
-        const center = cohortDetails.find((c: any) => c.cohortId === propCenterId);
+        const center = cohortDetails.find((c: any) => c.cohortId === centerIdToFetch);
 
         if (center && center.customFields) {
           const catchmentAreaField = center.customFields.find(
@@ -924,12 +936,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     return () => {
       isMounted = false;
     };
-  }, [isForReassign, propCenterId]);
+  }, [isForReassign, selectedCenter]);
 
   // Extract catchment blocks from selected center's CATCHMENT_AREA or fetched CATCHMENT_AREA (in reassign mode)
   useEffect(() => {
-    // Priority 1: In reassign mode with centerId, use fetched center's CATCHMENT_AREA from API
-    if (isForReassign && propCenterId && reassignCenterCatchmentArea) {
+    // Priority 1: In reassign mode, use fetched CATCHMENT_AREA for the currently selected center (fetched when selectedCenter changes)
+    if (isForReassign && selectedCenter && reassignCenterCatchmentArea) {
       // Extract blocks from fetched center's CATCHMENT_AREA
       const extractedBlocks: Array<{
         id: string | number;
