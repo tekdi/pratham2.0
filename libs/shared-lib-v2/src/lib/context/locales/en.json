@@ -161,7 +161,8 @@
     },
     "CHANGE_USER": "Change User",
     "FETCH_USER": "Fetch User",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "Search for an existing user by email and allocate working village to them"
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "Search for an existing user by email and allocate working village to them",
+    "RESET_USER": "Reset User"
   },
   "SWITCH_ACCOUNT": {
     "TITLE": "Select Account",
