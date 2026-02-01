@@ -173,7 +173,8 @@
     "USER_BATCHES": "{{name}} belongs to below batches",
     "DELETE_FROM_BATCH_WARNING": "Do you want to delete user from above center's batches?",
     "SAVE": "Save",
-    "SAVING": "Saving..."
+    "SAVING": "Saving...",
+    "MAP_NEW": "Map New"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

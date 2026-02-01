@@ -358,7 +358,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           {loading ? (
             <CircularProgress size={24} color="inherit" />
           ) : isUserLoaded ? (
-            t('COMMON.CHANGE_USER')
+            t('COMMON.RESET_USER')
           ) : (
             t('COMMON.FETCH_USER')
           )}

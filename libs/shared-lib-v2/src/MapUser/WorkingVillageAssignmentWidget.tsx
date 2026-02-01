@@ -85,6 +85,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const themeColor = '#FDBE16';
   const themeColorLight = 'rgba(253, 190, 22, 0.1)'; // 10% opacity
   const themeColorLighter = 'rgba(253, 190, 22, 0.05)'; // 5% opacity
+  const __villagesLoadSeqRef = React.useRef(0);
 
   // Local state management for geography filters and center selection
   const [selectedState, setSelectedState] = useState<string>('');      // Selected state ID
@@ -92,6 +93,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const [selectedBlock, setSelectedBlock] = useState<string>('');     // Selected block ID
   const [selectedCenter, setSelectedCenter] = useState<string>('');   // Selected center ID
   const [villageIdToSelect, setVillageIdToSelect] = useState<any>(existingWorkingVillageIds); // Village ID to select
+  // Sync villageIdToSelect when existingWorkingVillageIds prop changes (e.g. reassign modal opens after parent state updates)
+  React.useEffect(() => {
+    if (existingWorkingVillageIds !== undefined && existingWorkingVillageIds !== villageIdToSelect) {
+      setVillageIdToSelect(existingWorkingVillageIds);
+    }
+  }, [existingWorkingVillageIds]);
 
   // Options state for dropdowns
   const [stateOptions, setStateOptions] = useState<Array<{ value: string; label: string }>>([]);
@@ -145,11 +152,19 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     stateName: string;
   }>>([]);
 
-  // Store center's CATCHMENT_AREA fetched via API in reassign mode
-  const [reassignCenterCatchmentArea, setReassignCenterCatchmentArea] = useState<any>(null);
+  // Store center's CATCHMENT_AREA fetched via API in reassign mode (keyed by centerId to avoid stale usage during center switches)
+  const [reassignCenterCatchmentArea, setReassignCenterCatchmentArea] = useState<{
+    centerId: string;
+    selectedValues: any[] | null;
+  } | null>(null);
 
   // Load villages for all catchment blocks
   const loadVillagesForBlocks = useCallback(async () => {
+    const __seq = ++__villagesLoadSeqRef.current;
+    const __centerAtStart = selectedCenter;
+    const __blockIdsAtStart = Array.isArray(catchmentBlocks)
+      ? catchmentBlocks.map((b) => String(b.id)).join(',')
+      : '';
     if (!selectedCenter || catchmentBlocks.length === 0) {
       setVillagesByBlock({});
       setVillagesDisplayLimit({});
@@ -272,6 +287,18 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         }
       }
 
+      // Latest-wins guard: prevent older in-flight loads from overwriting the newest center/blocks state
+      // (this can happen during rapid center changes in reassign flow)
+      const __isLatest = __seq === __villagesLoadSeqRef.current;
+      const __sameCenter = selectedCenter === __centerAtStart;
+      const __sameBlocks =
+        (Array.isArray(catchmentBlocks)
+          ? catchmentBlocks.map((b) => String(b.id)).join(',')
+          : '') === __blockIdsAtStart;
+      if (!__isLatest || !__sameCenter || !__sameBlocks) {
+        return;
+      }
+
       setVillagesByBlock(villagesData);
       setVillagesDisplayLimit(displayLimits);
 
@@ -288,7 +315,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         if (villageIdToSelect) {
           const idsFromString = villageIdToSelect
             .split(',')
-            .map((id) => id.trim())
+            .map((id) => String(id).trim())
             .filter((id) => id.length > 0);
           idsFromString.forEach((id) => existingVillageIdSet.add(id));
         }
@@ -296,12 +323,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         const villagesToSelect = new Set<string>();
         Object.values(villagesData).forEach((villages) => {
           villages.forEach((village) => {
-            if (existingVillageIdSet.has(village.id)) {
+            const vid = String(village.id);
+            if (existingVillageIdSet.has(vid)) {
               villagesToSelect.add(village.id);
             }
           });
         });
-
         if (villagesToSelect.size > 0) {
           setSelectedVillages(villagesToSelect);
         }
@@ -666,7 +693,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             })
             .filter((item: any) => item !== null) || [];
         setCenterOptions(centers);
-        if (centers.length === 1 && !selectedCenter) {
+        // Reassign flow: preselect mobilizer's current center when propCenterId is provided
+        if (propCenterId && centers.some((c) => c.id === propCenterId)) {
+          setSelectedCenter(propCenterId);
+        } else if (centers.length === 1 && !selectedCenter) {
           setSelectedCenter(centers[0].id);
         }
         return;
@@ -857,14 +887,18 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     loadCenters();
   }, [loadCenters]);
 
-  // Fetch center's CATCHMENT_AREA via API in reassign mode when centerId is provided
+  // Fetch selected center's CATCHMENT_AREA via API in reassign mode (so villages update when user changes center)
   useEffect(() => {
-    if (!isForReassign || !propCenterId) {
+    if (!isForReassign || !selectedCenter) {
       setReassignCenterCatchmentArea(null);
       return;
     }
 
+    // Clear previous center's catchment while loading, but keep centerId so extract logic can't accidentally use stale data
+    setReassignCenterCatchmentArea({ centerId: selectedCenter, selectedValues: null });
+    setSelectedVillages(new Set()); // Clear village selection when center changes so new center's list is fresh
     let isMounted = true;
+    const centerIdToFetch = selectedCenter;
 
     const fetchCenterCatchmentArea = async () => {
       try {
@@ -880,7 +914,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
             filters: {
               type: 'COHORT',
               status: ['active'],
-              cohortId: [propCenterId],
+              cohortId: [centerIdToFetch],
             },
           },
           {
@@ -896,7 +930,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         if (!isMounted) return;
 
         const cohortDetails = response?.data?.result?.results?.cohortDetails || [];
-        const center = cohortDetails.find((c: any) => c.cohortId === propCenterId);
+        const center = cohortDetails.find((c: any) => c.cohortId === centerIdToFetch);
 
         if (center && center.customFields) {
           const catchmentAreaField = center.customFields.find(
@@ -904,17 +938,29 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           );
 
           if (catchmentAreaField && catchmentAreaField.selectedValues) {
-            setReassignCenterCatchmentArea(catchmentAreaField.selectedValues);
+            setReassignCenterCatchmentArea({
+              centerId: centerIdToFetch,
+              selectedValues: catchmentAreaField.selectedValues,
+            });
           } else {
-            setReassignCenterCatchmentArea(null);
+            setReassignCenterCatchmentArea({
+              centerId: centerIdToFetch,
+              selectedValues: null,
+            });
           }
         } else {
-          setReassignCenterCatchmentArea(null);
+          setReassignCenterCatchmentArea({
+            centerId: centerIdToFetch,
+            selectedValues: null,
+          });
         }
       } catch (error) {
         console.error('Error fetching center CATCHMENT_AREA:', error);
         if (isMounted) {
-          setReassignCenterCatchmentArea(null);
+          setReassignCenterCatchmentArea({
+            centerId: centerIdToFetch,
+            selectedValues: null,
+          });
         }
       }
     };
@@ -924,12 +970,19 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     return () => {
       isMounted = false;
     };
-  }, [isForReassign, propCenterId]);
+  }, [isForReassign, selectedCenter]);
 
   // Extract catchment blocks from selected center's CATCHMENT_AREA or fetched CATCHMENT_AREA (in reassign mode)
   useEffect(() => {
-    // Priority 1: In reassign mode with centerId, use fetched center's CATCHMENT_AREA from API
-    if (isForReassign && propCenterId && reassignCenterCatchmentArea) {
+    // Priority 1: In reassign mode, use fetched CATCHMENT_AREA for the currently selected center (fetched when selectedCenter changes)
+    if (
+      isForReassign &&
+      selectedCenter &&
+      reassignCenterCatchmentArea &&
+      reassignCenterCatchmentArea.centerId === selectedCenter &&
+      Array.isArray(reassignCenterCatchmentArea.selectedValues) &&
+      reassignCenterCatchmentArea.selectedValues.length > 0
+    ) {
       // Extract blocks from fetched center's CATCHMENT_AREA
       const extractedBlocks: Array<{
         id: string | number;
@@ -940,8 +993,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         stateName: string;
       }> = [];
 
-      if (Array.isArray(reassignCenterCatchmentArea) && reassignCenterCatchmentArea.length > 0) {
-        reassignCenterCatchmentArea.forEach((stateData: any) => {
+      const __selectedValues = reassignCenterCatchmentArea.selectedValues;
+      if (Array.isArray(__selectedValues) && __selectedValues.length > 0) {
+        __selectedValues.forEach((stateData: any) => {
           const stateId = stateData.stateId;
           const stateName = stateData.stateName || '';
 
@@ -1835,7 +1889,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                 return (
                   <Accordion
                     key={block.id}
-                    defaultExpanded
+                    defaultExpanded={false}
                     sx={{
                       border: '1px solid',
                       borderColor: 'divider',

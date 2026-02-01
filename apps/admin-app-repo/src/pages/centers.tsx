@@ -69,7 +69,11 @@ const Centers = () => {
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [totalCountBatch, setTotalCountBatch] = useState(0);
-  const storedProgram = localStorage.getItem('program');
+
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
 
   const { t, i18n } = useTranslation();
   const initialFormData = localStorage.getItem('stateId')
@@ -130,6 +134,7 @@ const Centers = () => {
         }
       });
       alterSchema.required = requiredArray;
+
       //add max selection custom
       if (alterSchema?.properties?.state) {
         alterSchema.properties.state.maxSelection = 1;
@@ -350,10 +355,16 @@ const Centers = () => {
       key: 'image',
       label: 'Images',
       render: (row: any) => {
-        console.log('Row in image column:', row);
+        const rawImage = row?.image;
+        const images: string[] = Array.isArray(rawImage)
+          ? rawImage
+          : typeof rawImage === 'string' && rawImage
+          ? [rawImage]
+          : [];
+
         return (
           <div style={{ display: 'flex', gap: '8px' }}>
-            {row?.image?.map((imgUrl: string, index: number) => (
+            {images.map((imgUrl: string, index: number) => (
               <img
                 key={index}
                 src={imgUrl}
@@ -491,7 +502,9 @@ const Centers = () => {
         setOpenBatchModal(true);
         // console.log('row in view batch', row);
       },
-      show: (row) => row.status !== 'archived',
+      show: (row) =>
+        row.status !== 'archived' &&
+        storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
     },
     {
       icon: (

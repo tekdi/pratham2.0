@@ -171,7 +171,8 @@
     "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
     "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
     "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found",
-    "NEXT": "Next"
+    "NEXT": "Next",
+    "MAP_NEW": "Map New"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -841,7 +842,8 @@
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
     "BACK_TO_FORM": "Back to form",
     "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}",
-    "RE_ASSIGN_VILLAGES": "Re-assign Villages"
+    "RE_ASSIGN_VILLAGES": "Re-assign Villages",
+    "VILLAGES_REASSIGNED_SUCCESSFULLY": "Villages re-assigned successfully"
   },
   "MENTORS": {
     "NEW_MENTOR": "New Mentor",
