@@ -85,6 +85,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   const themeColor = '#FDBE16';
   const themeColorLight = 'rgba(253, 190, 22, 0.1)'; // 10% opacity
   const themeColorLighter = 'rgba(253, 190, 22, 0.05)'; // 5% opacity
+  const __villagesLoadSeqRef = React.useRef(0);
 
   // Local state management for geography filters and center selection
   const [selectedState, setSelectedState] = useState<string>('');      // Selected state ID
@@ -151,11 +152,19 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
     stateName: string;
   }>>([]);
 
-  // Store center's CATCHMENT_AREA fetched via API in reassign mode
-  const [reassignCenterCatchmentArea, setReassignCenterCatchmentArea] = useState<any>(null);
+  // Store center's CATCHMENT_AREA fetched via API in reassign mode (keyed by centerId to avoid stale usage during center switches)
+  const [reassignCenterCatchmentArea, setReassignCenterCatchmentArea] = useState<{
+    centerId: string;
+    selectedValues: any[] | null;
+  } | null>(null);
 
   // Load villages for all catchment blocks
   const loadVillagesForBlocks = useCallback(async () => {
+    const __seq = ++__villagesLoadSeqRef.current;
+    const __centerAtStart = selectedCenter;
+    const __blockIdsAtStart = Array.isArray(catchmentBlocks)
+      ? catchmentBlocks.map((b) => String(b.id)).join(',')
+      : '';
     if (!selectedCenter || catchmentBlocks.length === 0) {
       setVillagesByBlock({});
       setVillagesDisplayLimit({});
@@ -276,6 +285,18 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           console.error('Error checking assigned villages:', error);
           // Continue without marking assigned villages if API fails
         }
+      }
+
+      // Latest-wins guard: prevent older in-flight loads from overwriting the newest center/blocks state
+      // (this can happen during rapid center changes in reassign flow)
+      const __isLatest = __seq === __villagesLoadSeqRef.current;
+      const __sameCenter = selectedCenter === __centerAtStart;
+      const __sameBlocks =
+        (Array.isArray(catchmentBlocks)
+          ? catchmentBlocks.map((b) => String(b.id)).join(',')
+          : '') === __blockIdsAtStart;
+      if (!__isLatest || !__sameCenter || !__sameBlocks) {
+        return;
       }
 
       setVillagesByBlock(villagesData);
@@ -873,7 +894,8 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
       return;
     }
 
-    setReassignCenterCatchmentArea(null); // Clear previous center's catchment while loading
+    // Clear previous center's catchment while loading, but keep centerId so extract logic can't accidentally use stale data
+    setReassignCenterCatchmentArea({ centerId: selectedCenter, selectedValues: null });
     setSelectedVillages(new Set()); // Clear village selection when center changes so new center's list is fresh
     let isMounted = true;
     const centerIdToFetch = selectedCenter;
@@ -916,17 +938,29 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           );
 
           if (catchmentAreaField && catchmentAreaField.selectedValues) {
-            setReassignCenterCatchmentArea(catchmentAreaField.selectedValues);
+            setReassignCenterCatchmentArea({
+              centerId: centerIdToFetch,
+              selectedValues: catchmentAreaField.selectedValues,
+            });
           } else {
-            setReassignCenterCatchmentArea(null);
+            setReassignCenterCatchmentArea({
+              centerId: centerIdToFetch,
+              selectedValues: null,
+            });
           }
         } else {
-          setReassignCenterCatchmentArea(null);
+          setReassignCenterCatchmentArea({
+            centerId: centerIdToFetch,
+            selectedValues: null,
+          });
         }
       } catch (error) {
         console.error('Error fetching center CATCHMENT_AREA:', error);
         if (isMounted) {
-          setReassignCenterCatchmentArea(null);
+          setReassignCenterCatchmentArea({
+            centerId: centerIdToFetch,
+            selectedValues: null,
+          });
         }
       }
     };
@@ -941,7 +975,14 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   // Extract catchment blocks from selected center's CATCHMENT_AREA or fetched CATCHMENT_AREA (in reassign mode)
   useEffect(() => {
     // Priority 1: In reassign mode, use fetched CATCHMENT_AREA for the currently selected center (fetched when selectedCenter changes)
-    if (isForReassign && selectedCenter && reassignCenterCatchmentArea) {
+    if (
+      isForReassign &&
+      selectedCenter &&
+      reassignCenterCatchmentArea &&
+      reassignCenterCatchmentArea.centerId === selectedCenter &&
+      Array.isArray(reassignCenterCatchmentArea.selectedValues) &&
+      reassignCenterCatchmentArea.selectedValues.length > 0
+    ) {
       // Extract blocks from fetched center's CATCHMENT_AREA
       const extractedBlocks: Array<{
         id: string | number;
@@ -952,8 +993,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         stateName: string;
       }> = [];
 
-      if (Array.isArray(reassignCenterCatchmentArea) && reassignCenterCatchmentArea.length > 0) {
-        reassignCenterCatchmentArea.forEach((stateData: any) => {
+      const __selectedValues = reassignCenterCatchmentArea.selectedValues;
+      if (Array.isArray(__selectedValues) && __selectedValues.length > 0) {
+        __selectedValues.forEach((stateData: any) => {
           const stateId = stateData.stateId;
           const stateName = stateData.stateName || '';
 
@@ -1847,7 +1889,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                 return (
                   <Accordion
                     key={block.id}
-                    defaultExpanded
+                    defaultExpanded={false}
                     sx={{
                       border: '1px solid',
                       borderColor: 'divider',

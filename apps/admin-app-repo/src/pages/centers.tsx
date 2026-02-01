@@ -134,6 +134,7 @@ const Centers = () => {
         }
       });
       alterSchema.required = requiredArray;
+
       //add max selection custom
       if (alterSchema?.properties?.state) {
         alterSchema.properties.state.maxSelection = 1;
@@ -354,10 +355,16 @@ const Centers = () => {
       key: 'image',
       label: 'Images',
       render: (row: any) => {
-        console.log('Row in image column:', row);
+        const rawImage = row?.image;
+        const images: string[] = Array.isArray(rawImage)
+          ? rawImage
+          : typeof rawImage === 'string' && rawImage
+          ? [rawImage]
+          : [];
+
         return (
           <div style={{ display: 'flex', gap: '8px' }}>
-            {row?.image?.map((imgUrl: string, index: number) => (
+            {images.map((imgUrl: string, index: number) => (
               <img
                 key={index}
                 src={imgUrl}

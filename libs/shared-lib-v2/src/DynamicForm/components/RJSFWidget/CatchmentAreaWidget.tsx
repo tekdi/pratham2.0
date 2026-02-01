@@ -134,8 +134,12 @@ const CatchmentAreaWidget = ({
   options,
 }: WidgetProps) => {
   const { t } = useTranslation();
+  const sanitizeSelectedStates = (input: any): SelectedState[] =>
+    Array.isArray(input)
+      ? (input.filter((s: any) => s && typeof s === 'object') as SelectedState[])
+      : [];
   const [selectedStates, setSelectedStates] = useState<SelectedState[]>(
-    value || []
+    sanitizeSelectedStates(value)
   );
   const [stateSelectValue, setStateSelectValue] = useState('');
   const [districtSelectValues, setDistrictSelectValues] = useState<{
@@ -156,8 +160,10 @@ const CatchmentAreaWidget = ({
   }>({});
 
   // Get available states (not yet selected)
+  const normalizedSelectedStates = sanitizeSelectedStates(selectedStates);
   const availableStates = states.filter(
-    (state) => !selectedStates.some((selected) => selected.stateId === state.id)
+    (state) =>
+      !normalizedSelectedStates.some((selected) => selected.stateId === state.id)
   );
 
   // Fetch states from API
@@ -224,7 +230,7 @@ const CatchmentAreaWidget = ({
   // Handle value prop changes (e.g., form reset, external updates)
   useEffect(() => {
     if (value && JSON.stringify(value) !== JSON.stringify(selectedStates)) {
-      setSelectedStates(value);
+      setSelectedStates(sanitizeSelectedStates(value));
     }
   }, [value]);
 
@@ -482,25 +488,46 @@ const CatchmentAreaWidget = ({
 
   // Check if any states are selected
   const hasSelectedStates = () => {
-    return selectedStates.length > 0;
+    return (
+      normalizedSelectedStates.length > 0 &&
+      normalizedSelectedStates.some((s: any) => s?.stateId || s?.stateName)
+    );
   };
+
+  const isCatchmentComplete = () => {
+    if (!hasSelectedStates()) return false;
+    for (const state of normalizedSelectedStates as any[]) {
+      const districtsArr = Array.isArray(state?.districts) ? state.districts : [];
+      if (districtsArr.length === 0) return false;
+      for (const district of districtsArr) {
+        const blocksArr = Array.isArray(district?.blocks) ? district.blocks : [];
+        if (blocksArr.length === 0) return false;
+      }
+    }
+    return true;
+  };
+
+  const showIncompleteCatchmentMessage = hasSelectedStates() && !isCatchmentComplete();
 
   // Get a string representation of selected states for the hidden input
   const getSelectedStatesString = () => {
-    return selectedStates.map((state) => state.stateName).join(', ');
+    return normalizedSelectedStates
+      .map((state: any) => state?.stateName)
+      .filter(Boolean)
+      .join(', ');
   };
 
   return (
-    <Box sx={{ mb: 3 }}>
-      {rawErrors.length > 0 && (
-        <Typography
-          color="error"
-          variant="caption"
-          sx={{ display: 'block', mb: 1 }}
-        >
-          {rawErrors[0]}
-        </Typography>
-      )}
+    <Box
+      id={id}
+      tabIndex={-1}
+      className={
+        rawErrors.length > 0 || showIncompleteCatchmentMessage
+          ? 'field-error'
+          : undefined
+      }
+      sx={{ mb: 3, outline: 'none' }}
+    >
       {/* State Selection */}
       {loadingStates ? (
         <Box
@@ -549,9 +576,18 @@ const CatchmentAreaWidget = ({
           </FormControl>
         )
       )}
+      {(rawErrors.length > 0 || showIncompleteCatchmentMessage) && (
+        <Typography
+          variant="caption"
+          sx={{ display: 'block', mt: -1, mb: 1, color: '#000' }}
+        >
+          Select at least 1 district and 1 block under each selected state. Also
+          select at least 1 block under each selected district.
+        </Typography>
+      )}
       {/* Hidden text input to force native validation */}
       <input
-        value={hasSelectedStates() ? getSelectedStatesString() : ''}
+        value={isCatchmentComplete() ? getSelectedStatesString() : ''}
         required={required}
         onChange={() => {}}
         tabIndex={-1}
@@ -559,7 +595,7 @@ const CatchmentAreaWidget = ({
           height: 1,
           padding: 0,
           border: 0,
-          ...(hasSelectedStates() && { visibility: 'hidden' }),
+          ...(isCatchmentComplete() && { visibility: 'hidden' }),
         }}
         aria-hidden="true"
       />
