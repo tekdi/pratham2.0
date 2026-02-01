@@ -9,6 +9,10 @@ import {
   DialogActions,
   IconButton,
   CircularProgress,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -72,6 +76,7 @@ import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { splitUserData } from '@/components/DynamicForm/DynamicFormCallback';
 import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
 import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { HierarchicalSearchUserList } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 interface Cohort {
   cohortId: string;
@@ -179,6 +184,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [formStep, setFormStep] = useState(0);
   const [myCenterIds, setMyCenterIds] = useState<any>([]);
   const [myCenterList, setMyCenterList] = useState<any[]>([]);
+  const [mySelectedCenterId, setMySelectedCenterId] = useState<any>(null);
+  const [mySelectedBatchIds, setMySelectedBatchIds] = useState<any>([]);
   const [selectedCenterId, setSelectedCenterId] = useState<any>([]);
   const [selectedCenterList, setSelectedCenterList] = useState<any[]>([]);
   const [selectedBatchList, setSelectedBatchList] = useState<any[]>([]);
@@ -190,6 +197,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [addFacilitatorUiSchema, setAddFacilitatorUiSchema] =
     useState<any>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [expandedBatchNames, setExpandedBatchNames] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState(users || []);
   const [TotalCount, setTotalCount] = useState<number>(0);
@@ -268,15 +276,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             cohort?.type === 'COHORT' &&
             cohort?.cohortStatus === 'active' &&
             cohort?.cohortMemberStatus === 'active';
-          console.log('Cohort filter:', {
-            cohortName: cohort?.cohortName,
-            type: cohort?.type,
-            cohortStatus: cohort?.cohortStatus,
-            cohortMemberStatus: cohort?.cohortMemberStatus,
-            isActiveCohort,
-          });
           return isActiveCohort;
         });
+
+        console.log("newtest############# filteredCohorts", filteredCohorts)
 
         // Helper function to extract custom field value by label
         const getCustomFieldValue = (
@@ -319,6 +322,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             districtId: getCustomFieldValue(customField, 'DISTRICT', 'id'),
             blockId: getCustomFieldValue(customField, 'BLOCK', 'id'),
             villageId: getCustomFieldValue(customField, 'VILLAGE', 'id'),
+            childData: cohort.childData || [],
           };
         });
         setMyCenterList(centersList);
@@ -333,6 +337,68 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
     fetchCenters();
   }, [temp_variable]);
+
+  // Initialize selected center and batch IDs when myCenterList is populated
+  useEffect(() => {
+    if (myCenterList && myCenterList.length > 0 && mySelectedCenterId === null) {
+      // Select the first center by default
+      const storedCenterId = localStorage.getItem('centerId');
+      if (storedCenterId) {
+        // Check if storedCenterId exists in myCenterList
+        const centerExists = myCenterList.find(
+          (center: any) => center.value === storedCenterId
+        );
+        if (centerExists) {
+          setMySelectedCenterId(storedCenterId);
+        } else {
+          // Use first center if stored center doesn't exist
+          const firstCenter = myCenterList[0];
+          const firstCenterId = firstCenter.value;
+          if (firstCenterId) {
+            localStorage.setItem('centerId', firstCenterId);
+          }
+          setMySelectedCenterId(firstCenterId);
+        }
+      }
+      else {
+        const firstCenter = myCenterList[0];
+        const firstCenterId = firstCenter.value;
+        if (firstCenterId) {
+          localStorage.setItem('centerId', firstCenterId);
+        }
+        setMySelectedCenterId(firstCenterId);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [myCenterList]);
+
+  useEffect(() => {
+    if (mySelectedCenterId) {
+      // Find the selected center from myCenterList
+      const selectedCenter = myCenterList.find(
+        (center: any) => (center.value || center.cohortId) === mySelectedCenterId
+      );
+      if (selectedCenter) {
+        // Extract active batch IDs from childData
+        const activeBatchIds = (selectedCenter.childData || [])
+          .filter((child: any) => child.status === 'active')
+          .map((child: any) => child.cohortId);
+
+        setMySelectedBatchIds(activeBatchIds);
+        setOffSet(0);
+        setPage(1);
+      } else {
+        setMySelectedBatchIds([]);
+        setOffSet(0);
+        setPage(1);
+      }
+    }
+    else {
+      setMySelectedBatchIds([]);
+      setOffSet(0);
+      setPage(1);
+    }
+  }, [mySelectedCenterId]);
 
   // Fetch facilitator form schema
   useEffect(() => {
@@ -458,174 +524,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   };
 
   useEffect(() => {
-    console.log("newtest############# cohortData",cohortData)
-    console.log("newtest############# isFromCenterDetailPage",isFromCenterDetailPage)
-    const getFacilitator = async () => {
-      if (!isMobile) {
-        setLoading(true);
-      }
-      try {
-        const cohortId = cohortData
-          .map((block: any) => {
-            return block?.blockId;
-          })
-          .join('');
-          if (cohortId) {
-            console.log("newtest############# cohortId",cohortId)
-
-            
-
-          const limit = 10;
-          const page = offset;
-          let stateIds = [];
-          let districtIds = [];
-          let blockIds = [];
-          if (localStorage.getItem('userData')) {
-            try {
-              const customFields = JSON.parse(
-                localStorage.getItem('userData')
-              ).customFields;
-
-              const getSelectedValueIds = (label) => {
-                const field = customFields.find(
-                  (f) => f.label.toLowerCase() === label.toLowerCase()
-                );
-                return (
-                  field?.selectedValues?.map((val) => val.id.toString()) || []
-                );
-              };
-
-              stateIds = getSelectedValueIds('STATE');
-              districtIds = getSelectedValueIds('DISTRICT');
-              blockIds = getSelectedValueIds('BLOCK');
-            } catch (e) {}
-          }
-
-          const filters = {
-            state: stateIds,
-            district: districtIds,
-            block: blockIds,
-            role: Role.TEACHER,
-            tenantStatus: [Status.ACTIVE],
-            tenantId: tenantId,
-          };
-          const fields = ['age'];
-          // const test = isMobile ? infinitePage : page
-          const resp = await getMyUserList({ limit, page, filters, fields });
-          // const resp = await queryClient.fetchQuery({
-          //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
-          //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
-          //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
-          // });
-          const facilitatorList = resp.result?.getUserDetails;
-          const entireFLList = await getMyUserList({
-            limit,
-            page: 0,
-            filters,
-            fields,
-          });
-          setAllFacilitatorsData(entireFLList?.result?.getUserDetails);
-
-          setTotalCount(resp.result?.totalCount);
-
-          if (!facilitatorList || facilitatorList?.length === 0) {
-            console.log('No users found.');
-            return;
-          }
-          const userIds = facilitatorList?.map((user: any) => user.userId);
-
-          const cohortDetailsPromises = userIds.map((userId: string) =>
-            queryClient.fetchQuery({
-              queryKey: [QueryKeys.MY_COHORTS, userId],
-              queryFn: () => getCohortList(userId, { customField: 'true' }),
-            })
-          );
-
-          const cohortDetailsResults = await Promise.allSettled(
-            cohortDetailsPromises
-          );
-
-          const cohortDetails = cohortDetailsResults.map((result) => {
-            if (result.status === 'fulfilled') {
-              return result.value;
-            } else {
-              console.error(
-                'Error fetching cohort details for a user:',
-                result.reason
-              );
-              return null; // or handle the error as needed
-            }
-          });
-
-          const extractedData = facilitatorList?.map(
-            (user: any, index: number) => {
-              const cohorts = cohortDetails[index] || [];
-
-
-
-              const batches = cohorts.flatMap((cohort: any) =>
-                (cohort.childData || []).filter(
-                  (child: any) => child.type === 'BATCH'
-                )
-              );
-
-              const batchNames = cohorts
-                .filter(
-                  (item: any) =>
-                    item.type === 'BATCH' && item.cohortStatus === 'active'
-                )
-                .map((item: any) => toPascalCase(item.cohortName));
-
-              const cohortNames = cohorts
-                .filter(
-                  ({ cohortStatus }: any) => cohortStatus === Status.ACTIVE
-                )
-                .map(({ cohortName }: any) => toPascalCase(cohortName))
-                .join(', ');
-
-              return {
-                userId: user?.userId,
-                name: toPascalCase(
-                  getUserFullName({
-                    firstName: user?.firstName,
-                    lastName: user?.lastName,
-                    name: user?.name,
-                  })
-                ),
-                cohortNames: cohortNames || null,
-                batchNames: batchNames || null,
-                customFields: user?.customFields,
-                cohorts: cohorts,
-              };
-            }
-          );
-
-          console.log('##############ddffdfdf extractedData', extractedData);
-          setUsers(extractedData);
-          // setLoading(false);
-          if (isMobile) {
-            setInfiniteData([...infiniteData, ...extractedData]);
-          } else {
-            setFilteredUsers(extractedData);
-            setInfiniteData(extractedData);
-          }
-
-          setTimeout(() => {
-            setUsers(extractedData);
-            setFilteredUsers(extractedData);
-            setLoading(false);
-          }, 50);
-        }
-      } catch (error) {
-        console.log(error);
-        // showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
-        setLoading(false);
-      }
-    };
-
+    console.log("newtest############# cohortData", cohortData)
+    console.log("newtest############# isFromCenterDetailPage", isFromCenterDetailPage)
     const fetchFacilitators = async () => {
-      //new api call for cohort member list for hierarchy search api
-
       const cohortId = cohortData;
       const page = 0;
       const filters = {
@@ -713,7 +614,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     if (isFromCenterDetailPage) {
       fetchFacilitators();
     } else {
-      getFacilitator();
+      //removeed this as center id can fetch facilitators
     }
   }, [
     isFacilitatorAdded,
@@ -722,6 +623,133 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     infinitePage,
     isFromCenterDetailPage,
   ]);
+
+  useEffect(() => {
+    const getFacilitator = async () => {
+      if (!isMobile) {
+        setLoading(true);
+      }
+      try {
+        const limit = 10;
+        const page = offset;
+
+        const bodyPayload = {
+          limit: limit,
+          offset: page,
+          role: [Role.TEACHER],
+          tenantStatus: [Status.ACTIVE],
+          filters: {
+            batch: mySelectedBatchIds,
+          },
+          customfields: [
+            'state',
+            'district',
+            'block',
+            'village',
+            'main_subject',
+            'subject_taught',
+          ],
+          sort: [
+            "firstName",
+            "asc"
+          ]
+        };
+        // const test = isMobile ? infinitePage : page
+        const resp = await HierarchicalSearchUserList(bodyPayload);
+        console.log("newtest############# resp", resp)
+        // const resp = await queryClient.fetchQuery({
+        //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
+        //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
+        //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
+        // });
+        const facilitatorList = resp?.getUserDetails;
+        setAllFacilitatorsData(facilitatorList);
+
+        setTotalCount(resp?.totalCount);
+
+        if (!facilitatorList || facilitatorList?.length === 0) {
+          setLoading(false);
+          console.log('No users found.');
+          return;
+        }
+
+        const extractedData = facilitatorList?.map(
+          (user: any, index: number) => {
+            // Extract batch names from cohortData
+            const batchNames = (user?.cohortData || [])
+              .filter(
+                (item: any) =>
+                  item.batchStatus === 'active' &&
+                  item.cohortMember?.status === 'active' &&
+                  item.centerStatus === 'active'
+              )
+              .map((item: any) => toPascalCase(item.batchName));
+
+            // Extract unique center names based on centerId where centerStatus is active
+            const uniqueCentersMap = new Map<string, string>();
+            (user?.cohortData || [])
+              .filter((item: any) => item.centerStatus === 'active' && item.cohortMember?.status === 'active' && item.batchStatus === 'active')
+              .forEach((item: any) => {
+                if (!uniqueCentersMap.has(item.centerId)) {
+                  uniqueCentersMap.set(item.centerId, item.centerName);
+                }
+              });
+
+            const cohortNames = Array.from(uniqueCentersMap.values())
+              .map((centerName: string) => toPascalCase(centerName))
+              .join(', ');
+
+            return {
+              userId: user?.userId,
+              name: toPascalCase(
+                getUserFullName({
+                  firstName: user?.firstName,
+                  lastName: user?.lastName,
+                  name: user?.name,
+                })
+              ),
+              cohortNames: cohortNames || null,
+              batchNames: batchNames || null,
+              customFields: user?.customfield,
+              cohorts: user?.cohortData,
+            };
+          }
+        );
+
+        console.log('##############ddffdfdf extractedData', extractedData);
+        setUsers(extractedData);
+        setLoading(false);
+        if (isMobile) {
+          setInfiniteData([...infiniteData, ...extractedData]);
+        } else {
+          setFilteredUsers(extractedData);
+          setInfiniteData(extractedData);
+        }
+
+        setTimeout(() => {
+          setUsers(extractedData);
+          setFilteredUsers(extractedData);
+          setLoading(false);
+        }, 50);
+
+      } catch (error) {
+        console.log(error);
+        // showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+        setLoading(false);
+      }
+      finally {
+        setLoading(false);
+      }
+    };
+    if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
+      console.log("newtest############# mySelectedBatchIds", mySelectedBatchIds)
+      getFacilitator();
+    } else {
+      setUsers([]);
+      setFilteredUsers([]);
+      setInfiniteData([]);
+    }
+  }, [mySelectedBatchIds, offset]);
 
   const handleClose = () => {
     setOpen(false);
@@ -744,27 +772,27 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const toggleDrawer =
     (anchor: Anchor, open: boolean, user?: any, teacherUserId?: string) =>
-    (event: React.KeyboardEvent | React.MouseEvent) => {
-      setCohortDeleteId(isFromFLProfile ? teacherUserId : user.userId);
-      if (!isFromFLProfile) {
-        const cohortNamesArray = user?.cohortNames?.split(', ');
-        const centerNames = cohortNamesArray?.map((cohortName: string) =>
-          cohortName.trim()
-        ) || [t('ATTENDANCE.NO_CENTERS_ASSIGNED')];
-        setCenters(centerNames);
-        fieldName: setSelectedUser(user);
-      }
+      (event: React.KeyboardEvent | React.MouseEvent) => {
+        setCohortDeleteId(isFromFLProfile ? teacherUserId : user.userId);
+        if (!isFromFLProfile) {
+          const cohortNamesArray = user?.cohortNames?.split(', ');
+          const centerNames = cohortNamesArray?.map((cohortName: string) =>
+            cohortName.trim()
+          ) || [t('ATTENDANCE.NO_CENTERS_ASSIGNED')];
+          setCenters(centerNames);
+          fieldName: setSelectedUser(user);
+        }
 
-      if (
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-          (event as React.KeyboardEvent).key === 'Shift')
-      ) {
-        return;
-      }
+        if (
+          event.type === 'keydown' &&
+          ((event as React.KeyboardEvent).key === 'Tab' ||
+            (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+          return;
+        }
 
-      setState({ ...state, bottom: open });
-    };
+        setState({ ...state, bottom: open });
+      };
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
     if (name === 'delete-User') {
@@ -858,45 +886,45 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           district.blocks?.forEach((block) => {
             block.centers?.forEach((center) => {
               center.batches?.forEach((batch) => {
-              // Check if centerId exists in cohortData with active status
-              const cohortCenterBatch = cohortData?.find(
-                (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
-              );
-              const isActiveCenterBatch =
-              cohortCenterBatch?.cohortMember?.status === 'active' && cohortCenterBatch?.centerStatus === 'active' && cohortCenterBatch?.batchStatus === 'active';
+                // Check if centerId exists in cohortData with active status
+                const cohortCenterBatch = cohortData?.find(
+                  (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
+                );
+                const isActiveCenterBatch =
+                  cohortCenterBatch?.cohortMember?.status === 'active' && cohortCenterBatch?.centerStatus === 'active' && cohortCenterBatch?.batchStatus === 'active';
 
-              // Only push if center has active cohortMember status
-              if (isActiveCenterBatch) {
-                const centerObject = {
-                  value: center.centerId,
-                  label: center.centerName,
-                  state: state.stateName,
-                  district: district.districtName,
-                  block: block.blockName,
-                  village: null, // villageName might not exist in the structure
-                  stateId: state.stateId,
-                  districtId: district.districtId,
-                  blockId: block.blockId,
-                  villageId: null, // villageId might not exist in the structure
-                };
-                centerList.push(centerObject);
-                const centerBatchObject = {
-                  id: batch.batchId,
-                  name: batch.batchName,
-                  centerId: center.centerId,
-                  centerName: center.centerName,
-                  state: state.stateName,
-                  district: district.districtName,
-                  block: block.blockName,
-                  village: null, // villageName might not exist in the structure
-                  stateId: state.stateId,
-                  districtId: district.districtId,
-                  blockId: block.blockId,
-                  villageId: null, // villageId might not exist in the structure
-                };
-                batchList.push(centerBatchObject);
-                centerIdArray.push(batch.batchId);
-              }
+                // Only push if center has active cohortMember status
+                if (isActiveCenterBatch) {
+                  const centerObject = {
+                    value: center.centerId,
+                    label: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  centerList.push(centerObject);
+                  const centerBatchObject = {
+                    id: batch.batchId,
+                    name: batch.batchName,
+                    centerId: center.centerId,
+                    centerName: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  batchList.push(centerBatchObject);
+                  centerIdArray.push(batch.batchId);
+                }
               });
             });
           });
@@ -1047,7 +1075,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     setFormStep(0);
   };
 
-  const handleDeleteUser = () => {};
+  const handleDeleteUser = () => { };
 
   const handleFacilitatorAdded = () => {
     setIsFacilitatorAdded((prev) => !prev);
@@ -1086,12 +1114,35 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     return batchNames.join(', ');
   };
 
+  const toggleBatchNamesExpanded = (userId: string) => {
+    setExpandedBatchNames((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(userId)) {
+        newSet.delete(userId);
+      } else {
+        newSet.add(userId);
+      }
+      return newSet;
+    });
+  };
+
   const handleSearch = (searchTerm: string) => {
     const term = searchTerm;
     setSearchTerm(term);
     setFilteredUsers(
       users?.filter((user) => user?.name?.toLowerCase()?.includes(term))
     );
+  };
+
+  const handleCenterChange = (event: any) => {
+    setPage(1);
+    setOffSet(0);
+    setUsers([]);
+    setFilteredUsers([]);
+    setInfiniteData([]);
+    const selectedCenterId = event.target.value;
+    setMySelectedCenterId(selectedCenterId);
+    localStorage.setItem('centerId', selectedCenterId);
   };
   const PAGINATION_CONFIG = {
     ITEMS_PER_PAGE: 10,
@@ -1147,13 +1198,23 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                   />
                 )}
                 {isFromCenterDetailPage ? null : (
-                  <Box mt={'18px'} px={'18px'} ml={'10px'}>
+                  <Box
+                    mt={'18px'}
+                    px={'18px'}
+                    ml={'10px'}
+                    sx={{
+                      display: 'flex',
+                      gap: '12px',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                    }}
+                  >
                     <Button
                       sx={{
                         border: `1px solid ${theme.palette.error.contrastText}`,
                         borderRadius: '100px',
                         height: '40px',
-                        width: '8rem',
+                        minWidth: '8rem',
                         color: theme.palette.error.contrastText,
                         '& .MuiButton-endIcon': {
                           marginLeft: isRTL
@@ -1163,14 +1224,52 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             ? '8px !important'
                             : '-2px !important',
                         },
-                        width: '100%',
+                        flex: myCenterList && myCenterList.length > 0 ? '0 0 auto' : '1 1 auto',
                       }}
                       className="text-1E"
                       onClick={handleOpenAddFaciModal}
                       endIcon={<AddIcon />}
                     >
-                      {t('COMMON.ADD_NEW')}
+                      {t('COMMON.MAP')}
                     </Button>
+                    {myCenterList && myCenterList.length > 0 && (
+                      <Box sx={{ flex: '1 1 auto', minWidth: '200px' }}>
+                        <FormControl fullWidth>
+                          <InputLabel id="center-select-label">
+                            {t('COMMON.SELECT_CENTER')}
+                          </InputLabel>
+                          <Select
+                            labelId="center-select-label"
+                            id="center-select"
+                            value={mySelectedCenterId || ''}
+                            label={t('COMMON.SELECT_CENTER')}
+                            onChange={handleCenterChange}
+                            sx={{
+                              borderRadius: '8px',
+                              height: '40px',
+                            }}
+                          >
+                            {[...myCenterList]
+                              .sort((a: any, b: any) =>
+                                (a.label || '').localeCompare(b.label || '', undefined, { sensitivity: 'base' })
+                              )
+                              .map((center: any) => (
+                                <MenuItem
+                                  key={center.value}
+                                  value={center.value}
+                                >
+                                  {(center.label)
+                                    .split(' ')
+                                    .map((word: string) =>
+                                      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                                    )
+                                    .join(' ')}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        </FormControl>
+                      </Box>
+                    )}
                   </Box>
                 )}
               </Grid>
@@ -1231,9 +1330,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                       ) : isFromCenterDetailPage ? (
                         <>
                           <Box>
-                            <Grid container spacing={2}>
-                              {filteredUsers.length > 0 ? (
-                                filteredUsers.map((user) => (
+                            <Grid container spacing={2} >
+                              {filteredUsers?.length > 0 ? (
+                                filteredUsers?.map((user) => (
                                   <Grid
                                     item
                                     xs={12}
@@ -1304,8 +1403,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             {user?.batchNames?.length > 0
                                               ? getBatchNames(user.batchNames)
                                               : t(
-                                                  'ATTENDANCE.NO_BATCHES_ASSIGNED'
-                                                )}
+                                                'ATTENDANCE.NO_BATCHES_ASSIGNED'
+                                              )}
                                           </Box>
                                         </Box>
                                       </Box>
@@ -1314,10 +1413,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                           onClick={(event) => {
                                             isMobile
                                               ? toggleDrawer(
-                                                  'bottom',
-                                                  true,
-                                                  user
-                                                )(event)
+                                                'bottom',
+                                                true,
+                                                user
+                                              )(event)
                                               : handleMenuOpen(event, user);
                                           }}
                                           sx={{
@@ -1358,7 +1457,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                       ) : (
                         <>
                           <Box>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={2} >
                               {(
                                 isMobile
                                   ? infiniteData.length > 0
@@ -1373,14 +1472,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                       md={6}
                                       lg={4}
                                       key={user.userId}
+                                      sx={{ display: 'flex' }}
                                     >
                                       <Box
                                         display={'flex'}
+                                        flexDirection={'column'}
                                         borderBottom={`1px solid ${theme.palette.warning['A100']}`}
                                         width={'100%'}
                                         justifyContent={'space-between'}
                                         sx={{
                                           cursor: 'pointer',
+                                          height: '100%',
                                           '@media (min-width: 600px)': {
                                             border: `1px solid  ${theme.palette.action.selected}`,
                                             padding: '4px 10px',
@@ -1392,10 +1494,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                       >
                                         <Box
                                           display="flex"
-                                          alignItems="center"
+                                          alignItems="flex-start"
                                           gap="5px"
+                                          flex={1}
                                         >
-                                          <Box>
+                                          <Box sx={{ flex: 1, minWidth: 0 }}>
                                             <CustomLink
                                               className="word-break"
                                               href="#"
@@ -1428,30 +1531,64 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                   theme.palette.action.selected,
                                                 padding: '5px',
                                                 width: 'fit-content',
+                                                maxWidth: '100%',
                                                 borderRadius: '5px',
                                                 fontSize: '12px',
                                                 fontWeight: '600',
                                                 color: 'black',
                                                 marginBottom: '10px',
+                                                position: 'relative',
                                               }}
                                             >
-                                              {user?.batchNames?.length > 0
-                                                ? getBatchNames(user.batchNames)
-                                                : t(
+                                              <Box
+                                                sx={{
+                                                  display: '-webkit-box',
+                                                  WebkitLineClamp: expandedBatchNames.has(user.userId) ? 'none' : 4,
+                                                  WebkitBoxOrient: 'vertical',
+                                                  overflow: expandedBatchNames.has(user.userId) ? 'visible' : 'hidden',
+                                                  wordBreak: 'break-word',
+                                                }}
+                                              >
+                                                {user?.batchNames?.length > 0
+                                                  ? getBatchNames(user.batchNames)
+                                                  : t(
                                                     'ATTENDANCE.NO_BATCHES_ASSIGNED'
                                                   )}
+                                              </Box>
+                                              {user?.batchNames?.length > 0 &&
+                                                getBatchNames(user.batchNames) &&
+                                                (() => {
+                                                  const batchText = getBatchNames(user.batchNames);
+                                                  // Show "Show more" if text is likely to exceed 4 lines (~100 chars at 12px font)
+                                                  const needsExpansion = batchText.length > 100;
+                                                  return needsExpansion && (
+                                                    <Typography
+                                                      onClick={() => toggleBatchNamesExpanded(user.userId)}
+                                                      sx={{
+                                                        fontSize: '11px',
+                                                        fontWeight: '600',
+                                                        color: theme.palette.secondary.main,
+                                                        cursor: 'pointer',
+                                                        marginTop: '4px',
+                                                        textDecoration: 'underline',
+                                                      }}
+                                                    >
+                                                      {expandedBatchNames.has(user.userId) ? 'Show less' : 'Show more'}
+                                                    </Typography>
+                                                  );
+                                                })()}
                                             </Box>
                                           </Box>
                                         </Box>
-                                        <Box>
+                                        <Box sx={{ alignSelf: 'flex-end' }}>
                                           <MoreVertIcon
                                             onClick={(event) => {
                                               isMobile
                                                 ? toggleDrawer(
-                                                    'bottom',
-                                                    true,
-                                                    user
-                                                  )(event)
+                                                  'bottom',
+                                                  true,
+                                                  user
+                                                )(event)
                                                 : handleMenuOpen(event, user);
                                             }}
                                             sx={{
@@ -1490,27 +1627,34 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                               )}
                             </Grid>
                           </Box>
-                          <Box
-                            sx={{
-                              mt: 2,
-                              display: 'flex',
-                              justifyContent: 'end',
-                            }}
-                          >
-                            <CustomPagination
-                              count={Math.ceil(
-                                TotalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE
-                              )}
-                              page={page}
-                              onPageChange={handlePageChange}
-                              fetchMoreData={() => fetchData()}
-                              hasMore={hasMore}
-                              TotalCount={TotalCount}
-                              items={infiniteData.map((user) => (
-                                <Box key={user.userId}></Box>
-                              ))}
-                            />
-                          </Box>
+                          {(
+                            isMobile
+                              ? infiniteData?.length > 0
+                              : filteredUsers?.length > 0
+                          )
+                            && (
+                              <Box
+                                sx={{
+                                  mt: 2,
+                                  display: 'flex',
+                                  justifyContent: 'end',
+                                }}
+                              >
+                                <CustomPagination
+                                  count={Math.ceil(
+                                    TotalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE
+                                  )}
+                                  page={page}
+                                  onPageChange={handlePageChange}
+                                  fetchMoreData={() => fetchData()}
+                                  hasMore={hasMore}
+                                  TotalCount={TotalCount}
+                                  items={infiniteData.map((user) => (
+                                    <Box key={user.userId}></Box>
+                                  ))}
+                                />
+                              </Box>
+                            )}
                         </>
                       )}
                     </Box>
@@ -1587,7 +1731,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 >
                   {selectedUser?.name
                     ? selectedUser.name.charAt(0).toUpperCase() +
-                      selectedUser.name.slice(1)
+                    selectedUser.name.slice(1)
                     : ''}
                 </Box>
                 <Box
@@ -1661,183 +1805,183 @@ const ManageUser: React.FC<ManageUsersProps> = ({
               //TODO: Add new reassign popup here
               //new reassign flow
 
-      
-      <Dialog
-        open={reassignModalOpen}
-        onClose={(event, reason) => {
-          // Prevent closing on backdrop click
-          if (reason !== 'backdropClick') {
-            setReassignModalOpen(false);
-            setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
-            setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
-            setSelectedCenterListReassign(null); // Reset center list selection when dialog closes
-            setSelectedBatchListReassign(null); // Reset batch selection when dialog closes
-            setSelectedUserIdReassign(null); // Reset user selection when dialog closes
-          }
-        }}
-        maxWidth={false}
-        fullWidth={true}
-        PaperProps={{
-          sx: {
-            width: '100%',
-            maxWidth: '100%',
-            maxHeight: '100vh',
-          },
-        }}
-      >
-        <DialogTitle
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            borderBottom: '1px solid #eee',
-            p: 2,
-          }}
-        >
-          <Typography variant="h1" component="div">
-            {t('Reassign Instructor to Batch')}
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={() => setReassignModalOpen(false)}
-            sx={{
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
-        {isReassignModelProgress ? (
-            <Box sx={{ mb: 3 }}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: '150px',
+
+              <Dialog
+                open={reassignModalOpen}
+                onClose={(event, reason) => {
+                  // Prevent closing on backdrop click
+                  if (reason !== 'backdropClick') {
+                    setReassignModalOpen(false);
+                    setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+                    setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+                    setSelectedCenterListReassign(null); // Reset center list selection when dialog closes
+                    setSelectedBatchListReassign(null); // Reset batch selection when dialog closes
+                    setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+                  }
+                }}
+                maxWidth={false}
+                fullWidth={true}
+                PaperProps={{
+                  sx: {
+                    width: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100vh',
+                  },
                 }}
               >
-                <CircularProgress />
-                <Typography variant="h1" component="div" sx={{ mt: 2 }}>
-                  {t('Loading...')}
-                </Typography>
-              </Box>
-            </Box>
-          ) : (
-            <Box sx={{ mb: 3 }}>
-              <LMPMultipleBatchListWidget
-                value={selectedCenterIdReassign}
-                onChange={(centerId) => {
-                  setSelectedCenterIdReassign(centerId);
-                  console.log('Selected Center ID:', centerId);
-                }}
-                onCenterList={(centerList) => {
-                  setSelectedCenterListReassign(centerList || []);
-                  console.log('############# centerList', centerList);
-                }}
-                selectedCenterList={selectedCenterListReassign}
-                onBatchList={(batchList) => {
-                  setSelectedBatchListReassign(batchList || []);
-                  console.log('############# batchList', batchList);
-                }}
-                selectedBatchList={selectedBatchListReassign}
-                label="Select Batch"
-                required={true}
-                multiple={false}
-                centerIds={myCenterIds}
-                centerList={myCenterList}
-              />
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={async () => {
-                if (selectedUserIdReassign && selectedCenterIdReassign) {
-                  setReassignInProgress(true);
-                  try {
-                      //map user to tenant
-                      // Extract all batch IDs from the nested structure
-                      const batchIds = extractBatchIds(selectedCenterIdReassign);
+                <DialogTitle
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottom: '1px solid #eee',
+                    p: 2,
+                  }}
+                >
+                  <Typography variant="h1" component="div">
+                    {t('Reassign Instructor to Batch')}
+                  </Typography>
+                  <IconButton
+                    aria-label="close"
+                    onClick={() => setReassignModalOpen(false)}
+                    sx={{
+                      color: (theme) => theme.palette.grey[500],
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+                  {isReassignModelProgress ? (
+                    <Box sx={{ mb: 3 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minHeight: '150px',
+                        }}
+                      >
+                        <CircularProgress />
+                        <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                          {t('Loading...')}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box sx={{ mb: 3 }}>
+                      <LMPMultipleBatchListWidget
+                        value={selectedCenterIdReassign}
+                        onChange={(centerId) => {
+                          setSelectedCenterIdReassign(centerId);
+                          console.log('Selected Center ID:', centerId);
+                        }}
+                        onCenterList={(centerList) => {
+                          setSelectedCenterListReassign(centerList || []);
+                          console.log('############# centerList', centerList);
+                        }}
+                        selectedCenterList={selectedCenterListReassign}
+                        onBatchList={(batchList) => {
+                          setSelectedBatchListReassign(batchList || []);
+                          console.log('############# batchList', batchList);
+                        }}
+                        selectedBatchList={selectedBatchListReassign}
+                        label="Select Batch"
+                        required={true}
+                        multiple={false}
+                        centerIds={myCenterIds}
+                        centerList={myCenterList}
+                      />
+                    </Box>
+                  )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={async () => {
+                      if (selectedUserIdReassign && selectedCenterIdReassign) {
+                        setReassignInProgress(true);
+                        try {
+                          //map user to tenant
+                          // Extract all batch IDs from the nested structure
+                          const batchIds = extractBatchIds(selectedCenterIdReassign);
 
-                      console.log('Creating with User ID:', selectedUserIdReassign);
-                      console.log('Extracted Batch IDs:', batchIds);
+                          console.log('Creating with User ID:', selectedUserIdReassign);
+                          console.log('Extracted Batch IDs:', batchIds);
 
-                      if (batchIds.length === 0) {
-                        showToastMessage(
-                          'Please select at least one batch',
-                          'error'
-                        );
-                        setReassignInProgress(false);
-                        return;
-                      }
+                          if (batchIds.length === 0) {
+                            showToastMessage(
+                              'Please select at least one batch',
+                              'error'
+                            );
+                            setReassignInProgress(false);
+                            return;
+                          }
 
 
-                  const removedIds = originalCenterIdReassign?.filter(
-                    (item: any) => !batchIds.includes(item)
-                  );
+                          const removedIds = originalCenterIdReassign?.filter(
+                            (item: any) => !batchIds.includes(item)
+                          );
 
-                      // Call the cohortmember/create API with extracted batch IDs
-                      const response = await bulkCreateCohortMembers({
-                        userId: [selectedUserIdReassign],
-                        cohortId: batchIds,
-                        //add remove cohort id check
-                        ...(removedIds?.length > 0
-                          ? { removeCohortId: removedIds }
-                          : {}),
-                      });
+                          // Call the cohortmember/create API with extracted batch IDs
+                          const response = await bulkCreateCohortMembers({
+                            userId: [selectedUserIdReassign],
+                            cohortId: batchIds,
+                            //add remove cohort id check
+                            ...(removedIds?.length > 0
+                              ? { removeCohortId: removedIds }
+                              : {}),
+                          });
 
-                      if (
-                        response?.responseCode === 201 ||
-                        response?.data?.responseCode === 201 ||
-                        response?.status === 201
-                      ) {
-                        showToastMessage(t(successCreateMessage), 'success');
-                        // Close dialog
-                        setReassignModalOpen(false);
-                        setSelectedCenterIdReassign(null);
-                        setOriginalCenterIdReassign(null);
-                        setSelectedCenterListReassign(null);
-                        setSelectedBatchListReassign(null);
-                        setSelectedUserIdReassign(null);
-                        // Refresh the data
-                        searchData(prefilledFormData, 0);
-                      } else {
-                        showToastMessage(
-                          response?.data?.params?.errmsg ||
+                          if (
+                            response?.responseCode === 201 ||
+                            response?.data?.responseCode === 201 ||
+                            response?.status === 201
+                          ) {
+                            showToastMessage(t(successCreateMessage), 'success');
+                            // Close dialog
+                            setReassignModalOpen(false);
+                            setSelectedCenterIdReassign(null);
+                            setOriginalCenterIdReassign(null);
+                            setSelectedCenterListReassign(null);
+                            setSelectedBatchListReassign(null);
+                            setSelectedUserIdReassign(null);
+                            // Refresh the data
+                            searchData(prefilledFormData, 0);
+                          } else {
+                            showToastMessage(
+                              response?.data?.params?.errmsg ||
+                              t(failureCreateMessage),
+                              'error'
+                            );
+                          }
+                        } catch (error) {
+                          console.error('Error creating cohort member:', error);
+                          showToastMessage(
+                            error?.response?.data?.params?.errmsg ||
                             t(failureCreateMessage),
-                          'error'
-                        );
+                            'error'
+                          );
+                        } finally {
+                          setReassignInProgress(false);
+                        }
+                      } else if (!selectedUserIdReassign) {
+                        showToastMessage('Please search and select a user', 'error');
+                      } else {
+                        showToastMessage('Please select a center', 'error');
                       }
-                  } catch (error) {
-                    console.error('Error creating cohort member:', error);
-                    showToastMessage(
-                      error?.response?.data?.params?.errmsg ||
-                        t(failureCreateMessage),
-                      'error'
-                    );
-                  } finally {
-                    setReassignInProgress(false);
-                  }
-                } else if (!selectedUserIdReassign) {
-                  showToastMessage('Please search and select a user', 'error');
-                } else {
-                  showToastMessage('Please select a center', 'error');
-                }
-              }}
-              disabled={
-                !selectedUserIdReassign || !selectedCenterIdReassign || isReassignInProgress
-              }
-            >
-              {t('COMMON.REASSIGN')}
-            </Button>
-        </DialogActions>
-      </Dialog>
+                    }}
+                    disabled={
+                      !selectedUserIdReassign || !selectedCenterIdReassign || isReassignInProgress
+                    }
+                  >
+                    {t('COMMON.REASSIGN')}
+                  </Button>
+                </DialogActions>
+              </Dialog>
 
 
               // <FacilitatorManage
@@ -2124,7 +2268,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             } else {
                               showToastMessage(
                                 response?.data?.params?.errmsg ||
-                                  t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
+                                t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
                                 'error'
                               );
                             }
@@ -2138,7 +2282,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           console.error('Error creating cohort member:', error);
                           showToastMessage(
                             error?.response?.data?.params?.errmsg ||
-                              t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
+                            t('COMMON.NOT_ABLE_CREATE_FACILITATOR'),
                             'error'
                           );
                         } finally {

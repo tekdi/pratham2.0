@@ -73,6 +73,7 @@ const API_ENDPOINTS = {
   contentCreate: `${baseurl}/tracking/content/create`,
   updateCohortUser: (userId: string | string[])=>`${baseurl}/user/v1/cohort/update/${userId}`,
   sendMessage: `${baseurl}/notification/send-raw`,
+  hierarchialSearch: `${baseurl}/user/hierarchical-search`,
 };
 
 export default API_ENDPOINTS;
