@@ -198,6 +198,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     useState<any>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [expandedBatchNames, setExpandedBatchNames] = useState<Set<string>>(new Set());
+  const [truncatedBatchNames, setTruncatedBatchNames] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState(users || []);
   const [TotalCount, setTotalCount] = useState<number>(0);
@@ -224,6 +225,20 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [isReassignInProgress, setReassignInProgress] = useState(false);
   const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
 
+  //message constants
+  const successUpdateMessage = 'FACILITATORS.FACILITATOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'scp-facilitator-updated-successfully';
+  const failureUpdateMessage = 'COMMON.NOT_ABLE_UPDATE_FACILITATOR';
+  const successCreateMessage = 'FACILITATORS.FACILITATOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'SCP-Facilitator-created-successfully';
+  const failureCreateMessage = 'COMMON.NOT_ABLE_CREATE_FACILITATOR';
+  const notificationKey = 'onFacilitatorCreated';
+  const notificationMessage = 'FACILITATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const notificationContext = 'USER';
+  const blockReassignmentNotificationKey = 'FACILITATOR_BLOCK_UPDATE';
+  const profileUpdateNotificationKey = 'FACILITATOR_PROFILE_UPDATE';
+  const centerUpdateNotificationKey = 'FACILITATOR_CENTER_UPDATE';
+
   useEffect(() => {
     if (reloadState) {
       setReloadState(false);
@@ -242,7 +257,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           setLoading(false);
           return;
         }
-        console.log('#############testlogs userId', userId);
         const headers = {
           'Content-Type': 'application/json',
           Accept: 'application/json, text/plain, */*',
@@ -250,25 +264,16 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
           academicyearid: localStorage.getItem('academicYearId') || '',
         };
-        console.log('#############testlogs headers', headers);
 
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/mycohorts/${userId}?customField=true&children=true`;
-        console.log('#############testlogs apiUrl', apiUrl);
+        
         const response = await axios.get(apiUrl, { headers });
-        console.log('#############testlogs response', response);
+        
 
         // Extract centers from response
         // Response structure: response.data.result is an array of cohorts
         const cohortsData = response?.data?.result || [];
 
-        console.log(
-          '#############testlogs API Response - cohortsData:',
-          cohortsData
-        );
-        console.log(
-          '#############testlogs Number of cohorts:',
-          cohortsData.length
-        );
 
         // Filter for active centers (type COHORT, status active, cohortMemberStatus active)
         const filteredCohorts = cohortsData.filter((cohort: any) => {
@@ -279,7 +284,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           return isActiveCohort;
         });
 
-        console.log("newtest############# filteredCohorts", filteredCohorts)
 
         // Helper function to extract custom field value by label
         const getCustomFieldValue = (
@@ -509,86 +513,72 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       return [];
     }
 
-    return cohorts.map((cohort: any) => ({
-      centerId: cohort.parentId || null,
-      centerName: null,
-      centerStatus: 'active',
-      batchId: cohort.cohortId || null,
-      batchName: cohort.cohortName || null,
-      batchStatus: cohort.cohortStatus || null,
-      cohortMember: {
-        status: cohort.cohortMemberStatus || null,
-        membershipId: cohort.cohortMembershipId || null,
-      },
-    }));
+    return cohorts.map((cohort: any) => (cohort));
   };
 
   useEffect(() => {
-    console.log("newtest############# cohortData", cohortData)
-    console.log("newtest############# isFromCenterDetailPage", isFromCenterDetailPage)
     const fetchFacilitators = async () => {
-      const cohortId = cohortData;
-      const page = 0;
-      const filters = {
-        cohortId: cohortId,
-        role: Role.TEACHER,
-        status: [Status.ACTIVE],
-      };
-      const facilitatorResponse = await fetchCohortMemberList({
-        page,
-        filters,
-      });
-      if (facilitatorResponse?.result?.userDetails) {
-        let facilitatorList = facilitatorResponse.result.userDetails;
+        const bodyPayload = {
+          limit: 100,
+          offset: 0,
+          role: [Role.TEACHER],
+          tenantStatus: [Status.ACTIVE],
+          filters: {
+            batch: [cohortData],
+            status: [Status.ACTIVE],
+          },
+          customfields: [
+            'state',
+            'district',
+            'block',
+            'village',
+            'main_subject',
+            'subject_taught',
+          ],
+          sort: [
+            "firstName",
+            "asc"
+          ]
+        };
+        // const test = isMobile ? infinitePage : page
+        const resp = await HierarchicalSearchUserList(bodyPayload);
+        // const resp = await queryClient.fetchQuery({
+        //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
+        //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
+        //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
+        // });
+
+      if (resp?.getUserDetails) {
+        let facilitatorList = resp?.getUserDetails;
         if (!facilitatorList || facilitatorList?.length === 0) {
           console.log('No users found.');
           return;
         }
-        const userIds = facilitatorList?.map((user: any) => user.userId);
-
-        const cohortDetailsPromises = userIds.map((userId: string) =>
-          queryClient.fetchQuery({
-            queryKey: [QueryKeys.MY_COHORTS, userId],
-            queryFn: () => getCohortList(userId, { customField: 'true' }),
-          })
-        );
-
-        const cohortDetailsResults = await Promise.allSettled(
-          cohortDetailsPromises
-        );
-
-        const cohortDetails = cohortDetailsResults.map((result) => {
-          if (result.status === 'fulfilled') {
-            return result.value;
-          } else {
-            console.error(
-              'Error fetching cohort details for a user:',
-              result.reason
-            );
-            return null; // or handle the error as needed
-          }
-        });
-
+        
         const extractedData = facilitatorList?.map(
           (user: any, index: number) => {
-            const cohorts = cohortDetails[index] || [];
-
-            const batches = cohorts.flatMap((cohort: any) =>
-              (cohort.childData || []).filter(
-                (child: any) => child.type === 'BATCH'
-              )
-            );
-
-            const batchNames = cohorts
+            // Extract batch names from cohortData
+            const batchNames = (user?.cohortData || [])
               .filter(
                 (item: any) =>
-                  item.type === 'BATCH' && item.cohortStatus === 'active'
+                  item.batchStatus === 'active' &&
+                  item.cohortMember?.status === 'active' &&
+                  item.centerStatus === 'active'
               )
-              .map((item: any) => item.cohortName);
+              .map((item: any) => toPascalCase(item.batchName));
 
-            const cohortNames = cohorts
-              .filter(({ cohortStatus }: any) => cohortStatus === Status.ACTIVE)
-              .map(({ cohortName }: any) => toPascalCase(cohortName))
+            // Extract unique center names based on centerId where centerStatus is active
+            const uniqueCentersMap = new Map<string, string>();
+            (user?.cohortData || [])
+              .filter((item: any) => item.centerStatus === 'active' && item.cohortMember?.status === 'active' && item.batchStatus === 'active')
+              .forEach((item: any) => {
+                if (!uniqueCentersMap.has(item.centerId)) {
+                  uniqueCentersMap.set(item.centerId, item.centerName);
+                }
+              });
+
+            const cohortNames = Array.from(uniqueCentersMap.values())
+              .map((centerName: string) => toPascalCase(centerName))
               .join(', ');
 
             return {
@@ -597,17 +587,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 getUserFullName({
                   firstName: user?.firstName,
                   lastName: user?.lastName,
-                  // name: user?.name,
+                  name: user?.name,
                 })
               ),
               cohortNames: cohortNames || null,
               batchNames: batchNames || null,
-              customFields: user?.customField,
-              cohorts: cohorts,
+              customFields: user?.customfield,
+              cohorts: user?.cohortData,
             };
           }
         );
-        console.log('##############ddffdfdf extractedData', extractedData);
+
         setFilteredUsers(extractedData);
       }
     };
@@ -656,7 +646,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         };
         // const test = isMobile ? infinitePage : page
         const resp = await HierarchicalSearchUserList(bodyPayload);
-        console.log("newtest############# resp", resp)
         // const resp = await queryClient.fetchQuery({
         //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
         //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
@@ -716,7 +705,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           }
         );
 
-        console.log('##############ddffdfdf extractedData', extractedData);
         setUsers(extractedData);
         setLoading(false);
         if (isMobile) {
@@ -741,15 +729,16 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         setLoading(false);
       }
     };
+    if(isFromCenterDetailPage===false){
     if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
-      console.log("newtest############# mySelectedBatchIds", mySelectedBatchIds)
       getFacilitator();
     } else {
       setUsers([]);
       setFilteredUsers([]);
       setInfiniteData([]);
     }
-  }, [mySelectedBatchIds, offset]);
+  }
+  }, [mySelectedBatchIds, offset, isFacilitatorAdded]);
 
   const handleClose = () => {
     setOpen(false);
@@ -877,9 +866,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const geographicalData = response?.data?.result || [];
 
       // Transform geographicalData into centerList
-      const centerList = [];
+      let centerList = [];
       const batchList = [];
       const centerIdArray = [];
+
 
       geographicalData.forEach((state) => {
         state.districts?.forEach((district) => {
@@ -930,6 +920,16 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           });
         });
       });
+
+      // Remove duplicates from centerList based on value field
+      const uniqueCenterMap = new Map();
+      centerList.forEach((center) => {
+        if (!uniqueCenterMap.has(center.value)) {
+          uniqueCenterMap.set(center.value, center);
+        }
+      });
+      centerList = Array.from(uniqueCenterMap.values());
+
       setSelectedCenterIdReassign(
         centerIdArray.length > 0 ? centerIdArray : null
       );
@@ -1119,8 +1119,15 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const newSet = new Set(prev);
       if (newSet.has(userId)) {
         newSet.delete(userId);
+        // When collapsing, let the ref callback check if it's still truncated
       } else {
         newSet.add(userId);
+        // When expanding, remove from truncated set since it's now fully visible
+        setTruncatedBatchNames((prevTruncated) => {
+          const newTruncatedSet = new Set(prevTruncated);
+          newTruncatedSet.delete(userId);
+          return newTruncatedSet;
+        });
       }
       return newSet;
     });
@@ -1541,6 +1548,33 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               }}
                                             >
                                               <Box
+                                                ref={(el: HTMLElement | null) => {
+                                                  if (!el) return;
+
+                                                  // Use requestAnimationFrame to ensure styles are applied
+                                                  requestAnimationFrame(() => {
+                                                    if (!expandedBatchNames.has(user.userId)) {
+                                                      // Check if content is actually truncated
+                                                      const isTruncated = el.scrollHeight > el.clientHeight;
+                                                      setTruncatedBatchNames((prev) => {
+                                                        const newSet = new Set(prev);
+                                                        if (isTruncated) {
+                                                          newSet.add(user.userId);
+                                                        } else {
+                                                          newSet.delete(user.userId);
+                                                        }
+                                                        return newSet;
+                                                      });
+                                                    } else {
+                                                      // When expanded, remove from truncated set
+                                                      setTruncatedBatchNames((prev) => {
+                                                        const newSet = new Set(prev);
+                                                        newSet.delete(user.userId);
+                                                        return newSet;
+                                                      });
+                                                    }
+                                                  });
+                                                }}
                                                 sx={{
                                                   display: '-webkit-box',
                                                   WebkitLineClamp: expandedBatchNames.has(user.userId) ? 'none' : 4,
@@ -1557,26 +1591,21 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               </Box>
                                               {user?.batchNames?.length > 0 &&
                                                 getBatchNames(user.batchNames) &&
-                                                (() => {
-                                                  const batchText = getBatchNames(user.batchNames);
-                                                  // Show "Show more" if text is likely to exceed 4 lines (~100 chars at 12px font)
-                                                  const needsExpansion = batchText.length > 100;
-                                                  return needsExpansion && (
-                                                    <Typography
-                                                      onClick={() => toggleBatchNamesExpanded(user.userId)}
-                                                      sx={{
-                                                        fontSize: '11px',
-                                                        fontWeight: '600',
-                                                        color: theme.palette.secondary.main,
-                                                        cursor: 'pointer',
-                                                        marginTop: '4px',
-                                                        textDecoration: 'underline',
-                                                      }}
-                                                    >
-                                                      {expandedBatchNames.has(user.userId) ? 'Show less' : 'Show more'}
-                                                    </Typography>
-                                                  );
-                                                })()}
+                                                truncatedBatchNames.has(user.userId) && (
+                                                  <Typography
+                                                    onClick={() => toggleBatchNamesExpanded(user.userId)}
+                                                    sx={{
+                                                      fontSize: '11px',
+                                                      fontWeight: '600',
+                                                      color: theme.palette.secondary.main,
+                                                      cursor: 'pointer',
+                                                      marginTop: '4px',
+                                                      textDecoration: 'underline',
+                                                    }}
+                                                  >
+                                                    {expandedBatchNames.has(user.userId) ? 'Show less' : 'Show more'}
+                                                  </Typography>
+                                                )}
                                             </Box>
                                           </Box>
                                         </Box>
@@ -1875,16 +1904,13 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                         value={selectedCenterIdReassign}
                         onChange={(centerId) => {
                           setSelectedCenterIdReassign(centerId);
-                          console.log('Selected Center ID:', centerId);
                         }}
                         onCenterList={(centerList) => {
                           setSelectedCenterListReassign(centerList || []);
-                          console.log('############# centerList', centerList);
                         }}
                         selectedCenterList={selectedCenterListReassign}
                         onBatchList={(batchList) => {
                           setSelectedBatchListReassign(batchList || []);
-                          console.log('############# batchList', batchList);
                         }}
                         selectedBatchList={selectedBatchListReassign}
                         label="Select Batch"
@@ -1908,9 +1934,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           //map user to tenant
                           // Extract all batch IDs from the nested structure
                           const batchIds = extractBatchIds(selectedCenterIdReassign);
-
-                          console.log('Creating with User ID:', selectedUserIdReassign);
-                          console.log('Extracted Batch IDs:', batchIds);
 
                           if (batchIds.length === 0) {
                             showToastMessage(
@@ -1950,7 +1973,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             setSelectedBatchListReassign(null);
                             setSelectedUserIdReassign(null);
                             // Refresh the data
-                            searchData(prefilledFormData, 0);
+                            setIsFacilitatorAdded((prev) => !prev);
                           } else {
                             showToastMessage(
                               response?.data?.params?.errmsg ||
@@ -2116,10 +2139,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     <EmailSearchUser
                       onUserSelected={(userId) => {
                         setSelectedUserId(userId || null);
-                        console.log('Selected User ID:', userId);
                       }}
                       onUserDetails={(userDetails) => {
-                        console.log('############# userDetails', userDetails);
                         setUserDetails(userDetails);
                         setFormStep(1);
                       }}
@@ -2141,16 +2162,13 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                       value={selectedCenterId}
                       onChange={(centerId) => {
                         setSelectedCenterId(centerId);
-                        console.log('Selected Center ID:', centerId);
                       }}
                       onCenterList={(centerList) => {
                         setSelectedCenterList(centerList || []);
-                        console.log('############# centerList', centerList);
                       }}
                       selectedCenterList={selectedCenterList}
                       onBatchList={(batchList) => {
                         setSelectedBatchList(batchList || []);
-                        console.log('############# batchList', batchList);
                       }}
                       selectedBatchList={selectedBatchList}
                       label={t('COMMON.SELECT_CENTER')}
@@ -2210,10 +2228,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                             customField: customFields,
                             userData: userData,
                           });
-                          console.log(
-                            '######### updatedResponse',
-                            updateUserResponse
-                          );
 
                           if (
                             updateUserResponse &&
@@ -2228,12 +2242,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
                             // Extract all batch IDs from the nested structure
                             const batchIds = extractBatchIds(selectedCenterId);
-
-                            console.log(
-                              'Creating with User ID:',
-                              selectedUserId
-                            );
-                            console.log('Extracted Batch IDs:', batchIds);
 
                             if (batchIds.length === 0) {
                               showToastMessage(
