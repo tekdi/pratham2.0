@@ -122,7 +122,7 @@ const Centers = () => {
         'district',
         'block',
         'village',
-        'catchment_area',
+        // 'catchment_area',
       ];
       if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
