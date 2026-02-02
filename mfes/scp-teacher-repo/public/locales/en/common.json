@@ -189,7 +189,8 @@
     "NEXT": "Next",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "Please select at least one batch",
     "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
-    "PLEASE_SELECT_CENTER": "Please select a center"
+    "PLEASE_SELECT_CENTER": "Please select a center",
+    "MAP_NEW": "Map New"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

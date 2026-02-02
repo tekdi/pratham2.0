@@ -1237,7 +1237,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                       onClick={handleOpenAddFaciModal}
                       endIcon={<AddIcon />}
                     >
-                      {t('COMMON.MAP')}
+                      {t('COMMON.MAP_NEW')}
                     </Button>
                     {myCenterList && myCenterList.length > 0 && (
                       <Box sx={{ flex: '1 1 auto', minWidth: '200px' }}>
