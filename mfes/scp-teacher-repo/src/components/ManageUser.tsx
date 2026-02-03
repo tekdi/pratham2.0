@@ -266,9 +266,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         };
 
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/mycohorts/${userId}?customField=true&children=true`;
-        
+
         const response = await axios.get(apiUrl, { headers });
-        
+
 
         // Extract centers from response
         // Response structure: response.data.result is an array of cohorts
@@ -518,35 +518,35 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   useEffect(() => {
     const fetchFacilitators = async () => {
-        const bodyPayload = {
-          limit: 100,
-          offset: 0,
-          role: [Role.TEACHER],
-          tenantStatus: [Status.ACTIVE],
-          filters: {
-            batch: [cohortData],
-            status: [Status.ACTIVE],
-          },
-          customfields: [
-            'state',
-            'district',
-            'block',
-            'village',
-            'main_subject',
-            'subject_taught',
-          ],
-          sort: [
-            "firstName",
-            "asc"
-          ]
-        };
-        // const test = isMobile ? infinitePage : page
-        const resp = await HierarchicalSearchUserList(bodyPayload);
-        // const resp = await queryClient.fetchQuery({
-        //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
-        //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
-        //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
-        // });
+      const bodyPayload = {
+        limit: 100,
+        offset: 0,
+        role: [Role.TEACHER],
+        tenantStatus: [Status.ACTIVE],
+        filters: {
+          batch: [cohortData],
+          status: [Status.ACTIVE],
+        },
+        customfields: [
+          'state',
+          'district',
+          'block',
+          'village',
+          'main_subject',
+          'subject_taught',
+        ],
+        sort: [
+          "firstName",
+          "asc"
+        ]
+      };
+      // const test = isMobile ? infinitePage : page
+      const resp = await HierarchicalSearchUserList(bodyPayload);
+      // const resp = await queryClient.fetchQuery({
+      //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
+      //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
+      //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
+      // });
 
       if (resp?.getUserDetails) {
         let facilitatorList = resp?.getUserDetails;
@@ -554,7 +554,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           console.log('No users found.');
           return;
         }
-        
+
         const extractedData = facilitatorList?.map(
           (user: any, index: number) => {
             // Extract batch names from cohortData
@@ -729,15 +729,15 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         setLoading(false);
       }
     };
-    if(isFromCenterDetailPage===false){
-    if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
-      getFacilitator();
-    } else {
-      setUsers([]);
-      setFilteredUsers([]);
-      setInfiniteData([]);
+    if (isFromCenterDetailPage === false) {
+      if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
+        getFacilitator();
+      } else {
+        setUsers([]);
+        setFilteredUsers([]);
+        setInfiniteData([]);
+      }
     }
-  }
   }, [mySelectedBatchIds, offset, isFacilitatorAdded]);
 
   const handleClose = () => {
@@ -1119,15 +1119,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const newSet = new Set(prev);
       if (newSet.has(userId)) {
         newSet.delete(userId);
-        // When collapsing, let the ref callback check if it's still truncated
+        // When collapsing, keep it in truncated set so "Show more" can appear again
       } else {
         newSet.add(userId);
-        // When expanding, remove from truncated set since it's now fully visible
-        setTruncatedBatchNames((prevTruncated) => {
-          const newTruncatedSet = new Set(prevTruncated);
-          newTruncatedSet.delete(userId);
-          return newTruncatedSet;
-        });
+        // When expanding, keep it in truncated set so "Show less" can appear
+        // The truncated set tracks items that were originally truncated
       }
       return newSet;
     });
@@ -1490,6 +1486,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                         sx={{
                                           cursor: 'pointer',
                                           height: '100%',
+                                          position: 'relative',
                                           '@media (min-width: 600px)': {
                                             border: `1px solid  ${theme.palette.action.selected}`,
                                             padding: '4px 10px',
@@ -1499,6 +1496,32 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                           },
                                         }}
                                       >
+                                        <Box
+                                          sx={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            zIndex: 1,
+                                          }}
+                                        >
+                                          <MoreVertIcon
+                                            onClick={(event) => {
+                                              isMobile
+                                                ? toggleDrawer(
+                                                  'bottom',
+                                                  true,
+                                                  user
+                                                )(event)
+                                                : handleMenuOpen(event, user);
+                                            }}
+                                            sx={{
+                                              fontSize: '24px',
+                                              color:
+                                                theme.palette.warning['300'],
+                                              cursor: 'pointer',
+                                            }}
+                                          />
+                                        </Box>
                                         <Box
                                           display="flex"
                                           alignItems="flex-start"
@@ -1554,7 +1577,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                   // Use requestAnimationFrame to ensure styles are applied
                                                   requestAnimationFrame(() => {
                                                     if (!expandedBatchNames.has(user.userId)) {
-                                                      // Check if content is actually truncated
+                                                      // Check if content is actually truncated when collapsed
                                                       const isTruncated = el.scrollHeight > el.clientHeight;
                                                       setTruncatedBatchNames((prev) => {
                                                         const newSet = new Set(prev);
@@ -1565,14 +1588,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                         }
                                                         return newSet;
                                                       });
-                                                    } else {
-                                                      // When expanded, remove from truncated set
-                                                      setTruncatedBatchNames((prev) => {
-                                                        const newSet = new Set(prev);
-                                                        newSet.delete(user.userId);
-                                                        return newSet;
-                                                      });
                                                     }
+                                                    // When expanded, keep it in truncated set so "Show less" button remains visible
                                                   });
                                                 }}
                                                 sx={{
@@ -1591,7 +1608,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               </Box>
                                               {user?.batchNames?.length > 0 &&
                                                 getBatchNames(user.batchNames) &&
-                                                truncatedBatchNames.has(user.userId) && (
+                                                (truncatedBatchNames.has(user.userId) || expandedBatchNames.has(user.userId)) && (
                                                   <Typography
                                                     onClick={() => toggleBatchNamesExpanded(user.userId)}
                                                     sx={{
@@ -1608,26 +1625,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                 )}
                                             </Box>
                                           </Box>
-                                        </Box>
-                                        <Box sx={{ alignSelf: 'flex-end' }}>
-                                          <MoreVertIcon
-                                            onClick={(event) => {
-                                              isMobile
-                                                ? toggleDrawer(
-                                                  'bottom',
-                                                  true,
-                                                  user
-                                                )(event)
-                                                : handleMenuOpen(event, user);
-                                            }}
-                                            sx={{
-                                              fontSize: '24px',
-                                              marginTop: '1rem',
-                                              color:
-                                                theme.palette.warning['300'],
-                                              cursor: 'pointer',
-                                            }}
-                                          />
                                         </Box>
                                       </Box>
                                     </Grid>
