@@ -186,7 +186,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         
         // Construct the proper registration link
         // Format: https://domain/registration?tenantId=Pratham&enroll=Second%20Chance%20Program
-        const registrationLink = `${registrationBase}/&enroll=${encodeURIComponent(enroll)}`;
+        const registrationLink = `${registrationBase}&enroll=${encodeURIComponent(enroll)}`;
 
         // Copy to clipboard
         await navigator.clipboard.writeText(registrationLink);
