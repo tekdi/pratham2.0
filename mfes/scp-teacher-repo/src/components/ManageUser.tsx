@@ -22,7 +22,7 @@ import ConfirmationModal from '@/components/ConfirmationModal';
 import ManageCentersModal from '@/components/ManageCentersModal';
 import ManageUsersModal from '@/components/ManageUsersModal';
 import { showToastMessage } from '@/components/Toastify';
-import { cohortList, getCohortList } from '@/services/CohortServices';
+import { cohortList } from '@/services/CohortServices';
 import {
   getMyCohortFacilitatorList,
   getMyUserList,
@@ -58,7 +58,6 @@ import { setTimeout } from 'timers';
 import { useDirection } from '../hooks/useDirection';
 import manageUserStore from '../store/manageUserStore';
 import CustomPagination from './CustomPagination';
-import DeleteUserModal from './DeleteUserModal';
 import Loader from './Loader';
 import ReassignModal from './ReassignModal';
 import SearchBar from './Searchbar';
@@ -77,6 +76,9 @@ import { splitUserData } from '@/components/DynamicForm/DynamicFormCallback';
 import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
 import { enhanceUiSchemaWithGrid } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { HierarchicalSearchUserList } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
+import ConfirmationPopup from '@/components/ConfirmationPopup';
+import DeleteDetails from '@/components/DeleteDetails';
 
 interface Cohort {
   cohortId: string;
@@ -160,13 +162,18 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [reassignModalOpen, setReassignModalOpen] =
     React.useState<boolean>(false);
 
-  const [openDeleteUserModal, setOpenDeleteUserModal] = React.useState(false);
   const [isFacilitatorAdded, setIsFacilitatorAdded] = React.useState(false);
-  const [openRemoveUserModal, setOpenRemoveUserModal] = React.useState(false);
-  const [removeCohortNames, setRemoveCohortNames] = React.useState('');
   const [reassignCohortNames, setReassignCohortNames] = React.useState('');
   const [userId, setUserId] = React.useState('');
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Admin-style delete confirmation (parity with admin-app)
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false);
+  const [deleteChecked, setDeleteChecked] = useState(false);
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deleteCenters, setDeleteCenters] = useState<string>('-');
+  const [deleteFirstName, setDeleteFirstName] = useState('');
+  const [deleteLastName, setDeleteLastName] = useState('');
   const CustomLink = styled(Link)(({ theme }) => ({
     textDecoration: 'underline',
     textDecorationColor: theme?.palette?.secondary.main,
@@ -583,6 +590,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
             return {
               userId: user?.userId,
+              firstName: user?.firstName,
+              lastName: user?.lastName,
               name: toPascalCase(
                 getUserFullName({
                   firstName: user?.firstName,
@@ -690,6 +699,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
             return {
               userId: user?.userId,
+              firstName: user?.firstName,
+              lastName: user?.lastName,
               name: toPascalCase(
                 getUserFullName({
                   firstName: user?.firstName,
@@ -747,7 +758,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const handleCloseModal = () => {
     setConfirmationModalOpen(false);
-    setOpenDeleteUserModal(false);
     setState({ ...state, bottom: false });
   };
 
@@ -755,8 +765,13 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     setReassignModalOpen(false);
   };
 
-  const handleCloseRemoveModal = () => {
-    setOpenRemoveUserModal(false);
+  const handleCloseDeleteConfirmation = () => {
+    setOpenDeleteConfirmation(false);
+    setDeleteChecked(false);
+    setDeleteReason('');
+    setDeleteCenters('-');
+    setDeleteFirstName('');
+    setDeleteLastName('');
   };
 
   const toggleDrawer =
@@ -785,50 +800,61 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
     if (name === 'delete-User') {
-      const userId = isFromFLProfile ? teacherUserId : store?.deleteId;
-      setUserId(userId);
+      const resolvedUserId = isFromFLProfile ? teacherUserId : store?.deleteId;
+      setUserId(resolvedUserId);
 
-      const cohortList = await getCohortList(userId);
+      // Build centers string from selected user's cohorts (same semantics as admin)
+      const activeCohorts = (selectedUser?.cohorts || []).filter(
+        (item: any) =>
+          item?.cohortMember?.status === 'active' &&
+          item?.centerStatus === 'active' &&
+          item?.batchStatus === 'active'
+      );
 
-      const hasActiveCohorts =
-        cohortList &&
-        cohortList.length > 0 &&
-        cohortList.some(
-          (cohort: { cohortStatus: string }) =>
-            cohort.cohortStatus === Status.ACTIVE
-        );
+      const uniqueCentersMap = new Map<string, string>();
+      activeCohorts.forEach((item: any) => {
+        if (
+          item?.centerId &&
+          item?.centerName &&
+          !uniqueCentersMap.has(item.centerId)
+        ) {
+          uniqueCentersMap.set(item.centerId, item.centerName);
+        }
+      });
 
-      if (hasActiveCohorts) {
-        const cohortNames = cohortList
-          .filter(
-            (cohort: { cohortStatus: string }) =>
-              cohort.cohortStatus === Status.ACTIVE
-          )
-          .map((cohort: { cohortName: string }) => cohort.cohortName)
-          .join(', ');
+      const centersString =
+        uniqueCentersMap.size > 0
+          ? Array.from(uniqueCentersMap.values())
+              .map((c: string) => toPascalCase(c))
+              .join(', ')
+          : '-';
 
-        setOpenRemoveUserModal(true);
-        setRemoveCohortNames(cohortNames);
+      setDeleteCenters(centersString);
+      const fallbackFullName = String(selectedUser?.name || '').trim();
+      const nameParts = fallbackFullName ? fallbackFullName.split(/\s+/) : [];
+      const fallbackFirst = nameParts[0] || '';
+      const fallbackLast = nameParts.slice(1).join(' ');
 
-        const telemetryInteract = {
-          context: {
-            env: 'teaching-center',
-            cdata: [],
-          },
-          edata: {
-            id: 'click-on-delete-user:' + userId,
-            type: Telemetry.CLICK,
-            subtype: '',
-            pageid: 'centers',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
-      } else {
-        console.log(
-          'User does not belong to any cohorts, proceed with deletion'
-        );
-        setOpenDeleteUserModal(true);
-      }
+      setDeleteFirstName(selectedUser?.firstName || fallbackFirst);
+      setDeleteLastName(selectedUser?.lastName || fallbackLast);
+      setDeleteChecked(false);
+      setDeleteReason('');
+      setOpenDeleteConfirmation(true);
+      setState({ ...state, bottom: false });
+
+      const telemetryInteract = {
+        context: {
+          env: 'teaching-center',
+          cdata: [],
+        },
+        edata: {
+          id: 'click-on-delete-user:' + resolvedUserId,
+          type: Telemetry.CLICK,
+          subtype: '',
+          pageid: 'centers',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
     }
     if (name === 'reassign-block') {
       //TODO: Add reassign logic here
@@ -2035,37 +2061,64 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
             )}
 
-            {openDeleteUserModal && (
-              <DeleteUserModal
-                type={Role.TEACHER}
-                userId={userId}
-                open={openDeleteUserModal}
-                onClose={handleCloseModal}
-                onUserDelete={handleDeleteUser}
-                reloadState={reloadState}
-                setReloadState={setReloadState}
-              />
-            )}
+            <ConfirmationPopup
+              checked={deleteChecked}
+              open={openDeleteConfirmation}
+              onClose={handleCloseDeleteConfirmation}
+              title={t('COMMON.DELETE_USER')}
+              primary={t('COMMON.DELETE_USER_WITH_REASON')}
+              secondary={t('COMMON.CANCEL')}
+              reason={deleteReason}
+              onClickPrimary={async () => {
+                try {
+                  const tenantId = localStorage.getItem('tenantId') || '';
+                  if (!tenantId) {
+                    showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+                    return;
+                  }
 
-            {openRemoveUserModal && (
-              <SimpleModal
-                primaryText={t('COMMON.OK')}
-                primaryActionHandler={handleCloseRemoveModal}
-                open={openRemoveUserModal}
-                onClose={handleCloseRemoveModal}
-                modalTitle={t('COMMON.DELETE_USER')}
-              >
-                {' '}
-                <Box mt={1.5} mb={1.5}>
-                  <Typography>
-                    {t('CENTERS.THE_USER_BELONGS_TO_THE_FOLLOWING_COHORT')}{' '}
-                    <strong>{toPascalCase(removeCohortNames)}</strong>
-                    <br />
-                    {t('CENTERS.PLEASE_REMOVE_THE_USER_FROM_COHORT')}
-                  </Typography>
-                </Box>
-              </SimpleModal>
-            )}
+                  const resp = await deleteUser({
+                    userId: userId,
+                    roleId: RoleId.TEACHER,
+                    tenantId,
+                    reason: deleteReason,
+                  });
+
+                  if (resp?.responseCode === 200) {
+                    showToastMessage(
+                      t('COMMON.USER_DELETED_PERMANENTLY'),
+                      'success'
+                    );
+                    setIsFacilitatorAdded((prev) => !prev);
+                    handleCloseDeleteConfirmation();
+                  } else {
+                    showToastMessage(
+                      resp?.params?.errmsg || t('COMMON.SOMETHING_WENT_WRONG'),
+                      'error'
+                    );
+                  }
+                } catch (error: any) {
+                  showToastMessage(
+                    error?.response?.data?.params?.errmsg ||
+                      t('COMMON.SOMETHING_WENT_WRONG'),
+                    'error'
+                  );
+                }
+              }}
+            >
+              <DeleteDetails
+                firstName={deleteFirstName || selectedUser?.firstName || ''}
+                lastName={deleteLastName || selectedUser?.lastName || ''}
+                village={''}
+                center={deleteCenters}
+                checked={deleteChecked}
+                setChecked={setDeleteChecked}
+                reason={deleteReason}
+                setReason={setDeleteReason}
+                isForFacilitator={true}
+                customLabel={t('COMMON.DELETE_FROM_BATCH_WARNING')}
+              />
+            </ConfirmationPopup>
             {/* Map Facilitator Modal Dialog */}
             <Dialog
               open={mapModalOpen}
