@@ -172,7 +172,9 @@
     "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
     "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found",
     "NEXT": "Next",
-    "MAP_NEW": "Map New"
+    "MAP_NEW": "Map New",
+    "COPY_REGISTRATION_LINK": "Copy Registration Link",
+    "LINK_COPIED": "Link Copied!"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

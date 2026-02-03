@@ -193,7 +193,9 @@
     "MAP_NEW": "Map New",
     "RESIGNED_FROM_COMPANY": "Resigned from Company",
     "MOVED_TO_DIFFERENT_ROLE": "Moved to Different Role",
-    "DELETE_FROM_BATCH_WARNING": "I confirm I want to remove this user from batches as well"
+    "DELETE_FROM_BATCH_WARNING": "I confirm I want to remove this user from batches as well",
+    "COPY_REGISTRATION_LINK": "Copy Registration Link",
+    "REGISTRATION_LINK_COPIED":"Registration link copied!\nShare this link with learners for program registration."
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
