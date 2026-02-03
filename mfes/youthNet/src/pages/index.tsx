@@ -50,6 +50,8 @@ const Index = () => {
   const [vilmodalOpen, setVilModalOpen] = useState<boolean>(false);
   const [userData, setUserData] = useState<any>([]);
   const [selectedMentorId, setSelectedMentorId] = useState<any>('');
+  const [centerOptions, setCenterOptions] = useState<any>([]);
+  const [selectedCenterId, setSelectedCenterId] = useState<string>('');
   const [cohortDataLoaded, setCohortDataLoaded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -64,6 +66,23 @@ const Index = () => {
               cohort.cohortStatus?.toLowerCase() === 'active' &&
               cohort.cohortMemberStatus?.toLowerCase() === 'active'
           );
+
+          const centerOptionsFromResponse = cohortDataArray
+            .filter(
+              (cohort: any) =>
+                (cohort.type === 'CENTER' || cohort.type === 'COHORT') &&
+                cohort.cohortId
+            )
+            .reduce((acc: any[], cohort: any) => {
+              const id = cohort.cohortId;
+              if (acc.some((c) => c.id === id)) return acc;
+              acc.push({
+                id,
+                name: cohort.cohortName || cohort.name || id,
+              });
+              return acc;
+            }, []);
+          setCenterOptions(centerOptionsFromResponse);
 
           if (cohortDataArray.length > 0) {
             localStorage.setItem('cohortData', JSON.stringify(cohortDataArray));
@@ -84,6 +103,7 @@ const Index = () => {
                 'workingLocationCenterId',
                 centerCohort.cohortId
               );
+              setSelectedCenterId(centerCohort.cohortId);
             } else {
               // Fallback: use first cohort with cohortId if no center found
               const firstCohort = cohortDataArray.find(
@@ -94,6 +114,7 @@ const Index = () => {
                   'workingLocationCenterId',
                   firstCohort.cohortId
                 );
+                setSelectedCenterId(firstCohort.cohortId);
               }
             }
           }
@@ -118,10 +139,9 @@ const Index = () => {
     getSurveyData();
   }, []);
 
-  const getMobilizersList = async () => {
-    const workingLocationCenterId = localStorage.getItem(
-      'workingLocationCenterId'
-    );
+  const getMobilizersList = async (centerId?: string) => {
+    const workingLocationCenterId =
+      centerId || localStorage.getItem('workingLocationCenterId');
 
     if (workingLocationCenterId) {
       const response = await fetchCohortMemberList({
@@ -154,10 +174,14 @@ const Index = () => {
     router.push(`/user-profile/${userId}`);
   };
   useEffect(() => {
-    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && cohortDataLoaded) {
-      getMobilizersList();
+    if (
+      YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() &&
+      cohortDataLoaded &&
+      selectedCenterId
+    ) {
+      getMobilizersList(selectedCenterId);
     }
-  }, [cohortDataLoaded]);
+  }, [cohortDataLoaded, selectedCenterId]);
   useEffect(() => {
     const getYouthData = async (userId: any) => {
       try {
@@ -316,29 +340,68 @@ const Index = () => {
             mt: '15px',
           }}
         >
-          {userData && userData?.length > 0 ? (
-            <Dropdown
-              name={t('MOBILIZER.MOBILIZER')}
-              values={userData}
-              defaultValue={userData?.[0]?.id}
-              onSelect={(value) => {
-                localStorage.setItem('selectedMentoruserId', value);
-                localStorage.setItem('selectedMentorId', value);
-                localStorage.setItem('selectedMentorData', JSON.stringify(userData.find((user: any) => user.id === value)));
-                setSelectedMentorId(value);
-              }}
-            />
-          ) : (
-            <Typography
-              sx={{
-                mt: 1,
-                color: 'text.secondary',
-                fontSize: '16px',
-              }}
-            >
-              {t('MOBILIZER.NO_MOBILIZER_FOUND') || 'No mobilizer found'}
-            </Typography>
-          )}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6} lg={6}>
+              {centerOptions && centerOptions?.length > 0 ? (
+                <Dropdown
+                  name={t('COMMON.CENTER')}
+                  values={centerOptions}
+                  defaultValue={selectedCenterId || centerOptions?.[0]?.id}
+                  onSelect={(value) => {
+                    if (value === selectedCenterId) return;
+                    localStorage.setItem('workingLocationCenterId', value);
+                    setSelectedCenterId(value);
+                    setUserData([]);
+                    setSelectedMentorId('');
+                    localStorage.setItem('selectedMentoruserId', '');
+                    localStorage.setItem('selectedMentorId', '');
+                    localStorage.setItem('selectedMentorData', '');
+                  }}
+                />
+              ) : (
+                <Typography
+                  sx={{
+                    mt: 1,
+                    color: 'text.secondary',
+                    fontSize: '16px',
+                  }}
+                >
+                  {t('COMMON.NO_CENTER_FOUND') || 'No Center found'}
+                </Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={12} md={6} lg={6}>
+              {userData && userData?.length > 0 ? (
+                <Dropdown
+                  name={t('MOBILIZER.MOBILIZER')}
+                  values={userData}
+                  defaultValue={selectedMentorId || userData?.[0]?.id}
+                  onSelect={(value) => {
+                    localStorage.setItem('selectedMentoruserId', value);
+                    localStorage.setItem('selectedMentorId', value);
+                    localStorage.setItem(
+                      'selectedMentorData',
+                      JSON.stringify(
+                        userData.find((user: any) => user.id === value)
+                      )
+                    );
+                    setSelectedMentorId(value);
+                  }}
+                />
+              ) : (
+                <Typography
+                  sx={{
+                    mt: 1,
+                    color: 'text.secondary',
+                    fontSize: '16px',
+                  }}
+                >
+                  {t('MOBILIZER.NO_MOBILIZER_FOUND') || 'No mobilizer found'}
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
         </Box>
       )}
       <Box ml={2}>

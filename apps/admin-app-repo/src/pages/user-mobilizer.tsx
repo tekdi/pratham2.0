@@ -109,6 +109,21 @@ const Mobilizer = () => {
   const [loadingCenters, setLoadingCenters] = useState(false);
   const [workingVillageId, setWorkingVillageId] = useState('');
   const [workingLocationId, setWorkingLocationId] = useState('');
+  // Restore/reactivate (single center + villages)
+  const [restoreCentersForWidget, setRestoreCentersForWidget] = useState<
+    Array<{ id: string; name: string; cohortMembershipId?: string }>
+  >([]);
+  const [restoreCenterIdToMembershipId, setRestoreCenterIdToMembershipId] =
+    useState<Record<string, string>>({});
+  const [restoreSelectedCenterId, setRestoreSelectedCenterId] =
+    useState<string>('');
+  const [restoreSelectedVillagesSet, setRestoreSelectedVillagesSet] = useState<
+    Set<string>
+  >(new Set());
+  const [restoreVillagesByBlockData, setRestoreVillagesByBlockData] = useState<
+    Record<string, any[]>
+  >({});
+  const [isRestoreInProgress, setIsRestoreInProgress] = useState(false);
   // const [workingVillageValues, setWorkingVillageValues] = useState([]);
 
   const searchStoreKey = 'mobilizer';
@@ -537,73 +552,242 @@ const Mobilizer = () => {
 
   const archiveToactive = async () => {
     try {
-      // Validate that at least one center is selected
-      if (!selectedCenters || selectedCenters.length === 0) {
-        showToastMessage('Please select at least one center', 'error');
+      // Strict sequence restore flow:
+      // 1) user-tenant/status active
+      // 2) cohortmember/update/:membershipId active
+      // 3) user/update (working_location + working_village)
+
+      if (!userID) {
+        showToastMessage('User not selected', 'error');
+        return;
+      }
+      if (!restoreSelectedCenterId) {
+        showToastMessage('Please select a center', 'error');
+        return;
+      }
+      if (restoreSelectedVillagesSet.size === 0) {
+        showToastMessage('Please select at least one village', 'error');
         return;
       }
 
-      // Update cohort member status for each selected center
-      const membershipIds = selectedCenters.map((center) => center.cohortMembershipId);
-      
-      for (const membershipId of membershipIds) {
-        try {
-          const updateResponse = await updateCohortMemberStatus({
-            memberStatus: 'active',
-            membershipId,
-          });
+      const membershipId = restoreCenterIdToMembershipId[restoreSelectedCenterId];
+      if (!membershipId) {
+        showToastMessage('Center membership not found for selected center', 'error');
+        return;
+      }
 
-          if (updateResponse?.responseCode !== 200) {
-            console.error(
-              `Failed to activate user with membershipId ${membershipId}:`,
-              updateResponse
-            );
-            showToastMessage(
-              `Failed to activate center membership ${membershipId}`,
-              'error'
-            );
-            return;
-          } else {
-            console.log(
-              `User with membershipId ${membershipId} successfully activated.`
-            );
-          }
-        } catch (error) {
-          console.error(
-            `Error activating user with membershipId ${membershipId}:`,
-            error
-          );
+      if (!workingLocationId || !workingVillageId) {
+        showToastMessage(
+          'Field IDs not loaded. Please refresh the page and try again.',
+          'error'
+        );
+        return;
+      }
+
+      setIsRestoreInProgress(true);
+      try {
+        // Step 1: Update user tenant status
+        const tenantStatusResp = await updateUserTenantStatus(userID, tenantId, {
+          status: 'active',
+        });
+        if (tenantStatusResp?.responseCode !== 200) {
+          console.error('Failed to activate mobilizer (tenant status):', tenantStatusResp);
           showToastMessage(
-            `Error activating center membership ${membershipId}`,
+            tenantStatusResp?.params?.errmsg || 'Failed to activate user',
             'error'
           );
           return;
         }
-      }
 
-      // After successful center activation, update user status
-      const resp = await updateUserTenantStatus(userID, tenantId, {
-        status: 'active',
-      });
-      
-      if (resp?.responseCode === 200) {
+        // Step 2: Update cohort membership status
+        const cohortMemberResp = await updateCohortMemberStatus({
+          memberStatus: 'active',
+          membershipId,
+        });
+        if (cohortMemberResp?.responseCode !== 200) {
+          console.error('Failed to activate cohort membership:', cohortMemberResp);
+          showToastMessage(
+            cohortMemberResp?.params?.errmsg || 'Failed to activate center membership',
+            'error'
+          );
+          return;
+        }
+
+        // Step 3: Update user working_location + working_village
+        const tenantIdLS = localStorage.getItem('tenantId') || '';
+        const token = localStorage.getItem('token') || '';
+        const academicYearId = localStorage.getItem('academicYearId') || '';
+
+        const headers = {
+          'Content-Type': 'application/json',
+          tenantId: tenantIdLS,
+          Authorization: `Bearer ${token}`,
+          academicyearid: academicYearId,
+        };
+
+        // Fetch selected center to get CATCHMENT_AREA
+        const cohortSearchResp = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+          {
+            limit: 200,
+            offset: 0,
+            filters: {
+              type: 'COHORT',
+              status: ['active'],
+              cohortId: [restoreSelectedCenterId],
+            },
+          },
+          { headers }
+        );
+
+        const cohortDetails =
+          cohortSearchResp?.data?.result?.results?.cohortDetails || [];
+        const selectedCenter = cohortDetails.find(
+          (c: any) => String(c.cohortId) === String(restoreSelectedCenterId)
+        );
+        const catchmentAreaField = selectedCenter?.customFields?.find(
+          (field: any) => field.label === 'CATCHMENT_AREA'
+        );
+        if (!catchmentAreaField?.selectedValues) {
+          showToastMessage(
+            'CATCHMENT_AREA not found for selected center',
+            'error'
+          );
+          return;
+        }
+
+        // Create a map of selected villages by block ID
+        const selectedVillagesByBlock: Record<
+          string,
+          Array<{ id: number; name: string }>
+        > = {};
+        Object.entries(restoreVillagesByBlockData).forEach(
+          ([blockId, villages]: any) => {
+            const selectedInBlock = (villages || []).filter((v: any) =>
+              restoreSelectedVillagesSet.has(v.id)
+            );
+            if (selectedInBlock.length > 0) {
+              selectedVillagesByBlock[blockId] = selectedInBlock.map((v: any) => ({
+                id: Number(v.id),
+                name: v.name,
+              }));
+            }
+          }
+        );
+
+        // Build working location structure from CATCHMENT_AREA
+        const workingLocationStructure: any[] = [];
+        catchmentAreaField.selectedValues.forEach((stateData: any) => {
+          const stateId = Number(stateData.stateId);
+          const stateName = stateData.stateName || '';
+
+          const districts: any[] = [];
+          if (stateData.districts && Array.isArray(stateData.districts)) {
+            stateData.districts.forEach((district: any) => {
+              const districtId = Number(district.districtId);
+              const districtName = district.districtName || '';
+
+              const blocks: any[] = [];
+              if (district.blocks && Array.isArray(district.blocks)) {
+                district.blocks.forEach((block: any) => {
+                  const blockIdStr = String(block.id);
+                  if (
+                    selectedVillagesByBlock[blockIdStr] &&
+                    selectedVillagesByBlock[blockIdStr].length > 0
+                  ) {
+                    blocks.push({
+                      id: Number(block.id),
+                      name: block.name || '',
+                      villages: selectedVillagesByBlock[blockIdStr],
+                    });
+                  }
+                });
+              }
+
+              if (blocks.length > 0) {
+                districts.push({
+                  districtId,
+                  districtName,
+                  blocks,
+                });
+              }
+            });
+          }
+
+          if (districts.length > 0) {
+            workingLocationStructure.push({
+              stateId,
+              stateName,
+              districts,
+            });
+          }
+        });
+
+        if (workingLocationStructure.length === 0) {
+          showToastMessage('Working location could not be built', 'error');
+          return;
+        }
+
+        const villageIds = Array.from(restoreSelectedVillagesSet).map((id) =>
+          String(id)
+        );
+
+        // Fetch current user data to preserve other customFields
+        let existingCustomFields: any[] = [];
+        try {
+          const userResp = await axios.get(
+            `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/user/read/${userID}`,
+            { headers }
+          );
+          const userDetailsResp = userResp?.data?.result;
+          if (userDetailsResp?.customFields) {
+            existingCustomFields = userDetailsResp.customFields;
+          }
+        } catch (fetchError) {
+          console.error('Error fetching user details:', fetchError);
+        }
+
+        const filteredCustomFields = (existingCustomFields || []).filter(
+          (field: any) =>
+            field.fieldId !== workingLocationId && field.fieldId !== workingVillageId
+        );
+        filteredCustomFields.push({
+          fieldId: workingLocationId,
+          value: workingLocationStructure,
+        });
+        filteredCustomFields.push({
+          fieldId: workingVillageId,
+          value: villageIds,
+        });
+
+        const updateUserResp = await updateUser(userID, {
+          userData: {},
+          customFields: filteredCustomFields,
+        });
+        if (updateUserResp?.status !== 200) {
+          console.error('Failed to update user working villages:', updateUserResp);
+          showToastMessage('Failed to update user villages', 'error');
+          return;
+        }
+
         showToastMessage(t('MOBILIZER.ACTIVATE_USER_SUCCESS'), 'success');
-        // Reset state
-        setSelectedCenters([]);
-        setAvailableCenters([]);
         setArchiveToActiveOpen(false);
-        // Refresh the list
+        setRestoreCentersForWidget([]);
+        setRestoreCenterIdToMembershipId({});
+        setRestoreSelectedCenterId('');
+        setRestoreSelectedVillagesSet(new Set());
+        setRestoreVillagesByBlockData({});
         searchData(prefilledFormData, currentPage);
-        console.log('Mobilizer successfully activated.');
-      } else {
-        console.error('Failed to activate mobilizer:', resp);
-        showToastMessage('Failed to activate mobilizer', 'error');
+        console.log('Mobilizer successfully reactivated with villages.');
+        return updateUserResp;
+      } finally {
+        setIsRestoreInProgress(false);
       }
-
-      return resp;
     } catch (error) {
       console.error('Error activating mobilizer:', error);
       showToastMessage('Error activating mobilizer', 'error');
+    } finally {
+      setIsRestoreInProgress(false);
     }
   };
   // Define actions
@@ -733,6 +917,11 @@ const Mobilizer = () => {
         setAvailableCenters([]);
         setLoadingCenters(true);
         setArchiveToActiveOpen(true);
+        setRestoreCentersForWidget([]);
+        setRestoreCenterIdToMembershipId({});
+        setRestoreSelectedCenterId('');
+        setRestoreSelectedVillagesSet(new Set());
+        setRestoreVillagesByBlockData({});
         
         try {
           // Fetch cohort list for the user
@@ -746,7 +935,19 @@ const Mobilizer = () => {
             (cohort.type === 'CENTER' || cohort.type === 'COHORT')
           );
           
-          setAvailableCenters(filteredCenters);
+          const centersForWidget = filteredCenters.map((c: any) => ({
+            id: String(c.cohortId),
+            name: c.cohortName || String(c.cohortId),
+            cohortMembershipId: c.cohortMembershipId,
+          }));
+          const membershipMap: Record<string, string> = {};
+          centersForWidget.forEach((c: any) => {
+            if (c?.id && c?.cohortMembershipId) {
+              membershipMap[String(c.id)] = String(c.cohortMembershipId);
+            }
+          });
+          setRestoreCentersForWidget(centersForWidget);
+          setRestoreCenterIdToMembershipId(membershipMap);
         } catch (error) {
           console.error('Error fetching cohort list:', error);
           showToastMessage('Failed to load centers', 'error');
@@ -1077,90 +1278,133 @@ const Mobilizer = () => {
             center={availableCenters}
           />
         </ConfirmationPopup>
-        <ConfirmationPopup
-          checked={true}
-          open={archiveToActiveOpen}
-          onClose={() => {
+      </Box>
+
+      {/* Restore/Reactivate Modal Dialog (same dimensions as reassign modal) */}
+      <Dialog
+        open={archiveToActiveOpen}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
             setArchiveToActiveOpen(false);
             setSelectedCenters([]);
             setAvailableCenters([]);
+            setRestoreCentersForWidget([]);
+            setRestoreCenterIdToMembershipId({});
+            setRestoreSelectedCenterId('');
+            setRestoreSelectedVillagesSet(new Set());
+            setRestoreVillagesByBlockData({});
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
           }}
-          title={t('COMMON.ACTIVATE_USER')}
-          primary={t('COMMON.ACTIVATE')}
-          secondary={t('COMMON.CANCEL')}
-          reason={selectedCenters.length > 0 ? 'yes' : ''}
-          onClickPrimary={archiveToactive}
         >
-          <Box
+          <Typography variant="h1" component="div">
+            Reactivate Mobilizer
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              setArchiveToActiveOpen(false);
+              setSelectedCenters([]);
+              setAvailableCenters([]);
+              setRestoreCentersForWidget([]);
+              setRestoreCenterIdToMembershipId({});
+              setRestoreSelectedCenterId('');
+              setRestoreSelectedVillagesSet(new Set());
+              setRestoreVillagesByBlockData({});
+            }}
             sx={{
-              border: '1px solid #ddd',
-              borderRadius: 2,
-              mb: 2,
-              p: 1,
+              color: (theme) => theme.palette.grey[500],
             }}
           >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          <Box sx={{ mb: 2 }}>
             <Typography>
               {firstName} {lastName} {t('FORM.WAS_BELONG_TO')}
             </Typography>
-            {loadingCenters ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                <CircularProgress size={24} />
-              </Box>
-            ) : (
-              <Autocomplete
-                multiple
-                options={availableCenters}
-                value={selectedCenters}
-                onChange={(event, newValue) => {
-                  setSelectedCenters(newValue);
-                }}
-                getOptionLabel={(option) => option.cohortName || ''}
-                isOptionEqualToValue={(option, value) =>
-                  option.cohortMembershipId === value.cohortMembershipId
-                }
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => (
-                    <Chip
-                      label={option.cohortName}
-                      {...getTagProps({ index })}
-                      key={option.cohortMembershipId}
-                    />
-                  ))
-                }
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select Centers"
-                    placeholder="Select centers to activate"
-                    sx={{ mt: 1 }}
-                  />
-                )}
-                renderOption={(props, option, { selected }) => (
-                  <li {...props} key={option.cohortMembershipId}>
-                    <Checkbox
-                      icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                      checkedIcon={<CheckBoxIcon fontSize="small" />}
-                      style={{ marginRight: 8 }}
-                      checked={selected}
-                    />
-                    {option.cohortName}
-                  </li>
-                )}
-                disableCloseOnSelect
-                disabled={loadingCenters || availableCenters.length === 0}
-              />
-            )}
-            {!loadingCenters && availableCenters.length === 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                No archived centers found for this user
-              </Typography>
-            )}
           </Box>
-          <Typography fontWeight="bold">
-            {t('FORM.CONFIRM_TO_ACTIVATE')}
-          </Typography>
-        </ConfirmationPopup>
-      </Box>
+
+          {loadingCenters ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : restoreCentersForWidget.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              No archived centers found for this user
+            </Typography>
+          ) : (
+            <WorkingVillageAssignmentWidget
+              userId={userID}
+              isForRestore={true}
+              isForLmp={true}
+              hideConfirmButton={true}
+              centerOptionsOverride={restoreCentersForWidget}
+              onCenterChange={(centerId) => {
+                setRestoreSelectedCenterId(centerId);
+                setRestoreSelectedVillagesSet(new Set());
+                setRestoreVillagesByBlockData({});
+              }}
+              onSelectionChange={(centerId, selectedVillages, villagesByBlock) => {
+                setRestoreSelectedCenterId(centerId);
+                setRestoreSelectedVillagesSet(selectedVillages);
+                setRestoreVillagesByBlockData(villagesByBlock);
+              }}
+            />
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            variant="contained"
+            fullWidth
+            disabled={
+              loadingCenters ||
+              isRestoreInProgress ||
+              !restoreSelectedCenterId ||
+              restoreSelectedVillagesSet.size === 0
+            }
+            onClick={archiveToactive}
+            sx={{
+              backgroundColor: '#FFC107',
+              color: '#000',
+              fontFamily: 'Poppins',
+              fontWeight: 500,
+              fontSize: '14px',
+              height: '40px',
+              lineHeight: '20px',
+              letterSpacing: '0.1px',
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              '&:hover': {
+                backgroundColor: '#ffb300',
+              },
+              width: '100%',
+            }}
+          >
+            {isRestoreInProgress ? 'Activating...' : t('COMMON.ACTIVATE')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Map Modal Dialog */}
       <Dialog
