@@ -1012,15 +1012,16 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
                                   <option value="prerequisite">
                                     {t('Prerequisite')}
                                   </option>
+                                  <option value="during">
+                                    {t('During')}
+                                  </option>
                                   <option value="postrequisite">
                                     {t('Postrequisite')}
                                   </option>
                                   <option value="facilitator-requisite">
                                     {t('Facilitator-requisite')}
                                   </option>
-                                  <option value="during">
-                                    {t('During')}
-                                  </option>
+                                
                                 </Select>
                               </FormControl>
                             </Grid>

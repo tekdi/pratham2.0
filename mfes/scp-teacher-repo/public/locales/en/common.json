@@ -189,7 +189,13 @@
     "NEXT": "Next",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "Please select at least one batch",
     "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
-    "PLEASE_SELECT_CENTER": "Please select a center"
+    "PLEASE_SELECT_CENTER": "Please select a center",
+    "MAP_NEW": "Map New",
+    "RESIGNED_FROM_COMPANY": "Resigned from Company",
+    "MOVED_TO_DIFFERENT_ROLE": "Moved to Different Role",
+    "DELETE_FROM_BATCH_WARNING": "I confirm I want to remove this user from batches as well",
+    "COPY_REGISTRATION_LINK": "Copy Registration Link",
+    "REGISTRATION_LINK_COPIED":"Registration link copied!\nShare this link with learners for program registration."
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -682,7 +688,12 @@
     "GRADE_9": "Grade 9",
     "GRADE_10": "Grade 10",
     "GRADE_11": "Grade 11",
-    "GRADE_12": "Grade 12"
+    "GRADE_12": "Grade 12",
+    "BELONG_TO": "belong to",
+    "BELONG_TO_MULTIPLE_CENTERS": "belong to multiple centers",
+    "WAS_BELONG_TO": "was belong to",
+    "DO_YOU_WANT_TO_DELETE": "Do you want to delete from center as well?",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete from centers as well?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
