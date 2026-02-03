@@ -189,7 +189,9 @@
     "NEXT": "Next",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "Please select at least one batch",
     "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
-    "PLEASE_SELECT_CENTER": "Please select a center"
+    "PLEASE_SELECT_CENTER": "Please select a center",
+    "COPY_REGISTRATION_LINK": "Copy Registration Link",
+    "REGISTRATION_LINK_COPIED":"Registration link copied!\nShare this link with learners for program registration."
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

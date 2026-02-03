@@ -37,6 +37,8 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
 import { Role } from '../utils/app.constant';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import LinkIcon from '@mui/icons-material/Link';
+import { showToastMessage } from './Toastify';
 
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
@@ -172,6 +174,35 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
+  const handleCopyRegistrationLink = async () => {
+    try {
+      // Get the registration link from environment variable or construct it
+      const registrationBase = process.env.NEXT_PUBLIC_PLP_REGISTERATION || '';
+      
+      if (registrationBase) {
+        const enroll = localStorage.getItem('tenantName') || '';
+        
+        // Construct the proper registration link
+        // Format: https://domain/registration?tenantId=Pratham&enroll=Second%20Chance%20Program
+        const registrationLink = `${registrationBase}&enroll=${encodeURIComponent(enroll)}`;
+
+        // Copy to clipboard
+        await navigator.clipboard.writeText(registrationLink);
+        
+        // Show success toast message
+        showToastMessage(
+          'Registration link copied!\nShare this link with learners for program registration.',
+          'success'
+        );
+      } else {
+        showToastMessage('Registration link not configured', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to copy registration link:', error);
+      showToastMessage('Failed to copy registration link', 'error');
+    }
+  };
+
   const navigateToYouthBoard = () => {
     closeDrawer();
     router.push('/');
@@ -234,16 +265,24 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       }}
     >
       <Box
-        sx={{ padding: '16px 16px 12px 16px', width: '350px' }}
+        sx={{ 
+          padding: '16px 16px 12px 16px', 
+          width: '350px',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
+        }}
         role="presentation"
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Box sx={{ overflowY: 'auto', flex: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
           <Box
             className="fs-14 fw-500"
             sx={{ color: theme.palette.warning['A200'] }}
@@ -860,6 +899,67 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
+        </Box>
+        
+        {/* Bottom Section - Fixed at bottom */}
+        <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
+          {process.env.NEXT_PUBLIC_PLP_REGISTERATION && typeof window !== 'undefined' && localStorage.getItem('tenantName') !== TENANT_DATA.PRAGYANPATH && (
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: 'transparent',
+                padding: '0px 18px !important',
+                gap: '10px',
+                color: 'black',
+                fontWeight: 500,
+                '&:hover': {
+                  background: 'transparent',
+                },
+                marginTop: '8px',
+              }}
+              startIcon={
+                <LinkIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />
+              }
+              onClick={handleCopyRegistrationLink}
+            >
+              {t('COMMON.COPY_REGISTRATION_LINK')}
+            </Button>
+          )}
+          {isActiveYear && !tenantName && (
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: 'transparent',
+                padding: '0px 18px !important',
+                gap: '10px',
+                color: '#FDBE16',
+                fontWeight: 500,
+                '&:hover': {
+                  background: 'transparent',
+                },
+                marginTop: '8px',
+              }}
+              startIcon={
+                <ErrorOutlineIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />
+              }
+              onClick={() => {
+                localStorage.removeItem('hasSeenTutorial');
+                setTimeout(() => {
+                  closeDrawer();
+                  router.push(`/`);
+                }, 0);
+              }}
+            >
+              {t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
+            </Button>
+          )}
+        </Box>
       </Box>
     </Drawer>
   );
