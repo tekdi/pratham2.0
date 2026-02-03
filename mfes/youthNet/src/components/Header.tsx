@@ -7,8 +7,7 @@ import { telemetryFactory } from '../utils/telemetry';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { Box, Stack } from '@mui/material';
-import MenuItem from '@mui/material/MenuItem';
+import { Box, Stack, MenuItem, Button, Divider } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
@@ -19,9 +18,15 @@ import logoLight from '../../public/images/logo-light.png';
 import menuIcon from '../assets/images/menuIcon.svg';
 import { useDirection } from '../hooks/useDirection';
 import useStore from '../store/store';
+import manageUserStore from '../store/manageUserStore';
 import ConfirmationModal from './ConfirmationModal';
 import StyledMenu from './StyledMenu';
 import { TENANT_DATA } from '../utils/app.config';
+import { getUserDetails } from '../services/ProfileService';
+import { getAcademicYear } from '../services/AcademicYearService';
+import { AcademicYear } from '../utils/Interfaces';
+import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
+import Loader from '@shared-lib-v2/DynamicForm/components/Loader';
 
 interface HeaderProps {
   toggleDrawer?: (newOpen: boolean) => () => void;
@@ -51,6 +56,27 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   const [darkMode, setDarkMode] = useState<string | null>(null);
   const { isRTL } = useDirection();
 
+  // Switch Account Dialog states
+  const [switchDialogOpen, setSwitchDialogOpen] = useState<boolean>(false);
+  const [tenantData, setTenantData] = useState<any[]>([]);
+  const [showSwitchButton, setShowSwitchButton] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // Store state setters
+  const setUserIdStore = manageUserStore((state) => state.setUserId);
+  const setUserRoleStore = useStore((state: any) => state.setUserRole);
+  const setAccessToken = useStore((state: any) => state.setAccessToken);
+  const setIsActiveYearSelected = useStore((state: any) => state.setIsActiveYearSelected);
+  const setDistrictCode = manageUserStore((state: any) => state.setDistrictCode);
+  const setDistrictId = manageUserStore((state: any) => state.setDistrictId);
+  const setDistrictName = manageUserStore((state: any) => state.setDistrictName);
+  const setStateCode = manageUserStore((state: any) => state.setStateCode);
+  const setStateId = manageUserStore((state: any) => state.setStateId);
+  const setStateName = manageUserStore((state: any) => state.setStateName);
+  const setBlockCode = manageUserStore((state: any) => state.setBlockCode);
+  const setBlockId = manageUserStore((state: any) => state.setBlockId);
+  const setBlockName = manageUserStore((state: any) => state.setBlockName);
+
   // Retrieve stored userId and language
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -60,8 +86,230 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       if (storedUserId) setUserId(storedUserId);
       if (storedLanguage) setSelectedLanguage(storedLanguage);
       if (storedDarkMode) setDarkMode(storedDarkMode);
+
+      // Load tenantData for switch account functionality
+      const storedTenantData = localStorage.getItem('tenantData');
+      if (storedTenantData) {
+        try {
+          const parsedTenantData = JSON.parse(storedTenantData);
+          setTenantData(parsedTenantData);
+          
+          // Show switch button if there are multiple tenants or multiple roles in any tenant
+          const shouldShowButton = 
+            parsedTenantData.length > 1 || 
+            parsedTenantData.some((tenant: any) => tenant?.roles?.length > 1);
+          setShowSwitchButton(shouldShowButton);
+        } catch (error) {
+          console.error('Error parsing tenantData:', error);
+        }
+      }
     }
   }, []);
+
+  const getAcademicYearList = async () => {
+    const academicYearList: AcademicYear[] = await getAcademicYear();
+    if (academicYearList) {
+      localStorage.setItem(
+        'academicYearList',
+        JSON.stringify(academicYearList)
+      );
+      const extractedAcademicYears = academicYearList?.map(
+        ({ id, session, isActive }) => ({ id, session, isActive })
+      );
+      const activeSession = extractedAcademicYears?.find(
+        (item) => item.isActive
+      );
+      const activeSessionId = activeSession ? activeSession.id : '';
+      localStorage.setItem('academicYearId', activeSessionId);
+      setIsActiveYearSelected(true);
+
+      return activeSessionId;
+    }
+  };
+
+  const handleSwitchAccount = () => {
+    handleClose();
+    setSwitchDialogOpen(true);
+  };
+
+  const callBackSwitchDialog = async (
+    tenantId: string,
+    tenantName: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    setSwitchDialogOpen(false);
+    setLoading(true);
+
+    const token =
+      typeof window !== 'undefined' && window.localStorage
+        ? localStorage.getItem('token')
+        : '';
+    const currentUserId = localStorage.getItem('userId');
+
+    // Find the tenant data for the selected tenant
+    const selectedTenant = tenantData?.find(
+      (tenant: any) => tenant.tenantId === tenantId
+    );
+
+    if (tenantData && tenantData.length > 0) {
+      localStorage.setItem('tenantName', tenantName);
+      localStorage.setItem('tenantId', tenantId);
+      
+      // Set templateId from tenant data
+      localStorage.setItem('templtateId', selectedTenant?.templateId || '');
+      
+      // Set channelId
+      if (selectedTenant?.channelId) {
+        localStorage.setItem('channelId', selectedTenant.channelId);
+      }
+      
+      // Set collectionFramework
+      if (selectedTenant?.collectionFramework) {
+        localStorage.setItem('collectionFramework', selectedTenant.collectionFramework);
+      }
+      
+      // Set uiConfig
+      const uiConfig = selectedTenant?.params?.uiConfig;
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+      
+      // Set userProgram
+      localStorage.setItem('userProgram', tenantName);
+    } else {
+      console.error('Tenant data not found.');
+    }
+
+    localStorage.setItem('userId', currentUserId || '');
+    setUserIdStore(currentUserId || '');
+
+    if (token && currentUserId) {
+      // Set token cookie
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+      document.cookie = `authToken=${token}; path=/; secure; SameSite=Strict`;
+      document.cookie = `userId=${currentUserId}; path=/; secure; SameSite=Strict`;
+
+      // Retrieve deviceID from local storage
+      const deviceID = localStorage.getItem('deviceID');
+
+      if (deviceID) {
+        try {
+          // Update device notification
+          const headers = {
+            tenantId: tenantId,
+            Authorization: `Bearer ${token}`,
+          };
+
+          await UpdateDeviceNotification(
+            { deviceId: deviceID, action: 'add' },
+            currentUserId,
+            headers
+          );
+
+          console.log('Device notification updated successfully');
+        } catch (updateError) {
+          console.error('Error updating device notification:', updateError);
+        }
+      }
+
+      localStorage.setItem('role', roleName);
+      localStorage.setItem('roleName', roleName);
+      localStorage.setItem('roleId', roleId || '');
+      setUserRoleStore(roleName);
+      setAccessToken(token);
+
+      const tenant = localStorage.getItem('tenantName');
+      if (
+        tenant?.toLocaleLowerCase() ===
+          TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()
+      ) {
+        try {
+          const userDetails = await getUserDetails(currentUserId, true);
+          console.log(userDetails);
+
+          if (userDetails?.result?.userData) {
+            const activeSessionId = await getAcademicYearList();
+            const customFields = userDetails?.result?.userData?.customFields;
+            if (customFields?.length) {
+              // set customFields in userData
+              const userDataString = localStorage.getItem('userData');
+              const userData: any = userDataString
+                ? JSON.parse(userDataString)
+                : null;
+              if (userData) {
+                userData.customFields = customFields;
+                localStorage.setItem('userData', JSON.stringify(userData));
+              }
+              const state = customFields.find(
+                (field: any) => field?.label === 'STATE'
+              );
+              const district = customFields.find(
+                (field: any) => field?.label === 'DISTRICT'
+              );
+              const block = customFields.find(
+                (field: any) => field?.label === 'BLOCK'
+              );
+
+              if (state) {
+                localStorage.setItem(
+                  'stateName',
+                  state?.selectedValues?.[0]?.value
+                );
+                setStateName(state?.selectedValues?.[0]?.value);
+                setStateCode(state?.selectedValues?.[0]?.id);
+                setStateId(state?.fieldId);
+              }
+
+              if (district) {
+                setDistrictName(district?.selectedValues?.[0]?.value);
+                setDistrictCode(district?.selectedValues?.[0]?.id);
+                setDistrictId(district?.fieldId);
+              }
+
+              if (block) {
+                setBlockName(block?.selectedValues?.[0]?.value);
+                setBlockCode(block?.selectedValues?.[0]?.id);
+                setBlockId(block?.fieldId);
+              }
+            }
+
+            // Route based on tenant and role
+            // Using replace() to prevent back navigation to old program
+            if ( tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase()) {
+              window.location.replace('/scp-teacher-repo/dashboard');
+            } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
+              window.location.replace('/youthnet');
+            } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
+              if (activeSessionId) {
+                localStorage.setItem('academicYearId', activeSessionId);
+              }
+              
+              // Check if user has Lead role for PRAGYANPATH
+              const hasLead = tenantData?.some((tenant: any) => 
+                tenant.roles.some((role: any) => role.roleName.toLowerCase().includes("lead"))
+              );
+              
+              if (hasLead && roleName.toLowerCase().includes('lead')) {
+                // For Lead role, set managrUserId for manager dashboard
+                localStorage.setItem('managrUserId', currentUserId);
+                window.location.replace('/youthnet/manager-dashboard');
+              } else {
+                // For other roles, redirect to youthNet MFE
+                window.location.replace('/youthnet');
+              }
+            }
+            console.log('userDetails', userDetails);
+          }
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+          setLoading(false);
+        }
+      }
+    }
+    setLoading(false);
+  };
 
   const handleProfileClick = () => {
     const tenant = localStorage.getItem('tenantName');
@@ -279,6 +527,27 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
                 />
                 {t('COMMON.LOGOUT')}
               </MenuItem>
+              
+              {/* Switch Account Button */}
+              {showSwitchButton && (
+                <>
+                  <Divider />
+                  <Box sx={{ px: 2, py: 1 }}>
+                    <Button
+                      fullWidth
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleSwitchAccount}
+                      sx={{
+                        fontSize: '14px',
+                        textTransform: 'none',
+                      }}
+                    >
+                      {t('COMMON.SWITCH_ACCOUNT', { defaultValue: 'Switch Account' })}
+                    </Button>
+                  </Box>
+                </>
+              )}
             </StyledMenu>
           </Stack>
         </Box>
@@ -300,8 +569,21 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
           language={language}
           setLanguage={setLanguage}
         />
+        
+        {/* Switch Account Dialog */}
+        <SwitchAccountDialog
+          open={switchDialogOpen}
+          onClose={() => setSwitchDialogOpen(false)}
+          callbackFunction={callBackSwitchDialog}
+          authResponse={tenantData}
+        />
       </Box>
       <Box sx={{ marginTop: '10px' }}></Box>
+      
+      {/* Loading Indicator */}
+      {loading && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
     </>
   );
 };
