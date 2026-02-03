@@ -721,7 +721,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
   };
 
   const handleClearFilters = () => {
-    setSelectedState([]);
+    setSelectedState(stateId ? [String(stateId)] : []);
     setSelectedDistrict([]);
     setSelectedBlock([]);
     setSelectedVillage([]);

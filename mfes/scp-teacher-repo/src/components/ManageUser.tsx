@@ -825,8 +825,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const centersString =
         uniqueCentersMap.size > 0
           ? Array.from(uniqueCentersMap.values())
-              .map((c: string) => toPascalCase(c))
-              .join(', ')
+            .map((c: string) => toPascalCase(c))
+            .join(', ')
           : '-';
 
       setDeleteCenters(centersString);
@@ -887,9 +887,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         ? transformCohortsToCohortData(selectedUser.cohorts)
         : [];
       setSelectedUserIdReassign(userId);
-      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
-      const response = await axios.get(apiUrl, { headers });
-      const geographicalData = response?.data?.result || [];
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
+      let response = null;
+      try {
+        const centerIds = myCenterList?.length > 0
+          ? myCenterList.map((center: any) => center.value).filter((id: any) => id)
+          : [];
+        response = await axios.post(apiUrl, { userId: userId, filters: { parentId: centerIds } }, { headers });
+      }
+      catch (e) { }
+      const geographicalData = response?.data?.result?.data || [];
 
       // Transform geographicalData into centerList
       let centerList = [];
@@ -1137,7 +1145,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const getBatchNames = (batchNames: any) => {
     if (!Array.isArray(batchNames)) return null;
-    return batchNames.join(', ');
+    return [...batchNames]
+      .sort((a, b) => (a || '').localeCompare(b || '', undefined, { sensitivity: 'base' }))
+      .join(', ');
   };
 
   const toggleBatchNamesExpanded = (userId: string) => {
@@ -2097,7 +2107,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 } catch (error: any) {
                   showToastMessage(
                     error?.response?.data?.params?.errmsg ||
-                      t('COMMON.SOMETHING_WENT_WRONG'),
+                    t('COMMON.SOMETHING_WENT_WRONG'),
                     'error'
                   );
                 }
