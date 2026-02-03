@@ -639,6 +639,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           tenantStatus: [Status.ACTIVE],
           filters: {
             batch: mySelectedBatchIds,
+            status: [Status.ACTIVE],
           },
           customfields: [
             'state',
@@ -1379,29 +1380,59 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     md={6}
                                     lg={4}
                                     key={user.userId}
+                                    sx={{ display: 'flex' }}
                                   >
                                     <Box
-                                      display={'flex'}
-                                      borderBottom={`1px solid ${theme.palette.warning['A100']}`}
-                                      width={'100%'}
-                                      justifyContent={'space-between'}
-                                      sx={{
-                                        cursor: 'pointer',
-                                        '@media (min-width: 600px)': {
-                                          border: `1px solid  ${theme.palette.action.selected}`,
-                                          padding: '4px 10px',
-                                          borderRadius: '8px',
-                                          background:
-                                            theme.palette.warning['A400'],
-                                        },
-                                      }}
+                                        display={'flex'}
+                                        flexDirection={'column'}
+                                        borderBottom={`1px solid ${theme.palette.warning['A100']}`}
+                                        width={'100%'}
+                                        justifyContent={'space-between'}
+                                        sx={{
+                                          cursor: 'pointer',
+                                          height: '100%',
+                                          position: 'relative',
+                                          '@media (min-width: 600px)': {
+                                            border: `1px solid  ${theme.palette.action.selected}`,
+                                            padding: '4px 10px',
+                                            borderRadius: '8px',
+                                            background:
+                                              theme.palette.warning['A400'],
+                                          },
+                                        }}
                                     >
+                                      
                                       <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap="5px"
+                                          sx={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            zIndex: 1,
+                                          }}>
+                                        <MoreVertIcon
+                                          onClick={(event) => {
+                                            isMobile
+                                              ? toggleDrawer(
+                                                'bottom',
+                                                true,
+                                                user
+                                              )(event)
+                                              : handleMenuOpen(event, user);
+                                          }}
+                                          sx={{
+                                            fontSize: '24px',
+                                            color: theme.palette.warning['300'],
+                                            cursor: 'pointer',
+                                          }}
+                                        />
+                                      </Box>
+                                      <Box
+                                          display="flex"
+                                          alignItems="flex-start"
+                                          gap="5px"
+                                          flex={1}
                                       >
-                                        <Box>
+                                        <Box sx={{ flex: 1, minWidth: 0 }}>
                                           <CustomLink
                                             className="word-break"
                                             href="#"
@@ -1426,45 +1457,76 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             </Typography>
                                           </CustomLink>
                                           {/* Uncomment if batchnames to be displayed */}
-                                          <Box
-                                            sx={{
-                                              backgroundColor:
-                                                theme.palette.action.selected,
-                                              padding: '5px',
-                                              width: 'fit-content',
-                                              borderRadius: '5px',
-                                              fontSize: '12px',
-                                              fontWeight: '600',
-                                              color: 'black',
-                                              marginBottom: '10px',
-                                            }}
-                                          >
-                                            {user?.batchNames?.length > 0
-                                              ? getBatchNames(user.batchNames)
-                                              : t(
-                                                'ATTENDANCE.NO_BATCHES_ASSIGNED'
-                                              )}
-                                          </Box>
+                                            <Box
+                                              sx={{
+                                                backgroundColor:
+                                                  theme.palette.action.selected,
+                                                padding: '5px',
+                                                width: 'fit-content',
+                                                maxWidth: '100%',
+                                                borderRadius: '5px',
+                                                fontSize: '12px',
+                                                fontWeight: '600',
+                                                color: 'black',
+                                                marginBottom: '10px',
+                                                position: 'relative',
+                                              }}
+                                            >
+                                              <Box
+                                                ref={(el: HTMLElement | null) => {
+                                                  if (!el) return;
+
+                                                  // Use requestAnimationFrame to ensure styles are applied
+                                                  requestAnimationFrame(() => {
+                                                    if (!expandedBatchNames.has(user.userId)) {
+                                                      // Check if content is actually truncated when collapsed
+                                                      const isTruncated = el.scrollHeight > el.clientHeight;
+                                                      setTruncatedBatchNames((prev) => {
+                                                        const newSet = new Set(prev);
+                                                        if (isTruncated) {
+                                                          newSet.add(user.userId);
+                                                        } else {
+                                                          newSet.delete(user.userId);
+                                                        }
+                                                        return newSet;
+                                                      });
+                                                    }
+                                                    // When expanded, keep it in truncated set so "Show less" button remains visible
+                                                  });
+                                                }}
+                                                sx={{
+                                                  display: '-webkit-box',
+                                                  WebkitLineClamp: expandedBatchNames.has(user.userId) ? 'none' : 4,
+                                                  WebkitBoxOrient: 'vertical',
+                                                  overflow: expandedBatchNames.has(user.userId) ? 'visible' : 'hidden',
+                                                  wordBreak: 'break-word',
+                                                }}
+                                              >
+                                                {user?.batchNames?.length > 0
+                                                  ? getBatchNames(user.batchNames)
+                                                  : t(
+                                                    'ATTENDANCE.NO_BATCHES_ASSIGNED'
+                                                  )}
+                                              </Box>
+                                              {user?.batchNames?.length > 0 &&
+                                                getBatchNames(user.batchNames) &&
+                                                (truncatedBatchNames.has(user.userId) || expandedBatchNames.has(user.userId)) && (
+                                                  <Typography
+                                                    onClick={() => toggleBatchNamesExpanded(user.userId)}
+                                                    sx={{
+                                                      fontSize: '11px',
+                                                      fontWeight: '600',
+                                                      color: theme.palette.secondary.main,
+                                                      cursor: 'pointer',
+                                                      marginTop: '4px',
+                                                      textDecoration: 'underline',
+                                                    }}
+                                                  >
+                                                    {expandedBatchNames.has(user.userId) ? 'Show less' : 'Show more'}
+                                                  </Typography>
+                                                )}
+                                            </Box>
                                         </Box>
-                                      </Box>
-                                      <Box>
-                                        <MoreVertIcon
-                                          onClick={(event) => {
-                                            isMobile
-                                              ? toggleDrawer(
-                                                'bottom',
-                                                true,
-                                                user
-                                              )(event)
-                                              : handleMenuOpen(event, user);
-                                          }}
-                                          sx={{
-                                            fontSize: '24px',
-                                            marginTop: '1rem',
-                                            color: theme.palette.warning['300'],
-                                            cursor: 'pointer',
-                                          }}
-                                        />
                                       </Box>
                                     </Box>
                                   </Grid>
