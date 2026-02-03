@@ -236,8 +236,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
           const currentSelectedState = Array.isArray(prevSelectedState)
             ? prevSelectedState
             : prevSelectedState
-            ? [prevSelectedState]
-            : [];
+              ? [prevSelectedState]
+              : [];
           const currentStateId = stateId ? String(stateId) : null;
           const currentInitialState = initialState
             ? Array.isArray(initialState)
@@ -275,8 +275,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
           const currentSelectedState = Array.isArray(prevSelectedState)
             ? prevSelectedState
             : prevSelectedState
-            ? [prevSelectedState]
-            : [];
+              ? [prevSelectedState]
+              : [];
           const currentStateId = stateId ? String(stateId) : null;
           const currentInitialState = initialState
             ? Array.isArray(initialState)
@@ -318,8 +318,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       const selectedStates = Array.isArray(selectedState)
         ? selectedState
         : selectedState
-        ? [selectedState]
-        : [];
+          ? [selectedState]
+          : [];
 
       // For non-central admin, always use stateId from localStorage
       // For central admin, use selectedStates
@@ -327,8 +327,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         !isCentralAdmin && stateId
           ? [stateId]
           : selectedStates.length > 0
-          ? selectedStates
-          : [];
+            ? selectedStates
+            : [];
 
       if (controllingField.length === 0) {
         setDistrictOptions([]);
@@ -357,8 +357,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         const currentSelectedDistricts = Array.isArray(selectedDistrict)
           ? selectedDistrict
           : selectedDistrict
-          ? [selectedDistrict]
-          : [];
+            ? [selectedDistrict]
+            : [];
         const currentInitialDistricts = initialDistrict
           ? Array.isArray(initialDistrict)
             ? initialDistrict
@@ -416,8 +416,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       const selectedDistricts = Array.isArray(selectedDistrict)
         ? selectedDistrict
         : selectedDistrict
-        ? [selectedDistrict]
-        : [];
+          ? [selectedDistrict]
+          : [];
 
       if (selectedDistricts.length === 0) {
         setBlockOptions([]);
@@ -549,8 +549,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const selectedStates = Array.isArray(selectedState)
       ? selectedState
       : selectedState
-      ? [selectedState]
-      : [];
+        ? [selectedState]
+        : [];
 
     // If no state selected and no search keyword, don't search
     if (selectedStates.length === 0 && !searchKeyword) {
@@ -576,8 +576,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
       const selectedDistricts = Array.isArray(selectedDistrict)
         ? selectedDistrict
         : selectedDistrict
-        ? [selectedDistrict]
-        : [];
+          ? [selectedDistrict]
+          : [];
       if (selectedDistricts.length > 0) {
         filters.district = selectedDistricts;
       }
@@ -688,8 +688,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const selectedStates = Array.isArray(selectedState)
       ? selectedState
       : selectedState
-      ? [selectedState]
-      : [];
+        ? [selectedState]
+        : [];
 
     // If no state selected and no search keyword, clear options
     if (selectedStates.length === 0 && !searchKeyword) {
@@ -1002,11 +1002,11 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const centerIdsToFetch = filtersChanged
       ? selectedCenters.map((center) => center.value) // Refetch all when filters change
       : selectedCenters
-          .filter((center) => {
-            const centerBatches = batchesRef.current[center.value];
-            return !centerBatches || centerBatches.length === 0;
-          })
-          .map((center) => center.value); // Only fetch missing ones otherwise
+        .filter((center) => {
+          const centerBatches = batchesRef.current[center.value];
+          return !centerBatches || centerBatches.length === 0;
+        })
+        .map((center) => center.value); // Only fetch missing ones otherwise
 
     // Only call API if we have center IDs to fetch (never call with empty array)
     if (centerIdsToFetch && centerIdsToFetch.length > 0) {
@@ -1019,8 +1019,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const stateIds = Array.isArray(newValue)
       ? newValue.map((state) => String(state.value))
       : newValue
-      ? [String(newValue.value)]
-      : [];
+        ? [String(newValue.value)]
+        : [];
 
     setSelectedState(stateIds);
     setSelectedDistrict([]);
@@ -1041,8 +1041,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const districtIds = Array.isArray(newValue)
       ? newValue.map((district) => String(district.value))
       : newValue
-      ? [String(district.value)]
-      : [];
+        ? [String(district.value)]
+        : [];
 
     setSelectedDistrict(districtIds);
     setSelectedBlock([]);
@@ -1062,8 +1062,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const blockIds = Array.isArray(newValue)
       ? newValue.map((block) => String(block.value))
       : newValue
-      ? [String(newValue.value)]
-      : [];
+        ? [String(newValue.value)]
+        : [];
 
     setSelectedBlock(blockIds);
     setSelectedVillage([]);
@@ -1082,8 +1082,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const villageIds = Array.isArray(newValue)
       ? newValue.map((village) => String(village.value))
       : newValue
-      ? [String(newValue.value)]
-      : [];
+        ? [String(newValue.value)]
+        : [];
 
     setSelectedVillage(villageIds);
     setCenterOptions([]); // Clear centers when filter changes
@@ -1094,7 +1094,7 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
   };
 
   const handleClearFilters = () => {
-    setSelectedState([]);
+    setSelectedState(stateId ? [String(stateId)] : []);
     setSelectedDistrict([]);
     setSelectedBlock([]);
     setSelectedVillage([]);
@@ -1502,13 +1502,13 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
     const selectedStates = Array.isArray(selectedState)
       ? selectedState
       : selectedState
-      ? [selectedState]
-      : [];
+        ? [selectedState]
+        : [];
     const selectedDistricts = Array.isArray(selectedDistrict)
       ? selectedDistrict
       : selectedDistrict
-      ? [selectedDistrict]
-      : [];
+        ? [selectedDistrict]
+        : [];
     count += selectedStates.length;
     count += selectedDistricts.length;
     count += selectedBlock.length;
@@ -1570,9 +1570,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {hasActiveFilters
-                  ? `${activeFiltersCount} filter${
-                      activeFiltersCount > 1 ? 's' : ''
-                    } active`
+                  ? `${activeFiltersCount} filter${activeFiltersCount > 1 ? 's' : ''
+                  } active`
                   : 'No filters applied'}
               </Typography>
             </Box>
@@ -1615,8 +1614,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
                   const selectedStates = Array.isArray(selectedState)
                     ? selectedState
                     : selectedState
-                    ? [selectedState]
-                    : [];
+                      ? [selectedState]
+                      : [];
                   return selectedStates.includes(String(state.value));
                 })}
                 onChange={handleStateChange}
@@ -1694,8 +1693,8 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
                   const selectedDistricts = Array.isArray(selectedDistrict)
                     ? selectedDistrict
                     : selectedDistrict
-                    ? [selectedDistrict]
-                    : [];
+                      ? [selectedDistrict]
+                      : [];
                   return selectedDistricts.includes(String(district.value));
                 })}
                 onChange={handleDistrictChange}
@@ -2642,7 +2641,7 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
                         <Chip
                           key={`${batch.id}-${batch.centerId}`}
                           label={
-                            <Box sx={{ mt:2 }}>
+                            <Box sx={{ mt: 2 }}>
                               <Typography variant="body2" fontWeight={600}>
                                 {batch.name}
                               </Typography>

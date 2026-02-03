@@ -479,9 +479,13 @@ const UserLeader = () => {
         const userId = row?.userId;
         const cohortData = row?.cohortData;
         setSelectedUserIdReassign(userId);
-        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
-        const response = await axios.get(apiUrl, { headers });
-        const geographicalData = response?.data?.result || [];
+        const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
+        let response=null; 
+        try{
+          response = await axios.post(apiUrl, { userId: userId }, { headers });
+        }
+        catch(e){}
+        const geographicalData = response?.data?.result?.data || [];
 
         // Transform geographicalData into centerList
         const centerList = [];
