@@ -102,6 +102,11 @@ const LoginComponent = () => {
 
     setReceivedToken(receivedToken);
 
+    // Store tenantData for later use (e.g., in Header for switch account)
+    if (receivedToken?.tenantData) {
+      localStorage.setItem('tenantData', JSON.stringify(receivedToken.tenantData));
+    }
+
     setSwitchDialogOpen(true);
   };
 
