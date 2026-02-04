@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -99,6 +99,15 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [isLanguageReady, setIsLanguageReady] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const callbackRef = useRef(callbackFunction);
+  const onCloseRef = useRef(onClose);
+  const autoConfirmedRef = useRef(false);
+
+  useEffect(() => {
+    callbackRef.current = callbackFunction;
+    onCloseRef.current = onClose;
+  }, [callbackFunction, onClose]);
 
   const host = useMemo(() => {
     if (typeof window !== 'undefined') {
@@ -243,6 +252,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     if (!open) {
       // Reset snackbar when dialog closes
       setSnackbarOpen(false);
+      autoConfirmedRef.current = false;
       return;
     }
 
@@ -250,6 +260,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     setSelectedTenant(null);
     setSelectedRole(null);
     setSnackbarOpen(false);
+    autoConfirmedRef.current = false;
 
     // Immediate language sync on dialog open to avoid late reflection
     if (typeof window !== 'undefined') {
@@ -309,6 +320,9 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   useEffect(() => {
     if (!open) return;
 
+    // Prevent repeated auto-confirm loops on rerenders
+    if (autoConfirmedRef.current) return;
+
     const tenants = visibleTenants ?? [];
 
     // If no tenants available, close dialog and show error snackbar
@@ -332,15 +346,16 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       if (roles.length === 1) {
         // Single tenant & single role: confirm and close
         const role = roles[0];
+        autoConfirmedRef.current = true;
         setSelectedTenant(tenant);
         setSelectedRole(role);
-        callbackFunction(
+        callbackRef.current(
           tenant.tenantId,
           tenant.tenantName,
           role.roleId,
           role.roleName
         );
-        onClose();
+        onCloseRef.current();
       } else if (roles.length > 1) {
         // Single tenant & multiple roles: preselect tenant and open role selection
         setSelectedTenant(tenant);
@@ -351,7 +366,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       setActiveStep(0);
     }
     // }, [open, visibleTenants, callbackFunction, onClose]);
-  }, [open, visibleTenants, callbackFunction, onClose]);
+  }, [open, visibleTenants]);
 
   const handleTenantSelect = (tenant: TenantData) => {
     // Prevent selection of archived tenants
