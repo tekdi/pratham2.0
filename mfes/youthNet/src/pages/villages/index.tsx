@@ -110,8 +110,8 @@ const Index = () => {
     tab
       ? Number(tab)
       : YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
-      ? 1
-      : 2
+        ? 1
+        : 2
   );
   const [searchInput, setSearchInput] = useState('');
   const [toggledUser, setToggledUser] = useState('');
@@ -412,7 +412,7 @@ const Index = () => {
     }
   }, [value, mobilizerCenterOptions, selectedCenterIdForLocation]);
 
-  // For Lead on Villages (2) / Youth/Volunteers (3): populate state/district/block from selected center's catchment
+  // For Lead on Villages (2) / Youth/Volunteers (3): on center change reset state/district/block/village and lists, then populate from new center's catchment
   useEffect(() => {
     if (
       (value !== 2 && value !== 3) ||
@@ -421,6 +421,15 @@ const Index = () => {
     ) {
       return;
     }
+    // Reset village selection and location-dependent lists when center changes
+    setSelectedVillageValue([]);
+    setVillageList([]);
+    setVillageListWithUsers([]);
+    setFilteredVillageListWithUsers([]);
+    setVillageCount(0);
+    setYouthList([]);
+    setFilteredYouthList([]);
+
     const { states, districtsByState, blocksByDistrict } =
       getStatesDistrictsAndBlocksFromCenterCatchment(selectedCenterIdForLocation);
 
@@ -992,8 +1001,8 @@ const Index = () => {
       tab
         ? Number(tab)
         : YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()
-        ? 1
-        : 2
+          ? 1
+          : 2
     );
   }, []);
   const FormSubmitFunction = async (formData: any, payload: any) => {
@@ -1180,11 +1189,11 @@ const Index = () => {
 
   const handleVillageReassign = async () => {
     if (!selectedMentor) return;
-    
+
     try {
       setLoading(true);
       const userId = selectedMentor?.Id;
-      
+
       // Extract WORKING_VILLAGE from customFields
       const workingVillageField = selectedMentor?.customFields?.find(
         (field: any) => field.label === 'WORKING_VILLAGE'
@@ -1192,16 +1201,16 @@ const Index = () => {
       const workingVillageIds = workingVillageField?.selectedValues
         ?.map((item: any) => item.id)
         .join(', ') || '';
-      
+
       // Call mycohorts API for user's cohort data (used for working villages etc.)
       const cohortResponse = await getCohortList(userId, true, true);
       const cohortList = cohortResponse?.result || [];
-      
+
       // Center dropdown: use cohortData from localStorage (all centers for the lead) so user can reassign to any center
       const cohortDataString = typeof window !== 'undefined' ? localStorage.getItem('cohortData') : null;
       const cohortData = cohortDataString ? JSON.parse(cohortDataString) : [];
       const centerIds = Array.isArray(cohortData) ? cohortData.map((cohort: any) => cohort.cohortId) : [];
-      
+
       // Preselect center should match the center used to fetch the mobilizer list (UI-selected for Lead).
       // Fallback to mobilizer's first cohort center if UI center is unavailable.
       const centerUsedForList =
@@ -1210,7 +1219,7 @@ const Index = () => {
           : localStorage.getItem('workingLocationCenterId') || '';
       const mobilizerCurrentCenterId = cohortList[0]?.cohortId || '';
       const preselectCenterId = centerUsedForList || mobilizerCurrentCenterId;
-      
+
       // Set state for reassign modal
       setReassignUserId(userId);
       setReassignCohortData(cohortList);
@@ -1222,7 +1231,7 @@ const Index = () => {
       // Capture original center once (used to decide whether to call bulkCreateCohortMembers on save)
       setOriginalReassignCenterId(preselectCenterId);
       setReassignCenterOptions([]);
-      
+
       // Open reassign modal
       setReassignModalOpen(true);
     } catch (error) {
@@ -1283,27 +1292,27 @@ const Index = () => {
           setLastName(selectedMentor?.lastName || '');
           setReason('');
           setChecked(false);
-          
+
           // Fetch active centers/villages for the mentor
           const fetchMentorCenters = async () => {
             try {
               if (mentorUserId) {
                 const cohortResponse = await getCohortList(mentorUserId);
                 const cohortList = cohortResponse?.result || [];
-                
+
                 // Filter active centers where cohortMemberStatus = "active" and cohortStatus = "active"
-                const activeCenters = cohortList.filter((cohort: any) => 
+                const activeCenters = cohortList.filter((cohort: any) =>
                   cohort.cohortMemberStatus === 'active' &&
                   cohort.cohortStatus === 'active' &&
                   (cohort.type === 'CENTER' || cohort.type === 'COHORT')
                 );
-                
+
                 // Extract center names
                 const centerNames = activeCenters
                   .map((cohort: any) => cohort.cohortName || cohort.name)
                   .filter(Boolean)
                   .join(', ');
-                
+
                 setAvailableCenters(centerNames);
                 setVillage(centerNames);
                 setOpen(true);
@@ -1319,7 +1328,7 @@ const Index = () => {
               setOpen(true);
             }
           };
-          
+
           fetchMentorCenters();
         }
         break;
@@ -1340,17 +1349,17 @@ const Index = () => {
     // Show mark button for non-volunteers, unmark button for volunteers
     isCurrentUserVolunteer
       ? {
-          label: t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER'),
-          icon: <SwapHorizIcon />,
-          onClick: () =>
-            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
-        }
+        label: t('YOUTHNET_DASHBOARD.UNMARK_AS_VOLUNTEER'),
+        icon: <SwapHorizIcon />,
+        onClick: () =>
+          handleButtonClick(BOTTOM_DRAWER_CONSTANTS.UNMARK_VOLUNTEER),
+      }
       : {
-          label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
-          icon: <SwapHorizIcon />,
-          onClick: () =>
-            handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
-        },
+        label: t('YOUTHNET_USERS_AND_VILLAGES.MARK_AS_VOLUNTEER'),
+        icon: <SwapHorizIcon />,
+        onClick: () =>
+          handleButtonClick(BOTTOM_DRAWER_CONSTANTS.MARK_VOLUNTEER),
+      },
   ];
 
   const mentorActions = [
@@ -1575,7 +1584,7 @@ const Index = () => {
       showToastMessage(t('COMMON.PLEASE_SELECT_REASON'), 'error');
       return;
     }
-    
+
     try {
       const resp = await deleteUser({
         userId: userID,
@@ -1717,6 +1726,10 @@ const Index = () => {
                   onSelect={(cohortId) => {
                     setSelectedMobilizerCenterId(cohortId);
                     localStorage.setItem('workingLocationCenterId', cohortId);
+                    // Reset mentor list on center change so stale data is not shown until refetch completes
+                    setMentorList([]);
+                    setFilteredmentorList([]);
+                    setMentorCount(0);
                   }}
                 />
               </Box>
@@ -1821,11 +1834,11 @@ const Index = () => {
                   <Typography fontWeight="bold">
                     {firstName} {lastName} {availableCenters || village ? t('FORM.BELONG_TO') : t('FORM.WAS_BELONG_TO')}
                   </Typography>
-                  <TextField 
-                    fullWidth 
-                    value={availableCenters || village || ''} 
-                    disabled 
-                    sx={{ mt: 1 }} 
+                  <TextField
+                    fullWidth
+                    value={availableCenters || village || ''}
+                    disabled
+                    sx={{ mt: 1 }}
                     placeholder={availableCenters || village ? '' : 'No center/village assigned'}
                   />
                 </Box>
@@ -2327,7 +2340,7 @@ const Index = () => {
                         console.error('Error creating mobilizer:', error);
                         showToastMessage(
                           (error as any)?.response?.data?.params?.errmsg ||
-                            t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
+                          t('MOBILIZER.NOT_ABLE_CREATE_MOBILIZER'),
                           'error'
                         );
                       } finally {
@@ -2623,7 +2636,7 @@ const Index = () => {
                           ) {
                             showToastMessage(
                               cohortMemberResponse?.params?.errmsg ||
-                                t('COMMON.SOMETHING_WENT_WRONG'),
+                              t('COMMON.SOMETHING_WENT_WRONG'),
                               'error'
                             );
                             return;
@@ -2632,7 +2645,7 @@ const Index = () => {
                           console.error('Error in bulkCreateCohortMembers:', cohortError);
                           showToastMessage(
                             (cohortError as any)?.response?.data?.params?.errmsg ||
-                              t('COMMON.SOMETHING_WENT_WRONG'),
+                            t('COMMON.SOMETHING_WENT_WRONG'),
                             'error'
                           );
                           return;
@@ -2653,12 +2666,12 @@ const Index = () => {
                       );
                       const userDataResponse = await userResponse.json();
                       const userDetails = userDataResponse?.result;
-                      
+
                       let existingCustomFields: any[] = [];
                       if (userDetails?.customFields) {
                         existingCustomFields = userDetails.customFields;
                       }
-                      
+
                       const filteredCustomFields = existingCustomFields.filter(
                         (field: any) => field.fieldId !== workingLocationId && field.fieldId !== workingVillageId
                       );
@@ -2670,7 +2683,7 @@ const Index = () => {
                         fieldId: workingVillageId,
                         value: villageIds,
                       });
-                      
+
                       const updateUserResponse = await updateUser(reassignUserId, {
                         userData: {},
                         customFields: filteredCustomFields,
@@ -2691,8 +2704,8 @@ const Index = () => {
                       } else {
                         showToastMessage(
                           updateUserResponse?.response?.data?.params?.errmsg ||
-                            t('MENTOR.VILLAGES_REASSIGN_FAILED') ||
-                            'Failed to reassign villages',
+                          t('MENTOR.VILLAGES_REASSIGN_FAILED') ||
+                          'Failed to reassign villages',
                           'error'
                         );
                       }
@@ -2700,7 +2713,7 @@ const Index = () => {
                       console.error('Error reassigning villages:', error);
                       showToastMessage(
                         t('MENTOR.VILLAGES_REASSIGN_FAILED') ||
-                          'Failed to reassign villages',
+                        'Failed to reassign villages',
                         'error'
                       );
                     } finally {
@@ -2745,10 +2758,16 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="state"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_STATES_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                        disabled
                       />
                     )}
                   </Grid>
@@ -2766,10 +2785,16 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="district"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_DISTRICTS_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                        disabled
                       />
                     )}
                   </Grid>
@@ -2785,10 +2810,16 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="block"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_BLOCKS_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                        disabled
                       />
                     )}
                   </Grid>
@@ -2942,10 +2973,16 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="state"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_STATES_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                        disabled
                       />
                     )}
                   </Grid>
@@ -2963,10 +3000,16 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="district"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_DISTRICTS_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                        disabled
                       />
                     )}
                   </Grid>
@@ -2982,14 +3025,22 @@ const Index = () => {
                     ) : (
                       <Dropdown
                         name="block"
-                        values={[]}
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_BLOCKS_FOUND'),
+                          },
+                        ]}
                         defaultValue=""
                         onSelect={() => {}}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                        disabled
                       />
                     )}
                   </Grid>
+
                   <Grid item xs={12} sm={6} md={4}>
+                    {villageList?.length > 0 ? (
                     <Dropdown
                       name={DROPDOWN_NAME}
                       values={villageList.map((item: any) =>
@@ -3003,6 +3054,21 @@ const Index = () => {
                       }}
                       label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
                     />
+                    ) : (
+                      <Dropdown
+                        name="village"
+                        values={[
+                          {
+                            id: '',
+                            name: t('YOUTHNET_USERS_AND_VILLAGES.NO_VILLAGES_FOUND'),
+                          },
+                        ]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
+                        disabled
+                      />
+                    )}
                   </Grid>
                 </Grid>
               </>

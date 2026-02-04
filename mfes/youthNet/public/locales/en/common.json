@@ -819,7 +819,12 @@
     "DISTRICT": "District",
     "DISTRICTS": "Districts",
     "STATE": "State",
-    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further",
+    "NO_STATES_FOUND": "No States found",
+    "NO_DISTRICTS_FOUND": "No Districts found",
+    "NO_BLOCKS_FOUND": "No Blocks found",
+    "NO_VILLAGES_FOUND": "No Villages found"
+    
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
