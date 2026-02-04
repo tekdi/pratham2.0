@@ -168,20 +168,20 @@ const Centers = () => {
       //set 2 grid layout
       let alterUISchema = responseForm?.uiSchema;
       alterUISchema['ui:order'] = [
-        "name",
-        "center_type",
         "state",
         "district",
         "block",
         "village",
+        "board",
+        "medium",
+        "grade",
+        "name",
+        "center_type",
         "address",
         "image",
         "google_map_link",
         'industry',
-        "catchment_area",
-        "board",
-        "medium",
-        "grade",
+        "catchment_area"
       ];
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
