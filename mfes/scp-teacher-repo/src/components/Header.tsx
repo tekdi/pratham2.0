@@ -423,12 +423,18 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       if (storedTenantData) {
         try {
           const parsedTenantData = JSON.parse(storedTenantData);
-          setTenantData(parsedTenantData);
+          
+          // Filter out pragyanpath tenant
+          const filteredTenantData = parsedTenantData.filter(
+            (tenant: any) => tenant?.tenantName?.toLowerCase() !== 'pragyanpath'
+          );
+          
+          setTenantData(filteredTenantData);
           
           // Show switch button if there are multiple tenants or multiple roles in any tenant
           const shouldShowButton = 
-            parsedTenantData.length > 1 || 
-            parsedTenantData.some((tenant: any) => tenant?.roles?.length > 1);
+            filteredTenantData.length > 1 || 
+            filteredTenantData.some((tenant: any) => tenant?.roles?.length > 1);
           setShowSwitchButton(shouldShowButton);
         } catch (error) {
           console.error('Error parsing tenantData:', error);
