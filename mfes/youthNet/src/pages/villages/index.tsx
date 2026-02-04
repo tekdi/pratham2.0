@@ -243,9 +243,13 @@ const Index = () => {
   // Lead role: selected center in mobilizer tab (data from cohortData in localStorage)
   const [selectedMobilizerCenterId, setSelectedMobilizerCenterId] = useState<string>('');
 
+  // Lead role: selected center for Villages (tab 2) and Youth/Volunteers (tab 3) - drives state/district/block from catchment
+  const [selectedCenterIdForLocation, setSelectedCenterIdForLocation] = useState<string>('');
+
   // Center dropdown options for mobilizer tab (Lead) - from cohortData in localStorage
+  // Center dropdown options for Lead: Mobilizer tab (tab 1) and Villages/Youth tabs (tabs 2 & 3) - from cohortData in localStorage
   const mobilizerCenterOptions = useMemo(() => {
-    if (typeof window === 'undefined' || value !== 1) return [];
+    if (typeof window === 'undefined') return [];
     const cohortDataString = localStorage.getItem('cohortData');
     const cohortData = cohortDataString ? JSON.parse(cohortDataString) : [];
     if (!Array.isArray(cohortData)) return [];
@@ -253,21 +257,23 @@ const Index = () => {
       id: cohort.cohortId,
       name: cohort.cohortName || cohort.name || cohort.cohortId || '',
     })).filter((o: { id: string; name: string }) => o.id && o.name);
-  }, [value]);
+  }, []);
 
-  // Helper function to extract states, districts and blocks from catchment_area
-  // Supports multiple centers by merging catchment areas from all active cohorts
-  const getStatesDistrictsAndBlocksFromCatchmentArea = () => {
+  // Helper: extract states, districts and blocks from a single center's catchment_area (for Villages & Youth/Volunteers tabs)
+  const getStatesDistrictsAndBlocksFromCenterCatchment = (centerId: string) => {
     try {
+      if (!centerId) return { states: [], districtsByState: {}, blocksByDistrict: {} };
       const cohortDataString = localStorage.getItem('cohortData');
-      const cohortData: any[] = cohortDataString
-        ? JSON.parse(cohortDataString)
-        : [];
+      const cohortData: any[] = cohortDataString ? JSON.parse(cohortDataString) : [];
+      if (!Array.isArray(cohortData)) return { states: [], districtsByState: {}, blocksByDistrict: {} };
 
-      console.log('cohortData???', cohortData);
-      
-      // Handle multiple centers - cohortData is now an array of active cohorts
-      if (!Array.isArray(cohortData) || cohortData.length === 0) {
+      const cohort = cohortData.find((c: any) => c.cohortId === centerId);
+      if (!cohort?.customField) return { states: [], districtsByState: {}, blocksByDistrict: {} };
+
+      const catchmentAreaField = cohort.customField.find(
+        (field: any) => field.label === 'CATCHMENT_AREA'
+      );
+      if (!catchmentAreaField?.selectedValues || !Array.isArray(catchmentAreaField.selectedValues)) {
         return { states: [], districtsByState: {}, blocksByDistrict: {} };
       }
 
@@ -275,82 +281,41 @@ const Index = () => {
       const stateMap = new Map();
       const districtsByState: Record<number, any[]> = {};
       const blocksByDistrict: Record<number, any[]> = {};
-      const districtMap = new Map<string, boolean>(); // Track districts to avoid duplicates
-      const blockMap = new Map<string, boolean>(); // Track blocks to avoid duplicates
+      const districtMap = new Map<string, boolean>();
+      const blockMap = new Map<string, boolean>();
 
-      // Iterate through all cohorts to merge catchment areas
-      cohortData.forEach((cohort: any) => {
-        if (!cohort || !cohort.customField) {
-          return;
+      catchmentAreaField.selectedValues.forEach((state: any) => {
+        if (state.stateId && !stateMap.has(state.stateId)) {
+          states.push({ id: state.stateId, name: state.stateName });
+          stateMap.set(state.stateId, true);
+          districtsByState[state.stateId] = [];
         }
-
-        // Find CATCHMENT_AREA field for this cohort
-        const catchmentAreaField = cohort.customField.find(
-          (field: any) => field.label === 'CATCHMENT_AREA'
-        );
-
-        if (!catchmentAreaField || !catchmentAreaField.selectedValues) {
-          return;
-        }
-
-        const catchmentAreaArray = catchmentAreaField.selectedValues;
-
-        // Extract states, districts and blocks from catchment_area
-        // catchmentAreaField.selectedValues is an array of state objects
-        if (Array.isArray(catchmentAreaArray)) {
-          catchmentAreaArray.forEach((state: any) => {
-            // Add state if not already added
-            if (state.stateId && !stateMap.has(state.stateId)) {
-              states.push({
-                id: state.stateId,
-                name: state.stateName,
+        if (state.districts && Array.isArray(state.districts)) {
+          state.districts.forEach((district: any) => {
+            const districtKey = `${state.stateId}-${district.districtId}`;
+            if (
+              district.districtId &&
+              !districtMap.has(districtKey) &&
+              !districtsByState[state.stateId]?.find((d: any) => d.id === district.districtId)
+            ) {
+              districtsByState[state.stateId].push({
+                id: district.districtId,
+                name: district.districtName,
               });
-              stateMap.set(state.stateId, true);
-              districtsByState[state.stateId] = [];
+              districtMap.set(districtKey, true);
+              blocksByDistrict[district.districtId] = [];
             }
-
-            // Extract districts from this state
-            if (state.districts && Array.isArray(state.districts)) {
-              state.districts.forEach((district: any) => {
-                const districtKey = `${state.stateId}-${district.districtId}`;
-                
-                // Add district to state's districts list if not already added
-                if (
-                  district.districtId &&
-                  !districtMap.has(districtKey) &&
-                  !districtsByState[state.stateId].find(
-                    (d: any) => d.id === district.districtId
-                  )
-                ) {
-                  districtsByState[state.stateId].push({
-                    id: district.districtId,
-                    name: district.districtName,
-                  });
-                  districtMap.set(districtKey, true);
-                  blocksByDistrict[district.districtId] = [];
-                }
-
-                // Extract blocks from this district
-                if (district.blocks && Array.isArray(district.blocks)) {
-                  district.blocks.forEach((block: any) => {
-                    const blockKey = `${district.districtId}-${block.id}`;
-                    if (block.id && !blockMap.has(blockKey)) {
-                      // Check if block already exists in the array to avoid duplicates
-                      const existingBlock = blocksByDistrict[district.districtId]?.find(
-                        (b: any) => b.id === block.id
-                      );
-                      if (!existingBlock) {
-                        if (!blocksByDistrict[district.districtId]) {
-                          blocksByDistrict[district.districtId] = [];
-                        }
-                        blocksByDistrict[district.districtId].push({
-                          id: block.id,
-                          name: block.name,
-                        });
-                        blockMap.set(blockKey, true);
-                      }
-                    }
-                  });
+            if (district.blocks && Array.isArray(district.blocks)) {
+              district.blocks.forEach((block: any) => {
+                const blockKey = `${district.districtId}-${block.id}`;
+                if (block.id && !blockMap.has(blockKey)) {
+                  if (!blocksByDistrict[district.districtId]) {
+                    blocksByDistrict[district.districtId] = [];
+                  }
+                  if (!blocksByDistrict[district.districtId].find((b: any) => b.id === block.id)) {
+                    blocksByDistrict[district.districtId].push({ id: block.id, name: block.name });
+                    blockMap.set(blockKey, true);
+                  }
                 }
               });
             }
@@ -360,61 +325,177 @@ const Index = () => {
 
       return { states, districtsByState, blocksByDistrict };
     } catch (error) {
-      console.error(
-        'Error extracting states, districts and blocks from catchment_area:',
-        error
-      );
+      console.error('Error extracting catchment from center:', error);
       return { states: [], districtsByState: {}, blocksByDistrict: {} };
     }
   };
 
+  // Legacy: merge catchment from all cohorts (kept for any non–center-first flows)
+  const getStatesDistrictsAndBlocksFromCatchmentArea = () => {
+    try {
+      const cohortDataString = localStorage.getItem('cohortData');
+      const cohortData: any[] = cohortDataString ? JSON.parse(cohortDataString) : [];
+      if (!Array.isArray(cohortData) || cohortData.length === 0) {
+        return { states: [], districtsByState: {}, blocksByDistrict: {} };
+      }
+      const states: any[] = [];
+      const stateMap = new Map();
+      const districtsByState: Record<number, any[]> = {};
+      const blocksByDistrict: Record<number, any[]> = {};
+      const districtMap = new Map<string, boolean>();
+      const blockMap = new Map<string, boolean>();
+
+      cohortData.forEach((cohort: any) => {
+        if (!cohort?.customField) return;
+        const catchmentAreaField = cohort.customField.find(
+          (field: any) => field.label === 'CATCHMENT_AREA'
+        );
+        if (!catchmentAreaField?.selectedValues) return;
+        const catchmentAreaArray = catchmentAreaField.selectedValues;
+        if (!Array.isArray(catchmentAreaArray)) return;
+
+        catchmentAreaArray.forEach((state: any) => {
+          if (state.stateId && !stateMap.has(state.stateId)) {
+            states.push({ id: state.stateId, name: state.stateName });
+            stateMap.set(state.stateId, true);
+            districtsByState[state.stateId] = [];
+          }
+          if (state.districts && Array.isArray(state.districts)) {
+            state.districts.forEach((district: any) => {
+              const districtKey = `${state.stateId}-${district.districtId}`;
+              if (
+                district.districtId &&
+                !districtMap.has(districtKey) &&
+                !districtsByState[state.stateId]?.find((d: any) => d.id === district.districtId)
+              ) {
+                districtsByState[state.stateId].push({
+                  id: district.districtId,
+                  name: district.districtName,
+                });
+                districtMap.set(districtKey, true);
+                blocksByDistrict[district.districtId] = [];
+              }
+              if (district.blocks && Array.isArray(district.blocks)) {
+                district.blocks.forEach((block: any) => {
+                  const blockKey = `${district.districtId}-${block.id}`;
+                  if (block.id && !blockMap.has(blockKey)) {
+                    if (!blocksByDistrict[district.districtId]) {
+                      blocksByDistrict[district.districtId] = [];
+                    }
+                    if (!blocksByDistrict[district.districtId].find((b: any) => b.id === block.id)) {
+                      blocksByDistrict[district.districtId].push({ id: block.id, name: block.name });
+                      blockMap.set(blockKey, true);
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+      });
+      return { states, districtsByState, blocksByDistrict };
+    } catch (error) {
+      console.error('Error extracting states, districts and blocks from catchment_area:', error);
+      return { states: [], districtsByState: {}, blocksByDistrict: {} };
+    }
+  };
+
+  // For Lead on Villages (2) / Youth/Volunteers (3): init selected center to first option when switching to tab
   useEffect(() => {
+    if (
+      (value === 2 || value === 3) &&
+      YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() &&
+      mobilizerCenterOptions.length > 0 &&
+      !selectedCenterIdForLocation
+    ) {
+      setSelectedCenterIdForLocation(mobilizerCenterOptions[0].id);
+    }
+  }, [value, mobilizerCenterOptions, selectedCenterIdForLocation]);
+
+  // For Lead on Villages (2) / Youth/Volunteers (3): populate state/district/block from selected center's catchment
+  useEffect(() => {
+    if (
+      (value !== 2 && value !== 3) ||
+      YOUTHNET_USER_ROLE.LEAD !== getLoggedInUserRole() ||
+      !selectedCenterIdForLocation
+    ) {
+      return;
+    }
+    const { states, districtsByState, blocksByDistrict } =
+      getStatesDistrictsAndBlocksFromCenterCatchment(selectedCenterIdForLocation);
+
+    if (states.length > 0) {
+      setStateData(states);
+      const initialStateId = states[0]?.id;
+      setSelectedStateValue(initialStateId);
+      setAllDistrictsByState(districtsByState);
+      setAllBlocksByDistrict(blocksByDistrict);
+
+      if (initialStateId && districtsByState[initialStateId]) {
+        const initialDistricts = districtsByState[initialStateId];
+        setDistrictData(initialDistricts);
+        const initialDistrictId = initialDistricts[0]?.id;
+        setSelectedDistrictValue(initialDistrictId ?? '');
+
+        if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
+          setBlockData(blocksByDistrict[initialDistrictId]);
+          setSelectedBlockValue(blockId ? blockId : blocksByDistrict[initialDistrictId][0]?.id ?? '');
+        } else {
+          setBlockData([]);
+          setSelectedBlockValue('');
+        }
+      } else {
+        setDistrictData([]);
+        setBlockData([]);
+        setSelectedDistrictValue('');
+        setSelectedBlockValue('');
+      }
+    } else {
+      setStateData([]);
+      setDistrictData([]);
+      setBlockData([]);
+      setAllDistrictsByState({});
+      setAllBlocksByDistrict({});
+      setSelectedStateValue('');
+      setSelectedDistrictValue('');
+      setSelectedBlockValue('');
+    }
+  }, [value, selectedCenterIdForLocation, blockId]);
+
+  // Fallback for non-Lead or when blockId/villageId in URL: ensure block/village selection is applied
+  useEffect(() => {
+    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (value === 2 || value === 3)) return;
     const getData = async () => {
       try {
-        // For tabs 2 and 3, get data from catchment_area
         const { states, districtsByState, blocksByDistrict } =
           getStatesDistrictsAndBlocksFromCatchmentArea();
-
         if (states.length > 0) {
           setStateData(states);
           const initialStateId = states[0]?.id;
           setSelectedStateValue(initialStateId);
-
-          // Store districts by state and blocks by district mappings
           setAllDistrictsByState(districtsByState);
           setAllBlocksByDistrict(blocksByDistrict);
-
-          // Set districts for the first state
           if (initialStateId && districtsByState[initialStateId]) {
             const initialDistricts = districtsByState[initialStateId];
             setDistrictData(initialDistricts);
             const initialDistrictId = initialDistricts[0]?.id;
-            setSelectedDistrictValue(initialDistrictId);
-
-            // Set blocks for the first district
+            setSelectedDistrictValue(initialDistrictId ?? '');
             if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
               const initialBlocks = blocksByDistrict[initialDistrictId];
               setBlockData(initialBlocks);
-              setSelectedBlockValue(blockId ? blockId : initialBlocks[0]?.id);
+              setSelectedBlockValue(blockId ? blockId : initialBlocks[0]?.id ?? '');
             } else {
-              // Fallback to API if no blocks from catchment_area for this district
               const controllingfieldfk = [initialDistrictId?.toString()];
-              const fieldName = 'block';
               const blockResponce = await getStateBlockDistrictList({
                 controllingfieldfk,
-                fieldName,
+                fieldName: 'block',
               });
-
-              const transformedBlockData = blockResponce?.result?.values?.map(
-                (item: any) => ({
-                  id: item?.value,
-                  name: item?.label,
-                })
-              );
+              const transformedBlockData = blockResponce?.result?.values?.map((item: any) => ({
+                id: item?.value,
+                name: item?.label,
+              }));
               setBlockData(transformedBlockData);
-              setSelectedBlockValue(
-                blockId ? blockId : transformedBlockData[0]?.id
-              );
+              setSelectedBlockValue(blockId ? blockId : transformedBlockData?.[0]?.id ?? '');
             }
           }
         }
@@ -425,35 +506,6 @@ const Index = () => {
     };
     getData();
   }, [blockId, villageId]);
-
-  useEffect(() => {
-    // Initialize states, districts and blocks from catchment_area for tabs 2 and 3
-    const { states, districtsByState, blocksByDistrict } =
-      getStatesDistrictsAndBlocksFromCatchmentArea();
-
-    if (states.length > 0) {
-      setStateData(states);
-      const initialStateId = states[0]?.id;
-      setSelectedStateValue(initialStateId);
-
-      // Store districts by state and blocks by district mappings
-      setAllDistrictsByState(districtsByState);
-      setAllBlocksByDistrict(blocksByDistrict);
-
-      // Set districts for the first state
-      if (initialStateId && districtsByState[initialStateId]) {
-        const initialDistricts = districtsByState[initialStateId];
-        setDistrictData(initialDistricts);
-        const initialDistrictId = initialDistricts[0]?.id;
-        setSelectedDistrictValue(initialDistrictId);
-
-        // Set blocks for the first district
-        if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
-          setBlockData(blocksByDistrict[initialDistrictId]);
-        }
-      }
-    }
-  }, []);
 
   // Update districts when state changes
   useEffect(() => {
@@ -638,7 +690,10 @@ const Index = () => {
         setLoading(false);
       }
     };
-    if (value === 3 && selectedVillageValue?.length > 0) getYouthData();
+    const hasVillageSelection = Array.isArray(selectedVillageValue)
+      ? selectedVillageValue.length > 0
+      : selectedVillageValue != null && selectedVillageValue !== '';
+    if (value === 3 && hasVillageSelection) getYouthData();
   }, [value, selectedVillageValue]);
 
   const getMobilizersList = async () => {
@@ -844,18 +899,18 @@ const Index = () => {
         setLoading(true);
         let userDataString = localStorage.getItem('userData');
         let userData: any = userDataString ? JSON.parse(userDataString) : null;
-        let blockIds: any;
+        let villageIds: any;
         if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
-          const blockResult = userData?.customFields?.find(
-            (item: any) => item.label === 'BLOCK'
+          const villageResult = userData?.customFields?.find(
+            (item: any) => item.label === 'VILLAGE'
           );
-          blockIds =
-            blockResult?.selectedValues?.map((item: any) => item.id) || [];
-        } else if (selectedBlockValue !== '') {
-          blockIds = [selectedBlockValue];
+          villageIds =
+            villageResult?.selectedValues?.map((item: any) => item.id) || [];
+        } else if (selectedVillageValue !== '') {
+          villageIds = [selectedVillageValue];
         }
         const filters = {
-          block: blockIds,
+          village: villageIds,
           role: Role.LEARNER,
           tenantStatus: [Status.ACTIVE],
         };
@@ -879,7 +934,7 @@ const Index = () => {
       }
     };
     if (villageList?.length !== 0) getVillageYouthData();
-  }, [villageList, selectedBlockValue]);
+  }, [villageList, selectedVillageValue]);
 
   useEffect(() => {
     const getVillageList = async () => {
@@ -2666,82 +2721,78 @@ const Index = () => {
           <>
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <>
-                <Box
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    p: '20px 20px 0px 20px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {stateData ? (
+                <Grid container spacing={2} sx={{ p: '20px 20px 20px 20px' }}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Dropdown
+                      name="center"
+                      values={mobilizerCenterOptions}
+                      defaultValue={selectedCenterIdForLocation || mobilizerCenterOptions?.[0]?.id}
+                      onSelect={(centerId) => {
+                        setSelectedCenterIdForLocation(centerId);
+                      }}
+                      label={t('COMMON.CENTER')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {stateData?.length > 0 ? (
                       <Dropdown
                         name={stateData?.STATE_NAME}
                         values={stateData}
                         defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedStateValue(value);
-                        }}
+                        onSelect={(val) => setSelectedStateValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="state"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                      />
                     )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {districtData ? (
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {districtData?.length > 0 ? (
                       <Dropdown
                         name={districtData?.DISTRICT_NAME}
                         values={districtData}
                         defaultValue={
                           selectedDistrictValue || districtData?.[0]?.id
                         }
-                        onSelect={(value) => {
-                          setSelectedDistrictValue(value);
-                        }}
+                        onSelect={(val) => setSelectedDistrictValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="district"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                      />
                     )}
-                  </Box>
-                </Box>
-                <Box
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    p: '20px 20px 20px 20px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {blockData ? (
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {blockData?.length > 0 ? (
                       <Dropdown
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
                         defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedBlockValue(value);
-                        }}
+                        onSelect={(val) => setSelectedBlockValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="block"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                      />
                     )}
-                  </Box>
-                </Box>
+                  </Grid>
+                </Grid>
               </>
             )}
             <Box
@@ -2867,87 +2918,78 @@ const Index = () => {
           <>
             {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
               <>
-                <Box
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    p: '20px 20px 0px 20px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {stateData ? (
+                <Grid container spacing={2} sx={{ p: '20px 20px 20px 20px' }}>
+                  <Grid item xs={12} sm={6} md={4}>
+                    <Dropdown
+                      name="center"
+                      values={mobilizerCenterOptions}
+                      defaultValue={selectedCenterIdForLocation || mobilizerCenterOptions?.[0]?.id}
+                      onSelect={(centerId) => {
+                        setSelectedCenterIdForLocation(centerId);
+                      }}
+                      label={t('COMMON.CENTER')}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {stateData?.length > 0 ? (
                       <Dropdown
                         name={stateData?.STATE_NAME}
                         values={stateData}
                         defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedStateValue(value);
-                        }}
+                        onSelect={(val) => setSelectedStateValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="state"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                      />
                     )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
-                    {districtData ? (
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {districtData?.length > 0 ? (
                       <Dropdown
                         name={districtData?.DISTRICT_NAME}
                         values={districtData}
                         defaultValue={
                           selectedDistrictValue || districtData?.[0]?.id
                         }
-                        onSelect={(value) => {
-                          setSelectedDistrictValue(value);
-                        }}
+                        onSelect={(val) => setSelectedDistrictValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="district"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                      />
                     )}
-                  </Box>
-                </Box>
-                <Box
-                  display={'flex'}
-                  flexDirection={'row'}
-                  sx={{
-                    p: '20px 20px 0px 20px',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '50%',
-                      mr: '20px',
-                    }}
-                  >
-                    {blockData ? (
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
+                    {blockData?.length > 0 ? (
                       <Dropdown
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
                         defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(value) => {
-                          setSelectedBlockValue(value);
-                        }}
+                        onSelect={(val) => setSelectedBlockValue(val)}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                       />
                     ) : (
-                      <Loader showBackdrop={true} />
+                      <Dropdown
+                        name="block"
+                        values={[]}
+                        defaultValue=""
+                        onSelect={() => {}}
+                        label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                      />
                     )}
-                  </Box>
-                  <Box
-                    sx={{
-                      width: '50%',
-                    }}
-                  >
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={4}>
                     <Dropdown
                       name={DROPDOWN_NAME}
                       values={villageList.map((item: any) =>
@@ -2957,13 +2999,12 @@ const Index = () => {
                       )}
                       defaultValue={selectedVillageValue}
                       onSelect={(value) => {
-                        console.log('Selected:', value);
                         setSelectedVillageValue(value);
                       }}
                       label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
                     />
-                  </Box>
-                </Box>
+                  </Grid>
+                </Grid>
               </>
             )}
             <Box
