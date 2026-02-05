@@ -339,7 +339,7 @@ export const getOfflineAssessmentDetails = async ({
   // Build filters dynamically
   const requestFilters: any = {
     program: filters.program,
-    board: filters.board,
+    se_boards: filters.board,
     status: ['Live'],
     primaryCategory: ['Practice Question Set'],
   };
