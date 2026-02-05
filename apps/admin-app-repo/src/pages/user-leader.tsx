@@ -990,7 +990,7 @@ const UserLeader = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-          {formStep === 0 && (
+          {formStep === 0 && !(!selectedUserId || isMappingInProgress) && (
             <Button
               sx={{
                 backgroundColor: '#FFC107',
@@ -1015,7 +1015,7 @@ const UserLeader = () => {
               {t('COMMON.NEXT')}
             </Button>
           )}
-          {formStep === 1 && (
+          {formStep === 1 && !(!selectedUserId || !selectedCenterId || isMappingInProgress) && (
             <Button
               variant="contained"
               color="primary"
