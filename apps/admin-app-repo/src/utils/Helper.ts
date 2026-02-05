@@ -139,6 +139,17 @@ export const transformLabel = (label: string): string => {
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
 };
 
+export const transformLabelWithoutSpaces = (label: string): string => {
+  if (typeof label !== 'string') {
+    return label as any;
+  }
+
+  return label
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+
 export const transformArray = (arr: State[]): State[] => {
   if (!arr || !Array.isArray(arr)) {
     return arr;
