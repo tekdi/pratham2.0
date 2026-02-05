@@ -32,7 +32,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel, transformLabelWithoutSpaces } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
@@ -279,7 +279,7 @@ const Centers = () => {
     {
       key: 'name',
       label: 'Center Name',
-      render: (row: any) => transformLabel(row?.name),
+      render: (row: any) => transformLabelWithoutSpaces(row?.name),
     },
     {
       key: 'address',
