@@ -273,9 +273,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         };
 
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/mycohorts/${userId}?customField=true&children=true`;
-        
+
         const response = await axios.get(apiUrl, { headers });
-        
+
 
         // Extract centers from response
         // Response structure: response.data.result is an array of cohorts
@@ -525,35 +525,35 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   useEffect(() => {
     const fetchFacilitators = async () => {
-        const bodyPayload = {
-          limit: 100,
-          offset: 0,
-          role: [Role.TEACHER],
-          tenantStatus: [Status.ACTIVE],
-          filters: {
-            batch: [cohortData],
-            status: [Status.ACTIVE],
-          },
-          customfields: [
-            'state',
-            'district',
-            'block',
-            'village',
-            'main_subject',
-            'subject_taught',
-          ],
-          sort: [
-            "firstName",
-            "asc"
-          ]
-        };
-        // const test = isMobile ? infinitePage : page
-        const resp = await HierarchicalSearchUserList(bodyPayload);
-        // const resp = await queryClient.fetchQuery({
-        //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
-        //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
-        //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
-        // });
+      const bodyPayload = {
+        limit: 100,
+        offset: 0,
+        role: [Role.TEACHER],
+        tenantStatus: [Status.ACTIVE],
+        filters: {
+          batch: [cohortData],
+          status: [Status.ACTIVE],
+        },
+        customfields: [
+          'state',
+          'district',
+          'block',
+          'village',
+          'main_subject',
+          'subject_taught',
+        ],
+        sort: [
+          "firstName",
+          "asc"
+        ]
+      };
+      // const test = isMobile ? infinitePage : page
+      const resp = await HierarchicalSearchUserList(bodyPayload);
+      // const resp = await queryClient.fetchQuery({
+      //   // queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR, filters],
+      //   queryKey: [QueryKeys.GET_ACTIVE_FACILITATOR],
+      //   queryFn: () => getMyUserList({ limit, page, filters, fields }),
+      // });
 
       if (resp?.getUserDetails) {
         let facilitatorList = resp?.getUserDetails;
@@ -561,7 +561,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           console.log('No users found.');
           return;
         }
-        
+
         const extractedData = facilitatorList?.map(
           (user: any, index: number) => {
             // Extract batch names from cohortData
@@ -639,6 +639,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
           tenantStatus: [Status.ACTIVE],
           filters: {
             batch: mySelectedBatchIds,
+            status: [Status.ACTIVE],
           },
           customfields: [
             'state',
@@ -740,15 +741,15 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         setLoading(false);
       }
     };
-    if(isFromCenterDetailPage===false){
-    if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
-      getFacilitator();
-    } else {
-      setUsers([]);
-      setFilteredUsers([]);
-      setInfiniteData([]);
+    if (isFromCenterDetailPage === false) {
+      if (mySelectedBatchIds && mySelectedBatchIds.length > 0) {
+        getFacilitator();
+      } else {
+        setUsers([]);
+        setFilteredUsers([]);
+        setInfiniteData([]);
+      }
     }
-  }
   }, [mySelectedBatchIds, offset, isFacilitatorAdded]);
 
   const handleClose = () => {
@@ -825,8 +826,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const centersString =
         uniqueCentersMap.size > 0
           ? Array.from(uniqueCentersMap.values())
-              .map((c: string) => toPascalCase(c))
-              .join(', ')
+            .map((c: string) => toPascalCase(c))
+            .join(', ')
           : '-';
 
       setDeleteCenters(centersString);
@@ -887,9 +888,17 @@ const ManageUser: React.FC<ManageUsersProps> = ({
         ? transformCohortsToCohortData(selectedUser.cohorts)
         : [];
       setSelectedUserIdReassign(userId);
-      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy/${userId}`;
-      const response = await axios.get(apiUrl, { headers });
-      const geographicalData = response?.data?.result || [];
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
+      let response = null;
+      try {
+        const centerIds = myCenterList?.length > 0
+          ? myCenterList.map((center: any) => center.value).filter((id: any) => id)
+          : [];
+        response = await axios.post(apiUrl, { userId: userId, filters: { parentId: centerIds } }, { headers });
+      }
+      catch (e) { }
+      const geographicalData = response?.data?.result?.data || [];
 
       // Transform geographicalData into centerList
       let centerList = [];
@@ -1137,7 +1146,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
   const getBatchNames = (batchNames: any) => {
     if (!Array.isArray(batchNames)) return null;
-    return batchNames.join(', ');
+    return [...batchNames]
+      .sort((a, b) => (a || '').localeCompare(b || '', undefined, { sensitivity: 'base' }))
+      .join(', ');
   };
 
   const toggleBatchNamesExpanded = (userId: string) => {
@@ -1145,15 +1156,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       const newSet = new Set(prev);
       if (newSet.has(userId)) {
         newSet.delete(userId);
-        // When collapsing, let the ref callback check if it's still truncated
+        // When collapsing, keep it in truncated set so "Show more" can appear again
       } else {
         newSet.add(userId);
-        // When expanding, remove from truncated set since it's now fully visible
-        setTruncatedBatchNames((prevTruncated) => {
-          const newTruncatedSet = new Set(prevTruncated);
-          newTruncatedSet.delete(userId);
-          return newTruncatedSet;
-        });
+        // When expanding, keep it in truncated set so "Show less" can appear
+        // The truncated set tracks items that were originally truncated
       }
       return newSet;
     });
@@ -1373,29 +1380,59 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                     md={6}
                                     lg={4}
                                     key={user.userId}
+                                    sx={{ display: 'flex' }}
                                   >
                                     <Box
-                                      display={'flex'}
-                                      borderBottom={`1px solid ${theme.palette.warning['A100']}`}
-                                      width={'100%'}
-                                      justifyContent={'space-between'}
-                                      sx={{
-                                        cursor: 'pointer',
-                                        '@media (min-width: 600px)': {
-                                          border: `1px solid  ${theme.palette.action.selected}`,
-                                          padding: '4px 10px',
-                                          borderRadius: '8px',
-                                          background:
-                                            theme.palette.warning['A400'],
-                                        },
-                                      }}
+                                        display={'flex'}
+                                        flexDirection={'column'}
+                                        borderBottom={`1px solid ${theme.palette.warning['A100']}`}
+                                        width={'100%'}
+                                        justifyContent={'space-between'}
+                                        sx={{
+                                          cursor: 'pointer',
+                                          height: '100%',
+                                          position: 'relative',
+                                          '@media (min-width: 600px)': {
+                                            border: `1px solid  ${theme.palette.action.selected}`,
+                                            padding: '4px 10px',
+                                            borderRadius: '8px',
+                                            background:
+                                              theme.palette.warning['A400'],
+                                          },
+                                        }}
                                     >
+                                      
                                       <Box
-                                        display="flex"
-                                        alignItems="center"
-                                        gap="5px"
+                                          sx={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            zIndex: 1,
+                                          }}>
+                                        <MoreVertIcon
+                                          onClick={(event) => {
+                                            isMobile
+                                              ? toggleDrawer(
+                                                'bottom',
+                                                true,
+                                                user
+                                              )(event)
+                                              : handleMenuOpen(event, user);
+                                          }}
+                                          sx={{
+                                            fontSize: '24px',
+                                            color: theme.palette.warning['300'],
+                                            cursor: 'pointer',
+                                          }}
+                                        />
+                                      </Box>
+                                      <Box
+                                          display="flex"
+                                          alignItems="flex-start"
+                                          gap="5px"
+                                          flex={1}
                                       >
-                                        <Box>
+                                        <Box sx={{ flex: 1, minWidth: 0 }}>
                                           <CustomLink
                                             className="word-break"
                                             href="#"
@@ -1420,45 +1457,76 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             </Typography>
                                           </CustomLink>
                                           {/* Uncomment if batchnames to be displayed */}
-                                          <Box
-                                            sx={{
-                                              backgroundColor:
-                                                theme.palette.action.selected,
-                                              padding: '5px',
-                                              width: 'fit-content',
-                                              borderRadius: '5px',
-                                              fontSize: '12px',
-                                              fontWeight: '600',
-                                              color: 'black',
-                                              marginBottom: '10px',
-                                            }}
-                                          >
-                                            {user?.batchNames?.length > 0
-                                              ? getBatchNames(user.batchNames)
-                                              : t(
-                                                'ATTENDANCE.NO_BATCHES_ASSIGNED'
-                                              )}
-                                          </Box>
+                                            <Box
+                                              sx={{
+                                                backgroundColor:
+                                                  theme.palette.action.selected,
+                                                padding: '5px',
+                                                width: 'fit-content',
+                                                maxWidth: '100%',
+                                                borderRadius: '5px',
+                                                fontSize: '12px',
+                                                fontWeight: '600',
+                                                color: 'black',
+                                                marginBottom: '10px',
+                                                position: 'relative',
+                                              }}
+                                            >
+                                              <Box
+                                                ref={(el: HTMLElement | null) => {
+                                                  if (!el) return;
+
+                                                  // Use requestAnimationFrame to ensure styles are applied
+                                                  requestAnimationFrame(() => {
+                                                    if (!expandedBatchNames.has(user.userId)) {
+                                                      // Check if content is actually truncated when collapsed
+                                                      const isTruncated = el.scrollHeight > el.clientHeight;
+                                                      setTruncatedBatchNames((prev) => {
+                                                        const newSet = new Set(prev);
+                                                        if (isTruncated) {
+                                                          newSet.add(user.userId);
+                                                        } else {
+                                                          newSet.delete(user.userId);
+                                                        }
+                                                        return newSet;
+                                                      });
+                                                    }
+                                                    // When expanded, keep it in truncated set so "Show less" button remains visible
+                                                  });
+                                                }}
+                                                sx={{
+                                                  display: '-webkit-box',
+                                                  WebkitLineClamp: expandedBatchNames.has(user.userId) ? 'none' : 4,
+                                                  WebkitBoxOrient: 'vertical',
+                                                  overflow: expandedBatchNames.has(user.userId) ? 'visible' : 'hidden',
+                                                  wordBreak: 'break-word',
+                                                }}
+                                              >
+                                                {user?.batchNames?.length > 0
+                                                  ? getBatchNames(user.batchNames)
+                                                  : t(
+                                                    'ATTENDANCE.NO_BATCHES_ASSIGNED'
+                                                  )}
+                                              </Box>
+                                              {user?.batchNames?.length > 0 &&
+                                                getBatchNames(user.batchNames) &&
+                                                (truncatedBatchNames.has(user.userId) || expandedBatchNames.has(user.userId)) && (
+                                                  <Typography
+                                                    onClick={() => toggleBatchNamesExpanded(user.userId)}
+                                                    sx={{
+                                                      fontSize: '11px',
+                                                      fontWeight: '600',
+                                                      color: theme.palette.secondary.main,
+                                                      cursor: 'pointer',
+                                                      marginTop: '4px',
+                                                      textDecoration: 'underline',
+                                                    }}
+                                                  >
+                                                    {expandedBatchNames.has(user.userId) ? 'Show less' : 'Show more'}
+                                                  </Typography>
+                                                )}
+                                            </Box>
                                         </Box>
-                                      </Box>
-                                      <Box>
-                                        <MoreVertIcon
-                                          onClick={(event) => {
-                                            isMobile
-                                              ? toggleDrawer(
-                                                'bottom',
-                                                true,
-                                                user
-                                              )(event)
-                                              : handleMenuOpen(event, user);
-                                          }}
-                                          sx={{
-                                            fontSize: '24px',
-                                            marginTop: '1rem',
-                                            color: theme.palette.warning['300'],
-                                            cursor: 'pointer',
-                                          }}
-                                        />
                                       </Box>
                                     </Box>
                                   </Grid>
@@ -1516,6 +1584,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                         sx={{
                                           cursor: 'pointer',
                                           height: '100%',
+                                          position: 'relative',
                                           '@media (min-width: 600px)': {
                                             border: `1px solid  ${theme.palette.action.selected}`,
                                             padding: '4px 10px',
@@ -1525,6 +1594,32 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                           },
                                         }}
                                       >
+                                        <Box
+                                          sx={{
+                                            position: 'absolute',
+                                            top: '8px',
+                                            right: '8px',
+                                            zIndex: 1,
+                                          }}
+                                        >
+                                          <MoreVertIcon
+                                            onClick={(event) => {
+                                              isMobile
+                                                ? toggleDrawer(
+                                                  'bottom',
+                                                  true,
+                                                  user
+                                                )(event)
+                                                : handleMenuOpen(event, user);
+                                            }}
+                                            sx={{
+                                              fontSize: '24px',
+                                              color:
+                                                theme.palette.warning['300'],
+                                              cursor: 'pointer',
+                                            }}
+                                          />
+                                        </Box>
                                         <Box
                                           display="flex"
                                           alignItems="flex-start"
@@ -1580,7 +1675,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                   // Use requestAnimationFrame to ensure styles are applied
                                                   requestAnimationFrame(() => {
                                                     if (!expandedBatchNames.has(user.userId)) {
-                                                      // Check if content is actually truncated
+                                                      // Check if content is actually truncated when collapsed
                                                       const isTruncated = el.scrollHeight > el.clientHeight;
                                                       setTruncatedBatchNames((prev) => {
                                                         const newSet = new Set(prev);
@@ -1591,14 +1686,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                         }
                                                         return newSet;
                                                       });
-                                                    } else {
-                                                      // When expanded, remove from truncated set
-                                                      setTruncatedBatchNames((prev) => {
-                                                        const newSet = new Set(prev);
-                                                        newSet.delete(user.userId);
-                                                        return newSet;
-                                                      });
                                                     }
+                                                    // When expanded, keep it in truncated set so "Show less" button remains visible
                                                   });
                                                 }}
                                                 sx={{
@@ -1617,7 +1706,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               </Box>
                                               {user?.batchNames?.length > 0 &&
                                                 getBatchNames(user.batchNames) &&
-                                                truncatedBatchNames.has(user.userId) && (
+                                                (truncatedBatchNames.has(user.userId) || expandedBatchNames.has(user.userId)) && (
                                                   <Typography
                                                     onClick={() => toggleBatchNamesExpanded(user.userId)}
                                                     sx={{
@@ -1634,26 +1723,6 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                                 )}
                                             </Box>
                                           </Box>
-                                        </Box>
-                                        <Box sx={{ alignSelf: 'flex-end' }}>
-                                          <MoreVertIcon
-                                            onClick={(event) => {
-                                              isMobile
-                                                ? toggleDrawer(
-                                                  'bottom',
-                                                  true,
-                                                  user
-                                                )(event)
-                                                : handleMenuOpen(event, user);
-                                            }}
-                                            sx={{
-                                              fontSize: '24px',
-                                              marginTop: '1rem',
-                                              color:
-                                                theme.palette.warning['300'],
-                                              cursor: 'pointer',
-                                            }}
-                                          />
                                         </Box>
                                       </Box>
                                     </Grid>
@@ -2100,7 +2169,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                 } catch (error: any) {
                   showToastMessage(
                     error?.response?.data?.params?.errmsg ||
-                      t('COMMON.SOMETHING_WENT_WRONG'),
+                    t('COMMON.SOMETHING_WENT_WRONG'),
                     'error'
                   );
                 }

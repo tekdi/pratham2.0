@@ -693,7 +693,8 @@
     "BELONG_TO_MULTIPLE_CENTERS": "belong to multiple centers",
     "WAS_BELONG_TO": "was belong to",
     "DO_YOU_WANT_TO_DELETE": "Do you want to delete from center as well?",
-    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete from centers as well?"
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete from centers as well?",
+    "CONSENT_FILE": "Consent File"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

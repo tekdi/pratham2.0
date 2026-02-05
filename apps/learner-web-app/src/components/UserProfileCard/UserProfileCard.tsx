@@ -9,17 +9,24 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import settingImage from '../../../public/images/settings.png';
 import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useRouter } from 'next/navigation';
 import { getUserDetails } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import DocumentViewer from '@shared-lib-v2/DynamicForm/components/DocumentViewer/DocumentViewer';
 
 // Helper function to get field value from userData based on schema
 const getFieldValue = (fieldName: string, fieldSchema: Record<string, unknown>, userData: Record<string, unknown>, customFields: Array<Record<string, unknown>> = []) => {
@@ -104,6 +111,9 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const [formSchema, setFormSchema] = useState<Record<string, unknown> | null>(null); // Form schema state
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState<string>('');
 
   const storedConfig =
     typeof window !== 'undefined'
@@ -182,6 +192,39 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
+  };
+
+  const handlePreview = (url: string, title: string) => {
+    setPreviewUrl(url);
+    setPreviewTitle(title);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewUrl(null);
+    setPreviewTitle('');
+  };
+
+  // Helper function to check if a field is a file field
+  const isFileField = (fieldSchema: Record<string, unknown>): boolean => {
+    return (
+      fieldSchema?.field_type === 'file_upload' ||
+      fieldSchema?.field_type === 'file' ||
+      fieldSchema?.type === 'array' && (fieldSchema?.items as Record<string, unknown>)?.type === 'string' && 
+      ((fieldSchema?.items as Record<string, unknown>)?.format === 'data-url' || (fieldSchema?.items as Record<string, unknown>)?.format === 'uri')
+    );
+  };
+
+  // Helper function to check if a value is a valid URL
+  const isValidUrl = (value: unknown): boolean => {
+    if (typeof value !== 'string') return false;
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   };
 
   const handleOpen = (option: string) => {
@@ -586,13 +629,46 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                 {otherSectionFields.map((field) => {
                   const fieldTitle = (field.schema.title as string) || field.name;
                   const labelKey = `FORM.${fieldTitle}`;
+                  const isFile = isFileField(field.schema);
+                  const hasValidUrl = isValidUrl(field.rawValue);
                   
                   return (
                     <Grid item xs={6} key={field.name}>
                       <Typography sx={labelStyle}>
                         {t(labelKey, { defaultValue: toPascalCase(String(fieldTitle).replace(/_/g, ' ')) })}
                       </Typography>
-                      <Typography sx={valueStyle}>{t(`FORM.${String(field.value).toUpperCase()}`, { defaultValue: toPascalCase(String(field.value)) })}</Typography>
+                      {isFile && hasValidUrl ? (
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 0.5,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              '& .view-text': {
+                                textDecoration: 'underline',
+                              }
+                            }
+                          }}
+                          onClick={() => handlePreview(String(field.rawValue), fieldTitle)}
+                        >
+                          <VisibilityIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                          <Typography 
+                            className="view-text"
+                            sx={{ 
+                              ...valueStyle, 
+                              color: 'primary.main',
+                              fontWeight: 500
+                            }}
+                          >
+                            {t('VIEW_FILE', { defaultValue: 'View File' })}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography sx={valueStyle}>
+                          {t(`FORM.${String(field.value).toUpperCase()}`, { defaultValue: toPascalCase(String(field.value)) })}
+                        </Typography>
+                      )}
                     </Grid>
                   );
                 })}
@@ -637,6 +713,56 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       >
         Open PDF
       </a> */}
+
+      {/* File Preview Dialog */}
+      <Dialog
+        open={isPreviewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            height: '90vh',
+            maxHeight: '90vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {t('FILE_PREVIEW', { defaultValue: 'File Preview' })} - {t(`FORM.${previewTitle}`, { defaultValue: toPascalCase(String(previewTitle).replace(/_/g, ' ')) })}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {previewUrl && (
+            <DocumentViewer
+              url={previewUrl}
+              width="100%"
+              height="100%"
+              showError={true}
+              showDownloadButton={false}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview}>{t('COMMON.CLOSE', { defaultValue: 'Close' })}</Button>
+          {/* {previewUrl && (
+            <Button
+              variant="contained"
+              href={previewUrl}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('COMMON.DOWNLOAD', { defaultValue: 'Download' })}
+            </Button> */}
+          
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

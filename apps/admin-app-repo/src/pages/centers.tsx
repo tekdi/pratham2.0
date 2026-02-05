@@ -32,7 +32,7 @@ import {
 } from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel, transformLabelWithoutSpaces } from '@/utils/Helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
@@ -168,20 +168,20 @@ const Centers = () => {
       //set 2 grid layout
       let alterUISchema = responseForm?.uiSchema;
       alterUISchema['ui:order'] = [
-        "name",
-        "center_type",
         "state",
         "district",
         "block",
         "village",
+        "board",
+        "medium",
+        "grade",
+        "name",
+        "center_type",
         "address",
         "image",
         "google_map_link",
         'industry',
-        "catchment_area",
-        "board",
-        "medium",
-        "grade",
+        "catchment_area"
       ];
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
@@ -279,7 +279,7 @@ const Centers = () => {
     {
       key: 'name',
       label: 'Center Name',
-      render: (row: any) => transformLabel(row?.name),
+      render: (row: any) => transformLabelWithoutSpaces(row?.name),
     },
     {
       key: 'address',

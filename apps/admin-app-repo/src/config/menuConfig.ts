@@ -8,12 +8,12 @@ export const MENU_CONFIG = {
       link: '/centers',
       roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
     },
-    batch: {
-      title: 'SIDEBAR.BATCH',
-      icon: '/images/centers.svg',
-      link: '/batch',
-      roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
-    },
+    // batch: {
+    //   title: 'SIDEBAR.BATCH',
+    //   icon: '/images/centers.svg',
+    //   link: '/batch',
+    //   roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+    // },
     manageUsers: {
       title: 'SIDEBAR.MANAGE_USERS',
       icon: '/images/group.svg',
