@@ -42,6 +42,7 @@ import {
   ArrowBack as ArrowBackIcon,
   CreateOutlined as CreateOutlinedIcon,
   East as EastIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import {
   Box,
@@ -50,6 +51,10 @@ import {
   CardContent,
   Grid,
   Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { GetStaticPaths } from 'next';
@@ -66,6 +71,14 @@ import {
   getCohortDetails,
 } from '@/services/CenterListServices';
 import LearnerManage from '@/shared/LearnerManage/LearnerManage';
+
+// Dynamically import DocumentViewer to avoid SSR issues
+const DocumentViewer = dynamic(
+  () => import('@shared-lib-v2/DynamicForm/components/DocumentViewer/DocumentViewer'),
+  {
+    ssr: false,
+  }
+);
 let AssessmentReport: ComponentType<AssessmentReportProp> | null = null;
 
 if (!isEliminatedFromBuild('AssessmentReport', 'component')) {
@@ -138,6 +151,9 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   const [center, setCenter] = useState<any>(null);
   const [batchName, setBatchName] = useState<string>('');
   const [batchNames, setBatchNames] = useState<string[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState<string>('');
 
   useEffect(() => {
     setSelectedValue(currentDayMonth);
@@ -891,6 +907,38 @@ if (familyField?.displayValue) {
 
   console.log(batchNames, 'batchNames');
 
+  // Helper function to check if a field is a file field
+  const isFileField = (fieldType: string): boolean => {
+    return (
+      fieldType === 'file_upload' ||
+      fieldType === 'file' ||
+      fieldType === 'document'
+    );
+  };
+
+  // Helper function to check if a value is a valid URL
+  const isValidUrl = (value: unknown): boolean => {
+    if (typeof value !== 'string') return false;
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  };
+
+  const handlePreview = (url: string, title: string) => {
+    setPreviewUrl(url);
+    setPreviewTitle(title);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewUrl(null);
+    setPreviewTitle('');
+  };
+
   return (
     <>
       <Header />
@@ -1230,6 +1278,10 @@ if (familyField?.displayValue) {
                   ? t(`FORM.${item?.label?.toUpperCase()}`, item?.label)
                   : item?.label;
 
+                // Check if this is a file field
+                const isFile = isFileField(item.type);
+                const hasValidUrl = isValidUrl(item.value || displayValue);
+
                 return (
                   <Grid item xs={4} key={i}>
                     <Typography
@@ -1242,19 +1294,51 @@ if (familyField?.displayValue) {
                     >
                       {labelText}
                     </Typography>
-                    <Typography
-                      variant="h4"
-                      margin={0}
-                      sx={{
-                        wordBreak: 'break-word',
-                        fontSize: '16px',
-                        color: theme.palette.warning['A200'],
-                      }}
-                    >
-                      {displayValue !== '-' && typeof displayValue === 'string'
-                        ? t(`FORM.${displayValue}`, toPascalCase(displayValue))
-                        : toPascalCase(displayValue)}
-                    </Typography>
+                    {isFile && hasValidUrl ? (
+                      <Box 
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 0.5,
+                          cursor: 'pointer',
+                          '&:hover': {
+                            '& .view-text': {
+                              textDecoration: 'underline',
+                            }
+                          }
+                        }}
+                        onClick={() => handlePreview(String(item.value || displayValue), labelText)}
+                      >
+                        <VisibilityIcon sx={{ fontSize: '1rem', color: theme.palette.secondary.main }} />
+                        <Typography 
+                          className="view-text"
+                          variant="h4"
+                          margin={0}
+                          sx={{
+                            wordBreak: 'break-word',
+                            fontSize: '16px',
+                            color: theme.palette.secondary.main,
+                            fontWeight: 500
+                          }}
+                        >
+                          {t('COMMON.VIEW_FILE', 'View File')}
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <Typography
+                        variant="h4"
+                        margin={0}
+                        sx={{
+                          wordBreak: 'break-word',
+                          fontSize: '16px',
+                          color: theme.palette.warning['A200'],
+                        }}
+                      >
+                        {displayValue !== '-' && typeof displayValue === 'string'
+                          ? t(`FORM.${displayValue}`, toPascalCase(displayValue))
+                          : toPascalCase(displayValue)}
+                      </Typography>
+                    )}
                   </Grid>
                 );
               })}
@@ -1281,6 +1365,56 @@ if (familyField?.displayValue) {
             </Card>
           </Box>
         )} */}
+
+      {/* File Preview Dialog */}
+      <Dialog
+        open={isPreviewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            height: '90vh',
+            maxHeight: '90vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {t('COMMON.FILE_PREVIEW', 'File Preview')} 
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {previewUrl && (
+            <DocumentViewer
+              url={previewUrl}
+              width="100%"
+              height="100%"
+              showError={true}
+              showDownloadButton={false}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview}>{t('COMMON.CLOSE', 'Close')}</Button>
+          {/* {previewUrl && (
+            <Button
+              variant="contained"
+              href={previewUrl}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('COMMON.DOWNLOAD', 'Download')}
+            </Button>
+          )} */}
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

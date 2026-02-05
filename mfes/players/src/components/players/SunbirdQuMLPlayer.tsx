@@ -1,6 +1,7 @@
 import 'reflect-metadata';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 // import axios from 'axios';
+import { CircularProgress, Box } from '@mui/material';
 import { handleTelemetryEventQuml } from '../../services/TelemetryService';
 import { handleExitEvent } from '../utils/Helper';
 import { createAssessmentTracking } from '../../services/PlayerService';
@@ -20,7 +21,40 @@ const SunbirdQuMLPlayer = ({
 }: PlayerConfigProps) => {
   const SunbirdQuMLPlayerRef = useRef<HTMLIFrameElement | null>(null);
 
+  const [invalidContent, setInvalidContent] = useState<boolean | null>(null);
+  const [renderContent, setRenderContent] = useState(true);
+
   useEffect(() => {
+
+    try {
+      //check if the playerConfig is valid or not
+      let contentObj: any = playerConfig?.metadata;
+      //fix for maxScore getting zero in backend then do not play the content
+      let maxScore_Temp = contentObj?.maxScore;
+      if (!maxScore_Temp) {
+        maxScore_Temp =
+          contentObj?.outcomeDeclaration?.maxScore?.defaultValue;
+      }
+      if (
+        maxScore_Temp == 0 ||
+        maxScore_Temp == null ||
+        maxScore_Temp == undefined ||
+        maxScore_Temp == '0'
+      ) {
+        setInvalidContent(true);
+        setRenderContent(false);
+      }
+      else {
+        setInvalidContent(false);
+        setRenderContent(true);
+      }
+    }
+    catch (error) {
+      console.error('Error checking content:', error);
+      setInvalidContent(true);
+      setRenderContent(false);
+    }
+
     const playerElement: any = SunbirdQuMLPlayerRef.current;
     if (playerElement) {
       const originalSrc = playerElement.src;
@@ -111,19 +145,45 @@ const SunbirdQuMLPlayer = ({
       window.removeEventListener('message', handleMessage);
     };
   }, []);
-
-  return (
-    <iframe
-      ref={SunbirdQuMLPlayerRef}
-      id="contentPlayer"
-      title="Content Player"
-      src={`${basePath}/libs/sunbird-quml-player/index.html`}
-      aria-label="Content Player"
-      style={{ border: 'none' }}
-      width={'100%'}
-      height={'100%'}
-    ></iframe>
-  );
+  if (renderContent === true) {
+    return (
+      <iframe
+        ref={SunbirdQuMLPlayerRef}
+        id="contentPlayer"
+        title="Content Player"
+        src={`${basePath}/libs/sunbird-quml-player/index.html`}
+        aria-label="Content Player"
+        style={{ border: 'none' }}
+        width={'100%'}
+        height={'100%'}
+      ></iframe>
+    );
+  }
+  if (invalidContent === null) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '400px',
+          width: '100%',
+        }}
+      >
+        <CircularProgress
+          size={60}
+          thickness={4}
+          sx={{
+            color: '#FDBE16',
+            animationDuration: '1.5s',
+          }}
+        />
+      </Box>
+    );
+  }
+  if (invalidContent === true) {
+    return <div>Unsupported content</div>;
+  }
 };
 
 export default SunbirdQuMLPlayer;
