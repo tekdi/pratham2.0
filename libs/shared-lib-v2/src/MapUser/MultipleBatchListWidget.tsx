@@ -590,11 +590,15 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         filters.village = selectedVillage;
       }
 
+      //for search name
+      if(searchKeyword){
+        filters.name = searchKeyword;
+      }
+
       const payload = {
         limit: 200,
         offset: 0,
         filters,
-        ...(searchKeyword && { name: searchKeyword }),
       };
 
       const response = await axios.post(
