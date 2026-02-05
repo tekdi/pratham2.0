@@ -134,6 +134,7 @@ export default function LandingPage() {
   };
 
   const aboutPrathamText = t('LANDING.ABOUT_PRATHAM_TEXT');
+  const aboutPrathamLearningPlatformText = t('LANDING.ABOUT_PRATHAM_LEARNING_PLATFORM_TEXT');
 
   return (
     <>
@@ -395,7 +396,7 @@ export default function LandingPage() {
                   whiteSpace: 'pre-line',
                 }}
               >
-                {aboutPrathamText}
+                {aboutPrathamLearningPlatformText}
               </Typography>
             </Grid>
           </Grid>
