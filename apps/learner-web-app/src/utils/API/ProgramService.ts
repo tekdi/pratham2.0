@@ -8,10 +8,24 @@ export const getTenantInfo = async (): Promise<any> => {
   try {
     const response = await axios.get(apiUrl);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const matchingTenants =
-      response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
-      ) || [];
+    const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    
+    // Check if we're on an ngrok domain
+    const isNgrokDomain = currentHostname.includes('ngrok') || currentHostname.includes('ngrok.io') || currentHostname.includes('ngrok-free.app');
+    
+    let matchingTenants = [];
+    
+    if (isNgrokDomain) {
+      // For ngrok domains, return all tenants as fallback
+      matchingTenants = response?.data?.result || [];
+    } else {
+      // Normal domain matching
+      matchingTenants =
+        response?.data?.result?.filter((tenant: any) =>
+          tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+        ) || [];
+    }
+    
     const programsData =
       matchingTenants.flatMap((t: any) => t?.children || []) || [];
       console.log("programsData", programsData)
@@ -41,10 +55,26 @@ export const getPrathamTenantId = async (): Promise<string | null> => {
   try {
     const response = await axios.get(apiUrl);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const matchingTenants =
-      response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+    const currentHostname = typeof window !== 'undefined' ? window.location.hostname : '';
+    
+    // Check if we're on an ngrok domain
+    const isNgrokDomain = currentHostname.includes('ngrok') || currentHostname.includes('ngrok.io') || currentHostname.includes('ngrok-free.app');
+    
+    let matchingTenants = [];
+    
+    if (isNgrokDomain) {
+      // For ngrok domains, find Pratham tenant by name as fallback
+      matchingTenants = response?.data?.result?.filter((tenant: any) =>
+        tenant?.name === 'Pratham'
       ) || [];
+    } else {
+      // Normal domain matching
+      matchingTenants =
+        response?.data?.result?.filter((tenant: any) =>
+          tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
+        ) || [];
+    }
+    
     return matchingTenants[0]?.tenantId || null;
   } catch (error) {
     console.error('Error in fetching tenant info', error);

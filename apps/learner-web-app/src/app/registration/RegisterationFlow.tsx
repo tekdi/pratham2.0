@@ -699,7 +699,12 @@ const RegisterationFlow = () => {
           if (typeof window !== 'undefined' && window.localStorage) {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
-            localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            // Only store refreshToken if it has a valid value
+            if (refreshToken) {
+              localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            } else {
+              localStorage.removeItem('refreshTokenForAndroid');
+            }
 
             localStorage.setItem('token', token);
 
