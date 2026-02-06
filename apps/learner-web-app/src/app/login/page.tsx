@@ -182,11 +182,21 @@ const LoginPage = () => {
       setLoading(true);
 
       const token = response.access_token;
-      const refreshToken = response?.refresh_token ?? '';
+      const refreshToken = response?.refresh_token;
+      // Only store refreshToken if it has a valid value
+      if (refreshToken) {
+        localStorage.setItem('refreshTokenForAndroid', refreshToken);
+        if (data?.remember) {
+          localStorage.setItem('refreshToken', refreshToken);
+        } else {
+          localStorage.removeItem('refreshToken');
+        }
+      } else {
+        // Clear refreshTokenForAndroid if no refresh token is provided
+        localStorage.removeItem('refreshTokenForAndroid');
+        localStorage.removeItem('refreshToken');
+      }
       localStorage.setItem('token', token);
-      data?.remember
-        ? localStorage.setItem('refreshToken', refreshToken)
-        : localStorage.removeItem('refreshToken');
 
       const userResponse = await getUserId();
 
@@ -324,6 +334,12 @@ const LoginPage = () => {
           if(localStorage.getItem('isAndroidApp') == 'yes')
             {
              // Send message to React Native WebView
+             // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+             let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+             // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+             if (!refreshToken || refreshToken === '') {
+               refreshToken = localStorage.getItem('refreshToken');
+             }
              if (window.ReactNativeWebView) {
                window.ReactNativeWebView.postMessage(JSON.stringify({
                  type: 'LOGIN_INTO_ONLY_ONE_PROGRAM_EVENT', // Event type identifier
@@ -331,7 +347,7 @@ const LoginPage = () => {
                    userId: userResponse?.userId,
                    tenantId:selectedTenantId,
                    token: localStorage.getItem('token'),
-                   refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+                   refreshToken: refreshToken,
                  
                    // Add any data you want to send
                  }
