@@ -185,7 +185,11 @@
     "REASSIGN_BATCH": "બેચ ફરીથી નિયુક્ત કરો",
     "NOT_ABLE_UPDATE_FACILITATOR": "ફેસિલિટેટર અપડેટ થઈ શકતા નથી",
     "HI": "નમસ્તે, {{name}}",
-    "FAQS": "વારંવાર પૂછાતા પ્રશ્નો (FAQ's)"
+    "FAQS": "વારંવાર પૂછાતા પ્રશ્નો (FAQ's)",
+    "NEXT": "આગળ",
+    "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "કૃપા કરીને ઓછામાં ઓછી એક બેચ પસંદ કરો",
+    "PLEASE_SEARCH_AND_SELECT_USER": "કૃપા કરીને વપરાશકર્તા શોધો અને પસંદ કરો.",
+    "PLEASE_SELECT_CENTER": "કૃપા કરીને એક કેન્દ્ર પસંદ કરો."
   },
   "LOGIN_PAGE": {
     "USERNAME": "વપરાશકર્તા નામ",
@@ -260,7 +264,7 @@
     "BLOCK": "બ્લોક",
     "ATTENDANCE": "હાજરી (%)",
     "VILLAGES_AND_YOUTH": "ગામો અને યુવાનો",
-    "USERS_&_VILLAGES": "\tવપરાશકર્તાઓ અને ગામો",
+    "USERS_&_VILLAGES": "વપરાશકર્તાઓ અને ગામો",
     "VILLAGES": "ગામો",
     "YOUTH_VOLUNTEERS": "યુવા/સ્વયંસેવકો",
     "SEARCH_VILLAGES": "ગામો શોધો",
@@ -339,7 +343,9 @@
     "CONTACT_NUMBER": "કોન્ટેક્ટ નંબર",
     "ENROLLMENT_NUMBER": "એનરોલમેન્ટ નંબર",
     "SELECT_OPTION": "ઓપ્શન સિલેક્ટ કરો",
-    "HINDI": "હિન્દી"
+    "HINDI": "હિન્દી",
+    "MOCK_TEST": "મોક ટેસ્ટ",
+    "UNIT_TEST": "યુનિટ ટેસ્ટ"
   },
   "FIELDS": {
     "DESIGNATION": "હોદો",
@@ -525,7 +531,8 @@
     "END_DATE_ERROR": "સમાપ્તિ તારીખ પ્રારંભ તારીખ કરતા પહેલાની ન હોઈ શકે",
     "DELETE_THIS_SESSION": "આ સત્ર કાઢી નાખો",
     "LEARNER_PREREQUISITES": "લર્નર ની પૂર્વજરૂરીયાતો",
-    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા"
+    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા",
+    "DURING_COURSE": "શીખો"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "સેન્ટર એ સફળતાપૂર્વક વિનંતી કરી",
@@ -649,7 +656,33 @@
     "SUBJECT_TAUGHT": "મારા દ્વારા શિખવેલ વિષયો",
     "WHAT_IS_YOUR_PRIMARY_WORK": "તમારું મુખ્ય કાર્ય શું છે?",
     "CENTER": "સેન્ટર",
-    "BATCH": "બેચ"
+    "BATCH": "બેચ",
+    "PARENT_GUARDIAN_PHONE_NO": "માતાપિતા/વાલીઓનો ફોન નંબર",
+    "TYPE_OF_PHONE_ACCESSIBLE": "સુલભ ફોનનો પ્રકાર",
+    "VILLAGE": "ગામ",
+    "BLOCK": "બ્લોક કરો",
+    "DISTRICT": "જિલ્લો",
+    "STATE": "રાજ્ય",
+    "FAMILY_MEMBER_DETAILS": "પરિવારના સભ્યની વિગતો",
+    "SPOUSE_NAME": "જીવનસાથીનું નામ",
+    "UNEMPLOYED_HOUSEWIFE_DOMESTIC_WORK": "બેરોજગાર/ગૃહિણી/ઘરકામ",
+    "SELF_EMPLOYMENT_OWN_BUSINESS_SHOP": "સ્વરોજગાર, પોતાનો વ્યવસાય અથવા દુકાન",
+    "NOPHONE": "ફોન નથી",
+    "FATHER": "પિતા",
+    "MOTHER": "માતા",
+    "SPOUSE": "જીવનસાથી",
+    "GRADE_1": "ગ્રેડ ૧",
+    "GRADE_2": "ગ્રેડ 2",
+    "GRADE_3": "ગ્રેડ 3",
+    "GRADE_4": "ગ્રેડ ૪",
+    "GRADE_5": "ગ્રેડ 5",
+    "GRADE_6": "ગ્રેડ 6",
+    "GRADE_7": "ગ્રેડ ૭",
+    "GRADE_8": "ગ્રેડ ૮",
+    "GRADE_9": "ધોરણ ૯",
+    "GRADE_10": "ધોરણ ૧૦",
+    "GRADE_11": "ધોરણ ૧૧",
+    "GRADE_12": "ધોરણ ૧૨"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઇનપુટ.",
@@ -706,7 +739,45 @@
     "NO_SUBJECT_FOUND": "કોઈ વિષય મળ્યો નથી",
     "NO_ASSIGNED": "કોઈ સોંપેલ નથી",
     "OUT_OF": "માંથી",
-    "NUMBER_OUT_OF_COMPLETED": "{{totalCount}} માંથી {{completedCount}} પૂર્ણ"
+    "NUMBER_OUT_OF_COMPLETED": "{{totalCount}} માંથી {{completedCount}} પૂર્ણ",
+    "ASSESSMENTS_FOUND": "{{count}} મૂલ્યાંકન મળ્યું",
+    "AI_ASSESSMENT": "એઆઈ આકારણી",
+    "ASSESSMENT_LIST": "મૂલ્યાંકન યાદી",
+    "AI_ASSESSMENT_LIST": "AI મૂલ્યાંકન યાદી",
+    "ASSESSMENT_DETAILS": "આકારણી વિગતો",
+    "MID_TERM_EXAM": "મધ્યવર્તી પરીક્ષા",
+    "MATHEMATICS_ASSESSMENT": "ગણિત મૂલ્યાંકન - બીજગણિત અને ભૂમિતિ",
+    "SEARCH_LEARNER": "શીખનાર શોધો..",
+    "QUESTIONS": "પ્રશ્નો",
+    "MINUTES": "મિનિટ",
+    "MINS": "મિનિટ",
+    "MATHEMATICS": "ગણિત",
+    "GRADE_10": "૧૦મું ધોરણ",
+    "OFFLINE_ASSESSMENT": "ઑફલાઇન મૂલ્યાંકન",
+    "DOWNLOAD_ASSESSMENT_MESSAGE": "આ મૂલ્યાંકનમાં લાંબા/ટૂંકા જવાબના પ્રશ્નો છે. શું તમે ઑફલાઇન પ્રશ્નપત્ર ડાઉનલોડ કરવા માંગો છો?",
+    "DOWNLOAD": "ડાઉનલોડ કરો",
+    "DOWNLOAD_SUCCESS": "પ્રશ્નપત્ર સફળતાપૂર્વક ડાઉનલોડ થયું",
+    "CANCEL": "રદ કરો",
+    "MARKS_APPROVED_SCORE": "મંજૂર થયેલા ગુણ: {{score}}/{{maxScore}}",
+    "UNDER_AI_EVALUATION": "AI મૂલ્યાંકન હેઠળ",
+    "AWAITING_YOUR_APPROVAL": "તમારી મંજૂરીની રાહ જોઈ રહ્યા છીએ",
+    "NOT_SUBMITTED": "સબમિટ કરેલ નથી",
+    "APPROVED_ON": "મંજૂર તારીખ: {{date}}",
+    "UPLOADED_ON": "અપલોડ કર્યાની તારીખ: {{date}}",
+    "SORT_BY_STATUS": "સ્થિતિ દ્વારા સૉર્ટ કરો",
+    "LEARNERS_COUNT": "{{કુલ}} શીખનારાઓમાંથી {{ગણતરી}}",
+    "NO_LEARNERS_FOUND": "તમારી શોધ સાથે મેળ ખાતા કોઈ શીખનારા મળ્યા નથી.",
+    "MANUAL_ASSESSMENT": "મેન્યુઅલ મૂલ્યાંકન",
+    "MANUAL_ASSESSMENT_LIST": "મેન્યુઅલ મૂલ્યાંકન યાદી",
+    "UNDER_EVALUATION": "મૂલ્યાંકન હેઠળ",
+    "UPDATE_MARKS": "અપડેટ માર્ક્સ",
+    "SUBMIT_MARKS": "ગુણ સબમિટ કરો",
+    "ASSESSMENTS_FOUND_PLURAL": "{{count}} મૂલ્યાંકન મળ્યાં",
+    "NO_ASSESSMENT_TYPE_FOUND": "કોઈ આકારણી પ્રકાર મળ્યો નથી",
+    "IMAGE_UPLOADED": "છબી અપલોડ કરી",
+    "VIEW": "જુઓ",
+    "REUPLOAD": "ફરીથી અપલોડ કરો",
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* ફોર્મેટ: jpg, jpeg. કદ: {{mb}} MB {{count}} છબીઓ સુધી"
   },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "બોર્ડ નોંધણી",
@@ -796,7 +867,8 @@
     "SELECT_DISTRICT": "જિલ્લો પસંદ કરો",
     "SELECT": "પસંદ કરો",
     "ASSIGN_VILLAGES_FROM_BLOCK": "બ્લોકમાંથી ગામો નિયુક્ત કરો",
-    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "તમે આને તમારી સુવિધા મુજબ પછીથી પૂર્ણ કરી શકો છો. જો કે, ગામો ફક્ત 'સમાપ્ત' પર ક્લિક કરવાથી જ નિયુક્ત થશે."
+    "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "તમે આને તમારી સુવિધા મુજબ પછીથી પૂર્ણ કરી શકો છો. જો કે, ગામો ફક્ત 'સમાપ્ત' પર ક્લિક કરવાથી જ નિયુક્ત થશે.",
+    "PLEASE_GO_BACK_MSG": "આગળ વધવા માટે કૃપા કરીને પસંદગી પછી પાછા જાઓ."
   },
   "SURVEYS": {
     "SURVEYS": "સર્વેક્ષણ",
@@ -809,9 +881,11 @@
   "FACILITATORS": {
     "NEW_FACILITATOR": "નવું સુવિધાકર્તા",
     "RE_ASSIGN_FACILITATOR": "ફેસિલિટેટર ફરીથી અસાઇન  કરો",
-    "FACILITATOR_UPDATED_SUCCESSFULLY": "ફેસિલિટેટર સફળતાપૂર્વક અપડેટ થયા ",
+    "FACILITATOR_UPDATED_SUCCESSFULLY": "ફેસિલિટેટર સફળતાપૂર્વક અપડેટ થયા",
     "FACILITATOR_CREATED_SUCCESSFULLY": "ફેસિલિટેટર સફળતાપૂર્વક બનાવાયો",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તાના ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે"
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તાના ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે",
+    "MAP_USER_AS_FACILITATOR": "સુવિધા આપનાર તરીકે નકશા વપરાશકર્તા",
+    "MAP_AS_FACILITATOR": "સુવિધા આપનાર તરીકે નકશો"
   },
   "MENTOR": {
     "BACK_TO_FORM": "ફોર્મ પર પાછા જાઓ",
@@ -823,9 +897,9 @@
     "NEW_LEARNER": "નવું શીખનાર",
     "EDIT_LEARNER": "લર્નર સંપાદિત(edit) કરો",
     "RE_ASSIGN_LEARNER": "લર્નર ફરી અસાઇન કરો",
-    "LEARNER_UPDATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક અપડેટ થયા ",
+    "LEARNER_UPDATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક અપડેટ થયા",
     "NOT_ABLE_UPDATE_LEARNER": "લર્નર અપડેટ કરી શકાયો નથી",
-    "LEARNER_CREATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક બનાવાયા ",
+    "LEARNER_CREATED_SUCCESSFULLY": "લર્નર સફળતાપૂર્વક બનાવાયા",
     "NOT_ABLE_CREATE_LEARNER": "લર્નર બનાવી શકાતા નથી",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તા ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે"
   },
@@ -908,7 +982,8 @@
     "BELOW_18": "18 વર્ષથી નીચે ની નોંધણી",
     "VLLAGE": "ગામ",
     "YOUTH_VOLUNTEERS": "યુવાનો/સ્વયંસેવકો",
-    "VILLAGES_AND_YOUTH": "ગામડા અને યુવાનો"
+    "VILLAGES_AND_YOUTH": "ગામડા અને યુવાનો",
+    "VLLAGE_18": "આજના નવા રજીસ્ટ્રેશન"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "પ્રવેશો",
@@ -938,7 +1013,7 @@
   },
   "VOLUNTEERLIST": {
     "ENTRIES": "એન્ટ્રીઓ",
-    "VOLUNTEERS_ASSIGNED": "અસાઇન થયેલ સ્વયંસેવકો "
+    "VOLUNTEERS_ASSIGNED": "અસાઇન થયેલ સ્વયંસેવકો"
   },
   "YOUTHNET_DASHlBOARD": {
     "MANAGES": "સંચાલન કરે છે",
@@ -1019,6 +1094,62 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• છબી લો અને પોર્ટલ પર અપલોડ કરો",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• જો જવાબ શીટમાં અનેક પાનાં હોય તો દરેક પાનું અલગથી ફોટો લો અને અપલોડ કરો",
     "READ_LESS": "ઓછું વાંચો",
-    "READ_MORE": "વધુ વાંચો"
+    "READ_MORE": "વધુ વાંચો",
+    "DOWNLOAD_QUESTION_PAPER": "પ્રશ્નપત્ર ડાઉનલોડ કરો"
+  },
+  "USER_REGISTRATION": {
+    "SELECT_ALL": "બધા પસંદ કરો",
+    "DESELECT_ALL": "બધા નાપસંદ કરો",
+    "LEARNER_REGISTRATIONS": "શીખનાર નોંધણીઓ",
+    "SEARCH_LEARNER": "શીખનાર શોધો..",
+    "TO_TAKE_ACTION_SELECT_LEARNER": "પગલાં લેવા માટે, ઓછામાં ઓછો એક શીખનાર પસંદ કરો",
+    "NO_LEARNERS_FOUND": "કોઈ શીખનાર મળ્યા નથી",
+    "NO_RECORDS_FOUND": "કોઈ રેકોર્ડ મળ્યા નથી",
+    "SHOWING_LEARNERS": "{{total}} શીખનારાઓમાંથી {{start}} - {{end}} બતાવી રહ્યું છે",
+    "SINGLE_PAGE": "(એક પાનું)",
+    "REMOTE_MODE": "રિમોટ મોડ",
+    "IN_PERSON_MODE": "વ્યક્તિગત સ્થિતિમાં",
+    "REGISTERED_ON": "નોંધણી તારીખ",
+    "ACTION_PENDING": "ક્રિયા બાકી છે",
+    "ARCHIVED": "આર્કાઇવ કરેલ",
+    "UPCOMING": "આગામી",
+    "ARCHIVED_NOT_INTERESTED": "આર્કાઇવ કરેલ/રસ નથી",
+    "MAY_JOIN_UPCOMING_YEAR": "આવતા વર્ષે જોડાઈ શકે છે",
+    "NO_DATA": "કોઈ ડેટા નથી",
+    "LEARNER": "શીખનાર",
+    "LEARNERS": "શીખનારાઓ",
+    "CANCEL": "રદ કરો",
+    "ASSIGN_BATCH": "બેચ સોંપો",
+    "SOMETHING_WENT_WRONG_ASSIGNING_BATCH": "બેચ સોંપતી વખતે કંઈક ખોટું થયું.",
+    "UNNAMED_BATCH": "અનામી બેચ",
+    "LEARNERS_SELECTED": "{{count}} શીખનારાઓ પસંદ કર્યા",
+    "LEARNERS_LABEL": "શીખનારાઓ",
+    "CENTER": "કેન્દ્ર",
+    "LOADING_CENTERS": "કેન્દ્રો લોડ કરી રહ્યું છે...",
+    "SET_LOCATION_FILTERS_FIRST": "પહેલા સ્થાન ફિલ્ટર સેટ કરો",
+    "NO_CENTERS_AVAILABLE": "કોઈ કેન્દ્રો ઉપલબ્ધ નથી",
+    "BATCH": "બેચ",
+    "LOADING_BATCHES": "બેચ લોડ કરી રહ્યું છે...",
+    "SELECT_CENTER_FIRST": "પહેલા કેન્દ્ર પસંદ કરો",
+    "NO_BATCHES_AVAILABLE": "કોઈ બેચ ઉપલબ્ધ નથી",
+    "ASSIGN_BATCH_LEARNERS": "બેચ ({{count}} શીખનારાઓ) સોંપો",
+    "LEARNER_FALLBACK": "શીખનાર",
+    "LEARNERS_ASSIGNED": "શીખનારા(ઓ) ને સોંપવામાં આવ્યા છે",
+    "MOVED_TO_BATCH": "અને બેચમાં ખસેડાયા",
+    "OKAY": "ઠીક છે",
+    "NOT_INTERESTED_TO_JOIN": "જોડાવામાં રસ નથી",
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "રસ ધરાવો છો, આવતા વર્ષે જોડાઈ શકો છો"
+  },
+  "MENTORS": {
+    "NEW_MENTOR": "નવા માર્ગદર્શક",
+    "FIRST_SELECT_REQUIRED_FIELDS": "પહેલા જરૂરી ક્ષેત્રો પસંદ કરો",
+    "MENTOR_CREATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક બનાવવામાં આવ્યો છે!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "માર્ગદર્શક બનાવવામાં આવ્યો છે, ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
+    "EDIT_MENTOR": "માર્ગદર્શક સંપાદિત કરો",
+    "NOT_ABLE_UPDATE_MENTOR": "માર્ગદર્શકને અપડેટ કરી શક્યા નથી",
+    "NOT_ABLE_CREATE_MENTOR": "માર્ગદર્શક બનાવવામાં અસમર્થ",
+    "UPDATE_MENTOR": "મેન્ટરને અપડેટ કરો",
+    "RE_ASSIGN_MENTOR": "માર્ગદર્શકને ફરીથી સોંપો"
   }
 }
