@@ -8,12 +8,18 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import { Delete, Visibility } from '@mui/icons-material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { CircularProgress } from '@mui/material';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
+import DocumentViewer from '../DocumentViewer/DocumentViewer';
 
 const CustomFileUpload = ({
   value = [],
@@ -38,6 +44,8 @@ const CustomFileUpload = ({
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
     if (!hasInitialized) {
@@ -134,6 +142,16 @@ const CustomFileUpload = ({
     return ['png', 'jpg', 'jpeg'].includes(ext);
   };
 
+  const handlePreview = (url: string) => {
+    setPreviewUrl(url);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewUrl(null);
+  };
+
   return (
     <FormControl fullWidth error={rawErrors.length > 0} required={required}>
       <FormLabel>{t(schema?.title)}</FormLabel>
@@ -202,22 +220,55 @@ const CustomFileUpload = ({
               flexShrink: 0,
               overflow: 'hidden',
               backgroundColor: '#f9f9f9',
+              cursor: 'pointer',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              },
             }}
+            onClick={() => handlePreview(url)}
           >
             {isEditable && !isDisabled && (
               <IconButton
                 size="small"
-                onClick={() => removeFile(idx)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFile(idx);
+                }}
                 sx={{
                   position: 'absolute',
                   top: 4,
                   right: 4,
                   background: 'rgba(255,255,255,0.8)',
+                  zIndex: 2,
+                  '&:hover': {
+                    background: 'rgba(255,255,255,0.95)',
+                  },
                 }}
               >
                 <Delete fontSize="small" />
               </IconButton>
             )}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePreview(url);
+              }}
+              sx={{
+                position: 'absolute',
+                top: 4,
+                left: 4,
+                background: 'rgba(255,255,255,0.8)',
+                zIndex: 2,
+                '&:hover': {
+                  background: 'rgba(255,255,255,0.95)',
+                },
+              }}
+            >
+              <Visibility fontSize="small" color="primary" />
+            </IconButton>
             {isImage(url) ? (
               <img
                 src={url}
@@ -243,11 +294,7 @@ const CustomFileUpload = ({
                 <InsertDriveFileIcon fontSize="large" />
                 <Typography
                   variant="caption"
-                  component="a"
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ textAlign: 'center', wordBreak: 'break-all' }}
+                  sx={{ textAlign: 'center', wordBreak: 'break-all', px: 1 }}
                 >
                   File {idx + 1}
                 </Typography>
@@ -257,6 +304,55 @@ const CustomFileUpload = ({
         ))}
       </Box>
       {/* {rawErrors.length > 0 && <FormHelperText>{rawErrors[0]}</FormHelperText>} */}
+
+      {/* Preview Dialog */}
+      <Dialog
+        open={isPreviewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            height: '90vh',
+            maxHeight: '90vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {t('File Preview')}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {previewUrl && (
+            <DocumentViewer
+              url={previewUrl}
+              width="100%"
+              height="100%"
+              showError={true}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview}>{t('Close')}</Button>
+          {previewUrl && (
+            <Button
+              variant="contained"
+              href={previewUrl}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('Download')}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
     </FormControl>
   );
 };

@@ -2055,7 +2055,7 @@ const Index = () => {
                 )}
               </DialogContent>
               <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-                {mobilizerFormStep === 0 && (
+                {mobilizerFormStep === 0 && !(!selectedMobilizerUserId || isMobilizerMappingInProgress) && (
                   <Button
                     sx={{
                       backgroundColor: '#FFC107',
@@ -2082,7 +2082,7 @@ const Index = () => {
                     {t('COMMON.NEXT')}
                   </Button>
                 )}
-                {mobilizerFormStep === 1 && (
+                {mobilizerFormStep === 1 && !(!selectedMobilizerUserId || !mobilizerUserDetails || !workingVillageAssignmentCenterId || selectedVillagesSet.size === 0 || isMobilizerMappingInProgress) && (
                   <Button
                     sx={{
                       backgroundColor: '#FFC107',

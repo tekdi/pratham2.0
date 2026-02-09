@@ -229,7 +229,7 @@ const Centers = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
-      const staticFilter = { type: CohortTypes.COHORT, tenantId: tenantId };
+      const staticFilter = { type: CohortTypes.COHORT };
       const { sortBy } = formData;
       const staticSort = ['name', sortBy || 'asc'];
       await searchListData(

@@ -153,11 +153,23 @@
     "NO_CONTENT_CREATOR_FOUND": "ସାମଗ୍ରୀ ସୃଷ୍ଟା (SCTA) ମିଳିଲେ ନାହିଁ",
     "NO_CONTENT_REVIEWER_FOUND": "ସାମଗ୍ରୀ ସମୀକ୍ଷକ (CCTA) ମିଳିଲେ ନାହିଁ",
     "LOADING": "ଲୋଡ୍ ହେଉଛି",
+    "USER_DELETE_SUCCSSFULLY": "ଉପଯୋଗକର୍ତ୍ତା ସଫଳତାର ସହିତ ବିଲୋପ କଲେ |",
     "SURE_REASSIGN_CENTER": "ଆପଣ ନିଶ୍ଚିତ କି ଏହି ଉପଭୋକ୍ତାଙ୍କୁ କେନ୍ଦ୍ର ପୁନର୍ନିୟୁକ୍ତ କରିବାକୁ ଚାହୁଁଛନ୍ତି?",
     "SORT": "ବିନ୍ୟାସ",
     "ARE_YOU_SURE_DELETE_STATE": "ଏହି ରାଜ୍ୟରେ {{district}}ଟି ସକ୍ରିୟ ଜିଲ୍ଲା ଅଛି ଯାହାକୁ ଆପଣ ଡିଲିଟ୍ କରିପାରିବେ ନାହିଁ।",
-    "USER_DELETE_SUCCSSFULLY": "ଉପଯୋଗକର୍ତ୍ତା ସଫଳତାର ସହିତ ବିଲୋପ କଲେ |",
-    "ADD": "ଯୋଡନ୍ତୁ |"
+    "ADD": "ଯୋଡନ୍ତୁ |",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "ଆପଣଙ୍କ ଅନୁରୋଧ ଦାଖଲ କରନ୍ତୁ ଏବଂ ଯେକୌଣସି ସମସ୍ୟା କିମ୍ବା ଚିନ୍ତାରେ ଆମକୁ ଆପଣଙ୍କୁ ସାହାଯ୍ୟ କରିବାକୁ ଦିଅନ୍ତୁ।",
+    "WE_ARE_HERE_TO_HELP": "ଆମେ ସାହାଯ୍ୟ କରିବାକୁ ଅଛୁ",
+    "NO_STATE_LEAD_FOUND": "କୌଣସି ରାଜ୍ୟ ଲିଡ୍ ମିଳିଲା ନାହିଁ",
+    "FAQS": "ସାଧାରଣ ପ୍ରଶ୍ନ (FAQ)",
+    "RESET_FILTERS": "ଫିଲ୍ଟରଗୁଡ଼ିକୁ ରିସେଟ୍ କରନ୍ତୁ",
+    "ACTIVATE_USER": "ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ସକ୍ରିୟ କରନ୍ତୁ",
+    "ACTIVATE": "ସକ୍ରିୟ କରନ୍ତୁ",
+    "RESIGNED_FROM_COMPANY": "କମ୍ପାନୀରୁ ଇସ୍ତଫା ଦେଇଛନ୍ତି",
+    "MOVED_TO_DIFFERENT_ROLE": "ଏକ ଭିନ୍ନ ଭୂମିକାକୁ ସ୍ଥାନାନ୍ତରିତ ହୋଇଛି",
+    "NO_MOBILIZER_FOUND": "କୌଣସି ପରାମର୍ଶଦାତା ମିଳିଲେ ନାହିଁ",
+    "MAP": "ମ୍ୟାପ୍",
+    "NEXT": "ପରବର୍ତ୍ତୀ"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ଉପଭୋକ୍ତା ନାମ",
@@ -219,7 +231,22 @@
     "CERTIFICATE_ISSUANCE": "ସର୍ଟିଫିକେଟ୍ ଇସ୍ୟୁନ୍ସ",
     "SUPPORT_REQUEST": "ସହଯୋଗ ଅନୁରୋଧ",
     "CONTENT_CREATOR": "ସାମଗ୍ରୀ ସୃଷ୍ଟା",
-    "CONTENT_REVIEWER": "ସାମଗ୍ରୀ ସମୀକ୍ଷକ"
+    "CONTENT_REVIEWER": "ସାମଗ୍ରୀ ସମୀକ୍ଷକ",
+    "TAXONOMY_EDITOR": "ବର୍ଗୀକରଣ ସମ୍ପାଦକ",
+    "MANAGE_NOTIFICATION": "ବିଜ୍ଞପ୍ତି ଟେମ୍ପଲେଟ୍ ପରିଚାଳନା କରନ୍ତୁ",
+    "YOUTH": "ଯୁବପିଢ଼ି",
+    "FAQS": "ସାଧାରଣ ପ୍ରଶ୍ନ (FAQ)",
+    "STATE_LEAD": "ରାଜ୍ୟ ନେତୃତ୍ୱ",
+    "MASTER": "ମାଷ୍ଟର",
+    "STATES": "ଯୁକ୍ତରାଷ୍ଟ୍ର",
+    "DISTRICTS": "ଜିଲ୍ଲାଗୁଡ଼ିକ",
+    "BLOCKS": "ବ୍ଲକ୍‌ଗୁଡ଼ିକ",
+    "VILLAGES": "ଗ୍ରାମ",
+    "PROGRAMS": "ପ୍ରୋଗ୍ରାମ୍",
+    "SKILLING_CENTERS": "ଦକ୍ଷତା କେନ୍ଦ୍ର",
+    "CURRICULUM_PLANNER": "ପାଠ୍ୟକ୍ରମ ଯୋଜନାକାରୀ",
+    "BATCH": "ବ୍ୟାଚ୍",
+    "MOBILIZER": "ପରାମର୍ଶଦାତା"
   },
   "FACILITATORS": {
     "STATE": "ରାଜ୍ୟ",
@@ -236,7 +263,11 @@
     "FINISH_ASSIGN": "ସମାପ୍ତ କରନ୍ତୁ ଓ ନିୟୁକ୍ତ କରନ୍ତୁ",
     "BATCHES_SELECTED": "ଚୟନିତ ବ୍ୟାଚ୍",
     "CENTERS": "କେନ୍ଦ୍ର",
-    "RE_ASSIGN_facilitator": "ଫ୍ୟାସିଲିଟେଟରକୁ ପୁଣିଯାଁଚି କାର୍ଯ୍ୟବାହୀ କରନ୍ତୁ"
+    "RE_ASSIGN_facilitator": "ଫ୍ୟାସିଲିଟେଟରକୁ ପୁଣିଯାଁଚି କାର୍ଯ୍ୟବାହୀ କରନ୍ତୁ",
+    "ASSIGN_BATCHES_FINISH": "ଆପଣ ଏହାକୁ ପରେ ନିଜ ଗତିରେ ସମାପ୍ତ କରିପାରିବେ। ତଥାପି, 'ସମାପ୍ତ ଏବଂ ନ୍ୟସ୍ତ କରନ୍ତୁ' ଉପରେ କ୍ଲିକ୍ କରିବା ପରେ ବ୍ୟାଚ୍ ଗୁଡ଼ିକ କେବଳ ନ୍ୟସ୍ତ କରାଯିବ।",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "କେନ୍ଦ୍ରରୁ ବ୍ୟାଚଗୁଡ଼ିକୁ ନ୍ୟସ୍ତ କରନ୍ତୁ",
+    "BACK_TO_FORM": "ଫର୍ମକୁ ଫେରନ୍ତୁ",
+    "SEARCH_BATCHES": "ବ୍ୟାଚଗୁଡ଼ିକ ଖୋଜନ୍ତୁ.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "ପାଠ୍ୟକ୍ରମ, ବିଷୟ, ଛାତ୍ର, ପିଡ଼ଏଫ୍ ଇତ୍ୟାଦି ଖୋଜନ୍ତୁ.."
@@ -250,7 +281,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "ବିଦ୍ୟାର୍ଥୀଙ୍କୁ ସଫଳତାର ସହ ଅପଡେଟ୍ କରାଯାଇଛି!",
     "EDIT_LEARNER": "ବିଦ୍ୟାର୍ଥୀକୁ ସମ୍ପାଦନ କରନ୍ତୁ",
     "NO_LEARNERS_FOUND": "କୌଣସି ଶିକ୍ଷାର୍ଥୀ ମିଳିଲେ ନାହିଁ",
-    "RE_ASSIGN_LEARNER": "ଶିକ୍ଷାର୍ଥୀକୁ ପୁଣି ନିୟୁକ୍ତ କରନ୍ତୁ"
+    "RE_ASSIGN_LEARNER": "ଶିକ୍ଷାର୍ଥୀକୁ ପୁଣି ନିୟୁକ୍ତ କରନ୍ତୁ",
+    "ACTIVATE_USER_SUCCESS": "ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ସଫଳତାର ସହ ସକ୍ରିୟ କରାଯାଇଛି।"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "ମେଣ୍ଟର ନେତା ସନ୍ଧାନ କରନ୍ତୁ..",
@@ -265,7 +297,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "ମେଣ୍ଟର ନେତାକୁ ସୃଷ୍ଟି କରିପାରିଲେ ନାହିଁ",
     "UPDATE_MENTOR_LEAD": "ମେଣ୍ଟର ନେତା ଅଦ୍ୟତନ କରନ୍ତୁ",
     "NEW_MENTOR_LEAD": "ନୂତନ ମେଣ୍ଟର ନେତା",
-    "ER": "ନୂଆ ମେଣ୍ଟର ନେତା"
+    "ER": "ନୂଆ ମେଣ୍ଟର ନେତା",
+    "RE_ASSIGN_MENTOR_LEAD": "କେନ୍ଦ୍ର ମୁଖ୍ୟଙ୍କୁ ପୁନଃନିଯୁକ୍ତ କରନ୍ତୁ"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "ଦଳ ନେତାମାନଙ୍କୁ ଖୋଜନ୍ତୁ..",
@@ -321,7 +354,15 @@
     "SUBTOPICS": "ଉପ-ବିଷୟଗୁଡ଼ିକ",
     "RESOURCES": "ସମ୍ବଳଗୁଡ଼ିକ",
     "TOPIC": "ବିଷୟ",
-    "DURATION/MONTH": "ଅବଧି/ମାସ"
+    "DURATION/MONTH": "ଅବଧି/ମାସ",
+    "UPLOAD_FAILED": "ଅପଲୋଡ୍ ବିଫଳ ହେଲା",
+    "IMPORT_NEW_PLANNER": "ନୂତନ ପ୍ଲାନର୍ ଇମ୍ପୋର୍ଟ କରନ୍ତୁ",
+    "ADD_NEW_TOPIC": "ନୂତନ ବିଷୟ ଯୋଡନ୍ତୁ",
+    "DELETE_PLANNER": "ପ୍ଲାନର୍ ଡିଲିଟ୍ କରନ୍ତୁ",
+    "CSV_TEMPLATE": "CSV ଟେମ୍ପଲେଟ୍",
+    "NEW_TOPIC": "ନୂତନ ବିଷୟ",
+    "DOWNLOAD_CSV": "ଅପଲୋଡ୍ କରାଯାଇଥିବା CSV ଡାଉନଲୋଡ୍ କରନ୍ତୁ",
+    "DURING_COURSE": "ଶିଖନ୍ତୁ"
   },
   "MASTER": {
     "STATE": "ରାଜ୍ୟ",
@@ -371,7 +412,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "କେନ୍ଦ୍ର ସଫଳତାର ସହ ତିଆରି ହୋଇଛି",
     "SEARCHBAR_PLACEHOLDER": "କେନ୍ଦ୍ର ସନ୍ଧାନ କର ..",
     "CENTER_UPDATE_FAILED": "କେନ୍ଦ୍ର ଅପଡେଟ୍ କରିବା ସମୟରେ କିଛି ଭୁଲ ହୋଇଗଲା।",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "ଆପଣ କେନ୍ଦ୍ରକୁ ଡିଲିଟ୍ କରିପାରିବେ ନାହିଁ କାରଣ ଏଥିରେ {{activeMembers}} ସକ୍ରିୟ ବିଦ୍ୟାର୍ଥୀ ଅଛନ୍ତି।"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "ଆପଣ କେନ୍ଦ୍ରକୁ ଡିଲିଟ୍ କରିପାରିବେ ନାହିଁ କାରଣ ଏଥିରେ {{activeMembers}} ସକ୍ରିୟ ବିଦ୍ୟାର୍ଥୀ ଅଛନ୍ତି।",
+    "BATCHES_FOR_CENTER": "{{centerName}} ପାଇଁ ବ୍ୟାଚ୍‌ଗୁଡ଼ିକ"
   },
   "BATCH": {
     "NEW_BATCH": "ନୂତନ ବ୍ୟାଚ୍",
@@ -380,7 +422,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "ବ୍ୟାଚ୍ ସଫଳତାର ସହିତ ଅଦ୍ୟତନ ହୋଇଛି",
     "BATCH_DELETE_SUCCESSFULLY": "ବ୍ୟାଚ୍ ସଫଳତାର ସହିତ ବିଲୋପ ହୋଇଛି",
     "BATCH_CREATED_SUCCESSFULLY": "ବ୍ୟାଚ୍ ସଫଳତାର ସହିତ ସୃଷ୍ଟି ହୋଇଛି",
-    "BATCH_UPDATE_FAILED": "ବ୍ୟାଚ୍ ଅଦ୍ୟତନ କରିବା ସମୟରେ କିଛି ତ୍ରୁଟି ଘଟିଛି"
+    "BATCH_UPDATE_FAILED": "ବ୍ୟାଚ୍ ଅଦ୍ୟତନ କରିବା ସମୟରେ କିଛି ତ୍ରୁଟି ଘଟିଛି",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "ଆପଣ ବ୍ୟାଚକୁ ଡିଲିଟ୍ କରିପାରିବେ ନାହିଁ କାରଣ ଏଥିରେ {{activeMembers}} ସକ୍ରିୟ ଶିକ୍ଷାର୍ଥୀ ଅଛନ୍ତି।",
+    "NO_BATCH_FOUND": "କୌଣସି ବ୍ୟାଚ୍ ମିଳିଲା ନାହିଁ",
+    "TYPE_OF_BATCH": "ବ୍ୟାଚର ପ୍ରକାର",
+    "BATCH_CREATE_FAILED": "ବ୍ୟାଚ୍ ତିଆରି କରିବା ସମୟରେ କିଛି ଭୁଲ ହୋଇଗଲା।"
   },
   "FORM": {
     "FULL_NAME": "ପୂର୍ଣ୍ଣ ନାମ",
@@ -491,7 +537,22 @@
     "PROGRAM_DESCRIPTION": "ପ୍ରୋଗ୍ରାମ ବର୍ଣ୍ଣନା",
     "PROGRAM_TYPE": "ପ୍ରୋଗ୍ରାମ ପ୍ରକାର",
     "PROGRAM_HEAD_NAME": "ପ୍ରୋଗ୍ରାମ ମୁଖ୍ୟ ନାମ",
-    "PROGRAM_IMAGE": "ପ୍ରୋଗ୍ରାମ ପ୍ରତିଛବି"
+    "PROGRAM_IMAGE": "ପ୍ରୋଗ୍ରାମ ପ୍ରତିଛବି",
+    "CONTACT": "ଯୋଗାଯୋଗ",
+    "BATCH": "ବ୍ୟାଚ୍",
+    "PREFERRED_LANGUAGE": "ପସନ୍ଦର ଭାଷା",
+    "FIRST_NAME": "ପ୍ରଥମ ନାମ",
+    "MIDDLE_NAME_OR_FATHER_NAME": "ମଧ୍ୟ ନାମ କିମ୍ବା ପିତାଙ୍କ ନାମ",
+    "LAST_NAME": "ଶେଷ ନାମ",
+    "MOTHER_NAME": "ମାତାଙ୍କ ନାମ",
+    "DATE_OF_BIRTH": "ଜନ୍ମ ତାରିଖ",
+    "TEST_BELONG_TO": "ପରୀକ୍ଷା ନିମ୍ନ କେନ୍ଦ୍ରର ଅଟେ",
+    "BELONG_TO": "ନିମ୍ନ କେନ୍ଦ୍ରର ଅଟେ",
+    "WAS_BELONG_TO": "ନିମ୍ନଲିଖିତ ସ୍ଥାନରେ ଆରକାଇଭ୍ କରାଯାଇଥିଲା",
+    "CONFIRM_TO_ACTIVATE": "ଆପଣ କ’ଣ ନିଶ୍ଚିତ ଯେ ଆପଣ ଏହି ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ପୁଣି ସକ୍ରିୟ କରିବାକୁ ଚାହୁଁଛନ୍ତି?",
+    "WORKING_LOCATION": "କାର୍ଯ୍ୟସ୍ଥଳୀ ଲୋକେସନ୍",
+    "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ",
+    "TYPE_OF_BATCH": "ବ୍ୟାଚର ପ୍ରକାର"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ଅବୈଧ ଇନପୁଟ୍।",
@@ -510,7 +571,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "ନାମରେ ସଂଖ୍ୟା ରହିପାରିବ ନାହିଁ",
     "INVALID_EMAIL_FORMAT": "ଅବୈଧ ଇମେଲ୍ ଫର୍ମାଟ୍",
     "ENTER_VALID_EMAIL": "ଏକ ବୈଧ ଇମେଲ୍ ଠିକଣା ଲେଖନ୍ତୁ",
-    "ENTER_VALID_MOBILE_NUMBER": "ଏକ ବୈଧ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ"
+    "ENTER_VALID_MOBILE_NUMBER": "ଏକ ବୈଧ ମୋବାଇଲ୍ ନମ୍ବର ପ୍ରବେଶ କରନ୍ତୁ",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ସ୍ପେସ୍ ଏବଂ ସ୍ୱତନ୍ତ୍ର ବର୍ଣ୍ଣ ଅନୁମୋଦିତ ନୁହେଁ",
+    "DATE_MUST_BE_ON_OR_BEFORE": "ତାରିଖ ନିଶ୍ଚିତ ଭାବରେ {{date}} ରେ କିମ୍ବା ପୂର୍ବରୁ ହେବା ଆବଶ୍ୟକ।",
+    "DATE_MUST_BE_ON_OR_AFTER": "ତାରିଖ ନିଶ୍ଚିତ ଭାବରେ {{date}} କିମ୍ବା ତା'ପରର ହେବା ଆବଶ୍ୟକ।"
   },
   "TABLE_TITLE": {
     "NAME": "ନାମ",
@@ -543,7 +607,9 @@
     "COURSE_STATUS": "ପାଠ୍ୟକ୍ରମ ସ୍ଥିତି",
     "ISSUED_DATE": "ଜାରି ତାରିଖ",
     "USER_ID": "ବ୍ୟବହାରକାରୀ ପରିଚୟ",
-    "COURSE_ID": "ପାଠ୍ୟକ୍ରମ ପରିଚ୯"
+    "COURSE_ID": "ପାଠ୍ୟକ୍ରମ ପରିଚ୯",
+    "LOCATION": "ସ୍ଥାନ (ରାଜ୍ୟ / ଜିଲ୍ଲା / ବ୍ଲକ / ଗ୍ରାମ)",
+    "WORKING_VILLAGE": "କାର୍ଯ୍ୟରତ ଗ୍ରାମ"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "ସମ୍ପାଦକ କାର୍ଯ୍ୟସ୍ଥାନ",
@@ -584,7 +650,8 @@
     "EDIT_PROGRAM": "ପ୍ରୋଗ୍ରାମ୍ ସମ୍ପାଦନ କରନ୍ତୁ",
     "DELETE_PROGRAM": "ପ୍ରୋଗ୍ରାମ୍ ଡିଲିଟ୍ କରନ୍ତୁ",
     "SEARCH_PROGRAM": "ପ୍ରୋଗ୍ରାମ ସନ୍ଧାନ କର ବା ଖୋଜ",
-    "NO_PROGRAMS_FOUND": "କୌଣସି ପ୍ରୋଗ୍ରାମ ମିଳିଲା ନାହିଁ"
+    "NO_PROGRAMS_FOUND": "କୌଣସି ପ୍ରୋଗ୍ରାମ ମିଳିଲା ନାହିଁ",
+    "EDIT": "ସମ୍ପାଦନ କରନ୍ତୁ"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "ପ୍ରସଙ୍ଗ ପ୍ରକାର",
@@ -639,7 +706,10 @@
     "ASSIGN_VILLAGES_FINISH": "ଆପଣ ଏହାକୁ ନିଜ ଗତିରେ ପରେ ପୂରଣ କରିପାରିବେ, କିନ୍ତୁ ‘ସମାପ୍ତ’ ଉପରେ କ୍ଲିକ୍ କରିଲେ ମାନେ ଗ୍ରାମ ନିଯୁକ୍ତ ହେବେ।",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "ବ୍ଲକ୍‌ରୁ ଗ୍ରାମ ନିଯୁକ୍ତ କରନ୍ତୁ",
     "BACK_TO_FORM": "ଫର୍ମକୁ ଫେରନ୍ତୁ",
-    "SEARCH_VILLAGES": "ଗ୍ରାମ ଖୋଜନ୍ତୁ.."
+    "SEARCH_VILLAGES": "ଗ୍ରାମ ଖୋଜନ୍ତୁ..",
+    "BACK": "ପଛକୁ",
+    "SAVE_SELECTION": "ଚୟନକୁ ସେଭ୍ କରନ୍ତୁ",
+    "SELECTED_VILLAGE_COUNT": "ଚୟନିତ ଗ୍ରାମ ସଂଖ୍ୟା : {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "ଲିଙ୍ଗ",
   "WORKING_STATE": "କାମ କରୁଥିବା ରାଜ୍ୟ",
@@ -737,12 +807,73 @@
     "EDIT_MENTOR": "ମେଣ୍ଟର ସମ୍ପାଦନ କରନ୍ତୁ",
     "NOT_ABLE_UPDATE_MENTOR": "ମେଣ୍ଟରକୁ ଅଦ୍ୟତନ କରିପାରିଲେ ନାହିଁ",
     "NOT_ABLE_CREATE_MENTOR": "ମେଣ୍ଟର ସୃଷ୍ଟି କରିପାରିଲେ ନାହିଁ",
-    "UPDATE_MENTOR": "ମେଣ୍ଟର ଅଦ୍ୟତନ କରନ୍ତୁ"
+    "UPDATE_MENTOR": "ମେଣ୍ଟର ଅଦ୍ୟତନ କରନ୍ତୁ",
+    "RE_ASSIGN_MENTOR": "ମେଣ୍ଟରଙ୍କୁ ପୁନଃନିଯୁକ୍ତ କରନ୍ତୁ"
   },
   "GOOGLE MAP_LINK": "ଗୁଗୁଲ୍ ମ୍ୟାପ୍ ଲିଙ୍କ୍",
   "District": "ଜିଲ୍ଲା",
   "State": "ରାଜ୍ୟ",
   "Village": "ଗ୍ରାମ",
   "GOOGLE_MAP_LINK": "ଗୁଗୁଲ୍ ମ୍ୟାପ୍ ଲିଙ୍କ୍",
-  "DISTRICTS": "ଜିଲ୍ଲା"
+  "DISTRICTS": "ଜିଲ୍ଲା",
+  "TYPE_OF_BATCH": "ବ୍ୟାଚର ପ୍ରକାର",
+  "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ",
+  "DISTRICT": "ଜିଲ୍ଲା",
+  "CENTER:": "କେନ୍ଦ୍ର:",
+  "SKILLING_CENTER_IMAGE": "ସ୍କିଲିଂ ସେଣ୍ଟର ଛବି",
+  "INDUSTRY": "ଶିଳ୍ପ",
+  "ADDRESS": "ଠିକଣା",
+  "DOB": "ଜନ୍ମ ତାରିଖ",
+  "SUBJECT": "ବିଷୟ",
+  "UNMARRIED": "ଅବିବାହିତ",
+  "MARRIED": "ବିବାହିତ",
+  "DIVORCED": "ବିବାହ ବିଚ୍ଛେଦ ହୋଇଛି",
+  "SELF_PLACED": "ନିଜେ ସ୍ଥାନିତ",
+  "DESIGNATION": "ପଦବୀ",
+  "YOUTH": {
+    "UPDATE_YOUTH": "ଯୁବପିଢ଼ିଙ୍କୁ ଅପଡେଟ୍ କରନ୍ତୁ",
+    "NEW_YOUTH": "ନୂତନ ଯୁବ",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ୟୁଜର୍ କ୍ରେଡେନସିଆଲ୍ସ ଶୀଘ୍ର ପଠାଯିବ।",
+    "NOT_ABLE_CREATE_YOUTH": "ଯୁବପିଢ଼ି ସୃଷ୍ଟି କରିପାରି ନାହିଁ।",
+    "YOUTH_CREATED_SUCCESSFULLY": "ଯୁବଶକ୍ତି ସଫଳତାର ସହିତ ସୃଷ୍ଟି ହୋଇଛି!",
+    "NOT_ABLE_UPDATE_YOUTH": "ଯୁବକମାନଙ୍କୁ ଅପଡେଟ୍ କରିପାରିଲା ନାହିଁ",
+    "YOUTH_UPDATED_SUCCESSFULLY": "ଯୁବପିଢ଼ିକୁ ସଫଳତାର ସହ ଅପଡେଟ୍ କରାଯାଇଛି!",
+    "SELF_PLACED": "ନିଜେ ସ୍ଥାନିତ",
+    "REGULAR": "ନିୟମିତ",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "ଶିକ୍ଷାନୁଷ୍ଠାନରେ ନାମ ଲେଖାଇଛି",
+    "OWN_FARMING": "ନିଜସ୍ୱ ଚାଷ",
+    "AGRICULTURAL_FARM_LABORER": "କୃଷି କୃଷି ଶ୍ରମିକ",
+    "NON_AGRICULTURAL_LABORER": "ଅଣ-କୃଷି ଶ୍ରମିକ",
+    "SALARIED_WORK": "ଦରମାପ୍ରାପ୍ତ କାମ",
+    "SELF_EMPLOYMENT": "ସ୍ୱନିଯୁକ୍ତି",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "ବେକାର କିମ୍ବା ଘରୋଇ କାମ",
+    "MARK_AS_VOLUNTEER": "ସ୍ଵେଚ୍ଛାସେବକ ଭାବରେ ଚିହ୍ନଟ କରନ୍ତୁ",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "ଆପଣ କ’ଣ ଜଣେ ସ୍ୱେଚ୍ଛାସେବକ ଭାବରେ ଚିହ୍ନିତ କରିବାକୁ ଚାହୁଁଛନ୍ତି?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "ସଫଳତାର ସହ ସ୍ୱେଚ୍ଛାସେବକ ଭାବରେ ଚିହ୍ନଟ କରାଯାଇଛି",
+    "MARK_AS_VOLUNTEER_FAILED": "ସ୍ଵେଚ୍ଛାସେବକ ଭାବରେ ଚିହ୍ନଟ କରିବାରେ ବିଫଳ ହୋଇଛି",
+    "PLEASE_GO_BACK_MSG": "ଆଗକୁ ବଢ଼ିବା ପାଇଁ ଦୟାକରି ଚୟନ ପରେ ପଛକୁ ଫେରନ୍ତୁ।",
+    "UNMARK_AS_VOLUNTEER": "ସ୍ଵେଚ୍ଛାସେବକ ଭାବରେ ଅଚିହ୍ନଟ କରନ୍ତୁ",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "ଆପଣ କ’ଣ ଜଣେ ସ୍ୱେଚ୍ଛାସେବକ ଭାବରେ ଅଚିହ୍ନଟ କରିବାକୁ ଚାହୁଁଛନ୍ତି?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "ସ୍ଵେଚ୍ଛାସେବକ ଭାବରେ ସଫଳତାର ସହ ଅଚିହ୍ନଟ କରାଯାଇଛି",
+    "UNMARK_AS_VOLUNTEER_FAILED": "ସ୍ୱେଚ୍ଛାସେବକ ଭାବରେ ଅଚିହ୍ନଟ କରିବାରେ ବିଫଳ ହୋଇଛି"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ସଫଳତାର ସହ ସକ୍ରିୟ କରାଯାଇଛି।",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "ମେଣ୍ଟରଙ୍କୁ ସଫଳତାର ସହ ଅପଡେଟ୍ କରାଯାଇଛି!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "ମେଣ୍ଟରକୁ ଅପଡେଟ୍ କରିପାରିଲି ନାହିଁ",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "ମେଣ୍ଟର ସଫଳତାର ସହ ସୃଷ୍ଟି ହୋଇଛି!",
+    "NOT_ABLE_CREATE_MOBILIZER": "ମେଣ୍ଟର ତିଆରି କରିପାରିଲେ ନାହିଁ",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ମେଣ୍ଟର ତିଆରି ହୋଇଛି, ଶୀଘ୍ର ପ୍ରମାଣପତ୍ର ପଠାଯିବ।",
+    "MAP_USER_AS_LEAD": "ଲିଡ୍ ଭାବରେ ମ୍ୟାପ୍ ବ୍ୟବହାରକାରୀ",
+    "MAP_USER_AS_MOBILIZER": "ପରାମର୍ଶଦାତା ଭାବରେ ମାନଚିତ୍ର ବ୍ୟବହାରକାରୀ",
+    "PLEASE_SEARCH_AND_SELECT_USER": "ଦୟାକରି ସନ୍ଧାନ କରନ୍ତୁ ଏବଂ ଜଣେ ଉପଯୋଗକର୍ତ୍ତା ଚୟନ କରନ୍ତୁ।",
+    "UNKNOWN_STATE": "ଅଜଣା ରାଜ୍ୟ",
+    "UNKNOWN_DISTRICT": "ଅଜଣା ଜିଲ୍ଲା",
+    "UNKNOWN_BLOCK": "ଅଜଣା ବ୍ଲକ",
+    "WORKING_LOCATION_REQUIRED": "କାର୍ଯ୍ୟସ୍ଥଳ ଆବଶ୍ୟକ। ଦୟାକରି ସମସ୍ତ ବ୍ଲକ ପାଇଁ ଗ୍ରାମ ଚୟନ କରନ୍ତୁ।",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "କାର୍ଯ୍ୟ ସ୍ଥାନ ଆବଶ୍ୟକ। ଦୟାକରି ସମସ୍ତ ବ୍ଲକ ପାଇଁ ଗ୍ରାମ ଚୟନ କରନ୍ତୁ। {{ବ୍ଲକ}} ଏବଂ {{ଗଣନା}} ଅଧିକ ବ୍ଲକରେ ଗ୍ରାମ ନାହିଁ।",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "କାର୍ଯ୍ୟ ସ୍ଥାନ ଆବଶ୍ୟକ। ଦୟାକରି ସମସ୍ତ ବ୍ଲକ ପାଇଁ ଗ୍ରାମ ଚୟନ କରନ୍ତୁ। {{ବ୍ଲକ}} ରେ ଗ୍ରାମ ନାହିଁ।",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "କାର୍ଯ୍ୟସ୍ଥଳ ଆବଶ୍ୟକ। ଦୟାକରି ସମସ୍ତ ବ୍ଲକରୁ ଅତି କମରେ ଗୋଟିଏ ଗ୍ରାମ ଚୟନ କରନ୍ତୁ।",
+    "MOBILIZER_NAME": "ପରାମର୍ଶଦାତାଙ୍କ ନାମ"
+  }
 }
