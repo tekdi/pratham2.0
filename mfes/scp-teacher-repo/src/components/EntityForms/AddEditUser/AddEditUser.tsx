@@ -471,6 +471,12 @@ const AddEditUser = ({
         };
       }
 
+      // Ensure batch is included from formData or prefilledFormData if missing from payload
+      // This handles cases where hidden fields might not be included in the submitted payload
+      if (!payload.batch && (formData?.batch || editPrefilledFormData?.batch)) {
+        payload.batch = formData?.batch || editPrefilledFormData?.batch;
+      }
+
       if (payload.batch) {
         const cohortIds = payload.batch;
         // payload.tenantCohortRoleMapping.push(cohortIds);
