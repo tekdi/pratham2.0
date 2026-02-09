@@ -272,14 +272,14 @@ const LoginPage = () => {
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields?.find(
-              (field: { label: string }) => field?.label === 'STATE'
+              (field: { label: string }) => field?.label === 'WORKING_STATE'
             )?.selectedValues?.[0]?.value
           );
           if (selectedStateName) {
             localStorage.setItem('stateName', selectedStateName);
           }
           const selectedStateId = userInfo?.customFields?.find(
-            (field: { label: string }) => field?.label === 'STATE'
+            (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
           if (selectedStateId) {
             localStorage.setItem('stateId', selectedStateId);
