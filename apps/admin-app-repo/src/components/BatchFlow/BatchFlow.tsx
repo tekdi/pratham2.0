@@ -375,8 +375,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         buildSchemaAndUi(true, existingValues);
         let tempFormData = extractMatchingKeys(row, addSchema);
         // Force batch_type to "remote" if centerType is "remote"
-        if (centerType === 'remote') {
-          tempFormData.batch_type = 'remote';
+        if (centerType === 'regular') {
+          tempFormData.batch_type = 'regular';
         }
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
