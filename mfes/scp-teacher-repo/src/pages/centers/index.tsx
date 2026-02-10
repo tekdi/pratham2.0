@@ -587,31 +587,22 @@ const CentersPage = () => {
     const ct = (params.centerType || '').toLowerCase();
     if (schema?.properties?.batch_type) {
       if (ct === 'remote') {
-        schema.properties.batch_type.enum = ['remote'];
-        schema.properties.batch_type.enumNames = ['REMOTE'];
+        // For remote center: show "remote" and "hybrid" options
+        schema.properties.batch_type.enum = ['remote', 'hybrid'];
+        schema.properties.batch_type.enumNames = ['Remote', 'Hybrid'];
         schema.properties.batch_type.default = 'remote';
         prefill.batch_type = 'remote';
+        ensureEnabled('batch_type');
+      } else if (ct === 'regular') {
+        // For regular center: show only "regular" option (disabled)
+        schema.properties.batch_type.enum = ['regular'];
+        schema.properties.batch_type.enumNames = ['Regular'];
+        schema.properties.batch_type.default = 'regular';
+        prefill.batch_type = 'regular';
         uiSchema.batch_type = {
           ...(uiSchema?.batch_type || {}),
           'ui:disabled': true,
         };
-      } else if (ct === 'regular') {
-        // Only restrict if enum exists; otherwise leave as-is.
-        const existingEnum = Array.isArray(schema.properties.batch_type.enum)
-          ? schema.properties.batch_type.enum
-          : null;
-        if (existingEnum) {
-          const allowed = ['regular', 'contact'].filter((v) =>
-            existingEnum.includes(v)
-          );
-          if (allowed.length) {
-            schema.properties.batch_type.enum = allowed;
-            schema.properties.batch_type.enumNames = allowed.map((v) =>
-              v.toUpperCase()
-            );
-          }
-        }
-        ensureEnabled('batch_type');
       }
     }
 
