@@ -312,7 +312,11 @@
     "MANUAL_ATTENDANCE_NOTE": "Note: Manually marked attendance will override auto-attendance if it is later recorded.",
     "NO_BATCHES_ASSIGNED": "No Batches Assigned",
     "ABSENT_STUDENTS": "Absent: {{count}}",
-    "N/A": "N/A"
+    "N/A": "N/A",
+    "IN_PERSON_SESSIONS": "In-Person Sessions ({{count}})",
+    "ONLINE_SESSIONS": "Online Sessions ({{count}})",
+    "ONLINE_ATTENDANCE_AUTO_MARKED_NOTE": "Online attendance is auto-marked based on 50% session duration threshold.",
+    "SUBMIT_ATTENDANCE": "Submit Attendance"
   },
   "PROFILE": {
     "EDIT_PROFILE": "Edit Profile",

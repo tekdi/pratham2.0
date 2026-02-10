@@ -9,8 +9,10 @@ import {
 
 import { Telemetry } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
+import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import ReactGA from 'react-ga4';
@@ -25,6 +27,7 @@ import { modalStyles } from '@/styles/modalStyles';
 interface MarkBulkAttendanceProps {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
   classId: string;
   selectedDate: Date;
   onSaveSuccess?: (isModified?: boolean) => void;
@@ -40,6 +43,7 @@ interface MarkBulkAttendanceProps {
 const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
   open,
   onClose,
+  onBack,
   classId,
   selectedDate,
   onSaveSuccess,
@@ -260,40 +264,57 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
               <Box
                 display={'flex'}
                 justifyContent={'space-between'}
+                alignItems={'flex-start'}
                 sx={{ padding: '0 10px' }}
               >
-                <Box marginBottom={'0px'}>
-                  <Typography 
-                    variant="h2"
-                    component="h2"
-                    marginBottom={'0px'}
-                    fontWeight={'500'}
-                    fontSize={'16px'}
-                    sx={{ color: theme.palette.warning['A200'] }}
-                  >
-                    {presentCount == 0 && absentCount == 0 ? t('COMMON.MARK_CENTER_ATTENDANCE'): t('COMMON.MODIFY_CENTER_ATTENDANCE')}
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      paddingBottom: '10px',
-                      color: theme.palette.warning['A200'],
-                      fontSize: '14px',
-                    }}
-                    component="h2"
-                  >
-                    {getDayMonthYearFormat(shortDateFormat(selectedDate))}
-                  </Typography>
-                  <ConfirmationModal
-                    message={getMessage()}
-                    handleAction={handleAction}
-                    handleCloseModal={handleCloseModel}
-                    buttonNames={{
-                      primary: t('COMMON.YES'),
-                      secondary: t('COMMON.NO_GO_BACK'),
-                    }}
-                    modalOpen={modalOpen}
-                  />
+                <Box display="flex" alignItems="center" gap={0.5} marginBottom={'0px'}>
+                  {onBack && (
+                    <IconButton
+                      size="small"
+                      onClick={onBack}
+                      aria-label={t('COMMON.BACK')}
+                      sx={{
+                        color: theme.palette.warning['A200'],
+                        padding: '4px',
+                        marginRight: '4px',
+                      }}
+                    >
+                      <ArrowBackIcon sx={{ fontSize: '24px' }} />
+                    </IconButton>
+                  )}
+                  <Box>
+                    <Typography 
+                      variant="h2"
+                      component="h2"
+                      marginBottom={'0px'}
+                      fontWeight={'500'}
+                      fontSize={'16px'}
+                      sx={{ color: theme.palette.warning['A200'] }}
+                    >
+                      {presentCount == 0 && absentCount == 0 ? t('COMMON.MARK_CENTER_ATTENDANCE'): t('COMMON.MODIFY_CENTER_ATTENDANCE')}
+                    </Typography>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        paddingBottom: '10px',
+                        color: theme.palette.warning['A200'],
+                        fontSize: '14px',
+                      }}
+                      component="h2"
+                    >
+                      {getDayMonthYearFormat(shortDateFormat(selectedDate))}
+                    </Typography>
+                    <ConfirmationModal
+                      message={getMessage()}
+                      handleAction={handleAction}
+                      handleCloseModal={handleCloseModel}
+                      buttonNames={{
+                        primary: t('COMMON.YES'),
+                        secondary: t('COMMON.NO_GO_BACK'),
+                      }}
+                      modalOpen={modalOpen}
+                    />
+                  </Box>
                 </Box>
                 <Box>
                   <CloseIcon

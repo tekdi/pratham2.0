@@ -40,6 +40,9 @@ import AttendanceComparison from '@/components/AttendanceComparison';
 import CohortSelectionSection from '@/components/CohortSelectionSection';
 import GuideTour from '@/components/GuideTour';
 import MarkBulkAttendance from '@/components/MarkBulkAttendance';
+import MarkCenterAttendanceSessionsModal, {
+  DaySessionForAttendance,
+} from '@/components/MarkCenterAttendanceSessionsModal';
 import OverviewCard from '@/components/OverviewCard';
 import { showToastMessage } from '@/components/Toastify';
 import WeekCalender from '@/components/WeekCalender';
@@ -109,6 +112,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const isActiveYear = store.isActiveYearSelected;
 
   const [open, setOpen] = React.useState(false);
+  const [sessionsModalOpen, setSessionsModalOpen] = React.useState(false);
   const [cohortsData, setCohortsData] = React.useState<Array<ICohort>>([]);
   const [manipulatedCohortData, setManipulatedCohortData] =
     React.useState<Array<ICohort>>(cohortsData);
@@ -539,7 +543,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleModalToggle = () => {
-    setOpen(!open);
+    setSessionsModalOpen(true);
 
     const telemetryInteract = {
       context: {
@@ -674,8 +678,13 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   const handleClose = () => {
     setOpen(false);
+    setSessionsModalOpen(false);
     setIsRemoteCohort(false);
-    // setTest(false)
+  };
+
+  const handleSessionSelect = (_session: DaySessionForAttendance) => {
+    setSessionsModalOpen(false);
+    setOpen(true);
   };
 
   const todayDate = getTodayDate();
@@ -1134,10 +1143,26 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               </Button>
                             </Stack>
                           </Box>
+                          {sessionsModalOpen && (
+                            <MarkCenterAttendanceSessionsModal
+                              open={sessionsModalOpen}
+                              onClose={handleClose}
+                              selectedDate={new Date(selectedDate)}
+                              activeCount={attendanceData?.numberOfCohortMembers ?? 0}
+                              dropoutCount={attendanceData?.dropoutCount ?? 0}
+                              presentCount={attendanceData?.presentCount ?? 0}
+                              absentCount={attendanceData?.absentCount ?? 0}
+                              onSessionSelect={handleSessionSelect}
+                            />
+                          )}
                           {open && (
                             <MarkBulkAttendance
                               open={open}
                               onClose={handleClose}
+                              onBack={() => {
+                                setOpen(false);
+                                setSessionsModalOpen(true);
+                              }}
                               classId={classId}
                               selectedDate={new Date(selectedDate)}
                               onSaveSuccess={(isModified) => {
