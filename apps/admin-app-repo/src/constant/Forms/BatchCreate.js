@@ -118,12 +118,12 @@ export const BatchCreateSchema = {
       enum: [
         'remote',
         'regular',
-        'contact',
+        'hybrid',
       ],
       enumNames: [
         'REMOTE',
         'REGULAR',
-        'CONTACT',
+        'HYBRID',
       ],
     },
   },

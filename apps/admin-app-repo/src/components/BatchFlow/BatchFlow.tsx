@@ -149,19 +149,20 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {
       if (centerType === 'remote') {
-        // For remote center: show only "remote" option
-        alterSchema.properties.batch_type.enum = ['remote'];
-        alterSchema.properties.batch_type.enumNames = ['REMOTE'];
+        // For remote center: show "remote" and "hybrid" options
+        alterSchema.properties.batch_type.enum = ['remote', 'hybrid'];
+        alterSchema.properties.batch_type.enumNames = ['REMOTE', 'HYBRID'];
         alterSchema.properties.batch_type.default = 'remote';
-        if (alterUiSchema?.batch_type) {
-          alterUiSchema.batch_type['ui:disabled'] = true;
-        }
-      } else if (centerType === 'regular') {
-        // For regular center: show only "regular" and "contact" options
-        alterSchema.properties.batch_type.enum = ['regular', 'contact'];
-        alterSchema.properties.batch_type.enumNames = ['REGULAR', 'CONTACT'];
         if (alterUiSchema?.batch_type?.['ui:disabled']) {
           delete alterUiSchema.batch_type['ui:disabled'];
+        }
+      } else if (centerType === 'regular') {
+        // For regular center: show only "regular" option (disabled)
+        alterSchema.properties.batch_type.enum = ['regular'];
+        alterSchema.properties.batch_type.enumNames = ['REGULAR'];
+        alterSchema.properties.batch_type.default = 'regular';
+        if (alterUiSchema?.batch_type) {
+          alterUiSchema.batch_type['ui:disabled'] = true;
         }
       }
     }
