@@ -21,7 +21,7 @@ import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useRouter } from 'next/navigation';
-import { getUserDetails } from '@learner/utils/API/userService';
+import { getUserDetails, getMentorList } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
@@ -114,6 +114,8 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewTitle, setPreviewTitle] = useState<string>('');
+  const [villageId, setVillageId] = useState<number | null>(null);
+  const [mentorData, setMentorData] = useState<Record<string, unknown> | null>(null);
 
   const storedConfig =
     typeof window !== 'undefined'
@@ -177,6 +179,13 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         console.log('useInfo', userInfoResponse?.result?.userData);
         console.log('responseForm', formResponse);
         
+        // Extract village ID for mentor lookup
+        const extractedVillageId =
+          userInfoResponse?.result?.userData?.customFields?.find(
+            (f: Record<string, unknown>) => f.label === 'VILLAGE'
+          )?.selectedValues?.[0]?.id ?? null;
+        setVillageId(extractedVillageId);
+        
         setUserData(userInfoResponse?.result?.userData);
         setFormSchema(formResponse);
       } catch (error) {
@@ -186,6 +195,45 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
 
     fetchData();
   }, []);
+
+  // Fetch mentor data based on village ID
+  useEffect(() => {
+    const fetchMentorData = async () => {
+      try {
+        if (villageId) {
+          const mentorResponse = await getMentorList({
+            limit: 100,
+            filters: {
+              working_village: [String(villageId)],
+              role: 'Mobilizer',
+            },
+            sort: ['createdAt', 'asc'],
+            offset: 0,
+          });
+
+          // Handle different possible response structures
+          const mentorList =
+            mentorResponse?.getUserDetails ||
+            mentorResponse?.userDetails ||
+            mentorResponse?.results ||
+            [];
+
+          // Get the first mentor from the list if available
+          if (Array.isArray(mentorList) && mentorList.length > 0) {
+            setMentorData(mentorList[0] as Record<string, unknown>);
+          } else {
+            setMentorData(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching mentor data:', error);
+        setMentorData(null);
+      }
+    };
+
+    fetchMentorData();
+  }, [villageId]);
+
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -672,6 +720,49 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
                     </Grid>
                   );
                 })}
+              </Grid>
+            </Box>
+          </>
+        )}
+
+        {/* My Mentor Details Section */}
+        {mentorData && (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.MY_MENTOR_DETAILS')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              <Grid container spacing={1.5}>
+                {(mentorData.firstName || mentorData.lastName) ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_NAME')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {toPascalCase(
+                        [String(mentorData.firstName || ''), String(mentorData.lastName || '')]
+                          .filter(Boolean)
+                          .join(' ')
+                      )}
+                    </Typography>
+                  </Grid>
+                ) : null}
+                {mentorData.email ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_EMAIL')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{String(mentorData.email)}</Typography>
+                  </Grid>
+                ) : null}
+                {mentorData.mobile ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{String(mentorData.mobile)}</Typography>
+                  </Grid>
+                ) : null}
               </Grid>
             </Box>
           </>
