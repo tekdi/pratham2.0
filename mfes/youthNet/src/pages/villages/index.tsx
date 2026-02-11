@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import SearchBar from '../../components/Searchbar';
 import SortBy from '../../components/youthNet/SortBy';
@@ -412,7 +412,8 @@ const Index = () => {
     }
   }, [value, mobilizerCenterOptions, selectedCenterIdForLocation]);
 
-  // For Lead on Villages (2) / Youth/Volunteers (3): on center change reset state/district/block/village and lists, then populate from new center's catchment
+  // For Lead on Villages (2) / Youth/Volunteers (3): populate state/district/block from center catchment.
+  // Village/youth lists are reset only when user changes center (in dropdown onSelect), not here, so effect re-runs (e.g. blockId) don't wipe the list.
   useEffect(() => {
     if (
       (value !== 2 && value !== 3) ||
@@ -421,14 +422,6 @@ const Index = () => {
     ) {
       return;
     }
-    // Reset village selection and location-dependent lists when center changes
-    setSelectedVillageValue([]);
-    setVillageList([]);
-    setVillageListWithUsers([]);
-    setFilteredVillageListWithUsers([]);
-    setVillageCount(0);
-    setYouthList([]);
-    setFilteredYouthList([]);
 
     const { states, districtsByState, blocksByDistrict } =
       getStatesDistrictsAndBlocksFromCenterCatchment(selectedCenterIdForLocation);
@@ -616,10 +609,15 @@ const Index = () => {
     } catch (e) {
       setLoading(false);
     }
-  }, [searchInput, appliedFilters, value]);
+  }, [searchInput, appliedFilters, value, villageListWithUsers, youthList]);
 
   useEffect(() => {
     const getYouthData = async () => {
+      const villagesWeAreFetching = Array.isArray(selectedVillageValue)
+        ? selectedVillageValue
+        : selectedVillageValue != null && selectedVillageValue !== ''
+          ? [selectedVillageValue]
+          : [];
       try {
         setLoading(true);
         const filters = {
@@ -629,7 +627,19 @@ const Index = () => {
         };
 
         const result = await fetchUserList({ filters });
-        console.log('result', result);
+        const currentKey = JSON.stringify(
+          Array.isArray(selectedVillageValueRef.current)
+            ? selectedVillageValueRef.current
+            : selectedVillageValueRef.current != null && selectedVillageValueRef.current !== ''
+              ? [selectedVillageValueRef.current]
+              : []
+        );
+        const fetchKey = JSON.stringify(villagesWeAreFetching);
+        if (currentKey !== fetchKey) {
+          setLoading(false);
+          return;
+        }
+
         if (result.getUserDetails) {
           const transformedYouthData = result?.getUserDetails.map(
             (user: any) => {
@@ -686,7 +696,6 @@ const Index = () => {
           const ascending = [...transformedYouthData].sort((a, b) =>
             a.name.localeCompare(b.name)
           );
-
           setYouthList(ascending);
           setFilteredYouthList(ascending);
         } else {
@@ -945,8 +954,15 @@ const Index = () => {
     if (villageList?.length !== 0) getVillageYouthData();
   }, [villageList, selectedVillageValue]);
 
+  const selectedBlockValueRef = useRef(selectedBlockValue);
+  selectedBlockValueRef.current = selectedBlockValue;
+
+  const selectedVillageValueRef = useRef(selectedVillageValue);
+  selectedVillageValueRef.current = selectedVillageValue;
+
   useEffect(() => {
     const getVillageList = async () => {
+      const blockWeAreFetching = selectedBlockValue;
       try {
         if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
           let villageDataString = localStorage.getItem('villageData');
@@ -972,24 +988,26 @@ const Index = () => {
             fieldName,
           });
 
+          if (selectedBlockValueRef.current !== blockWeAreFetching) return;
+
           const transformedVillageData = villageResponce?.result?.values?.map(
             (item: any) => ({
               Id: item?.value,
               name: item?.label,
             })
           );
-          setVillageCount(transformedVillageData.length);
-
-          setVillageList(transformedVillageData);
+          setVillageCount(transformedVillageData?.length ?? 0);
+          setVillageList(transformedVillageData ?? []);
           if (selectedBlockValue === blockId) {
             setSelectedVillageValue(villageId);
           } else {
             if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole())
               setSelectedVillageValue(villageId);
-            else setSelectedVillageValue(transformedVillageData[0]?.Id);
+            else setSelectedVillageValue(transformedVillageData?.[0]?.Id);
           }
         }
       } catch (error) {
+        if (selectedBlockValueRef.current !== blockWeAreFetching) return;
         console.log(error);
       }
     };
@@ -1611,11 +1629,14 @@ const Index = () => {
   };
 
   useEffect(() => {
+    const noVillageSelection =
+      !selectedVillageValue ||
+      (Array.isArray(selectedVillageValue) && selectedVillageValue.length === 0);
     if (
       value === 3 &&
       villageList &&
       villageList.length > 0 &&
-      !selectedVillageValue
+      noVillageSelection
     ) {
       setSelectedVillageValue(villageList?.map((village: any) => village.Id));
     }
@@ -2742,6 +2763,16 @@ const Index = () => {
                       defaultValue={selectedCenterIdForLocation || mobilizerCenterOptions?.[0]?.id}
                       onSelect={(centerId) => {
                         setSelectedCenterIdForLocation(centerId);
+                        setSelectedStateValue('');
+                        setSelectedDistrictValue('');
+                        setSelectedBlockValue('');
+                        setSelectedVillageValue([]);
+                        setVillageList([]);
+                        setVillageListWithUsers([]);
+                        setFilteredVillageListWithUsers([]);
+                        setVillageCount(0);
+                        setYouthList([]);
+                        setFilteredYouthList([]);
                       }}
                       label={t('COMMON.CENTER')}
                     />
@@ -2752,7 +2783,12 @@ const Index = () => {
                         name={stateData?.STATE_NAME}
                         values={stateData}
                         defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(val) => setSelectedStateValue(val)}
+                        onSelect={(val) => {
+                          setSelectedStateValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
                       />
                     ) : (
@@ -2779,7 +2815,12 @@ const Index = () => {
                         defaultValue={
                           selectedDistrictValue || districtData?.[0]?.id
                         }
-                        onSelect={(val) => setSelectedDistrictValue(val)}
+                        onSelect={(val) => {
+                          setSelectedDistrictValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                       />
                     ) : (
@@ -2804,7 +2845,12 @@ const Index = () => {
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
                         defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(val) => setSelectedBlockValue(val)}
+                        onSelect={(val) => {
+                          setSelectedBlockValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                       />
                     ) : (
@@ -2957,6 +3003,16 @@ const Index = () => {
                       defaultValue={selectedCenterIdForLocation || mobilizerCenterOptions?.[0]?.id}
                       onSelect={(centerId) => {
                         setSelectedCenterIdForLocation(centerId);
+                        setSelectedStateValue('');
+                        setSelectedDistrictValue('');
+                        setSelectedBlockValue('');
+                        setSelectedVillageValue([]);
+                        setVillageList([]);
+                        setVillageListWithUsers([]);
+                        setFilteredVillageListWithUsers([]);
+                        setVillageCount(0);
+                        setYouthList([]);
+                        setFilteredYouthList([]);
                       }}
                       label={t('COMMON.CENTER')}
                     />
@@ -2967,7 +3023,12 @@ const Index = () => {
                         name={stateData?.STATE_NAME}
                         values={stateData}
                         defaultValue={selectedStateValue || stateData?.[0]?.id}
-                        onSelect={(val) => setSelectedStateValue(val)}
+                        onSelect={(val) => {
+                          setSelectedStateValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
                       />
                     ) : (
@@ -2994,7 +3055,12 @@ const Index = () => {
                         defaultValue={
                           selectedDistrictValue || districtData?.[0]?.id
                         }
-                        onSelect={(val) => setSelectedDistrictValue(val)}
+                        onSelect={(val) => {
+                          setSelectedDistrictValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
                       />
                     ) : (
@@ -3019,7 +3085,12 @@ const Index = () => {
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
                         defaultValue={selectedBlockValue || blockData?.[0]?.id}
-                        onSelect={(val) => setSelectedBlockValue(val)}
+                        onSelect={(val) => {
+                          setSelectedBlockValue(val);
+                          setSelectedVillageValue([]);
+                          setYouthList([]);
+                          setFilteredYouthList([]);
+                        }}
                         label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
                       />
                     ) : (
