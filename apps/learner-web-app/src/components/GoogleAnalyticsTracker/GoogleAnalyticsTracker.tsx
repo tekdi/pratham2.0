@@ -23,6 +23,11 @@ const GoogleAnalyticsTracker = () => {
         console.log('Initializing GA for Themantic');
         initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_THEMATIC}`);
       }
+      else if(window.location.href.includes('plp') )
+      {
+        console.log('Initializing GA for PLP or PDP');
+        initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_PLP}`);
+      }
       else
       initGA(`${process.env.NEXT_PUBLIC_MEASUREMENT_ID_POS}`);
       window.GA_INITIALIZED = true;
