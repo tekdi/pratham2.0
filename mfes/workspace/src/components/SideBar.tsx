@@ -6,6 +6,7 @@ import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import OutlinedFlagOutlinedIcon from '@mui/icons-material/OutlinedFlagOutlined';
 import PreviewOutlinedIcon from '@mui/icons-material/PreviewOutlined';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import {
   Box,
   Drawer,
@@ -102,6 +103,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'content-library',
       icon: <ManageSearchIcon />,
      },
+    {
+      text: 'Bulk Import QuestionSet',
+      key: 'bulk-import',
+      icon: <UploadFileIcon />,
+    },
     ...(isSCP
       ? [
           {
