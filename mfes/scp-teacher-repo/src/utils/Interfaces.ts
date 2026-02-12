@@ -65,6 +65,8 @@ export interface BulkAttendanceParams {
   attendanceDate: string;
   contextId: string;
   userAttendance: UserAttendanceObj[];
+  /** 'event' for session-level attendance, 'cohort' for batch-level (default) */
+  context?: 'cohort' | 'event';
 }
 export interface MarkAttendanceParams {
   userId: string;
@@ -206,6 +208,8 @@ export interface AttendanceStatusListProps {
     toDate: string | Date;
     contextId: string;
     scope: string;
+    /** 'event' for session-level attendance list, 'cohort' (default) for batch-level */
+    context?: 'cohort' | 'event';
   };
 }
 

@@ -316,7 +316,10 @@
     "IN_PERSON_SESSIONS": "In-Person Sessions ({{count}})",
     "ONLINE_SESSIONS": "Online Sessions ({{count}})",
     "ONLINE_ATTENDANCE_AUTO_MARKED_NOTE": "Online attendance is auto-marked based on 50% session duration threshold.",
-    "SUBMIT_ATTENDANCE": "Submit Attendance"
+    "SUBMIT_ATTENDANCE": "Submit Attendance",
+    "NO_SESSIONS_FOR_DAY": "No sessions scheduled for this day",
+    "NO_IN_PERSON_SESSIONS": "No in-person sessions scheduled",
+    "NO_ONLINE_SESSIONS": "No online sessions scheduled"
   },
   "PROFILE": {
     "EDIT_PROFILE": "Edit Profile",

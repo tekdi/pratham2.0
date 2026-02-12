@@ -13,9 +13,13 @@ import { useTranslation } from 'next-i18next';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { modalStyles } from '@/styles/modalStyles';
+import Loader from './Loader';
+import NoDataFound from './common/NoDataFound';
 
 export interface DaySessionForAttendance {
   id: string;
+  /** Required for marking session attendance (from event list API) */
+  eventRepetitionId?: string;
   name: string;
   startTime: string;
   endTime: string;
@@ -29,41 +33,9 @@ export interface MarkCenterAttendanceSessionsModalProps {
   onClose: () => void;
   selectedDate: Date;
   sessions?: DaySessionForAttendance[];
+  sessionsLoading?: boolean;
   onSessionSelect: (session: DaySessionForAttendance) => void;
 }
-
-const defaultMockSessions: DaySessionForAttendance[] = [
-  {
-    id: '1',
-    name: 'Morning Theory Session',
-    startTime: '09:00',
-    endTime: '11:00',
-    type: 'inPerson',
-  },
-  {
-    id: '2',
-    name: 'Hands-on Lab Session',
-    startTime: '11:30',
-    endTime: '13:30',
-    type: 'inPerson',
-  },
-  {
-    id: '3',
-    name: 'Online Q&A Session',
-    startTime: '15:00',
-    endTime: '16:00',
-    type: 'online',
-    presentCount: 4,
-    totalCount: 6,
-  },
-  {
-    id: '4',
-    name: 'Evening Revision',
-    startTime: '17:00',
-    endTime: '18:00',
-    type: 'online',
-  },
-];
 
 const MarkCenterAttendanceSessionsModal: React.FC<
   MarkCenterAttendanceSessionsModalProps
@@ -71,14 +43,17 @@ const MarkCenterAttendanceSessionsModal: React.FC<
   open,
   onClose,
   selectedDate,
-  sessions = defaultMockSessions,
+  sessions,
+  sessionsLoading = false,
   onSessionSelect,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
 
-  const inPersonSessions = sessions.filter((s) => s.type === 'inPerson');
-  const onlineSessions = sessions.filter((s) => s.type === 'online');
+  const sessionList = sessions ?? [];
+  const inPersonSessions = sessionList.filter((s) => s.type === 'inPerson');
+  const onlineSessions = sessionList.filter((s) => s.type === 'online');
+  const hasSessions = inPersonSessions.length > 0 || onlineSessions.length > 0;
 
   const dateStr = selectedDate ? shortDateFormat(selectedDate) : '';
   const formattedDate = dateStr ? getDayMonthYearFormat(dateStr) : '';
@@ -161,6 +136,15 @@ const MarkCenterAttendanceSessionsModal: React.FC<
 
             <Box sx={{ height: '1px', background: '#D0C5B4' }} />
 
+            {sessionsLoading ? (
+              <Box sx={{ padding: 2, minHeight: 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+              </Box>
+            ) : !hasSessions ? (
+              <Box sx={{ padding: 2 }}>
+                <NoDataFound title="ATTENDANCE.NO_SESSIONS_FOR_DAY" />
+              </Box>
+            ) : (
             <Box sx={{ padding: '0 10px', marginTop: 2 }}>
               <Box sx={{ marginBottom: 1.5, display: 'flex', alignItems: 'center', gap: 0.5, color: 'black' }}>
                 <LocationOnOutlinedIcon sx={{ fontSize: 18 }} />
@@ -168,17 +152,31 @@ const MarkCenterAttendanceSessionsModal: React.FC<
                   {t('ATTENDANCE.IN_PERSON_SESSIONS', { count: inPersonSessions.length })}
                 </Typography>
               </Box>
-              <Box display="flex" flexDirection="column" gap={1}>
-                {inPersonSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    theme={theme}
-                    presentLabel={t('ATTENDANCE.PRESENT')}
-                    onClick={() => onSessionSelect(session)}
-                  />
-                ))}
-              </Box>
+              {inPersonSessions.length === 0 ? (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: theme.palette.text?.secondary ?? 'rgba(0,0,0,0.6)',
+                    fontSize: '12px',
+                    display: 'block',
+                    marginBottom: 1,
+                  }}
+                >
+                  {t('ATTENDANCE.NO_IN_PERSON_SESSIONS')}
+                </Typography>
+              ) : (
+                <Box display="flex" flexDirection="column" gap={1}>
+                  {inPersonSessions.map((session) => (
+                    <SessionCard
+                      key={session.id}
+                      session={session}
+                      theme={theme}
+                      presentLabel={t('ATTENDANCE.PRESENT')}
+                      onClick={() => onSessionSelect(session)}
+                    />
+                  ))}
+                </Box>
+              )}
 
               <Box sx={{ marginTop: 2, marginBottom: 1.5, display: 'flex', alignItems: 'center', gap: 0.5, color: 'black' }}>
                 <VideocamOutlinedIcon sx={{ fontSize: 18 }} />
@@ -197,18 +195,32 @@ const MarkCenterAttendanceSessionsModal: React.FC<
               >
                 {t('ATTENDANCE.ONLINE_ATTENDANCE_AUTO_MARKED_NOTE')}
               </Typography>
-              <Box display="flex" flexDirection="column" gap={1}>
-                {onlineSessions.map((session) => (
-                  <SessionCard
-                    key={session.id}
-                    session={session}
-                    theme={theme}
-                    presentLabel={t('ATTENDANCE.PRESENT')}
-                    onClick={() => onSessionSelect(session)}
-                  />
-                ))}
-              </Box>
+              {onlineSessions.length === 0 ? (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: theme.palette.text?.secondary ?? 'rgba(0,0,0,0.6)',
+                    fontSize: '12px',
+                    display: 'block',
+                  }}
+                >
+                  {t('ATTENDANCE.NO_ONLINE_SESSIONS')}
+                </Typography>
+              ) : (
+                <Box display="flex" flexDirection="column" gap={1}>
+                  {onlineSessions.map((session) => (
+                    <SessionCard
+                      key={session.id}
+                      session={session}
+                      theme={theme}
+                      presentLabel={t('ATTENDANCE.PRESENT')}
+                      onClick={() => onSessionSelect(session)}
+                    />
+                  ))}
+                </Box>
+              )}
             </Box>
+            )}
           </Box>
         </Box>
       </Fade>

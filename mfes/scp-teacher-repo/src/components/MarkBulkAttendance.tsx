@@ -24,12 +24,21 @@ import Loader from './Loader';
 import { showToastMessage } from './Toastify';
 import { modalStyles } from '@/styles/modalStyles';
 
+/** When provided, attendance is marked at session/event level (contextId = eventRepetitionId, context = 'event') */
+export interface SelectedSessionForAttendance {
+  eventRepetitionId: string;
+}
+
 interface MarkBulkAttendanceProps {
   open: boolean;
   onClose: () => void;
   onBack?: () => void;
   classId: string;
   selectedDate: Date;
+  /** When set, bulk attendance is submitted with contextId = eventRepetitionId and context = 'event' */
+  selectedSession?: SelectedSessionForAttendance | null;
+  /** Show loader until session-level prefill data is loaded (when opened from session card) */
+  prefillLoading?: boolean;
   onSaveSuccess?: (isModified?: boolean) => void;
   memberList: Array<{}>;
   presentCount: number;
@@ -46,6 +55,8 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
   onBack,
   classId,
   selectedDate,
+  selectedSession,
+  prefillLoading = false,
   onSaveSuccess,
   memberList,
   presentCount,
@@ -142,6 +153,22 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
     }
   }, []);
 
+  // Sync from props when modal is open so session-level attendance (loaded async) is shown
+  useEffect(() => {
+    if (!open) return;
+    setCohortMemberList(deepClone(memberList ?? []));
+    setDynamicPresentCount(presentCount ?? 0);
+    setDynamicAbsentCount(absentCount ?? 0);
+    setBulkAttendanceStatus(bulkStatus ?? '');
+    const list = memberList ?? [];
+    const allMarked =
+      list.length > 0 &&
+      list.every(
+        (u: any) => u.attendance === 'present' || u.attendance === 'absent'
+      );
+    setIsAllAttendanceMarked(allMarked);
+  }, [open, memberList, presentCount, absentCount, bulkStatus]);
+
   const handleSave = () => {
     onClose();
     const userAttendance = cohortMemberList?.map((user: any) => {
@@ -152,10 +179,12 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
     });
     if (userAttendance) {
       const date = shortDateFormat(selectedDate);
+      const isSessionLevel = Boolean(selectedSession?.eventRepetitionId);
       const data = {
         attendanceDate: date,
-        contextId: classId,
+        contextId: isSessionLevel ? selectedSession!.eventRepetitionId : classId,
         userAttendance,
+        context: isSessionLevel ? ('event' as const) : ('cohort' as const),
       };
       const markBulkAttendance = async () => {
         setLoading(true);
@@ -327,7 +356,7 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
                 </Box>
               </Box>
               <Box sx={{ height: '1px', background: '#D0C5B4' }}></Box>
-              {loading && (
+              {(loading || prefillLoading) && (
                 <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
               )}
 

@@ -46,7 +46,7 @@ import MarkCenterAttendanceSessionsModal, {
 import OverviewCard from '@/components/OverviewCard';
 import { showToastMessage } from '@/components/Toastify';
 import WeekCalender from '@/components/WeekCalender';
-import { getEventList } from '@/services/EventService';
+import { getEventsForDay, getEventList } from '@/services/EventService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import {
   QueryKeys,
@@ -113,6 +113,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   const [open, setOpen] = React.useState(false);
   const [sessionsModalOpen, setSessionsModalOpen] = React.useState(false);
+  const [daySessions, setDaySessions] = React.useState<DaySessionForAttendance[]>([]);
+  const [sessionsLoading, setSessionsLoading] = React.useState(false);
+  const [selectedSession, setSelectedSession] = React.useState<DaySessionForAttendance | null>(null);
+  const [sessionAttendanceLoading, setSessionAttendanceLoading] = React.useState(false);
   const [cohortsData, setCohortsData] = React.useState<Array<ICohort>>([]);
   const [manipulatedCohortData, setManipulatedCohortData] =
     React.useState<Array<ICohort>>(cohortsData);
@@ -533,6 +537,91 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   }, [classId, selectedDate, handleSaveHasRun]);
 
+  // When learner list opens from a session card, fetch session-level attendance (context=event)
+  useEffect(() => {
+    const eventRepetitionId =
+      selectedSession?.eventRepetitionId ?? selectedSession?.id;
+    if (
+      !open ||
+      !eventRepetitionId ||
+      !classId ||
+      classId === 'all' ||
+      !selectedDate
+    ) {
+      return;
+    }
+    const fetchSessionAttendance = async () => {
+      setSessionAttendanceLoading(true);
+      try {
+        const limit = 300;
+        const page = 0;
+        const filters = { cohortId: classId };
+        const response = await getMyCohortMemberList({
+          limit,
+          page,
+          filters,
+          includeArchived: true,
+        });
+        const resp = response?.result?.userDetails;
+        if (!resp) return;
+        const nameUserIdArray = resp
+          ?.map((entry: any) => ({
+            userId: entry.userId,
+            name: toPascalCase(entry.firstName),
+            memberStatus: entry.status,
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+            userName: entry.username,
+          }))
+          .filter(
+            (member: {
+              createdAt: string | number | Date;
+              updatedAt: string | number | Date;
+              memberStatus: string;
+            }) => {
+              const createdAt = new Date(member.createdAt);
+              createdAt.setHours(0, 0, 0, 0);
+              const updatedAt = new Date(member.updatedAt);
+              updatedAt.setHours(0, 0, 0, 0);
+              const currentDate = new Date(selectedDate);
+              currentDate.setHours(0, 0, 0, 0);
+              if (
+                (member.memberStatus === Status.ARCHIVED ||
+                  member.memberStatus === 'reassigned') &&
+                updatedAt <= currentDate
+              ) {
+                return false;
+              }
+              return createdAt <= new Date(selectedDate);
+            }
+          );
+        const filteredEntries = getLatestEntries(
+          nameUserIdArray,
+          selectedDate
+        );
+        if (filteredEntries && selectedDate) {
+          const wrappedUpdate = (data: any) => {
+            handleAttendanceDataUpdate(data);
+            setSessionAttendanceLoading(false);
+          };
+          fetchAttendanceDetails(
+            filteredEntries,
+            selectedDate,
+            eventRepetitionId,
+            wrappedUpdate,
+            { context: 'event' }
+          );
+        } else {
+          setSessionAttendanceLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching session attendance:', error);
+        setSessionAttendanceLoading(false);
+      }
+    };
+    fetchSessionAttendance();
+  }, [open, selectedSession, classId, selectedDate]);
+
   const showDetailsHandle = (dayStr: string) => {
     setSelectedDate(formatSelectedDate(dayStr));
     setShowDetails(true);
@@ -679,13 +768,43 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const handleClose = () => {
     setOpen(false);
     setSessionsModalOpen(false);
+    setSelectedSession(null);
+    setSessionAttendanceLoading(false);
     setIsRemoteCohort(false);
   };
 
-  const handleSessionSelect = (_session: DaySessionForAttendance) => {
+  const handleSessionSelect = (session: DaySessionForAttendance) => {
+    setSelectedSession(session);
     setSessionsModalOpen(false);
     setOpen(true);
   };
+
+  useEffect(() => {
+    if (!sessionsModalOpen || !classId || classId === 'all') {
+      return;
+    }
+    let cancelled = false;
+    setSessionsLoading(true);
+    getEventsForDay(classId, selectedDate)
+      .then((sessions) => {
+        if (!cancelled) {
+          setDaySessions(sessions);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDaySessions([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setSessionsLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionsModalOpen, classId, selectedDate, t]);
 
   const todayDate = getTodayDate();
 
@@ -1148,10 +1267,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               open={sessionsModalOpen}
                               onClose={handleClose}
                               selectedDate={new Date(selectedDate)}
-                              activeCount={attendanceData?.numberOfCohortMembers ?? 0}
-                              dropoutCount={attendanceData?.dropoutCount ?? 0}
-                              presentCount={attendanceData?.presentCount ?? 0}
-                              absentCount={attendanceData?.absentCount ?? 0}
+                              sessions={daySessions}
+                              sessionsLoading={sessionsLoading}
                               onSessionSelect={handleSessionSelect}
                             />
                           )}
@@ -1165,6 +1282,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               }}
                               classId={classId}
                               selectedDate={new Date(selectedDate)}
+                              selectedSession={
+                                selectedSession
+                                  ? { eventRepetitionId: selectedSession.eventRepetitionId ?? selectedSession.id }
+                                  : null
+                              }
+                              prefillLoading={!!selectedSession && sessionAttendanceLoading}
                               onSaveSuccess={(isModified) => {
                                 if (isModified) {
                                   showToastMessage(
