@@ -100,7 +100,7 @@ const ForgotPassword = ({}) => {
         );
       }
     } catch {
-      showToastMessage('please enter correct username', 'error');
+      showToastMessage('Please enter correct Username or Phone Number', 'error');
     }
   };
 

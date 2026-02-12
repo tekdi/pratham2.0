@@ -153,10 +153,22 @@
     "NO_CONTENT_CREATOR_FOUND": "कोई सामग्री निर्माता (SCTA) नहीं मिला",
     "NO_CONTENT_REVIEWER_FOUND": "कोई सामग्री समीक्षक (CCTA) नहीं मिला",
     "LOADING": "लोड हो रहा है",
+    "USER_DELETE_SUCCSSFULLY": "उपयोगकर्ता सफलतापूर्वक हटाया गया",
     "SURE_REASSIGN_CENTER": "क्या आप सुनिश्चित हैं कि आप इस उपयोगकर्ता को केंद्र पुनः आवंटित करना चाहते हैं?",
     "SORT": "छाँटें",
-    "USER_DELETE_SUCCSSFULLY": "उपयोगकर्ता सफलतापूर्वक हटाया गया",
-    "ADD": "जोडा"
+    "ADD": "जोडा",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "अपना अनुरोध सबमिट करें और हम आपकी किसी भी समस्या या चिंता में आपकी सहायता करेंगे।",
+    "WE_ARE_HERE_TO_HELP": "हम आपकी मदद के लिए यहाँ हैं",
+    "NO_STATE_LEAD_FOUND": "राज्य स्तर पर कोई सुराग नहीं मिला",
+    "FAQS": "अक्सर पूछे जाने वाले प्रश्न",
+    "RESET_FILTERS": "फ़िल्टर रीसेट करें",
+    "ACTIVATE_USER": "उपयोगकर्ता को सक्रिय करें",
+    "ACTIVATE": "सक्रिय करें",
+    "RESIGNED_FROM_COMPANY": "कंपनी से इस्तीफा दे दिया",
+    "MOVED_TO_DIFFERENT_ROLE": "एक अलग भूमिका में स्थानांतरित",
+    "NO_MOBILIZER_FOUND": "कोई मार्गदर्शक नहीं मिला",
+    "MAP": "मानचित्र",
+    "NEXT": "अगला"
   },
   "LOGIN_PAGE": {
     "USERNAME": "उपयोगकर्ता नाम",
@@ -217,7 +229,22 @@
     "CERTIFICATE_ISSUANCE": "सर्टिफिकेट जारी करना",
     "SUPPORT_REQUEST": "समर्थन अनुरोध",
     "CONTENT_CREATOR": "सामग्री निर्माता",
-    "CONTENT_REVIEWER": "सामग्री समीक्षक"
+    "CONTENT_REVIEWER": "सामग्री समीक्षक",
+    "TAXONOMY_EDITOR": "वर्गीकरण संपादक",
+    "MANAGE_NOTIFICATION": "अधिसूचना टेम्पलेट प्रबंधित करें",
+    "YOUTH": "युवा",
+    "FAQS": "अक्सर पूछे जाने वाले प्रश्न",
+    "STATE_LEAD": "राज्य नेतृत्व",
+    "MASTER": "मालिक",
+    "STATES": "राज्य अमेरिका",
+    "DISTRICTS": "जिलों",
+    "BLOCKS": "ब्लाकों",
+    "VILLAGES": "गांवों",
+    "PROGRAMS": "कार्यक्रमों",
+    "SKILLING_CENTERS": "कौशल विकास केंद्र",
+    "CURRICULUM_PLANNER": "पाठ्यक्रम योजनाकार",
+    "BATCH": "बैच",
+    "MOBILIZER": "उपदेशक"
   },
   "FACILITATORS": {
     "STATE": "राज्य",
@@ -234,7 +261,11 @@
     "FINISH_ASSIGN": "समाप्त & असाइन करें",
     "BATCHES_SELECTED": "चयनित बैच",
     "CENTERS": "केंद्र",
-    "RE_ASSIGN_facilitator": "फैसिलिटेटर को फिर से असाइन करें"
+    "RE_ASSIGN_facilitator": "फैसिलिटेटर को फिर से असाइन करें",
+    "ASSIGN_BATCHES_FINISH": "आप इसे बाद में अपनी सुविधानुसार पूरा कर सकते हैं। हालांकि, बैच तभी असाइन किए जाएंगे जब आप 'समाप्त करें और असाइन करें' पर क्लिक करेंगे।",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "केंद्र से बैच असाइन करें",
+    "BACK_TO_FORM": "फॉर्म में वापसी",
+    "SEARCH_BATCHES": "बैच खोजें..."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "पाठ्यक्रम, विषय, छात्र, पीडीएफ आदि खोजें.."
@@ -248,7 +279,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "विद्यार्थी यशस्वीपणे अपडेट केला!",
     "EDIT_LEARNER": "विद्यार्थी संपादित करा",
     "NO_LEARNERS_FOUND": "कोई लर्नर नहीं मिला",
-    "RE_ASSIGN_LEARNER": "लर्नर को फिर से असाइन करें"
+    "RE_ASSIGN_LEARNER": "लर्नर को फिर से असाइन करें",
+    "ACTIVATE_USER_SUCCESS": "उपयोगकर्ता सफलतापूर्वक सक्रिय हो गया है।"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "मेंटर लीडर खोजें..",
@@ -263,7 +295,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "मेंटर लीड बनाने में सक्षम नहीं",
     "UPDATE_MENTOR_LEAD": "मेंटर लीड अपडेट करें",
     "NEW_MENTOR_LEAD": "नया मेंटर लीड",
-    "ER": "नए मेंटर लीडर्स"
+    "ER": "नए मेंटर लीडर्स",
+    "RE_ASSIGN_MENTOR_LEAD": "केंद्र प्रमुख को पुनः नियुक्त करें"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "टीम लीडर्स को खोजें..",
@@ -319,7 +352,15 @@
     "SUBTOPICS": "उप-विषय",
     "RESOURCES": "संसाधन",
     "TOPIC": "विषय",
-    "DURATION/MONTH": "अवधि/माह"
+    "DURATION/MONTH": "अवधि/माह",
+    "UPLOAD_FAILED": "अपलोड विफल",
+    "IMPORT_NEW_PLANNER": "नया प्लानर आयात करें",
+    "ADD_NEW_TOPIC": "नया विषय जोड़ें",
+    "DELETE_PLANNER": "प्लानर हटाएं",
+    "CSV_TEMPLATE": "सीएसवी टेम्पलेट",
+    "NEW_TOPIC": "नया विषय",
+    "DOWNLOAD_CSV": "अपलोड की गई CSV फ़ाइल डाउनलोड करें",
+    "DURING_COURSE": "सीखना"
   },
   "MASTER": {
     "STATE": "राज्य",
@@ -379,7 +420,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "बैच सफलतापूर्वक अपडेट किया गया",
     "BATCH_DELETE_SUCCESSFULLY": "बैच सफलतापूर्वक हटाया गया",
     "BATCH_CREATED_SUCCESSFULLY": "बैच सफलतापूर्वक बनाया गया",
-    "BATCH_UPDATE_FAILED": "बैच अपडेट करते समय कुछ गलत हुआ"
+    "BATCH_UPDATE_FAILED": "बैच अपडेट करते समय कुछ गलत हुआ",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "आप बैच को डिलीट नहीं कर सकते क्योंकि इसमें {{activeMembers}} सक्रिय शिक्षार्थी हैं।",
+    "NO_BATCH_FOUND": "कोई बैच नहीं मिला",
+    "TYPE_OF_BATCH": "बैच का प्रकार",
+    "BATCH_CREATE_FAILED": "बैच बनाते समय कुछ गड़बड़ हो गई"
   },
   "FORM": {
     "FULL_NAME": "पूरा नाम",
@@ -483,7 +528,22 @@
     "DO_YOU_WANT_TO_DELETE": "क्या आप केंद्र से उपयोगकर्ता को हटाना चाहते हैं?",
     "BOARD": "बोर्ड",
     "MEDIUM": "माध्यम",
-    "GRADE": "ग्रेड"
+    "GRADE": "ग्रेड",
+    "CONTACT": "संपर्क",
+    "BATCH": "बैच",
+    "PREFERRED_LANGUAGE": "पसंदीदा भाषा",
+    "FIRST_NAME": "पहला नाम",
+    "MIDDLE_NAME_OR_FATHER_NAME": "मध्य नाम या पिता का नाम",
+    "LAST_NAME": "उपनाम",
+    "MOTHER_NAME": "माँ का नाम",
+    "DATE_OF_BIRTH": "जन्म तिथि",
+    "TEST_BELONG_TO": "परीक्षण केंद्र के नीचे से संबंधित है",
+    "BELONG_TO": "केंद्र के नीचे से संबंधित है",
+    "WAS_BELONG_TO": "इसे नीचे दिए गए स्थान पर संग्रहीत किया गया था।",
+    "CONFIRM_TO_ACTIVATE": "क्या आप वाकई इस उपयोगकर्ता को दोबारा सक्रिय करना चाहते हैं?",
+    "WORKING_LOCATION": "कार्यस्थल",
+    "CATCHMENT_AREA": "जलग्रह - क्षेत्र",
+    "TYPE_OF_BATCH": "बैच का प्रकार"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट",
@@ -502,7 +562,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "नावात अंक समाविष्ट असू शकत नाहीत",
     "INVALID_EMAIL_FORMAT": "अवैध ईमेल स्वरूप",
     "ENTER_VALID_EMAIL": "वैध ईमेल पत्ता प्रविष्ट करा",
-    "ENTER_VALID_MOBILE_NUMBER": "वैध मोबाइल नंबर प्रविष्ट करा"
+    "ENTER_VALID_MOBILE_NUMBER": "वैध मोबाइल नंबर प्रविष्ट करा",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "स्पेस और विशेष वर्णों की अनुमति नहीं है।",
+    "DATE_MUST_BE_ON_OR_BEFORE": "तिथि {{date}} को या उससे पहले होनी चाहिए।",
+    "DATE_MUST_BE_ON_OR_AFTER": "तिथि {{date}} को या उसके बाद की होनी चाहिए।"
   },
   "TABLE_TITLE": {
     "NAME": "नाव",
@@ -535,7 +598,9 @@
     "COURSE_STATUS": "कोर्स स्थिति",
     "ISSUED_DATE": "जारी तिथि",
     "USER_ID": "उपयोगकर्ता आईडी",
-    "COURSE_ID": "कोर्स आईडी"
+    "COURSE_ID": "कोर्स आईडी",
+    "LOCATION": "स्थान (राज्य / जिला / ब्लॉक / गाँव)",
+    "WORKING_VILLAGE": "कार्यशील गाँव"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "संपादक कार्यस्थान",
@@ -570,7 +635,8 @@
     "SAVE_AS_DRAFT": "मसौदे के रूप में सहेजें",
     "CONTINUE_PROGRAM": "क्या आप बदलाव जारी रखना चाहते हैं या त्यागना चाहते हैं?",
     "DRAFTS": "मसौदे",
-    "DISCARD_CHANGES": "बदलाव त्यागें"
+    "DISCARD_CHANGES": "बदलाव त्यागें",
+    "EDIT": "संपादन करना"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "संदर्भ प्रकार",
@@ -623,9 +689,13 @@
     "ASSIGN_VILLAGES_FINISH": "आप इसे बाद में अपनी गति से पूरा कर सकते हैं। हालांकि, गांव केवल तभी असाइन किए जाएंगे जब आप ‘समाप्त’ पर क्लिक करेंगे।",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "ब्लॉकों से गांव असाइन करें",
     "BACK_TO_FORM": "फॉर्म पर वापस जाएं",
-    "SEARCH_VILLAGES": "गांव खोजें.."
+    "SEARCH_VILLAGES": "गांव खोजें..",
+    "BACK": "पीछे",
+    "SAVE_SELECTION": "चयन सहेजें",
+    "SELECTED_VILLAGE_COUNT": "चयनित गांवों की संख्या: {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "लिंग",
+  "WORKING_STATE": "कार्यरत राज्य",
   "first_name": "पहला नाम",
   "last_name": "अंतिम नाम",
   "phone_number": "फोन नंबर",
@@ -720,12 +790,73 @@
     "EDIT_MENTOR": "मेंटर संपादित करें",
     "NOT_ABLE_UPDATE_MENTOR": "मेंटर को अपडेट करने में सक्षम नहीं",
     "NOT_ABLE_CREATE_MENTOR": "मेंटर बनाने में सक्षम नहीं",
-    "UPDATE_MENTOR": "मेंटर अपडेट करें"
+    "UPDATE_MENTOR": "मेंटर अपडेट करें",
+    "RE_ASSIGN_MENTOR": "मेंटर को पुनः नियुक्त करें"
   },
   "GOOGLE MAP_LINK": "गूगल मैप लिंक",
   "District": "जिला",
   "State": "राज्य",
   "Village": "गांव",
   "GOOGLE_MAP_LINK": "गूगल मैप लिंक",
-  "DISTRICTS": "जिला"
+  "DISTRICTS": "जिला",
+  "TYPE_OF_BATCH": "बैच का प्रकार",
+  "CATCHMENT_AREA": "जलग्रह - क्षेत्र",
+  "DISTRICT": "ज़िला",
+  "CENTER:": "केंद्र:",
+  "SKILLING_CENTER_IMAGE": "कौशल केंद्र की छवि",
+  "INDUSTRY": "उद्योग",
+  "ADDRESS": "पता",
+  "DOB": "जन्म तिथि",
+  "SUBJECT": "विषय",
+  "UNMARRIED": "अविवाहित",
+  "MARRIED": "विवाहित",
+  "DIVORCED": "तलाकशुदा",
+  "SELF_PLACED": "स्वयं स्थापित",
+  "DESIGNATION": "पद का नाम",
+  "YOUTH": {
+    "UPDATE_YOUTH": "युवाओं को अपडेट करें",
+    "NEW_YOUTH": "नए युवा",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "उपयोगकर्ता क्रेडेंशियल जल्द ही भेजे जाएंगे",
+    "NOT_ABLE_CREATE_YOUTH": "युवा पीढ़ी का सृजन करने में असमर्थ",
+    "YOUTH_CREATED_SUCCESSFULLY": "युवा पीढ़ी का निर्माण सफलतापूर्वक हो चुका है!",
+    "NOT_ABLE_UPDATE_YOUTH": "युवाओं को अपडेट करने में असमर्थ",
+    "YOUTH_UPDATED_SUCCESSFULLY": "युवाओं का संस्करण सफलतापूर्वक अपडेट हो गया है!",
+    "SELF_PLACED": "स्वयं स्थापित",
+    "REGULAR": "नियमित",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "शैक्षणिक संस्थान में नामांकित",
+    "OWN_FARMING": "स्वयं की खेती",
+    "AGRICULTURAL_FARM_LABORER": "कृषि मजदूर",
+    "NON_AGRICULTURAL_LABORER": "गैर-कृषि मजदूर",
+    "SALARIED_WORK": "वेतनभोगी कार्य",
+    "SELF_EMPLOYMENT": "स्व रोजगार",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "बेरोजगार या घरेलू कामगार",
+    "MARK_AS_VOLUNTEER": "स्वयंसेवक के रूप में चिह्नित करें",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "क्या आप स्वयंसेवक के रूप में अपना नाम दर्ज कराना चाहते हैं?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "स्वयंसेवक के रूप में सफलतापूर्वक चिह्नित किया गया",
+    "MARK_AS_VOLUNTEER_FAILED": "स्वयंसेवक के रूप में चिह्नित करने में विफल",
+    "PLEASE_GO_BACK_MSG": "चयन करने के बाद आगे बढ़ने के लिए कृपया वापस जाएं।",
+    "UNMARK_AS_VOLUNTEER": "स्वयंसेवक के रूप में चिह्नित न करें",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "क्या आप स्वयंसेवक के रूप में अपना नाम हटाना चाहते हैं?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "स्वयंसेवक के रूप में सफलतापूर्वक अचिह्नित",
+    "UNMARK_AS_VOLUNTEER_FAILED": "स्वयंसेवक के रूप में चिह्नित हटाने में विफल"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "उपयोगकर्ता सफलतापूर्वक सक्रिय हो गया है।",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक अपडेट हो गया है!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "मेंटर को अपडेट करने में असमर्थ",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक बनाया गया है!",
+    "NOT_ABLE_CREATE_MOBILIZER": "मेंटर बनाने में असमर्थ",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "मेंटर बना दिया गया है, क्रेडेंशियल जल्द ही भेज दिए जाएंगे।",
+    "MAP_USER_AS_LEAD": "उपयोगकर्ता को मुख्य उपयोगकर्ता के रूप में मैप करें",
+    "MAP_USER_AS_MOBILIZER": "उपयोगकर्ता को मार्गदर्शक के रूप में मैप करें",
+    "PLEASE_SEARCH_AND_SELECT_USER": "कृपया उपयोगकर्ता खोजें और चुनें",
+    "UNKNOWN_STATE": "अज्ञात राज्य",
+    "UNKNOWN_DISTRICT": "अज्ञात जिला",
+    "UNKNOWN_BLOCK": "अज्ञात ब्लॉक",
+    "WORKING_LOCATION_REQUIRED": "कार्यस्थल का उल्लेख आवश्यक है। कृपया सभी ब्लॉकों के लिए गांवों का चयन करें।",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "कार्यस्थल आवश्यक है। कृपया सभी ब्लॉकों के लिए गांवों का चयन करें। {{blocks}} और {{count}} और ब्लॉकों में गांव अनुपस्थित हैं।",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "कार्यस्थल आवश्यक है। कृपया सभी ब्लॉकों के लिए गांवों का चयन करें। निम्नलिखित ब्लॉकों में गांव अनुपलब्ध हैं: {{ब्लॉक}}।",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "कार्यस्थल का उल्लेख आवश्यक है। कृपया सभी ब्लॉकों में से कम से कम एक गाँव का चयन करें।",
+    "MOBILIZER_NAME": "मेंटर का नाम"
+  }
 }

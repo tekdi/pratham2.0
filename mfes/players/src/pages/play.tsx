@@ -36,8 +36,17 @@ const Players: React.FC<SunbirdPlayerProps> = ({
   );
   const [loading, setLoading] = useState(!propPlayerConfig);
 
+  const [invalidIdentifier, setInvalidIdentifier] = useState<boolean | null>(null);
+
   useEffect(() => {
-    if (playerConfig || !identifier) return;
+    if (playerConfig || !identifier) {
+      setInvalidIdentifier(false);
+      setLoading(false);
+      return;
+    }
+    else {
+      setInvalidIdentifier(true);
+    }
 
     const loadContent = async () => {
       setLoading(true);
@@ -71,7 +80,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
     loadContent();
   }, [identifier, playerConfig]);
 
-  if (!identifier) {
+  if (invalidIdentifier===true && loading===false) {
     return (
       <Box
         display="flex"

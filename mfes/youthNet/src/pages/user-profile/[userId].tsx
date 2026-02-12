@@ -3,7 +3,7 @@
 import withRole from '../../components/withRole';
 import React, { useEffect, useState } from 'react';
 import { TENANT_DATA } from '../../utils/app.config';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import Header from '../../components/Header';
@@ -21,11 +21,15 @@ import {
   updateUser,
 } from '../../services/youthNet/Dashboard/UserServices';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
-import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import {
+  fetchForm,
+  splitUserData,
+} from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import SimpleModal from '../../components/SimpleModal';
 import { showToastMessage } from '../../components/Toastify';
+import EditIcon from '@mui/icons-material/Edit';
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
 
 const UserId = () => {
   const { t } = useTranslation();
@@ -33,7 +37,6 @@ const UserId = () => {
   const router = useRouter();
   const { userId } = router.query;
   const [schema, setSchema] = useState(null);
-  const [formData, setFormData] = useState<any>();
   const [editModal, setEditModal] = useState<boolean>(false);
   const [updatedUser, setUpdatedUser] = useState<boolean>(false);
   const { tab, blockId, villageId } = router.query;
@@ -41,6 +44,7 @@ const UserId = () => {
   const [uiSchema, setUiSchema] = useState(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [userProgram, setUserProgram] = useState<string | null>(null);
+  const [tenantId, setTenantId] = useState<string>('');
   const [user, setUser] = React.useState<{
     userRole: string | null;
     userID: string | null;
@@ -57,6 +61,7 @@ const UserId = () => {
     village?: string | null;
     userName?: string | null;
     joinedOn?: string | null;
+    workingVillages?: string | null;
   }>({
     userRole: null,
     userID: null,
@@ -73,6 +78,7 @@ const UserId = () => {
     middleName: null,
     userName: null,
     joinedOn: null,
+    workingVillages: null,
   });
 
   // Get current user ID and userProgram from localStorage on mount
@@ -80,6 +86,7 @@ const UserId = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
       setCurrentUserId(localStorage.getItem('userId'));
       setUserProgram(localStorage.getItem('userProgram'));
+      setTenantId(localStorage.getItem('tenantId') || '');
     }
   }, []);
   const handleOpenEditModal = () => {
@@ -103,70 +110,99 @@ const UserId = () => {
 
     return parsedDate.toISOString().split('T')[0];
   }
-  useEffect(() => {
-    const fetchData = async () => {
-      if (typeof window === 'undefined' || !window.localStorage) return;
-      
-      try {
-        const tenantId = localStorage.getItem('tenantId');
-        const responseForm: any = await fetchForm([
-          {
-            fetchUrl: `${
-              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-            }/form/read?context=${
-              FormContext.mentor.context
-            }&contextType=${user?.userRole?.toUpperCase()}`,
-            header: {},
-          },
-          {
-            fetchUrl: `${
-              process.env.NEXT_PUBLIC_MIDDLEWARE_URL
-            }/form/read?context=${
-              FormContext.mentor.context
-            }&contextType=${user?.userRole?.toUpperCase()}`,
-            header: { tenantid: tenantId },
-          },
-        ]);
-        console.log('responseForm', responseForm);
-        const { newSchema, extractedFields } = filterSchema(responseForm);
-        console.log(newSchema?.schema);
-        console.log(newSchema?.uiSchema);
+  const fetchData = async () => {
+    if (typeof window === 'undefined' || !window.localStorage) return;
 
-        const extractUserInfo = (({
-          firstName,
-          lastName,
-          middleName,
-          gender,
-          phone: mobile,
-          dob,
-          email,
-        }: any) => ({
-          firstName,
-          lastName,
-          middleName,
-          gender,
-          mobile,
-          dob,
-          email,
-        }))(user);
-        extractUserInfo.dob = formatDate(extractUserInfo?.dob);
-        extractUserInfo.mobile = extractUserInfo?.mobile?.toString();
+    try {
+      const tenantId = localStorage.getItem('tenantId');
+      const responseForm: any = await fetchForm([
+        {
+          fetchUrl: `${
+            process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+          }/form/read?context=${
+            FormContext.mentor.context
+          }&contextType=${user?.userRole?.toUpperCase()}`,
+          header: {},
+        },
+        {
+          fetchUrl: `${
+            process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+          }/form/read?context=${
+            FormContext.mentor.context
+          }&contextType=${user?.userRole?.toUpperCase()}`,
+          header: { tenantid: tenantId },
+        },
+      ]);
+      console.log('responseForm', responseForm);
+      const { newSchema, extractedFields } = filterSchema(responseForm);
+      console.log(newSchema?.schema);
+      console.log(newSchema?.uiSchema);
 
-        console.log(extractUserInfo);
-        setFormData(extractUserInfo);
-        setSchema(newSchema?.schema);
-        const updatedUiSchema = {
-          ...newSchema?.uiSchema,
-          'ui:submitButtonOptions': {
-            norender: true,
-          },
-        };
-        setUiSchema(updatedUiSchema);
-      } catch (e) {
-        console.log(e);
+      const extractUserInfo = (({
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        phone: mobile,
+        dob,
+        email,
+      }: any) => ({
+        firstName,
+        lastName,
+        middleName,
+        gender,
+        mobile,
+        dob,
+        email,
+      }))(user);
+      extractUserInfo.dob = formatDate(extractUserInfo?.dob);
+      extractUserInfo.mobile = extractUserInfo?.mobile?.toString();
+
+      console.log(extractUserInfo);
+      const keysToRemove = ['working_village', 'working_location'];
+
+      const alterSchema: any = newSchema?.schema
+        ? JSON.parse(JSON.stringify(newSchema.schema))
+        : null;
+      let alterUiSchema: any = newSchema?.uiSchema
+        ? JSON.parse(JSON.stringify(newSchema.uiSchema))
+        : null;
+
+      if (alterSchema?.properties && alterUiSchema) {
+        // Keep editable fields aligned with admin-app user-mobilizer edit flow:
+        // Disable identity fields + contact fields.
+        const fieldsToDisable = ['firstName', 'lastName', 'dob', 'email', 'mobile', 'phone'];
+        fieldsToDisable.forEach((fieldKey) => {
+          if (alterUiSchema?.[fieldKey]) {
+            alterUiSchema[fieldKey]['ui:disabled'] = true;
+          }
+        });
+
+        keysToRemove.forEach((key) => {
+          delete alterSchema.properties[key];
+          delete alterUiSchema[key];
+        });
+        alterSchema.required =
+          alterSchema.required?.filter((key: string) => !keysToRemove.includes(key)) ||
+          [];
       }
-      // setSdbvFieldData(extractedFields);
-    };
+
+      setSchema(alterSchema);
+      const updatedUiSchema = {
+        ...alterUiSchema,
+        'ui:submitButtonOptions': {
+          norender: true,
+        },
+      };
+
+      setUiSchema(updatedUiSchema);
+    } catch (e) {
+      console.log(e);
+    }
+    // setSdbvFieldData(extractedFields);
+  };
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedUserId = localStorage.getItem('userId');
       if (userId === storedUserId && user?.userRole) {
@@ -174,27 +210,47 @@ const UserId = () => {
       }
     }
   }, [user, userId]);
+
+  useEffect(() => {
+    if (!editModal) return;
+    const canRenderEditContent = Boolean(schema && uiSchema && userId);
+  }, [editModal, schema, uiSchema, userId]);
+
+  useEffect(() => {
+    if (!editModal) return;
+    if (schema && uiSchema) return;
+    if (!userId || !user?.userRole) return;
+    fetchData().catch(() => {});
+  }, [editModal, schema, uiSchema, userId, user?.userRole]);
   const onClose = () => {
     setEditModal(false);
   };
-  const FormSubmitFunction = async (formData: any, payload: any) => {
+  const handleProfileUpdate = async (payload: any) => {
     try {
-      const object = {
-        userData: formData,
-      };
-      if (user?.email == formData?.email) {
-        delete formData?.email;
-      }
       if (userId) {
-        const updateUserResponse = await updateUser(userId.toString(), object);
+        const { userData, customFields } =
+          payload && typeof payload === 'object' && 'userData' in payload
+            ? payload
+            : splitUserData(payload);
+
+        if (user?.email && userData?.email && user?.email === userData?.email) {
+          delete userData.email;
+        }
+
+        const updateUserResponse = await updateUser(userId.toString(), {
+          userData,
+          customFields,
+        });
         if (typeof window !== 'undefined' && window.localStorage) {
           const userlocalData = localStorage.getItem('userData');
-          const userData = userlocalData ? JSON.parse(userlocalData) : {};
-          // let userlocalData = JSON.parse(localStorage.getItem("userData")) || {};
+          const existingUserData = userlocalData ? JSON.parse(userlocalData) : {};
 
-          // Merge existing data with updated values
-          const updatedUserData = { ...userData, ...formData };
-          console.log(updatedUserData);
+          const updatedUserData = {
+            ...existingUserData,
+            ...(userData || {}),
+            ...(customFields ? { customFields } : {}),
+          };
+
           localStorage.setItem('userData', JSON.stringify(updatedUserData));
         }
 
@@ -216,27 +272,120 @@ const UserId = () => {
 
       if (userId === storedUserId) {
         userData = JSON.parse(localStorage.getItem('userData') || '{}');
+        console.log('userData====>', userData);
       } else if (userId) {
         const data = await getUserDetails(userId, true);
+        console.log('data>>>>', data);
         userData = data?.userData || {};
       }
 
       if (userData) {
         const getFieldValue = (label: string) => {
-          const field = userData?.customFields?.find((item: any) => item.label === label);
+          const field = userData?.customFields?.find(
+            (item: any) => item.label === label
+          );
           const selectedValues = field?.selectedValues;
-          
+
           if (!selectedValues || selectedValues.length === 0) {
             return '';
           }
-          
+
           if (selectedValues.length === 1) {
             return toPascalCase(selectedValues[0]?.value || '');
           }
-          
+
           // If multiple values, return all values as array or concatenated string
-          return selectedValues.map((item: any) => toPascalCase(item?.value || '')).join(', ');
+          return selectedValues
+            .map((item: any) => toPascalCase(item?.value || ''))
+            .join(', ');
         };
+
+        // Function to extract working village names
+        const getWorkingVillages = () => {
+          const workingVillageField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_VILLAGE'
+          );
+          const workingLocationField = userData?.customFields?.find(
+            (item: any) => item.label === 'WORKING_LOCATION'
+          );
+
+          if (!workingVillageField || !workingLocationField) {
+            return '';
+          }
+
+          // Get village IDs from WORKING_VILLAGE field
+          const villageIdsData = workingVillageField?.selectedValues;
+          if (!villageIdsData || villageIdsData.length === 0) {
+            return '';
+          }
+
+          // Handle different formats: object with id/value, array of objects, or comma-separated string
+          console.log('villageIdsData', villageIdsData);
+          let villageIds: string[] = [];
+          
+          // Process all selectedValues
+          villageIdsData.forEach((item: any) => {
+            if (typeof item === 'string') {
+              // If it's a string, split by comma and add all IDs
+              const ids = item.split(',').map((id: string) => id.trim());
+              villageIds.push(...ids);
+            } else if (item && typeof item === 'object') {
+              // If it's an object with id property
+              if (item.id !== undefined) {
+                villageIds.push(String(item.id));
+              } else if (typeof item.value === 'string') {
+                // If value is a comma-separated string
+                const ids = item.value.split(',').map((id: string) => id.trim());
+                villageIds.push(...ids);
+              } else if (Array.isArray(item.value)) {
+                // If value is an array
+                item.value.forEach((val: any) => {
+                  if (val?.id !== undefined) {
+                    villageIds.push(String(val.id));
+                  } else if (typeof val === 'string') {
+                    villageIds.push(val.trim());
+                  }
+                });
+              }
+            }
+          });
+          
+          // Remove duplicates and filter out empty values
+          villageIds = [...new Set(villageIds.filter(Boolean))];
+
+          // Get working location data - handle both single object and array
+          const workingLocationDataArray =
+            workingLocationField?.selectedValues || [];
+          if (workingLocationDataArray.length === 0) {
+            return '';
+          }
+
+          // Extract all village names from the nested structure
+          const villageNames: string[] = [];
+
+          // Iterate through all state objects in selectedValues
+          workingLocationDataArray.forEach((workingLocationData: any) => {
+            // The structure has districts directly in each state object
+            if (workingLocationData.districts) {
+              workingLocationData.districts.forEach((district: any) => {
+                if (district.blocks) {
+                  district.blocks.forEach((block: any) => {
+                    if (block.villages) {
+                      block.villages.forEach((village: any) => {
+                        if (villageIds?.includes(String(village.id))) {
+                          villageNames.push(village.name);
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+
+          return villageNames.map((name) => toPascalCase(name)).join(', ');
+        };
+
         let date;
         let formattedDOBDate;
         if (userData.dob) {
@@ -251,6 +400,51 @@ const UserId = () => {
           formattedDOBDate = date.toLocaleDateString('en-GB', options);
         }
 
+        // Function to extract role based on tenant matching
+        const getRoleFromTenant = () => {
+          const tenantName = localStorage.getItem('tenantName');
+          if (!tenantName || !userData?.tenantData) {
+            return null;
+          }
+
+          // Find the tenant that matches the tenantName from localStorage
+          const matchedTenant = userData.tenantData.find(
+            (tenant: any) => tenant?.tenantName === tenantName
+          );
+
+          if (!matchedTenant || !matchedTenant.roles) {
+            return null;
+          }
+
+          // Filter roles to only include Mobilizer or Lead
+          const allowedRoles = matchedTenant.roles.filter((role: any) => {
+            const roleName = role?.roleName?.toLowerCase();
+            return roleName === 'mobilizer' || roleName === 'lead';
+          });
+
+          if (allowedRoles.length === 0) {
+            return null;
+          }
+
+          // Prefer Lead over Mobilizer if both exist
+          const leadRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'lead'
+          );
+          if (leadRole) {
+            return toPascalCase(leadRole.roleName);
+          }
+
+          // Otherwise use Mobilizer
+          const mobilizerRole = allowedRoles.find(
+            (role: any) => role?.roleName?.toLowerCase() === 'mobilizer'
+          );
+          if (mobilizerRole) {
+            return toPascalCase(mobilizerRole.roleName);
+          }
+
+          return null;
+        };
+
         setUser({
           firstName: toPascalCase(userData?.firstName) || '',
           lastName: toPascalCase(userData?.lastName) || '',
@@ -262,20 +456,31 @@ const UserId = () => {
           phone: userData?.mobile || '',
           gender: userData?.gender || '',
           userRole:
-           localStorage.getItem('roleName') || toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
-            toPascalCase(role),
+            userId === localStorage.getItem('userId')
+              ? toPascalCase(role)
+              : (
+                  getRoleFromTenant() ||
+                  localStorage.getItem('roleName') ||
+                  toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
+                  toPascalCase(role)
+                ),
           dob: formattedDOBDate || '',
           district: getFieldValue('DISTRICT'),
           block: getFieldValue('BLOCK'),
           state: getFieldValue('STATE'),
           village: getFieldValue('VILLAGE'),
+          workingVillages: getWorkingVillages(),
         });
       }
     };
 
     fetchData();
   }, [userId, updatedUser]);
-
+  console.log('user====>', user);
+  const handleEditPassword = () => {
+ //   handleClose4(); // Close the menu first
+    router.push('/edit-password'); // Then navigate to the edit password page
+  };
   return (
     <>
       <Box minHeight="100vh">
@@ -311,7 +516,8 @@ const UserId = () => {
             }}
           />
         </Box>
-        {userId === currentUserId && userProgram !== 'Pragyanpath' && (
+        {userId?.toString() !== currentUserId &&
+          userProgram !== TENANT_DATA.PRAGYANPATH && (
           <Box
             sx={{
               marginLeft: '30%',
@@ -389,7 +595,11 @@ const UserId = () => {
             {t('YOUTHNET_PROFILE.PROFILE_DETAILS')}
           </Typography>
           <Profile
-            fullName={user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.firstName || user.lastName || '')}
+            fullName={
+              user.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : user.firstName || user.lastName || ''
+            }
             emailId={user.email || '-'}
             designation={user.userRole || '-'}
             mentorId={user.userID || ''}
@@ -406,26 +616,65 @@ const UserId = () => {
             joinedOn={user.joinedOn || null}
             firstName={user.firstName || ''}
             lastName={user.lastName || ''}
+            workingVillages={user.workingVillages || null}
           />
         </Box>
+        <Button
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={handleEditPassword}
+              sx={{
+                fontSize: '16px',
+                backgroundColor: 'white',
+                border: '0.6px solid #1E1B16',
+                my: '20px',
+                marginLeft: '16px',
+                width: '408px',
+                '@media (max-width: 434px)': { width: '100%' },
+              }}
+              endIcon={<EditIcon />}
+            >
+              {typeof window !== 'undefined' && localStorage.getItem('temporaryPassword') === 'true'
+                ? t('LOGIN_PAGE.SET_PASSWORD')
+                : t('LOGIN_PAGE.RESET_PASSWORD')}
+            </Button>
       </Box>
       <SimpleModal
         open={editModal}
         onClose={onClose}
         showFooter={true}
-        modalTitle= {t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
+        modalTitle={t('YOUTHNET_PROFILE.UPDATE_PROFILE')}
         //  handleNext={FormSubmitFunction}
         primaryText={'Submit'}
         id="dynamic-form-id"
         // secondaryText={count === 1 ? 'Save Progress' : ''}
       >
-        {schema && uiSchema && (
-          <DynamicForm
-            hideSubmit={true}
+        {editModal && (!schema || !uiSchema) && (
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minHeight: '200px',
+              gap: 2,
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="body2">{t('COMMON.LOADING')}</Typography>
+          </Box>
+        )}
+        {schema && uiSchema && userId && (
+          <EditSearchUser
+            onUserDetails={handleProfileUpdate}
             schema={schema}
             uiSchema={uiSchema}
-            FormSubmitFunction={FormSubmitFunction}
-            prefilledFormData={formData || {}}
+            userId={userId.toString()}
+            roleId={''}
+            tenantId={tenantId}
+            type={'mentor'}
+            selectedUserRow={updatedUser}
           />
         )}
       </SimpleModal>
@@ -449,4 +698,4 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
   };
 };
 
-export default  UserId
+export default UserId;

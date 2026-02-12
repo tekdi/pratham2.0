@@ -9,17 +9,24 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import settingImage from '../../../public/images/settings.png';
 import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useRouter } from 'next/navigation';
-import { getUserDetails } from '@learner/utils/API/userService';
+import { getUserDetails, getMentorList } from '@learner/utils/API/userService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import DocumentViewer from '@shared-lib-v2/DynamicForm/components/DocumentViewer/DocumentViewer';
 
 // Helper function to get field value from userData based on schema
 const getFieldValue = (fieldName: string, fieldSchema: Record<string, unknown>, userData: Record<string, unknown>, customFields: Array<Record<string, unknown>> = []) => {
@@ -104,6 +111,11 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const [formSchema, setFormSchema] = useState<Record<string, unknown> | null>(null); // Form schema state
   const { t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState<string>('');
+  const [villageId, setVillageId] = useState<number | null>(null);
+  const [mentorData, setMentorData] = useState<Record<string, unknown> | null>(null);
 
   const storedConfig =
     typeof window !== 'undefined'
@@ -167,6 +179,13 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         console.log('useInfo', userInfoResponse?.result?.userData);
         console.log('responseForm', formResponse);
         
+        // Extract village ID for mentor lookup
+        const extractedVillageId =
+          userInfoResponse?.result?.userData?.customFields?.find(
+            (f: Record<string, unknown>) => f.label === 'VILLAGE'
+          )?.selectedValues?.[0]?.id ?? null;
+        setVillageId(extractedVillageId);
+        
         setUserData(userInfoResponse?.result?.userData);
         setFormSchema(formResponse);
       } catch (error) {
@@ -176,12 +195,84 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
 
     fetchData();
   }, []);
+
+  // Fetch mentor data based on village ID
+  useEffect(() => {
+    const fetchMentorData = async () => {
+      try {
+        if (villageId) {
+          const mentorResponse = await getMentorList({
+            limit: 100,
+            filters: {
+              working_village: [String(villageId)],
+              role: 'Mobilizer',
+            },
+            sort: ['createdAt', 'asc'],
+            offset: 0,
+          });
+
+          // Handle different possible response structures
+          const mentorList =
+            mentorResponse?.getUserDetails ||
+            mentorResponse?.userDetails ||
+            mentorResponse?.results ||
+            [];
+
+          // Get the first mentor from the list if available
+          if (Array.isArray(mentorList) && mentorList.length > 0) {
+            setMentorData(mentorList[0] as Record<string, unknown>);
+          } else {
+            setMentorData(null);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching mentor data:', error);
+        setMentorData(null);
+      }
+    };
+
+    fetchMentorData();
+  }, [villageId]);
+
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
+  };
+
+  const handlePreview = (url: string, title: string) => {
+    setPreviewUrl(url);
+    setPreviewTitle(title);
+    setIsPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewUrl(null);
+    setPreviewTitle('');
+  };
+
+  // Helper function to check if a field is a file field
+  const isFileField = (fieldSchema: Record<string, unknown>): boolean => {
+    return (
+      fieldSchema?.field_type === 'file_upload' ||
+      fieldSchema?.field_type === 'file' ||
+      fieldSchema?.type === 'array' && (fieldSchema?.items as Record<string, unknown>)?.type === 'string' && 
+      ((fieldSchema?.items as Record<string, unknown>)?.format === 'data-url' || (fieldSchema?.items as Record<string, unknown>)?.format === 'uri')
+    );
+  };
+
+  // Helper function to check if a value is a valid URL
+  const isValidUrl = (value: unknown): boolean => {
+    if (typeof value !== 'string') return false;
+    try {
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
   };
 
   const handleOpen = (option: string) => {
@@ -199,16 +290,38 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       window.open('https://www.pratham.org/privacy-guidelines/', '_blank');
     } else if (
       option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
-      dob &&
-      isBelow18(String(dob))
+      dob
     ) {
-      window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
-    } else if (
-      option === t('LEARNER_APP.USER_PROFILE_CARD.CONSENT_FORM') &&
-      dob &&
-      !isBelow18(String(dob))
-    ) {
-      window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+      // Get the selected language from localStorage (same key as Header.jsx uses)
+      const selectedLanguage =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('lang') || 'en'
+          : 'en';
+
+      // Map language codes to lowercase language names for PDF file naming
+      const languageFileMap: { [key: string]: string } = {
+        en: 'english',
+        hi: 'hindi',
+        mr: 'marathi',
+        bn: 'bengali',
+        as: 'assamese',
+        guj: 'gujarati',
+        kan: 'kannada',
+        odi: 'odia',
+        tam: 'tamil',
+        tel: 'telugu',
+        ur: 'urdu',
+      };
+
+      // Get the language name from the map, default to 'hindi'
+      const languageName = languageFileMap[selectedLanguage] || 'hindi';
+
+      // Open appropriate consent form based on age
+      if (isBelow18(String(dob))) {
+        window.open(`/files/consent_form_below_18_${languageName}.pdf`, '_blank');
+      } else {
+        window.open(`/files/consent_form_above_18_${languageName}.pdf`, '_blank');
+      }
     } else if (option === t('COMMON.FAQS')) {
       router.push('/faqs');
     } else if (option === t('COMMON.SUPPORT_REQUEST')) {
@@ -557,23 +670,99 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         {otherSectionFields.length > 0 && (
           <>
             <Typography sx={sectionTitleStyle}>
-              {t('LEARNER_APP.USER_PROFILE_CARD.ADDITIONAL_INFORMATION')}
+              {t('NAVAPATHAM.ADDITIONAL_INFORMATION')}
             </Typography>
             <Box sx={sectionCardStyle}>
               <Grid container spacing={1.5}>
                 {otherSectionFields.map((field) => {
                   const fieldTitle = (field.schema.title as string) || field.name;
                   const labelKey = `FORM.${fieldTitle}`;
+                  const isFile = isFileField(field.schema);
+                  const hasValidUrl = isValidUrl(field.rawValue);
                   
                   return (
                     <Grid item xs={6} key={field.name}>
                       <Typography sx={labelStyle}>
                         {t(labelKey, { defaultValue: toPascalCase(String(fieldTitle).replace(/_/g, ' ')) })}
                       </Typography>
-                      <Typography sx={valueStyle}>{t(`FORM.${String(field.value).toUpperCase()}`, { defaultValue: toPascalCase(String(field.value)) })}</Typography>
+                      {isFile && hasValidUrl ? (
+                        <Box 
+                          sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 0.5,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              '& .view-text': {
+                                textDecoration: 'underline',
+                              }
+                            }
+                          }}
+                          onClick={() => handlePreview(String(field.rawValue), fieldTitle)}
+                        >
+                          <VisibilityIcon sx={{ fontSize: '1rem', color: 'primary.main' }} />
+                          <Typography 
+                            className="view-text"
+                            sx={{ 
+                              ...valueStyle, 
+                              color: 'primary.main',
+                              fontWeight: 500
+                            }}
+                          >
+                            {t('VIEW_FILE', { defaultValue: 'View File' })}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography sx={valueStyle}>
+                          {t(`FORM.${String(field.value).toUpperCase()}`, { defaultValue: toPascalCase(String(field.value)) })}
+                        </Typography>
+                      )}
                     </Grid>
                   );
                 })}
+              </Grid>
+            </Box>
+          </>
+        )}
+
+        {/* My Mentor Details Section */}
+        {mentorData && (
+          <>
+            <Typography sx={sectionTitleStyle}>
+              {t('LEARNER_APP.USER_PROFILE_CARD.MY_MENTOR_DETAILS')}
+            </Typography>
+            <Box sx={sectionCardStyle}>
+              <Grid container spacing={1.5}>
+                {(mentorData.firstName || mentorData.lastName) ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_NAME')}
+                    </Typography>
+                    <Typography sx={valueStyle}>
+                      {toPascalCase(
+                        [String(mentorData.firstName || ''), String(mentorData.lastName || '')]
+                          .filter(Boolean)
+                          .join(' ')
+                      )}
+                    </Typography>
+                  </Grid>
+                ) : null}
+                {mentorData.email ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.MENTOR_EMAIL')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{String(mentorData.email)}</Typography>
+                  </Grid>
+                ) : null}
+                {mentorData.mobile ? (
+                  <Grid item xs={6}>
+                    <Typography sx={labelStyle}>
+                      {t('LEARNER_APP.USER_PROFILE_CARD.PHONE_NUMBER')}
+                    </Typography>
+                    <Typography sx={valueStyle}>{String(mentorData.mobile)}</Typography>
+                  </Grid>
+                ) : null}
               </Grid>
             </Box>
           </>
@@ -615,6 +804,56 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
       >
         Open PDF
       </a> */}
+
+      {/* File Preview Dialog */}
+      <Dialog
+        open={isPreviewOpen}
+        onClose={handleClosePreview}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            height: '90vh',
+            maxHeight: '90vh',
+          },
+        }}
+      >
+        <DialogTitle>
+          {t('FILE_PREVIEW', { defaultValue: 'File Preview' })} - {t(`FORM.${previewTitle}`, { defaultValue: toPascalCase(String(previewTitle).replace(/_/g, ' ')) })}
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            p: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {previewUrl && (
+            <DocumentViewer
+              url={previewUrl}
+              width="100%"
+              height="100%"
+              showError={true}
+              showDownloadButton={false}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview}>{t('COMMON.CLOSE', { defaultValue: 'Close' })}</Button>
+          {/* {previewUrl && (
+            <Button
+              variant="contained"
+              href={previewUrl}
+              download
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('COMMON.DOWNLOAD', { defaultValue: 'Download' })}
+            </Button> */}
+          
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -139,6 +139,17 @@ export const transformLabel = (label: string): string => {
     .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize the first letter of each word
 };
 
+export const transformLabelWithoutSpaces = (label: string): string => {
+  if (typeof label !== 'string') {
+    return label as any;
+  }
+
+  return label
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+
 export const transformArray = (arr: State[]): State[] => {
   if (!arr || !Array.isArray(arr)) {
     return arr;
@@ -854,7 +865,10 @@ const flattenObject = (obj: any, parentKey = "", res: any = {}): any => {
 };
 
 // Recursive task extractor (handles children + learningResources)
-export const extractTasks = (tasks: any[], parentId: string | null = null): any[] => {
+export const extractTasks = (
+  tasks: any[],
+  parentId: string | null = null
+): any[] => {
   let rows: any[] = [];
 
   tasks.forEach((task) => {
@@ -865,7 +879,7 @@ export const extractTasks = (tasks: any[], parentId: string | null = null): any[
     // learning resources
     if (task.learningResources?.length) {
       task.learningResources.forEach((lr: any) => {
-        let lrRow = { ...flatTask, ...flattenObject(lr, "learningResource") };
+        let lrRow = { ...flatTask, ...flattenObject(lr, 'learningResource') };
         rows.push(lrRow);
       });
     }
@@ -878,3 +892,34 @@ export const extractTasks = (tasks: any[], parentId: string | null = null): any[
 
   return rows;
 };
+
+export const extractWorkingLocationVillages = (row: any): string => {
+  if (!row?.customfield?.working_location) return '';
+
+  let parsedLocation;
+
+  try {
+    parsedLocation =
+      typeof row.customfield.working_location === 'string'
+        ? JSON.parse(row.customfield.working_location)
+        : row.customfield.working_location;
+  } catch (error) {
+    console.error('Invalid working_location JSON', error);
+    return '';
+  }
+
+  const villages: string[] = [];
+
+  parsedLocation?.districts?.forEach((district: any) => {
+    district?.blocks?.forEach((block: any) => {
+      block?.villages?.forEach((village: any) => {
+        if (village?.name) {
+          villages.push(village.name);
+        }
+      });
+    });
+  });
+
+  return villages.join(', ');
+};
+

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
+import { useTranslation as useSharedTranslation } from '@shared-lib-v2/lib/context/LanguageContext';
 import { showToastMessage } from '../../Toastify';
 import { createUser, updateUser } from '@/services/CreateUserService';
 import {
@@ -71,7 +72,19 @@ const AddEditUser = ({
   //   editPrefilledFormData
   // );
 
-  const { t } = useTranslation();
+  // Use react-i18next for translations
+  const { t, i18n } = useTranslation();
+  const reactI18nLanguage = i18n.language;
+  
+  // Use @shared-lib-v2 LanguageContext to sync language changes
+  const { setLanguage: setSharedLanguage } = useSharedTranslation();
+
+  // Sync react-i18next language changes to @shared-lib-v2 LanguageContext
+  useEffect(() => {
+    if (reactI18nLanguage && setSharedLanguage) {
+      setSharedLanguage(reactI18nLanguage);
+    }
+  }, [reactI18nLanguage, setSharedLanguage]);
 
   const [tempArray, setTempArray] = useState<any>([]);
   const [alteredSchema, setAlteredSchema] = useState<any>(null);
@@ -270,7 +283,7 @@ const AddEditUser = ({
 
     setAlteredSchema(isEditSchema);
     setAlteredUiSchema(isEditUiSchema);
-  }, [isEdit, isReassign]);
+  }, [isEdit, isReassign, reactI18nLanguage]);
   const isBelow18 = (dob: any) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -456,6 +469,12 @@ const AddEditUser = ({
           fieldName: 'Block',
           fieldId: blockFieldId,
         };
+      }
+
+      // Ensure batch is included from formData or prefilledFormData if missing from payload
+      // This handles cases where hidden fields might not be included in the submitted payload
+      if (!payload.batch && (formData?.batch || editPrefilledFormData?.batch)) {
+        payload.batch = formData?.batch || editPrefilledFormData?.batch;
       }
 
       if (payload.batch) {

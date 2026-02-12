@@ -7,6 +7,8 @@ import Header from '@learner/components/Header/Header';
 import { getTenantInfo, getPrathamTenantId } from '@learner/utils/API/ProgramService';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import LockIcon from '@mui/icons-material/Lock';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useTranslation } from '@shared-lib';
 import 'swiper/css';
 import 'swiper/css/autoplay';
@@ -40,6 +42,7 @@ export default function LandingPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [programs, setPrograms] = useState<Program[]>([]);
+  const [ssoPrograms, setSsoPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,10 +52,15 @@ export default function LandingPage() {
         const programsData = res?.result || [];
         const visiblePrograms = programsData?.filter(
           (program: any) =>
-            program?.params?.uiConfig?.showProgram === true ||
-            program?.params?.uiConfig?.sso?.length > 0
+            program?.params?.uiConfig?.showProgram === true 
+           // program?.params?.uiConfig?.sso?.length > 0
         );
         setPrograms(visiblePrograms || []);
+        const ssoProgramsData = programsData?.filter(
+          (program: any) =>
+            program?.params?.uiConfig?.sso?.length > 0
+        );
+        setSsoPrograms(ssoProgramsData || []);
       } catch (error) {
         console.error('Failed to fetch programs:', error);
       } finally {
@@ -61,13 +69,16 @@ export default function LandingPage() {
     };
 
     fetchPrograms();
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.removeItem('isForNavaPatham');
+  }
   }, []);
 
   const handleGetStarted = async () => {
     try {
       const tenantId = await getPrathamTenantId();
       if (tenantId) {
-        router.push(`/registration?tenantId=${tenantId}`);
+        router.push(`/registration?tenantId=Pratham`);
       } else {
         console.error('Failed to get tenant ID');
         // Fallback: redirect without tenantId or show error
@@ -85,7 +96,7 @@ export default function LandingPage() {
     };
 
   const handlePragyanpath = () => {
-    const program = programs.find((p) =>
+    const program = ssoPrograms.find((p) =>
       p.name.toLowerCase().includes('pragyanpath')
     );
     if (program) {
@@ -123,6 +134,7 @@ export default function LandingPage() {
   };
 
   const aboutPrathamText = t('LANDING.ABOUT_PRATHAM_TEXT');
+  const aboutPrathamLearningPlatformText = t('LANDING.ABOUT_PRATHAM_LEARNING_PLATFORM_TEXT');
 
   return (
     <>
@@ -216,7 +228,7 @@ export default function LandingPage() {
                   py: 1.5,
                   borderRadius: '8px',
                   textTransform: 'none',
-                  mb: 1,
+                //  mb: 2,
                   '&:hover': {
                     backgroundColor: '#FFB300',
                   },
@@ -224,59 +236,107 @@ export default function LandingPage() {
               >
                 {t('LANDING.GET_STARTED')}
               </Button>
-              <Box sx={{ mt: 1 }}>
+              <Box
+                sx={{
+                //  mt: 2,
+                  borderRadius: '8px',
+                  py: 3,
+                  px: 3,
+                  maxWidth: '500px',
+                  mx: 'auto',
+                }}
+              >
                 <Typography
                   variant="body2"
                   sx={{
                     color: '#fff',
-                    display: 'inline',
+                    mb: 1,
+                     fontSize: '20px'
                   }}
                 >
-                  {t('LANDING.ALREADY_SIGNED_UP')}{' '}
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{
-                      color: '#fff',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      '&:hover': {
-                        textDecoration: 'none',
-                      },
-                    }}
-                    onClick={handleLogin}
-                  >
-                    {t('LANDING.CLICK_HERE')}
-                  </Typography>
-                  {' '}{t('LANDING.TO_LOGIN')}
+                  {t('LANDING.ALREADY_SIGNED_UP')}
                 </Typography>
+                <Button
+                  variant="outlined"
+                  onClick={handleLogin}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{
+                    fontFamily: 'Poppins',
+                    backgroundColor: 'rgba(31, 27, 19, 0.5)',
+                    borderColor: '#fff',
+                    color: '#fff',
+                    fontWeight: 500,
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0.15px',
+                    textAlign: 'center',
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    '&:hover': {
+                      borderColor: '#fff',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
+                  {t('LANDING.LOGIN')}
+                </Button>
               </Box>
-              <Box sx={{ mt: 1 }}>
+              
+              {/* For Pratham Employees Section */}
+              <Box
+                sx={{
+                  mt: { xs: 4, md: 6 },
+                  backgroundColor: 'rgba(31, 27, 19, 0.5)',
+                  borderRadius: '8px',
+                  py: 3,
+                  px: 3,
+                  maxWidth: '500px',
+                  mx: 'auto',
+                }}
+              >
                 <Typography
-                  variant="body2"
+                  variant="h6"
                   sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 600,
+                    fontSize: '20px',
+                    lineHeight: '28px',
+                    letterSpacing: '0px',
+                    textAlign: 'center',
+                    mb: 3,
                     color: '#fff',
-                    display: 'inline',
                   }}
                 >
-                  {t('LANDING.ARE_YOU_PRATHAM_EMPLOYEE')}{' '}
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{
-                      color: '#fff',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      '&:hover': {
-                        textDecoration: 'none',
-                      },
-                    }}
-                    onClick={handlePragyanpath}
-                  >
-                  {t('LANDING.CLICK_HERE')}
-                  </Typography>
-                  {' '}{t('LANDING.TO_GET_ACCESS_TO_PRAGYANPATH')}
+                  {t('LANDING.FOR_PRATHAM_EMPLOYEES')}
                 </Typography>
+                <Button
+                  variant="outlined"
+                  onClick={handlePragyanpath}
+                  startIcon={<LockIcon />}
+                  sx={{
+                    fontFamily: 'Poppins',
+                    backgroundColor: 'transparent',
+                    borderColor: '#fff',
+                    color: '#fff',
+                    fontWeight: 500,
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0.15px',
+                    textAlign: 'center',
+                    px: 4,
+                    py: 1.5,
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    '&:hover': {
+                      borderColor: '#fff',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    },
+                  }}
+                >
+                  {t('LANDING.ACCESS_PRAGYANPATH')}
+                </Button>
               </Box>
             </Box>
           </Container>
@@ -336,7 +396,7 @@ export default function LandingPage() {
                   whiteSpace: 'pre-line',
                 }}
               >
-                {aboutPrathamText}
+                {aboutPrathamLearningPlatformText}
               </Typography>
             </Grid>
           </Grid>
@@ -410,7 +470,7 @@ export default function LandingPage() {
             </Box>
           ) : (
             <Grid container spacing={4}>
-              {programs.slice(0, 3).map((program, index) => (
+              {programs?.map((program, index) => (
                 <Grid item xs={12} md={4} key={program.tenantId || index}>
                   <Card
                     sx={{

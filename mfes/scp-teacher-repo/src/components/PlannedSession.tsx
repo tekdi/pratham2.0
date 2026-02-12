@@ -221,7 +221,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           // });
 
           // const courseSubjectLists = getSubjects.map((subject: any) => {
-          const commonAssociations = getSubjects?.filter(
+          const commonAssociations = getSubjects?.filter((subject: any) => subject?.status !== "Retired")?.filter(
             (assoc: any) =>
               // matchState?.associations.filter(
               //   (item: any) => item.code === assoc.code

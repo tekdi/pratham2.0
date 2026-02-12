@@ -191,6 +191,7 @@ const SSOContent = () => {
 
       const userResponse = await getUserId();
         localStorage.setItem('userId', userResponse?.userId);
+        localStorage.setItem('temporaryPassword', userResponse?.temporaryPassword);
         // Safely set tenantId with fallback - try userResponse first, then URL param
         const tenantIdFromResponse = userResponse?.tenantData?.[0]?.tenantId;
         const tenantIdFromUrl = searchParams.get('tenantid');

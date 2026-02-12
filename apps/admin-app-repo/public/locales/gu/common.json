@@ -1,7 +1,6 @@
 {
   "COMMON": {
     "LANGUAGE": "ભાષા",
-    "LOADING": "લોડ કરી રહ્યા છીએ",
     "ADD_NEW": "નવું જોડો",
     "PAGE_SIZE": "કાગળનું માપ",
     "DELETE_USER": "ઉપયોગકર્તાને સ્થાયી રૂપથી હટાવો",
@@ -153,9 +152,24 @@
     "NOT_ABLE_CREATE_LEARNER": "શીખનારને બનાવવા સક્ષમ નથી",
     "NO_CONTENT_CREATOR_FOUND": "કોઈ સામગ્રી નિર્માતા (SCTA) મળ્યો નથી",
     "NO_CONTENT_REVIEWER_FOUND": "કોઈ સામગ્રી સમીક્ષક (CCTA) મળ્યો નથી",
-    "ARE_YOU_SURE_DELETE_STATE": "આ રાજ્યમાં {{જિલ્લા}} સક્રિય જિલ્લાઓ છે જેને તમે કાઢી શકતા નથી.",
+    "LOADING": "લોડ કરી રહ્યા છીએ",
     "USER_DELETE_SUCCSSFULLY": "વપરાશકર્તા સફળતાપૂર્વક કાઢી નાખ્યો",
-    "ADD": "ઉમેરો"
+    "SURE_REASSIGN_CENTER": "શું તમે ખરેખર આ વપરાશકર્તાને સેન્ટર ફરીથી સોંપવા માંગો છો?",
+    "SORT": "સૉર્ટ કરો",
+    "ARE_YOU_SURE_DELETE_STATE": "આ રાજ્યમાં {{જિલ્લા}} સક્રિય જિલ્લાઓ છે જેને તમે કાઢી શકતા નથી.",
+    "ADD": "ઉમેરો",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "તમારી વિનંતી સબમિટ કરો અને કોઈપણ સમસ્યા અથવા ચિંતાઓમાં અમને તમારી સહાય કરવા દો.",
+    "WE_ARE_HERE_TO_HELP": "અમે મદદ કરવા માટે અહીં છીએ",
+    "NO_STATE_LEAD_FOUND": "કોઈ રાજ્ય લીડ મળ્યું નથી",
+    "FAQS": "વારંવાર પૂછાતા પ્રશ્નો",
+    "RESET_FILTERS": "ફિલ્ટર્સ રીસેટ કરો",
+    "ACTIVATE_USER": "વપરાશકર્તાને સક્રિય કરો",
+    "ACTIVATE": "સક્રિય કરો",
+    "RESIGNED_FROM_COMPANY": "કંપનીમાંથી રાજીનામું આપ્યું",
+    "MOVED_TO_DIFFERENT_ROLE": "અલગ ભૂમિકામાં ખસેડાયા",
+    "NO_MOBILIZER_FOUND": "કોઈ માર્ગદર્શક મળ્યો નથી",
+    "MAP": "નકશો",
+    "NEXT": "આગળ"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ઉપયોગકર્તાનું નામ",
@@ -217,7 +231,22 @@
     "CERTIFICATE_ISSUANCE": "પ્રમાણપત્ર જારી",
     "SUPPORT_REQUEST": "સહાય વિનંતી",
     "CONTENT_CREATOR": "સામગ્રી નિર્માતા",
-    "CONTENT_REVIEWER": "સામગ્રી સમીક્ષક"
+    "CONTENT_REVIEWER": "સામગ્રી સમીક્ષક",
+    "TAXONOMY_EDITOR": "વર્ગીકરણ સંપાદક",
+    "MANAGE_NOTIFICATION": "સૂચના નમૂનાઓનું સંચાલન કરો",
+    "YOUTH": "યુવાની",
+    "FAQS": "વારંવાર પૂછાતા પ્રશ્નો",
+    "STATE_LEAD": "રાજ્ય નેતા",
+    "MASTER": "માસ્ટર",
+    "STATES": "રાજ્યો",
+    "DISTRICTS": "જિલ્લાઓ",
+    "BLOCKS": "બ્લોક્સ",
+    "VILLAGES": "ગામડાઓ",
+    "PROGRAMS": "કાર્યક્રમો",
+    "SKILLING_CENTERS": "કૌશલ્ય કેન્દ્રો",
+    "CURRICULUM_PLANNER": "અભ્યાસક્રમ આયોજક",
+    "BATCH": "બેચ",
+    "MOBILIZER": "માર્ગદર્શક"
   },
   "FACILITATORS": {
     "STATE": "રાજ્ય",
@@ -234,7 +263,11 @@
     "FINISH_ASSIGN": "સમાપ્ત કરો અને સોંપો",
     "BATCHES_SELECTED": "બેચ પસંદ કર્યા",
     "CENTERS": "કેન્દ્રો",
-    "RE_ASSIGN_facilitator": "ફેસિલિટેટરને ફરીથી સોંપો"
+    "RE_ASSIGN_facilitator": "ફેસિલિટેટરને ફરીથી સોંપો",
+    "ASSIGN_BATCHES_FINISH": "તમે આને પછીથી તમારી પોતાની ગતિએ પૂર્ણ કરી શકો છો. જોકે, બેચ ફક્ત ત્યારે જ સોંપવામાં આવશે જ્યારે તમે ‘ફિનિશ અને અસાઇન’ પર ક્લિક કરશો.",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "કેન્દ્રમાંથી બેચ સોંપો",
+    "BACK_TO_FORM": "ફોર્મ પર પાછા",
+    "SEARCH_BATCHES": "બેચ શોધો.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "અભ્યાસક્રમ ,વિષય , વિધ્યાર્થી ,PDF વગેરે શોધો"
@@ -248,7 +281,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "લર્નરને સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
     "EDIT_LEARNER": "લર્નરને સંપાદિત કરો",
     "NO_LEARNERS_FOUND": "કોઈ શીખનારા મળ્યા નથી",
-    "RE_ASSIGN_LEARNER": "લર્નરને ફરીથી સોંપો"
+    "RE_ASSIGN_LEARNER": "લર્નરને ફરીથી સોંપો",
+    "ACTIVATE_USER_SUCCESS": "વપરાશકર્તા સફળતાપૂર્વક સક્રિય થયો છે."
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "માર્ગદર્શક નેતાઓ શોધો..",
@@ -263,7 +297,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "માર્ગદર્શક લીડ બનાવવામાં અસમર્થ",
     "UPDATE_MENTOR_LEAD": "માર્ગદર્શક લીડ અપડેટ કરો",
     "NEW_MENTOR_LEAD": "નવા માર્ગદર્શક લીડ",
-    "ER": "નવા માર્ગદર્શક નેતાઓ"
+    "ER": "નવા માર્ગદર્શક નેતાઓ",
+    "RE_ASSIGN_MENTOR_LEAD": "કેન્દ્ર વડાને ફરીથી સોંપો"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "ટીમ લીડર શોધો",
@@ -299,7 +334,7 @@
     "CLEAR_SELECTION": "પસંદગી સાફ કરો",
     "SELECT_ALL_MESSSAGE": "મધ્યમ, ગ્રેડ અને પ્રકાર પસંદ કરો",
     "GRADE": "ગ્રેડ",
-    "MEDIUM": "માધ્યમ ",
+    "MEDIUM": "માધ્યમ",
     "FILTER": "ફિલ્ટર કરો",
     "BOARDS_FULLY_UPLOADED": "બોર્ડ સંપૂર્ણપણે અપલોડ",
     "ACTIVITY": "પ્રવૃત્તિ",
@@ -319,7 +354,15 @@
     "SUBTOPICS": "પેટા વિષયો",
     "RESOURCES": "સંસાધનો",
     "TOPIC": "વિષય",
-    "DURATION/MONTH": "સમયગાળો/મહિનો"
+    "DURATION/MONTH": "સમયગાળો/મહિનો",
+    "UPLOAD_FAILED": "અપલોડ નિષ્ફળ થયું",
+    "IMPORT_NEW_PLANNER": "નવો પ્લાનર આયાત કરો",
+    "ADD_NEW_TOPIC": "નવો વિષય ઉમેરો",
+    "DELETE_PLANNER": "પ્લાનર કાઢી નાખો",
+    "CSV_TEMPLATE": "CSV ટેમ્પલેટ",
+    "NEW_TOPIC": "નવો વિષય",
+    "DOWNLOAD_CSV": "અપલોડ કરેલ CSV ડાઉનલોડ કરો",
+    "DURING_COURSE": "શીખો"
   },
   "MASTER": {
     "STATE": "સમૂહ ને શોધો",
@@ -369,7 +412,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "કેન્દ્ર સફળતાપૂર્વક બનાવવામાં આવ્યું",
     "SEARCHBAR_PLACEHOLDER": "કેન્દ્ર શોધો",
     "CENTER_UPDATE_FAILED": "કેન્દ્ર અપડેટ કરતી વખતે કંઈક ખોટું થયું",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "તમે કેન્દ્રને કાઢી શકતા નથી કારણ કે તેમાં {{activeMembers}} સક્રિય લર્નર્સ છે"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "તમે કેન્દ્રને કાઢી શકતા નથી કારણ કે તેમાં {{activeMembers}} સક્રિય લર્નર્સ છે",
+    "BATCHES_FOR_CENTER": "{{centerName}} માટે બેચ"
   },
   "BATCH": {
     "NEW_BATCH": "નવી બેચ",
@@ -378,7 +422,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "બેચ સફળતાપૂર્વક અપડેટ કરવામાં આવી છે",
     "BATCH_DELETE_SUCCESSFULLY": "બેચ સફળતાપૂર્વક કાઢી નાખવામાં આવી છે",
     "BATCH_CREATED_SUCCESSFULLY": "બેચ સફળતાપૂર્વક બનાવવામાં આવી",
-    "BATCH_UPDATE_FAILED": "બેચ અપડેટ કરતી વખતે કંઈક ખોટું થયું"
+    "BATCH_UPDATE_FAILED": "બેચ અપડેટ કરતી વખતે કંઈક ખોટું થયું",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "તમે બેચ ડિલીટ કરી શકતા નથી કારણ કે તેમાં {{activeMembers}} સક્રિય શીખનારાઓ છે.",
+    "NO_BATCH_FOUND": "કોઈ બેચ મળ્યો નથી",
+    "TYPE_OF_BATCH": "બેચનો પ્રકાર",
+    "BATCH_CREATE_FAILED": "બેચ બનાવતી વખતે કંઈક ખોટું થયું."
   },
   "FORM": {
     "FULL_NAME": "પૂરું નામ",
@@ -480,16 +528,31 @@
     "AVAILABLE_SUGGESTIONS": "ઉપલબ્ધ સૂચનો:",
     "USERNAME_ALREADY_EXIST": "આ વપરાશકર્તા નામ પહેલેથી જ અસ્તિત્વમાં છે",
     "DO_YOU_WANT_TO_DELETE": "શું તમે કેન્દ્રમાંથી વપરાશકર્તાને કાઢી નાખવા માંગો છો?",
-    "BOARD": "બોર્ડ ",
-    "MEDIUM": "માધ્યમ ",
-    "GRADE": "ગ્રેડ ",
+    "BOARD": "બોર્ડ",
+    "MEDIUM": "માધ્યમ",
+    "GRADE": "ગ્રેડ",
     "USERNAME": "વપરાશકર્તા નામ",
     "DESCRIPTION": "વર્ણન",
     "PROGRAM_NAME": "પ્રોગ્રામનું નામ",
     "PROGRAM_DESCRIPTION": "પ્રોગ્રામ વર્ણન",
     "PROGRAM_TYPE": "પ્રોગ્રામનો પ્રકાર",
     "PROGRAM_HEAD_NAME": "પ્રોગ્રામ હેડનું નામ",
-    "PROGRAM_IMAGE": "પ્રોગ્રામ ઈમેજ"
+    "PROGRAM_IMAGE": "પ્રોગ્રામ ઈમેજ",
+    "CONTACT": "સંપર્ક કરો",
+    "BATCH": "બેચ",
+    "PREFERRED_LANGUAGE": "પસંદગીની ભાષા",
+    "FIRST_NAME": "પ્રથમ નામ",
+    "MIDDLE_NAME_OR_FATHER_NAME": "મધ્ય નામ અથવા પિતાનું નામ",
+    "LAST_NAME": "છેલ્લું નામ",
+    "MOTHER_NAME": "માતાનું નામ",
+    "DATE_OF_BIRTH": "જન્મ તારીખ",
+    "TEST_BELONG_TO": "કસોટી નીચેના કેન્દ્રની છે.",
+    "BELONG_TO": "નીચેના કેન્દ્રનો છે",
+    "WAS_BELONG_TO": "નીચેના સ્થાન પર આર્કાઇવ કરવામાં આવ્યું હતું",
+    "CONFIRM_TO_ACTIVATE": "શું તમે ખરેખર આ વપરાશકર્તાને ફરીથી સક્રિય કરવા માંગો છો?",
+    "WORKING_LOCATION": "કાર્યસ્થળ",
+    "CATCHMENT_AREA": "કેચમેન્ટ એરિયા",
+    "TYPE_OF_BATCH": "બેચનો પ્રકાર"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઇનપુટ.",
@@ -508,7 +571,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "નામમાં અંકો શામેલ હોઈ શકતા નથી",
     "INVALID_EMAIL_FORMAT": "અમાન્ય ઇમેઇલ ફોર્મેટ",
     "ENTER_VALID_EMAIL": "માન્ય ઇમેઇલ સરનામું દાખલ કરો",
-    "ENTER_VALID_MOBILE_NUMBER": "માન્ય મોબાઇલ નંબર દાખલ કરો"
+    "ENTER_VALID_MOBILE_NUMBER": "માન્ય મોબાઇલ નંબર દાખલ કરો",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "જગ્યા અને ખાસ અક્ષરોની મંજૂરી નથી",
+    "DATE_MUST_BE_ON_OR_BEFORE": "તારીખ {{date}} ના રોજ અથવા તે પહેલાંની હોવી જોઈએ.",
+    "DATE_MUST_BE_ON_OR_AFTER": "તારીખ {{date}} ના રોજ અથવા તે પછીની હોવી જોઈએ."
   },
   "TABLE_TITLE": {
     "NAME": "નામ",
@@ -541,7 +607,9 @@
     "COURSE_STATUS": "કોર્સ સ્થિતિ",
     "ISSUED_DATE": "જારી કરેલી તારીખ",
     "USER_ID": "યુઝર આઈડી",
-    "COURSE_ID": "કોર્સ આઈડી"
+    "COURSE_ID": "કોર્સ આઈડી",
+    "LOCATION": "સ્થાન (રાજ્ય / જિલ્લો / બ્લોક / ગામ)",
+    "WORKING_VILLAGE": "કાર્યકારી ગામ"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "એડિટર વર્કસ્પેસ",
@@ -582,7 +650,8 @@
     "EDIT_PROGRAM": "કાર્યક્રમ સંપાદિત કરો",
     "DELETE_PROGRAM": "પ્રોગ્રામ કાઢી નાખો",
     "SEARCH_PROGRAM": "શોધ કાર્યક્રમ...",
-    "NO_PROGRAMS_FOUND": "કોઈ કાર્યક્રમ મળ્યો નથી"
+    "NO_PROGRAMS_FOUND": "કોઈ કાર્યક્રમ મળ્યો નથી",
+    "EDIT": "ફેરફાર કરો"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "સંદર્ભ પ્રકાર",
@@ -637,9 +706,13 @@
     "ASSIGN_VILLAGES_FINISH": "તમે આને પછીથી તમારી પોતાની ગતિએ પૂર્ણ કરી શકો છો. જોકે, ગામો ફક્ત ત્યારે જ સોંપવામાં આવશે જ્યારે તમે ‘સમાપ્ત’ પર ક્લિક કરશો.",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "બ્લોકમાંથી ગામડાઓ સોંપો",
     "BACK_TO_FORM": "ફોર્મ પર પાછા જાઓ",
-    "SEARCH_VILLAGES": "ગામ શોધો.."
+    "SEARCH_VILLAGES": "ગામ શોધો..",
+    "BACK": "પાછળ",
+    "SAVE_SELECTION": "પસંદગી સાચવો",
+    "SELECTED_VILLAGE_COUNT": "પસંદ કરેલા ગામોની સંખ્યા : {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "લિંગ",
+  "WORKING_STATE": "કામ કરતું રાજ્ય",
   "first_name": "પ્રથમ નામ",
   "last_name": "છેલ્લું નામ",
   "phone_number": "ફોન નંબર",
@@ -734,12 +807,73 @@
     "EDIT_MENTOR": "માર્ગદર્શક સંપાદિત કરો",
     "NOT_ABLE_UPDATE_MENTOR": "માર્ગદર્શક અપડેટ કરી શકતા નથી",
     "NOT_ABLE_CREATE_MENTOR": "માર્ગદર્શક બનાવી શકતા નથી",
-    "UPDATE_MENTOR": "માર્ગદર્શક અપડેટ કરો"
+    "UPDATE_MENTOR": "માર્ગદર્શક અપડેટ કરો",
+    "RE_ASSIGN_MENTOR": "માર્ગદર્શકને ફરીથી સોંપો"
   },
   "GOOGLE MAP_LINK": "ગુગલ મેપ લિંક",
   "District": "જિલ્લો",
   "State": "રાજ્ય",
   "Village": "ગામ",
   "GOOGLE_MAP_LINK": "ગુગલ મેપ લિંક",
-  "DISTRICTS": "જિલ્લો"
+  "DISTRICTS": "જિલ્લો",
+  "TYPE_OF_BATCH": "બેચનો પ્રકાર",
+  "CATCHMENT_AREA": "કેચમેન્ટ એરિયા",
+  "DISTRICT": "જિલ્લો",
+  "CENTER:": "કેન્દ્ર:",
+  "SKILLING_CENTER_IMAGE": "સ્કલિંગ સેન્ટરની છબી",
+  "INDUSTRY": "ઉદ્યોગ",
+  "ADDRESS": "સરનામું",
+  "DOB": "જન્મ તારીખ",
+  "SUBJECT": "વિષય",
+  "UNMARRIED": "અપરિણીત",
+  "MARRIED": "પરિણીત",
+  "DIVORCED": "છૂટાછેડા લીધેલા",
+  "SELF_PLACED": "સ્વયં સ્થાન",
+  "DESIGNATION": "હોદ્દો",
+  "YOUTH": {
+    "UPDATE_YOUTH": "યુવા અપડેટ કરો",
+    "NEW_YOUTH": "ન્યૂ યુથ",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તા ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે.",
+    "NOT_ABLE_CREATE_YOUTH": "યુવાની પેદા કરવામાં સક્ષમ નથી",
+    "YOUTH_CREATED_SUCCESSFULLY": "યુવાની સફળતાપૂર્વક બનાવવામાં આવી છે!",
+    "NOT_ABLE_UPDATE_YOUTH": "યુવાનોને અપડેટ કરવામાં અસમર્થ",
+    "YOUTH_UPDATED_SUCCESSFULLY": "યુવા સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
+    "SELF_PLACED": "સ્વયં સ્થાન",
+    "REGULAR": "નિયમિત",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "શૈક્ષણિક સંસ્થામાં પ્રવેશ મેળવ્યો",
+    "OWN_FARMING": "પોતાની ખેતી",
+    "AGRICULTURAL_FARM_LABORER": "કૃષિ ખેતમજૂર",
+    "NON_AGRICULTURAL_LABORER": "બિન-કૃષિ મજૂર",
+    "SALARIED_WORK": "પગારદાર કામ",
+    "SELF_EMPLOYMENT": "સ્વરોજગાર",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "બેરોજગાર અથવા ઘરકામ",
+    "MARK_AS_VOLUNTEER": "સ્વયંસેવક તરીકે ચિહ્નિત કરો",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "શું તમે સ્વયંસેવક તરીકે ચિહ્નિત કરવા માંગો છો?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "સ્વયંસેવક તરીકે સફળતાપૂર્વક ચિહ્નિત થયા",
+    "MARK_AS_VOLUNTEER_FAILED": "સ્વયંસેવક તરીકે ચિહ્નિત કરવામાં નિષ્ફળ ગયા",
+    "PLEASE_GO_BACK_MSG": "આગળ વધવા માટે કૃપા કરીને પસંદગી પછી પાછા જાઓ.",
+    "UNMARK_AS_VOLUNTEER": "સ્વયંસેવક તરીકે ચિહ્નિત ન કરો",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "શું તમે સ્વયંસેવક તરીકે ચિહ્નિત કરવાનું રદ કરવા માંગો છો?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "સ્વયંસેવક તરીકે સફળતાપૂર્વક ચિહ્નિત કર્યા નથી",
+    "UNMARK_AS_VOLUNTEER_FAILED": "સ્વયંસેવક તરીકે ચિહ્નિત કરવાનું રદ કરવામાં નિષ્ફળ થયાં"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "વપરાશકર્તા સફળતાપૂર્વક સક્રિય થયો છે.",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "મેન્ટરને અપડેટ કરી શકતા નથી",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક બનાવવામાં આવ્યો છે!",
+    "NOT_ABLE_CREATE_MOBILIZER": "માર્ગદર્શક બનાવી શક્યા નથી",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "માર્ગદર્શક બનાવવામાં આવ્યો છે, ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે.",
+    "MAP_USER_AS_LEAD": "લીડ તરીકે નકશા વપરાશકર્તા",
+    "MAP_USER_AS_MOBILIZER": "માર્ગદર્શક તરીકે નકશા વપરાશકર્તા",
+    "PLEASE_SEARCH_AND_SELECT_USER": "કૃપા કરીને વપરાશકર્તા શોધો અને પસંદ કરો.",
+    "UNKNOWN_STATE": "અજાણ્યું રાજ્ય",
+    "UNKNOWN_DISTRICT": "અજાણ્યો જિલ્લો",
+    "UNKNOWN_BLOCK": "અજાણ્યો બ્લોક",
+    "WORKING_LOCATION_REQUIRED": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોક માટે ગામડાઓ પસંદ કરો.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોક માટે ગામો પસંદ કરો. {{blocks}} અને {{count}} વધુ બ્લોક(ઓ) માં ગામો ખૂટે છે.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોક માટે ગામો પસંદ કરો. {{blocks}} માં ગામો ખૂટે છે.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોકમાંથી ઓછામાં ઓછું એક ગામ પસંદ કરો.",
+    "MOBILIZER_NAME": "માર્ગદર્શકનું નામ"
+  }
 }

@@ -166,7 +166,15 @@
     "ACTIVATE_USER": "Activate User",
     "ACTIVATE": "Activate",
     "RESIGNED_FROM_COMPANY": "Resigned from the company",
-    "MOVED_TO_DIFFERENT_ROLE":"Moved to a different role"
+    "MOVED_TO_DIFFERENT_ROLE": "Moved to a different role",
+    "NO_MOBILIZER_FOUND": "No Mentor Found",
+    "MAP": "Map",
+    "NEXT": "Next",
+    "USER_BATCHES": "{{name}} belongs to below batches",
+    "DELETE_FROM_BATCH_WARNING": "Do you want to delete user from above center's batches?",
+    "SAVE": "Save",
+    "SAVING": "Saving...",
+    "MAP_NEW": "Map New"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -179,6 +187,7 @@
     "REMEMBER_ME": "Remember Me",
     "CONFIRM_PASSWORD": "Confirm password",
     "RESET_PASSWORD": "Reset Password",
+    "SET_PASSWORD": "Set Password",
     "CREATE_NEW": "Create a new, strong password that you don't use for other websites",
     "NOT_MATCH": "Passwords do not match",
     "CHARACTERS_LONG": "Passwords must be at least 8 characters long",
@@ -242,7 +251,8 @@
     "PROGRAMS": "Programs",
     "SKILLING_CENTERS": "Skilling Centers",
     "CURRICULUM_PLANNER": "Curriculum Planner",
-    "BATCH": "Batch"
+    "BATCH": "Batch",
+    "MOBILIZER": "Mentor"
   },
   "FACILITATORS": {
     "STATE": "State",
@@ -278,8 +288,7 @@
     "EDIT_LEARNER": "Edit Learner",
     "NO_LEARNERS_FOUND": "No Learners Found",
     "RE_ASSIGN_LEARNER": "Re-assign Learner",
-               "ACTIVATE_USER_SUCCESS": "User has been successfully activated"
-
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "Search Center Heads..",
@@ -383,7 +392,6 @@
     "BLOCK_CODE": "Block Code",
     "CODE": "Code",
     "MASTER": "Master"
-    
   },
   "CENTERS": {
     "CENTER": "center",
@@ -423,7 +431,9 @@
     "BATCH_CREATED_SUCCESSFULLY": "Batch Created successfully",
     "BATCH_UPDATE_FAILED": "Something went wrong while updating batch",
     "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "You can't delete the batch because it has {{activeMembers}} Active Learners",
-    "NO_BATCH_FOUND": "No Batch Found"
+    "NO_BATCH_FOUND": "No Batch Found",
+    "TYPE_OF_BATCH": "Type of Batch",
+    "BATCH_CREATE_FAILED": "Something went wrong while creating batch"
   },
   "FORM": {
     "FULL_NAME": "Full Name",
@@ -479,7 +489,7 @@
     "EMAIL": "Email",
     "YEAR_OF_JOINING_SCP": "Year of joining SCP",
     "ASSIGN_CENTERS": "Assign Centers",
-    "TYPE_OF_COHORT": "Type Of Center",
+    "TYPE_OF_COHORT": "Type of Center",
     "UNIT_NAME": "Unit Name",
     "SUBJECTS_I_TEACH": "Subject I Teach",
     "MY_MAIN_SUBJECTS": "Main subjects",
@@ -487,6 +497,7 @@
     "DESIGNATION": "Designation",
     "REGULAR": "Regular",
     "REMOTE": "Remote",
+    "CONTACT": "Contact",
     "NOTE_THIS_WILL_BE_CENTER_NAME": "Note : This will be center name",
     "STATE": "State",
     "DISTRICT": "District",
@@ -543,9 +554,15 @@
     "MOTHER_NAME": "Mother Name",
     "DATE_OF_BIRTH": "Date of Birth",
     "TEST_BELONG_TO": "test belongs to below center",
-         "WAS_BELONG_TO": "was archived in the below location",
-    "CONFIRM_TO_ACTIVATE":"Are you sure you want to activate this user again?",
-    "BELONG_TO": "belongs to below center"
+    "BELONG_TO": "belongs to below center",
+    "WAS_BELONG_TO": "was archived in the below location",
+    "CONFIRM_TO_ACTIVATE": "Are you sure you want to activate this user again?",
+    "WORKING_LOCATION": "Working Location",
+    "CATCHMENT_AREA": "Catchment Area",
+    "TYPE_OF_BATCH": "Type of Batch",
+    "BELONG_TO_MULTIPLE_CENTERS": "belongs to below centers",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete user from all centers?",
+    "DO_YOU_WANT_TO_DELETE_FROM_LOCATION": "Do you want to delete user from this location?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -600,7 +617,9 @@
     "COURSE_STATUS": "Course Status",
     "ISSUED_DATE": "Issued Date",
     "USER_ID": "User Id",
-    "COURSE_ID": "Course Id"
+    "COURSE_ID": "Course Id",
+    "LOCATION": "Location (State / District / Block / Village)",
+    "WORKING_VILLAGE": "Working Village"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "Editor Workspace",
@@ -703,6 +722,7 @@
     "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "Gender",
+  "WORKING_STATE": "Working State",
   "first_name": "First Name",
   "last_name": "Last Name",
   "phone_number": "Phone Number",
@@ -715,7 +735,8 @@
   "dob": "DOB",
   "email": "Email",
   "UNIT_NAME": "Unit Name",
-  "TYPE_OF_CENTER": "Type Of Center",
+  "TYPE_OF_CENTER": "Type of Center",
+  "TYPE_OF_BATCH": "Type of Batch",
   "MY_MAIN_SUBJECTS": "Main subjects",
   "LIFE_SKILLS": "Life Skills",
   "ENGLISH": "English",
@@ -751,6 +772,7 @@
   "REMOTE": "Remote",
   "IS_VOLUNTEER": "Is Volunteer",
   "middle_name": "Middle Name",
+  "CATCHMENT_AREA": "Catchment Area",
   "CONTENT_CREATORS": {
     "SEARCHBAR_PLACEHOLDER": "Search content creator..",
     "NEW_CONTENT_CREATOR": "New Content Creator",
@@ -844,5 +866,25 @@
     "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
     "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
     "UNMARK_AS_VOLUNTEER_FAILED": "Failed to unmark as volunteer"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mentor",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mentor",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
+    "MAP_USER_AS_LEAD": "Map User as Lead",
+    "MAP_USER_AS_MOBILIZER": "Map User as Mentor",
+    "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
+    "UNKNOWN_STATE": "Unknown State",
+    "UNKNOWN_DISTRICT": "Unknown District",
+    "UNKNOWN_BLOCK": "Unknown Block",
+    "WORKING_LOCATION_REQUIRED": "Working location is required. Please select villages for all blocks.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
+    "MOBILIZER_NAME": "Mentor Name",
+    "EDIT_MOBILIZER": "Edit Mobilizer"
   }
 }

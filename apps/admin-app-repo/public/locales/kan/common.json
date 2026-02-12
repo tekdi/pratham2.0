@@ -153,11 +153,23 @@
     "NO_CONTENT_CREATOR_FOUND": "ವಿಷಯ ಸೃಷ್ಟಿಕರ್ತ (SCTA) ಸಿಕ್ಕಿಲ್ಲ",
     "NO_CONTENT_REVIEWER_FOUND": "ವಿಷಯ ವಿಮರ್ಶಕ (CCTA) ಸಿಕ್ಕಿಲ್ಲ",
     "LOADING": "ಲೋಡ್ ಆಗುತ್ತಿದೆ",
+    "USER_DELETE_SUCCSSFULLY": "ಬಳಕೆದಾರರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
     "SURE_REASSIGN_CENTER": "ಈ ಬಳಕೆದಾರರಿಗೆ ಕೇಂದ್ರವನ್ನು ಮರು ನಿಯೋಜಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?",
     "SORT": "ವಿಂಗಡಿಸಿ",
     "ARE_YOU_SURE_DELETE_STATE": "ಈ ರಾಜ್ಯದಲ್ಲಿ {{district}} ಸಕ್ರಿಯ ಜಿಲ್ಲೆಗಳಿವೆ, ಅದನ್ನು ನೀವು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
-    "USER_DELETE_SUCCSSFULLY": "ಬಳಕೆದಾರರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
-    "ADD": "ಸೇರಿಸಿ"
+    "ADD": "ಸೇರಿಸಿ",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "გამოგვიგზავნეთ თქვენი მოთხოვნა და მოგვეცით საშუალება დაგეხმაროთ ნებისმიერი პრობლემის ან შეშფოთების მოგვარებაში.",
+    "WE_ARE_HERE_TO_HELP": "ჩვენ აქ ვართ დასახმარებლად",
+    "NO_STATE_LEAD_FOUND": "სახელმწიფოს მიერ მიყენებული ზიანი ვერ იქნა ნაპოვნი",
+    "FAQS": "ხშირად დასმული კითხვები",
+    "RESET_FILTERS": "ფილტრების გადატვირთვა",
+    "ACTIVATE_USER": "მომხმარებლის გააქტიურება",
+    "ACTIVATE": "გააქტიურება",
+    "RESIGNED_FROM_COMPANY": "კომპანიიდან გადადგა",
+    "MOVED_TO_DIFFERENT_ROLE": "სხვა როლზე გადავიდა",
+    "NO_MOBILIZER_FOUND": "მენტორი ვერ მოიძებნა",
+    "MAP": "რუკა",
+    "NEXT": "შემდეგი"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ಬಳಕೆದಾರಹೆಸರು",
@@ -219,7 +231,22 @@
     "CERTIFICATE_ISSUANCE": "ಪ್ರಮಾಣಪತ್ರ ಹೊರಡುವಿಕೆ",
     "SUPPORT_REQUEST": "ಬೆಂಬಲ ಕೇಳು",
     "CONTENT_CREATOR": "ವಿಷಯ ಸೃಷ್ಟಿಕರ್ತ",
-    "CONTENT_REVIEWER": "ವಿಷಯ ವಿಮರ್ಶಕ"
+    "CONTENT_REVIEWER": "ವಿಷಯ ವಿಮರ್ಶಕ",
+    "TAXONOMY_EDITOR": "ტაქსონომიის რედაქტორი",
+    "MANAGE_NOTIFICATION": "შეტყობინებების შაბლონების მართვა",
+    "YOUTH": "ახალგაზრდობა",
+    "FAQS": "ხშირად დასმული კითხვები",
+    "STATE_LEAD": "სახელმწიფო ლიდერობა",
+    "MASTER": "ოსტატი",
+    "STATES": "შტატები",
+    "DISTRICTS": "რაიონები",
+    "BLOCKS": "ბლოკები",
+    "VILLAGES": "სოფლები",
+    "PROGRAMS": "პროგრამები",
+    "SKILLING_CENTERS": "კვალიფიკაციის ცენტრები",
+    "CURRICULUM_PLANNER": "სასწავლო გეგმის დამგეგმავი",
+    "BATCH": "პარტია",
+    "MOBILIZER": "მენტორი"
   },
   "FACILITATORS": {
     "STATE": "ರಾಜ್ಯ",
@@ -236,7 +263,11 @@
     "FINISH_ASSIGN": "ಪೂರ್ಣಗೊಳಿಸಿ ಮತ್ತು ನಿಯೋಜಿಸಿ",
     "BATCHES_SELECTED": "ಗುಂಪುಗಳು ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ",
     "CENTERS": "ಕೇಂದ್ರಗಳು",
-    "RE_ASSIGN_facilitator": "ಪುನಃ ಕಾರ್ಯನಿರ್ವಹಣೆ"
+    "RE_ASSIGN_facilitator": "ಪುನಃ ಕಾರ್ಯನಿರ್ವಹಣೆ",
+    "ASSIGN_BATCHES_FINISH": "ამის დასრულება მოგვიანებით, თქვენივე ტემპით შეგიძლიათ. თუმცა, პარტიები მხოლოდ „დასრულება და მინიჭებაზე“ დაწკაპუნების შემდეგ დაინიშნება.",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "ცენტრიდან ჯგუფების მინიჭება",
+    "BACK_TO_FORM": "ფორმაში დაბრუნება",
+    "SEARCH_BATCHES": "პარტიების ძიება.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "ಕೋರ್ಸ್, ವಿಷಯ, ವಿದ್ಯಾರ್ಥಿ, ಪಿಡಿಎಫ್ ಇತ್ಯಾದಿಗಳನ್ನು ಹುಡುಕಿ.."
@@ -250,7 +281,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "ಕಲಿಯುವವರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!",
     "EDIT_LEARNER": "ಕಲಿಯುವವರನ್ನು ಸಂಪಾದಿಸಿ",
     "NO_LEARNERS_FOUND": "ವಿದ್ಯಾರ್ಥಿಗಳು ಸಿಕ್ಕಿಲ್ಲ",
-    "RE_ASSIGN_LEARNER": "ಪುನಃ ವಿದ್ಯಾರ್ಥಿಯನ್ನು ನಿಯೋಜಿಸಿ"
+    "RE_ASSIGN_LEARNER": "ಪುನಃ ವಿದ್ಯಾರ್ಥಿಯನ್ನು ನಿಯೋಜಿಸಿ",
+    "ACTIVATE_USER_SUCCESS": "მომხმარებელი წარმატებით გააქტიურდა"
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "ಮಾರ್ಗದರ್ಶಕ ನಾಯಕರು ಹುಡುಕಿ..",
@@ -265,7 +297,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "ಮಾರ್ಗದರ್ಶಕ ನಾಯಕರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     "UPDATE_MENTOR_LEAD": "ಮಾರ್ಗದರ್ಶಕ ನಾಯಕರನ್ನು ನವೀಕರಿಸಿ",
     "NEW_MENTOR_LEAD": "ಹೊಸ ಮಾರ್ಗದರ್ಶಕ ನಾಯಕ",
-    "ER": "ಹೊಸ ಮಾರ್ಗದರ್ಶಕ ನಾಯಕರು"
+    "ER": "ಹೊಸ ಮಾರ್ಗದರ್ಶಕ ನಾಯಕರು",
+    "RE_ASSIGN_MENTOR_LEAD": "ცენტრის ხელმძღვანელის ხელახლა დანიშვნა"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "ತಂಡದ ನಾಯಕರನ್ನು ಹುಡುಕಿ..",
@@ -306,10 +339,10 @@
     "BOARDS_FULLY_UPLOADED": "ಬೋರ್ಡ್‌ಗಳನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗಿದೆ",
     "ACTIVITY": "ಚಟುವಟಿಕೆ",
     "COPY_LINK": "ಲಿಂಕ್ ನಕಲಿಸಿ",
-    "SEARCH": "ಹುಡುಕಿ ",
+    "SEARCH": "ಹುಡುಕಿ",
     "DATA_NOT_FOUND": "ಡೇಟಾ ಕಂಡುಬಂದಿಲ್ಲ.",
-    "SUBJECTS_UPLOADED": "ವಿಷಯಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗಿದೆ  ",
-    "IMPORT_PLANNER": "ಇಂಪೋರ್ಟ್ ಪ್ಲಾನರ್ ",
+    "SUBJECTS_UPLOADED": "ವಿಷಯಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗಿದೆ",
+    "IMPORT_PLANNER": "ಇಂಪೋರ್ಟ್ ಪ್ಲಾನರ್",
     "REMOVE_FILE": "ತೆಗೆದುಹಾಕಿ",
     "IMPORT_PLANNER_TO_UPLOADING": "ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಪ್ರಾರಂಭಿಸಲು 'ಇಂಪೋರ್ಟ್ ಪ್ಲಾನರ್ ' ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.",
     "TOPIC_DETAILS": "ವಿಷಯದ ವಿವರಗಳು",
@@ -321,7 +354,15 @@
     "SUBTOPICS": "ಉಪ-ವಿಷಯಗಳು",
     "RESOURCES": "ಸಂಪನ್ಮೂಲಗಳು",
     "TOPIC": "ವಿಷಯ",
-    "DURATION/MONTH": "ಅವಧಿ/ತಿಂಗಳು"
+    "DURATION/MONTH": "ಅವಧಿ/ತಿಂಗಳು",
+    "UPLOAD_FAILED": "ატვირთვა ვერ მოხერხდა",
+    "IMPORT_NEW_PLANNER": "ახალი დამგეგმავის იმპორტი",
+    "ADD_NEW_TOPIC": "ახალი თემის დამატება",
+    "DELETE_PLANNER": "დამგეგმავის წაშლა",
+    "CSV_TEMPLATE": "CSV შაბლონი",
+    "NEW_TOPIC": "ახალი თემა",
+    "DOWNLOAD_CSV": "ატვირთული CSV ფაილის ჩამოტვირთვა",
+    "DURING_COURSE": "სწავლა"
   },
   "MASTER": {
     "STATE": "ರಾಜ್ಯ",
@@ -371,7 +412,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "ಕೇಂದ್ರವನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ。",
     "SEARCHBAR_PLACEHOLDER": "ಸರ್ಚ್ ಸೆಂಟರ್",
     "CENTER_UPDATE_FAILED": "ಕೇಂದ್ರವನ್ನು ನವೀಕರಿಸುವಾಗ ಏನೋ ತಪ್ಪಾಗಿದೆ。",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "ನೀವು ಕೇಂದ್ರವನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ ಏಕೆಂದರೆ ಅದು {{activeMembers}} ಸಕ್ರಿಯ ಕಲಿಯುವವರನ್ನು ಹೊಂದಿದೆ。"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "ನೀವು ಕೇಂದ್ರವನ್ನು ಅಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ ಏಕೆಂದರೆ ಅದು {{activeMembers}} ಸಕ್ರಿಯ ಕಲಿಯುವವರನ್ನು ಹೊಂದಿದೆ。",
+    "BATCHES_FOR_CENTER": "{{centerName}}-ის პარტიები"
   },
   "BATCH": {
     "NEW_BATCH": "ಹೊಸ ಬ್ಯಾಚ್",
@@ -380,7 +422,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ",
     "BATCH_DELETE_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ಅಳಿಸಲಾಗಿದೆ",
     "BATCH_CREATED_SUCCESSFULLY": "ಬ್ಯಾಚ್ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ",
-    "BATCH_UPDATE_FAILED": "ಬ್ಯಾಚ್ ನವೀಕರಣದಲ್ಲಿ ಕೆಲವು ತಪ್ಪು ಸಂಭವಿಸಿದವು"
+    "BATCH_UPDATE_FAILED": "ಬ್ಯಾಚ್ ನವೀಕರಣದಲ್ಲಿ ಕೆಲವು ತಪ್ಪು ಸಂಭವಿಸಿದವು",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "პარტიის წაშლა შეუძლებელია, რადგან მასში {{activeMembers}} აქტიური მოსწავლეა.",
+    "NO_BATCH_FOUND": "პარტია ვერ მოიძებნა",
+    "TYPE_OF_BATCH": "პარტიის ტიპი",
+    "BATCH_CREATE_FAILED": "პარტიის შექმნისას რაღაც შეცდომა მოხდა"
   },
   "FORM": {
     "FULL_NAME": "ಪೂರ್ಣ ಹೆಸರು",
@@ -491,7 +537,22 @@
     "PROGRAM_DESCRIPTION": "ಕಾರ್ಯಕ್ರಮದ ವಿವರಣೆ",
     "PROGRAM_TYPE": "ಕಾರ್ಯಕ್ರಮದ ಪ್ರಕಾರ",
     "PROGRAM_HEAD_NAME": "ಕಾರ್ಯಕ್ರಮದ ಮುಖ್ಯಸ್ಥರ ಹೆಸರು",
-    "PROGRAM_IMAGE": "ಕಾರ್ಯಕ್ರಮದ ಚಿತ್ರ"
+    "PROGRAM_IMAGE": "ಕಾರ್ಯಕ್ರಮದ ಚಿತ್ರ",
+    "CONTACT": "კონტაქტი",
+    "BATCH": "პარტია",
+    "PREFERRED_LANGUAGE": "სასურველი ენა",
+    "FIRST_NAME": "სახელი",
+    "MIDDLE_NAME_OR_FATHER_NAME": "მამის სახელი ან შუა სახელი",
+    "LAST_NAME": "გვარი",
+    "MOTHER_NAME": "დედის სახელი",
+    "DATE_OF_BIRTH": "დაბადების თარიღი",
+    "TEST_BELONG_TO": "ტესტი ცენტრის ქვემოთ მდებარეობს",
+    "BELONG_TO": "ცენტრის ქვემოთ მდებარეობს",
+    "WAS_BELONG_TO": "არქივში იყო შენახული ქვემოთ მოცემულ ადგილას",
+    "CONFIRM_TO_ACTIVATE": "დარწმუნებული ხართ, რომ გსურთ ამ მომხმარებლის ხელახლა გააქტიურება?",
+    "WORKING_LOCATION": "სამუშაო ადგილმდებარეობა",
+    "CATCHMENT_AREA": "წყალშემკრები არეალია",
+    "TYPE_OF_BATCH": "პარტიის ტიპი"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಅಮಾನ್ಯ ಇನ್‌ಪುಟ್.",
@@ -510,7 +571,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "ಹೆಸರಿನಲ್ಲಿ ಅಂಕಿಗಳು ಇರಬಾರದು.",
     "INVALID_EMAIL_FORMAT": "ಅಮಾನ್ಯ ಇಮೇಲ್ ಸ್ವರೂಪ",
     "ENTER_VALID_EMAIL": "ಮಾನ್ಯ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ.",
-    "ENTER_VALID_MOBILE_NUMBER": "ಮಾನ್ಯವಾದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ"
+    "ENTER_VALID_MOBILE_NUMBER": "ಮಾನ್ಯವಾದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "სივრცეები და სპეციალური სიმბოლოები დაუშვებელია",
+    "DATE_MUST_BE_ON_OR_BEFORE": "თარიღი უნდა იყოს {{date}}-მდე ან უფრო ადრე",
+    "DATE_MUST_BE_ON_OR_AFTER": "თარიღი უნდა იყოს {{date}} ან მის შემდეგ"
   },
   "TABLE_TITLE": {
     "NAME": "ಹೆಸರು",
@@ -543,7 +607,9 @@
     "COURSE_STATUS": "ಪಠ್ಯಕ್ರಮದ ಸ್ಥಿತಿ",
     "ISSUED_DATE": "ನೀಡಿದ ದಿನಾಂಕ",
     "USER_ID": "ಬಳಕೆದಾರ ಐಡಿ",
-    "COURSE_ID": "ಪಠ್ಯಕ್ರಮ ಐಡಿ"
+    "COURSE_ID": "ಪಠ್ಯಕ್ರಮ ಐಡಿ",
+    "LOCATION": "მდებარეობა (შტატი / რაიონი / კვარტალი / სოფელი)",
+    "WORKING_VILLAGE": "მშრომელთა სოფელი"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "ಸಂಪಾದಕ ಕಾರ್ಯಕ್ಷೇತ್ರ",
@@ -584,7 +650,8 @@
     "EDIT_PROGRAM": "ಕಾರ್ಯಕ್ರಮವನ್ನು ಸಂಪಾದಿಸಿ",
     "DELETE_PROGRAM": "ಕಾರ್ಯಕ್ರಮವನ್ನು ಅಳಿಸಿ",
     "SEARCH_PROGRAM": "ಕಾರ್ಯಕ್ರಮವನ್ನು ಹುಡುಕಿ...",
-    "NO_PROGRAMS_FOUND": "ಯಾವುದೇ ಕಾರ್ಯಕ್ರಮ ಕಂಡುಬಂದಿಲ್ಲ."
+    "NO_PROGRAMS_FOUND": "ಯಾವುದೇ ಕಾರ್ಯಕ್ರಮ ಕಂಡುಬಂದಿಲ್ಲ.",
+    "EDIT": "რედაქტირება"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "ಸಂದರ್ಭ ಪ್ರಕಾರ",
@@ -639,9 +706,13 @@
     "ASSIGN_VILLAGES_FINISH": "ನೀವು ಇದನ್ನು ನಂತರ ನಿಮ್ಮ ಸ್ವಂತ ವೇಗದಲ್ಲಿ ಪೂರ್ಣಗೊಳಿಸಬಹುದು. ಆದಾಗ್ಯೂ, ನೀವು ‘ಮುಕ್ತಾಯ’ ಕ್ಲಿಕ್ ಮಾಡಿದ ನಂತರ ಮಾತ್ರ ಗ್ರಾಮಗಳನ್ನು ನಿಯೋಜಿಸಲಾಗುತ್ತದೆ.",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "ಬ್ಲಾಕ್‌ಗಳಿಂದ ಗ್ರಾಮಗಳನ್ನು ನಿಯೋಜಿಸಿ",
     "BACK_TO_FORM": "ಫಾರ್ಮ್‌ಗೆ ಹಿಂತಿರುಗಿ",
-    "SEARCH_VILLAGES": "ಗ್ರಾಮಗಳನ್ನು ಹುಡುಕಿ.."
+    "SEARCH_VILLAGES": "ಗ್ರಾಮಗಳನ್ನು ಹುಡುಕಿ..",
+    "BACK": "უკან",
+    "SAVE_SELECTION": "არჩევანის შენახვა",
+    "SELECTED_VILLAGE_COUNT": "არჩეული სოფლების რაოდენობა: {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "ಲಿಂಗ",
+  "WORKING_STATE": "ಕೆಲಸ ಮಾಡುವ ರಾಜ್ಯ",
   "first_name": "ಮೊದಲ ಹೆಸರು",
   "last_name": "ಕೊನೆಯ ಹೆಸರು",
   "phone_number": "ದೂರವಾಣಿ ಸಂಖ್ಯೆ",
@@ -736,12 +807,73 @@
     "EDIT_MENTOR": "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ಸಂಪಾದಿಸಿ",
     "NOT_ABLE_UPDATE_MENTOR": "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     "NOT_ABLE_CREATE_MENTOR": "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
-    "UPDATE_MENTOR": "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ನವೀಕರಿಸಿ"
+    "UPDATE_MENTOR": "ಮಾರ್ಗದರ್ಶಿಯನ್ನು ನವೀಕರಿಸಿ",
+    "RE_ASSIGN_MENTOR": "მენტორის ხელახლა დანიშვნა"
   },
   "GOOGLE MAP_LINK": "ಗೂಗಲ್ ನಕ್ಷೆ ಲಿಂಕ್",
   "District": "ಜಿಲ್ಲೆ",
   "State": "ರಾಜ್ಯ",
   "Village": "ಗ್ರಾಮ",
   "GOOGLE_MAP_LINK": "ಗೂಗಲ್ ನಕ್ಷೆ ಲಿಂಕ್",
-  "DISTRICTS": "ಜಿಲ್ಲೆ"
+  "DISTRICTS": "ಜಿಲ್ಲೆ",
+  "TYPE_OF_BATCH": "პარტიის ტიპი",
+  "CATCHMENT_AREA": "წყალშემკრები არეალია",
+  "DISTRICT": "რაიონი",
+  "CENTER:": "ცენტრი:",
+  "SKILLING_CENTER_IMAGE": "სკლინგის ცენტრის სურათი",
+  "INDUSTRY": "ინდუსტრია",
+  "ADDRESS": "მისამართი",
+  "DOB": "დაბადების თარიღი",
+  "SUBJECT": "თემა",
+  "UNMARRIED": "დაუქორწინებელი",
+  "MARRIED": "დაქორწინებული",
+  "DIVORCED": "განქორწინებული",
+  "SELF_PLACED": "თვითგანთავსებადი",
+  "DESIGNATION": "დანიშნულება",
+  "YOUTH": {
+    "UPDATE_YOUTH": "ახალგაზრდობის განახლება",
+    "NEW_YOUTH": "ახალი ახალგაზრდობა",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "მომხმარებლის ავტორიზაციის მონაცემები მალე გაიგზავნება",
+    "NOT_ABLE_CREATE_YOUTH": "ახალგაზრდობის შექმნა არ შეუძლია",
+    "YOUTH_CREATED_SUCCESSFULLY": "ახალგაზრდობა წარმატებით შეიქმნა!",
+    "NOT_ABLE_UPDATE_YOUTH": "ახალგაზრდების განახლება შეუძლებელია",
+    "YOUTH_UPDATED_SUCCESSFULLY": "ახალგაზრდობა წარმატებით განახლდა!",
+    "SELF_PLACED": "თვითგანთავსებადი",
+    "REGULAR": "ჩვეულებრივი",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "საგანმანათლებლო დაწესებულებაში ჩარიცხული",
+    "OWN_FARMING": "საკუთარი მეურნეობა",
+    "AGRICULTURAL_FARM_LABORER": "სოფლის მეურნეობის ფერმის მუშა",
+    "NON_AGRICULTURAL_LABORER": "არასასოფლო-სამეურნეო მუშა",
+    "SALARIED_WORK": "ანაზღაურებადი სამუშაო",
+    "SELF_EMPLOYMENT": "თვითდასაქმება",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "უმუშევარი ან საოჯახო სამუშაო",
+    "MARK_AS_VOLUNTEER": "მონიშნეთ, როგორც მოხალისე",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "გსურთ მოხალისედ მონიშვნა?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "წარმატებით მონიშნულია, როგორც მოხალისე",
+    "MARK_AS_VOLUNTEER_FAILED": "მოხალისედ მონიშვნა ვერ მოხერხდა",
+    "PLEASE_GO_BACK_MSG": "გთხოვთ, არჩევანის შემდეგ უკან დაბრუნდეთ შემდგომი გადასასვლელად",
+    "UNMARK_AS_VOLUNTEER": "მოხალისედ მონიშვნის გაუქმება",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "გსურთ მოხალისედ მონიშვნის გაუქმება?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "მოხალისედ მონიშვნა წარმატებით მოიხსნა",
+    "UNMARK_AS_VOLUNTEER_FAILED": "მოხალისედ მონიშვნის გაუქმება ვერ მოხერხდა"
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "მომხმარებელი წარმატებით გააქტიურდა",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "მენტორი წარმატებით განახლდა!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Mentor-ის განახლება შეუძლებელია",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "მენტორი წარმატებით შეიქმნა!",
+    "NOT_ABLE_CREATE_MOBILIZER": "მენტორის შექმნა შეუძლებელია",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "მენტორი შეიქმნა, სერთიფიკატები მალე გაიგზავნება",
+    "MAP_USER_AS_LEAD": "მომხმარებლის, როგორც პოტენციური კლიენტის რუკა",
+    "MAP_USER_AS_MOBILIZER": "რუკის მომხმარებელი, როგორც მენტორი",
+    "PLEASE_SEARCH_AND_SELECT_USER": "გთხოვთ, მოძებნოთ და აირჩიოთ მომხმარებელი",
+    "UNKNOWN_STATE": "უცნობი შტატი",
+    "UNKNOWN_DISTRICT": "უცნობი რაიონი",
+    "UNKNOWN_BLOCK": "უცნობი ბლოკი",
+    "WORKING_LOCATION_REQUIRED": "სამუშაო ადგილი აუცილებელია. გთხოვთ, ყველა ბლოკისთვის აირჩიოთ სოფლები.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "სამუშაო მდებარეობა სავალდებულოა. გთხოვთ, ყველა ბლოკისთვის აირჩიოთ სოფლები. სოფლები აკლია: {{blocks}} და კიდევ {{count}} ბლოკში.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "სამუშაო მდებარეობა სავალდებულოა. გთხოვთ, ყველა ბლოკისთვის აირჩიოთ სოფლები. სოფლები აკლია: {{ბლოკები}}.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "სამუშაო ადგილი აუცილებელია. გთხოვთ, ყველა ბლოკში აირჩიოთ სულ მცირე ერთი სოფელი.",
+    "MOBILIZER_NAME": "მენტორის სახელი"
+  }
 }

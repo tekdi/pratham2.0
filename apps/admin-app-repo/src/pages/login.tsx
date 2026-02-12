@@ -71,6 +71,8 @@ const LoginPage = () => {
 
   const passwordRef = useRef<HTMLInputElement>(null);
   const loginButtonRef = useRef<HTMLButtonElement>(null);
+  const isFetchingTenantInfo = useRef<boolean>(false);
+  const isFetchingUserDetail = useRef<boolean>(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -117,7 +119,7 @@ const LoginPage = () => {
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         } else {
@@ -144,7 +146,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         }
@@ -180,6 +182,12 @@ const LoginPage = () => {
   };
 
   const fetchUserDetail = async () => {
+    // Prevent multiple simultaneous calls
+    if (isFetchingUserDetail.current) {
+      return;
+    }
+
+    isFetchingUserDetail.current = true;
     let userId;
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -206,6 +214,10 @@ const LoginPage = () => {
         const program = tenantName;
 
         const response = await getUserDetailsInfo(userId, fieldValue);
+        localStorage.setItem(
+          'temporaryPassword',
+          response?.userData?.temporaryPassword ?? 'false'
+        );
 
         const userInfo = response?.userData;
         // Override role with selected role from SwitchAccount (ensures correct redirect)
@@ -260,14 +272,14 @@ const LoginPage = () => {
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields?.find(
-              (field: { label: string }) => field?.label === 'STATE'
+              (field: { label: string }) => field?.label === 'WORKING_STATE'
             )?.selectedValues?.[0]?.value
           );
           if (selectedStateName) {
             localStorage.setItem('stateName', selectedStateName);
           }
           const selectedStateId = userInfo?.customFields?.find(
-            (field: { label: string }) => field?.label === 'STATE'
+            (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
           if (selectedStateId) {
             localStorage.setItem('stateId', selectedStateId);
@@ -351,8 +363,8 @@ const LoginPage = () => {
                 (Role.CENTRAL_ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head', undefined, { locale: locale });
+                window.location.href = '/user-leader';
+                router.push('/user-leader', undefined, { locale: locale });
               }
             } else {
               if (
@@ -371,8 +383,8 @@ const LoginPage = () => {
                 userInfo?.role === Role.ADMIN &&
                 tenantData?.tenantName == TenantName.YOUTHNET
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head');
+                window.location.href = '/user-leader';
+                router.push('/user-leader');
               } 
             }
           }
@@ -438,8 +450,8 @@ const LoginPage = () => {
                       (Role.CENTRAL_ADMIN &&
                         tenantData?.tenantName == TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head', undefined, {
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader', undefined, {
                         locale: locale,
                       });
                     }
@@ -460,8 +472,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head');
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader');
                     }
                   }
                 }
@@ -474,6 +486,8 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      isFetchingUserDetail.current = false;
     }
   };
 
@@ -545,7 +559,7 @@ const LoginPage = () => {
     roleName: string
   ) => {
     setSwitchDialogOpen(false);
-    setLoading(true)
+    setLoading(true);
 
     // Set the state values
     setTenantId(tenantId);
@@ -585,10 +599,16 @@ const LoginPage = () => {
     }
 
     await fetchUserDetail();
-    setLoading(false)
+    setLoading(false);
   };
 
   const fetchTenantInfo = async () => {
+    // Prevent multiple simultaneous calls
+    if (isFetchingTenantInfo.current) {
+      return;
+    }
+
+    isFetchingTenantInfo.current = true;
     const storedTenantId = localStorage.getItem('tenantId');
     try {
       const res = await getTenantInfo();
@@ -607,6 +627,8 @@ const LoginPage = () => {
       console.log('programsData++++', programsData);
     } catch (error) {
       console.error('Failed to fetch tenant info:', error);
+    } finally {
+      isFetchingTenantInfo.current = false;
     }
   };
 
@@ -861,7 +883,8 @@ const LoginPage = () => {
                       logEvent({
                         action: 'remember-me-button-clicked',
                         category: 'Login Page',
-                        label: `Remember Me ${rememberMe ? 'Checked' : 'Unchecked'
+                        label: `Remember Me ${
+                          rememberMe ? 'Checked' : 'Unchecked'
                         }`,
                       });
                     }}

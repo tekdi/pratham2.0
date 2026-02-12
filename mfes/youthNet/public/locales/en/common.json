@@ -63,6 +63,8 @@
     "YES": "Yes",
     "REVIEW_ATTENDANCE": "Review Attendance",
     "ADD_NEW": "Add New",
+    "ADD_MOBILIZER": "Add Mentor",
+    "MAP": "Map",
     "ADD": "ADD",
     "ADD_CENTER": "Add Centers to your view",
     "REMOVE_FROM_CENTER": "Remove From Center",
@@ -168,7 +170,11 @@
     "COURSES_FOUND": "{{count}} Course Found",
     "COURSES_FOUND_PLURAL": "{{count}} Courses Found",
     "ASSESSMENT_TYPE_FOUND": "{{count}} Assessment Type Found",
-    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found"
+    "ASSESSMENT_TYPE_FOUND_PLURAL": "{{count}} Assessment Types Found",
+    "NEXT": "Next",
+    "MAP_NEW": "Map New",
+    "COPY_REGISTRATION_LINK": "Copy Registration Link",
+    "LINK_COPIED": "Link Copied!"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
@@ -181,6 +187,7 @@
     "REMEMBER_ME": "Remember Me",
     "CONFIRM_PASSWORD": "Confirm password",
     "RESET_PASSWORD": "Reset Password",
+    "SET_PASSWORD": "Set Password",
     "CREATE_NEW": "Create a new, strong password that you don't use for other websites",
     "NOT_MATCH": "Passwords do not match",
     "CHARACTERS_LONG": "Passwords must be at least 8 characters long",
@@ -242,7 +249,7 @@
     "BLOCK": "Block",
     "ATTENDANCE": "Attendance (%)",
     "VILLAGES_AND_YOUTH": "Villages and Youth",
-    "USERS_&_VILLAGES": "Mentor, Villages and Youths",
+    "USERS_&_VILLAGES": "Mentors, Villages and Youths",
     "VILLAGES": "Villages",
     "YOUTH_VOLUNTEERS": "Youth/Volunteers",
     "SEARCH_VILLAGES": "Search Village",
@@ -614,7 +621,10 @@
     "AVAILABLE_SUGGESTIONS": "Available suggestions:",
     "USERNAME_ALREADY_EXIST": "This username already exists",
     "GRADUATE": "Graduate",
-    "POST_GRADUATE": "Post Graduate"
+    "POST_GRADUATE": "Post Graduate",
+    "BELONG_TO": "belongs to",
+    "WAS_BELONG_TO": "was belonging to",
+    "DO_YOU_WANT_TO_DELETE": "Do you want to delete this user?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -739,9 +749,9 @@
     "TOTAL_COUNT_YOUTH": "Total Count of Youth",
     "MARK_AS_VOLUNTEER_SUCCESSFULLY": "Successfully mark youth as a volunteer",
     "MARK_AS_VOLUNTEER_FAILED": "Failed to mark youth as a volunteer",
-    "ABOVE_18_YO":"Above 18 y/o",
-    "BELOW_18_YO":"Below 18 y/o",
-    "FROM":"From",
+    "ABOVE_18_YO": "Above 18 y/o",
+    "BELOW_18_YO": "Below 18 y/o",
+    "FROM": "From",
     "UNMARK_AS_VOLUNTEER": "Unmark as Volunteer",
     "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "Do you want to unmark as a volunteer",
     "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "Unmarked as volunteer successfully",
@@ -781,7 +791,8 @@
     "MIDDLE_NAME": "Middle Name",
     "LAST_NAME": "Last Name",
     "USERNAME": "Username",
-    "UPDATE_PROFILE": "Update Profile"
+    "UPDATE_PROFILE": "Update Profile",
+    "WORKING_VILLAGES": "Working Villages"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
@@ -807,7 +818,13 @@
     "BLOCKS": "Blocks",
     "DISTRICT": "District",
     "DISTRICTS": "Districts",
-    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
+    "STATE": "State",
+    "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further",
+    "NO_STATES_FOUND": "No States found",
+    "NO_DISTRICTS_FOUND": "No Districts found",
+    "NO_BLOCKS_FOUND": "No Blocks found",
+    "NO_VILLAGES_FOUND": "No Villages found"
+    
   },
   "YOUTHNET_CAMP_DETAILS": {
     "SUBMISSION": "Submission",
@@ -832,7 +849,8 @@
     "ASSIGN_VILLAGES_FROM_BLOCKS": "Assign Villages from Blocks",
     "BACK_TO_FORM": "Back to form",
     "SELECTED_VILLAGE_COUNT": "Selected village count : {{totalVillageCount}}",
-    "RE_ASSIGN_VILLAGES": "Re-assign Villages"
+    "RE_ASSIGN_VILLAGES": "Re-assign Villages",
+    "VILLAGES_REASSIGNED_SUCCESSFULLY": "Villages re-assigned successfully"
   },
   "MENTORS": {
     "NEW_MENTOR": "New Mentor",
@@ -960,14 +978,36 @@
     "UPDATE_MARKS": "Update Marks",
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
-    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "NO_ASSESSMENT_TYPE_FOUND": "No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
     "REUPLOAD": "Reupload",
     "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
   },
+  "MOBILIZER": {
+    "MOBILIZER": "Mentor",
+    "ACTIVATE_USER_SUCCESS": "User has been successfully activated",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "Mentor has been successfully updated!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "Not able to update Mentor",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "Mentor has been successfully created!",
+    "NOT_ABLE_CREATE_MOBILIZER": "Not able to create Mentor",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Mentor is created, credentials will be sent soon",
+    "MAP_USER_AS_LEAD": "Map User as Lead",
+    "MAP_USER_AS_MOBILIZER": "Map User as Mentor",
+    "PLEASE_SEARCH_AND_SELECT_USER": "Please search and select a user",
+    "UNKNOWN_STATE": "Unknown State",
+    "UNKNOWN_DISTRICT": "Unknown District",
+    "UNKNOWN_BLOCK": "Unknown Block",
+    "WORKING_LOCATION_REQUIRED": "Working location is required. Please select villages for all blocks.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}} and {{count}} more block(s).",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "Working location is required. Please select villages for all blocks. Missing villages in: {{blocks}}.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "Working location is required. Please select at least one village in all blocks.",
+    "MOBILIZER_NAME": "Mentor Name",
+    "NO_MOBILIZER_FOUND": "No Mentor Found",
+    "SEARCH_MOBILIZERS": "Search Mentor..."
+  },
   "UNIT_NAME": "Unit Name",
-  "TYPE_OF_CENTER": "Type Of Center",
+  "TYPE_OF_CENTER": "Type of Center",
   "GOOGLE MAP_LINK": "Google Map Link",
   "MY_MAIN_SUBJECTS": "Main subjects",
   "LIFE_SKILLS": "Life Skills",
@@ -1011,12 +1051,12 @@
   "middle_name": "Middle Name",
   "last_name": "Last Name",
   "WHATS_YOUR_GENDER": "Gender",
+  "WORKING_STATE": "Working State",
   "MALE": "Male",
   "FEMALE": "Female",
   "TRANSGENDER": "Transgender",
   "phone_number": "Phone Number",
-  "first_name": "First Name"
+  "first_name": "First Name",
+  "WORKING_LOCATION": "Working Location",
+  "CATCHMENT_AREA": "Catchment Area"
 }
-
-
-

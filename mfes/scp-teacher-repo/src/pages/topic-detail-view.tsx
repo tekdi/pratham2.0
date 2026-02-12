@@ -184,19 +184,20 @@ const TopicDetailView = () => {
               resources={getLearningResources(ResourcesType.PREREQUSITE)}
             />
             <CourseAccordion
-              expanded={expanded.includes('panel2')}
-              onChange={toggleAccordion('panel2')}
-              title={t('CENTER_SESSION.POST_REQUISITES')}
-              type={ResourcesType.POSTREQUSITE}
-              resources={getLearningResources(ResourcesType.POSTREQUSITE)}
-            />
-            <CourseAccordion
               expanded={expanded.includes('panel3')}
               onChange={toggleAccordion('panel3')}
               title={t('CENTER_SESSION.DURING_COURSE')}
               type={ResourcesType.DURING_COURSE}
               resources={getLearningResources(ResourcesType.DURING_COURSE)}
             />
+            <CourseAccordion
+              expanded={expanded.includes('panel2')}
+              onChange={toggleAccordion('panel2')}
+              title={t('CENTER_SESSION.POST_REQUISITES')}
+              type={ResourcesType.POSTREQUSITE}
+              resources={getLearningResources(ResourcesType.POSTREQUSITE)}
+            />
+            
           </Box>
         )}
       </Box>

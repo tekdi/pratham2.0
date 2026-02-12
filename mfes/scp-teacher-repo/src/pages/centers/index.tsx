@@ -47,6 +47,67 @@ import SimpleModal from '@/components/SimpleModalV2';
 import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import { fetchForm } from '@/components/DynamicForm/DynamicFormCallback';
 
+const toUpperString = (value: unknown) =>
+  typeof value === 'string' ? value.toUpperCase() : '';
+
+const asString = (value: unknown): string | null => {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'value' in (value as any)) {
+    const v = (value as any).value;
+    return typeof v === 'string' ? v : null;
+  }
+  return null;
+};
+
+const uniqStrings = (values: Array<string | null | undefined>) =>
+  Array.from(new Set(values.filter((v): v is string => !!v)));
+
+const getCustomFieldEntry = (customField: any[] | undefined, label: string) => {
+  const target = label.toUpperCase();
+  return (customField || []).find(
+    (item) => toUpperString(item?.label) === target
+  );
+};
+
+const getCustomFieldValues = (customField: any[] | undefined, label: string) => {
+  const entry = getCustomFieldEntry(customField, label);
+  const selectedValues = Array.isArray(entry?.selectedValues)
+    ? entry.selectedValues
+    : [];
+
+  // Some APIs use `value` (string) instead of `selectedValues`.
+  if (selectedValues.length === 0 && entry?.value) {
+    return uniqStrings([asString(entry.value)]);
+  }
+
+  return uniqStrings(selectedValues.map((v: any) => asString(v) ?? v));
+};
+
+const getCustomFieldSingleValue = (
+  customField: any[] | undefined,
+  label: string
+) => {
+  const values = getCustomFieldValues(customField, label);
+  return values?.[0] || null;
+};
+
+const findCohortById = (items: any, cohortId: string): any | null => {
+  if (!cohortId) return null;
+  const stack: any[] = Array.isArray(items) ? [...items] : [];
+
+  while (stack.length) {
+    const node = stack.pop();
+    if (!node) continue;
+
+    if (node?.cohortId === cohortId) return node;
+
+    const children = Array.isArray(node?.childData) ? node.childData : [];
+    for (const child of children) stack.push(child);
+  }
+
+  return null;
+};
+
 const CentersPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -86,9 +147,12 @@ const CentersPage = () => {
   const [centerList, setCenterList] = useState<any[]>([]);
   const userStore = manageUserStore();
   const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [baseBatchSchema, setBaseBatchSchema] = useState<any>(null);
+  const [baseBatchUiSchema, setBaseBatchUiSchema] = useState<any>(null);
   const [addBatchSchema, setAddBatchSchema] = useState<any>(null);
   const [addBatchUiSchema, setAddBatchUiSchema] = useState<any>(null);
   const [emptyFormData, setEmptyFormData] = useState<any>({});
+  const [batchPrefillFormData, setBatchPrefillFormData] = useState<any>({});
   const [tempVariable, setTempVariable] = useState([]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -230,7 +294,9 @@ const CentersPage = () => {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const location = getLocationFromCustomFields(userData);
     // console.log('location', location);
-    setEmptyFormData({...location,  name: ''});
+    const base = { ...location, name: '' };
+    setEmptyFormData(base);
+    setBatchPrefillFormData(base);
   }, [tempVariable]);
 
   useEffect(() => {
@@ -417,6 +483,132 @@ const CentersPage = () => {
     }
   };
 
+  const cloneDeep = <T,>(obj: T): T => JSON.parse(JSON.stringify(obj));
+
+  const buildBatchCreateConfigForCenter = (params: {
+    baseSchema: any;
+    baseUiSchema: any;
+    parentId: string;
+    parentName?: string | null;
+    centerType: string | null;
+    boards: string[];
+    mediums: string[];
+    grades: string[];
+  }) => {
+    const schema = cloneDeep(params.baseSchema);
+    const uiSchema = cloneDeep(params.baseUiSchema);
+
+    const parentSchema = schema?.properties?.parentId;
+    const parentIsArray =
+      parentSchema?.type === 'array' || typeof parentSchema?.items === 'object';
+    const prefill: any = {
+      parentId: parentIsArray ? [params.parentId] : params.parentId,
+    };
+
+    // Ensure parentId validates against schema (enum/api often comes from remote lists).
+    if (schema?.properties?.parentId) {
+      const parentLabel = params.parentName || 'Center';
+      if (schema.properties.parentId?.api) delete schema.properties.parentId.api;
+      if (schema.properties.parentId?.items?.api)
+        delete schema.properties.parentId.items.api;
+
+      if (parentIsArray) {
+        schema.properties.parentId.items = {
+          ...(schema.properties.parentId.items || {}),
+          type: 'string',
+          enum: [params.parentId],
+          enumNames: [parentLabel],
+        };
+      } else {
+        schema.properties.parentId.enum = [params.parentId];
+        schema.properties.parentId.enumNames = [parentLabel];
+        schema.properties.parentId.default = params.parentId;
+      }
+    }
+
+    // Hide parentId since it's derived from selected center dropdown.
+    uiSchema.parentId = {
+      ...(uiSchema?.parentId || {}),
+      'ui:widget': 'hidden',
+    };
+
+    const ensureEnabled = (key: string) => {
+      if (uiSchema?.[key]?.['ui:disabled']) {
+        const next = { ...(uiSchema[key] || {}) };
+        delete next['ui:disabled'];
+        uiSchema[key] = next;
+      }
+    };
+
+    const overrideEnum = (key: 'board' | 'medium' | 'grade', allowed: any[]) => {
+      const allowedValues = Array.isArray(allowed) ? allowed.filter(Boolean) : [];
+      if (!allowedValues.length) {
+        ensureEnabled(key);
+        return;
+      }
+
+      if (!schema?.properties?.[key]) return;
+
+      // Remove dynamic api source and restrict to center-allowed values.
+      if (schema.properties[key]?.api) delete schema.properties[key].api;
+      if (schema.properties[key]?.items?.api) delete schema.properties[key].items.api;
+
+      if (schema.properties[key]?.type === 'array' || schema.properties[key]?.items) {
+        schema.properties[key].items = {
+          ...(schema.properties[key].items || {}),
+          type: 'string',
+          enum: allowedValues,
+          enumNames: allowedValues,
+        };
+      } else {
+        schema.properties[key].enum = allowedValues;
+        schema.properties[key].enumNames = allowedValues;
+      }
+
+      if (allowedValues.length === 1) {
+        prefill[key] =
+          schema.properties[key]?.type === 'array' || schema.properties[key]?.items
+            ? [allowedValues[0]]
+            : allowedValues[0];
+        uiSchema[key] = {
+          ...(uiSchema?.[key] || {}),
+          'ui:disabled': true,
+        };
+      } else {
+        ensureEnabled(key);
+      }
+    };
+
+    overrideEnum('board', params.boards);
+    overrideEnum('medium', params.mediums);
+    overrideEnum('grade', params.grades);
+
+    // Batch type behavior (if supported by schema), similar to admin app.
+    const ct = (params.centerType || '').toLowerCase();
+    if (schema?.properties?.batch_type) {
+      if (ct === 'remote') {
+        // For remote center: show "remote" and "hybrid" options
+        schema.properties.batch_type.enum = ['remote', 'hybrid'];
+        schema.properties.batch_type.enumNames = ['Remote', 'Hybrid'];
+        schema.properties.batch_type.default = 'remote';
+        prefill.batch_type = 'remote';
+        ensureEnabled('batch_type');
+      } else if (ct === 'regular') {
+        // For regular center: show only "regular" option (disabled)
+        schema.properties.batch_type.enum = ['regular'];
+        schema.properties.batch_type.enumNames = ['Regular'];
+        schema.properties.batch_type.default = 'regular';
+        prefill.batch_type = 'regular';
+        uiSchema.batch_type = {
+          ...(uiSchema?.batch_type || {}),
+          'ui:disabled': true,
+        };
+      }
+    }
+
+    return { schema, uiSchema, prefill };
+  };
+
   console.log('filtered batches before render:', filteredBatches);
 
   useEffect(() => {
@@ -436,7 +628,7 @@ const CentersPage = () => {
 
       if (responseForm?.schema && responseForm?.uiSchema) {
         // Remove unnecessary fields for batch creation
-        let alterSchema = responseForm?.schema;
+        let alterSchema = cloneDeep(responseForm?.schema);
         let requiredArray = alterSchema?.required ?? [];
         const mustRequired = [
           'name',
@@ -493,10 +685,14 @@ const CentersPage = () => {
 
           return updatedData;
         };
-        const fieldsToHide = ['state', 'district', 'block'];
+        const fieldsToHide = ['state', 'district', 'block', 'village'];
         const updatedData = hideFields(responseForm?.uiSchema, fieldsToHide);
-        setAddBatchSchema(alterSchema);
-        setAddBatchUiSchema(updatedData);
+        const normalizedUi = cloneDeep(updatedData);
+        const normalizedSchema = cloneDeep(alterSchema);
+        setBaseBatchSchema(normalizedSchema);
+        setBaseBatchUiSchema(normalizedUi);
+        setAddBatchSchema(normalizedSchema);
+        setAddBatchUiSchema(normalizedUi);
       }
     };
 
@@ -504,6 +700,51 @@ const CentersPage = () => {
   }, []);
 
   const handleOpenAddBatchModal = () => {
+    if (!selectedCenter) {
+      showToastMessage(t('COMMON.PLEASE_SELECT_THE_CENTER'), 'error');
+      return;
+    }
+
+    const effectiveBaseSchema = baseBatchSchema || addBatchSchema;
+    const effectiveBaseUiSchema = baseBatchUiSchema || addBatchUiSchema;
+    if (!effectiveBaseSchema || !effectiveBaseUiSchema) {
+      showToastMessage(t('COMMON.LOADING'), 'info');
+      return;
+    }
+
+    const selectedNode = findCohortById(centerList, selectedCenter);
+    const cf = (selectedNode?.customField ||
+      selectedNode?.customFields ||
+      []) as any[];
+
+    const boards = getCustomFieldValues(cf, 'BOARD');
+    const mediums = getCustomFieldValues(cf, 'MEDIUM');
+    const grades = getCustomFieldValues(cf, 'GRADE');
+    const selectedCenterType =
+      getCustomFieldSingleValue(cf, 'TYPE_OF_COHORT') ||
+      getCustomFieldSingleValue(cf, 'TYPE_OF_CENTER');
+
+    const { schema, uiSchema, prefill } = buildBatchCreateConfigForCenter({
+      baseSchema: effectiveBaseSchema,
+      baseUiSchema: effectiveBaseUiSchema,
+      parentId: selectedCenter,
+      parentName:
+        selectedNode?.cohortName ||
+        selectedNode?.name ||
+        selectedNode?.cohortName,
+      centerType: selectedCenterType,
+      boards,
+      mediums,
+      grades,
+    });
+
+    setAddBatchSchema(schema);
+    setAddBatchUiSchema(uiSchema);
+    setBatchPrefillFormData({
+      ...(emptyFormData || {}),
+      ...(prefill || {}),
+    });
+
     setOpenBatchModal(true);
     const telemetryInteract = {
       context: {
@@ -745,6 +986,7 @@ const CentersPage = () => {
         id="dynamic-form-id"
       >
         <AddEditUser
+          key={`${selectedCenter || 'no-center'}-batch-create`}
           SuccessCallback={() => {
             if (selectedCenter) {
               getBlocksByCenterId(selectedCenter, centerList).then((res) => {
@@ -756,7 +998,7 @@ const CentersPage = () => {
           }}
           schema={addBatchSchema}
           uiSchema={addBatchUiSchema}
-          editPrefilledFormData={emptyFormData}
+          editPrefilledFormData={batchPrefillFormData}
           isEdit={false}
           isReassign={false}
           editableUserId={emptyUserId}
@@ -768,12 +1010,21 @@ const CentersPage = () => {
           extraFieldsUpdate={{}}
           successCreateMessage="BATCH.BATCH_CREATED_SUCCESSFULLY"
           telemetryCreateKey="batch-created-successfully"
-          failureCreateMessage="BATCH.BATCH_CREATION_FAILED"
+          failureCreateMessage="BATCH.BATCH_CREATE_FAILED"
           successUpdateMessage="BATCH.BATCH_UPDATED_SUCCESSFULLY"
           telemetryUpdateKey="batch-updated-successfully"
           failureUpdateMessage="BATCH.BATCH_UPDATE_FAILED"
           isNotificationRequired={false}
+          notificationKey=""
+          notificationMessage=""
+          notificationContext={{}}
+          blockFieldId=""
+          districtFieldId=""
+          villageFieldId=""
+          centerFieldId=""
           hideSubmit={true}
+          setButtonShow={() => {}}
+          isSteeper={false}
           type="batch"
         />
       </SimpleModal>

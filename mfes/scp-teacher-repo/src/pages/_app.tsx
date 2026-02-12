@@ -28,7 +28,7 @@ import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { prefixer } from 'stylis';
 import rtlPlugin from 'stylis-plugin-rtl';
-import { fullWidthPages } from '../../app.config';
+import { fullWidthPages, TENANT_DATA } from '../../app.config';
 import nextI18NextConfig from '../../next-i18next.config.js';
 import { useDirection } from '../hooks/useDirection';
 import customTheme from '../styles/customTheme';
@@ -92,6 +92,41 @@ function App({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
   const isFullWidthPage = fullWidthPages.includes(router.pathname);
+
+  // Route Guard: Only allow access if userProgram is "Second Chance Program"
+  useEffect(() => {
+    const checkAccess = () => {
+      // Skip check for public pages
+      const publicPages = ['/login', '/forgot-password', '/reset-password', '/create-password', '/unauthorized'];
+      if (publicPages.includes(router.pathname)) {
+        return;
+      }
+
+      if (typeof window !== 'undefined') {
+        const userProgram = localStorage.getItem('userProgram');
+        const tenantName = localStorage.getItem('tenantName');
+        
+        const isAuthorized = 
+          userProgram?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          userProgram?.toLowerCase() === TENANT_DATA.PRATHAM_SCP?.toLowerCase() ||
+          tenantName?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          tenantName?.toLowerCase() === TENANT_DATA.PRATHAM_SCP?.toLowerCase();
+
+        if (!isAuthorized) {
+          console.warn('Access denied: Invalid program for scp-teacher-repo');
+          // Redirect to unauthorized or back to appropriate application
+          router.push('/unauthorized');
+        }
+      }
+    };
+
+    checkAccess();
+    router.events.on('routeChangeComplete', checkAccess);
+
+    return () => {
+      router.events.off('routeChangeComplete', checkAccess);
+    };
+  }, [router.pathname, router.events]);
 
   useEffect(() => {
     const htmlElement = document.documentElement;

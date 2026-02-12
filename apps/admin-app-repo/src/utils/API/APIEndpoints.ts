@@ -44,6 +44,7 @@ export const API_ENDPOINTS = {
   program: `${baseurl}/tenant/read`,
   hierarchialSearch: `${baseurl}/user/hierarchical-search`,
   userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
+  usersHierarchyView: `${baseurl}/user/users-hierarchy-view`,
 };
 
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;

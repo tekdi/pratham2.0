@@ -117,6 +117,31 @@ function generateSchemaAndUISchema(fields) {
       schemaField.uniqueItems = validation.isMultiSelect;
       schemaField.type = 'array';
     }
+    //custom validation json to array
+    if (name === 'catchment_area') {
+      schemaField.type = 'array';
+      schemaField.field_type = 'text';
+      schemaField.items = {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      };
+    }
+    if (name === 'working_location') {
+      schemaField.type = 'array';
+      schemaField.field_type = 'text';
+      schemaField.items = {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      };
+    }
+    // Set working_village to string type - it will be populated with comma-separated village IDs
+    // Allow null for empty state
+    if (name === 'working_village') {
+      schemaField.type = 'string';
+      schemaField.field_type = 'text';
+    }
     if (validation?.isRequired) {
       schemaField.isRequired = validation.isRequired;
       isRequired = validation.isRequired;
@@ -225,18 +250,47 @@ function generateSchemaAndUISchema(fields) {
           hideError: true,
         },
       };
+    } else if (type === 'file') {
+      uiSchema[name] = { 'ui:widget': 'dateTime' };
     } else if (type === 'dateTime') {
       schemaField.format = 'date-time';
       uiSchema[name] = { 'ui:widget': 'dateTime' };
+    } else if (type === 'json') {
+      if (name === 'catchment_area') {
+        uiSchema[name] = {
+          'ui:widget': 'CatchmentAreaWidget',
+          'ui:options': {
+            hideError: true, // ✅ hides automatic error rendering
+            skipValidation: true,
+          },
+        };
+      } else if (name === 'working_location') {
+        uiSchema[name] = {
+          'ui:widget': 'WorkingLocationWidget',
+          'ui:options': {
+            hideError: true, // ✅ hides automatic error rendering
+            skipValidation: true,
+          },
+        };
+      } else {
+        uiSchema[name] = { 'ui:widget': 'CustomTextFieldWidget' };
+      }
     } else {
-      uiSchema[name] = {
-        'ui:widget': 'CustomTextFieldWidget',
-        'ui:options': { validateOnBlur: true, hideError: true },
-      };
+      // Hide working_village field - it will be populated from working_location
+      if (name === 'working_village') {
+        uiSchema[name] = {
+          'ui:widget': 'hidden',
+        };
+      } else {
+        uiSchema[name] = {
+          'ui:widget': 'CustomTextFieldWidget',
+          'ui:options': { validateOnBlur: true, hideError: true },
+        };
+      }
     }
 
     //Our custom RJSF field attributes
-    if (api) {
+    if (api && type !== 'file') {
       schemaField.api = api;
       if (schemaField?.isMultiSelect === true) {
         schemaField.items = {
@@ -248,6 +302,53 @@ function generateSchemaAndUISchema(fields) {
         schemaField.enum = ['Select'];
         schemaField.enumNames = ['Select'];
       }
+    } else if (type === 'file' && schemaField?.isMultiSelect === true) {
+      schemaField.items = { type: 'string', format: 'uri' };
+      uiSchema[name] = {
+        'ui:widget': 'CustomFileUpload',
+        'ui:options': {
+          isRequired: schemaField?.isRequired,
+          isMultiSelect: schemaField?.isMultiSelect,
+          maxSelections: schemaField?.maxSelection,
+          allowedFormats:
+            name == 'consent_file'
+              ? [
+                  '.jpg',
+                  '.png',
+                  '.jpeg',
+                  '.pdf',
+                  '.doc',
+                  '.docx',
+                  '.xls',
+                  '.xlsx',
+                  '.ppt',
+                  '.pptx',
+                ]
+              : ['.jpg', '.png', '.jpeg'],
+        },
+      };
+    } else if (type === 'file' && schemaField?.isMultiSelect === false) {
+      schemaField.items = { type: 'string', format: 'uri' };
+      uiSchema[name] = {
+        'ui:widget': 'CustomFileUpload',
+        'ui:options': {
+          isRequired: schemaField?.isRequired,
+          isMultiSelect: schemaField?.isMultiSelect,
+          maxSelections: schemaField?.maxSelection,
+          allowedFormats: [
+            '.jpg',
+            '.png',
+            '.jpeg',
+            '.pdf',
+            '.doc',
+            '.docx',
+            '.xls',
+            '.xlsx',
+            '.ppt',
+            '.pptx',
+          ],
+        },
+      };
     }
 
     if (extra) {

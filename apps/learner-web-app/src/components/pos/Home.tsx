@@ -19,6 +19,7 @@ import { ContentSearch, getfilterList } from '@learner/utils/API/contentService'
 import { staticFilterContent } from '@shared-lib-v2/utils/AuthService';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import type { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -222,6 +223,20 @@ const rangeLength = contentLanguageField?.range?.length || 0;
   const mediaMD = useMediaQuery('(max-width: 900px)');
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
+
+  // Update navigation when refs are ready
+  useEffect(() => {
+    if (swiperInstance && prevRef.current && nextRef.current) {
+      const navigation = swiperInstance.params.navigation;
+      if (navigation && typeof navigation !== 'boolean') {
+        navigation.prevEl = prevRef.current;
+        navigation.nextEl = nextRef.current;
+        swiperInstance.navigation.init();
+        swiperInstance.navigation.update();
+      }
+    }
+  }, [swiperInstance]);
 
   return (
     <Layout onlyHideElements={['footer']} _topAppBar={{ _config: {} }}>
@@ -263,23 +278,13 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               pagination={{
                 clickable: true,
               }}
-              navigation={{
-                prevEl: prevRef.current,
-                nextEl: nextRef.current,
-              }}
-              onBeforeInit={(swiper) => {
-                if (typeof swiper.params.navigation !== 'boolean') {
-                  if (swiper.params.navigation) {
-                    swiper.params.navigation.prevEl = prevRef.current;
-                    swiper.params.navigation.nextEl = nextRef.current;
-                  }
-                }
-              }}
+              navigation={true}
+              onSwiper={setSwiperInstance}
               style={{ width: '100%', height: '100%' }}
             >
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-02.jpg"
+                  src="/images/PLP Photos-02.png"
                   alt="PLP Photos 02"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -287,7 +292,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-03.jpg"
+                  src="/images/PLP Photos-03.png"
                   alt="PLP Photos 03"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -295,7 +300,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-04.jpg"
+                  src="/images/PLP Photos-04.png"
                   alt="PLP Photos 04"
                   fill
                   style={{ objectFit: 'cover' }}
@@ -303,8 +308,16 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               </SwiperSlide>
               <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
                 <Image
-                  src="/images/PLP Photos-05.jpg"
+                  src="/images/PLP Photos-05.png"
                   alt="PLP Photos 05"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                />
+              </SwiperSlide>
+              <SwiperSlide style={{ position: 'relative', width: '100%', height: '500px' }}>
+                <Image
+                  src="/images/PLP Photos-06.png"
+                  alt="PLP Photos 06"
                   fill
                   style={{ objectFit: 'cover' }}
                 />

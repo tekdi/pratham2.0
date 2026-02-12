@@ -153,11 +153,23 @@
     "NO_CONTENT_CREATOR_FOUND": "உள்ளடக்க உருவாக்குநர் (SCTA) கண்டறியப்படவில்லை",
     "NO_CONTENT_REVIEWER_FOUND": "உள்ளடக்க மதிப்பாய்வு (CCTA) கண்டறியப்படவில்லை",
     "LOADING": "பதிவேற்றம் செய்யப்படுகிறது",
+    "USER_DELETE_SUCCSSFULLY": "பயனர் வெற்றிகரமாக நீக்கப்பட்டார்",
     "SURE_REASSIGN_CENTER": "இந்தப் பயனருக்கு நிச்சயமாக மையத்தை மீண்டும் ஒதுக்க விரும்புகிறீர்களா?",
     "SORT": "வரிசைப்படுத்து",
     "ARE_YOU_SURE_DELETE_STATE": "இந்த மாநிலத்தில் {{ மாவட்டம் }} செயலில் உள்ள மாவட்டங்கள் உள்ளன அதை உங்களால் நீக்க முடியாது.",
-    "USER_DELETE_SUCCSSFULLY": "பயனர் வெற்றிகரமாக நீக்கப்பட்டார்",
-    "ADD": "சேர்"
+    "ADD": "சேர்",
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "உங்கள் கோரிக்கையைச் சமர்ப்பிக்கவும், ஏதேனும் சிக்கல்கள் அல்லது கவலைகளுக்கு நாங்கள் உங்களுக்கு உதவுவோம்.",
+    "WE_ARE_HERE_TO_HELP": "நாங்கள் உதவ இங்கே இருக்கிறோம்",
+    "NO_STATE_LEAD_FOUND": "மாநில லீட் எதுவும் கிடைக்கவில்லை.",
+    "FAQS": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+    "RESET_FILTERS": "வடிப்பான்களை மீட்டமை",
+    "ACTIVATE_USER": "பயனரைச் செயல்படுத்து",
+    "ACTIVATE": "செயல்படுத்து",
+    "RESIGNED_FROM_COMPANY": "நிறுவனத்திலிருந்து ராஜினாமா செய்தார்",
+    "MOVED_TO_DIFFERENT_ROLE": "வேறு பதவிக்கு மாற்றப்பட்டார்",
+    "NO_MOBILIZER_FOUND": "வழிகாட்டி இல்லை",
+    "MAP": "வரைபடம்",
+    "NEXT": "அடுத்து"
   },
   "LOGIN_PAGE": {
     "USERNAME": "பயனர் பெயர்",
@@ -219,7 +231,22 @@
     "CERTIFICATE_ISSUANCE": "சான்றிதழ் வழங்குதல்",
     "SUPPORT_REQUEST": "ஆதரவு கோரிக்கை",
     "CONTENT_CREATOR": "உள்ளடக்க உருவாக்குநர்",
-    "CONTENT_REVIEWER": "உள்ளடக்க மதிப்பாய்வாளர்"
+    "CONTENT_REVIEWER": "உள்ளடக்க மதிப்பாய்வாளர்",
+    "TAXONOMY_EDITOR": "வகைபிரித்தல் ஆசிரியர்",
+    "MANAGE_NOTIFICATION": "அறிவிப்பு டெம்ப்ளேட்களை நிர்வகிக்கவும்",
+    "YOUTH": "இளைஞர்கள்",
+    "FAQS": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+    "STATE_LEAD": "மாநிலத் தலைவர்",
+    "MASTER": "குரு",
+    "STATES": "மாநிலங்கள்",
+    "DISTRICTS": "மாவட்டங்கள்",
+    "BLOCKS": "தொகுதிகள்",
+    "VILLAGES": "கிராமங்கள்",
+    "PROGRAMS": "நிகழ்ச்சிகள்",
+    "SKILLING_CENTERS": "திறன் மையங்கள்",
+    "CURRICULUM_PLANNER": "பாடத்திட்ட திட்டமிடுபவர்",
+    "BATCH": "தொகுதி",
+    "MOBILIZER": "வழிகாட்டி"
   },
   "FACILITATORS": {
     "STATE": "மாநிலம்",
@@ -236,7 +263,11 @@
     "FINISH_ASSIGN": "முடித்து ஒதுக்கவும்",
     "BATCHES_SELECTED": "தொகுப்புகள் தேர்ந்தெடுக்கப்பட்டுள்ளன",
     "CENTERS": "மையங்கள்",
-    "RE_ASSIGN_facilitator": "உதவியாளரை மீண்டும் ஒதுக்கவும்"
+    "RE_ASSIGN_facilitator": "உதவியாளரை மீண்டும் ஒதுக்கவும்",
+    "ASSIGN_BATCHES_FINISH": "இதை நீங்கள் பின்னர் உங்கள் சொந்த வேகத்தில் முடிக்கலாம். இருப்பினும், நீங்கள் ‘முடித்து ஒதுக்கு’ என்பதைக் கிளிக் செய்தவுடன் மட்டுமே தொகுதிகள் ஒதுக்கப்படும்.",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "மையத்திலிருந்து தொகுதிகளை ஒதுக்கவும்",
+    "BACK_TO_FORM": "படிவத்திற்குத் திரும்பு",
+    "SEARCH_BATCHES": "தேடல் தொகுதிகள்.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "பாடநெறி, தலைப்பு, மாணவர், pdf போன்றவற்றைத் தேடுங்கள்."
@@ -250,7 +281,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "மாணவர் வெற்றிகரமாக புதுப்பிக்கப்பட்டார்!",
     "EDIT_LEARNER": "மாணவரைத் திருத்தவும்",
     "NO_LEARNERS_FOUND": "மாணவர்கள் கண்டறியப்படவில்லை",
-    "RE_ASSIGN_LEARNER": "மாணவரை மீண்டும் ஒதுக்கவும்"
+    "RE_ASSIGN_LEARNER": "மாணவரை மீண்டும் ஒதுக்கவும்",
+    "ACTIVATE_USER_SUCCESS": "பயனர் வெற்றிகரமாக செயல்படுத்தப்பட்டார்."
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "வழிகாட்டி தலைவர்களை தேடுங்கள்..",
@@ -265,7 +297,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "வழிகாட்டி தலைவரை உருவாக்க முடியவில்லை",
     "UPDATE_MENTOR_LEAD": "வழிகாட்டி தலைவரை புதுப்பிக்கவும்",
     "NEW_MENTOR_LEAD": "புதிய வழிகாட்டி தலைவர்",
-    "ER": "புதிய வழிகாட்டி தலைவர்கள்"
+    "ER": "புதிய வழிகாட்டி தலைவர்கள்",
+    "RE_ASSIGN_MENTOR_LEAD": "மையத் தலைவரை மீண்டும் ஒதுக்கவும்"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "டீம்லீடர்களை தேடல்..",
@@ -303,25 +336,33 @@
     "GRADE": "வகுப்பு",
     "MEDIUM": "மீடியம்",
     "FILTER": "வடிக்கட்டு",
-    "BOARDS_FULLY_UPLOADED": "வாரியம் முழுமையாக பதிவேற்றப்பட்டது ",
+    "BOARDS_FULLY_UPLOADED": "வாரியம் முழுமையாக பதிவேற்றப்பட்டது",
     "ACTIVITY": "செயல்பாடு",
     "COPY_LINK": "இணைப்பை நகலெடுக்கவும்",
     "SEARCH": "தேடு",
     "DATA_NOT_FOUND": "தரவு கிடைக்கவில்லை",
     "SUBJECTS_UPLOADED": "பாடங்கள் பதிவேற்றப்பட்டன",
-    "IMPORT_PLANNER": "planner -ஐ தரவிறக்கவும் ",
-    "REMOVE_FILE": "நீக்கு ",
+    "IMPORT_PLANNER": "planner -ஐ தரவிறக்கவும்",
+    "REMOVE_FILE": "நீக்கு",
     "IMPORT_PLANNER_TO_UPLOADING": "பதிவேற்றத்தைத் தொடங்க, ‘planner -ஐ தரவிறக்கவும் ’ என்பதைக் கிளிக் செய்யவும்",
     "TOPIC_DETAILS": "தலைப்பு விவரங்கள்",
-    "BROWSE_FILE": "பிரவுஸ் பைல் ",
+    "BROWSE_FILE": "பிரவுஸ் பைல்",
     "UPLOAD": "பதிவேற்றவும்",
     "COURSE_CREATED_SUCCESSFULLY": "பாடநெறி வெற்றிகரமாக உருவாக்கப்பட்டது",
     "COURSE_NOT_CREATED": "பாடநெறி உருவாக்கப்படவில்லை",
     "SUB-TOPIC": "துணை தலைப்பு",
     "SUBTOPICS": "துணை தலைப்புகள்",
-    "RESOURCES": "கற்றல் உபகரணங்கள் ",
+    "RESOURCES": "கற்றல் உபகரணங்கள்",
     "TOPIC": "தலைப்பு",
-    "DURATION/MONTH": "காலம்/மாதம்"
+    "DURATION/MONTH": "காலம்/மாதம்",
+    "UPLOAD_FAILED": "பதிவேற்றம் தோல்வியடைந்தது",
+    "IMPORT_NEW_PLANNER": "புதிய திட்டமிடுபவரை இறக்குமதி செய்",
+    "ADD_NEW_TOPIC": "புதிய தலைப்பைச் சேர்",
+    "DELETE_PLANNER": "திட்டமிடுபவரை நீக்கு",
+    "CSV_TEMPLATE": "CSV வார்ப்புரு",
+    "NEW_TOPIC": "புதிய தலைப்பு",
+    "DOWNLOAD_CSV": "பதிவேற்றப்பட்ட CSV-ஐப் பதிவிறக்கு",
+    "DURING_COURSE": "அறிய"
   },
   "MASTER": {
     "STATE": "மாநிலம்",
@@ -371,7 +412,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "மையம் வெற்றிகரமாக உருவாக்கப்பட்டது",
     "SEARCHBAR_PLACEHOLDER": "மையத்தை தேடு ..",
     "CENTER_UPDATE_FAILED": "மையத்தைப் புதுப்பிக்கும்போது ஏதோ தவறு ஏற்பட்டது",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "மையத்தில் {{activeMembers}} ஆக்டிவ் மாணவர்கள் இருப்பதால் உங்களால் அதை நீக்க முடியாது"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "மையத்தில் {{activeMembers}} ஆக்டிவ் மாணவர்கள் இருப்பதால் உங்களால் அதை நீக்க முடியாது",
+    "BATCHES_FOR_CENTER": "{{centerName}} க்கான தொகுப்புகள்"
   },
   "BATCH": {
     "NEW_BATCH": "புதிய தொகுப்பு",
@@ -380,7 +422,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "தொகுப்பு வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
     "BATCH_DELETE_SUCCESSFULLY": "தொகுப்பு வெற்றிகரமாக நீக்கப்பட்டது",
     "BATCH_CREATED_SUCCESSFULLY": "தொகுப்பு வெற்றிகரமாக உருவாக்கப்பட்டது",
-    "BATCH_UPDATE_FAILED": "தொகுப்பை புதுப்பிக்கும்போது ஏதோ பிழை ஏற்பட்டது"
+    "BATCH_UPDATE_FAILED": "தொகுப்பை புதுப்பிக்கும்போது ஏதோ பிழை ஏற்பட்டது",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "{{activeMembers}} செயலில் உள்ள கற்றவர்கள் இருப்பதால், நீங்கள் தொகுப்பை நீக்க முடியாது.",
+    "NO_BATCH_FOUND": "எந்தத் தொகுதியும் கிடைக்கவில்லை.",
+    "TYPE_OF_BATCH": "தொகுதி வகை",
+    "BATCH_CREATE_FAILED": "தொகுப்பை உருவாக்கும் போது ஏதோ தவறு ஏற்பட்டது."
   },
   "FORM": {
     "FULL_NAME": "முழுப் பெயர்",
@@ -491,7 +537,22 @@
     "PROGRAM_DESCRIPTION": "திட்டத்தின் விளக்கம்",
     "PROGRAM_TYPE": "திட்டத்தின் வகை",
     "PROGRAM_HEAD_NAME": "திட்டத்தின் தலைவரின் பெயர்",
-    "PROGRAM_IMAGE": "திட்டத்தின் படம்"
+    "PROGRAM_IMAGE": "திட்டத்தின் படம்",
+    "CONTACT": "தொடர்பு",
+    "BATCH": "தொகுதி",
+    "PREFERRED_LANGUAGE": "விருப்பமான மொழி",
+    "FIRST_NAME": "பெயர்",
+    "MIDDLE_NAME_OR_FATHER_NAME": "நடுப் பெயர் அல்லது தந்தை பெயர்",
+    "LAST_NAME": "கடைசி பெயர்",
+    "MOTHER_NAME": "தாயார் பெயர்",
+    "DATE_OF_BIRTH": "பிறந்த தேதி",
+    "TEST_BELONG_TO": "சோதனை கீழ் மையத்தைச் சேர்ந்தது.",
+    "BELONG_TO": "கீழ் மையத்தைச் சேர்ந்தது",
+    "WAS_BELONG_TO": "கீழே உள்ள இடத்தில் காப்பகப்படுத்தப்பட்டது.",
+    "CONFIRM_TO_ACTIVATE": "இந்த பயனரை மீண்டும் செயல்படுத்த விரும்புகிறீர்களா?",
+    "WORKING_LOCATION": "வேலை செய்யும் இடம்",
+    "CATCHMENT_AREA": "நீர்ப்பிடிப்பு பகுதி",
+    "TYPE_OF_BATCH": "தொகுதி வகை"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "தவறான உள்ளீடு",
@@ -510,7 +571,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "பெயரில் இலக்கங்கள் இருக்கக்கூடாது",
     "INVALID_EMAIL_FORMAT": "தவறான மின்னஞ்சல் வடிவம்",
     "ENTER_VALID_EMAIL": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
-    "ENTER_VALID_MOBILE_NUMBER": "சரியான மொபைல் எண்ணை உள்ளிடவும்"
+    "ENTER_VALID_MOBILE_NUMBER": "சரியான மொபைல் எண்ணை உள்ளிடவும்",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "இடைவெளிகள் மற்றும் சிறப்பு எழுத்துக்கள் அனுமதிக்கப்படாது.",
+    "DATE_MUST_BE_ON_OR_BEFORE": "தேதி {{date}} அன்று அல்லது அதற்கு முன் இருக்க வேண்டும்.",
+    "DATE_MUST_BE_ON_OR_AFTER": "தேதி {{date}} அன்று அல்லது அதற்குப் பிறகு இருக்க வேண்டும்."
   },
   "TABLE_TITLE": {
     "NAME": "பெயர்",
@@ -543,7 +607,9 @@
     "COURSE_STATUS": "பாடநெறி நிலை",
     "ISSUED_DATE": "வழங்கப்பட்ட தேதி",
     "USER_ID": "பயனர் ஐடி",
-    "COURSE_ID": "பாடநெறி ஐடி"
+    "COURSE_ID": "பாடநெறி ஐடி",
+    "LOCATION": "இடம் (மாநிலம் / மாவட்டம் / தொகுதி / கிராமம்)",
+    "WORKING_VILLAGE": "வேலை செய்யும் கிராமம்"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "எடிட்டர் பணியிடம்",
@@ -584,7 +650,8 @@
     "EDIT_PROGRAM": "திட்டத்தை திருத்தவும்",
     "DELETE_PROGRAM": "திட்டத்தை நீக்கு",
     "SEARCH_PROGRAM": "திட்டத்தை தேடு...",
-    "NO_PROGRAMS_FOUND": "திட்டம் எதுவும் இல்லை"
+    "NO_PROGRAMS_FOUND": "திட்டம் எதுவும் இல்லை",
+    "EDIT": "திருத்து"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "சூழல் வகை",
@@ -639,9 +706,13 @@
     "ASSIGN_VILLAGES_FINISH": "இதை நீங்கள் பின்னர் உங்கள் சொந்த வேகத்தில் முடிக்கலாம். இருப்பினும், நீங்கள் 'முடி' என்பதைக் கிளிக் செய்தவுடன் மட்டுமே கிராமங்கள் ஒதுக்கப்படும்.",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "தொகுதிகளிலிருந்து கிராமங்களை ஒதுக்குதல்",
     "BACK_TO_FORM": "படிவத்திற்குத் திரும்புதல்",
-    "SEARCH_VILLAGES": "கிராமங்களைத் தேடுங்கள்.."
+    "SEARCH_VILLAGES": "கிராமங்களைத் தேடுங்கள்..",
+    "BACK": "மீண்டும்",
+    "SAVE_SELECTION": "தேர்வைச் சேமி",
+    "SELECTED_VILLAGE_COUNT": "தேர்ந்தெடுக்கப்பட்ட கிராம எண்ணிக்கை: {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "பாலினம்",
+  "WORKING_STATE": "வேலை செய்யும் மாநிலம்",
   "first_name": "முதல் பெயர்",
   "last_name": "கடைசி பெயர்",
   "phone_number": "தொலைபேசி எண்",
@@ -736,12 +807,73 @@
     "EDIT_MENTOR": "வழிகாட்டியை திருத்தவும்",
     "NOT_ABLE_UPDATE_MENTOR": "வழிகாட்டியை புதுப்பிக்க முடியவில்லை",
     "NOT_ABLE_CREATE_MENTOR": "வழிகாட்டியை உருவாக்க முடியவில்லை",
-    "UPDATE_MENTOR": "வழிகாட்டியை புதுப்பிக்கவும்"
+    "UPDATE_MENTOR": "வழிகாட்டியை புதுப்பிக்கவும்",
+    "RE_ASSIGN_MENTOR": "வழிகாட்டியை மீண்டும் நியமிக்கவும்"
   },
   "GOOGLE MAP_LINK": "கூகிள் வரைபட இணைப்பு",
   "District": "மாவட்டம்",
   "State": "மாநிலம்",
   "Village": "கிராமம்",
   "GOOGLE_MAP_LINK": "கூகிள் வரைபட இணைப்பு",
-  "DISTRICTS": "மாவட்டம்"
+  "DISTRICTS": "மாவட்டம்",
+  "TYPE_OF_BATCH": "தொகுதி வகை",
+  "CATCHMENT_AREA": "நீர்ப்பிடிப்பு பகுதி",
+  "DISTRICT": "மாவட்டம்",
+  "CENTER:": "மையம்:",
+  "SKILLING_CENTER_IMAGE": "ஸ்க்லிங் மையப் படம்",
+  "INDUSTRY": "தொழில்",
+  "ADDRESS": "முகவரி",
+  "DOB": "பிறந்த தேதி",
+  "SUBJECT": "பொருள்",
+  "UNMARRIED": "திருமணமாகாதவர்",
+  "MARRIED": "திருமணமானவர்",
+  "DIVORCED": "விவாகரத்து பெற்றவர்",
+  "SELF_PLACED": "சுயமாக வைக்கப்பட்டது",
+  "DESIGNATION": "பதவி",
+  "YOUTH": {
+    "UPDATE_YOUTH": "இளைஞர்களைப் புதுப்பித்தல்",
+    "NEW_YOUTH": "புதிய இளைஞர்கள்",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "பயனர் சான்றுகள் விரைவில் அனுப்பப்படும்.",
+    "NOT_ABLE_CREATE_YOUTH": "இளைஞர்களை உருவாக்க முடியவில்லை.",
+    "YOUTH_CREATED_SUCCESSFULLY": "இளைஞர்கள் வெற்றிகரமாக உருவாக்கப்பட்டுள்ளனர்!",
+    "NOT_ABLE_UPDATE_YOUTH": "இளைஞர்களைப் புதுப்பிக்க முடியவில்லை.",
+    "YOUTH_UPDATED_SUCCESSFULLY": "இளைஞர்கள் வெற்றிகரமாக புதுப்பிக்கப்பட்டுள்ளனர்!",
+    "SELF_PLACED": "சுயமாக வைக்கப்பட்டது",
+    "REGULAR": "வழக்கமான",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "கல்வி நிறுவனத்தில் சேர்ந்தார்.",
+    "OWN_FARMING": "சொந்த விவசாயம்",
+    "AGRICULTURAL_FARM_LABORER": "விவசாய பண்ணைத் தொழிலாளி",
+    "NON_AGRICULTURAL_LABORER": "விவசாயம் அல்லாத தொழிலாளி",
+    "SALARIED_WORK": "சம்பள வேலை",
+    "SELF_EMPLOYMENT": "சுயதொழில்",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "வேலையில்லாதவர் அல்லது வீட்டு வேலை",
+    "MARK_AS_VOLUNTEER": "தன்னார்வலராகக் குறிக்கவும்",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "நீங்கள் ஒரு தன்னார்வலராகக் குறிக்க விரும்புகிறீர்களா?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "தன்னார்வலராக வெற்றிகரமாக குறிக்கப்பட்டது",
+    "MARK_AS_VOLUNTEER_FAILED": "தன்னார்வலராகக் குறிக்க முடியவில்லை.",
+    "PLEASE_GO_BACK_MSG": "தேர்வுக்குப் பிறகு மேலும் தொடர திரும்பிச் செல்லவும்.",
+    "UNMARK_AS_VOLUNTEER": "தன்னார்வலராகக் குறிநீக்கு",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "தன்னார்வலராக இருந்து விலக விரும்புகிறீர்களா?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "தன்னார்வலராக இருந்து வெற்றிகரமாக குறி நீக்கப்பட்டது",
+    "UNMARK_AS_VOLUNTEER_FAILED": "தன்னார்வலராகக் குறியிடுவதை நீக்க முடியவில்லை."
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "பயனர் வெற்றிகரமாக செயல்படுத்தப்பட்டார்.",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "வழிகாட்டியைப் புதுப்பிக்க முடியவில்லை.",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாக உருவாக்கப்பட்டது!",
+    "NOT_ABLE_CREATE_MOBILIZER": "வழிகாட்டியை உருவாக்க முடியவில்லை.",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "வழிகாட்டி உருவாக்கப்பட்டுவிட்டார், விரைவில் சான்றுகள் அனுப்பப்படும்.",
+    "MAP_USER_AS_LEAD": "வரைபடப் பயனர் லீடாக",
+    "MAP_USER_AS_MOBILIZER": "வழிகாட்டியாக வரைபடப் பயனர்",
+    "PLEASE_SEARCH_AND_SELECT_USER": "தயவுசெய்து தேடி ஒரு பயனரைத் தேர்ந்தெடுக்கவும்.",
+    "UNKNOWN_STATE": "தெரியாத மாநிலம்",
+    "UNKNOWN_DISTRICT": "தெரியாத மாவட்டம்",
+    "UNKNOWN_BLOCK": "தெரியாத தொகுதி",
+    "WORKING_LOCATION_REQUIRED": "வேலை செய்யும் இடம் தேவை. அனைத்து தொகுதிகளுக்கும் கிராமங்களைத் தேர்ந்தெடுக்கவும்.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "வேலை செய்யும் இடம் தேவை. அனைத்து தொகுதிகளுக்கும் கிராமங்களைத் தேர்ந்தெடுக்கவும். {{blocks}} மற்றும் {{count}} கூடுதல் தொகுதி(கள்) ஆகியவற்றில் கிராமங்கள் விடுபட்டுள்ளன.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "வேலை செய்யும் இடம் தேவை. அனைத்து தொகுதிகளுக்கும் கிராமங்களைத் தேர்ந்தெடுக்கவும். {{தொகுதிகள்}} இல் உள்ள கிராமங்கள் விடுபட்டுள்ளன.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "வேலை செய்யும் இடம் தேவை. அனைத்து தொகுதிகளிலும் குறைந்தது ஒரு கிராமத்தையாவது தேர்ந்தெடுக்கவும்.",
+    "MOBILIZER_NAME": "வழிகாட்டி பெயர்"
+  }
 }

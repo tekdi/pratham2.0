@@ -57,6 +57,7 @@ const App = ({
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
   const [mimeType, setMemetype] = useState('');
+  const [isVideo, setIsVideo] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showJotFormModal, setShowJotFormModal] = useState(false);
@@ -66,6 +67,31 @@ const App = ({
     mimeType: string;
   } | null>(null);
 
+  const [isPortrait, setIsPortrait] = useState(false);
+
+  useEffect(() => {
+    setIsVideo(mimeType=='video/mp4' || mimeType=='video/webm');
+  }, [mimeType]);
+
+  // Check if device is in portrait mode (width < height)
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsPortrait(window.innerWidth < window.innerHeight);
+    };
+
+    // Check on mount
+    checkOrientation();
+
+    // Listen for resize and orientation changes
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+
+    return () => {
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', checkOrientation);
+    };
+  }, []);
+
   let activeLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
@@ -74,6 +100,8 @@ const App = ({
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
+      setItem({ content: response });
+
       const rt = (await hierarchyAPI(courseId as string)) as any;
       console.log('rt=======>', rt);
       const currentPath =
@@ -117,7 +145,8 @@ const App = ({
       console.log('response2=======>', mimeType);
 
       setMemetype(mimeType);
-      setItem({ content: response });
+      console.log('setItem=======>', response);
+
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
         const breadcrum = findCourseUnitPath({
@@ -400,9 +429,13 @@ const App = ({
           unitId={unitId}
           mimeType={mimeType}
           {..._config?.player}
+          isPortrait={isPortrait}
+          isVideo={isVideo}
         />
         {item?.content?.artifactUrl &&
+          
           isDownloadableMimeType(item?.content?.mimeType || mimeType) &&
+          (!isPortrait || (isVideo && !isPortrait)) &&
           isDownloadContentEnabled() && (
             <Box
               sx={{
@@ -454,7 +487,8 @@ const App = ({
 
       <Grid
         sx={{
-          display: isShowMoreContent ? 'flex' : 'none',
+          display: isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)) ? 'flex' : 'none',
+
           flexDirection: 'column',
           flex: { xs: 1, sm: 1, md: 9 },
         }}
@@ -612,6 +646,8 @@ const PlayerBox = ({
   trackable,
   isShowMoreContent,
   mimeType,
+  isPortrait,
+  isVideo
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -693,6 +729,7 @@ const PlayerBox = ({
             width: isShowMoreContent
               ? '100%'
               : { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
+            ...(isPortrait && isVideo ? { p:0, ml:-10, mr:-5 } : {}),
           }}
         >
           <iframe
@@ -715,8 +752,8 @@ const PlayerBox = ({
               aspectRatio: getAspectRatio(),
             }}
             allowFullScreen
-            width="100%"
-            height="100%"
+            width={isPortrait && isVideo ? "110%" : "100%"}
+            height={isPortrait && isVideo ? '300%' : '100%'}
             title="Embedded Localhost"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
             frameBorder="0"

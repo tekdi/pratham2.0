@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Select, MenuItem, IconButton, Menu } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -12,32 +12,47 @@ import { useRouter } from 'next/navigation';
 import { languages } from '@shared-lib-v2/lib/context/Languages';
 
 const Header = ({ isShowLogout = false }) => {
-  const { t, setLanguage } = useTranslation();
-  const [lang, setLang] = useState(
-    typeof window !== 'undefined' ? localStorage.getItem('lang') || 'en' : 'en'
-  ); // state for selected language
+  const { t, setLanguage, language } = useTranslation();
+  // Initialize with language from context if available, otherwise fallback to localStorage or 'en'
+  const [lang, setLang] = useState(() => {
+    if (language) {
+      return language;
+    }
+    return typeof window !== 'undefined'
+      ? localStorage.getItem('lang') || 'en'
+      : 'en';
+  }); // state for selected language
   const [logoutAnchorEl, setLogoutAnchorEl] = useState(null);
   const router = useRouter();
+
+  // Sync local state with language from context
+  useEffect(() => {
+    if (language) {
+      setLang(language);
+    }
+  }, [language]);
 
   const handleLanguageChange = (event) => {
     const newLang = event.target.value;
     setLang(newLang);
     setLanguage(newLang);
-   if(localStorage.getItem('isAndroidApp') == 'yes')
-      {
-       // Send message to React Native WebView
-       if (window.ReactNativeWebView) {
-         window.ReactNativeWebView.postMessage(JSON.stringify({
-           type: 'LANGUAGE_CHANGE_EVENT', // Event type identifier
-           data: {
-             language: newLang,
-           
-             // Add any data you want to send
-           }
-         }));
-       }
-       
+    // Save language to localStorage so it persists and can be used by other components
+    localStorage.setItem('lang', newLang);
+    if (localStorage.getItem('isAndroidApp') == 'yes') {
+      // Send message to React Native WebView
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: 'LANGUAGE_CHANGE_EVENT', // Event type identifier
+            data: {
+              language: newLang,
+
+              // Add any data you want to send
+            },
+          })
+        );
       }
+    }
   };
 
   const handleLogoutMenuOpen = (event) => {
@@ -114,12 +129,12 @@ const Header = ({ isShowLogout = false }) => {
           >
             <MenuItem value="en">English</MenuItem>
             <MenuItem value="hi">हिंदी</MenuItem>
-      <MenuItem value="mr">मराठी</MenuItem>
-      <MenuItem value="odi">ଓଡ଼ିଆ</MenuItem>
-      <MenuItem value="tel">తెలుగు</MenuItem>
-      <MenuItem value="kan">ಕನ್ನಡ</MenuItem>
-      <MenuItem value="tam">தமிழ்</MenuItem>
-      <MenuItem value="guj">ગુજરાતી</MenuItem>
+            <MenuItem value="mr">मराठी</MenuItem>
+            <MenuItem value="odi">ଓଡ଼ିଆ</MenuItem>
+            <MenuItem value="tel">తెలుగు</MenuItem>
+            <MenuItem value="kan">ಕನ್ನಡ</MenuItem>
+            <MenuItem value="tam">தமிழ்</MenuItem>
+            <MenuItem value="guj">ગુજરાતી</MenuItem>
             {/* Add more languages as needed */}
           </Select>
         </Box>

@@ -241,3 +241,15 @@ export const getOverallStatus = (cohortData?: any[]): string => {
   return first?.cohortMember?.status ?? '';
 }
 
+export const extractWorkingVillageIds = (users: any[]): number[] => {
+  const villageIds = users.flatMap((user) =>
+    user.customFields
+      ?.filter((field: any) => field.label === 'WORKING_VILLAGE')
+      .flatMap(
+        (field: any) => field.selectedValues?.map((val: any) => val.id) || []
+      )
+  );
+
+  return Array.from(new Set(villageIds)); // Remove duplicates
+};
+

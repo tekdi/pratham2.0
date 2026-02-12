@@ -359,17 +359,24 @@ const AssessmentDetails: React.FC = () => {
       // Use getMyCohortMemberList to fetch learners
       const filters = { cohortId: cohortId as string };
       const cohortResponse = await getMyCohortMemberList({ filters });
+      console.log(cohortResponse, "cohortResponse")
 
       if (cohortResponse?.result?.userDetails) {
+        // Filter to only include active users
+        const activeUsers = cohortResponse.result.userDetails.filter(
+          (user: any) => user.status === 'active'
+        );
+        console.log('Active users count:', activeUsers.length);
+
         const ImageUploadedFlag = await getOfflineAssessmentStatus({
-          userIds: cohortResponse.result.userDetails.map(
+          userIds: activeUsers.map(
             (user: any) => user.userId
           ),
           questionSetId: assessmentId as string,
         });
         console.log('ImageUploadedFlag', ImageUploadedFlag);
         const userData = await getAssessmentStatus({
-          userId: cohortResponse.result.userDetails.map(
+          userId: activeUsers.map(
             (user: any) => user.userId
           ),
           courseId: [assessmentId as string],
@@ -399,8 +406,8 @@ const AssessmentDetails: React.FC = () => {
           })
           : userData;
 
-        // Directly use cohortResponse data without complex mapping
-        const learners = cohortResponse?.result?.userDetails?.map(
+        // Directly use active users data without complex mapping
+        const learners = activeUsers?.map(
           (user: any) => {
             const matchingUserData = updatedUserData?.find(
               (data: any) => data.userId === user.userId
@@ -994,16 +1001,23 @@ const AssessmentDetails: React.FC = () => {
                         flex: 1,
                       }}
                       primary={
-                        <Typography
-                          sx={{
-                            fontWeight: 500,
-                            fontSize: '16px',
-                            color: '#1F1B13',
-                            lineHeight: '24px',
-                          }}
-                        >
-                          {toPascalCase(learner?.name)}
-                        </Typography>
+                        <>
+                          <Typography
+                            sx={{
+                              fontWeight: 500,
+                              fontSize: '16px',
+                              color: '#1F1B13',
+                              lineHeight: '24px',
+                            }}
+                          >
+                            {toPascalCase(learner?.name)}
+                          </Typography>
+                          {learner.username && (
+                            <Typography sx={{ fontSize: '12px', fontWeight: '400', color: '#FFA726' }}>
+                              {learner.username}
+                            </Typography>
+                          )}
+                        </>
                       }
                       secondary={
                         <Box>

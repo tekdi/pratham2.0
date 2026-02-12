@@ -18,6 +18,7 @@ interface AssessmentReportCardProp {
   classId: string;
   assessmentType?: string;
   board?: string;
+  username?: string;
 }
 
 const AssessmentReportCard: React.FC<AssessmentReportCardProp> = ({
@@ -27,7 +28,8 @@ const AssessmentReportCard: React.FC<AssessmentReportCardProp> = ({
   userId,
   classId,
   assessmentType,
-  board
+  board,
+  username
 }) => {
   const theme = useTheme<any>();
   const router = useRouter();
@@ -167,7 +169,9 @@ const AssessmentReportCard: React.FC<AssessmentReportCardProp> = ({
                 >
                   {getCardTitle(cardTitle)}
                 </Typography>
-
+                <Typography sx={{ fontSize: '12px', fontWeight: '400', color: '#FFA726' }}>
+                  {username}
+                </Typography>
               </Box>
               <Box
                 sx={{
