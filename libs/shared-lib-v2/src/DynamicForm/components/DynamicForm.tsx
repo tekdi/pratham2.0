@@ -20,6 +20,8 @@ import CustomFileUpload from './RJSFWidget/CustomFileUpload';
 import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
 import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
 import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
+//custom form
+import SubProgramListWidget from './RJSFWidget/CustomForm/SubProgramListWidget';
 
 import {
   calculateAgeFromDate,
@@ -225,7 +227,7 @@ const DynamicForm = ({
   }, [formUiSchema]);
 
   // Helper function to reorder fields in UI schema
-   const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
+  const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
     if (!uiSchema['ui:order']) {
       return uiSchema;
     }
@@ -377,12 +379,12 @@ const DynamicForm = ({
 
             // Reorder guardian fields to appear right after DOB
             let reorderedUiSchema = updatedUiSchema;
-            
+
             // Ensure ui:order exists and add guardian_info_note to it if not present
             if (!reorderedUiSchema['ui:order']) {
               reorderedUiSchema['ui:order'] = Object.keys(oldFormSchema.properties);
             }
-            
+
             // Only add guardian_info_note to ui:order if it's not already there
             if (!reorderedUiSchema['ui:order'].includes('guardian_info_note')) {
               const dobIndex = reorderedUiSchema['ui:order'].indexOf('dob');
@@ -392,7 +394,7 @@ const DynamicForm = ({
                 reorderedUiSchema['ui:order'].push('guardian_info_note');
               }
             }
-            
+
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
@@ -723,50 +725,51 @@ const DynamicForm = ({
           return updatedSchema;
         });
       };
-      
-      if(formSchema.properties?.own_phone_check){ 
-        if (formData.phone_type_accessible === 'nophone') {
-        removeFields(['own_phone_check']);
-      } else if (formData.phone_type_accessible ) {
-        // 1. Add back to schema if missing
-        setFormSchema((prevSchema) => {
-          if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
-            return {
-              ...prevSchema,
-              properties: {
-                ...prevSchema.properties,
-                own_phone_check: {
-                  type: 'string',
-                  title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
-                  coreField: 0,
-                  fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
-                  field_type: 'radio',
-                  isRequired: true,
-                  enum: ['yes', 'no'],
-                  enumNames: ['YES', 'NO'],
-                },
-              },
-              required: prevSchema.required?.includes('own_phone_check')
-                ? prevSchema.required
-                : [...(prevSchema.required || []), 'own_phone_check'],
-            };
-          }
-          return prevSchema;
-        });
 
-        // 2. Add back to uiSchema
-        setFormUiSchema((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: {
-            'ui:widget': 'CustomRadioWidget',
-            'ui:options': {
-              hideError: true,
+      if (formSchema.properties?.own_phone_check) {
+        if (formData.phone_type_accessible === 'nophone') {
+          removeFields(['own_phone_check']);
+        } else if (formData.phone_type_accessible) {
+          // 1. Add back to schema if missing
+          setFormSchema((prevSchema) => {
+            if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
+              return {
+                ...prevSchema,
+                properties: {
+                  ...prevSchema.properties,
+                  own_phone_check: {
+                    type: 'string',
+                    title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
+                    coreField: 0,
+                    fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
+                    field_type: 'radio',
+                    isRequired: true,
+                    enum: ['yes', 'no'],
+                    enumNames: ['YES', 'NO'],
+                  },
+                },
+                required: prevSchema.required?.includes('own_phone_check')
+                  ? prevSchema.required
+                  : [...(prevSchema.required || []), 'own_phone_check'],
+              };
+            }
+            return prevSchema;
+          });
+
+          // 2. Add back to uiSchema
+          setFormUiSchema((prevUiSchema) => ({
+            ...prevUiSchema,
+            own_phone_check: {
+              'ui:widget': 'CustomRadioWidget',
+              'ui:options': {
+                hideError: true,
+              },
             },
-          },
-        }));
+          }));
+        }
+
       }
-      
-    }}
+    }
   }, [formData]);
 
   const widgets = {
@@ -783,6 +786,8 @@ const DynamicForm = ({
     //custom widget
     CatchmentAreaWidget,
     WorkingLocationWidget,
+    //custom form
+    SubProgramListWidget,
   };
 
   // Custom field for Guardian Information Note
@@ -868,19 +873,19 @@ const DynamicForm = ({
           // If header exists, replace values with localStorage values
           let customHeader = api?.header
             ? {
-                tenantId:
-                  api.header.tenantId === '**'
-                    ? localStorage.getItem('tenantId') || ''
-                    : api.header.tenantId,
-                Authorization:
-                  api.header.Authorization === '**'
-                    ? `Bearer ${localStorage.getItem('token') || ''}`
-                    : api.header.Authorization,
-                academicyearid:
-                  api.header.academicyearid === '**'
-                    ? localStorage.getItem('academicYearId') || ''
-                    : api.header.academicyearid,
-              }
+              tenantId:
+                api.header.tenantId === '**'
+                  ? localStorage.getItem('tenantId') || ''
+                  : api.header.tenantId,
+              Authorization:
+                api.header.Authorization === '**'
+                  ? `Bearer ${localStorage.getItem('token') || ''}`
+                  : api.header.Authorization,
+              academicyearid:
+                api.header.academicyearid === '**'
+                  ? localStorage.getItem('academicYearId') || ''
+                  : api.header.academicyearid,
+            }
             : {};
           const config = {
             method: api.method,
@@ -920,8 +925,8 @@ const DynamicForm = ({
                       : ['Select'],
                     enumNames: data
                       ? data?.map((item) =>
-                          transformLabel(item?.[label].toString())
-                        )
+                        transformLabel(item?.[label].toString())
+                      )
                       : ['Select'],
                   },
                 };
@@ -933,8 +938,8 @@ const DynamicForm = ({
                     : ['Select'],
                   enumNames: data
                     ? data?.map((item) =>
-                        transformLabel(item?.[label].toString())
-                      )
+                      transformLabel(item?.[label].toString())
+                    )
                     : ['Select'],
                 };
               }
@@ -1140,19 +1145,19 @@ const DynamicForm = ({
             // If header exists, replace values with localStorage values
             let customHeader = api?.header
               ? {
-                  tenantId:
-                    api.header.tenantId === '**'
-                      ? localStorage.getItem('tenantId') || ''
-                      : api.header.tenantId,
-                  Authorization:
-                    api.header.Authorization === '**'
-                      ? `Bearer ${localStorage.getItem('token') || ''}`
-                      : api.header.Authorization,
-                  academicyearid:
-                    api.header.academicyearid === '**'
-                      ? localStorage.getItem('academicYearId') || ''
-                      : api.header.academicyearid,
-                }
+                tenantId:
+                  api.header.tenantId === '**'
+                    ? localStorage.getItem('tenantId') || ''
+                    : api.header.tenantId,
+                Authorization:
+                  api.header.Authorization === '**'
+                    ? `Bearer ${localStorage.getItem('token') || ''}`
+                    : api.header.Authorization,
+                academicyearid:
+                  api.header.academicyearid === '**'
+                    ? localStorage.getItem('academicYearId') || ''
+                    : api.header.academicyearid,
+              }
               : {};
             const config = {
               method: api.method,
@@ -1206,21 +1211,20 @@ const DynamicForm = ({
                       // If header exists, replace values with localStorage values
                       let customHeader = api?.header
                         ? {
-                            tenantId:
-                              api.header.tenantId === '**'
-                                ? localStorage.getItem('tenantId') || ''
-                                : api.header.tenantId,
-                            Authorization:
-                              api.header.Authorization === '**'
-                                ? `Bearer ${
-                                    localStorage.getItem('token') || ''
-                                  }`
-                                : api.header.Authorization,
-                            academicyearid:
-                              api.header.academicyearid === '**'
-                                ? localStorage.getItem('academicYearId') || ''
-                                : api.header.academicyearid,
-                          }
+                          tenantId:
+                            api.header.tenantId === '**'
+                              ? localStorage.getItem('tenantId') || ''
+                              : api.header.tenantId,
+                          Authorization:
+                            api.header.Authorization === '**'
+                              ? `Bearer ${localStorage.getItem('token') || ''
+                              }`
+                              : api.header.Authorization,
+                          academicyearid:
+                            api.header.academicyearid === '**'
+                              ? localStorage.getItem('academicYearId') || ''
+                              : api.header.academicyearid,
+                        }
                         : {};
                       const config = {
                         method: api.method,
@@ -1670,19 +1674,19 @@ const DynamicForm = ({
                 // If header exists, replace values with localStorage values
                 let customHeader = api?.header
                   ? {
-                      tenantId:
-                        api.header.tenantId === '**'
-                          ? localStorage.getItem('tenantId') || ''
-                          : api.header.tenantId,
-                      Authorization:
-                        api.header.Authorization === '**'
-                          ? `Bearer ${localStorage.getItem('token') || ''}`
-                          : api.header.Authorization,
-                      academicyearid:
-                        api.header.academicyearid === '**'
-                          ? localStorage.getItem('academicYearId') || ''
-                          : api.header.academicyearid,
-                    }
+                    tenantId:
+                      api.header.tenantId === '**'
+                        ? localStorage.getItem('tenantId') || ''
+                        : api.header.tenantId,
+                    Authorization:
+                      api.header.Authorization === '**'
+                        ? `Bearer ${localStorage.getItem('token') || ''}`
+                        : api.header.Authorization,
+                    academicyearid:
+                      api.header.academicyearid === '**'
+                        ? localStorage.getItem('academicYearId') || ''
+                        : api.header.academicyearid,
+                  }
                   : {};
                 const config = {
                   method: api.method,
@@ -2083,7 +2087,7 @@ const DynamicForm = ({
     return updatedError.filter(
       (err) =>
         !err?.property?.startsWith?.('.catchment_area') &&
-        !err?.property?.startsWith?.('.working_location')
+        !err?.property?.startsWith?.('.working_location') 
       // Don't filter working_village errors - we need them in onSubmit for toast
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));

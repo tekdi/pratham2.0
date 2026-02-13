@@ -684,7 +684,9 @@
     "SUMMER_CAMP_VOLUNTEER": "उन्हाळी शिबिर स्वयंसेवक",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "तुम्ही कोणत्या कार्यक्रमाचा भाग आहात?",
     "WHAT PROGRAM ARE YOU PART OF": "तुम्ही कोणत्या कार्यक्रमाचा भाग आहात?",
-    "CATCHMENT_AREA": "पाणलोट क्षेत्र"
+    "CATCHMENT_AREA": "पाणलोट क्षेत्र",
+    "PROGRAM_PREFERENCES": "कार्यक्रम प्राधान्ये",
+    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम निवडा"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट.",

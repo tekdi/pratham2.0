@@ -684,7 +684,9 @@
     "SUMMER_CAMP_VOLUNTEER": "వేసవి శిబిరం వాలంటీర్",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "మీరు ఏ కార్యక్రమంలో భాగం?",
     "WHAT PROGRAM ARE YOU PART OF": "మీరు ఏ కార్యక్రమంలో భాగం?",
-    "CATCHMENT_AREA": "పరీవాహక ప్రాంతం"
+    "CATCHMENT_AREA": "పరీవాహక ప్రాంతం",
+    "PROGRAM_PREFERENCES": "కార్యక్రమ ప్రాధాన్యతలు",
+    "CHOOSE_SUB_PROGRAM": "ఉప-కార్యక్రమాన్ని ఎంచుకోండి"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "చెల్లని ఇన్‌పుట్‌.",

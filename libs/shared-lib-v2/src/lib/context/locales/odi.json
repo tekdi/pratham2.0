@@ -684,7 +684,9 @@
     "SUMMER_CAMP_VOLUNTEER": "ଗ୍ରୀଷ୍ମ ଶିବିର ସ୍ଵେଚ୍ଛାସେବକ",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "ଆପଣ କେଉଁ ପ୍ରୋଗ୍ରାମର ଅଂଶ?",
     "WHAT PROGRAM ARE YOU PART OF": "ଆପଣ କେଉଁ ପ୍ରୋଗ୍ରାମର ଅଂଶ?",
-    "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ"
+    "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ",
+    "PROGRAM_PREFERENCES": "କାର୍ଯ୍ୟକ୍ରମ ପସନ୍ଦ",
+    "CHOOSE_SUB_PROGRAM": "ଉପ-କାର୍ଯ୍ୟକ୍ରମ ବାଛନ୍ତୁ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ଅବୈଧ ଇନ୍ପୁଟ୍ ।",
