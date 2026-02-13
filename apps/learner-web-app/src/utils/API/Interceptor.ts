@@ -14,6 +14,10 @@ const refreshToken = async () => {
         const newRefreshToken = response?.result?.refresh_token;
         localStorage.setItem('token', accessToken);
         localStorage.setItem('refreshToken', newRefreshToken);
+        // Also update refreshTokenForAndroid if it exists (for Android app)
+        if (localStorage.getItem('isAndroidApp') === 'yes' && newRefreshToken) {
+          localStorage.setItem('refreshTokenForAndroid', newRefreshToken);
+        }
         return accessToken;
       }
     } catch (error) {

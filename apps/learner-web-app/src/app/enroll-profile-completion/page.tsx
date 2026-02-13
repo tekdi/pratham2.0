@@ -166,19 +166,25 @@ const EnrollProfileCompletionInner = () => {
               //        const program = JSON.parse(enrolledProgramData || '{}');
 
 
-         if (window.ReactNativeWebView) {
-           window.ReactNativeWebView.postMessage(JSON.stringify({
-             type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
-             data: {
-               userId: localStorage.getItem('userId'),
-               tenantId: localStorage.getItem('tenantId'),
-               token: localStorage.getItem('token'),
-               refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+            // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+          let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+          // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+          if (!refreshToken || refreshToken === '') {
+            refreshToken = localStorage.getItem('refreshToken');
+          }
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
 
-               // Add any data you want to send
-             }
-           }));
-         }
+                // Add any data you want to send
+              }
+            }));
+          }
          setSignupSuccessModal(false);
         }
         else{
