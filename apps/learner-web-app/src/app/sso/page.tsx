@@ -182,11 +182,21 @@ const SSOContent = () => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = response.access_token;
       const refreshToken = response?.refresh_token;
-      localStorage.setItem('refreshTokenForAndroid', refreshToken);
+      console.log('refreshToken', refreshToken);
+      // Only store refreshToken if it has a valid value
+      if (refreshToken) {
+        localStorage.setItem('refreshTokenForAndroid', refreshToken);
+        if (data?.remember) {
+          localStorage.setItem('refreshToken', refreshToken);
+        } else {
+          localStorage.removeItem('refreshToken');
+        }
+      } else {
+        // Clear refreshTokenForAndroid if no refresh token is provided
+        localStorage.removeItem('refreshTokenForAndroid');
+        localStorage.removeItem('refreshToken');
+      }
       localStorage.setItem('token', token);
-      data?.remember
-        ? localStorage.setItem('refreshToken', refreshToken)
-        : localStorage.removeItem('refreshToken');
 
       const userResponse = await getUserId();
       console.log('userResponse', userResponse);
