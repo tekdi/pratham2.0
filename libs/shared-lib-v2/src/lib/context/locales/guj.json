@@ -685,7 +685,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "તમે કયા કાર્યક્રમનો ભાગ છો?",
     "CATCHMENT_AREA": "કેચમેન્ટ એરિયા",
     "PROGRAM_PREFERENCES": "કાર્યક્રમ પસંદગીઓ",
-    "CHOOSE_SUB_PROGRAM": "ઉપ-કાર્યક્રમ પસંદ કરો"
+    "CHOOSE_SUB_PROGRAM": "ઉપ-કાર્યક્રમ પસંદ કરો",
+    "POLICY_ACKNOWLEDGEMENTS": "નીતિ સ્વીકૃતિ",
+    "I_HAVE_READ_AND_AGREE": "મેં વાંચ્યું છે અને સંમત છું ",
+    "CHILD_PROTECTION_POLICY": "બાળ સુરક્ષા નીતિ",
+    "POCSO_POLICY": "POCSO નીતિ",
+    "NDA_POLICY": "NDA નીતિ",
+    "FRAUD_PROTECTION_POLICY": "ફ્રોડ સુરક્ષા નીતિ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઈનપુટ.",

@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "நீங்கள் எந்த திட்டத்தில் பங்கேற்கிறீர்கள்?",
     "CATCHMENT_AREA": "நீர்ப்பிடிப்பு பகுதி",
     "PROGRAM_PREFERENCES": "திட்ட விருப்பங்கள்",
-    "CHOOSE_SUB_PROGRAM": "உப-திட்டத்தைத் தேர்ந்தெடுக்கவும்"
+    "CHOOSE_SUB_PROGRAM": "உப-திட்டத்தைத் தேர்ந்தெடுக்கவும்",
+    "POLICY_ACKNOWLEDGEMENTS": "கொள்கை ஒப்புதல்",
+    "I_HAVE_READ_AND_AGREE": "நான் படித்து ஒப்புக்கொள்கிறேன் ",
+    "CHILD_PROTECTION_POLICY": "குழந்தை பாதுகாப்பு கொள்கை",
+    "POCSO_POLICY": "POCSO கொள்கை",
+    "NDA_POLICY": "NDA கொள்கை",
+    "FRAUD_PROTECTION_POLICY": "மோசடி பாதுகாப்பு கொள்கை"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "தவறான உள்ளீடு.",

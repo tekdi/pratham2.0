@@ -22,7 +22,8 @@ import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
 import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
 //custom form
 import SubProgramListWidget from './RJSFWidget/CustomForm/SubProgramListWidget';
-
+import ChildPocsoPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/ChildPocsoPolicyAcknowledgementWidget';
+import NdaFraudPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/NdaFraudPolicyAcknowledgementWidget';
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -788,6 +789,8 @@ const DynamicForm = ({
     WorkingLocationWidget,
     //custom form
     SubProgramListWidget,
+    ChildPocsoPolicyAcknowledgementWidget,
+    NdaFraudPolicyAcknowledgementWidget,
   };
 
   // Custom field for Guardian Information Note
@@ -2087,7 +2090,7 @@ const DynamicForm = ({
     return updatedError.filter(
       (err) =>
         !err?.property?.startsWith?.('.catchment_area') &&
-        !err?.property?.startsWith?.('.working_location') 
+        !err?.property?.startsWith?.('.working_location')
       // Don't filter working_village errors - we need them in onSubmit for toast
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));

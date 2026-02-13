@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "आप किस कार्यक्रम का हिस्सा हैं?",
     "CATCHMENT_AREA": "जलग्रह - क्षेत्र",
     "PROGRAM_PREFERENCES": "कार्यक्रम वरीयताएं",
-    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम चुनें"
+    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम चुनें",
+    "POLICY_ACKNOWLEDGEMENTS": "नीति स्वीकृति",
+    "I_HAVE_READ_AND_AGREE": "मैंने पढ़ा है और सहमत हूं ",
+    "CHILD_PROTECTION_POLICY": "बाल संरक्षण नीति",
+    "POCSO_POLICY": "POCSO नीति",
+    "NDA_POLICY": "NDA नीति",
+    "FRAUD_PROTECTION_POLICY": "धोखाधड़ी संरक्षण नीति"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अमान्य इनपुट।",

@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "ଆପଣ କେଉଁ ପ୍ରୋଗ୍ରାମର ଅଂଶ?",
     "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ",
     "PROGRAM_PREFERENCES": "କାର୍ଯ୍ୟକ୍ରମ ପସନ୍ଦ",
-    "CHOOSE_SUB_PROGRAM": "ଉପ-କାର୍ଯ୍ୟକ୍ରମ ବାଛନ୍ତୁ"
+    "CHOOSE_SUB_PROGRAM": "ଉପ-କାର୍ଯ୍ୟକ୍ରମ ବାଛନ୍ତୁ",
+    "POLICY_ACKNOWLEDGEMENTS": "ନୀତି ସ୍ୱୀକୃତି",
+    "I_HAVE_READ_AND_AGREE": "ମୁଁ ପଢ଼ିଛି ଏବଂ ସମ୍ମତ ଅଛି ",
+    "CHILD_PROTECTION_POLICY": "ଶିଶୁ ସୁରକ୍ଷା ନୀତି",
+    "POCSO_POLICY": "POCSO ନୀତି",
+    "NDA_POLICY": "NDA ନୀତି",
+    "FRAUD_PROTECTION_POLICY": "ପ୍ରତାରଣା ସୁରକ୍ଷା ନୀତି"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ଅବୈଧ ଇନ୍ପୁଟ୍ ।",
