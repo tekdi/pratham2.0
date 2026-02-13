@@ -684,7 +684,9 @@
     "SUMMER_CAMP_VOLUNTEER": "समर कैंप स्वयंसेवक",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "आप किस कार्यक्रम का हिस्सा हैं?",
     "WHAT PROGRAM ARE YOU PART OF": "आप किस कार्यक्रम का हिस्सा हैं?",
-    "CATCHMENT_AREA": "जलग्रह - क्षेत्र"
+    "CATCHMENT_AREA": "जलग्रह - क्षेत्र",
+    "PROGRAM_PREFERENCES": "कार्यक्रम वरीयताएं",
+    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम चुनें"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अमान्य इनपुट।",

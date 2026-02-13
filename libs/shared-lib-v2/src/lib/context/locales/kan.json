@@ -684,7 +684,9 @@
     "SUMMER_CAMP_VOLUNTEER": "ಬೇಸಿಗೆ ಶಿಬಿರದ ಸ್ವಯಂಸೇವಕ",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "WHAT PROGRAM ARE YOU PART OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
-    "CATCHMENT_AREA": "ಜಲಾನಯನ ಪ್ರದೇಶ"
+    "CATCHMENT_AREA": "ಜಲಾನಯನ ಪ್ರದೇಶ",
+    "PROGRAM_PREFERENCES": "ಕಾರ್ಯಕ್ರಮ ಆದ್ಯತೆಗಳು",
+    "CHOOSE_SUB_PROGRAM": "ಉಪ-ಕಾರ್ಯಕ್ರಮವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಅಮಾನ್ಯ ಇನ್ಪುಟ್.",
