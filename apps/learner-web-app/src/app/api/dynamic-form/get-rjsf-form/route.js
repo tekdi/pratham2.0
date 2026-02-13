@@ -293,6 +293,20 @@ function generateSchemaAndUISchema(fields) {
         },
       };
     }
+    //for custom widget form
+    else if(name=='child_pocso_policy'){
+      uiSchema[name] = {
+        'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name=='nda_fraud_policy'){
+      uiSchema[name] = {
+        'ui:widget': 'NdaFraudPolicyAcknowledgementWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    //end custom widget form
 
     if (extra) {
       schemaField.extra = extra;

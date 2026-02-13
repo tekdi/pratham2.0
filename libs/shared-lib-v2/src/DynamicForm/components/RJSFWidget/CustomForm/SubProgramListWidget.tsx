@@ -265,7 +265,7 @@ const SubProgramListWidget = ({
                         border: 0,
                         margin: 0,
                         clip: 'rect(0, 0, 0, 0)',
-                        overflow: 'hidden',
+                        overflow: 'hidden', marginLeft: 50,
                     }}
                     aria-hidden="true"
                 />

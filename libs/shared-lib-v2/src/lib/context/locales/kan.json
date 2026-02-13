@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "CATCHMENT_AREA": "ಜಲಾನಯನ ಪ್ರದೇಶ",
     "PROGRAM_PREFERENCES": "ಕಾರ್ಯಕ್ರಮ ಆದ್ಯತೆಗಳು",
-    "CHOOSE_SUB_PROGRAM": "ಉಪ-ಕಾರ್ಯಕ್ರಮವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
+    "CHOOSE_SUB_PROGRAM": "ಉಪ-ಕಾರ್ಯಕ್ರಮವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "POLICY_ACKNOWLEDGEMENTS": "ನೀತಿ ಒಪ್ಪಿಗೆ",
+    "I_HAVE_READ_AND_AGREE": "ನಾನು ಓದಿದ್ದೇನೆ ಮತ್ತು ಒಪ್ಪುತ್ತೇನೆ ",
+    "CHILD_PROTECTION_POLICY": "ಮಕ್ಕಳ ರಕ್ಷಣೆ ನೀತಿ",
+    "POCSO_POLICY": "POCSO ನೀತಿ",
+    "NDA_POLICY": "NDA ನೀತಿ",
+    "FRAUD_PROTECTION_POLICY": "ವಂಚನೆ ರಕ್ಷಣೆ ನೀತಿ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಅಮಾನ್ಯ ಇನ್ಪುಟ್.",

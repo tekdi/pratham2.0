@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "మీరు ఏ కార్యక్రమంలో భాగం?",
     "CATCHMENT_AREA": "పరీవాహక ప్రాంతం",
     "PROGRAM_PREFERENCES": "కార్యక్రమ ప్రాధాన్యతలు",
-    "CHOOSE_SUB_PROGRAM": "ఉప-కార్యక్రమాన్ని ఎంచుకోండి"
+    "CHOOSE_SUB_PROGRAM": "ఉప-కార్యక్రమాన్ని ఎంచుకోండి",
+    "POLICY_ACKNOWLEDGEMENTS": "పాలసీ అంగీకారం",
+    "I_HAVE_READ_AND_AGREE": "నేను చదివాను మరియు అంగీకరిస్తున్నాను ",
+    "CHILD_PROTECTION_POLICY": "బాల రక్షణ పాలసీ",
+    "POCSO_POLICY": "POCSO పాలసీ",
+    "NDA_POLICY": "NDA పాలసీ",
+    "FRAUD_PROTECTION_POLICY": "మోసం రక్షణ పాలసీ"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "చెల్లని ఇన్‌పుట్‌.",

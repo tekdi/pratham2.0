@@ -806,7 +806,13 @@
     "CATCHMENT_AREA": "Catchment Area",
     "CONSENT_FILE": "Consent File",
     "PROGRAM_PREFERENCES": "Program Preferences",
-    "CHOOSE_SUB_PROGRAM": "Choose Sub-Program"
+    "CHOOSE_SUB_PROGRAM": "Choose Sub-Program",
+    "POLICY_ACKNOWLEDGEMENTS": "Policy Acknowledgements",
+    "I_HAVE_READ_AND_AGREE": "I have read and agree to the ",
+    "CHILD_PROTECTION_POLICY": "Child Protection Policy",
+    "POCSO_POLICY": "POCSO Policy",
+    "NDA_POLICY": "NDA Policy",
+    "FRAUD_PROTECTION_POLICY": "Fraud Protection Policy"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

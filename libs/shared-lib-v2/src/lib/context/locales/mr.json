@@ -686,7 +686,13 @@
     "WHAT PROGRAM ARE YOU PART OF": "तुम्ही कोणत्या कार्यक्रमाचा भाग आहात?",
     "CATCHMENT_AREA": "पाणलोट क्षेत्र",
     "PROGRAM_PREFERENCES": "कार्यक्रम प्राधान्ये",
-    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम निवडा"
+    "CHOOSE_SUB_PROGRAM": "उप-कार्यक्रम निवडा",
+    "POLICY_ACKNOWLEDGEMENTS": "धोरण स्वीकृती",
+    "I_HAVE_READ_AND_AGREE": "मी वाचले आहे आणि सहमत आहे ",
+    "CHILD_PROTECTION_POLICY": "बाल संरक्षण धोरण",
+    "POCSO_POLICY": "POCSO धोरण",
+    "NDA_POLICY": "NDA धोरण",
+    "FRAUD_PROTECTION_POLICY": "फसवणूक संरक्षण धोरण"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट.",

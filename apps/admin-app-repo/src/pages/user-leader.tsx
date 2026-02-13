@@ -82,6 +82,47 @@ import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUserTenantStatus } from '@/services/UserService';
 
 const UserLeader = () => {
+
+  //sample schema for team leader
+  const testSchema = {
+    type: 'object',
+    properties: {
+      sub_program: {
+        "type": "array", // Always use array type, even for single selection
+        "items": {
+          "type": "string"
+        },
+      },
+      child_pocso_policy: {
+        "type": "string"
+      },
+      nda_fraud_policy: {
+        "type": "string"
+      },
+    },
+    "required": [
+      "sub_program",
+      "child_pocso_policy",
+      "nda_fraud_policy",
+    ]
+  };
+  const testUiSchema = {
+    sub_program: {
+      'ui:widget': 'SubProgramListWidget',
+      'ui:options': {
+        multiple: false,
+      },
+    },
+    child_pocso_policy: {
+      'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',
+      'ui:options': { hideError: true },
+    },
+    nda_fraud_policy: {
+      'ui:widget': 'NdaFraudPolicyAcknowledgementWidget',
+      'ui:options': { hideError: true },
+    },
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(TeamLeaderSearchSchema);
   const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
@@ -130,11 +171,11 @@ const UserLeader = () => {
   const searchStoreKey = 'teamLeader';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -235,7 +276,7 @@ const UserLeader = () => {
 
       // Update cohort member status for each selected center
       const membershipIds = selectedCenters.map((center) => center.cohortMembershipId);
-      
+
       for (const membershipId of membershipIds) {
         try {
           const updateResponse = await updateCohortMemberStatus({
@@ -275,7 +316,7 @@ const UserLeader = () => {
       const resp = await updateUserTenantStatus(userID, tenantId, {
         status: 'active',
       });
-      
+
       if (resp?.responseCode === 200) {
         showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
         // Reset state
@@ -332,9 +373,8 @@ const UserLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${
-          transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -353,9 +393,8 @@ const UserLeader = () => {
         const state = transformLabel(row?.customfield?.state) || '';
         const district = transformLabel(row?.customfield?.district) || '';
         const block = transformLabel(row?.customfield?.block) || '';
-        return `${state == '' ? '' : `${state}`}${
-          district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}`;
+        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+          }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
@@ -480,11 +519,11 @@ const UserLeader = () => {
         const cohortData = row?.cohortData;
         setSelectedUserIdReassign(userId);
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
-        let response=null; 
-        try{
+        let response = null;
+        try {
           response = await axios.post(apiUrl, { userId: userId }, { headers });
         }
-        catch(e){}
+        catch (e) { }
         const geographicalData = response?.data?.result?.data || [];
 
         // Transform geographicalData into centerList
@@ -562,19 +601,19 @@ const UserLeader = () => {
         setAvailableCenters([]);
         setLoadingCenters(true);
         setArchiveToActiveOpen(true);
-        
+
         try {
           // Fetch cohort list for the user
           const cohortResponse = await getCohortList(selectedUserId);
           const cohortList = cohortResponse?.result || [];
-          
+
           // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
-          const filteredCenters = cohortList.filter((cohort: any) => 
+          const filteredCenters = cohortList.filter((cohort: any) =>
             cohort.cohortMemberStatus === 'archived' &&
             cohort.cohortStatus === 'active' &&
             (cohort.type === 'CENTER' || cohort.type === 'COHORT')
           );
-          
+
           setAvailableCenters(filteredCenters);
         } catch (error) {
           console.error('Error fetching cohort list:', error);
@@ -688,6 +727,48 @@ const UserLeader = () => {
             />
           )
         )}
+
+        <Box mt={4}>
+          {testSchema &&
+            testUiSchema && (
+              <>
+                <DynamicForm
+                  schema={testSchema}
+                  uiSchema={testUiSchema}
+                  FormSubmitFunction={(formData: any, payload: any) => {
+                    console.log('########## debug payload', payload);
+                    console.log('########## debug formdata', formData);
+                  }}
+                  prefilledFormData={{}}
+                  hideSubmit={true}
+                  type={''}
+                />
+                <Button
+                  sx={{
+                    backgroundColor: '#FFC107',
+                    color: '#000',
+                    fontFamily: 'Poppins',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    height: '40px',
+                    lineHeight: '20px',
+                    letterSpacing: '0.1px',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    '&:hover': {
+                      backgroundColor: '#ffb300',
+                    },
+                    width: '100%',
+                  }}
+                  form="dynamic-form-id"
+                  type="submit"
+                >
+                  {t('COMMON.NEXT')}
+                </Button>
+              </>
+            )}
+        </Box>
+
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton
             searchStoreKey="teamLeader"
@@ -874,7 +955,7 @@ const UserLeader = () => {
       </ConfirmationPopup>
 
       {/* Map Modal Dialog */}
-      <Dialog
+      {/* <Dialog
         open={mapModalOpen}
         onClose={(event, reason) => {
           // Prevent closing on backdrop click
@@ -1090,7 +1171,7 @@ const UserLeader = () => {
                       } else {
                         showToastMessage(
                           response?.data?.params?.errmsg ||
-                            t(failureCreateMessage),
+                          t(failureCreateMessage),
                           'error'
                         );
                       }
@@ -1102,7 +1183,7 @@ const UserLeader = () => {
                     console.error('Error creating cohort member:', error);
                     showToastMessage(
                       error?.response?.data?.params?.errmsg ||
-                        t(failureCreateMessage),
+                      t(failureCreateMessage),
                       'error'
                     );
                   } finally {
@@ -1122,7 +1203,7 @@ const UserLeader = () => {
             </Button>
           )}
         </DialogActions>
-      </Dialog>
+      </Dialog> */}
 
       {/* Reassign Modal Dialog */}
       <Dialog
@@ -1263,7 +1344,7 @@ const UserLeader = () => {
                   console.error('Error creating cohort member:', error);
                   showToastMessage(
                     error?.response?.data?.params?.errmsg ||
-                      t(failureCreateMessage),
+                    t(failureCreateMessage),
                     'error'
                   );
                 } finally {
@@ -1342,28 +1423,28 @@ const UserLeader = () => {
           ) : (
             <Box sx={{ mb: 3 }}>
               <EditSearchUser
-                onUserDetails={async(userDetails) => {
+                onUserDetails={async (userDetails) => {
                   console.log('############# userDetails', userDetails);
                   if (selectedUserIdEdit) {
                     setIsEditInProgress(true);
                     try {
                       const { userData, customFields } =
                         splitUserData(userDetails);
-  
+
                       delete userData.email;
-  
+
                       const object = {
                         userData: userData,
                         customFields: customFields,
                       };
-  
+
                       //update user details
                       const updateUserResponse = await updateUser(selectedUserIdEdit, object);
                       console.log(
                         '######### updatedResponse',
                         updateUserResponse
                       );
-  
+
                       if (
                         updateUserResponse &&
                         updateUserResponse?.status == 200
@@ -1381,7 +1462,7 @@ const UserLeader = () => {
                       console.error('Error creating cohort member:', error);
                       showToastMessage(
                         error?.response?.data?.params?.errmsg ||
-                          t(failureCreateMessage),
+                        t(failureCreateMessage),
                         'error'
                       );
                     } finally {
@@ -1406,29 +1487,29 @@ const UserLeader = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-            <Button
-              sx={{
-                backgroundColor: '#FFC107',
-                color: '#000',
-                fontFamily: 'Poppins',
-                fontWeight: 500,
-                fontSize: '14px',
-                height: '40px',
-                lineHeight: '20px',
-                letterSpacing: '0.1px',
-                textAlign: 'center',
-                verticalAlign: 'middle',
-                '&:hover': {
-                  backgroundColor: '#ffb300',
-                },
-                width: '100%',
-              }}
-              disabled={!selectedUserIdEdit || isEditInProgress}
-              form="dynamic-form-id"
-              type="submit"
-            >
-              {t('COMMON.SAVE')}
-            </Button>
+          <Button
+            sx={{
+              backgroundColor: '#FFC107',
+              color: '#000',
+              fontFamily: 'Poppins',
+              fontWeight: 500,
+              fontSize: '14px',
+              height: '40px',
+              lineHeight: '20px',
+              letterSpacing: '0.1px',
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              '&:hover': {
+                backgroundColor: '#ffb300',
+              },
+              width: '100%',
+            }}
+            disabled={!selectedUserIdEdit || isEditInProgress}
+            form="dynamic-form-id"
+            type="submit"
+          >
+            {t('COMMON.SAVE')}
+          </Button>
         </DialogActions>
       </Dialog>
 
