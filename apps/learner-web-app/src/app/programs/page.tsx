@@ -29,7 +29,6 @@ function ProgramsContent() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isAndroidApp, setIsAndroidApp] = useState(true);
   const [isCheckingEnrollTenantId, setIsCheckingEnrollTenantId] = useState(false);
-
   useEffect(() => {
     const processData = async () => {
       // Safely access localStorage only on client side
@@ -65,9 +64,16 @@ function ProgramsContent() {
               setIsCheckingEnrollTenantId(false);
               return;
             }
-
             // Handle Android app case
             if (localStorage.getItem('isAndroidApp') === 'yes') {
+              console.log('refreshTokenForAndroid');
+
+              // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+              let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+              // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+              if (!refreshToken || refreshToken === '') {
+                refreshToken = localStorage.getItem('refreshToken');
+              }
               // Send message to React Native WebView
               if (window.ReactNativeWebView) {
                 window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -76,7 +82,7 @@ function ProgramsContent() {
                     userId: storedUserId,
                     tenantId: enrollTenantId,
                     token: token,
-                    refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+                    refreshToken: refreshToken,
                   }
                 }));
               }
