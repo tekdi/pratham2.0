@@ -1,4 +1,4 @@
-import { post } from './RestClient';
+import { deleteApi, post } from './RestClient';
 import {
   BulkAttendanceParams,
   AttendanceStatusListProps,
@@ -206,6 +206,16 @@ export const markAttendance = async ({
   } catch (error) {
     console.error('error in marking attendance', error);
   }
+};
+
+export const bulkDeleteAttendance = async (attendanceRecords: {
+  userId: string;
+  contextIds: string[];
+  date: string;
+}[]): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.bulkDeleteAttendance;
+  const response = await deleteApi(apiUrl, { attendanceRecords });
+  return response?.data;
 };
 
 const postAttendanceList = async ({
