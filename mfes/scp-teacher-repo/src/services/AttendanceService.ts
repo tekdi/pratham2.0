@@ -191,6 +191,7 @@ export const markAttendance = async ({
   attendanceDate,
   contextId,
   attendance,
+  context = 'cohort',
 }: MarkAttendanceParams): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.attendanceCreate
   try {
@@ -199,7 +200,7 @@ export const markAttendance = async ({
       attendanceDate,
       contextId,
       attendance,
-      context: "cohort" // Add context directly
+      context,
     });
     return response?.data;
   } catch (error) {
@@ -268,12 +269,12 @@ export const overallAttendanceInPercentageStatusList = async ({
 export const getLearnerAttendanceStatus = async ({
   limit,
   page,
-  filters: { contextId, scope, toDate, fromDate, userId },
+  filters: { contextId, scope, toDate, fromDate, userId, context },
 }: LearnerAttendanceProps): Promise<any> => {
   return postAttendanceList({
     limit,
     page,
-    filters: { contextId, scope, toDate, fromDate, userId, context: "cohort" }, // Add context to filters
+    filters: { contextId, scope, toDate, fromDate, userId, context: context ?? 'cohort' },
   });
 };
 

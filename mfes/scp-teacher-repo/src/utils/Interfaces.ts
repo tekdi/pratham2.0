@@ -22,6 +22,11 @@ export interface MarkAttendanceProps {
   handleClose: () => void;
   onAttendanceUpdate: () => void;
   attendanceDates?: any[];
+  /** When set, attendance is marked at session/event level (contextId = eventRepetitionId, context = 'event') */
+  selectedSession?: { eventRepetitionId: string } | null;
+  /** When provided, shows back control to return to session list */
+  onBack?: () => void;
+  prefillLoading?: boolean;
 }
 
 export interface AttendanceStatusListViewProps {
@@ -73,6 +78,7 @@ export interface MarkAttendanceParams {
   attendanceDate: string;
   contextId: string;
   attendance: string;
+  context?: 'cohort' | 'event';
 }
 
 export interface UserIdFilter {
@@ -254,6 +260,7 @@ export interface LearnerAttendanceProps {
     toDate: string | Date;
     fromDate: string | Date;
     userId: string;
+    context?: 'cohort' | 'event';
   };
 }
 
