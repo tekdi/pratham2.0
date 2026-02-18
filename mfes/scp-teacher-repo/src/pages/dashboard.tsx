@@ -206,7 +206,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
 
     const calculateDateRange = () => {
+      // Use yesterday as end date so Overview reflects batch-level attendance
+      // (cron runs at end of day); range is 7 days ending yesterday.
       const endRangeDate = new Date();
+      endRangeDate.setDate(endRangeDate.getDate() - 1);
       endRangeDate.setHours(23, 59, 59, 999);
       const startRangeDate = new Date(endRangeDate);
       startRangeDate.setDate(startRangeDate.getDate() - 6);
