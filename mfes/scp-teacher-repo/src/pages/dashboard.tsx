@@ -183,6 +183,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     React.useState(false);
   const [resetAttendanceLoading, setResetAttendanceLoading] =
     React.useState(false);
+  const batchAttendanceSnapshotRef = React.useRef<typeof attendanceData | null>(
+    null
+  );
   const handleAttendanceDataUpdate = (data: any) => {
     setAttendanceData(data);
   };
@@ -559,6 +562,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     ) {
       return;
     }
+    if (!batchAttendanceSnapshotRef.current) {
+      batchAttendanceSnapshotRef.current = { ...attendanceData };
+    }
     const fetchSessionAttendance = async () => {
       setSessionAttendanceLoading(true);
       try {
@@ -775,11 +781,16 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleClose = () => {
+    const hadSessionSelected = !!selectedSession;
     setOpen(false);
     setSessionsModalOpen(false);
     setSelectedSession(null);
     setSessionAttendanceLoading(false);
     setIsRemoteCohort(false);
+    if (hadSessionSelected && batchAttendanceSnapshotRef.current) {
+      setAttendanceData(batchAttendanceSnapshotRef.current);
+      batchAttendanceSnapshotRef.current = null;
+    }
   };
 
   const handleSessionSelect = (session: DaySessionForAttendance) => {
