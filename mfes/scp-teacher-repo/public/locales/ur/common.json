@@ -252,6 +252,7 @@
     "BACK_TO_TOP": "اوپر واپس جائیں",
     "LAST_SEVEN_DAYS_RANGE": "پچھلے 7 دن {{date_range}}",
     "AS_OF_TODAY_DATE": "آج تک، {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "کل تک، {{day_date}}",
     "LEARNER": "طلباء",
     "ATTENDANCE_COMPARISON": "حاضری کا موازنہ",
     "CENTER_TYPE": "سنٹر کی قسم",

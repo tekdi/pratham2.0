@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "બેક ટુ ટોપ",
     "LAST_SEVEN_DAYS_RANGE": "છેલ્લા 7 દિવસ {{date_range}}",
     "AS_OF_TODAY_DATE": "આજથી, {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "ગઈકાલ સુધી, {{day_date}}",
     "LEARNER": "લ્ર્નર્સ",
     "ATTENDANCE_COMPARISON": "હાજરીની સરખામણી",
     "CENTER_TYPE": "સેન્ટર પ્રકાર",

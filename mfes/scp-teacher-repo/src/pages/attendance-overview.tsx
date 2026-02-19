@@ -117,7 +117,15 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
 
-  const menuItems = getMenuItems(t, dateRange, currentDayMonth);
+  const yesterdayForDisplay = (() => {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    return `(${y.getDate()} ${y.toLocaleString('default', { month: 'long' })})`;
+  })();
+  const menuItems = getMenuItems(t, dateRange, currentDayMonth, {
+    useYesterdayLabel: true,
+    yesterdayDate: yesterdayForDisplay,
+  });
 
   useEffect(() => {
     setSelectedValue(currentDayMonth);
@@ -244,7 +252,11 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
             // Conditionally add fromDate and toDate to filters if selectedValue doesn't match the specific condition
             if (
               selectedValue !==
-              t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth })
+                t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth }) &&
+              selectedValue !==
+                t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+                  day_date: yesterdayForDisplay,
+                })
             ) {
               filters.fromDate = isFromDate;
               filters.toDate = isToDate;
@@ -317,7 +329,11 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
             // Conditionally add fromDate and toDate to filters if selectedValue doesn't match the specific condition
             if (
               selectedValue !==
-              t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth })
+                t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth }) &&
+              selectedValue !==
+                t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+                  day_date: yesterdayForDisplay,
+                })
             ) {
               filters.fromDate = isFromDate;
               filters.toDate = isToDate;

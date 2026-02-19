@@ -266,6 +266,7 @@
     "BACK_TO_TOP": "Back to Top",
     "LAST_SEVEN_DAYS_RANGE": "Last 7 Days {{date_range}}",
     "AS_OF_TODAY_DATE": "As of Today, {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "As of Yesterday, {{day_date}}",
     "LEARNER": "Learners",
     "ATTENDANCE_COMPARISON": "Attendance Comparison",
     "CENTER_TYPE": "Center Type",

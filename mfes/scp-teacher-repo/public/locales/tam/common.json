@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "மேலே திரும்பு",
     "LAST_SEVEN_DAYS_RANGE": "கடந்த 7 நாட்கள் {{date_range}}",
     "AS_OF_TODAY_DATE": "இன்றைய நிலவரப்படி{{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "நேற்று வரை, {{day_date}}",
     "LEARNER": "மாணவர்கள்",
     "ATTENDANCE_COMPARISON": "வருகை ஒப்பீடு",
     "CENTER_TYPE": "மைய வகை",
