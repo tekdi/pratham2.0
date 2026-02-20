@@ -93,6 +93,12 @@ const UserLeader = () => {
           "type": "string"
         },
       },
+      ptm_name: {
+        "type": "string"
+      },
+      organization_name: {
+        "type": "string"
+      },
       child_pocso_policy: {
         "type": "string"
       },
@@ -102,6 +108,8 @@ const UserLeader = () => {
     },
     "required": [
       "sub_program",
+      "ptm_name",
+      "organization_name",
       "child_pocso_policy",
       "nda_fraud_policy",
     ]
@@ -112,6 +120,14 @@ const UserLeader = () => {
       'ui:options': {
         multiple: false,
       },
+    },
+    ptm_name: {
+      'ui:widget': 'PTMNameWidget',
+      'ui:options': { hideError: true },
+    },
+    organization_name: {
+      'ui:widget': 'OrganizationSearchWidget',
+      'ui:options': { hideError: true },
     },
     child_pocso_policy: {
       'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',

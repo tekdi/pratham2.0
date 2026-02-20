@@ -21,6 +21,7 @@ import {
 } from '../utils/app.config';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
 import { v5 as uuidv5 } from 'uuid';
+import axios from 'axios';
 dayjs.extend(utc);
 
 export const ATTENDANCE_ENUM = {
@@ -1181,4 +1182,41 @@ export const flresponsetotl = async (response: any[]) => {
   // console.log('########## testflresponse transformedData', transformedData);
 
   return transformedData;
+};
+
+interface AcademicYear {
+  id: string;
+  isActive: boolean;
+}
+
+// Fetch active academic year ID
+export const fetchActiveAcademicYearId = async (): Promise<string | null> => {
+  try {
+    const tenantId = localStorage.getItem('onboardTenantId') || '';
+    const token = localStorage.getItem('token') || '';
+
+    if (!tenantId || !token) {
+      return null;
+    }
+
+    const response = await axios.post(
+      API_ENDPOINTS.academicYearsList,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          tenantid: tenantId,
+        },
+      }
+    );
+
+    const academicYears: AcademicYear[] = response.data?.result || [];
+    const activeAcademicYear = academicYears.find((year) => year.isActive === true);
+
+    return activeAcademicYear?.id || null;
+  } catch (err: any) {
+    console.error('Error fetching academic year:', err);
+    return null;
+  }
 };

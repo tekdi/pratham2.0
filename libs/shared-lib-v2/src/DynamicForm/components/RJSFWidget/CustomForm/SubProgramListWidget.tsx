@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
+import { fetchActiveAcademicYearId } from '../../../utils/Helper';
 
 interface Cohort {
     cohortId: string;
@@ -22,10 +23,6 @@ interface Cohort {
     status: string;
 }
 
-interface AcademicYear {
-    id: string;
-    isActive: boolean;
-}
 
 const SubProgramListWidget = ({
     id,
@@ -44,38 +41,13 @@ const SubProgramListWidget = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Fetch active academic year ID
-    const fetchActiveAcademicYearId = useCallback(async (): Promise<string | null> => {
-        try {
-            const tenantId = localStorage.getItem('onboardTenantId') || '';
-            const token = localStorage.getItem('token') || '';
-
-            if (!tenantId || !token) {
-                setError('Missing tenant ID or token');
-                return null;
-            }
-
-            const response = await axios.post(
-                API_ENDPOINTS.academicYearsList,
-                {},
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                        tenantid: tenantId,
-                    },
-                }
-            );
-
-            const academicYears: AcademicYear[] = response.data?.result || [];
-            const activeAcademicYear = academicYears.find((year) => year.isActive === true);
-
-            return activeAcademicYear?.id || null;
-        } catch (err: any) {
-            console.error('Error fetching academic year:', err);
+    // Fetch active academic year ID using helper function
+    const getAcademicYearId = useCallback(async (): Promise<string | null> => {
+        const academicYearId = await fetchActiveAcademicYearId();
+        if (!academicYearId) {
             setError('Failed to fetch academic year');
-            return null;
         }
+        return academicYearId;
     }, []);
 
     // Fetch cohorts
@@ -134,7 +106,7 @@ const SubProgramListWidget = ({
         let isMounted = true;
 
         const loadCohorts = async () => {
-            const academicYearId = await fetchActiveAcademicYearId();
+            const academicYearId = await getAcademicYearId();
             if (isMounted && academicYearId) {
                 await fetchCohorts(academicYearId);
             }
@@ -145,7 +117,7 @@ const SubProgramListWidget = ({
         return () => {
             isMounted = false;
         };
-    }, [fetchActiveAcademicYearId, fetchCohorts]);
+    }, [getAcademicYearId, fetchCohorts]);
 
     // Check if multiple selection is enabled
     // Check options (RJSF merges ui:options into options), ui:options, and direct uiSchema property

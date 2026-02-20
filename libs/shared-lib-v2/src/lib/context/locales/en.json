@@ -812,7 +812,14 @@
     "CHILD_PROTECTION_POLICY": "Child Protection Policy",
     "POCSO_POLICY": "POCSO Policy",
     "NDA_POLICY": "NDA Policy",
-    "FRAUD_PROTECTION_POLICY": "Fraud Protection Policy"
+    "FRAUD_PROTECTION_POLICY": "Fraud Protection Policy",
+    "PTM_NAME": "PTM Name",
+    "SEARCH_AND_SELECT_PTM": "Search and select PTM",
+    "SEARCH": "Search...",
+    "NO_USER_DATA_FOUND": "No user data found",
+    "ORGANISATION_NAME": "Organisation Name",
+    "SEARCH_AND_SELECT_ORGANISATION": "Search and select your organisation",
+    "NO_ORGANISATION_DATA_FOUND": "No organisation data found"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
