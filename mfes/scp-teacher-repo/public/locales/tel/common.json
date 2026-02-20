@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "పైకి తిరిగి వెళ్లండి",
     "LAST_SEVEN_DAYS_RANGE": "గత 7 రోజులు {{date_range}}",
     "AS_OF_TODAY_DATE": "నేటి వరకు, {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "నిన్న వరకు, {{day_date}}",
     "LEARNER": "లెర్నర్‌లు",
     "ATTENDANCE_COMPARISON": "హాజరు పోలిక",
     "CENTER_TYPE": "సెంటర్ రకం",

@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "शीर्षस्थानी परत",
     "LAST_SEVEN_DAYS_RANGE": "मागील 7 दिवस {{date_range}}",
     "AS_OF_TODAY_DATE": "आजच्या तारखेपर्यंत, {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "कालच्या तारखेपर्यंत, {{day_date}}",
     "LEARNER": "शिकणारे",
     "ATTENDANCE_COMPARISON": "हजेरी तुलना",
     "CENTER_TYPE": "केंद्र प्रकार",

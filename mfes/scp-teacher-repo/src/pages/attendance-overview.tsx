@@ -84,10 +84,18 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
   const [searchWord, setSearchWord] = React.useState('');
   const [modalOpen, setModalOpen] = React.useState(false);
   const [learnerData, setLearnerData] = React.useState<Array<any>>([]);
-  const [isFromDate, setIsFromDate] = useState(
-    formatSelectedDate(new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000))
-  );
-  const [isToDate, setIsToDate] = useState(getTodayDate());
+  const [isFromDate, setIsFromDate] = useState(() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const start = new Date(yesterday);
+    start.setDate(yesterday.getDate() - 6);
+    return formatSelectedDate(start);
+  });
+  const [isToDate, setIsToDate] = useState(() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return formatSelectedDate(yesterday);
+  });
   const [displayStudentList, setDisplayStudentList] = React.useState<
     Array<any>
   >([]);
@@ -109,7 +117,15 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
 
-  const menuItems = getMenuItems(t, dateRange, currentDayMonth);
+  const yesterdayForDisplay = (() => {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    return `(${y.getDate()} ${y.toLocaleString('default', { month: 'long' })})`;
+  })();
+  const menuItems = getMenuItems(t, dateRange, currentDayMonth, {
+    useYesterdayLabel: true,
+    yesterdayDate: yesterdayForDisplay,
+  });
 
   useEffect(() => {
     setSelectedValue(currentDayMonth);
@@ -137,17 +153,19 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
 
   useEffect(() => {
     const getAttendanceMarkedDays = async () => {
-      const todayFormattedDate = formatSelectedDate(new Date());
-      const lastSeventhDayDate = new Date(
-        today.getTime() - 6 * 24 * 60 * 60 * 1000
-      );
-      const lastSeventhDayFormattedDate = formatSelectedDate(
-        new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
-      );
+      // Last 7 Days: up to yesterday (batch-level attendance from cron at EOD)
+      const endRangeDate = new Date(today);
+      endRangeDate.setDate(today.getDate() - 1);
+      const lastSeventhDayDate = new Date(endRangeDate);
+      lastSeventhDayDate.setDate(endRangeDate.getDate() - 6);
+      const lastSeventhDayFormattedDate = formatSelectedDate(lastSeventhDayDate);
+      const endRangeFormattedDate = formatSelectedDate(endRangeDate);
 
-      const endDay = today.getDate();
-      const endDayMonth = today.toLocaleString('default', { month: 'long' });
-      setCurrentDayMonth(`(${endDay} ${endDayMonth})`);
+      const endDay = endRangeDate.getDate();
+      const endDayMonth = endRangeDate.toLocaleString('default', {
+        month: 'long',
+      });
+      setCurrentDayMonth(`(${today.getDate()} ${today.toLocaleString('default', { month: 'long' })})`);
       const startDay = lastSeventhDayDate.getDate();
       const startDayMonth = lastSeventhDayDate.toLocaleString('default', {
         month: 'long',
@@ -157,13 +175,15 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
       } else {
         setDateRange(`(${startDay} ${startDayMonth}-${endDay} ${endDayMonth})`);
       }
+      setIsFromDate(lastSeventhDayFormattedDate);
+      setIsToDate(endRangeFormattedDate);
       const cohortAttendanceData: CohortAttendancePercentParam = {
         limit: AttendanceAPILimit,
         page: 0,
         filters: {
           scope: Role.STUDENT,
           fromDate: lastSeventhDayFormattedDate,
-          toDate: todayFormattedDate,
+          toDate: endRangeFormattedDate,
           contextId: classId,
         },
         facets: ['attendanceDate'],
@@ -232,7 +252,11 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
             // Conditionally add fromDate and toDate to filters if selectedValue doesn't match the specific condition
             if (
               selectedValue !==
-              t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth })
+                t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth }) &&
+              selectedValue !==
+                t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+                  day_date: yesterdayForDisplay,
+                })
             ) {
               filters.fromDate = isFromDate;
               filters.toDate = isToDate;
@@ -305,7 +329,11 @@ const AttendanceOverview: React.FC<AttendanceOverviewProps> = () => {
             // Conditionally add fromDate and toDate to filters if selectedValue doesn't match the specific condition
             if (
               selectedValue !==
-              t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth })
+                t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth }) &&
+              selectedValue !==
+                t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+                  day_date: yesterdayForDisplay,
+                })
             ) {
               filters.fromDate = isFromDate;
               filters.toDate = isToDate;

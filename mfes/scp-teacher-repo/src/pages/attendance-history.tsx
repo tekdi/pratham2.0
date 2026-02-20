@@ -31,7 +31,11 @@ import AttendanceStatusListView from '@/components/AttendanceStatusListView';
 import CohortSelectionSection from '@/components/CohortSelectionSection';
 import NoDataFound from '@/components/common/NoDataFound';
 import MarkBulkAttendance from '@/components/MarkBulkAttendance';
+import MarkCenterAttendanceSessionsModal, {
+  DaySessionForAttendance,
+} from '@/components/MarkCenterAttendanceSessionsModal';
 import MonthCalender from '@/components/MonthCalender';
+import { getEventsForDay } from '@/services/EventService';
 import { showToastMessage } from '@/components/Toastify';
 import UpDownButton from '@/components/UpDownButton';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
@@ -87,6 +91,11 @@ const UserAttendanceHistory = () => {
     setOpenMarkAttendance(!openMarkAttendance);
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = useState(false);
+  const [sessionsModalOpen, setSessionsModalOpen] = useState(false);
+  const [daySessions, setDaySessions] = useState<DaySessionForAttendance[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<DaySessionForAttendance | null>(null);
+  const [sessionAttendanceLoading, setSessionAttendanceLoading] = useState(false);
   const [handleSaveHasRun, setHandleSaveHasRun] = React.useState(false);
   const [blockName, setBlockName] = React.useState<string>('');
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -108,7 +117,22 @@ const UserAttendanceHistory = () => {
     bulkAttendanceStatus: '',
   });
 
-  const handleAttendanceDataUpdate = (data: any) => {
+  const [sessionAttendanceData, setSessionAttendanceData] = useState({
+    cohortMemberList: [],
+    presentCount: 0,
+    absentCount: 0,
+    numberOfCohortMembers: 0,
+    dropoutMemberList: [],
+    dropoutCount: 0,
+    bulkAttendanceStatus: '',
+  });
+
+  const handleAttendanceDataUpdate = (data: any, source?: 'cohort' | 'session') => {
+    if (source === 'session') {
+      setSessionAttendanceData(data);
+      setSessionAttendanceLoading(false);
+      return;
+    }
     setAttendanceData(data);
     let attendanceInfo = {};
 
@@ -142,7 +166,7 @@ const UserAttendanceHistory = () => {
   };
 
   const handleOpen = () => {
-    setOpen(true);
+    setSessionsModalOpen(true);
     ReactGA.event('mark/modify-attendance-button-clicked-attendance-history', {
       teacherId: userId,
     });
@@ -164,6 +188,24 @@ const UserAttendanceHistory = () => {
 
   const handleClose = () => {
     setOpen(false);
+    setSessionsModalOpen(false);
+    setSelectedSession(null);
+    setSessionAttendanceLoading(false);
+    setSessionAttendanceData({
+      cohortMemberList: [],
+      presentCount: 0,
+      absentCount: 0,
+      numberOfCohortMembers: 0,
+      dropoutMemberList: [],
+      dropoutCount: 0,
+      bulkAttendanceStatus: '',
+    });
+  };
+
+  const handleSessionSelect = (session: DaySessionForAttendance) => {
+    setSelectedSession(session);
+    setSessionsModalOpen(false);
+    setOpen(true);
   };
 
   useEffect(() => {
@@ -413,6 +455,108 @@ const UserAttendanceHistory = () => {
   useEffect(() => {
     getCohortMemberList();
   }, [classId, selectedDate, handleSaveHasRun]);
+
+  // Fetch sessions when sessions modal opens (for Mark flow)
+  useEffect(() => {
+    if (!sessionsModalOpen || !classId) return;
+    let cancelled = false;
+    setSessionsLoading(true);
+    getEventsForDay(classId, shortDateFormat(selectedDate))
+      .then((sessions) => {
+        if (!cancelled) setDaySessions(sessions);
+      })
+      .catch(() => {
+        if (!cancelled) setDaySessions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionsModalOpen, classId, selectedDate]);
+
+  // When learner list opens from a session, fetch session-level attendance (context=event)
+  useEffect(() => {
+    const eventRepetitionId =
+      selectedSession?.eventRepetitionId ?? selectedSession?.id;
+    if (!open || !eventRepetitionId || !classId || !selectedDate) return;
+    const fetchSessionAttendance = async () => {
+      setSessionAttendanceLoading(true);
+      try {
+        const limit = 300;
+        const page = 0;
+        const filters = { cohortId: classId };
+        const response = await getMyCohortMemberList({
+          limit,
+          page,
+          filters,
+          includeArchived: true,
+        });
+        const resp = response?.result?.userDetails;
+        if (!resp) {
+          setSessionAttendanceLoading(false);
+          return;
+        }
+        const nameUserIdArray = resp
+          ?.map((entry: any) => ({
+            userId: entry.userId,
+            name:
+              toPascalCase(entry?.firstName || '') +
+              ' ' +
+              (entry?.lastName ? toPascalCase(entry.lastName) : ''),
+            memberStatus: entry.status,
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+            userName: entry.username,
+          }))
+          .filter(
+            (member: {
+              createdAt: string | number | Date;
+              updatedAt: string | number | Date;
+              memberStatus: string;
+            }) => {
+              const createdAt = new Date(member.createdAt);
+              createdAt.setHours(0, 0, 0, 0);
+              const updatedAt = new Date(member.updatedAt);
+              updatedAt.setHours(0, 0, 0, 0);
+              const currentDate = new Date(selectedDate);
+              currentDate.setHours(0, 0, 0, 0);
+              if (
+                (member.memberStatus === Status.ARCHIVED ||
+                  member.memberStatus === 'reassigned') &&
+                updatedAt <= currentDate
+              ) {
+                return false;
+              }
+              return createdAt <= new Date(selectedDate);
+            }
+          );
+        const filteredEntries = getLatestEntries(
+          nameUserIdArray,
+          shortDateFormat(selectedDate)
+        );
+        if (filteredEntries && selectedDate) {
+          const wrappedUpdate = (data: any) => {
+            handleAttendanceDataUpdate(data, 'session');
+          };
+          fetchAttendanceDetails(
+            filteredEntries,
+            selectedDate,
+            eventRepetitionId,
+            wrappedUpdate,
+            { context: 'event' }
+          );
+        } else {
+          setSessionAttendanceLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching session attendance:', error);
+        setSessionAttendanceLoading(false);
+      }
+    };
+    fetchSessionAttendance();
+  }, [open, selectedSession, classId, selectedDate]);
 
   useEffect(() => {
     console.log(status);
@@ -910,20 +1054,73 @@ const UserAttendanceHistory = () => {
               <NoDataFound bgColor={theme.palette.warning['A400']} />
             )}
           </Box>
+          {sessionsModalOpen && (
+            <MarkCenterAttendanceSessionsModal
+              open={sessionsModalOpen}
+              onClose={handleClose}
+              selectedDate={selectedDate}
+              sessions={daySessions}
+              sessionsLoading={sessionsLoading}
+              onSessionSelect={handleSessionSelect}
+            />
+          )}
           {open && (
             <MarkBulkAttendance
               open={open}
               onClose={handleClose}
+              onBack={() => {
+                setOpen(false);
+                setSessionsModalOpen(true);
+              }}
               classId={classId}
               selectedDate={selectedDate}
+              selectedSession={
+                selectedSession
+                  ? {
+                      eventRepetitionId:
+                        selectedSession.eventRepetitionId ?? selectedSession.id,
+                    }
+                  : null
+              }
+              prefillLoading={
+                !!selectedSession && sessionAttendanceLoading
+              }
               onSaveSuccess={() => setHandleSaveHasRun(!handleSaveHasRun)}
-              memberList={attendanceData.cohortMemberList}
-              presentCount={attendanceData.presentCount}
-              absentCount={attendanceData.absentCount}
-              numberOfCohortMembers={attendanceData.numberOfCohortMembers}
-              dropoutMemberList={attendanceData.dropoutMemberList}
-              dropoutCount={attendanceData.dropoutCount}
-              bulkStatus={attendanceData.bulkAttendanceStatus}
+              memberList={
+                selectedSession
+                  ? sessionAttendanceData.cohortMemberList
+                  : attendanceData.cohortMemberList
+              }
+              presentCount={
+                selectedSession
+                  ? sessionAttendanceData.presentCount
+                  : attendanceData.presentCount
+              }
+              absentCount={
+                selectedSession
+                  ? sessionAttendanceData.absentCount
+                  : attendanceData.absentCount
+              }
+              numberOfCohortMembers={
+                selectedSession
+                  ? sessionAttendanceData.numberOfCohortMembers
+                  : attendanceData.numberOfCohortMembers
+              }
+              dropoutMemberList={
+                selectedSession
+                  ? sessionAttendanceData.dropoutMemberList
+                  : attendanceData.dropoutMemberList
+              }
+              dropoutCount={
+                selectedSession
+                  ? sessionAttendanceData.dropoutCount
+                  : attendanceData.dropoutCount
+              }
+              bulkStatus={
+                selectedSession
+                  ? sessionAttendanceData.bulkAttendanceStatus
+                  : attendanceData.bulkAttendanceStatus
+              }
             />
           )}
         </Box>

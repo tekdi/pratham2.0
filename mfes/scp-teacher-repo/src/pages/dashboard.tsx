@@ -1,10 +1,11 @@
 'use client';
 
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
 import { format, isAfter, isValid, parse, startOfDay } from 'date-fns';
 import React, { ComponentType, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import {
+  bulkDeleteAttendance,
   classesMissedAttendancePercentList,
   getAllCenterAttendance,
   getCohortAttendance,
@@ -40,10 +41,13 @@ import AttendanceComparison from '@/components/AttendanceComparison';
 import CohortSelectionSection from '@/components/CohortSelectionSection';
 import GuideTour from '@/components/GuideTour';
 import MarkBulkAttendance from '@/components/MarkBulkAttendance';
+import MarkCenterAttendanceSessionsModal, {
+  DaySessionForAttendance,
+} from '@/components/MarkCenterAttendanceSessionsModal';
 import OverviewCard from '@/components/OverviewCard';
 import { showToastMessage } from '@/components/Toastify';
 import WeekCalender from '@/components/WeekCalender';
-import { getEventList } from '@/services/EventService';
+import { getEventsForDay, getEventList } from '@/services/EventService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import {
   QueryKeys,
@@ -86,6 +90,7 @@ import dynamic from 'next/dynamic';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import useEventDates from './../hooks/useEventDates';
 import ModalComponent from '@/components/Modal';
+import { modalStyles } from '@/styles/modalStyles';
 
 let SessionCardFooter: ComponentType<any> | null = null;
 if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
@@ -109,6 +114,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const isActiveYear = store.isActiveYearSelected;
 
   const [open, setOpen] = React.useState(false);
+  const [sessionsModalOpen, setSessionsModalOpen] = React.useState(false);
+  const [daySessions, setDaySessions] = React.useState<DaySessionForAttendance[]>([]);
+  const [sessionsLoading, setSessionsLoading] = React.useState(false);
+  const [selectedSession, setSelectedSession] = React.useState<DaySessionForAttendance | null>(null);
+  const [sessionAttendanceLoading, setSessionAttendanceLoading] = React.useState(false);
   const [cohortsData, setCohortsData] = React.useState<Array<ICohort>>([]);
   const [manipulatedCohortData, setManipulatedCohortData] =
     React.useState<Array<ICohort>>(cohortsData);
@@ -169,6 +179,13 @@ const Dashboard: React.FC<DashboardProps> = () => {
     bulkAttendanceStatus: '',
   });
   const [isRemoteCohort, setIsRemoteCohort] = React.useState<boolean>(false);
+  const [resetAttendanceModalOpen, setResetAttendanceModalOpen] =
+    React.useState(false);
+  const [resetAttendanceLoading, setResetAttendanceLoading] =
+    React.useState(false);
+  const batchAttendanceSnapshotRef = React.useRef<typeof attendanceData | null>(
+    null
+  );
   const handleAttendanceDataUpdate = (data: any) => {
     setAttendanceData(data);
   };
@@ -192,7 +209,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
 
     const calculateDateRange = () => {
+      // Use yesterday as end date so Overview reflects batch-level attendance
+      // (cron runs at end of day); range is 7 days ending yesterday.
       const endRangeDate = new Date();
+      endRangeDate.setDate(endRangeDate.getDate() - 1);
       endRangeDate.setHours(23, 59, 59, 999);
       const startRangeDate = new Date(endRangeDate);
       startRangeDate.setDate(startRangeDate.getDate() - 6);
@@ -529,6 +549,94 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   }, [classId, selectedDate, handleSaveHasRun]);
 
+  // When learner list opens from a session card, fetch session-level attendance (context=event)
+  useEffect(() => {
+    const eventRepetitionId =
+      selectedSession?.eventRepetitionId ?? selectedSession?.id;
+    if (
+      !open ||
+      !eventRepetitionId ||
+      !classId ||
+      classId === 'all' ||
+      !selectedDate
+    ) {
+      return;
+    }
+    if (!batchAttendanceSnapshotRef.current) {
+      batchAttendanceSnapshotRef.current = { ...attendanceData };
+    }
+    const fetchSessionAttendance = async () => {
+      setSessionAttendanceLoading(true);
+      try {
+        const limit = 300;
+        const page = 0;
+        const filters = { cohortId: classId };
+        const response = await getMyCohortMemberList({
+          limit,
+          page,
+          filters,
+          includeArchived: true,
+        });
+        const resp = response?.result?.userDetails;
+        if (!resp) return;
+        const nameUserIdArray = resp
+          ?.map((entry: any) => ({
+            userId: entry.userId,
+            name: toPascalCase(entry.firstName),
+            memberStatus: entry.status,
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+            userName: entry.username,
+          }))
+          .filter(
+            (member: {
+              createdAt: string | number | Date;
+              updatedAt: string | number | Date;
+              memberStatus: string;
+            }) => {
+              const createdAt = new Date(member.createdAt);
+              createdAt.setHours(0, 0, 0, 0);
+              const updatedAt = new Date(member.updatedAt);
+              updatedAt.setHours(0, 0, 0, 0);
+              const currentDate = new Date(selectedDate);
+              currentDate.setHours(0, 0, 0, 0);
+              if (
+                (member.memberStatus === Status.ARCHIVED ||
+                  member.memberStatus === 'reassigned') &&
+                updatedAt <= currentDate
+              ) {
+                return false;
+              }
+              return createdAt <= new Date(selectedDate);
+            }
+          );
+        const filteredEntries = getLatestEntries(
+          nameUserIdArray,
+          selectedDate
+        );
+        if (filteredEntries && selectedDate) {
+          const wrappedUpdate = (data: any) => {
+            handleAttendanceDataUpdate(data);
+            setSessionAttendanceLoading(false);
+          };
+          fetchAttendanceDetails(
+            filteredEntries,
+            selectedDate,
+            eventRepetitionId,
+            wrappedUpdate,
+            { context: 'event' }
+          );
+        } else {
+          setSessionAttendanceLoading(false);
+        }
+      } catch (error) {
+        console.error('Error fetching session attendance:', error);
+        setSessionAttendanceLoading(false);
+      }
+    };
+    fetchSessionAttendance();
+  }, [open, selectedSession, classId, selectedDate]);
+
   const showDetailsHandle = (dayStr: string) => {
     setSelectedDate(formatSelectedDate(dayStr));
     setShowDetails(true);
@@ -539,7 +647,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleModalToggle = () => {
-    setOpen(!open);
+    setSessionsModalOpen(true);
 
     const telemetryInteract = {
       context: {
@@ -673,10 +781,50 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleClose = () => {
+    const hadSessionSelected = !!selectedSession;
     setOpen(false);
+    setSessionsModalOpen(false);
+    setSelectedSession(null);
+    setSessionAttendanceLoading(false);
     setIsRemoteCohort(false);
-    // setTest(false)
+    if (hadSessionSelected && batchAttendanceSnapshotRef.current) {
+      setAttendanceData(batchAttendanceSnapshotRef.current);
+      batchAttendanceSnapshotRef.current = null;
+    }
   };
+
+  const handleSessionSelect = (session: DaySessionForAttendance) => {
+    setSelectedSession(session);
+    setSessionsModalOpen(false);
+    setOpen(true);
+  };
+
+  useEffect(() => {
+    if (!sessionsModalOpen || !classId || classId === 'all') {
+      return;
+    }
+    let cancelled = false;
+    setSessionsLoading(true);
+    getEventsForDay(classId, selectedDate)
+      .then((sessions) => {
+        if (!cancelled) {
+          setDaySessions(sessions);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setDaySessions([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setSessionsLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionsModalOpen, classId, selectedDate, t]);
 
   const todayDate = getTodayDate();
 
@@ -999,8 +1147,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                           >
                             <Stack
                               direction="row"
-                              spacing={1}
-                              // marginTop={1}
+                              spacing={0}
+                              sx={{ gap: 0 }}
                               justifyContent={'space-between'}
                               alignItems={'center'}
                             >
@@ -1099,47 +1247,101 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                   </Typography>
                                 )}
                               </Box>
-                              <Button
-                                className="btn-mark-width"
-                                variant="contained"
-                                color="primary"
-                                sx={{
-                                  '&.Mui-disabled': {
-                                    backgroundColor:
-                                      theme?.palette?.primary?.main, // Custom disabled text color
-                                  },
-                                  minWidth: '84px',
-                                  height: '2.5rem',
-                                  padding: theme.spacing(1),
-                                  fontWeight: '500',
-                                  '@media (min-width: 500px)': {
-                                    width: '20%',
-                                  },
-                                  '@media (min-width: 700px)': {
-                                    width: '15%',
-                                  },
-                                }}
-                                onClick={handleRemoteSession}
-                                disabled={
-                                  currentAttendance === 'futureDate' ||
-                                  classId === 'all' ||
-                                  (modifyAttendanceLimit > 0 &&
-                                    formattedSevenDaysAgo > selectedDate)
-                                }
-                              >
-                                {currentAttendance === 'notMarked' ||
-                                currentAttendance === 'futureDate'
-                                  ? t('COMMON.MARK')
-                                  : t('COMMON.MODIFY')}
-                              </Button>
+                              <Box display="flex" sx={{ gap: 1 }}>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      backgroundColor:
+                                        theme?.palette?.primary?.main,
+                                    },
+                                    minWidth: '84px',
+                                    height: '2.5rem',
+                                    padding: theme.spacing(1),
+                                    fontWeight: '500',
+                                    marginRight: 0,
+                                    '@media (min-width: 500px)': {
+                                      width: '20%',
+                                    },
+                                    '@media (min-width: 700px)': {
+                                      width: '15%',
+                                    },
+                                  }}
+                                  onClick={() =>
+                                    setResetAttendanceModalOpen(true)
+                                  }
+                                  disabled={
+                                    currentAttendance === 'notMarked' ||
+                                    currentAttendance === 'futureDate' ||
+                                    classId === 'all'
+                                  }
+                                >
+                                  {t('COMMON.RESET')}
+                                </Button>
+                                <Button
+                                  className="btn-mark-width"
+                                  variant="contained"
+                                  color="primary"
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      backgroundColor:
+                                        theme?.palette?.primary?.main,
+                                    },
+                                    minWidth: '84px',
+                                    height: '2.5rem',
+                                    padding: theme.spacing(1),
+                                    fontWeight: '500',
+                                    marginLeft: 0,
+                                    '@media (min-width: 500px)': {
+                                      width: '20%',
+                                    },
+                                    '@media (min-width: 700px)': {
+                                      width: '15%',
+                                    },
+                                  }}
+                                  onClick={handleRemoteSession}
+                                  disabled={
+                                    currentAttendance === 'futureDate' ||
+                                    classId === 'all' ||
+                                    (modifyAttendanceLimit > 0 &&
+                                      formattedSevenDaysAgo > selectedDate)
+                                  }
+                                >
+                                  {currentAttendance === 'notMarked' ||
+                                  currentAttendance === 'futureDate'
+                                    ? t('COMMON.MARK')
+                                    : t('COMMON.MODIFY')}
+                                </Button>
+                              </Box>
                             </Stack>
                           </Box>
+                          {sessionsModalOpen && (
+                            <MarkCenterAttendanceSessionsModal
+                              open={sessionsModalOpen}
+                              onClose={handleClose}
+                              selectedDate={new Date(selectedDate)}
+                              sessions={daySessions}
+                              sessionsLoading={sessionsLoading}
+                              onSessionSelect={handleSessionSelect}
+                            />
+                          )}
                           {open && (
                             <MarkBulkAttendance
                               open={open}
                               onClose={handleClose}
+                              onBack={() => {
+                                setOpen(false);
+                                setSessionsModalOpen(true);
+                              }}
                               classId={classId}
                               selectedDate={new Date(selectedDate)}
+                              selectedSession={
+                                selectedSession
+                                  ? { eventRepetitionId: selectedSession.eventRepetitionId ?? selectedSession.id }
+                                  : null
+                              }
+                              prefillLoading={!!selectedSession && sessionAttendanceLoading}
                               onSaveSuccess={(isModified) => {
                                 if (isModified) {
                                   showToastMessage(
@@ -1229,6 +1431,235 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               </Box>
                             </ModalComponent>
                           )}
+                          <Modal
+                            open={resetAttendanceModalOpen}
+                            onClose={() => setResetAttendanceModalOpen(false)}
+                          >
+                            <Box
+                              sx={{
+                                ...modalStyles(theme, '90%'),
+                                p: 2.5,
+                                outline: 'none',
+                              }}
+                              data-testid="reset-attendance-modal"
+                            >
+                              <Typography
+                                variant="h6"
+                                component="h2"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: theme.palette.warning['A200'],
+                                  mb: 1.5,
+                                  fontSize: '1.125rem',
+                                }}
+                              >
+                                {t('COMMON.RESET_ATTENDANCE')}
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  color: theme.palette.warning['300'],
+                                  fontSize: '14px',
+                                  fontWeight: 400,
+                                  mb: 2,
+                                }}
+                              >
+                                {t(
+                                  'COMMON.RESET_ATTENDANCE_CONFIRM_MESSAGE'
+                                )}
+                              </Typography>
+                              <Box
+                                display="flex"
+                                justifyContent="flex-end"
+                                gap={1.5}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  onClick={() =>
+                                    setResetAttendanceModalOpen(false)
+                                  }
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      backgroundColor:
+                                        theme?.palette?.primary?.main,
+                                    },
+                                  }}
+                                >
+                                  {t('COMMON.CANCEL')}
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="primary"
+                                  disabled={resetAttendanceLoading}
+                                  onClick={async () => {
+                                    if (
+                                      !classId ||
+                                      classId === 'all' ||
+                                      !selectedDate
+                                    ) {
+                                      setResetAttendanceModalOpen(false);
+                                      return;
+                                    }
+                                    setResetAttendanceLoading(true);
+                                    try {
+                                      let userIds: string[] = [];
+                                      if (
+                                        attendanceData?.cohortMemberList
+                                          ?.length > 0
+                                      ) {
+                                        userIds =
+                                          attendanceData.cohortMemberList.map(
+                                            (m: any) => m.userId
+                                          );
+                                      } else {
+                                        const response =
+                                          await getMyCohortMemberList({
+                                            limit: 300,
+                                            page: 0,
+                                            filters: { cohortId: classId },
+                                            includeArchived: true,
+                                          });
+                                        const resp =
+                                          response?.result?.userDetails;
+                                        if (resp) {
+                                          const nameUserIdArray = resp
+                                            ?.map((entry: any) => ({
+                                              userId: entry.userId,
+                                              name: toPascalCase(
+                                                entry.firstName
+                                              ),
+                                              memberStatus: entry.status,
+                                              createdAt: entry.createdAt,
+                                              updatedAt: entry.updatedAt,
+                                              userName: entry.username,
+                                            }))
+                                            .filter(
+                                              (member: {
+                                                createdAt:
+                                                  string | number | Date;
+                                                updatedAt:
+                                                  string | number | Date;
+                                                memberStatus: string;
+                                              }) => {
+                                                const createdAt = new Date(
+                                                  member.createdAt
+                                                );
+                                                createdAt.setHours(
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                                );
+                                                const updatedAt = new Date(
+                                                  member.updatedAt
+                                                );
+                                                updatedAt.setHours(
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                                );
+                                                const currentDate = new Date(
+                                                  selectedDate
+                                                );
+                                                currentDate.setHours(
+                                                  0,
+                                                  0,
+                                                  0,
+                                                  0
+                                                );
+                                                if (
+                                                  (member.memberStatus ===
+                                                    Status.ARCHIVED ||
+                                                    member.memberStatus ===
+                                                      'reassigned') &&
+                                                  updatedAt <= currentDate
+                                                ) {
+                                                  return false;
+                                                }
+                                                return (
+                                                  createdAt <=
+                                                  new Date(selectedDate)
+                                                );
+                                              }
+                                            );
+                                          const filteredEntries =
+                                            getLatestEntries(
+                                              nameUserIdArray,
+                                              selectedDate
+                                            );
+                                          userIds =
+                                            filteredEntries?.map(
+                                              (m: any) => m.userId
+                                            ) ?? [];
+                                        }
+                                      }
+                                      const contextIds: string[] = [
+                                        classId,
+                                      ];
+                                      const dateStr = shortDateFormat(
+                                        new Date(selectedDate)
+                                      );
+                                      const sessions =
+                                        await getEventsForDay(
+                                          classId,
+                                          dateStr
+                                        );
+                                      contextIds.push(
+                                        ...sessions.map(
+                                          (s: DaySessionForAttendance) =>
+                                            s.eventRepetitionId ?? s.id
+                                        )
+                                      );
+                                      const attendanceRecords = userIds.map(
+                                        (userId) => ({
+                                          userId,
+                                          contextIds: contextIds,
+                                          date: dateStr,
+                                        })
+                                      );
+                                      if (
+                                        attendanceRecords.length === 0
+                                      ) {
+                                        setResetAttendanceModalOpen(false);
+                                        setResetAttendanceLoading(false);
+                                        return;
+                                      }
+                                      await bulkDeleteAttendance(
+                                        attendanceRecords
+                                      );
+                                      setResetAttendanceModalOpen(false);
+                                      showToastMessage(
+                                        t(
+                                          'ATTENDANCE.ATTENDANCE_RESET_SUCCESSFULLY'
+                                        ),
+                                        'success'
+                                      );
+                                      setHandleSaveHasRun(!handleSaveHasRun);
+                                    } catch (error) {
+                                      console.error(
+                                        'Error resetting attendance:',
+                                        error
+                                      );
+                                      showToastMessage(
+                                        t('COMMON.SOMETHING_WENT_WRONG'),
+                                        'error'
+                                      );
+                                    } finally {
+                                      setResetAttendanceLoading(false);
+                                    }
+                                  }}
+                                  sx={{
+                                    '&.Mui-disabled': {
+                                      backgroundColor:
+                                        theme?.palette?.primary?.main,
+                                    },
+                                  }}
+                                >
+                                  {t('COMMON.RESET_ATTENDANCE_BUTTON')}
+                                </Button>
+                              </Box>
+                            </Box>
+                          </Modal>
                         </Box>
                       </Box>
                       <Box sx={{ padding: '0 20px' }}>
