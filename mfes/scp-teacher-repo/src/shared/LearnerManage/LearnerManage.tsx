@@ -328,7 +328,7 @@ const LearnerManage = ({
               if (typeof onLearnerAdded === 'function') {
                 onLearnerAdded();
               }
-              if (typeof onLearnerReassign === 'function') {
+              if (typeof onLearnerReassigned === 'function') {
                 onLearnerReassigned();
               }
               setOpenModal(false);
@@ -347,7 +347,7 @@ const LearnerManage = ({
               if (typeof onLearnerAdded === 'function') {
                 onLearnerAdded();
               }
-              if (typeof onLearnerReassign === 'function') {
+              if (typeof onLearnerReassigned === 'function') {
                 onLearnerReassigned();
               }
               setOpenModal(false);
