@@ -21,6 +21,7 @@ import {
   MenuItem,
   InputLabel,
   Button,
+  IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -102,6 +103,7 @@ const OrganizationSearchWidget = ({
     search: '',
   });
   const previousSearchQueryRef = useRef<string>('');
+  const [popperWidth, setPopperWidth] = useState<number | undefined>(undefined);
 
   const limit = 10;
 
@@ -473,6 +475,10 @@ const OrganizationSearchWidget = ({
     if (disabled || readonly) return;
     setOpen((prev) => !prev);
     if (!open) {
+      // Capture width when opening
+      if (anchorRef.current) {
+        setPopperWidth(anchorRef.current.clientWidth);
+      }
       // Focus search input when opening
       setTimeout(() => {
         searchInputRef.current?.focus();
@@ -512,6 +518,57 @@ const OrganizationSearchWidget = ({
     onChange(undefined);
   };
 
+  // Handle clear state filter
+  const handleClearState = () => {
+    if (disabled || readonly || (!isCentralAdmin && stateId)) return;
+
+    // Clear organization list and reset pagination
+    setOrganizations([]);
+    setOffset(0);
+    setHasMore(true);
+    setTotalCount(0);
+    currentDataSearchQueryRef.current = '';
+
+    setSelectedState('');
+    setSelectedDistrict('');
+    setSelectedBlock('');
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
+  // Handle clear district filter
+  const handleClearDistrict = () => {
+    if (disabled || readonly || !selectedState) return;
+
+    // Clear organization list and reset pagination
+    setOrganizations([]);
+    setOffset(0);
+    setHasMore(true);
+    setTotalCount(0);
+    currentDataSearchQueryRef.current = '';
+
+    setSelectedDistrict('');
+    setSelectedBlock('');
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
+  // Handle clear block filter
+  const handleClearBlock = () => {
+    if (disabled || readonly || !selectedDistrict) return;
+
+    // Clear organization list and reset pagination
+    setOrganizations([]);
+    setOffset(0);
+    setHasMore(true);
+    setTotalCount(0);
+    currentDataSearchQueryRef.current = '';
+
+    setSelectedBlock('');
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
   // Handle clear filters
   const handleClearFilters = () => {
     // Clear organization list and reset pagination
@@ -547,104 +604,142 @@ const OrganizationSearchWidget = ({
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* State Dropdown */}
         <Grid item xs={12} sm={12} md={4}>
-          <FormControl fullWidth>
-            <InputLabel id={`${id}-state-label`}>
-              {t('FORM.STATE', { defaultValue: 'State' })}
-            </InputLabel>
-            <Select
-              labelId={`${id}-state-label`}
-              value={selectedState}
-              onChange={handleStateChange}
-              label={t('FORM.STATE', { defaultValue: 'State' })}
-              disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
-            >
-              {loadingStates.state ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} />
-                </MenuItem>
-              ) : (
-                stateOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel id={`${id}-state-label`}>
+                {t('FORM.STATE', { defaultValue: 'State' })}
+              </InputLabel>
+              <Select
+                labelId={`${id}-state-label`}
+                value={selectedState}
+                onChange={handleStateChange}
+                label={t('FORM.STATE', { defaultValue: 'State' })}
+                disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
+              >
+                {loadingStates.state ? (
+                  <MenuItem disabled>
+                    <CircularProgress size={20} />
                   </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
+                ) : (
+                  stateOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+            {selectedState && !disabled && !readonly && (isCentralAdmin || !stateId) && (
+              <IconButton
+                size="small"
+                onClick={handleClearState}
+                sx={{
+                  mt: 1,
+                  color: 'text.secondary',
+                  '&:hover': {
+                    color: 'error.main',
+                    backgroundColor: 'error.light',
+                  },
+                }}
+                aria-label="Clear state"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
         </Grid>
 
         {/* District Dropdown */}
         <Grid item xs={12} sm={12} md={4}>
-          <FormControl fullWidth>
-            <InputLabel id={`${id}-district-label`}>
-              {t('FORM.DISTRICT', { defaultValue: 'District' })}
-            </InputLabel>
-            <Select
-              labelId={`${id}-district-label`}
-              value={selectedDistrict}
-              onChange={handleDistrictChange}
-              label={t('FORM.DISTRICT', { defaultValue: 'District' })}
-              disabled={disabled || readonly || !selectedState || loadingStates.district}
-            >
-              {loadingStates.district ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} />
-                </MenuItem>
-              ) : (
-                districtOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel id={`${id}-district-label`}>
+                {t('FORM.DISTRICT', { defaultValue: 'District' })}
+              </InputLabel>
+              <Select
+                labelId={`${id}-district-label`}
+                value={selectedDistrict}
+                onChange={handleDistrictChange}
+                label={t('FORM.DISTRICT', { defaultValue: 'District' })}
+                disabled={disabled || readonly || !selectedState || loadingStates.district}
+              >
+                {loadingStates.district ? (
+                  <MenuItem disabled>
+                    <CircularProgress size={20} />
                   </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
+                ) : (
+                  districtOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+            {selectedDistrict && !disabled && !readonly && selectedState && (
+              <IconButton
+                size="small"
+                onClick={handleClearDistrict}
+                sx={{
+                  mt: 1,
+                  color: 'text.secondary',
+                  '&:hover': {
+                    color: 'error.main',
+                    backgroundColor: 'error.light',
+                  },
+                }}
+                aria-label="Clear district"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
         </Grid>
 
         {/* Block Dropdown */}
         <Grid item xs={12} sm={12} md={4}>
-          <FormControl fullWidth>
-            <InputLabel id={`${id}-block-label`}>
-              {t('FORM.BLOCK', { defaultValue: 'Block' })}
-            </InputLabel>
-            <Select
-              labelId={`${id}-block-label`}
-              value={selectedBlock}
-              onChange={handleBlockChange}
-              label={t('FORM.BLOCK', { defaultValue: 'Block' })}
-              disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
-            >
-              {loadingStates.block ? (
-                <MenuItem disabled>
-                  <CircularProgress size={20} />
-                </MenuItem>
-              ) : (
-                blockOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+            <FormControl fullWidth>
+              <InputLabel id={`${id}-block-label`}>
+                {t('FORM.BLOCK', { defaultValue: 'Block' })}
+              </InputLabel>
+              <Select
+                labelId={`${id}-block-label`}
+                value={selectedBlock}
+                onChange={handleBlockChange}
+                label={t('FORM.BLOCK', { defaultValue: 'Block' })}
+                disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
+              >
+                {loadingStates.block ? (
+                  <MenuItem disabled>
+                    <CircularProgress size={20} />
                   </MenuItem>
-                ))
-              )}
-            </Select>
-          </FormControl>
-        </Grid>
-
-        {/* Clear Filters Button */}
-        <Grid item xs={12} sm={12} md={12}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<ClearIcon />}
-              onClick={handleClearFilters}
-              disabled={disabled || readonly || !hasActiveFilters}
-              sx={{
-                textTransform: 'none',
-                minWidth: 'auto',
-              }}
-            >
-              {t('FORM.CLEAR_FILTERS', { defaultValue: 'Clear Filters' })}
-            </Button>
+                ) : (
+                  blockOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+            {selectedBlock && !disabled && !readonly && selectedDistrict && (
+              <IconButton
+                size="small"
+                onClick={handleClearBlock}
+                sx={{
+                  mt: 1,
+                  color: 'text.secondary',
+                  '&:hover': {
+                    color: 'error.main',
+                    backgroundColor: 'error.light',
+                  },
+                }}
+                aria-label="Clear block"
+              >
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            )}
           </Box>
         </Grid>
       </Grid>
@@ -747,7 +842,33 @@ const OrganizationSearchWidget = ({
           open={open}
           anchorEl={anchorRef.current}
           placement="bottom-start"
-          style={{ zIndex: 1300, width: anchorRef.current?.clientWidth }}
+          disablePortal={false}
+          modifiers={[
+            {
+              name: 'preventOverflow',
+              enabled: true,
+              options: {
+                altBoundary: true,
+                altAxis: true,
+                padding: 8,
+              },
+            },
+            {
+              name: 'flip',
+              enabled: false,
+            },
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 4],
+              },
+            },
+          ]}
+          sx={{
+            zIndex: 1300,
+            width: popperWidth || anchorRef.current?.clientWidth || 'auto',
+            minWidth: popperWidth || anchorRef.current?.clientWidth || 'auto',
+          }}
         >
           <ClickAwayListener onClickAway={handleClickAway}>
             <Paper
