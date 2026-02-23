@@ -99,10 +99,10 @@ const UserLeader = () => {
       organization_name: {
         "type": "string"
       },
-      child_pocso_policy: {
+      child_pocso_fraud_policy: {
         "type": "string"
       },
-      nda_fraud_policy: {
+      nda_policy: {
         "type": "string"
       },
     },
@@ -110,8 +110,8 @@ const UserLeader = () => {
       "sub_program",
       "ptm_name",
       "organization_name",
-      "child_pocso_policy",
-      "nda_fraud_policy",
+      "child_pocso_fraud_policy",
+      "nda_policy",
     ]
   };
   const testUiSchema = {
@@ -129,12 +129,12 @@ const UserLeader = () => {
       'ui:widget': 'OrganizationSearchWidget',
       'ui:options': { hideError: true },
     },
-    child_pocso_policy: {
-      'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',
+    child_pocso_fraud_policy: {
+      'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
       'ui:options': { hideError: true },
     },
-    nda_fraud_policy: {
-      'ui:widget': 'NdaFraudPolicyAcknowledgementWidget',
+    nda_policy: {
+      'ui:widget': 'NdaPolicyAcknowledgementWidget',
       'ui:options': { hideError: true },
     },
   };

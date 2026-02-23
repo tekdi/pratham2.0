@@ -16,10 +16,16 @@ import {
   Paper,
   Popper,
   ClickAwayListener,
+  Grid,
+  Select,
+  MenuItem,
+  InputLabel,
+  Button,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import ClearIcon from '@mui/icons-material/Clear';
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
 import { fetchActiveAcademicYearId } from '../../../utils/Helper';
@@ -35,6 +41,11 @@ interface CohortDetail {
 interface OrganizationOption {
   label: string;
   value: string;
+}
+
+interface LocationOption {
+  value: string;
+  label: string;
 }
 
 const OrganizationSearchWidget = ({
@@ -62,11 +73,34 @@ const OrganizationSearchWidget = ({
   const [academicYearId, setAcademicYearId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
+  // State, District, Block filters
+  const [stateOptions, setStateOptions] = useState<LocationOption[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<LocationOption[]>([]);
+  const [blockOptions, setBlockOptions] = useState<LocationOption[]>([]);
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [selectedBlock, setSelectedBlock] = useState<string>('');
+  const [loadingStates, setLoadingStates] = useState({
+    state: false,
+    district: false,
+    block: false,
+  });
+
+  // Get user role and state from localStorage
+  const stateId = typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
+  const userRole = typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
+  const isCentralAdmin = userRole === 'Central Lead' || userRole === 'Central Admin';
+
   const anchorRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const lastSearchQueryRef = useRef<string>('');
   const currentDataSearchQueryRef = useRef<string>('');
+  const previousFiltersRef = useRef<{ state: string; district: string; block: string; search: string }>({
+    state: '',
+    district: '',
+    block: '',
+    search: '',
+  });
   const previousSearchQueryRef = useRef<string>('');
 
   const limit = 10;
@@ -79,6 +113,116 @@ const OrganizationSearchWidget = ({
     };
     loadAcademicYear();
   }, []);
+
+  // Load state options on mount
+  useEffect(() => {
+    const loadStateOptions = async () => {
+      setLoadingStates((prev) => ({ ...prev, state: true }));
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+          {
+            fieldName: 'state',
+            sort: ['state_name', 'asc'],
+          }
+        );
+        const states =
+          response?.data?.result?.values?.map((item) => ({
+            value: item.value,
+            label: item.label,
+          })) || [];
+        setStateOptions(states);
+
+        // Set default state from localStorage if available
+        if (stateId && !selectedState) {
+          const stateExists = states.some((state) => state.value === stateId);
+          if (stateExists) {
+            setSelectedState(stateId);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading states:', error);
+        if (stateId && !selectedState) {
+          setSelectedState(stateId);
+        }
+      } finally {
+        setLoadingStates((prev) => ({ ...prev, state: false }));
+      }
+    };
+    loadStateOptions();
+  }, []);
+
+  // Load district options when state changes
+  useEffect(() => {
+    const loadDistrictOptions = async () => {
+      const stateToUse = selectedState || stateId;
+      if (!stateToUse) {
+        setDistrictOptions([]);
+        setSelectedDistrict('');
+        return;
+      }
+
+      setLoadingStates((prev) => ({ ...prev, district: true }));
+      try {
+        const controllingField = !isCentralAdmin && stateId ? [stateId] : [stateToUse];
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+          {
+            fieldName: 'district',
+            controllingfieldfk: controllingField,
+            sort: ['district_name', 'asc'],
+          }
+        );
+        const districts =
+          response?.data?.result?.values?.map((item) => ({
+            value: item.value,
+            label: item.label,
+          })) || [];
+        setDistrictOptions(districts);
+      } catch (error) {
+        console.error('Error loading districts:', error);
+        setDistrictOptions([]);
+      } finally {
+        setLoadingStates((prev) => ({ ...prev, district: false }));
+      }
+    };
+    loadDistrictOptions();
+  }, [selectedState, stateId, isCentralAdmin]);
+
+  // Load block options when district changes
+  useEffect(() => {
+    const loadBlockOptions = async () => {
+      if (!selectedDistrict) {
+        setBlockOptions([]);
+        setSelectedBlock('');
+        return;
+      }
+
+      setLoadingStates((prev) => ({ ...prev, block: true }));
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+          {
+            fieldName: 'block',
+            controllingfieldfk: [selectedDistrict],
+            sort: ['block_name', 'asc'],
+          }
+        );
+        const blocks =
+          response?.data?.result?.values?.map((item) => ({
+            value: item.value,
+            label: item.label,
+          })) || [];
+        setBlockOptions(blocks);
+      } catch (error) {
+        console.error('Error loading blocks:', error);
+        setBlockOptions([]);
+      } finally {
+        setLoadingStates((prev) => ({ ...prev, block: false }));
+      }
+    };
+    loadBlockOptions();
+  }, [selectedDistrict]);
 
   // Fetch organizations from API
   const fetchOrganizations = useCallback(
@@ -112,6 +256,17 @@ const OrganizationSearchWidget = ({
             status: ["active"]
           },
         };
+
+        // Add location filters if selected
+        if (selectedState) {
+          requestBody.filters.state = [selectedState];
+        }
+        if (selectedDistrict) {
+          requestBody.filters.district = [selectedDistrict];
+        }
+        if (selectedBlock) {
+          requestBody.filters.block = [selectedBlock];
+        }
 
         // Add search filter if search term exists
         if (searchTerm.trim()) {
@@ -163,6 +318,13 @@ const OrganizationSearchWidget = ({
           setOrganizations(organizationOptions);
           // Update the search query that current data corresponds to
           currentDataSearchQueryRef.current = searchTerm;
+          // Update the filter state that current data corresponds to
+          previousFiltersRef.current = {
+            state: selectedState || '',
+            district: selectedDistrict || '',
+            block: selectedBlock || '',
+            search: searchTerm || '',
+          };
         }
 
         // Check if there are more results
@@ -183,61 +345,53 @@ const OrganizationSearchWidget = ({
         }
       }
     },
-    [academicYearId]
+    [academicYearId, selectedState, selectedDistrict, selectedBlock]
   );
 
-  // Initial load - only fetch when dropdown first opens if no data exists
+  // Fetch organizations when filters or search change (only when dropdown is open)
   useEffect(() => {
-    if (academicYearId && open) {
-      // Only fetch on initial open if we have no data
-      // Don't fetch if search is being handled by search effect
-      if (organizations.length === 0 && currentDataSearchQueryRef.current === '') {
-        lastSearchQueryRef.current = searchQuery;
-        fetchOrganizations(searchQuery, 0, false);
-      }
-    }
-  }, [academicYearId, open, fetchOrganizations]);
+    if (!academicYearId || !open) return;
 
-  // Reset selected item and pagination immediately when user types in search box
-  useEffect(() => {
-    if (!open) return;
+    // Check if filters or search actually changed
+    const currentFilters = {
+      state: selectedState || '',
+      district: selectedDistrict || '',
+      block: selectedBlock || '',
+      search: searchQuery || '',
+    };
 
-    // Reset if search query changed (user typed something)
-    // Skip reset only on very first render when both previous and current are empty
-    const isInitialState = previousSearchQueryRef.current === '' && searchQuery === '';
+    const filtersChanged =
+      previousFiltersRef.current.state !== currentFilters.state ||
+      previousFiltersRef.current.district !== currentFilters.district ||
+      previousFiltersRef.current.block !== currentFilters.block ||
+      previousFiltersRef.current.search !== currentFilters.search;
 
-    if (previousSearchQueryRef.current !== searchQuery && !isInitialState) {
-      // Reset selected item
-      setSelectedOrganization(null);
-      onChange(undefined);
-      // Reset pagination state immediately to prevent multiple API calls
+    // Only reset pagination when filters/search actually change
+    if (filtersChanged) {
       setOffset(0);
       setHasMore(true);
       setTotalCount(0);
-      setOrganizations([]); // Clear existing organizations to prevent showing old data
-      // Don't reset currentDataSearchQueryRef here - let search effect handle it
-      // This ensures search effect can detect change even when clearing to empty
+      setOrganizations([]);
+      currentDataSearchQueryRef.current = '';
+
+      // Debounce search query changes
+      const timeoutId = setTimeout(() => {
+        fetchOrganizations(searchQuery, 0, false);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
     }
 
-    // Update previous search query ref
-    previousSearchQueryRef.current = searchQuery;
-  }, [searchQuery, open, onChange]);
+    // If filters haven't changed but dropdown just opened and we have no data, fetch initial data
+    // This handles the case when dropdown first opens with no previous data
+    if (organizations.length === 0) {
+      const timeoutId = setTimeout(() => {
+        fetchOrganizations(searchQuery, 0, false);
+      }, 300);
 
-  // Handle search with debounce - fetch organizations when search changes
-  useEffect(() => {
-    if (!open || !academicYearId) return;
-
-    // Only trigger if search query actually changed from what we last fetched
-    if (currentDataSearchQueryRef.current === searchQuery) return;
-
-    const timeoutId = setTimeout(() => {
-      // Fetch only first page (offset 0) when search changes
-      lastSearchQueryRef.current = searchQuery;
-      fetchOrganizations(searchQuery, 0, false);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, open, academicYearId, fetchOrganizations]);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, academicYearId, open, fetchOrganizations, organizations.length]);
 
   // Handle scroll pagination
   const handleScroll = useCallback(
@@ -245,11 +399,18 @@ const OrganizationSearchWidget = ({
       const target = e.currentTarget;
       const bottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
 
+      // Check if current filters match the data we have loaded
+      const filtersMatch =
+        previousFiltersRef.current.state === (selectedState || '') &&
+        previousFiltersRef.current.district === (selectedDistrict || '') &&
+        previousFiltersRef.current.block === (selectedBlock || '') &&
+        previousFiltersRef.current.search === (searchQuery || '');
+
       // Only trigger pagination if:
       // 1. Scrolled to bottom
       // 2. Has more data
       // 3. Not currently loading
-      // 4. Search query matches current data (prevents pagination during search change)
+      // 4. Filters match current data (prevents pagination during filter/search change)
       // 5. Academic year is available
       if (
         bottom &&
@@ -257,13 +418,32 @@ const OrganizationSearchWidget = ({
         !loading &&
         !loadingMore &&
         academicYearId &&
-        currentDataSearchQueryRef.current === searchQuery
+        filtersMatch
       ) {
         fetchOrganizations(searchQuery, offset, true);
       }
     },
-    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchOrganizations]
+    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchOrganizations, selectedState, selectedDistrict, selectedBlock]
   );
+
+  // Clear selected organization when user types in search box
+  useEffect(() => {
+    if (!open) {
+      previousSearchQueryRef.current = searchQuery;
+      return;
+    }
+
+    // Clear selection when user types anything in search box (search query changes)
+    const searchChanged = previousSearchQueryRef.current !== searchQuery;
+
+    if (selectedOrganization && searchChanged) {
+      // Clear selection when user starts typing or changes search
+      setSelectedOrganization(null);
+      onChange(undefined);
+    }
+
+    previousSearchQueryRef.current = searchQuery;
+  }, [searchQuery, open, selectedOrganization, onChange]);
 
   // Set selected organization when value changes
   useEffect(() => {
@@ -305,8 +485,170 @@ const OrganizationSearchWidget = ({
     setOpen(false);
   };
 
+  // Handle state change
+  const handleStateChange = (event: any) => {
+    const newState = event.target.value;
+    setSelectedState(newState);
+    setSelectedDistrict('');
+    setSelectedBlock('');
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
+  // Handle district change
+  const handleDistrictChange = (event: any) => {
+    const newDistrict = event.target.value;
+    setSelectedDistrict(newDistrict);
+    setSelectedBlock('');
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
+  // Handle block change
+  const handleBlockChange = (event: any) => {
+    const newBlock = event.target.value;
+    setSelectedBlock(newBlock);
+    setSelectedOrganization(null);
+    onChange(undefined);
+  };
+
+  // Handle clear filters
+  const handleClearFilters = () => {
+    // Clear organization list and reset pagination
+    setOrganizations([]);
+    setOffset(0);
+    setHasMore(true);
+    setTotalCount(0);
+    currentDataSearchQueryRef.current = '';
+
+    // For non-central admin with stateId, don't clear state (it's locked)
+    if (!isCentralAdmin && stateId) {
+      setSelectedDistrict('');
+      setSelectedBlock('');
+      // Don't update previousFiltersRef here - let useEffect detect the change
+    } else {
+      setSelectedState('');
+      setSelectedDistrict('');
+      setSelectedBlock('');
+      // Don't update previousFiltersRef here - let useEffect detect the change
+    }
+    setSelectedOrganization(null);
+    setSearchQuery('');
+    onChange(undefined);
+    // The useEffect that watches for filter changes will automatically reload organizations
+  };
+
+  // Check if any filters are active
+  const hasActiveFilters = selectedState || selectedDistrict || selectedBlock;
+
   return (
     <Box>
+      {/* State, District, Block Filters */}
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {/* State Dropdown */}
+        <Grid item xs={12} sm={12} md={4}>
+          <FormControl fullWidth>
+            <InputLabel id={`${id}-state-label`}>
+              {t('FORM.STATE', { defaultValue: 'State' })}
+            </InputLabel>
+            <Select
+              labelId={`${id}-state-label`}
+              value={selectedState}
+              onChange={handleStateChange}
+              label={t('FORM.STATE', { defaultValue: 'State' })}
+              disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
+            >
+              {loadingStates.state ? (
+                <MenuItem disabled>
+                  <CircularProgress size={20} />
+                </MenuItem>
+              ) : (
+                stateOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* District Dropdown */}
+        <Grid item xs={12} sm={12} md={4}>
+          <FormControl fullWidth>
+            <InputLabel id={`${id}-district-label`}>
+              {t('FORM.DISTRICT', { defaultValue: 'District' })}
+            </InputLabel>
+            <Select
+              labelId={`${id}-district-label`}
+              value={selectedDistrict}
+              onChange={handleDistrictChange}
+              label={t('FORM.DISTRICT', { defaultValue: 'District' })}
+              disabled={disabled || readonly || !selectedState || loadingStates.district}
+            >
+              {loadingStates.district ? (
+                <MenuItem disabled>
+                  <CircularProgress size={20} />
+                </MenuItem>
+              ) : (
+                districtOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Block Dropdown */}
+        <Grid item xs={12} sm={12} md={4}>
+          <FormControl fullWidth>
+            <InputLabel id={`${id}-block-label`}>
+              {t('FORM.BLOCK', { defaultValue: 'Block' })}
+            </InputLabel>
+            <Select
+              labelId={`${id}-block-label`}
+              value={selectedBlock}
+              onChange={handleBlockChange}
+              label={t('FORM.BLOCK', { defaultValue: 'Block' })}
+              disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
+            >
+              {loadingStates.block ? (
+                <MenuItem disabled>
+                  <CircularProgress size={20} />
+                </MenuItem>
+              ) : (
+                blockOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {/* Clear Filters Button */}
+        <Grid item xs={12} sm={12} md={12}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<ClearIcon />}
+              onClick={handleClearFilters}
+              disabled={disabled || readonly || !hasActiveFilters}
+              sx={{
+                textTransform: 'none',
+                minWidth: 'auto',
+              }}
+            >
+              {t('FORM.CLEAR_FILTERS', { defaultValue: 'Clear Filters' })}
+            </Button>
+          </Box>
+        </Grid>
+      </Grid>
+
       <FormControl
         fullWidth
         required={required}

@@ -692,7 +692,10 @@
     "CHILD_PROTECTION_POLICY": "குழந்தை பாதுகாப்பு கொள்கை",
     "POCSO_POLICY": "POCSO கொள்கை",
     "NDA_POLICY": "NDA கொள்கை",
-    "FRAUD_PROTECTION_POLICY": "மோசடி பாதுகாப்பு கொள்கை"
+    "FRAUD_PROTECTION_POLICY": "மோசடி பாதுகாப்பு கொள்கை",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " மற்றும் இரகசியத்தை பராமரிக்க ஒப்புக்கொள்கிறேன்.",
+    "AND_TO_COMPLY": " மற்றும் இணங்க ஒப்புக்கொள்கிறேன்.",
+    "AND": " மற்றும் "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "தவறான உள்ளீடு.",

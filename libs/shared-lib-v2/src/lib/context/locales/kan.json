@@ -692,7 +692,10 @@
     "CHILD_PROTECTION_POLICY": "ಮಕ್ಕಳ ರಕ್ಷಣೆ ನೀತಿ",
     "POCSO_POLICY": "POCSO ನೀತಿ",
     "NDA_POLICY": "NDA ನೀತಿ",
-    "FRAUD_PROTECTION_POLICY": "ವಂಚನೆ ರಕ್ಷಣೆ ನೀತಿ"
+    "FRAUD_PROTECTION_POLICY": "ವಂಚನೆ ರಕ್ಷಣೆ ನೀತಿ",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " ಮತ್ತು ಗೌಪ್ಯತೆಯನ್ನು ಕಾಪಾಡಲು ಒಪ್ಪುತ್ತೇನೆ.",
+    "AND_TO_COMPLY": " ಮತ್ತು ಅನುಸರಿಸಲು ಒಪ್ಪುತ್ತೇನೆ.",
+    "AND": " ಮತ್ತು "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ಅಮಾನ್ಯ ಇನ್ಪುಟ್.",

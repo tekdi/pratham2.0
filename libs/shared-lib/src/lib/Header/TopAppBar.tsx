@@ -98,6 +98,7 @@ const LanguageSelect = ({
       onLanguageChange(newLanguage);
     } else {
       localStorage.setItem('lang', newLanguage);
+      localStorage.setItem('preferredLanguage', newLanguage);
     }
   };
 
