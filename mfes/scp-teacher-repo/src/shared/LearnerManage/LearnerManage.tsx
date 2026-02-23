@@ -328,9 +328,9 @@ const LearnerManage = ({
               if (typeof onLearnerAdded === 'function') {
                 onLearnerAdded();
               }
-              // if (typeof onLearnerReassign === 'function') {
+              if (typeof onLearnerReassign === 'function') {
                 onLearnerReassigned();
-              // }
+              }
               setOpenModal(false);
             }}
             schema={isEditProfile ? addEditSchema : addSchema}
@@ -347,9 +347,9 @@ const LearnerManage = ({
               if (typeof onLearnerAdded === 'function') {
                 onLearnerAdded();
               }
-              // if (typeof onLearnerReassign === 'function') {
+              if (typeof onLearnerReassign === 'function') {
                 onLearnerReassigned();
-              // }
+              }
               setOpenModal(false);
             }}
             extraFields={extraFields}
