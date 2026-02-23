@@ -604,12 +604,12 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
                         >
                           {role.roleName}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        {/* <Typography variant="body2" color="text.secondary">
                           {t('SWITCH_ACCOUNT.ROLE_ID_LABEL', {
                             defaultValue: 'Role ID:',
                           })}{' '}
                           {role.roleId}
-                        </Typography>
+                        </Typography> */}
                       </Box>
                       {selectedRole?.roleId === role.roleId && (
                         <CheckCircle color="primary" />
