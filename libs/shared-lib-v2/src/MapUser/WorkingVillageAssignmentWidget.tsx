@@ -301,7 +301,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           // Extract assigned village IDs
           const assignedVillageIds = new Set<number>();
           if (userListResponse?.data?.result?.getUserDetails) {
-            const filteredResponse = userListResponse.data.result.getUserDetails;
+            const userListResponseData = userListResponse.data.result.getUserDetails;
+            const filteredResponse = userListResponseData?.filter(
+              user => user.tenantStatus === "active"
+            );
             // console.log("filteredResponse>>>>", filteredResponse);
             
             // Filter out the current user's data to avoid marking their own villages as assigned
