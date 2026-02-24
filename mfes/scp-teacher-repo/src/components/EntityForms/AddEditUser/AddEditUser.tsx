@@ -135,6 +135,8 @@ const AddEditUser = ({
           'grade',
           'center',
           'program',
+          'privacy_consent',
+          'parent_guardian_consent',
           //  'class',
           // 'marital_status',
           // 'phone_type_available',
@@ -226,7 +228,7 @@ const AddEditUser = ({
         keysToHave.includes(key)
       );
     } else {
-      const keysToRemove = ['password', 'confirm_password', 'program'];
+      const keysToRemove = ['password', 'confirm_password', 'program', 'privacy_consent', 'parent_guardian_consent'];
       keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
