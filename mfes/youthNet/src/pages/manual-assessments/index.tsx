@@ -26,14 +26,17 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toPascalCase } from '../../utils/Helper';
 import Dropdown from '../../components/youthNet/DropDown';
 import { getStateBlockDistrictList } from '../../services/youthNet/Dashboard/VillageServices';
-import { cohortHierarchy } from '../../utils/app.constant';
-import { DROPDOWN_NAME, YOUTHNET_USER_ROLE } from '../../components/youthNet/tempConfigs';
-import { getLoggedInUserRole } from '../../utils/Helper';
+import { DROPDOWN_NAME } from '../../components/youthNet/tempConfigs';
 import { loggedInProgram } from '../../utils/app.config';
+import {
+  DropdownOption,
+  extractFromCenterCatchment,
+  getCenterOptionsFromLocalStorage,
+} from '../../utils/location/catchment';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();
@@ -74,13 +77,24 @@ const AssessmentList = () => {
     return null;
   });
 
-  const [districtData, setDistrictData] = useState<any>(null);
-  const [blockData, setBlockData] = useState<any>(null);
-  const [selectedStateValue, setSelectedStateValue] = useState<any>('');
-  const [selectedDistrictValue, setSelectedDistrictValue] = useState<any>('');
-  const [selectedBlockValue, setSelectedBlockValue] = useState<any>('');
-  const [villageList, setVillageList] = useState<any>([]);
-  const [selectedVillageValue, setSelectedVillageValue] = useState<any>('');
+  const [centerOptions, setCenterOptions] = useState<DropdownOption[]>([]);
+  const [selectedCenterIdForLocation, setSelectedCenterIdForLocation] = useState<string>('');
+
+  const [stateData, setStateData] = useState<DropdownOption[]>([]);
+  const [districtData, setDistrictData] = useState<DropdownOption[]>([]);
+  const [blockData, setBlockData] = useState<DropdownOption[]>([]);
+  const [allDistrictsByState, setAllDistrictsByState] = useState<
+    Record<string, DropdownOption[]>
+  >({});
+  const [allBlocksByDistrict, setAllBlocksByDistrict] = useState<
+    Record<string, DropdownOption[]>
+  >({});
+
+  const [selectedStateValue, setSelectedStateValue] = useState<string>('');
+  const [selectedDistrictValue, setSelectedDistrictValue] = useState<string>('');
+  const [selectedBlockValue, setSelectedBlockValue] = useState<string>('');
+  const [villageList, setVillageList] = useState<any[]>([]);
+  const [selectedVillageValue, setSelectedVillageValue] = useState<string>('');
 
   // Course accordion state
   const [courseData, setCourseData] = useState<any[]>([]);
@@ -89,6 +103,11 @@ const AssessmentList = () => {
   const [courseAssessments, setCourseAssessments] = useState<{ [courseId: string]: any[] }>({});
 
   const { query } = router;
+
+  const queryRef = useRef(router.query);
+  useEffect(() => {
+    queryRef.current = router.query;
+  }, [router.query]);
 
   // Authentication check (following existing pattern)
   useEffect(() => {
@@ -114,171 +133,286 @@ const AssessmentList = () => {
     setAssessmentType(newAssessmentType);
   }, [query.type]);
 
-  // Extract center data from cohorts (following /assessments/index.tsx pattern)
-  // useEffect(() => {
-  //   if (classId && cohortsData?.length) {
-  //     const cohort = cohortsData.find((item: any) => item.cohortId === classId);
-  //     if (!cohort?.customField) {
-  //       setCenterData(null);
-  //       return;
-  //     }
-  //     const selectedState =
-  //       cohort.customField.find((item: any) => item.label === 'STATE')
-  //         ?.selectedValues?.[0]?.value || '';
+  const getQueryParam = useCallback(
+    (key: string) => {
+      const val = queryRef.current?.[key];
+      return Array.isArray(val) ? String(val[0] ?? '') : String(val ?? '');
+    },
+    []
+  );
 
-  //     const selectedBoard =
-  //       cohort.customField.find((item: any) => item.label === 'BOARD')
-  //         ?.selectedValues?.[0] || '';
+  const updateLocationQuery = useCallback(
+    (next: Record<string, string>, clearKeys: string[] = []) => {
+      const newQuery: Record<string, any> = { ...router.query, ...next };
+      clearKeys.forEach((k) => {
+        delete newQuery[k];
+      });
+      router.push({ pathname: router.pathname, query: newQuery }, undefined, {
+        shallow: true,
+      });
+    },
+    [router]
+  );
 
-  //     setCenterData({ state: selectedState, board: selectedBoard });
-  //   }
-  // }, [classId, cohortsData]);
-
-  // Initialize district and block dropdown data (role-based, mirroring villages page)
+  // Load center options from localStorage.cohortData
   useEffect(() => {
-    // Only initialize district/block data for LEAD role
-    if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole()) {
-      try {
-        const userDataString = localStorage.getItem('userData');
-        const userData: any = userDataString ? JSON.parse(userDataString) : null;
-        const stateResult = userData?.customFields?.find(
-          (item: any) => item.label === cohortHierarchy.STATE
-        );
-        setSelectedStateValue(stateResult?.selectedValues?.[0]?.id);
+    if (!router.isReady) return;
+    setCenterOptions(getCenterOptionsFromLocalStorage());
+  }, [router.isReady]);
 
-        const districtResult = userData?.customFields?.find(
-          (item: any) => item.label === cohortHierarchy.DISTRICT
-        );
-        const transformedDistricts = districtResult?.selectedValues?.map(
-          (item: any) => ({ id: item?.id, name: item?.value })
-        );
-        setDistrictData(transformedDistricts);
-        const firstDistrictId = transformedDistricts?.[0]?.id;
-        setSelectedDistrictValue(firstDistrictId);
+  // Initialize selected center from query / workingLocationCenterId / first option
+  useEffect(() => {
+    if (!router.isReady || centerOptions.length === 0) return;
 
-        if (firstDistrictId) {
-          const controllingfieldfk = [firstDistrictId?.toString()];
-          const fieldName = 'block';
-          getStateBlockDistrictList({ controllingfieldfk, fieldName })
-            .then((blockResponce: any) => {
-              const transformedBlockData = blockResponce?.result?.values?.map(
-                (item: any) => ({ id: item?.value, name: item?.label })
-              );
-              setBlockData(transformedBlockData);
-              let firstBlockId = transformedBlockData?.[0]?.id || '';
-              if (
-                router.query.blockId &&
-                transformedBlockData?.some(
-                  (b: any) => String(b.id) === String(router.query.blockId)
-                )
-              ) {
-                firstBlockId = router.query.blockId;
-              }
-              setSelectedBlockValue(firstBlockId);
-              setBlockId(firstBlockId);
-            })
-            .catch((e: any) => {
-              console.error('Error fetching block data:', e);
-              setBlockData([]);
-            });
-        } else {
-          setBlockData([]);
-        }
-      } catch (e) {
-        console.error('Error initializing district/block data:', e);
-        setDistrictData([]);
-        setBlockData([]);
-      }
+    const centerIdFromQuery = getQueryParam('centerId');
+    const workingLocationCenterId =
+      typeof window !== 'undefined' ? localStorage.getItem('workingLocationCenterId') : null;
+
+    const resolvedCenterId =
+      (centerIdFromQuery &&
+        centerOptions.some((c) => String(c.id) === String(centerIdFromQuery)) &&
+        centerIdFromQuery) ||
+      (workingLocationCenterId &&
+        centerOptions.some((c) => String(c.id) === String(workingLocationCenterId)) &&
+        workingLocationCenterId) ||
+      centerOptions[0]?.id ||
+      '';
+
+    if (resolvedCenterId && resolvedCenterId !== selectedCenterIdForLocation) {
+      setSelectedCenterIdForLocation(String(resolvedCenterId));
     }
-  }, [router.isReady, router.query.blockId]);
+  }, [
+    router.isReady,
+    centerOptions,
+    selectedCenterIdForLocation,
+    getQueryParam,
+    router.query.centerId,
+  ]);
 
-  // Village list fetching logic (role-based, following villages page pattern)
+  // Populate state/district/block from selected center catchment
+  useEffect(() => {
+    if (!router.isReady || !selectedCenterIdForLocation) return;
+
+    let cohortData: any[] = [];
+    try {
+      const cohortDataString = localStorage.getItem('cohortData');
+      const parsed = cohortDataString ? JSON.parse(cohortDataString) : [];
+      cohortData = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      cohortData = [];
+    }
+
+    const { states, districtsByState, blocksByDistrict } = extractFromCenterCatchment(
+      cohortData,
+      selectedCenterIdForLocation
+    );
+
+    setStateData(states);
+    setAllDistrictsByState(districtsByState);
+    setAllBlocksByDistrict(blocksByDistrict);
+
+    const stateIdFromQuery = getQueryParam('stateId');
+    const resolvedStateId =
+      (stateIdFromQuery && states.some((s) => String(s.id) === String(stateIdFromQuery)) && stateIdFromQuery) ||
+      states[0]?.id ||
+      '';
+    setSelectedStateValue(String(resolvedStateId));
+
+    const districts = resolvedStateId ? districtsByState[String(resolvedStateId)] || [] : [];
+    setDistrictData(districts);
+    const districtIdFromQuery = getQueryParam('districtId');
+    const resolvedDistrictId =
+      (districtIdFromQuery &&
+        districts.some((d) => String(d.id) === String(districtIdFromQuery)) &&
+        districtIdFromQuery) ||
+      districts[0]?.id ||
+      '';
+    setSelectedDistrictValue(String(resolvedDistrictId));
+
+    const blocks = resolvedDistrictId ? blocksByDistrict[String(resolvedDistrictId)] || [] : [];
+    setBlockData(blocks);
+    const blockIdFromQuery = getQueryParam('blockId');
+    const resolvedBlockId =
+      (blockIdFromQuery && blocks.some((b) => String(b.id) === String(blockIdFromQuery)) && blockIdFromQuery) ||
+      blocks[0]?.id ||
+      '';
+    setSelectedBlockValue(String(resolvedBlockId));
+    setBlockId(String(resolvedBlockId));
+
+    // Village will be fetched based on resolved block
+    setVillageList([]);
+    setSelectedVillageValue('');
+    setVillageId('');
+  }, [
+    router.isReady,
+    selectedCenterIdForLocation,
+    getQueryParam,
+  ]);
+
+  // Update districts when state changes
+  useEffect(() => {
+    if (!selectedStateValue) {
+      setDistrictData([]);
+      setSelectedDistrictValue('');
+      return;
+    }
+
+    const districtsForState = allDistrictsByState[selectedStateValue] || [];
+    setDistrictData(districtsForState);
+
+    const districtIdFromQuery = getQueryParam('districtId');
+    const resolvedDistrictId =
+      (districtIdFromQuery &&
+        districtsForState.some((d) => String(d.id) === String(districtIdFromQuery)) &&
+        districtIdFromQuery) ||
+      districtsForState[0]?.id ||
+      '';
+
+    if (String(resolvedDistrictId) !== String(selectedDistrictValue)) {
+      setSelectedDistrictValue(String(resolvedDistrictId));
+    }
+  }, [selectedStateValue, allDistrictsByState, getQueryParam]);
+
+  // Update blocks when district changes
+  useEffect(() => {
+    if (!selectedDistrictValue) {
+      setBlockData([]);
+      setSelectedBlockValue('');
+      setBlockId('');
+      return;
+    }
+
+    const blocksForDistrict = allBlocksByDistrict[selectedDistrictValue] || [];
+    setBlockData(blocksForDistrict);
+
+    const blockIdFromQuery = getQueryParam('blockId');
+    const resolvedBlockId =
+      (blockIdFromQuery &&
+        blocksForDistrict.some((b) => String(b.id) === String(blockIdFromQuery)) &&
+        blockIdFromQuery) ||
+      blocksForDistrict[0]?.id ||
+      '';
+
+    if (String(resolvedBlockId) !== String(selectedBlockValue)) {
+      setSelectedBlockValue(String(resolvedBlockId));
+      setBlockId(String(resolvedBlockId));
+    }
+  }, [selectedDistrictValue, allBlocksByDistrict, getQueryParam]);
+
+  // Village list fetching logic (unified) with stale-response guard + fallback
+  const selectedBlockValueRef = useRef<string>(selectedBlockValue);
+  selectedBlockValueRef.current = selectedBlockValue;
+
+  const villageFetchRunRef = useRef(0);
   useEffect(() => {
     const getVillageList = async () => {
-      try {
-        if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
-          // For INSTRUCTOR role: get villages from localStorage (logged user's block villages)
-          const villageDataString = localStorage.getItem('villageData');
-          const villageData: any = villageDataString
-            ? JSON.parse(villageDataString)
-            : null;
-          setVillageList(villageData || []);
-          if (villageData && villageData.length > 0) {
-            let firstVillageId = villageData[0]?.Id;
-            if (
-              router.query.villageId &&
-              villageData.some(
-                (v: any) => String(v.Id) === String(router.query.villageId)
-              )
-            ) {
-              firstVillageId = router.query.villageId;
-            }
-            setSelectedVillageValue(firstVillageId);
-            setVillageId(firstVillageId);
-          }
-        } else if (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue !== '') {
-          // For LEAD role: fetch villages based on selected block
-          const controllingfieldfk = [selectedBlockValue?.toString()];
-          const fieldName = 'village';
-          const villageResponce = await getStateBlockDistrictList({
-            controllingfieldfk,
-            fieldName,
-          });
-
-          const transformedVillageData = villageResponce?.result?.values?.map(
-            (item: any) => ({
-              Id: item?.value,
-              name: item?.label,
-            })
-          );
-          setVillageList(transformedVillageData || []);
-          if (transformedVillageData && transformedVillageData.length > 0) {
-            let firstVillageId = transformedVillageData[0]?.Id;
-            if (
-              router.query.villageId &&
-              transformedVillageData.some(
-                (v: any) => String(v.Id) === String(router.query.villageId)
-              )
-            ) {
-              firstVillageId = router.query.villageId;
-            }
-            setSelectedVillageValue(firstVillageId);
-            setVillageId(firstVillageId);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching village data:', error);
+      const blockWeAreFetching = selectedBlockValue;
+      villageFetchRunRef.current += 1;
+      if (!blockWeAreFetching) {
         setVillageList([]);
+        setSelectedVillageValue('');
+        setVillageId('');
+        return;
+      }
+
+      try {
+        const controllingfieldfk = [String(blockWeAreFetching)];
+        const fieldName = 'village';
+        const villageResponce = await getStateBlockDistrictList({
+          controllingfieldfk,
+          fieldName,
+        });
+
+        if (selectedBlockValueRef.current !== blockWeAreFetching) return;
+
+        const transformedVillageData =
+          villageResponce?.result?.values?.map((item: any) => ({
+            Id: item?.value,
+            name: item?.label,
+          })) || [];
+
+        setVillageList(transformedVillageData);
+
+        const villageIdFromQuery = getQueryParam('villageId');
+        const resolvedVillageId =
+          (villageIdFromQuery &&
+            transformedVillageData.some((v: any) => String(v.Id) === String(villageIdFromQuery)) &&
+            villageIdFromQuery) ||
+          transformedVillageData?.[0]?.Id ||
+          '';
+
+        setSelectedVillageValue(String(resolvedVillageId));
+        setVillageId(String(resolvedVillageId));
+      } catch (error) {
+        if (selectedBlockValueRef.current !== blockWeAreFetching) return;
+
+        try {
+          const villageDataString = localStorage.getItem('villageData');
+          const villageData: any[] = villageDataString ? JSON.parse(villageDataString) : [];
+          const safeVillageData = Array.isArray(villageData) ? villageData : [];
+          setVillageList(safeVillageData);
+
+          const villageIdFromQuery = getQueryParam('villageId');
+          const resolvedVillageId =
+            (villageIdFromQuery &&
+              safeVillageData.some((v: any) => String(v.Id) === String(villageIdFromQuery)) &&
+              villageIdFromQuery) ||
+            safeVillageData?.[0]?.Id ||
+            '';
+
+          setSelectedVillageValue(String(resolvedVillageId));
+          setVillageId(String(resolvedVillageId));
+        } catch (e) {
+          console.error('Error fetching village data:', error, e);
+          setVillageList([]);
+          setSelectedVillageValue('');
+          setVillageId('');
+        }
       }
     };
 
     getVillageList();
-  }, [selectedBlockValue, router.query.villageId]);
+  }, [selectedBlockValue, getQueryParam]);
 
-  // Initialize villages on page load for INSTRUCTOR role
+  // Keep location-related query params in sync with current selection (shallow)
   useEffect(() => {
     if (!router.isReady) return;
-    if (YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole()) {
-      const villageDataString = localStorage.getItem('villageData');
-      const villageData: any = villageDataString
-        ? JSON.parse(villageDataString)
-        : null;
-      if (villageData && villageData.length > 0) {
-        setVillageList(villageData);
-        let firstVillageId = villageData[0]?.Id;
-        if (
-          router.query.villageId &&
-          villageData.some(
-            (v: any) => String(v.Id) === String(router.query.villageId)
-          )
-        ) {
-          firstVillageId = router.query.villageId;
-        }
-        setSelectedVillageValue(firstVillageId);
-        setVillageId(firstVillageId);
-      }
-    }
-  }, [router.isReady, router.query.villageId]);
+
+    const managed: Record<string, string> = {
+      centerId: selectedCenterIdForLocation,
+      stateId: selectedStateValue,
+      districtId: selectedDistrictValue,
+      blockId: selectedBlockValue,
+      villageId: selectedVillageValue,
+    };
+
+    const nextQuery: Record<string, any> = { ...router.query };
+    (Object.keys(managed) as Array<keyof typeof managed>).forEach((k) => {
+      const v = managed[k];
+      if (v) nextQuery[k] = v;
+    });
+
+    const changed = (Object.keys(managed) as Array<keyof typeof managed>).some((k) => {
+      const desired = managed[k] || '';
+      if (!desired) return false;
+      const current = getQueryParam(k);
+      return String(current) !== String(desired);
+    });
+
+    if (!changed) return;
+
+    router.replace({ pathname: router.pathname, query: nextQuery }, undefined, {
+      shallow: true,
+    });
+  }, [
+    router.isReady,
+    selectedCenterIdForLocation,
+    selectedStateValue,
+    selectedDistrictValue,
+    selectedBlockValue,
+    selectedVillageValue,
+    getQueryParam,
+  ]);
 
   // Reset assessment type and related lists when class changes
   useEffect(() => {
@@ -576,10 +710,23 @@ const AssessmentList = () => {
     console.log('parentId (courseId)', parentId);
     // Navigate to assessment details page with assessmentId, cohortId, parentId, and subject
     if (identifier ) {
-      const navigationUrl = `/manual-assessments/${identifier}?villageId=${villageId}&blockId=${blockId}&parentId=${parentId || ''}&subject=${encodeURIComponent(
-        subject
-      )}`;
-      router.push(navigationUrl);
+      router.push(
+        {
+          pathname: `/manual-assessments/${identifier}`,
+          query: {
+            ...router.query,
+            centerId: selectedCenterIdForLocation || undefined,
+            stateId: selectedStateValue || undefined,
+            districtId: selectedDistrictValue || undefined,
+            blockId: blockId || undefined,
+            villageId: villageId || undefined,
+            parentId: parentId || undefined,
+            subject,
+          },
+        },
+        undefined,
+        { shallow: true }
+      );
     } else {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     }
@@ -681,100 +828,208 @@ const AssessmentList = () => {
 
       <SearchBar onSearch={handleSearch} placeholder={t('COMMON.SEARCH')} />
 
-      {/* Dropdown section - role-based layout following villages page pattern */}
+      {/* Dropdown section - unified (Center → State → District → Block → Village → Type) */}
       <Box sx={{ px: '20px', mt: 2 }}>
         <Grid container spacing={2}>
-          {/* District & Block Dropdowns - Only show for LEAD role */}
-          {YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && (
-            <>
-              {/* District Dropdown */}
-              {/* <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ width: '100%' }}>
-                  {districtData ? (
-                    <Dropdown
-                      name={districtData?.DISTRICT_NAME}
-                      values={districtData}
-                      defaultValue={districtData?.[0]?.id}
-                      onSelect={(value) => {
-                        setSelectedDistrictValue(value);
-                        console.log('District selected:', value);
-                      }}
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
-                    />
-                  ) : (
-                    <Loader showBackdrop={false} />
-                  )}
-                </Box>
-              </Grid> */}
+          {/* Center */}
+          <Grid item xs={12} sm={6} md={2}>
+            <Box sx={{ width: '100%' }}>
+              {centerOptions?.length > 0 ? (
+                <Dropdown
+                  name="center"
+                  values={centerOptions}
+                  defaultValue={selectedCenterIdForLocation || centerOptions?.[0]?.id}
+                  onSelect={(centerId) => {
+                    setSelectedCenterIdForLocation(String(centerId));
+                    setSelectedStateValue('');
+                    setSelectedDistrictValue('');
+                    setSelectedBlockValue('');
+                    setBlockId('');
+                    setVillageList([]);
+                    setSelectedVillageValue('');
+                    setVillageId('');
+                    updateLocationQuery(
+                      { centerId: String(centerId) },
+                      ['stateId', 'districtId', 'blockId', 'villageId']
+                    );
+                  }}
+                  label={t('COMMON.CENTER')}
+                />
+              ) : (
+                <Dropdown
+                  name="center"
+                  values={[
+                    {
+                      id: '',
+                      name: t('COMMON.NO_CENTERS_ASSIGNED'),
+                    },
+                  ]}
+                  defaultValue=""
+                  onSelect={() => {}}
+                  label={t('COMMON.CENTER')}
+                  disabled
+                />
+              )}
+            </Box>
+          </Grid>
 
-              {/* Block Dropdown */}
-              <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ width: '100%' }}>
-                  {blockData ? (
-                    <Dropdown
-                      name={blockData?.BLOCK_NAME}
-                      values={blockData}
-                      defaultValue={selectedBlockValue}
-                      onSelect={(value) => {
-                        setSelectedBlockValue(value);
-                        setBlockId(value);
-                        const { villageId, ...rest } = router.query;
-                        const newQuery = { ...rest, blockId: value };
-                        router.push(
-                          { pathname: router.pathname, query: newQuery },
-                          undefined,
-                          { shallow: true }
-                        );
-                        console.log('Block selected:', value);
-                      }}
-                      label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
-                    />
-                  ) : (
-                    <Loader showBackdrop={false} />
-                  )}
-                </Box>
-              </Grid>
-            </>
-          )}
+          {/* State */}
+          <Grid item xs={12} sm={6} md={2}>
+            <Box sx={{ width: '100%' }}>
+              {stateData?.length > 0 ? (
+                <Dropdown
+                  name="state"
+                  values={stateData}
+                  defaultValue={selectedStateValue || stateData?.[0]?.id}
+                  onSelect={(val) => {
+                    setSelectedStateValue(String(val));
+                    setSelectedDistrictValue('');
+                    setSelectedBlockValue('');
+                    setBlockId('');
+                    setVillageList([]);
+                    setSelectedVillageValue('');
+                    setVillageId('');
+                    updateLocationQuery(
+                      { stateId: String(val) },
+                      ['districtId', 'blockId', 'villageId']
+                    );
+                  }}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                />
+              ) : (
+                <Dropdown
+                  name="state"
+                  values={[
+                    {
+                      id: '',
+                      name: t('YOUTHNET_USERS_AND_VILLAGES.NO_STATES_FOUND'),
+                    },
+                  ]}
+                  defaultValue=""
+                  onSelect={() => {}}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.STATE')}
+                  disabled
+                />
+              )}
+            </Box>
+          </Grid>
 
-          {/* Village Dropdown - Always show but data source depends on role */}
-          <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+          {/* District */}
+          <Grid item xs={12} sm={6} md={2}>
+            <Box sx={{ width: '100%' }}>
+              {districtData?.length > 0 ? (
+                <Dropdown
+                  name="district"
+                  values={districtData}
+                  defaultValue={selectedDistrictValue || districtData?.[0]?.id}
+                  onSelect={(val) => {
+                    setSelectedDistrictValue(String(val));
+                    setSelectedBlockValue('');
+                    setBlockId('');
+                    setVillageList([]);
+                    setSelectedVillageValue('');
+                    setVillageId('');
+                    updateLocationQuery(
+                      { districtId: String(val) },
+                      ['blockId', 'villageId']
+                    );
+                  }}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                />
+              ) : (
+                <Dropdown
+                  name="district"
+                  values={[
+                    {
+                      id: '',
+                      name: t('YOUTHNET_USERS_AND_VILLAGES.NO_DISTRICTS_FOUND'),
+                    },
+                  ]}
+                  defaultValue=""
+                  onSelect={() => {}}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.DISTRICTS')}
+                  disabled
+                />
+              )}
+            </Box>
+          </Grid>
+
+          {/* Block */}
+          <Grid item xs={12} sm={6} md={2}>
+            <Box sx={{ width: '100%' }}>
+              {blockData?.length > 0 ? (
+                <Dropdown
+                  name="block"
+                  values={blockData}
+                  defaultValue={selectedBlockValue || blockData?.[0]?.id}
+                  onSelect={(val) => {
+                    setSelectedBlockValue(String(val));
+                    setBlockId(String(val));
+                    setVillageList([]);
+                    setSelectedVillageValue('');
+                    setVillageId('');
+                    updateLocationQuery({ blockId: String(val) }, ['villageId']);
+                  }}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                />
+              ) : (
+                <Dropdown
+                  name="block"
+                  values={[
+                    {
+                      id: '',
+                      name: t('YOUTHNET_USERS_AND_VILLAGES.NO_BLOCKS_FOUND'),
+                    },
+                  ]}
+                  defaultValue=""
+                  onSelect={() => {}}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.BLOCKS')}
+                  disabled
+                />
+              )}
+            </Box>
+          </Grid>
+
+          {/* Village */}
+          <Grid item xs={12} sm={6} md={2}>
             <Box sx={{ width: '100%' }}>
               {villageList?.length > 0 ? (
                 <Dropdown
                   name={DROPDOWN_NAME}
                   values={villageList.map((item: any) =>
                     Array.isArray(item)
-                      ? item.map(({ Id, name }) => ({ id: Id, name }))
+                      ? item.map(({ Id, name }: any) => ({ id: Id, name }))
                       : { id: item.Id, name: item.name }
                   )}
                   defaultValue={selectedVillageValue}
                   onSelect={(value) => {
-                    console.log('Village selected:', value);
-                    setSelectedVillageValue(value);
-                    setVillageId(value);
-                    const newQuery = { ...router.query, villageId: value };
-                    router.push(
-                      { pathname: router.pathname, query: newQuery },
-                      undefined,
-                      { shallow: true }
-                    );
+                    setSelectedVillageValue(String(value));
+                    setVillageId(String(value));
+                    updateLocationQuery({ villageId: String(value) });
                   }}
                   label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
                 />
-              ) : (YOUTHNET_USER_ROLE.LEAD === getLoggedInUserRole() && selectedBlockValue && villageList?.length === 0) ? (
-                <Typography sx={{ fontSize: '14px', mt: 2 }}>
-                  {t('YOUTHNET_USERS_AND_VILLAGES.NO_VILLAGES_FOUND')}
-                </Typography>
               ) : (
-                <Loader showBackdrop={false} />
+                <Dropdown
+                  name="village"
+                  values={[
+                    {
+                      id: '',
+                      name: t('YOUTHNET_USERS_AND_VILLAGES.NO_VILLAGES_FOUND'),
+                    },
+                  ]}
+                  defaultValue=""
+                  onSelect={() => {}}
+                  label={t('YOUTHNET_USERS_AND_VILLAGES.VILLAGES')}
+                  disabled
+                />
               )}
             </Box>
           </Grid>
 
           {/* Assessment Type Dropdown - Always show */}
           {availableAssessmentTypes && availableAssessmentTypes?.length > 0 ? (
-            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+            <Grid item xs={12} sm={6} md={2}>
               <Box sx={{ width: '100%' }}>
                 <FormControl fullWidth>
                   <InputLabel
@@ -813,7 +1068,7 @@ const AssessmentList = () => {
               </Box>
             </Grid>
           ) : (
-            <Grid item xs={12} sm={6} md={YOUTHNET_USER_ROLE.MOBILIZER === getLoggedInUserRole() ? 6 : 3}>
+            <Grid item xs={12} sm={6} md={2}>
               <Box sx={{ width: '100%', mt: 2 }}>
                 <Typography sx={{ fontSize: '14px' }}>
                   {t('ASSESSMENTS.NO_ASSESSMENT_TYPE_FOUND')}
