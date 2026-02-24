@@ -145,6 +145,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.block;
         delete responseFormForEnroll?.schema?.properties?.village;
         delete responseFormForEnroll?.schema?.properties?.consent_file;
+        delete responseFormForEnroll?.schema?.properties?.privacy_consent;
+        delete responseFormForEnroll?.schema?.properties?.parent_guardian_consent;
         responseFormForEnroll?.schema?.required?.pop('batch');
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
@@ -162,6 +164,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseForm?.schema?.properties.district;
         delete responseForm?.schema?.properties.block;
         delete responseForm?.schema?.properties.village;
+        delete responseForm?.schema?.properties?.privacy_consent;
+        delete responseForm?.schema?.properties?.parent_guardian_consent;
 
         responseForm?.schema?.required.pop('batch');
         let userId = localStorage.getItem('userId');
