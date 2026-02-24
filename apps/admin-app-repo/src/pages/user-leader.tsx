@@ -93,17 +93,25 @@ const UserLeader = () => {
           "type": "string"
         },
       },
-      child_pocso_policy: {
+      ptm_name: {
         "type": "string"
       },
-      nda_fraud_policy: {
+      organization_name: {
+        "type": "string"
+      },
+      nda_policy: {
+        "type": "string"
+      },
+      child_pocso_fraud_policy: {
         "type": "string"
       },
     },
     "required": [
       "sub_program",
-      "child_pocso_policy",
-      "nda_fraud_policy",
+      "ptm_name",
+      "organization_name",
+      "nda_policy",
+      "child_pocso_fraud_policy",
     ]
   };
   const testUiSchema = {
@@ -113,12 +121,20 @@ const UserLeader = () => {
         multiple: false,
       },
     },
-    child_pocso_policy: {
-      'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',
+    ptm_name: {
+      'ui:widget': 'PTMNameWidget',
       'ui:options': { hideError: true },
     },
-    nda_fraud_policy: {
-      'ui:widget': 'NdaFraudPolicyAcknowledgementWidget',
+    organization_name: {
+      'ui:widget': 'OrganizationSearchWidget',
+      'ui:options': { hideError: true },
+    },
+    nda_policy: {
+      'ui:widget': 'NdaPolicyAcknowledgementWidget',
+      'ui:options': { hideError: true },
+    },
+    child_pocso_fraud_policy: {
+      'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
       'ui:options': { hideError: true },
     },
   };
@@ -728,7 +744,7 @@ const UserLeader = () => {
           )
         )}
 
-        <Box mt={4}>
+        {/* <Box mt={4}>
           {testSchema &&
             testUiSchema && (
               <>
@@ -767,7 +783,7 @@ const UserLeader = () => {
                 </Button>
               </>
             )}
-        </Box>
+        </Box> */}
 
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton

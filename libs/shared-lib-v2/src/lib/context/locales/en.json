@@ -808,11 +808,21 @@
     "PROGRAM_PREFERENCES": "Program Preferences",
     "CHOOSE_SUB_PROGRAM": "Choose Sub-Program",
     "POLICY_ACKNOWLEDGEMENTS": "Policy Acknowledgements",
-    "I_HAVE_READ_AND_AGREE": "I have read and agree to the ",
+    "I_HAVE_READ_AND_AGREE": "I acknowledge that I have read and understood the ",
     "CHILD_PROTECTION_POLICY": "Child Protection Policy",
     "POCSO_POLICY": "POCSO Policy",
     "NDA_POLICY": "NDA Policy",
-    "FRAUD_PROTECTION_POLICY": "Fraud Protection Policy"
+    "FRAUD_PROTECTION_POLICY": "Fraud Protection Policy",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " and agree to maintain confidentiality.",
+    "AND_TO_COMPLY": " and agree to comply.",
+    "AND": " and ",
+    "PTM_NAME": "PTM Name",
+    "SEARCH_AND_SELECT_PTM": "Search and select PTM",
+    "SEARCH": "Search...",
+    "NO_USER_DATA_FOUND": "No user data found",
+    "ORGANISATION_NAME": "Organisation Name",
+    "SEARCH_AND_SELECT_ORGANISATION": "Search and select your organisation",
+    "NO_ORGANISATION_DATA_FOUND": "No organisation data found"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",

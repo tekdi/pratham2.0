@@ -692,7 +692,10 @@
     "CHILD_PROTECTION_POLICY": "బాల రక్షణ పాలసీ",
     "POCSO_POLICY": "POCSO పాలసీ",
     "NDA_POLICY": "NDA పాలసీ",
-    "FRAUD_PROTECTION_POLICY": "మోసం రక్షణ పాలసీ"
+    "FRAUD_PROTECTION_POLICY": "మోసం రక్షణ పాలసీ",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " మరియు గోప్యతను నిర్వహించడానికి అంగీకరిస్తున్నాను.",
+    "AND_TO_COMPLY": " మరియు అనుసరించడానికి అంగీకరిస్తున్నాను.",
+    "AND": " మరియు "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "చెల్లని ఇన్‌పుట్‌.",

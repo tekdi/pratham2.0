@@ -11,7 +11,7 @@ import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageConte
 import SecurityIcon from '@mui/icons-material/Security';
 import CheckIcon from '@mui/icons-material/Check';
 
-const ChildPocsoPolicyAcknowledgementWidget = ({
+const NdaPolicyAcknowledgementWidget = ({
   id,
   label,
   value,
@@ -36,7 +36,7 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
 
   // Check if checkbox should be checked (value exists and is a valid timestamp string)
   const isChecked = Boolean(value && typeof value === 'string');
-  const handleChildProtectionPolicy = () => {
+  const handleNdaPolicy = () => {
     // Get the selected language from localStorage (same key as Header.jsx uses)
     const selectedLanguage =
       typeof window !== 'undefined'
@@ -63,64 +63,35 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
     const languageName = languageFileMap[selectedLanguage] || 'hindi';
 
     // Use PDF file naming convention: consent_form_below_18_<language>.pdf
-    window.open(`/files/c2c/Child_Protection_Policy_${languageName}.pdf`, '_blank');
-  }
-  const handlePocsoPolicy = () => {
-    // Get the selected language from localStorage (same key as Header.jsx uses)
-    const selectedLanguage =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('lang') || 'en'
-        : 'en';
-
-    // Map language codes to lowercase language names for PDF file naming
-    // Using the same language codes as Header.jsx
-    const languageFileMap: { [key: string]: string } = {
-      en: 'english',
-      hi: 'hindi',
-      mr: 'marathi',
-      bn: 'bengali',
-      as: 'assamese',
-      guj: 'gujarati',
-      kan: 'kannada',
-      odi: 'odia',
-      tam: 'tamil',
-      tel: 'telugu',
-      ur: 'urdu',
-    };
-
-    // Get the language name from the map, default to 'hindi'
-    const languageName = languageFileMap[selectedLanguage] || 'hindi';
-
-    // Use PDF file naming convention: consent_form_below_18_<language>.pdf
-    window.open(`/files/c2c/POCSO_Policy_${languageName}.pdf`, '_blank');
+    window.open(`/files/c2c/NDA_Policy_${languageName}.pdf`, '_blank');
   }
   return (
     <Box>
-      {/* Header Section */}
-      <Box
+    {/* Header Section */}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: 2,
+      }}
+    >
+      <SecurityIcon
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: 2,
+          color: '#ffc107', // Yellow color
+          fontSize: 28,
+          marginRight: 1,
+        }}
+      />
+      <Typography
+        variant="h2"
+        sx={{
+          fontWeight: 600,
+          color: '#424242', // Dark grey
         }}
       >
-        <SecurityIcon
-          sx={{
-            color: '#ffc107', // Yellow color
-            fontSize: 28,
-            marginRight: 1,
-          }}
-        />
-        <Typography
-          variant="h2"
-          sx={{
-            fontWeight: 600,
-            color: '#424242', // Dark grey
-          }}
-        >
-          {t('FORM.POLICY_ACKNOWLEDGEMENTS', { defaultValue: 'Policy Acknowledgements' })}
-        </Typography>
-      </Box>
+        {t('FORM.POLICY_ACKNOWLEDGEMENTS', { defaultValue: 'Policy Acknowledgements' })}
+      </Typography>
+    </Box>
 
       {/* Checkbox Section */}
       <Box
@@ -212,7 +183,7 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
               }}
             >
               {t('FORM.I_HAVE_READ_AND_AGREE', {
-                defaultValue: 'I have read and agree to the ',
+                defaultValue: 'I acknowledge that I have read and understood the ',
               })}
               <Typography
                 component="span"
@@ -222,11 +193,11 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
                   cursor: 'pointer',
                 }}
                 onClick={(e) => {
-                  handleChildProtectionPolicy();
+                  handleNdaPolicy();
                 }}
               >
-                {t('FORM.CHILD_PROTECTION_POLICY', {
-                  defaultValue: 'Child Protection Policy',
+                {t('FORM.NDA_POLICY', {
+                  defaultValue: 'NDA Policy',
                 })}
               </Typography>
               {required && (
@@ -240,33 +211,10 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
                   *
                 </Typography>
               )}
-              {""}And{" "}
-              <Typography
-                component="span"
-                sx={{
-                  color: '#ff9800', // Yellow-orange color for link
-                  // textDecoration: 'underline',
-                  cursor: 'pointer',
-                }}
-                onClick={(e) => {
-                  handlePocsoPolicy();
-                }}
-              >
-                {t('FORM.POCSO_POLICY', {
-                  defaultValue: 'POCSO Policy',
-                })}
-              </Typography>
-              {required && (
-                <Typography
-                  component="span"
-                  sx={{
-                    color: '#f44336', // Red asterisk
-                    marginLeft: 0.5,
-                  }}
-                >
-                  *
-                </Typography>
-              )}
+                  {" "}
+                  {t('FORM.AND_TO_MAINTAIN_CONFIDENTIALITY', {
+                    defaultValue: ' and agree to maintain confidentiality.',
+                  })}
             </Typography>
           </Box>
         </FormControl>
@@ -275,5 +223,5 @@ const ChildPocsoPolicyAcknowledgementWidget = ({
   );
 };
 
-export default ChildPocsoPolicyAcknowledgementWidget;
+export default NdaPolicyAcknowledgementWidget;
 

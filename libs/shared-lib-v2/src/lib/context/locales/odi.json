@@ -692,7 +692,10 @@
     "CHILD_PROTECTION_POLICY": "ଶିଶୁ ସୁରକ୍ଷା ନୀତି",
     "POCSO_POLICY": "POCSO ନୀତି",
     "NDA_POLICY": "NDA ନୀତି",
-    "FRAUD_PROTECTION_POLICY": "ପ୍ରତାରଣା ସୁରକ୍ଷା ନୀତି"
+    "FRAUD_PROTECTION_POLICY": "ପ୍ରତାରଣା ସୁରକ୍ଷା ନୀତି",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " ଏବଂ ଗୋପନୀୟତା ବଜାୟ ରଖିବାକୁ ସମ୍ମତ ଅଛି।",
+    "AND_TO_COMPLY": " ଏବଂ ପାଳନ କରିବାକୁ ସମ୍ମତ ଅଛି।",
+    "AND": " ଏବଂ "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "ଅବୈଧ ଇନ୍ପୁଟ୍ ।",

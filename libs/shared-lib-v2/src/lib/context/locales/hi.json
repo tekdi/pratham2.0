@@ -692,7 +692,10 @@
     "CHILD_PROTECTION_POLICY": "बाल संरक्षण नीति",
     "POCSO_POLICY": "POCSO नीति",
     "NDA_POLICY": "NDA नीति",
-    "FRAUD_PROTECTION_POLICY": "धोखाधड़ी संरक्षण नीति"
+    "FRAUD_PROTECTION_POLICY": "धोखाधड़ी संरक्षण नीति",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " और गोपनीयता बनाए रखने के लिए सहमत हैं।",
+    "AND_TO_COMPLY": " और अनुपालन करने के लिए सहमत हैं।",
+    "AND": " और "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अमान्य इनपुट।",

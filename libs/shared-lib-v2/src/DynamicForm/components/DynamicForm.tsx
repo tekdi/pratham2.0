@@ -22,8 +22,11 @@ import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
 import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
 //custom form
 import SubProgramListWidget from './RJSFWidget/CustomForm/SubProgramListWidget';
-import ChildPocsoPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/ChildPocsoPolicyAcknowledgementWidget';
-import NdaFraudPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/NdaFraudPolicyAcknowledgementWidget';
+import ChildPocsoFraudPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/ChildPocsoFraudPolicyAcknowledgementWidget';
+import NdaPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/NdaPolicyAcknowledgementWidget';
+import PTMNameWidget from './RJSFWidget/CustomForm/PTMNameWidget';
+import OrganizationSearchWidget from './RJSFWidget/CustomForm/OrganizationSearchWidget';
+
 import {
   calculateAgeFromDate,
   toPascalCase,
@@ -789,8 +792,10 @@ const DynamicForm = ({
     WorkingLocationWidget,
     //custom form
     SubProgramListWidget,
-    ChildPocsoPolicyAcknowledgementWidget,
-    NdaFraudPolicyAcknowledgementWidget,
+    ChildPocsoFraudPolicyAcknowledgementWidget,
+    NdaPolicyAcknowledgementWidget,
+    PTMNameWidget,
+    OrganizationSearchWidget
   };
 
   // Custom field for Guardian Information Note

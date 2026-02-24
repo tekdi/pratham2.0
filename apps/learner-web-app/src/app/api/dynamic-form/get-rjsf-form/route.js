@@ -294,15 +294,15 @@ function generateSchemaAndUISchema(fields) {
       };
     }
     //for custom widget form
-    else if(name=='child_pocso_policy'){
+    else if(name=='child_pocso_fraud_policy'){
       uiSchema[name] = {
-        'ui:widget': 'ChildPocsoPolicyAcknowledgementWidget',
+        'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
         'ui:options': { hideError: true },
       };
     }
-    else if(name=='nda_fraud_policy'){
+    else if(name=='nda_policy'){
       uiSchema[name] = {
-        'ui:widget': 'NdaFraudPolicyAcknowledgementWidget',
+        'ui:widget': 'NdaPolicyAcknowledgementWidget',
         'ui:options': { hideError: true },
       };
     }

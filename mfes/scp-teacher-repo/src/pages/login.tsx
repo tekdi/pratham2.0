@@ -412,6 +412,7 @@ const LoginPage = () => {
     const newLocale = event.target.value;
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('lang', newLocale);
       setLanguage(event.target.value);
       ReactGA.event('select-language-login-page', {
         selectedLanguage: event.target.value,

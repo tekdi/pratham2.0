@@ -691,7 +691,10 @@
     "CHILD_PROTECTION_POLICY": "બાળ સુરક્ષા નીતિ",
     "POCSO_POLICY": "POCSO નીતિ",
     "NDA_POLICY": "NDA નીતિ",
-    "FRAUD_PROTECTION_POLICY": "ફ્રોડ સુરક્ષા નીતિ"
+    "FRAUD_PROTECTION_POLICY": "ફ્રોડ સુરક્ષા નીતિ",
+    "AND_TO_MAINTAIN_CONFIDENTIALITY": " અને ગુપ્તતા જાળવવા માટે સંમત છું.",
+    "AND_TO_COMPLY": " અને પાલન કરવા માટે સંમત છું.",
+    "AND": " અને "
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઈનપુટ.",
