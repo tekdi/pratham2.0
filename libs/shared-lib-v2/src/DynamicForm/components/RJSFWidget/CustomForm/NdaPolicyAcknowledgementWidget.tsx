@@ -67,6 +67,32 @@ const NdaPolicyAcknowledgementWidget = ({
   }
   return (
     <Box>
+    {/* Header Section */}
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        marginBottom: 2,
+      }}
+    >
+      <SecurityIcon
+        sx={{
+          color: '#ffc107', // Yellow color
+          fontSize: 28,
+          marginRight: 1,
+        }}
+      />
+      <Typography
+        variant="h2"
+        sx={{
+          fontWeight: 600,
+          color: '#424242', // Dark grey
+        }}
+      >
+        {t('FORM.POLICY_ACKNOWLEDGEMENTS', { defaultValue: 'Policy Acknowledgements' })}
+      </Typography>
+    </Box>
+
       {/* Checkbox Section */}
       <Box
         sx={{

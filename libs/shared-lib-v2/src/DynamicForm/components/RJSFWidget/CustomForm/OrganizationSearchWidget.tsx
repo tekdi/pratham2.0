@@ -600,6 +600,35 @@ const OrganizationSearchWidget = ({
 
   return (
     <Box>
+      <Typography
+        variant="h1"
+        sx={{
+          fontWeight: 600,
+          marginBottom: 1,
+          color: 'black',
+        }}
+      >
+        {t('FORM.VERIFY_ORGANISATION', { defaultValue: 'Verify Organisation' })}
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          marginBottom: 2,
+          color: 'grey',
+        }}
+      >
+        {t('FORM.COMPLETE_YOUR_REGISTRATION', { defaultValue: 'Complete your registration.' })}
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          marginBottom: 1,
+          color: 'grey',
+        }}
+      >
+        {t('FORM.FIND_YOUR_REGISTRED_ORGANISATION', { defaultValue: 'Find your registered organisation and link yourself as a volunteer.' })}
+      </Typography>
+
       {/* State, District, Block Filters */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         {/* State Dropdown */}

@@ -18,13 +18,13 @@ import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageConte
 import { fetchActiveAcademicYearId } from '../../../utils/Helper';
 
 interface Cohort {
-    tenantId: string;
+    cohortId: string;
     name: string;
     status: string;
 }
 
 
-const SubProgramListWidget = ({
+const OrgCohortCreateWidget = ({
     id,
     label,
     value,
@@ -41,26 +41,55 @@ const SubProgramListWidget = ({
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Fetch active academic year ID using helper function
+    const getAcademicYearId = useCallback(async (): Promise<string | null> => {
+        const academicYearId = await fetchActiveAcademicYearId();
+        if (!academicYearId) {
+            setError('Failed to fetch academic year');
+        }
+        return academicYearId;
+    }, []);
+
     // Fetch cohorts
-    const fetchCohorts = useCallback(async () => {
+    const fetchCohorts = useCallback(async (academicYearId: string) => {
         try {
             setLoading(true);
             setError(null);
 
-            const response = await axios.get(
-                API_ENDPOINTS.tenantRead,
+            const tenantId = localStorage.getItem('onboardTenantId') || '';
+            const token = localStorage.getItem('token') || '';
+
+            if (!tenantId || !token) {
+                setError('Missing tenant ID or token');
+                return;
+            }
+
+            const response = await axios.post(
+                API_ENDPOINTS.cohortSearch,
+                {
+                    limit: 100,
+                    offset: 0,
+                    sort: ['name', 'asc'],
+                    filters: {
+                        type: 'SUBPROGRAM',
+                        status: ['active'],
+                    },
+                },
                 {
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                        tenantid: tenantId,
+                        academicyearid: academicYearId,
                     },
                 }
             );
 
-            const cohortDetails: Cohort[] = response.data?.result?.[0]?.children || [];
+            const cohortDetails: Cohort[] = response.data?.result?.results?.cohortDetails || [];
 
             // Filter only active cohorts
             const activeCohorts = cohortDetails.filter(
-                (cohort) => cohort.type === 'VolunteerOnboarding'
+                (cohort) => cohort.status === 'active'
             );
 
             setCohorts(activeCohorts);
@@ -77,8 +106,9 @@ const SubProgramListWidget = ({
         let isMounted = true;
 
         const loadCohorts = async () => {
-            if (isMounted) {
-                await fetchCohorts();
+            const academicYearId = await getAcademicYearId();
+            if (isMounted && academicYearId) {
+                await fetchCohorts(academicYearId);
             }
         };
 
@@ -87,7 +117,7 @@ const SubProgramListWidget = ({
         return () => {
             isMounted = false;
         };
-    }, [fetchCohorts]);
+    }, [getAcademicYearId, fetchCohorts]);
 
     // Check if multiple selection is enabled
     // Check options (RJSF merges ui:options into options), ui:options, and direct uiSchema property
@@ -121,25 +151,25 @@ const SubProgramListWidget = ({
     };
 
     // Handle multiple selection (checkbox)
-    const handleCheckboxChange = (tenantId: string) => {
+    const handleCheckboxChange = (cohortId: string) => {
         const currentValue = normalizedValue;
-        const isSelected = currentValue.includes(tenantId);
+        const isSelected = currentValue.includes(cohortId);
 
         if (isSelected) {
             // Remove from selection
-            const newValue = currentValue.filter((id) => id !== tenantId);
+            const newValue = currentValue.filter((id) => id !== cohortId);
             // Always return an array for multiple selection (even if empty)
             onChange(newValue);
         } else {
             // Add to selection
-            onChange([...currentValue, tenantId]);
+            onChange([...currentValue, cohortId]);
         }
     };
 
     // Check if a cohort is selected (for both single and multiple)
     // Always check against array since we always use arrays
-    const isSelected = (tenantId: string) => {
-        return Array.isArray(normalizedValue) && normalizedValue.includes(tenantId);
+    const isSelected = (cohortId: string) => {
+        return Array.isArray(normalizedValue) && normalizedValue.includes(cohortId);
     };
 
     const capitalizeWords = (str: string): string => {
@@ -242,14 +272,14 @@ const SubProgramListWidget = ({
                             >
                                 {cohorts.map((cohort) => (
                                     <Box
-                                        key={cohort.tenantId}
+                                        key={cohort.cohortId}
                                         sx={{
-                                            border: isSelected(cohort.tenantId)
+                                            border: isSelected(cohort.cohortId)
                                                 ? '2px solid #ff9800'
                                                 : '1px solid #e0e0e0',
                                             borderRadius: 2,
                                             padding: 2,
-                                            backgroundColor: isSelected(cohort.tenantId)
+                                            backgroundColor: isSelected(cohort.cohortId)
                                                 ? '#fff3e0'
                                                 : '#f5f5f5',
                                             cursor: disabled || readonly ? 'default' : 'pointer',
@@ -265,7 +295,7 @@ const SubProgramListWidget = ({
                                             if (!disabled && !readonly &&
                                                 target === e.currentTarget) {
                                                 // Only fire if clicking directly on the Box, not on any child
-                                                handleCheckboxChange(cohort.tenantId);
+                                                handleCheckboxChange(cohort.cohortId);
                                             }
                                         }}
                                     >
@@ -279,15 +309,15 @@ const SubProgramListWidget = ({
                                             <FormControlLabel
                                                 control={
                                                     <Checkbox
-                                                        checked={isSelected(cohort.tenantId)}
+                                                        checked={isSelected(cohort.cohortId)}
                                                         onChange={(e) => {
                                                             e.stopPropagation();
                                                             if (!disabled && !readonly) {
-                                                                handleCheckboxChange(cohort.tenantId);
+                                                                handleCheckboxChange(cohort.cohortId);
                                                             }
                                                         }}
                                                         sx={{
-                                                            color: isSelected(cohort.tenantId) ? '#ff9800' : '#757575',
+                                                            color: isSelected(cohort.cohortId) ? '#ff9800' : '#757575',
                                                             '&.Mui-checked': {
                                                                 color: '#ff9800',
                                                             },
@@ -301,7 +331,7 @@ const SubProgramListWidget = ({
                                                     cursor: disabled || readonly ? 'default' : 'pointer',
                                                     '& .MuiFormControlLabel-label': {
                                                         fontSize: '1rem',
-                                                        fontWeight: isSelected(cohort.tenantId) ? 500 : 400,
+                                                        fontWeight: isSelected(cohort.cohortId) ? 500 : 400,
                                                         cursor: disabled || readonly ? 'default' : 'pointer',
                                                     },
                                                 }}
@@ -325,14 +355,14 @@ const SubProgramListWidget = ({
                             >
                                 {cohorts.map((cohort) => (
                                     <Box
-                                        key={cohort.tenantId}
+                                        key={cohort.cohortId}
                                         sx={{
-                                            border: isSelected(cohort.tenantId)
+                                            border: isSelected(cohort.cohortId)
                                                 ? '2px solid #ff9800'
                                                 : '1px solid #e0e0e0',
                                             borderRadius: 2,
                                             padding: 2,
-                                            backgroundColor: isSelected(cohort.tenantId)
+                                            backgroundColor: isSelected(cohort.cohortId)
                                                 ? '#fff3e0'
                                                 : '#f5f5f5',
                                             cursor: disabled || readonly ? 'default' : 'pointer',
@@ -344,16 +374,16 @@ const SubProgramListWidget = ({
                                         }}
                                         onClick={() => {
                                             if (!disabled && !readonly) {
-                                                onChange([cohort.tenantId]); // Always return as array
+                                                onChange([cohort.cohortId]); // Always return as array
                                             }
                                         }}
                                     >
                                         <FormControlLabel
-                                            value={cohort.tenantId}
+                                            value={cohort.cohortId}
                                             control={
                                                 <Radio
                                                     sx={{
-                                                        color: isSelected(cohort.tenantId) ? '#ff9800' : '#757575',
+                                                        color: isSelected(cohort.cohortId) ? '#ff9800' : '#757575',
                                                         '&.Mui-checked': {
                                                             color: '#ff9800',
                                                         },
@@ -365,7 +395,7 @@ const SubProgramListWidget = ({
                                                 margin: 0,
                                                 '& .MuiFormControlLabel-label': {
                                                     fontSize: '1rem',
-                                                    fontWeight: isSelected(cohort.tenantId) ? 500 : 400,
+                                                    fontWeight: isSelected(cohort.cohortId) ? 500 : 400,
                                                 },
                                             }}
                                         />
@@ -386,5 +416,5 @@ const SubProgramListWidget = ({
     );
 };
 
-export default SubProgramListWidget;
+export default OrgCohortCreateWidget;
 
