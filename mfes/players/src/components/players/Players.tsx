@@ -16,9 +16,10 @@ const SunbirdQuMLPlayer = dynamic(() => import('./SunbirdQuMLPlayer'), {
   ssr: false,
 });
 
-const SunbirdV1Player = dynamic(() => import('../V1-Player/V1Player'), {
-  ssr: false,
-});
+const SunbirdH5pPlayer = dynamic(
+  () => import('@player-lib').then((m) => ({ default: m.H5pPlayer })),
+  { ssr: false }
+);
 
 interface PlayerProps {
   'player-config': any;
@@ -80,7 +81,7 @@ const SunbirdPlayers = ({
     case 'video/x-youtube':
       //case 'application/vnd.ekstep.ecml-archive':
       return (
-        <SunbirdV1Player
+        <SunbirdH5pPlayer
           playerConfig={playerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}

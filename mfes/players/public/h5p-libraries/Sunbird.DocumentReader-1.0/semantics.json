@@ -1,0 +1,38 @@
+[
+    {
+        "name": "title",
+        "type": "text",
+        "label": "Document Title",
+        "description": "The title of the document being presented.",
+        "importance": "high"
+    },
+    {
+        "name": "documentFile",
+        "type": "file",
+        "label": "Document Asset (.epub or .pdf)",
+        "description": "Upload an EPUB or PDF document up to 50MB.",
+        "mimetypes": [
+            "application/epub+zip",
+            "application/pdf"
+        ]
+    },
+    {
+        "name": "authorMetadata",
+        "type": "group",
+        "label": "Authoring Metadata",
+        "fields": [
+            {
+                "name": "author",
+                "type": "text",
+                "label": "Author",
+                "optional": true
+            },
+            {
+                "name": "publisher",
+                "type": "text",
+                "label": "Publisher",
+                "optional": true
+            }
+        ]
+    }
+]
