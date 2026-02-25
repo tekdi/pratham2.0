@@ -364,7 +364,15 @@
       "ADDITIONAL_INFORMATION": "Additional Information",
       "MY_MENTOR_DETAILS": "My Mentor Details",
       "MENTOR_NAME": "Mentor Name",
-      "MENTOR_EMAIL": "Mentor Email"
+      "MENTOR_EMAIL": "Mentor Email",
+      "REGISTER_AS_PTM": "Register as PTM",
+      "GO_TO_PTM_PORTAL": "Go to PTM Portal",
+      "CONGRATULATIONS_TITLE": "Congratulations! 🎉",
+      "CONGRATULATIONS_MESSAGE": "Congratulations on being associated as a PTM with Pratham. Let's get started with your new journey.",
+      "TO_LOG_IN": "To log in,",
+      "CLICK_HERE": "click here",
+      "LOGIN_TIP": "Tip: Log in using your ERP ID",
+      "REGISTER_TO_ANOTHER_PROGRAM": "Add More Programs"
     },
     "USERNAME_SUGGESTION": {
       "USERNAME": "Username",
