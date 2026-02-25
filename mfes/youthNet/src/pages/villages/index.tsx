@@ -98,6 +98,8 @@ import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { bulkCreateCohortMembers } from '../../services/CohortService';
 import { getCohortList } from '../../services/GetCohortList';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { sendCredentialService } from '../../services/NotificationService';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 const Index = () => {
   const { isRTL } = useDirection();
@@ -2298,6 +2300,10 @@ const Index = () => {
                         const { userData, customFields } = splitUserData(
                           mobilizerUserDetails
                         );
+                        const mappedUserEmail =
+                          userData?.email || mobilizerUserDetails?.email;
+                        const mappedUserFirstName =
+                          userData?.firstName || mobilizerUserDetails?.firstName || '';
                         delete userData.email;
                         const filteredCustomFields = customFields.filter(
                           (field: any) =>
@@ -2343,6 +2349,34 @@ const Index = () => {
                             t('MOBILIZER.MOBILIZER_CREATED_SUCCESSFULLY'),
                             'success'
                           );
+
+                          try {
+                            const program =
+                              localStorage.getItem('tenantName') ||
+                              localStorage.getItem('program') ||
+                              '';
+                            // TODO: confirm which env var should provide login link
+                            const loginLink = process.env.NEXT_PUBLIC_LOGIN_URL;
+
+                            if (mappedUserEmail) {
+                              await sendCredentialService(
+                                buildProgramMappingEmailRequest({
+                                  email: mappedUserEmail,
+                                  firstName: mappedUserFirstName,
+                                  role: 'Mentor',
+                                  program,
+                                  platform: 'Pratham learning Platform (PLP)',
+                                  loginLink,
+                                })
+                              );
+                            }
+                          } catch (notificationError) {
+                            console.error(
+                              'Error sending program mapping notification:',
+                              notificationError
+                            );
+                          }
+
                           setMapModalOpen(false);
                           setMobilizerFormStep(0);
                           setSelectedMobilizerUserId(null);

@@ -14,7 +14,7 @@ import {
   facilitatorSearchSchema,
   facilitatorSearchUISchema,
 } from '../constant/Forms/facilitatorSearch';
-import { Role, RoleId, Status } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, Status } from '@/utils/app.constant';
 import {
   getUserDetailsInfo,
   HierarchicalSearchUserList,
@@ -90,6 +90,8 @@ import { showToastMessage } from '@/components/Toastify';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import { updateUserTenantStatus } from '@/services/UserService';
+import { sendCredentialService } from '@/services/NotificationService';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
@@ -1311,6 +1313,10 @@ const Facilitator = () => {
                     const { userData, customFields } =
                       splitUserData(userDetails);
 
+                    const mappedUserEmail = userData?.email || userDetails?.email;
+                    const mappedUserFirstName =
+                      userData?.firstName || userDetails?.firstName || '';
+
                     delete userData.email;
 
                     const object = {
@@ -1368,6 +1374,34 @@ const Facilitator = () => {
                         response?.status === 201
                       ) {
                         showToastMessage(t(successCreateMessage), 'success');
+
+                        try {
+                          const program =
+                            localStorage.getItem('tenantName') ||
+                            localStorage.getItem('program') ||
+                            '';
+                          // TODO: confirm which env var should provide login link
+                          const loginLink = ROLE_LOGIN_URL_MAP[Role.TEACHER];
+
+                          if (mappedUserEmail) {
+                            await sendCredentialService(
+                              buildProgramMappingEmailRequest({
+                                email: mappedUserEmail,
+                                firstName: mappedUserFirstName,
+                                role: Role.TEACHER,
+                                program,
+                                platform: 'Pratham learning Platform (PLP)',
+                                loginLink,
+                              })
+                            );
+                          }
+                        } catch (notificationError) {
+                          console.error(
+                            'Error sending program mapping notification:',
+                            notificationError
+                          );
+                        }
+
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);

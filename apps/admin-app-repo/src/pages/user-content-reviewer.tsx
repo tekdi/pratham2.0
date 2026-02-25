@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentReviewerSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -54,6 +54,8 @@ import {
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { sendCredentialService } from '@/services/NotificationService';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 const ContentReviewer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
@@ -755,6 +757,11 @@ const ContentReviewer = () => {
                       const { userData, customFields } =
                         splitUserData(userDetails);
 
+                      const mappedUserEmail =
+                        userData?.email || userDetails?.email;
+                      const mappedUserFirstName =
+                        userData?.firstName || userDetails?.firstName || '';
+
                       delete userData.email;
 
                       const object = {
@@ -782,6 +789,33 @@ const ContentReviewer = () => {
                         // getNotification(editableUserId, profileUpdateNotificationKey);
                         showToastMessage(t(successUpdateMessage), 'success');
                         // telemetryCallbacks(telemetryUpdateKey);
+
+                        try {
+                          const program =
+                            localStorage.getItem('tenantName') ||
+                            localStorage.getItem('program') ||
+                            '';
+                          // TODO: confirm which env var should provide login link
+                          const loginLink = ROLE_LOGIN_URL_MAP[Role.CONTENT_REVIEWER];
+
+                          if (mappedUserEmail) {
+                            await sendCredentialService(
+                              buildProgramMappingEmailRequest({
+                                email: mappedUserEmail,
+                                firstName: mappedUserFirstName,
+                                role: RoleName.CONTENT_REVIEWER,
+                                program,
+                                platform: 'Pratham learning Platform (PLP)',
+                                loginLink,
+                              })
+                            );
+                          }
+                        } catch (notificationError) {
+                          console.error(
+                            'Error sending program mapping notification:',
+                            notificationError
+                          );
+                        }
 
                         // Close dialog
                         setMapModalOpen(false);
