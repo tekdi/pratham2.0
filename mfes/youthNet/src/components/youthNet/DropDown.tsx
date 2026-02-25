@@ -9,6 +9,7 @@ interface DropdownProps {
   values?: any[];
   onSelect: (value: string) => void;
   defaultValue?: string;
+  disabled?: boolean;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -17,6 +18,7 @@ const Dropdown: React.FC<DropdownProps> = ({
   values = [],
   onSelect,
   defaultValue = '',
+  disabled = false,
 }) => {
   const [selectedValue, setSelectedValue] = useState(defaultValue);
 
@@ -37,6 +39,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         value={selectedValue}
         label={label || name}
         onChange={handleChange}
+        disabled={disabled}
         IconComponent={KeyboardArrowDownIcon}
         MenuProps={{
           PaperProps: {
