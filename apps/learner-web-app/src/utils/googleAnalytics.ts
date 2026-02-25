@@ -19,10 +19,15 @@ export const logPageView = (url: string) => {
   const additionalParams: Record<string, string> = {};
   if (doidMatches.length === 3) {
     // If there are exactly 3 do_ IDs: first=content_id, second=course_id, third=unit_id
-    additionalParams.content_id = doidMatches[0][0];
-    additionalParams.course_id = doidMatches[1][0];
-    additionalParams.unit_id = doidMatches[2][0];
-  } else if (doidMatches.length > 0) {
+    additionalParams.content_id =  doidMatches[2][0];
+    additionalParams.course_id = doidMatches[0][0];
+    additionalParams.unit_id = doidMatches[1][0]
+  } 
+  else if (doidMatches.length === 2) {
+    additionalParams.course_id = doidMatches[0][0];
+    additionalParams.unit_id = doidMatches[1][0];
+  }
+  else if (doidMatches.length > 0) {
     // If there are other numbers of do_ IDs, use the last one as content_id
     additionalParams.content_id = doidMatches[doidMatches.length - 1][0];
   }
