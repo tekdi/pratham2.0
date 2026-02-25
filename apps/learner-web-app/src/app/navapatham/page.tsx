@@ -165,7 +165,7 @@ export default function LandingPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundImage: 'url(/images/home-page-banner.png)',
+            backgroundImage: 'url(/images/nava-patham.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
