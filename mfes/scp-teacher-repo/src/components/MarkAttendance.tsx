@@ -16,6 +16,7 @@ import { Icon } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'; //present
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelIcon from '@mui/icons-material/Cancel'; //absent
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 // import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'; //Half-Day
@@ -47,6 +48,9 @@ const MarkAttendance: React.FC<MarkAttendanceProps> = ({
   onAttendanceUpdate,
   handleClose,
   attendanceDates,
+  selectedSession,
+  onBack,
+  prefillLoading,
 }) => {
   const { t } = useTranslation();
 
@@ -78,21 +82,21 @@ const MarkAttendance: React.FC<MarkAttendanceProps> = ({
     try {
       const learnerId = localStorage.getItem('learnerId');
 
-      const matchingContextId = attendanceDates?.length
-        ? attendanceDates.find((item) => item.attendanceDate === date)
-            ?.contextId || ''
-        : '';
+      const isEventContext = !!selectedSession?.eventRepetitionId;
+      const contextId = isEventContext
+        ? selectedSession!.eventRepetitionId
+        : (attendanceDates?.length
+            ? attendanceDates.find((item) => item.attendanceDate === date)
+                ?.contextId || ''
+            : '') || localStorage.getItem('classId');
 
-      const classId = matchingContextId
-        ? matchingContextId
-        : localStorage.getItem('classId');
-
-      if (classId && learnerId) {
+      if (contextId && learnerId) {
         const markAttendanceRequest: MarkAttendanceParams = {
           userId: learnerId,
           attendanceDate: date,
-          contextId: classId,
+          contextId,
           attendance: updatedStatus,
+          ...(isEventContext && { context: 'event' as const }),
         };
         const response = await markAttendance(markAttendanceRequest);
         setUpdatedStatus(response?.data?.attendance);
@@ -144,19 +148,32 @@ const MarkAttendance: React.FC<MarkAttendanceProps> = ({
         sx={{ borderRadius: '16px' }}
       >
         <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          <Typography variant="h2" sx={{ marginBottom: 0 }}>
-            {currentStatus === ATTENDANCE_ENUM.NOT_MARKED
-              ? t('COMMON.MARK_ATTENDANCE')
-              : t('COMMON.UPDATE_ATTENDANCE')}
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{ marginBottom: 0, color: theme.palette.warning['A200'] }}
-          >
-            {formatDate(date)}
-          </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
+            {selectedSession && onBack && (
+              <IconButton
+                aria-label="back"
+                onClick={onBack}
+                size="small"
+                sx={{ color: theme.palette.warning['A200'], mr: 0.5 }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            <Box flex={1}>
+              <Typography variant="h2" sx={{ marginBottom: 0 }}>
+                {currentStatus === ATTENDANCE_ENUM.NOT_MARKED
+                  ? t('COMMON.MARK_ATTENDANCE')
+                  : t('COMMON.UPDATE_ATTENDANCE')}
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ marginBottom: 0, color: theme.palette.warning['A200'] }}
+              >
+                {formatDate(date)}
+              </Typography>
+            </Box>
+          </Box>
         </DialogTitle>
-        {/* <Typography variant="h2">Mark Attendance</Typography> */}
         <IconButton
           aria-label="close"
           onClick={handleClose}
@@ -231,6 +248,7 @@ const MarkAttendance: React.FC<MarkAttendanceProps> = ({
               submitUpdateAttendance();
             }}
             disabled={
+              prefillLoading ||
               updatedStatus === ATTENDANCE_ENUM.NOT_MARKED ||
               updatedStatus === currentStatus
             }

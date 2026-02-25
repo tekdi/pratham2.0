@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "ଉପରକୁ ଫେରିଯାଇ",
     "LAST_SEVEN_DAYS_RANGE": "ଗତ 7 ଦିନ {{date_range}}",
     "AS_OF_TODAY_DATE": "ଆଜି ଅନୁସାରେ {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "ଗତକାଲି ଅନୁସାରେ {{day_date}}",
     "LEARNER": "ଶିକ୍ଷାର୍ଥୀ",
     "ATTENDANCE_COMPARISON": "ଉପସ୍ଥିତି ତୁଳନା",
     "CENTER_TYPE": "କେନ୍ଦ୍ର ପ୍ରକାର",

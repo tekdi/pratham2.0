@@ -256,6 +256,7 @@
     "BACK_TO_TOP": "ಮೇಲಕ್ಕೆ ಹಿಂತಿರುಗಿ",
     "LAST_SEVEN_DAYS_RANGE": "ಕಳೆದ 7 ದಿನಗಳು {{date_range}}",
     "AS_OF_TODAY_DATE": "ಇಂದಿನಿಂದ, {{ದಿನ_ದಿನಾಂಕ}}",
+    "AS_OF_YESTERDAY_DATE": "ನಿನ್ನೆ ವರೆಗೆ, {{day_date}}",
     "LEARNER": "ಕಲಿಯುವವರು",
     "ATTENDANCE_COMPARISON": "ಹಾಜರಾತಿ ಹೋಲಿಕೆ",
     "CENTER_TYPE": "ಸೆಂಟರ್ ಟೈಪ್",

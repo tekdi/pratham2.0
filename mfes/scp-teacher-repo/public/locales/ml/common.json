@@ -198,6 +198,7 @@
     "BACK_TO_TOP": "മുകളിൽ തിരിച്ചുക",
     "LAST_SEVEN_DAYS_RANGE": "കഴിഞ്ഞ 7 ദിവസങ്ങൾ {{date_range}}",
     "AS_OF_TODAY_DATE": "ഇന്നുവരെ, {{day_date}}",
+    "AS_OF_YESTERDAY_DATE": "ഇന്നലെ വരെ, {{day_date}}",
     "LEARNER": "പഠിതാവ്",
     "ATTENDANCE_COMPARISON": "ഹാജർ താരതമ്യം",
     "CENTER_TYPE": "സെന്റർ തരം",

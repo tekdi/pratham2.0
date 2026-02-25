@@ -1,4 +1,4 @@
-import { post } from './RestClient';
+import { deleteApi, post } from './RestClient';
 import {
   BulkAttendanceParams,
   AttendanceStatusListProps,
@@ -169,18 +169,20 @@ export const bulkAttendance = async ({
   attendanceDate,
   contextId,
   userAttendance,
+  context = 'cohort',
 }: BulkAttendanceParams): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.bulkAttendance
+  const apiUrl: string = API_ENDPOINTS.bulkAttendance;
   try {
     const response = await post(apiUrl, {
       attendanceDate,
       contextId,
       userAttendance,
-      context: "cohort" // Add context directly
+      context,
     });
     return response?.data;
   } catch (error) {
     console.error('error in marking bulk attendance', error);
+    throw error;
   }
 };
 
@@ -189,6 +191,7 @@ export const markAttendance = async ({
   attendanceDate,
   contextId,
   attendance,
+  context = 'cohort',
 }: MarkAttendanceParams): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.attendanceCreate
   try {
@@ -197,12 +200,22 @@ export const markAttendance = async ({
       attendanceDate,
       contextId,
       attendance,
-      context: "cohort" // Add context directly
+      context,
     });
     return response?.data;
   } catch (error) {
     console.error('error in marking attendance', error);
   }
+};
+
+export const bulkDeleteAttendance = async (attendanceRecords: {
+  userId: string;
+  contextIds: string[];
+  date: string;
+}[]): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.bulkDeleteAttendance;
+  const response = await deleteApi(apiUrl, { attendanceRecords });
+  return response?.data;
 };
 
 const postAttendanceList = async ({
@@ -211,26 +224,27 @@ const postAttendanceList = async ({
   filters = {},
   facets,
 }: any): Promise<any> => {
-  const apiUrl: string = API_ENDPOINTS.attendanceList
-  filters.context = "cohort"; // Ensure context is added to filters
+  const apiUrl: string = API_ENDPOINTS.attendanceList;
+  if (filters.context === undefined) {
+    filters.context = 'cohort';
+  }
   try {
     const response = await post(apiUrl, { limit, page, filters, facets });
     return response?.data;
   } catch (error) {
     console.error('Error in fetching attendance list', error);
-    // throw error; // Rethrow the error to handle it in the caller function if needed
   }
 };
 
 export const attendanceStatusList = async ({
   limit,
   page,
-  filters: { fromDate, toDate, contextId, scope },
+  filters: { fromDate, toDate, contextId, scope, context },
 }: AttendanceStatusListProps): Promise<any> => {
   return postAttendanceList({
     limit,
     page,
-    filters: { fromDate, toDate, contextId, scope, context: "cohort" }, // Add context to filters
+    filters: { fromDate, toDate, contextId, scope, context: context ?? 'cohort' },
   });
 };
 
@@ -265,12 +279,12 @@ export const overallAttendanceInPercentageStatusList = async ({
 export const getLearnerAttendanceStatus = async ({
   limit,
   page,
-  filters: { contextId, scope, toDate, fromDate, userId },
+  filters: { contextId, scope, toDate, fromDate, userId, context },
 }: LearnerAttendanceProps): Promise<any> => {
   return postAttendanceList({
     limit,
     page,
-    filters: { contextId, scope, toDate, fromDate, userId, context: "cohort" }, // Add context to filters
+    filters: { contextId, scope, toDate, fromDate, userId, context: context ?? 'cohort' },
   });
 };
 

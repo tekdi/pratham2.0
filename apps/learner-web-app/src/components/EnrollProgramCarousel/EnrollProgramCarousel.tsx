@@ -182,15 +182,23 @@ const EnrollProgramCarousel = ({
       }
      if(localStorage.getItem('isAndroidApp') == 'yes')
       {
+        // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
+        }
+        
        // Send message to React Native WebView
        if (window.ReactNativeWebView) {
+
          window.ReactNativeWebView.postMessage(JSON.stringify({
            type: 'ACCESS_PROGRAM_EVENT', // Event type identifier
            data: {
              userId: userId,
              tenantId: program.tenantId,
              token: localStorage.getItem('token'),
-             refreshToken: localStorage.getItem('refreshTokenForAndroid'),
+             refreshToken: refreshToken,
            
              // Add any data you want to send
            }
@@ -304,6 +312,13 @@ const EnrollProgramCarousel = ({
       }
  if(localStorage.getItem('isAndroidApp') == 'yes')
       {
+       // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+       let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+       // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+       if (!refreshToken || refreshToken === '') {
+         refreshToken = localStorage.getItem('refreshToken');
+       }
+      
        // Send message to React Native WebView
        if (window.ReactNativeWebView) {
          window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -312,7 +327,7 @@ const EnrollProgramCarousel = ({
              userId: userId,
              tenantId: program.tenantId,
              token: localStorage.getItem('token'),
-             refreshToken: localStorage.getItem('refreshToken'),
+             refreshToken: refreshToken,
            
              // Add any data you want to send
            }
@@ -461,6 +476,15 @@ const EnrollProgramCarousel = ({
     if (enrolledProgram) {
      if(localStorage.getItem('isAndroidApp') == 'yes')
         {
+         // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+         let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+         // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+         if (!refreshToken || refreshToken === '') {
+           refreshToken = localStorage.getItem('refreshToken');
+         }
+         console.log('onSigin - refreshTokenForAndroid', localStorage.getItem('refreshTokenForAndroid'));
+         console.log('onSigin - refreshToken (fallback)', localStorage.getItem('refreshToken'));
+         console.log('onSigin - Using refreshToken:', refreshToken);
          // Send message to React Native WebView
 
               //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
@@ -475,7 +499,7 @@ const EnrollProgramCarousel = ({
                userId: localStorage.getItem('userId'),
                tenantId: enrolledProgram?.tenantId,
                token: localStorage.getItem('token'),
-               refreshToken: localStorage.getItem('refreshToken'),
+               refreshToken: refreshToken,
              
                // Add any data you want to send
              }

@@ -7,7 +7,7 @@ import { AttendanceAPILimit } from '../../app.config';
 export const fetchAttendanceDetails = async (
   nameUserIdArray: any[],
   selectedDate: any,
-  classId: string,
+  contextId: string,
   onAttendanceDataUpdate: (data: {
     cohortMemberList: any[];
     presentCount: number;
@@ -16,7 +16,8 @@ export const fetchAttendanceDetails = async (
     dropoutMemberList: any[];
     dropoutCount: number;
     bulkStatus: string;
-  }) => void
+  }) => void,
+  options?: { context: 'cohort' | 'event' }
 ) => {
   let cohortMemberList: Array<{}> = [];
   let presentCount = 0;
@@ -49,8 +50,9 @@ export const fetchAttendanceDetails = async (
       filters: {
         fromDate: formatSelectedDate,
         toDate: formatSelectedDate,
-        contextId: classId,
+        contextId,
         scope: cohortPrivileges.STUDENT,
+        ...(options?.context && { context: options.context }),
       },
     };
 
