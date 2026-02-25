@@ -8,7 +8,7 @@ import {
   ParsedQuestionSet,
   ParsedSection,
   ParsedQuestion,
-} from '../utils/bulkImportValidation';
+} from '@workspace/utils/bulkImportValidation';
 
 export interface ImportProgress {
   currentQuestionSet: number;
@@ -179,7 +179,13 @@ export async function bulkImportQuestionSets(
       const sectionIds: string[] = [];
       const nodesModified: any = {};
       const hierarchy: any = {};
-
+      
+      // Calculate total maxScore as sum of all question scores
+      const totalMaxScore = qs.sections.reduce(
+        (acc, section) =>
+          acc + section.questions.reduce((a, q) => a + q.maxScore, 0),
+        0
+      );
       // Root node
       nodesModified[questionSetId] = {
         root: true,
@@ -203,7 +209,7 @@ export async function bulkImportQuestionSets(
             maxScore: {
               cardinality: 'single',
               type: 'integer',
-              defaultValue: 0,
+              defaultValue: totalMaxScore,
             },
           },
         },
