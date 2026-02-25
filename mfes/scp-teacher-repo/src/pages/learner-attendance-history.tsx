@@ -5,9 +5,13 @@ import AttendanceStatus from '@/components/AttendanceStatus';
 import Header from '@/components/Header';
 import Loader from '@/components/Loader';
 import MarkAttendance from '@/components/MarkAttendance';
+import MarkCenterAttendanceSessionsModal, {
+  DaySessionForAttendance,
+} from '@/components/MarkCenterAttendanceSessionsModal';
 import MonthCalender from '@/components/MonthCalender';
 import { showToastMessage } from '@/components/Toastify';
 import { getLearnerAttendanceStatus } from '@/services/AttendanceService';
+import { getEventsForDay } from '@/services/EventService';
 import { shortDateFormat } from '@/utils/Helper';
 import { LearnerAttendanceProps } from '@/utils/Interfaces';
 import { logEvent } from '@/utils/googleAnalytics';
@@ -44,6 +48,13 @@ const LearnerAttendanceHistory = () => {
   const [loading, setLoading] = React.useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [open, setOpen] = useState(false);
+  const [sessionsModalOpen, setSessionsModalOpen] = useState(false);
+  const [daySessions, setDaySessions] = useState<DaySessionForAttendance[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [selectedSession, setSelectedSession] =
+    useState<DaySessionForAttendance | null>(null);
+  const [sessionAttendanceStatus, setSessionAttendanceStatus] = useState('');
+  const [sessionAttendanceLoading, setSessionAttendanceLoading] = useState(false);
   const [attendanceUpdated, setAttendanceUpdated] = useState(false);
   const [learnerAttendance, setLearnerAttendance] = useState<
     LearnerAttendanceData | undefined
@@ -79,7 +90,7 @@ const LearnerAttendanceHistory = () => {
   };
 
   const handleOpen = () => {
-    setOpen(true);
+    setSessionsModalOpen(true);
     logEvent({
       action: 'individual-learner-attendance-modal-open',
       category: 'Learner Attendance History Page',
@@ -89,12 +100,73 @@ const LearnerAttendanceHistory = () => {
 
   const handleModalClose = () => {
     setOpen(false);
+    setSessionsModalOpen(false);
+    setSelectedSession(null);
+    setSessionAttendanceStatus('');
+    setSessionAttendanceLoading(false);
     logEvent({
       action: 'individual-learner-attendance-modal-close',
       category: 'Learner Attendance History Page',
       label: 'Mark Individual Learner Modal Close',
     });
   };
+
+  const handleSessionSelect = (session: DaySessionForAttendance) => {
+    setSelectedSession(session);
+    setSessionsModalOpen(false);
+    setOpen(true);
+    setSessionAttendanceLoading(true);
+    setSessionAttendanceStatus('');
+    const classId = localStorage.getItem('classId') ?? '';
+    const userId = localStorage.getItem('learnerId') ?? '';
+    const dateStr = shortDateFormat(selectedDate);
+    if (classId && userId) {
+      const eventRepetitionId = session.eventRepetitionId ?? session.id;
+      getLearnerAttendanceStatus({
+        limit: 300,
+        page: 0,
+        filters: {
+          contextId: eventRepetitionId,
+          context: 'event',
+          fromDate: dateStr,
+          toDate: dateStr,
+          scope: Role.STUDENT,
+          userId,
+        },
+      })
+        .then((response) => {
+          const list = response?.data?.attendanceList ?? [];
+          const forDate = list.find(
+            (r: { attendanceDate: string }) => r.attendanceDate === dateStr
+          );
+          setSessionAttendanceStatus(forDate?.attendance ?? '');
+        })
+        .catch(() => setSessionAttendanceStatus(''))
+        .finally(() => setSessionAttendanceLoading(false));
+    } else {
+      setSessionAttendanceLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const classId = localStorage.getItem('classId') ?? '';
+    if (!sessionsModalOpen || !classId) return;
+    let cancelled = false;
+    setSessionsLoading(true);
+    getEventsForDay(classId, shortDateFormat(selectedDate))
+      .then((sessions) => {
+        if (!cancelled) setDaySessions(sessions);
+      })
+      .catch(() => {
+        if (!cancelled) setDaySessions([]);
+      })
+      .finally(() => {
+        if (!cancelled) setSessionsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionsModalOpen, selectedDate]);
 
   useEffect(() => {
     const getAttendanceStatus = async () => {
@@ -255,17 +327,46 @@ const LearnerAttendanceHistory = () => {
         onChange={handleActiveStartDateChange}
         onDateChange={handleSelectedDateChange}
       />
+      {sessionsModalOpen && (
+        <MarkCenterAttendanceSessionsModal
+          open={sessionsModalOpen}
+          onClose={handleModalClose}
+          selectedDate={selectedDate}
+          sessions={daySessions}
+          sessionsLoading={sessionsLoading}
+          onSessionSelect={handleSessionSelect}
+        />
+      )}
       <MarkAttendance
         isOpen={open}
         date={shortDateFormat(selectedDate)}
         isSelfAttendance={false}
         currentStatus={
-          learnerAttendance?.[shortDateFormat(selectedDate)]
-            ?.attendanceStatus ?? ''
+          selectedSession
+            ? sessionAttendanceStatus
+            : learnerAttendance?.[shortDateFormat(selectedDate)]
+                ?.attendanceStatus ?? ''
         }
         handleClose={handleModalClose}
         onAttendanceUpdate={() => setAttendanceUpdated(!attendanceUpdated)}
         attendanceDates={extractedAttendanceDates}
+        selectedSession={
+          selectedSession
+            ? {
+                eventRepetitionId:
+                  selectedSession.eventRepetitionId ?? selectedSession.id,
+              }
+            : null
+        }
+        onBack={
+          selectedSession
+            ? () => {
+                setOpen(false);
+                setSessionsModalOpen(true);
+              }
+            : undefined
+        }
+        prefillLoading={!!selectedSession && sessionAttendanceLoading}
       />
     </Box>
   );

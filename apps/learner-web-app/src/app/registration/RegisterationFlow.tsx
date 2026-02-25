@@ -79,6 +79,9 @@ const RegisterationFlow = () => {
   const [otpmodal, setOtpModal] = useState(false);
   const [otp, setOtp] = useState<string[]>(['', '', '', '']);
   const [hash, setHash] = useState<string>('');
+  const [below18PrivacyConsent, setBelow18PrivacyConsent] = useState<string>("");
+   const [above18ParentGuardianConsent, setAbove18ParentGuardianConsent] = useState<string>("");
+
   const localFormData =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('formData') || '{}')
@@ -208,12 +211,16 @@ const RegisterationFlow = () => {
           // },
         ]);
         console.log('responseForm####', responseForm);
+        setAbove18ParentGuardianConsent(responseForm?.schema?.properties.privacy_consent?.fieldId);
+        setBelow18PrivacyConsent(responseForm?.schema?.properties?.parent_guardian_consent?.fieldId);
         delete responseForm?.schema?.properties.password;
         delete responseForm?.schema?.properties.confirm_password;
         delete responseForm?.schema?.properties.username;
         delete responseForm?.schema?.properties.program;
         delete responseForm?.schema?.properties.batch;
         delete responseForm?.schema?.properties.center;
+        delete responseForm?.schema?.properties.privacy_consent;
+        delete responseForm?.schema?.properties.parent_guardian_consent;
         responseForm?.schema?.required.pop('batch');
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
@@ -448,6 +455,19 @@ const RegisterationFlow = () => {
         if (isUnderEighteen(updated_payload?.dob)) {
           //  delete updated_payload?.mobile;
           updated_payload.mobile = formData?.parent_phone;
+          
+          // Add privacy consent for users under 18
+          const customFieldsArray = [...(payload.customFields || [])];
+          if (below18PrivacyConsent) {
+            customFieldsArray.push({
+              fieldId: below18PrivacyConsent,
+              value: 'yes'
+            });
+          }
+          updated_payload = {
+            ...payload,
+            customFields: customFieldsArray,
+          };
         } else {
           updated_payload.mobile = formData?.mobile;
 
@@ -456,11 +476,22 @@ const RegisterationFlow = () => {
             '3a7bf305-6bac-4377-bf09-f38af866105c',
             '7ecaa845-901a-4ac7-a136-eed087f3b85b',
           ];
+          
+          // Add parent/guardian consent for users 18 and above
+          const filteredCustomFields = payload.customFields.filter(
+            (field: any) => !fieldIdsToRemove.includes(field.fieldId)
+          );
+          
+          if (above18ParentGuardianConsent) {
+            filteredCustomFields.push({
+              fieldId: above18ParentGuardianConsent,
+              value: 'yes'
+            });
+          }
+          
           updated_payload = {
             ...payload,
-            customFields: payload.customFields.filter(
-              (field: any) => !fieldIdsToRemove.includes(field.fieldId)
-            ),
+            customFields: filteredCustomFields,
           };
           delete formData?.parent_phone;
           delete formData?.guardian_relation;
@@ -699,7 +730,12 @@ const RegisterationFlow = () => {
           if (typeof window !== 'undefined' && window.localStorage) {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
-            localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            // Only store refreshToken if it has a valid value
+            if (refreshToken) {
+              localStorage.setItem('refreshTokenForAndroid', refreshToken);
+            } else {
+              localStorage.removeItem('refreshTokenForAndroid');
+            }
 
             localStorage.setItem('token', token);
 

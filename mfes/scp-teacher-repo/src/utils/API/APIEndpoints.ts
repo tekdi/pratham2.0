@@ -44,6 +44,7 @@ const API_ENDPOINTS = {
   assessmentSearchStatus: `${baseurl}/tracking/assessment/search/status`,
   assessmentSearch: `${baseurl}/tracking/assessment/search`,
   bulkAttendance: `${baseurl}/account/attendance/bulkAttendance`,
+  bulkDeleteAttendance: `${baseurl}/account/attendance/bulkDelete`,
   attendanceCreate: `${baseurl}/attendance/create`,
   attendanceList: `${baseurl}/account/attendance/list`,
   cohortHierarchy: (cohortId: string) => `${baseurl}/cohort/cohortHierarchy/${cohortId}`,

@@ -118,9 +118,13 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [userName, setUserName] = useState<any | null>(null);
-  const [isFromDate, setIsFromDate] = useState(
-    formatSelectedDate(new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000))
-  );
+  const [isFromDate, setIsFromDate] = useState(() => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const start = new Date(yesterday);
+    start.setDate(yesterday.getDate() - 6);
+    return formatSelectedDate(start);
+  });
   const [submittedOn, setSubmittedOn] = useState();
   const [overallAttendance, setOverallAttendance] =
     useState<OverallAttendance>();
@@ -162,11 +166,13 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
       setCohortId(localStorage.getItem('classId') || '');
       setClassId(localStorage.getItem('classId') || '');
     }
-    const todayFormattedDate = formatSelectedDate(new Date());
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
     const lastSeventhDayFormattedDate = formatSelectedDate(
-      new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
+      new Date(yesterday.getTime() - 6 * 24 * 60 * 60 * 1000)
     );
-    getAttendanceData(lastSeventhDayFormattedDate, todayFormattedDate);
+    const yesterdayFormattedDate = formatSelectedDate(yesterday);
+    getAttendanceData(lastSeventhDayFormattedDate, yesterdayFormattedDate);
   }, []);
 
   const handleReload = () => {
@@ -178,7 +184,15 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     getAttendanceData(fromDate, toDate);
   };
 
-  const menuItems = getMenuItems(t, dateRange, currentDayMonth);
+  const yesterdayForDisplay = (() => {
+    const y = new Date();
+    y.setDate(y.getDate() - 1);
+    return `(${y.getDate()} ${y.toLocaleString('default', { month: 'long' })})`;
+  })();
+  const menuItems = getMenuItems(t, dateRange, currentDayMonth, {
+    useYesterdayLabel: true,
+    yesterdayDate: yesterdayForDisplay,
+  });
 
   const handleOpenAddLearnerModal = () => {
     setOpenAddLearnerModal(true);
@@ -305,7 +319,11 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     // Conditionally add fromDate and toDate to filters if selectedValue doesn't match the specific condition
     if (
       selectedValue !==
-      t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth })
+        t('DASHBOARD.AS_OF_TODAY_DATE', { day_date: currentDayMonth }) &&
+      selectedValue !==
+        t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+          day_date: yesterdayForDisplay,
+        })
     ) {
       filters.fromDate = fromDates;
       filters.toDate = toDates;
@@ -384,7 +402,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                   genericFormResponse.fields =
                     genericFormResponse.fields.filter(
                       (item: { name: string }) =>
-                        !['password', 'confirm_password', 'program'].includes(
+                        !['password', 'confirm_password', 'program' ].includes(
                           item.name
                         )
                     );
@@ -613,7 +631,7 @@ if (familyField?.displayValue) {
   } else if (role === 'mother') {
     removeSet.add('SPOUSE_NAME').add('FATHER_NAME');
   }
-
+  removeSet.add("INTERESTED_TO_JOIN")
   learnerDetailsByOrder = learnerDetailsByOrder.filter(
     (f) => !removeSet.has(f.label?.toUpperCase())
   );
@@ -792,18 +810,21 @@ if (familyField?.displayValue) {
   //----- code for Attendance Marked out of 7 days  ------------
   useEffect(() => {
     const getAttendanceMarkedDays = async () => {
-      // const today = new Date();
-      const todayFormattedDate = formatSelectedDate(new Date());
-      const lastSeventhDayDate = new Date(
-        today.getTime() - 6 * 24 * 60 * 60 * 1000
-      );
-      const lastSeventhDayFormattedDate = formatSelectedDate(
-        new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000)
-      );
+      const today = new Date();
+      const endRangeDate = new Date(today);
+      endRangeDate.setDate(today.getDate() - 1);
+      const lastSeventhDayDate = new Date(endRangeDate);
+      lastSeventhDayDate.setDate(endRangeDate.getDate() - 6);
+      const lastSeventhDayFormattedDate = formatSelectedDate(lastSeventhDayDate);
+      const endRangeFormattedDate = formatSelectedDate(endRangeDate);
 
-      const endDay = today.getDate();
-      const endDayMonth = today.toLocaleString('default', { month: 'long' });
-      setCurrentDayMonth(`(${endDay} ${endDayMonth})`);
+      const endDay = endRangeDate.getDate();
+      const endDayMonth = endRangeDate.toLocaleString('default', {
+        month: 'long',
+      });
+      setCurrentDayMonth(
+        `(${today.getDate()} ${today.toLocaleString('default', { month: 'long' })})`
+      );
       const startDay = lastSeventhDayDate.getDate();
       const startDayMonth = lastSeventhDayDate.toLocaleString('default', {
         month: 'long',
@@ -813,6 +834,7 @@ if (familyField?.displayValue) {
       } else {
         setDateRange(`(${startDay} ${startDayMonth}-${endDay} ${endDayMonth})`);
       }
+      setIsFromDate(lastSeventhDayFormattedDate);
 
       const cohortAttendanceData: CohortAttendancePercentParam = {
         limit: AttendanceAPILimit,
@@ -820,7 +842,7 @@ if (familyField?.displayValue) {
         filters: {
           scope: Role.STUDENT,
           fromDate: lastSeventhDayFormattedDate,
-          toDate: todayFormattedDate,
+          toDate: endRangeFormattedDate,
           contextId: classId,
         },
         facets: ['attendanceDate'],

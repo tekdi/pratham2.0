@@ -34,6 +34,8 @@
       "@questionSet": ["mfes/editors/src/components/QuestionSetEditor.tsx"],
       "@registration": ["mfes/registration/src/app/page.tsx"],
       "@scp-teacher-repo": ["mfes/scp-teacher-repo/src/pages/index.tsx"],
+      "@player-lib": ["libs/player-lib/src/index.ts"],
+      "@player-lib/*": ["libs/player-lib/src/*"],
       "@shared-lib": ["libs/shared-lib/src/index.ts"],
       "@shared-lib-v2/*": ["libs/shared-lib-v2/src/*"],
       "@sunbirdPlayers": ["mfes/workspace/src/pages/sunbirdPlayers.tsx"],

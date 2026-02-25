@@ -22,6 +22,11 @@ export interface MarkAttendanceProps {
   handleClose: () => void;
   onAttendanceUpdate: () => void;
   attendanceDates?: any[];
+  /** When set, attendance is marked at session/event level (contextId = eventRepetitionId, context = 'event') */
+  selectedSession?: { eventRepetitionId: string } | null;
+  /** When provided, shows back control to return to session list */
+  onBack?: () => void;
+  prefillLoading?: boolean;
 }
 
 export interface AttendanceStatusListViewProps {
@@ -65,12 +70,15 @@ export interface BulkAttendanceParams {
   attendanceDate: string;
   contextId: string;
   userAttendance: UserAttendanceObj[];
+  /** 'event' for session-level attendance, 'cohort' for batch-level (default) */
+  context?: 'cohort' | 'event';
 }
 export interface MarkAttendanceParams {
   userId: string;
   attendanceDate: string;
   contextId: string;
   attendance: string;
+  context?: 'cohort' | 'event';
 }
 
 export interface UserIdFilter {
@@ -206,6 +214,8 @@ export interface AttendanceStatusListProps {
     toDate: string | Date;
     contextId: string;
     scope: string;
+    /** 'event' for session-level attendance list, 'cohort' (default) for batch-level */
+    context?: 'cohort' | 'event';
   };
 }
 
@@ -250,6 +260,7 @@ export interface LearnerAttendanceProps {
     toDate: string | Date;
     fromDate: string | Date;
     userId: string;
+    context?: 'cohort' | 'event';
   };
 }
 
