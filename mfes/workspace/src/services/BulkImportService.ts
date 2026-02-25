@@ -8,7 +8,7 @@ import {
   ParsedQuestionSet,
   ParsedSection,
   ParsedQuestion,
-} from '@workspace/utils/bulkImportValidation';
+} from '../utils/bulkImportValidation';
 
 export interface ImportProgress {
   currentQuestionSet: number;
