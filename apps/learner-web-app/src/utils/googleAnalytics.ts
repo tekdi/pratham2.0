@@ -85,15 +85,20 @@ export const logEvent = ({
   
   if (doidMatches.length === 3) {
     // If there are exactly 3 do_ IDs: first=content_id, second=course_id, third=unit_id
-    eventParams.content_id = doidMatches[0][0];
-    eventParams.course_id = doidMatches[1][0];
-    eventParams.unit_id = doidMatches[2][0];
-  } else if (doidMatches.length > 0) {
+    eventParams.content_id = doidMatches[2][0];
+    eventParams.course_id = doidMatches[0][0];
+    eventParams.unit_id =  doidMatches[1][0];
+  } 
+  else if (doidMatches.length === 2) {
+    eventParams.course_id = doidMatches[0][0];
+    eventParams.unit_id = doidMatches[1][0];
+  }
+  else if (doidMatches.length > 0) {
     // If there are other numbers of do_ IDs, use the last one as content_id
     eventParams.content_id = doidMatches[doidMatches.length - 1][0];
   }
-  
-  // Use gtag directly to send event with custom parameters
+ 
+  // // Use gtag directly to send event with custom parameters
   // This ensures custom parameters like 'program' are sent to GA4
   if (window.gtag && typeof window.gtag === 'function') {
     window.gtag('event', action, eventParams);
