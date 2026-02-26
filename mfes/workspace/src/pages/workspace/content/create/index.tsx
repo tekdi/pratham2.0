@@ -27,6 +27,7 @@ import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Image from 'next/image';
 import WorkspaceText from '../../../../components/WorkspaceText';
 import { getLocalStoredUserId } from '../../../../services/LocalStorageService';
@@ -175,6 +176,12 @@ const CreatePage = () => {
           query: { editorforlargecontent: 'true' }, // No change needed
         }); // Removed an extra comma
       },
+    },
+    {
+      title: 'Bulk Import QuestionSet',
+      description: 'Import question sets in bulk from a CSV file',
+      icon: <UploadFileIcon fontSize="large" />,
+      onClick: () => router.push('/workspace/content/bulk-import'),
     },
     ...(isSCP
       ? [

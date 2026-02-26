@@ -1,0 +1,47 @@
+{
+    "title": "Sunbird Document Reader",
+    "description": "Unified H5P Plugin for rendering EPUB and PDF documents.",
+    "majorVersion": 1,
+    "minorVersion": 0,
+    "patchVersion": 0,
+    "runnable": 1,
+    "fullscreen": 1,
+    "coreApi": {
+        "majorVersion": 1,
+        "minorVersion": 24
+    },
+    "author": "Sunbird ED",
+    "license": "MIT",
+    "machineName": "Sunbird.DocumentReader",
+    "preloadedJs": [
+        {
+            "path": "jszip.min.js"
+        },
+        {
+            "path": "epub.min.js"
+        },
+        {
+            "path": "pdf.min.js"
+        },
+        {
+            "path": "document-reader.js"
+        }
+    ],
+    "preloadedCss": [
+        {
+            "path": "document-reader.css"
+        }
+    ],
+    "preloadedDependencies": [
+        {
+            "machineName": "FontAwesome",
+            "majorVersion": 4,
+            "minorVersion": 5
+        },
+        {
+            "machineName": "H5P.JoubelUI",
+            "majorVersion": 1,
+            "minorVersion": 3
+        }
+    ]
+}
