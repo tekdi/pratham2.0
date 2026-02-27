@@ -56,6 +56,7 @@ const DynamicForm = ({
   mobileSchema = {},
   parentDataAddUiSchema = {},
   parentDataSchema = {},
+  id
 }: any) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -2132,7 +2133,7 @@ const DynamicForm = ({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           fields={customFields}
-          id="dynamic-form-id"
+          id={id ||"dynamic-form-id"}
           // template
           templates={{ ObjectFieldTemplate: CustomObjectFieldTemplate }}
         >

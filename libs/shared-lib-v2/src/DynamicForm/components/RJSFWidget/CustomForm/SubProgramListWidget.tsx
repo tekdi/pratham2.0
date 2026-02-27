@@ -16,6 +16,7 @@ import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 import { fetchActiveAcademicYearId } from '../../../utils/Helper';
+import { readUserIdTrue } from '../../../services/NotificationService';
 
 interface Cohort {
     tenantId: string;
@@ -47,23 +48,53 @@ const SubProgramListWidget = ({
             setLoading(true);
             setError(null);
 
-            const response = await axios.get(
-                API_ENDPOINTS.tenantRead,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            // Get current userId from localStorage
+            const userId = localStorage.getItem('userId');
+            
+            // Fetch both cohorts and user details in parallel
+            const [cohortResponse, userInfoResponse] = await Promise.all([
+                axios.get(
+                    API_ENDPOINTS.tenantRead,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                ),
+                userId ? readUserIdTrue(userId) : Promise.resolve(null)
+            ]);
 
-            const cohortDetails: Cohort[] = response.data?.result?.[0]?.children || [];
+            const cohortDetails: Cohort[] = cohortResponse.data?.result?.[0]?.children || [];
 
-            // Filter only active cohorts
+            // Filter only VolunteerOnboarding cohorts
             const activeCohorts = cohortDetails.filter(
                 (cohort) => cohort.type === 'VolunteerOnboarding'
             );
+            console.log('activeCohorts', activeCohorts);
+            // Get volunteer program lead tenant IDs to filter out
+            let volunteerProgramLeadTenantIds: string[] = [];
+            if (userInfoResponse?.result?.userData?.tenantData) {
+                const tenants = userInfoResponse.result.userData.tenantData;
+                volunteerProgramLeadTenantIds = tenants
+                    .filter((tenant: any) =>
+                        tenant.tenantType === 'VolunteerOnboarding' &&
+                        tenant.roles?.some(
+                            (role: any) => role.roleName?.toLowerCase() === 'lead'
+                        )
+                    )
+                    .map((tenant: any) => tenant.tenantId);
+                
+                console.log('volunteerProgramLeadTenantIds to filter out:', volunteerProgramLeadTenantIds);
+            }
 
-            setCohorts(activeCohorts);
+            // Filter out cohorts where user has lead role
+            const filteredCohorts = activeCohorts.filter(
+                (cohort) => !volunteerProgramLeadTenantIds.includes(cohort.tenantId)
+            );
+            
+            console.log('filteredCohorts after removing lead tenants:', filteredCohorts);
+
+            setCohorts(filteredCohorts);
         } catch (err: any) {
             console.error('Error fetching cohorts:', err);
             // setError('Failed to fetch cohorts');
