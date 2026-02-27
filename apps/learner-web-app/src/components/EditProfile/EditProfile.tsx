@@ -39,6 +39,9 @@ import {
 } from '@learner/utils/API/userService';
 import Header from '../Header/Header';
 
+//volunteer onboarding
+import VolunteerOnboard from '@shared-lib-v2/VolunteerOnboard/VolunteerOnboard';
+
 type UserAccount = {
   name: string;
   username: string;
@@ -108,6 +111,19 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
       router.push('/login');
     }
   }, []);
+
+  const[isVolunteerOnboard, setIsVolunteerOnboard] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const temp_program_type = localStorage.getItem('temp_program_type');
+    if (temp_program_type=='VolunteerOnboarding') {
+      setIsVolunteerOnboard(true);
+    }
+    else{
+      setIsVolunteerOnboard(false);
+    }
+  }, []);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -348,8 +364,13 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
+    if(isVolunteerOnboard==false){
+      fetchData();
+    }
+    else{
+      setLoading(false);
+    }
+  }, [isVolunteerOnboard]);
 console.log("addSchema", addSchema);
 console.log("addUiSchema", addUiSchema);
   const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
@@ -580,6 +601,7 @@ if(enrolledProgram && userTenantStatus){
                 sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
               />
           </Box>)}
+
           <Box
             sx={{
               textAlign: 'center',
@@ -633,75 +655,86 @@ if(enrolledProgram && userTenantStatus){
                 </Typography>
               )}
           </Box>
-          <Box
-            sx={{
-              ml: 'auto',
-              mr: 'auto',
-              width: {
-                xs: '90vw',
-                md: '50vw',
-              },
-              display: 'flex',
-              flexDirection: 'column',
-              bgcolor: '#fff',
-              p: '40px',
-            }}
-          >
-            {completeProfile && !enrolledProgram && (
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
-                <Image src={face} alt="Step Icon" />
-                <Typography fontWeight={600}>
-                  {t('LEARNER_APP.EDIT_PROFILE.BACKGROUND_HELP_TEXT')}
-                </Typography>
+          {isVolunteerOnboard != null && (
+            <>
+          {isVolunteerOnboard==true ? (
+            <>
+              <VolunteerOnboard />
+            </>
+          ) : (
+              <>
+              <Box
+                sx={{
+                  ml: 'auto',
+                  mr: 'auto',
+                  width: {
+                    xs: '90vw',
+                    md: '50vw',
+                  },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  bgcolor: '#fff',
+                  p: '40px',
+                }}
+              >
+                {completeProfile && !enrolledProgram && (
+                  <Box display="flex" alignItems="center" gap={1} mb={2}>
+                    <Image src={face} alt="Step Icon" />
+                    <Typography fontWeight={600}>
+                      {t('LEARNER_APP.EDIT_PROFILE.BACKGROUND_HELP_TEXT')}
+                    </Typography>
+                  </Box>
+                )}
+                {enrolledProgram &&
+                  typeof window !== 'undefined' &&
+                  window.localStorage &&
+                  localStorage.getItem('userProgram') && (
+                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+                      <Image src={face} alt="Step Icon" />
+                      <Typography fontWeight={600}>
+                        {t('NAVAPATHAM.WELCOME_JOINED')} {getProgramName()}!<br />
+                        {t('NAVAPATHAM.ENROLLMENT_INTRO')}
+                      </Typography>
+                    </Box>
+                  )}
+                {addSchema && addUiSchema && (
+                  <DynamicForm
+                    schema={addSchema}
+                    uiSchema={addUiSchema}
+                    mobileAddUiSchema={mobileAddUiSchema}
+                    mobileSchema={mobileSchema}
+                    parentDataAddUiSchema={parentDataAddUiSchema}
+                    parentDataSchema={parentDataSchema}
+                    forEditedschema={responseFormData?.schema?.properties}
+                    FormSubmitFunction={FormSubmitFunction}
+                    prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
+                    hideSubmit={true}
+                    type="learner"
+                    isCompleteProfile={completeProfile}
+                    createNew={false}
+                  />
+                )}
+                <Button
+                  sx={{
+                    mt: 3,
+                    backgroundColor: '#FFC107',
+                    color: '#000',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: '#ffb300',
+                    },
+                  }}
+                  form="dynamic-form-id"
+                  type="submit"
+                >
+                  {enrolledProgram
+                    ? t('NAVAPATHAM.FINISH_ENROLL')
+                    : t('COMMON.SUBMIT')}
+                </Button>
               </Box>
+              </>
             )}
-            {enrolledProgram &&
-              typeof window !== 'undefined' &&
-              window.localStorage &&
-              localStorage.getItem('userProgram') && (
-                <Box display="flex" alignItems="center" gap={1} mb={2}>
-                  <Image src={face} alt="Step Icon" />
-                  <Typography fontWeight={600}>
-                    {t('NAVAPATHAM.WELCOME_JOINED')} {getProgramName()}!<br />
-                    {t('NAVAPATHAM.ENROLLMENT_INTRO')}
-                  </Typography>
-                </Box>
-              )}
-            {addSchema && addUiSchema && (
-              <DynamicForm
-                schema={addSchema}
-                uiSchema={addUiSchema}
-                mobileAddUiSchema={mobileAddUiSchema}
-                mobileSchema={mobileSchema}
-                parentDataAddUiSchema={parentDataAddUiSchema}
-                parentDataSchema={parentDataSchema}
-                forEditedschema={responseFormData?.schema?.properties}
-                FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
-                hideSubmit={true}
-                type="learner"
-                isCompleteProfile={completeProfile}
-                createNew={false}
-              />
-            )}
-            <Button
-              sx={{
-                mt: 3,
-                backgroundColor: '#FFC107',
-                color: '#000',
-                fontWeight: 'bold',
-                '&:hover': {
-                  backgroundColor: '#ffb300',
-                },
-              }}
-              form="dynamic-form-id"
-              type="submit"
-            >
-              {enrolledProgram
-                ? t('NAVAPATHAM.FINISH_ENROLL')
-                : t('COMMON.SUBMIT')}
-            </Button>
-          </Box>
+          </>)}
         </>
       )}
 

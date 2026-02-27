@@ -189,6 +189,10 @@ function ProgramsContent() {
               // Remove enrollTenantId from localStorage
              // localStorage.removeItem('enrollTenantId');
 
+              //volunteer enboard flow integration
+              localStorage.setItem('onboardTennatId', program.tenantId);
+              localStorage.setItem('temp_program_type', program?.type);
+
               // Navigate to enrollment profile completion page (keep loading state true during redirect)
               router.push('/enroll-profile-completion?directEnroll=true');
               return;

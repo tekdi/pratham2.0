@@ -99,6 +99,9 @@ const UserLeader = () => {
       organization_name: {
         "type": "string"
       },
+      poc_name: {
+        "type": "string"
+      },
       nda_policy: {
         "type": "string"
       },
@@ -110,6 +113,7 @@ const UserLeader = () => {
       "sub_program",
       "ptm_name",
       "organization_name",
+      "poc_name",
       "nda_policy",
       "child_pocso_fraud_policy",
     ]
@@ -127,6 +131,10 @@ const UserLeader = () => {
     },
     organization_name: {
       'ui:widget': 'OrganizationSearchWidget',
+      'ui:options': { hideError: true },
+    },
+    poc_name: {
+      'ui:widget': 'POCNameSelectWidget',
       'ui:options': { hideError: true },
     },
     nda_policy: {
@@ -744,7 +752,7 @@ const UserLeader = () => {
           )
         )}
 
-        {/* <Box mt={4}>
+        <Box mt={4}>
           {testSchema &&
             testUiSchema && (
               <>
@@ -783,7 +791,7 @@ const UserLeader = () => {
                 </Button>
               </>
             )}
-        </Box> */}
+        </Box>
 
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton

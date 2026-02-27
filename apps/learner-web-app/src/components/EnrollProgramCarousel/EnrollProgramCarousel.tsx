@@ -41,6 +41,7 @@ interface Program {
   ordering: number;
   name: string;
   tenantId: string;
+  type: string;
   params?: {
     uiConfig?: {
       showSignup?: boolean;
@@ -452,6 +453,10 @@ const EnrollProgramCarousel = ({
           })
         );
       }
+
+      //volunteer enboard flow integration
+      localStorage.setItem('onboardTennatId', program.tenantId);
+      localStorage.setItem('temp_program_type', program?.type);
 
       // Navigate to enrollment profile completion page
       router.push('/enroll-profile-completion');
