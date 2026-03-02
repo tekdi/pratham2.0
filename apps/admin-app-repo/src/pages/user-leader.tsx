@@ -93,6 +93,9 @@ const UserLeader = () => {
           "type": "string"
         },
       },
+      register_type: {
+        "type": "string"
+      },
       ptm_name: {
         "type": "string"
       },
@@ -111,6 +114,7 @@ const UserLeader = () => {
     },
     "required": [
       "sub_program",
+      "register_type",
       "ptm_name",
       "organization_name",
       "poc_name",
@@ -124,6 +128,10 @@ const UserLeader = () => {
       'ui:options': {
         multiple: false,
       },
+    },
+    register_type: {
+      'ui:widget': 'RegisterTypeWidget',
+      'ui:options': { hideError: true },
     },
     ptm_name: {
       'ui:widget': 'PTMNameWidget',

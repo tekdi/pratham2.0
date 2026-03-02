@@ -27,6 +27,7 @@ import NdaPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/NdaPolicyAck
 import PTMNameWidget from './RJSFWidget/CustomForm/PTMNameWidget';
 import OrganizationSearchWidget from './RJSFWidget/CustomForm/OrganizationSearchWidget';
 import POCNameSelectWidget from './RJSFWidget/CustomForm/POCNameSelectWidget';
+import RegisterTypeWidget from './RJSFWidget/CustomForm/RegisterTypeWidget';
 
 import {
   calculateAgeFromDate,
@@ -797,7 +798,8 @@ const DynamicForm = ({
     NdaPolicyAcknowledgementWidget,
     PTMNameWidget,
     OrganizationSearchWidget,
-    POCNameSelectWidget
+    POCNameSelectWidget,
+    RegisterTypeWidget
   };
 
   // Custom field for Guardian Information Note
