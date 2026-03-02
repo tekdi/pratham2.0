@@ -802,7 +802,10 @@ if (familyField?.displayValue) {
   // }, [address]);
 
   const getLearnerAttendance = () => {
-    router.push('/learner-attendance-history');
+    router.push({
+      pathname: '/learner-attendance-history',
+      query: { userName: userName ?? '' },
+    });
   };
 
   // //-------Edit Learner Profile------------------
