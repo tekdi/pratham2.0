@@ -93,31 +93,39 @@ const UserLeader = () => {
           "type": "string"
         },
       },
-      register_type: {
-        "type": "string"
-      },
-      ptm_name: {
-        "type": "string"
-      },
-      organization_name: {
-        "type": "string"
-      },
-      poc_name: {
-        "type": "string"
-      },
       nda_policy: {
         "type": "string"
       },
       child_pocso_fraud_policy: {
         "type": "string"
       },
+      how_would_you_like_to_register: {
+        "type": "string"
+      },
+      volunteer_type: {
+        "type": "string"
+      },
+      organisation_registered: {
+        "type": "string"
+      },
+      ptm_id: {
+        "type": "string"
+      },
+      org_id: {
+        "type": "string"
+      },
+      poc_id: {
+        "type": "string"
+      },
     },
     "required": [
       "sub_program",
-      "register_type",
-      "ptm_name",
-      "organization_name",
-      "poc_name",
+      "how_would_you_like_to_register",
+      "volunteer_type",
+      "organisation_registered",
+      "ptm_id",
+      "org_id",
+      "poc_id",
       "nda_policy",
       "child_pocso_fraud_policy",
     ]
@@ -129,19 +137,27 @@ const UserLeader = () => {
         multiple: false,
       },
     },
-    register_type: {
+    how_would_you_like_to_register: {
       'ui:widget': 'RegisterTypeWidget',
       'ui:options': { hideError: true },
     },
-    ptm_name: {
+    volunteer_type: {
+      'ui:widget': 'VolunteerTypeWidget',
+      'ui:options': { hideError: true },
+    },
+    organisation_registered: {
+      'ui:widget': 'OrganizationRegistredWidget',
+      'ui:options': { hideError: true },
+    },
+    ptm_id: {
       'ui:widget': 'PTMNameWidget',
       'ui:options': { hideError: true },
     },
-    organization_name: {
+    org_id: {
       'ui:widget': 'OrganizationSearchWidget',
       'ui:options': { hideError: true },
     },
-    poc_name: {
+    poc_id: {
       'ui:widget': 'POCNameSelectWidget',
       'ui:options': { hideError: true },
     },

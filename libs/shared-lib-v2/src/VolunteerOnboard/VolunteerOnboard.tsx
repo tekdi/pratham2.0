@@ -108,6 +108,20 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
       {JSON.stringify(learnerUiSchema)}
       {JSON.stringify(orgSchema)}
       {JSON.stringify(orgUiSchema)}
+      {learnerSchema &&
+        learnerUiSchema && (
+          <DynamicForm
+            schema={learnerSchema}
+            uiSchema={learnerUiSchema}
+            FormSubmitFunction={(formData: any, payload: any) => {
+              console.log('########## debug payload', payload);
+              console.log('########## debug formdata', formData);
+            }}
+            prefilledFormData={{}}
+            hideSubmit={true}
+            type={''}
+          />
+        )}
     </Box>
   );
 };

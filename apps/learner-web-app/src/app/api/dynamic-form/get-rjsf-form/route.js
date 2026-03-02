@@ -146,7 +146,65 @@ function generateSchemaAndUISchema(fields) {
       uiSchema[name]['ui:help'] = hint;
     }
 
-    if (type === 'radio') {
+    //custom form widget for volunteer onboarding fileds
+    if(name === 'nda_policy'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'NdaPolicyAcknowledgementWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'child_pocso_fraud_policy'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'how_would_you_like_to_register'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'RegisterTypeWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'volunteer_type'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'VolunteerTypeWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'organisation_registered'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'OrganizationRegistredWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'ptm_id'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'PTMNameWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'org_id'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'OrganizationSearchWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    else if(name === 'poc_id'){
+      schemaField.type = 'string';
+      uiSchema[name] = {
+        'ui:widget': 'POCNameSelectWidget',
+        'ui:options': { hideError: true },
+      };
+    }
+    //end custom form widget for volunteer onboarding fileds
+    else if (type === 'radio') {
       schemaField.enum = options?.map((opt) => opt.value);
       schemaField.enumNames = options?.map((opt) => opt.label);
       uiSchema[name] = {
@@ -293,21 +351,7 @@ function generateSchemaAndUISchema(fields) {
         },
       };
     }
-    //for custom widget form
-    else if(name=='child_pocso_fraud_policy'){
-      uiSchema[name] = {
-        'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
-        'ui:options': { hideError: true },
-      };
-    }
-    else if(name=='nda_policy'){
-      uiSchema[name] = {
-        'ui:widget': 'NdaPolicyAcknowledgementWidget',
-        'ui:options': { hideError: true },
-      };
-    }
-    //end custom widget form
-
+    
     if (extra) {
       schemaField.extra = extra;
     }
