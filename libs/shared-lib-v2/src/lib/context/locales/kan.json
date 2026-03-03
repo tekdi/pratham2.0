@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "ದಾಖಲಾತಿಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ",
     "CHANGE_USER": "ಬಳಕೆದಾರರನ್ನು ಬದಲಾಯಿಸಿ",
     "FETCH_USER": "ಬಳಕೆದಾರರನ್ನು ಪಡೆಯಿರಿ",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ಇಮೇಲ್ ಮೂಲಕ ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಬಳಕೆದಾರರನ್ನು ಹುಡುಕಿ ಮತ್ತು ಅವರಿಗೆ ಕೆಲಸ ಮಾಡುವ ಗ್ರಾಮವನ್ನು ನಿಗದಿಪಡಿಸಿ."
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ಇಮೇಲ್ ಮೂಲಕ ಅಸ್ತಿತ್ವದಲ್ಲಿರುವ ಬಳಕೆದಾರರನ್ನು ಹುಡುಕಿ ಮತ್ತು ಅವರಿಗೆ ಕೆಲಸ ಮಾಡುವ ಗ್ರಾಮವನ್ನು ನಿಗದಿಪಡಿಸಿ.",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

@@ -29,7 +29,6 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ClearIcon from '@mui/icons-material/Clear';
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
-import { fetchActiveAcademicYearId } from '../../../utils/Helper';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 interface CohortDetail {
@@ -99,9 +98,9 @@ const OrganizationSearchWidget = ({
   });
 
   // Get user role and state from localStorage
-  const stateId = typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
-  const userRole = typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
-  const isCentralAdmin = userRole === 'Central Lead' || userRole === 'Central Admin';
+  const stateId = null;
+  const userRole = null;
+  const isCentralAdmin = false;
 
   const anchorRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -122,8 +121,10 @@ const OrganizationSearchWidget = ({
   // Fetch active academic year ID on mount
   useEffect(() => {
     const loadAcademicYear = async () => {
-      const yearId = await fetchActiveAcademicYearId();
-      setAcademicYearId(yearId);
+      if (typeof window !== 'undefined') {
+        const yearId = localStorage.getItem('temp_academicYearId') || '';
+        setAcademicYearId(yearId);
+      }
     };
     loadAcademicYear();
   }, []);

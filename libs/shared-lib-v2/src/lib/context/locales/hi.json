@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "नामांकन पूरा करें",
     "CHANGE_USER": "उपयोगकर्ता बदलें",
     "FETCH_USER": "उपयोगकर्ता को प्राप्त करें",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ईमेल के माध्यम से मौजूदा उपयोगकर्ता को खोजें और उन्हें कार्यक्षेत्र आवंटित करें।"
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ईमेल के माध्यम से मौजूदा उपयोगकर्ता को खोजें और उन्हें कार्यक्षेत्र आवंटित करें।",
+    "CONTINUE": "जारी रखें"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

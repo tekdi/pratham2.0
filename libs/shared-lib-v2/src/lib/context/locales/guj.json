@@ -128,7 +128,8 @@
     "FINISH_ENROLL": "નોંધણી પૂર્ણ કરો",
     "CHANGE_USER": "વપરાશકર્તા બદલો",
     "FETCH_USER": "વપરાશકર્તા મેળવો",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ઈમેલ દ્વારા હાલના વપરાશકર્તાને શોધો અને તેમને કાર્યકારી ગામ ફાળવો."
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ઈમેલ દ્વારા હાલના વપરાશકર્તાને શોધો અને તેમને કાર્યકારી ગામ ફાળવો.",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

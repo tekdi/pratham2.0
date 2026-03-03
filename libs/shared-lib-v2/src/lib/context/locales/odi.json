@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "ପଞ୍ଜିକରଣ ସମାପ୍ତ କରନ୍ତୁ",
     "CHANGE_USER": "ଉପଯୋଗକର୍ତ୍ତା ବଦଳାନ୍ତୁ",
     "FETCH_USER": "ଉପଯୋଗକର୍ତ୍ତାଙ୍କୁ ଆଣନ୍ତୁ",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ଇମେଲ ମାଧ୍ୟମରେ ଜଣେ ବିଦ୍ୟମାନ ଉପଭୋକ୍ତାଙ୍କୁ ଖୋଜନ୍ତୁ ଏବଂ ତାଙ୍କୁ କାର୍ଯ୍ୟରତ ଗ୍ରାମ ବଣ୍ଟନ କରନ୍ତୁ।"
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ଇମେଲ ମାଧ୍ୟମରେ ଜଣେ ବିଦ୍ୟମାନ ଉପଭୋକ୍ତାଙ୍କୁ ଖୋଜନ୍ତୁ ଏବଂ ତାଙ୍କୁ କାର୍ଯ୍ୟରତ ଗ୍ରାମ ବଣ୍ଟନ କରନ୍ତୁ।",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

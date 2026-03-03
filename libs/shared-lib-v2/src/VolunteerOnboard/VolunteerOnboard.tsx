@@ -18,14 +18,23 @@ import {
   splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '../DynamicForm/components/DynamicFormConstant';
+import { updateUserPLP } from '../DynamicForm/services/CreateUserService';
+import { showToastMessage } from '../DynamicForm/components/Toastify';
+import { fetchActiveAcademicYearId } from '../DynamicForm/utils/Helper';
+import { post } from '../DynamicForm/services/RestClient';
+import API_ENDPOINTS from '../DynamicForm/utils/API/APIEndpoints';
 
 interface VolunteerOnboardProps {
   t: any;
+  enrolledProgram?: boolean;
+  uponEnrollCompletion?: () => void;
 }
 
 
 const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
   t,
+  enrolledProgram,
+  uponEnrollCompletion
 }) => {
 
 
@@ -45,6 +54,8 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
   const [allVisitedSteps, setAllVisitedSteps] = useState<string[]>([]);
   const [formStepsData, setFormStepsData] = useState<any>({});
 
+  const [tempYearId, setTempYearId] = useState<string>('');
+  const [tempTenantId, setTempTenantId] = useState<string>('');
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -83,6 +94,16 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
       }
     };
     fetchData();
+    const loadAcademicYear = async () => {
+      if (typeof window !== 'undefined') {
+        const yearId = await fetchActiveAcademicYearId();
+        localStorage.setItem('temp_academicYearId', yearId || '');
+        setTempYearId(yearId || '');
+        const tenantId = localStorage.getItem('onboardTenantId');
+        setTempTenantId(tenantId || '');
+      }
+    };
+    loadAcademicYear();
   }, []);
 
   useEffect(() => {
@@ -201,11 +222,298 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
     }
   }, [learnerSchema, learnerUiSchema, orgSchema, orgUiSchema]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isSubmitSetActionPerform, setIsSubmitSetActionPerform] = useState(false);
+
   useEffect(() => {
-    if (activeStep.includes('step4')) {
-      console.log('##########formsteps end of form submit call', formStepsData);
+    const performAction = async () => {
+      if (activeStep.includes('step4') && isSubmitSetActionPerform === true) {
+        if (isSubmitting) {
+          console.log('Already submitting, ignoring duplicate submission');
+          return;
+        }
+
+        setIsSubmitting(true);
+        let userId = localStorage.getItem('userId') || '';
+        console.log('##########formsteps end of form submit call', formStepsData);
+        let submitFormData = {};
+        if (activeStep == 'step4_1') {
+          submitFormData = {
+            ...formStepsData?.step1,
+            ...formStepsData?.step2,
+            ...formStepsData?.step3_1,
+            ...formStepsData?.step4_1,
+          }
+        }
+        else if (activeStep == 'step4_2') {
+          let temp_ptm_id = localStorage.getItem('temp_ptm_id');
+          submitFormData = {
+            ...formStepsData?.step1,
+            ...formStepsData?.step2,
+            ...formStepsData?.step3_1,
+            ...formStepsData?.step4_2,
+            ptm_id: temp_ptm_id
+          }
+          //also assign cohort organization with status pending and role as VOLUNTEER
+          let responseAssign = await assignCohortOrganization(userId, formStepsData?.step4_2?.org_id, "VOLUNTEER");
+          if (responseAssign?.success == false) {
+            showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitting(false);
+            return;
+          }
+        }
+        else if (activeStep == 'step4_3') {
+          //also register new organization with cohort status pending
+          let responseCreateCohort = await registerOrganization(formStepsData?.step4_3, orgSchema);
+          if (responseCreateCohort?.success == false) {
+            setIsSubmitting(false);
+            return;
+          }
+          //get that new organization id
+          let org_id = responseCreateCohort?.data?.result?.cohortId || '';
+          //assign that org_id to ptm as cohort in active status with role PTM
+          let temp_ptm_id = localStorage.getItem('temp_ptm_id') || '';
+          let responseAssign = await assignCohortOrganization(temp_ptm_id, org_id, "PTM");
+          if (responseAssign?.success == false) {
+            showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitting(false);
+            return;
+          }
+          //assign that organization cohort to that user as status pending and role as POC          
+          responseAssign = await assignCohortOrganization(userId, org_id, "POC");
+          if (responseAssign?.success == false) {
+            showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitting(false);
+            return;
+          }
+          //assign that org id as user data org id and assign that ptm id as user data ptm_id
+          submitFormData = {
+            ...formStepsData?.step1,
+            ...formStepsData?.step2,
+            ...formStepsData?.step3_2,
+            org_id: org_id,
+            ptm_id: temp_ptm_id,
+          }
+        }
+        else if (activeStep == 'step4_4') {
+          let temp_ptm_id = localStorage.getItem('temp_ptm_id');
+          submitFormData = {
+            ...formStepsData?.step1,
+            ...formStepsData?.step2,
+            ...formStepsData?.step3_2,
+            ...formStepsData?.step4_4,
+            ptm_id: temp_ptm_id
+          }
+          //also assign cohort organization with status pending and role as POC
+          let responseAssign = await assignCohortOrganization(userId, formStepsData?.step4_4?.org_id, "POC");
+          if (responseAssign?.success == false) {
+            showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitting(false);
+            return;
+          }
+        }
+        //submit form data to api
+        const submitPayload = transformFormData(
+          submitFormData,
+          learnerSchema,
+          {}
+        );
+        console.log('##########formsteps debug submitPayload', submitPayload);
+        const { userData, customFields = [] } = splitUserData(submitPayload);
+        //custom field hardcoded for pending status
+        const data = {
+          fieldId:
+            'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+          value: 'pending'
+        }
+        const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+        const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
+        if (enrolledProgram && userTenantStatus) {
+          customFields.push(data);
+        }
+        const object = {
+          userData: {
+            ...userData,
+          },
+          customFields: customFields,
+        };
+        if (userId) {
+          try {
+            /*const updateUserResponse = await updateUserPLP(userId, object);
+            // console.log('updatedResponse', updateUserResponse);
+            if (
+              updateUserResponse &&
+              updateUserResponse?.data?.params?.err === null
+              && !enrolledProgram
+            ) {
+              showToastMessage('Profile Updated succeessfully', 'success');
+            }
+
+            if (enrolledProgram) {
+              // Don't reset isSubmitting here - we're navigating away
+              uponEnrollCompletion?.();
+              // Don't redirect here - let the callback handle navigation after showing modal
+              return;
+            }*/
+            // Reset submitting state for non-redirect cases
+            setIsSubmitting(false);
+          } catch (error) {
+            console.error('Error updating user:', error);
+            setIsSubmitting(false);
+          }
+          finally {
+            setIsSubmitting(false);
+          }
+        }
+      }
     }
-  }, [formStepsData]);
+    performAction()
+  }, [isSubmitSetActionPerform]);
+
+  function transformFormData(
+    formData: Record<string, any>,
+    schema: any,
+    extraFields: Record<string, any> = {} // Optional root-level custom fields
+  ) {
+    const transformedData: Record<string, any> = {
+      ...extraFields, // Add optional root-level custom fields dynamically
+      customFields: [],
+    };
+
+    for (const key in formData) {
+      if (schema.properties[key]) {
+        const fieldSchema = schema.properties[key];
+
+        if (fieldSchema.coreField === 0 && fieldSchema.fieldId) {
+          // Use fieldId for custom fields
+          transformedData.customFields.push({
+            fieldId: fieldSchema.fieldId,
+            value: formData[key] || '',
+          });
+        } else {
+          // Use the field name for core fields
+          transformedData[key] = formData[key] || '';
+        }
+      }
+    }
+
+    return transformedData;
+  }
+
+  const assignCohortOrganization = async (userId: string, orgId: string, role: string) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || '';
+      const apiUrl = `${baseUrl}/user/v1/cohortmember/bulkCreate`;
+
+      const token = localStorage.getItem('token') || '';
+
+      const requestBody = {
+        userId: [userId],
+        cohortId: [orgId],
+        cohortMemberRole: role,
+        ...(role !== 'PTM' && { status: 'pending' })
+      };
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'academicyearid': tempYearId,
+        'tenantid': tempTenantId
+      };
+
+      const response = await post(apiUrl, requestBody, headers);
+
+      if (response?.data?.params?.err === null) {
+        console.log('Cohort organization assigned successfully:', response.data);
+        return { success: true, data: response.data };
+      } else {
+        console.error('Error assigning cohort organization:', response?.data?.params?.err);
+        // showToastMessage('Failed to assign cohort organization', 'error');
+        return { success: false, error: response?.data?.params?.err };
+      }
+    } catch (error: any) {
+      console.error('Error in assignCohortOrganization:', error);
+      // showToastMessage('Failed to assign cohort organization', 'error');
+      return { success: false, error: error.message || 'Unknown error' };
+    }
+  }
+
+  const registerOrganization = async (orgFormData: any, orgSchema: any) => {
+    try {
+      //find out same state district block present not same name of organization
+      const orgName = orgFormData?.name;
+      const orgState = orgFormData?.state;
+      const orgDistrict = orgFormData?.district;
+      const orgBlock = orgFormData?.block;
+
+      let isOrganizationExists = false;
+      // Check if organization with same name exists in the same state, district, block
+      if (orgName && orgState && orgDistrict && orgBlock) {
+        const searchApiUrl = API_ENDPOINTS.cohortSearch;
+        const token = localStorage.getItem('token') || '';
+
+        const searchHeaders = {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'academicyearid': tempYearId,
+          'tenantid': tempTenantId
+        };
+
+        const searchRequestBody = {
+          limit: 10,
+          offset: 0,
+          sort: ['name', 'asc'],
+          filters: {
+            type: 'COHORT',
+            name: orgName,
+            state: [orgState],
+            district: [orgDistrict],
+            block: [orgBlock]
+          }
+        };
+        try {
+          const searchResponse = await post(searchApiUrl, searchRequestBody, searchHeaders);
+          if (searchResponse?.data?.result?.count > 0) {
+            showToastMessage('Organization name already exists in that state, district, and block', 'error');
+            isOrganizationExists = true;
+          }
+        }
+        catch (error: any) { }
+      }
+      if (isOrganizationExists == true) {
+        return { success: false, error: 'Organization name already exists in that location' };
+      }
+      const apiUrl: string = API_ENDPOINTS.cohortCreate;
+      //submit form data to api
+      const submitPayload = transformFormData(
+        orgFormData,
+        orgSchema,
+        {}
+      );
+      const token = localStorage.getItem('token') || '';
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'academicyearid': tempYearId,
+        'tenantid': tempTenantId
+      };
+      const response = await post(apiUrl, submitPayload, headers);
+      if (response?.data?.params?.err === null) {
+        console.log('Cohort organization created successfully:', response.data);
+        return { success: true, data: response.data };
+      } else {
+        console.error('Error creating cohort organization:', response?.data?.params?.err);
+        // showToastMessage('Failed to assign cohort organization', 'error');
+        return { success: false, error: response?.data?.params?.err };
+      }
+    } catch (error: any) {
+      console.error('Error in assignCohortOrganization:', error);
+      // showToastMessage('Failed to assign cohort organization', 'error');
+      return { success: false, error: error.message || 'Unknown error' };
+    }
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Box
@@ -229,6 +537,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               {allVisitedSteps.length > 0 && (
                 <IconButton
                   onClick={() => {
+                    setFormStepsData({ ...formStepsData, [activeStep]: {} });
                     const lastStep = allVisitedSteps[allVisitedSteps.length - 1];
                     setActiveStep(lastStep);
                     setAllVisitedSteps(allVisitedSteps.slice(0, -1));
@@ -275,6 +584,9 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
                     setActiveStep('step4_4');
                   }
                 }
+                else if (activeStep.includes('step4')) {
+                  setIsSubmitSetActionPerform(true)
+                }
               }}
               prefilledFormData={formStepsData?.[activeStep] || {}}
               hideSubmit={true}
@@ -300,8 +612,10 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               }}
               form="dynamic-form-id"
               type="submit"
+              disabled={isSubmitting}
             >
-              {activeStep.includes('step4') ? t('COMMON.SUBMIT') : t('COMMON.NEXT')}
+              {isSubmitting ? <CircularProgress size={20} /> : null}
+              {activeStep.includes('step4') ? t('COMMON.SUBMIT') : t('COMMON.CONTINUE')}
             </Button>
           </Box>
           :

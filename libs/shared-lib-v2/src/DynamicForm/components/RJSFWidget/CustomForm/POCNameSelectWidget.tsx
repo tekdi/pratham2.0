@@ -21,7 +21,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
-import { fetchActiveAcademicYearId } from '../../../utils/Helper';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 interface User {
@@ -67,8 +66,10 @@ const POCNameSelectWidget = ({
     // Fetch active academic year ID on mount
     useEffect(() => {
         const loadAcademicYear = async () => {
-            const yearId = await fetchActiveAcademicYearId();
-            setAcademicYearId(yearId);
+            if (typeof window !== 'undefined') {
+                const yearId = localStorage.getItem('temp_academicYearId') || '';
+                setAcademicYearId(yearId);
+            }
         };
         loadAcademicYear();
     }, []);

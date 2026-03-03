@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "నమోదును పూర్తి చేయండి",
     "CHANGE_USER": "వినియోగదారుని మార్చండి",
     "FETCH_USER": "యూజర్‌ను పొందండి",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ఇప్పటికే ఉన్న వినియోగదారుని ఇమెయిల్ ద్వారా శోధించండి మరియు వారికి పని చేసే గ్రామాన్ని కేటాయించండి."
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ఇప్పటికే ఉన్న వినియోగదారుని ఇమెయిల్ ద్వారా శోధించండి మరియు వారికి పని చేసే గ్రామాన్ని కేటాయించండి.",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

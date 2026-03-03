@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "பதிவை முடிக்கவும்",
     "CHANGE_USER": "பயனரை மாற்று",
     "FETCH_USER": "பயனரைப் பெறு",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "மின்னஞ்சல் மூலம் ஏற்கனவே உள்ள பயனரைத் தேடி, அவர்களுக்கு வேலை செய்யும் கிராமத்தை ஒதுக்கவும்."
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "மின்னஞ்சல் மூலம் ஏற்கனவே உள்ள பயனரைத் தேடி, அவர்களுக்கு வேலை செய்யும் கிராமத்தை ஒதுக்கவும்.",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {

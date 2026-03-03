@@ -129,7 +129,8 @@
     "FINISH_ENROLL": "नोंदणी पूर्ण करा",
     "CHANGE_USER": "वापरकर्ता बदला",
     "FETCH_USER": "वापरकर्ता मिळवा",
-    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ईमेलद्वारे विद्यमान वापरकर्त्याचा शोध घ्या आणि त्यांना कार्यरत गाव वाटून घ्या."
+    "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ईमेलद्वारे विद्यमान वापरकर्त्याचा शोध घ्या आणि त्यांना कार्यरत गाव वाटून घ्या.",
+    "CONTINUE": "Continue"
   },
   "LEARNER_APP": {
     "COMPLETE_PROFILE_BANNER": {
