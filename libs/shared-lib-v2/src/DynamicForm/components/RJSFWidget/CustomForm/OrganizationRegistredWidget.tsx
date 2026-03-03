@@ -36,15 +36,15 @@ const OrganizationRegistredWidget = ({
     {
       label: 'THIS_IS_THE_FIRST_TIME_MY_ORGANISATION_IS_REGISTERING',
       value: 'this_is_the_first_time_my_organisation_is_registering',
-      description: 'Your organisation has not been registered on this platform before. You will set it up now.',
-      helpText: 'Your organisation has not been registered on this platform before. You will set it up now.',
+      description: 'FIRST_TIME_ORGANISATION_DESCRIPTION',
+      helpText: 'FIRST_TIME_ORGANISATION_HELP_TEXT',
       icon: DescriptionIcon,
     },
     {
       label: 'MY_ORGANISATION_IS_ALREADY_REGISTERED',
       value: 'my_organisation_is_already_registered',
-      description: 'Your organisation is already on the platform. You want to join as the Point of Contact.',
-      helpText: 'Your organisation is already on the platform. You want to join as the Point of Contact.',
+      description: 'ALREADY_REGISTERED_ORGANISATION_DESCRIPTION',
+      helpText: 'ALREADY_REGISTERED_ORGANISATION_HELP_TEXT',
       icon: SearchIcon,
     },
   ];
@@ -96,7 +96,7 @@ const OrganizationRegistredWidget = ({
           },
         }}
       >
-        {'Is Your Organisation Registered?'}
+        {t('FORM.IS_YOUR_ORGANISATION_REGISTERED', { defaultValue: 'Is Your Organisation Registered?' })}
       </FormLabel>
 
       <Typography
@@ -106,7 +106,7 @@ const OrganizationRegistredWidget = ({
           color: '#757575',
         }}
       >
-        Let us know so we can guide you to the right step.
+        {t('FORM.LET_US_KNOW_SO_WE_CAN_GUIDE_YOU', { defaultValue: 'Let us know so we can guide you to the right step.' })}
       </Typography>
 
       <Typography
@@ -117,7 +117,7 @@ const OrganizationRegistredWidget = ({
           fontWeight: 500,
         }}
       >
-        Is this your organisation's first time on the platform?
+        {t('FORM.IS_THIS_YOUR_ORGANISATIONS_FIRST_TIME', { defaultValue: 'Is this your organisation\'s first time on the platform?' })}
       </Typography>
 
       {/* Hidden input for form validation */}
@@ -279,7 +279,7 @@ const OrganizationRegistredWidget = ({
                         lineHeight: 1.5,
                       }}
                     >
-                      {option.description}
+                      {t(`FORM.${option.description}`, { defaultValue: option.description })}
                     </Typography>
                   </Box>
                 </Box>

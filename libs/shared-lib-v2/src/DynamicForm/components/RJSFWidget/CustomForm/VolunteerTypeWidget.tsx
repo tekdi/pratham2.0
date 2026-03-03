@@ -36,15 +36,15 @@ const VolunteerTypeWidget = ({
     {
       label: 'INDIVIDUAL_VOLUNTEER',
       value: 'individual_volunteer',
-      description: 'I am volunteering on my own',
-      helpText: 'Select this option if you are volunteering independently.',
+      description: 'INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION',
+      helpText: 'INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT',
       icon: PersonIcon,
     },
     {
       label: 'INDIVIDUAL_VOLUNTEER_THROUGH_AN_ORGANISATION',
       value: 'individual_volunteer_through_an_organisation',
-      description: 'I am volunteering through an organisation that is already registered',
-      helpText: 'Select this option if you are volunteering through an organisation that is already registered.',
+      description: 'INDIVIDUAL_VOLUNTEER_THROUGH_ORGANISATION_DESCRIPTION',
+      helpText: 'INDIVIDUAL_VOLUNTEER_THROUGH_ORGANISATION_HELP_TEXT',
       icon: GroupsIcon,
     },
   ];
@@ -96,7 +96,7 @@ const VolunteerTypeWidget = ({
           },
         }}
       >
-        {label || 'Choose Volunteer Type'}
+        {t('FORM.CHOOSE_VOLUNTEER_TYPE', { defaultValue: 'Choose Volunteer Type' })}
       </FormLabel>
 
       <Typography
@@ -106,7 +106,7 @@ const VolunteerTypeWidget = ({
           color: '#757575',
         }}
       >
-        How would you like to volunteer?
+        {t('FORM.HOW_WOULD_YOU_LIKE_TO_VOLUNTEER', { defaultValue: 'How would you like to volunteer?' })}
       </Typography>
 
       {/* Hidden input for form validation */}

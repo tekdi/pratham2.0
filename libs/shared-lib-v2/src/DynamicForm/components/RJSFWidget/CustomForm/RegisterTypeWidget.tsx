@@ -34,17 +34,17 @@ const RegisterTypeWidget = ({
   // Default options if not provided
   const defaultOptions = [
     {
-      label: 'Individual Volunteer',
+      label: 'INDIVIDUAL_VOLUNTEER',
       value: 'individual_volunteer',
-      description: 'Register yourself as a volunteer, independently or through an organisation.',
-      helpText: 'Select this option if you want to register as an individual volunteer. You can register independently or through an organisation.',
+      description: 'INDIVIDUAL_VOLUNTEER_DESCRIPTION',
+      helpText: 'INDIVIDUAL_VOLUNTEER_HELP_TEXT',
       icon: PersonIcon,
     },
     {
-      label: 'Register an Organisation as POC',
+      label: 'REGISTER_AN_ORGANISATION_AS_POC',
       value: 'register_an_organisation_as_poc',
-      description: 'Register your organisation and act as the Point of Contact.',
-      helpText: 'Select this option if you want to register your organisation and act as the Point of Contact (POC) for your organisation.',
+      description: 'REGISTER_ORGANISATION_AS_POC_DESCRIPTION',
+      helpText: 'REGISTER_ORGANISATION_AS_POC_HELP_TEXT',
       icon: BusinessIcon,
     },
   ];
@@ -96,7 +96,7 @@ const RegisterTypeWidget = ({
           },
         }}
       >
-        {label || 'How Would You Like to Register?'}
+        {t('FORM.HOW_WOULD_YOU_LIKE_TO_REGISTER', { defaultValue: 'How Would You Like to Register?' })}
       </FormLabel>
 
       <Typography
@@ -106,7 +106,7 @@ const RegisterTypeWidget = ({
           color: '#757575',
         }}
       >
-        Choose the option that best describes your role.
+        {t('FORM.CHOOSE_THE_OPTION_THAT_BEST_DESCRIBES_YOUR_ROLE', { defaultValue: 'Choose the option that best describes your role.' })}
       </Typography>
 
       {/* Hidden input for form validation */}
@@ -268,7 +268,7 @@ const RegisterTypeWidget = ({
                         lineHeight: 1.5,
                       }}
                     >
-                      {option.description}
+                      {t(`FORM.${option.description}`, { defaultValue: option.description })}
                     </Typography>
                   </Box>
                 </Box>

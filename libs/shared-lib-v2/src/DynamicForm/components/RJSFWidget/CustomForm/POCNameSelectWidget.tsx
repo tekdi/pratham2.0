@@ -291,7 +291,7 @@ const POCNameSelectWidget = ({
                     },
                 }}
             >
-                {label || 'POC Name'}
+                {label || t('FORM.POC_NAME', { defaultValue: 'POC Name' })}
             </FormLabel>
 
             {/* Hidden input for form validation */}
@@ -332,8 +332,8 @@ const POCNameSelectWidget = ({
                     fullWidth
                     placeholder={
                         !orgId
-                            ? 'Please select an organization first'
-                            : 'Select POC Name'
+                            ? t('FORM.PLEASE_SELECT_AN_ORGANIZATION_FIRST', { defaultValue: 'Please select an organization first' })
+                            : t('FORM.SELECT_POC_NAME', { defaultValue: 'Select POC Name' })
                     }
                     value={selectedUser ? selectedUser.label : ''}
                     InputProps={{
@@ -422,8 +422,8 @@ const POCNameSelectWidget = ({
                                     sx={{ p: 2, textAlign: 'center' }}
                                 >
                                     {error
-                                        ? 'Failed to load users'
-                                        : 'No users found'}
+                                        ? t('FORM.FAILED_TO_LOAD_USERS', { defaultValue: 'Failed to load users' })
+                                        : t('FORM.NO_USERS_FOUND', { defaultValue: 'No users found' })}
                                 </Typography>
                             )}
 
