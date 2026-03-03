@@ -82,95 +82,6 @@ import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUserTenantStatus } from '@/services/UserService';
 
 const UserLeader = () => {
-
-  //sample schema for team leader
-  const testSchema = {
-    type: 'object',
-    properties: {
-      sub_program: {
-        "type": "array", // Always use array type, even for single selection
-        "items": {
-          "type": "string"
-        },
-      },
-      nda_policy: {
-        "type": "string"
-      },
-      child_pocso_fraud_policy: {
-        "type": "string"
-      },
-      how_would_you_like_to_register: {
-        "type": "string"
-      },
-      volunteer_type: {
-        "type": "string"
-      },
-      organisation_registered: {
-        "type": "string"
-      },
-      ptm_id: {
-        "type": "string"
-      },
-      org_id: {
-        "type": "string"
-      },
-      poc_id: {
-        "type": "string"
-      },
-    },
-    "required": [
-      "sub_program",
-      "how_would_you_like_to_register",
-      "volunteer_type",
-      "organisation_registered",
-      "ptm_id",
-      "org_id",
-      "poc_id",
-      "nda_policy",
-      "child_pocso_fraud_policy",
-    ]
-  };
-  const testUiSchema = {
-    sub_program: {
-      'ui:widget': 'SubProgramListWidget',
-      'ui:options': {
-        multiple: false,
-      },
-    },
-    how_would_you_like_to_register: {
-      'ui:widget': 'RegisterTypeWidget',
-      'ui:options': { hideError: true },
-    },
-    volunteer_type: {
-      'ui:widget': 'VolunteerTypeWidget',
-      'ui:options': { hideError: true },
-    },
-    organisation_registered: {
-      'ui:widget': 'OrganizationRegistredWidget',
-      'ui:options': { hideError: true },
-    },
-    ptm_id: {
-      'ui:widget': 'PTMNameWidget',
-      'ui:options': { hideError: true },
-    },
-    org_id: {
-      'ui:widget': 'OrganizationSearchWidget',
-      'ui:options': { hideError: true },
-    },
-    poc_id: {
-      'ui:widget': 'POCNameSelectWidget',
-      'ui:options': { hideError: true },
-    },
-    nda_policy: {
-      'ui:widget': 'NdaPolicyAcknowledgementWidget',
-      'ui:options': { hideError: true },
-    },
-    child_pocso_fraud_policy: {
-      'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
-      'ui:options': { hideError: true },
-    },
-  };
-
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(TeamLeaderSearchSchema);
   const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
@@ -775,48 +686,6 @@ const UserLeader = () => {
             />
           )
         )}
-
-        <Box mt={4}>
-          {testSchema &&
-            testUiSchema && (
-              <>
-                <DynamicForm
-                  schema={testSchema}
-                  uiSchema={testUiSchema}
-                  FormSubmitFunction={(formData: any, payload: any) => {
-                    console.log('########## debug payload', payload);
-                    console.log('########## debug formdata', formData);
-                  }}
-                  prefilledFormData={{}}
-                  hideSubmit={true}
-                  type={''}
-                />
-                <Button
-                  sx={{
-                    backgroundColor: '#FFC107',
-                    color: '#000',
-                    fontFamily: 'Poppins',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                    height: '40px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.1px',
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    '&:hover': {
-                      backgroundColor: '#ffb300',
-                    },
-                    width: '100%',
-                  }}
-                  form="dynamic-form-id"
-                  type="submit"
-                >
-                  {t('COMMON.NEXT')}
-                </Button>
-              </>
-            )}
-        </Box>
-
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton
             searchStoreKey="teamLeader"
@@ -1003,7 +872,7 @@ const UserLeader = () => {
       </ConfirmationPopup>
 
       {/* Map Modal Dialog */}
-      {/* <Dialog
+      <Dialog
         open={mapModalOpen}
         onClose={(event, reason) => {
           // Prevent closing on backdrop click
@@ -1251,7 +1120,7 @@ const UserLeader = () => {
             </Button>
           )}
         </DialogActions>
-      </Dialog> */}
+      </Dialog>
 
       {/* Reassign Modal Dialog */}
       <Dialog

@@ -131,6 +131,7 @@ const ChildPocsoFraudPolicyAcknowledgementWidget = ({
           backgroundColor: '#fafafa', // Light beige/off-white
           borderRadius: 2,
           padding: 2,
+          border: '1px solid #e0e0e0',
         }}
       >
         <FormControl
@@ -298,11 +299,11 @@ const ChildPocsoFraudPolicyAcknowledgementWidget = ({
                 >
                   *
                 </Typography>
-                  )}
-                  {" "}
-                  {t('FORM.AND_TO_COMPLY', {
-                    defaultValue: ' and agree to comply.',
-                  })}
+              )}
+              {" "}
+              {t('FORM.AND_TO_COMPLY', {
+                defaultValue: ' and agree to comply.',
+              })}
             </Typography>
           </Box>
         </FormControl>

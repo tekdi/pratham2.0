@@ -659,7 +659,7 @@ if(enrolledProgram && userTenantStatus){
             <>
           {isVolunteerOnboard==true ? (
             <>
-              <VolunteerOnboard />
+              <VolunteerOnboard t={t} />
             </>
           ) : (
               <>

@@ -96,13 +96,13 @@ const OrganizationRegistredWidget = ({
           },
         }}
       >
-        {label || 'Is Your Organisation Registered?'}
+        {'Is Your Organisation Registered?'}
       </FormLabel>
 
       <Typography
         variant="body2"
         sx={{
-          marginBottom: 1,
+          marginBottom: 2,
           color: '#757575',
         }}
       >
@@ -167,10 +167,10 @@ const OrganizationRegistredWidget = ({
                 borderRadius: 2,
                 cursor: disabled || readonly ? 'default' : 'pointer',
                 transition: 'all 0.2s ease-in-out',
-                backgroundColor: selected ? '#fff3e0' : '#f5f5f5',
+                backgroundColor: selected ? '#fff3e0' : '#ffffff',
                 '&:hover': {
                   borderColor: disabled || readonly ? '#e0e0e0' : '#ff9800',
-                  backgroundColor: disabled || readonly ? '#f5f5f5' : '#fff8e1',
+                  backgroundColor: disabled || readonly ? '#ffffff' : '#fff8e1',
                 },
               }}
             >
