@@ -84,63 +84,6 @@ import { sendCredentialService } from '@/services/NotificationService';
 import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 const UserLeader = () => {
-
-  //sample schema for team leader
-  const testSchema = {
-    type: 'object',
-    properties: {
-      sub_program: {
-        "type": "array", // Always use array type, even for single selection
-        "items": {
-          "type": "string"
-        },
-      },
-      ptm_name: {
-        "type": "string"
-      },
-      organization_name: {
-        "type": "string"
-      },
-      nda_policy: {
-        "type": "string"
-      },
-      child_pocso_fraud_policy: {
-        "type": "string"
-      },
-    },
-    "required": [
-      "sub_program",
-      "ptm_name",
-      "organization_name",
-      "nda_policy",
-      "child_pocso_fraud_policy",
-    ]
-  };
-  const testUiSchema = {
-    sub_program: {
-      'ui:widget': 'SubProgramListWidget',
-      'ui:options': {
-        multiple: false,
-      },
-    },
-    ptm_name: {
-      'ui:widget': 'PTMNameWidget',
-      'ui:options': { hideError: true },
-    },
-    organization_name: {
-      'ui:widget': 'OrganizationSearchWidget',
-      'ui:options': { hideError: true },
-    },
-    nda_policy: {
-      'ui:widget': 'NdaPolicyAcknowledgementWidget',
-      'ui:options': { hideError: true },
-    },
-    child_pocso_fraud_policy: {
-      'ui:widget': 'ChildPocsoFraudPolicyAcknowledgementWidget',
-      'ui:options': { hideError: true },
-    },
-  };
-
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(TeamLeaderSearchSchema);
   const [uiSchema, setUiSchema] = useState(TeamLeaderSearchUISchema);
@@ -745,48 +688,6 @@ const UserLeader = () => {
             />
           )
         )}
-
-        {/* <Box mt={4}>
-          {testSchema &&
-            testUiSchema && (
-              <>
-                <DynamicForm
-                  schema={testSchema}
-                  uiSchema={testUiSchema}
-                  FormSubmitFunction={(formData: any, payload: any) => {
-                    console.log('########## debug payload', payload);
-                    console.log('########## debug formdata', formData);
-                  }}
-                  prefilledFormData={{}}
-                  hideSubmit={true}
-                  type={''}
-                />
-                <Button
-                  sx={{
-                    backgroundColor: '#FFC107',
-                    color: '#000',
-                    fontFamily: 'Poppins',
-                    fontWeight: 500,
-                    fontSize: '14px',
-                    height: '40px',
-                    lineHeight: '20px',
-                    letterSpacing: '0.1px',
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    '&:hover': {
-                      backgroundColor: '#ffb300',
-                    },
-                    width: '100%',
-                  }}
-                  form="dynamic-form-id"
-                  type="submit"
-                >
-                  {t('COMMON.NEXT')}
-                </Button>
-              </>
-            )}
-        </Box> */}
-
         <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
           <ResetFiltersButton
             searchStoreKey="teamLeader"
@@ -973,7 +874,7 @@ const UserLeader = () => {
       </ConfirmationPopup>
 
       {/* Map Modal Dialog */}
-      {/* <Dialog
+      <Dialog
         open={mapModalOpen}
         onClose={(event, reason) => {
           // Prevent closing on backdrop click
@@ -1257,7 +1158,7 @@ const UserLeader = () => {
             </Button>
           )}
         </DialogActions>
-      </Dialog> */}
+      </Dialog>
 
       {/* Reassign Modal Dialog */}
       <Dialog

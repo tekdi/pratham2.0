@@ -80,6 +80,25 @@ export const updateUser = async (
     return error;
   }
 };
+
+export const updateUserPLP = async (
+  userId: string,
+  { userData, customFields }: UserDetailParam
+): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.userUpdate(userId);
+
+  try {
+    const response = await patch(
+      apiUrl,
+      { userData, customFields },
+      { tenantid: localStorage.getItem('tenantId') }
+    );
+    return response;
+  } catch (error) {
+    console.error('error in fetching user details', error);
+    return error;
+  }
+};
 export interface userListParam {
   limit?: number;
   //  page: number;
