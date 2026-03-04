@@ -175,10 +175,10 @@ const POCNameSelectWidget = ({
                 limit,
                 offset: 0,
                 filters: {
-                    center: [orgId],
-                    status: ['active'],
+                    role: "Learner",
+                    org_id: orgId,
+                    tenantStatus: ['active'],
                 },
-                role: ['Learner'],
                 // customfields: [''],
                 sort: ['firstName', 'asc'],
             };
@@ -186,7 +186,7 @@ const POCNameSelectWidget = ({
             console.log('POCNameSelectWidget: API request body:', requestBody);
 
             const response = await axios.post(
-                API_ENDPOINTS.hierarchialSearch,
+                API_ENDPOINTS.userList,
                 requestBody,
                 {
                     headers: {
@@ -199,7 +199,7 @@ const POCNameSelectWidget = ({
             );
 
             const result = response.data?.result || {};
-            const fetchedUsers: User[] = result.users || [];
+            const fetchedUsers: User[] = result.getUserDetails || [];
             const total = result.totalCount || 0;
 
             console.log('POCNameSelectWidget: Fetched users:', fetchedUsers.length, 'total:', total);
@@ -292,7 +292,7 @@ const POCNameSelectWidget = ({
                     },
                 }}
             >
-                {label || t('FORM.POC_NAME', { defaultValue: 'POC Name' })}
+                {t('FORM.POC_NAME', { defaultValue: 'POC Name' })}
             </FormLabel>
 
             {/* Hidden input for form validation */}
@@ -422,9 +422,10 @@ const POCNameSelectWidget = ({
                                     color="text.secondary"
                                     sx={{ p: 2, textAlign: 'center' }}
                                 >
-                                    {error
+                                    {/* {error
                                         ? t('FORM.FAILED_TO_LOAD_USERS', { defaultValue: 'Failed to load users' })
-                                        : t('FORM.NO_USERS_FOUND', { defaultValue: 'No users found' })}
+                                        : t('FORM.NO_USERS_FOUND', { defaultValue: 'No users found' })} */}
+                                    {t('FORM.NO_USERS_FOUND', { defaultValue: 'No users found' })}
                                 </Typography>
                             )}
 

@@ -397,15 +397,15 @@ const OrganizationSearchWidget = ({
           limit: 1,
           offset: 0,
           filters: {
-            role: 'Lead',
-            tenantStatus: ['active'],
-            org_id: [organizationId],
+            cohortId:organizationId,
+            cohortMemberRole: ['PTM'],
+            status: ['active'],
           },
-          sort: ['firstName', 'asc'],
+          sort: ['name', 'asc'],
         };
 
         const response = await axios.post(
-          API_ENDPOINTS.userList,
+          API_ENDPOINTS.cohortMemberList,
           requestBody,
           {
             headers: {
@@ -418,7 +418,7 @@ const OrganizationSearchWidget = ({
         );
 
         const result = response.data?.result || {};
-        const fetchedUsers: User[] = result.getUserDetails || [];
+        const fetchedUsers: User[] = result.userDetails || [];
 
         if (fetchedUsers.length > 0) {
           const ptmUser = fetchedUsers[0];

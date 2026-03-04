@@ -81,7 +81,7 @@ const PTMNameWidget = ({
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedBlock, setSelectedBlock] = useState<string>('');
-  const [ptmCode, setPtmCode] = useState<string>('');
+  const [ptmEmail, setPtmEmail] = useState<string>('');
   const [loadingStates, setLoadingStates] = useState({
     state: false,
     district: false,
@@ -99,11 +99,11 @@ const PTMNameWidget = ({
   const lastSearchQueryRef = useRef<string>('');
   const currentDataSearchQueryRef = useRef<string>('');
   const previousSearchQueryRef = useRef<string>('');
-  const previousFiltersRef = useRef<{ state: string; district: string; block: string; ptmCode: string; search: string }>({
+  const previousFiltersRef = useRef<{ state: string; district: string; block: string; ptmEmail: string; search: string }>({
     state: '',
     district: '',
     block: '',
-    ptmCode: '',
+    ptmEmail: '',
     search: '',
   });
 
@@ -316,8 +316,8 @@ const PTMNameWidget = ({
         if (selectedBlock) {
           requestBody.filters.block = [selectedBlock];
         }
-        if (ptmCode && ptmCode.trim()) {
-          requestBody.filters.ptm_code = ptmCode.trim();
+        if (ptmEmail && ptmEmail.trim()) {
+          requestBody.filters.email = ptmEmail.trim();
         }
 
         // Add search filter if search term exists
@@ -377,7 +377,7 @@ const PTMNameWidget = ({
             state: selectedState || '',
             district: selectedDistrict || '',
             block: selectedBlock || '',
-            ptmCode: ptmCode || '',
+            ptmEmail: ptmEmail || '',
             search: searchTerm || '',
           };
         }
@@ -400,7 +400,7 @@ const PTMNameWidget = ({
         }
       }
     },
-    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmCode, formatUserName, formatRegion]
+    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmEmail, formatUserName, formatRegion]
   );
 
   // Fetch users when filters or search change (only when dropdown is open)
@@ -412,7 +412,7 @@ const PTMNameWidget = ({
       state: selectedState || '',
       district: selectedDistrict || '',
       block: selectedBlock || '',
-      ptmCode: ptmCode || '',
+      ptmEmail: ptmEmail || '',
       search: searchQuery || '',
     };
 
@@ -420,7 +420,7 @@ const PTMNameWidget = ({
       previousFiltersRef.current.state !== currentFilters.state ||
       previousFiltersRef.current.district !== currentFilters.district ||
       previousFiltersRef.current.block !== currentFilters.block ||
-      previousFiltersRef.current.ptmCode !== currentFilters.ptmCode ||
+      previousFiltersRef.current.ptmEmail !== currentFilters.ptmEmail ||
       previousFiltersRef.current.search !== currentFilters.search;
 
     // Only reset pagination when filters/search actually change
@@ -448,7 +448,7 @@ const PTMNameWidget = ({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, ptmCode, academicYearId, open, fetchUsers, users.length]);
+  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, ptmEmail, academicYearId, open, fetchUsers, users.length]);
 
   // Reset selected item and pagination immediately when user types in search box
   useEffect(() => {
@@ -487,7 +487,7 @@ const PTMNameWidget = ({
         previousFiltersRef.current.state === (selectedState || '') &&
         previousFiltersRef.current.district === (selectedDistrict || '') &&
         previousFiltersRef.current.block === (selectedBlock || '') &&
-        previousFiltersRef.current.ptmCode === (ptmCode || '') &&
+        previousFiltersRef.current.ptmEmail === (ptmEmail || '') &&
         previousFiltersRef.current.search === (searchQuery || '');
 
       // Only trigger pagination if:
@@ -507,7 +507,7 @@ const PTMNameWidget = ({
         fetchUsers(searchQuery, offset, true);
       }
     },
-    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchUsers, selectedState, selectedDistrict, selectedBlock, ptmCode]
+    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchUsers, selectedState, selectedDistrict, selectedBlock, ptmEmail]
   );
 
   // Set selected user when value changes
@@ -577,9 +577,9 @@ const PTMNameWidget = ({
     onChange(undefined);
   };
 
-  // Handle PTM code change
-  const handlePtmCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPtmCode(event.target.value);
+  // Handle PTM email change
+  const handlePtmEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPtmEmail(event.target.value);
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -635,8 +635,8 @@ const PTMNameWidget = ({
     onChange(undefined);
   };
 
-  // Handle clear PTM code filter
-  const handleClearPtmCode = () => {
+  // Handle clear PTM email filter
+  const handleClearPtmEmail = () => {
     if (disabled || readonly) return;
 
     // Clear user list and reset pagination
@@ -646,7 +646,7 @@ const PTMNameWidget = ({
     setTotalCount(0);
     currentDataSearchQueryRef.current = '';
 
-    setPtmCode('');
+    setPtmEmail('');
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -826,22 +826,22 @@ const PTMNameWidget = ({
 
       </Grid>
 
-      {/* PTM Code TextField - Full Width on Next Line */}
+      {/* PTM Email TextField - Full Width on Next Line */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
             <TextField
               fullWidth
-              label={t('FORM.PTM_CODE', { defaultValue: 'PTM Code (Optional)' })}
-              value={ptmCode}
-              onChange={handlePtmCodeChange}
+              label={t('FORM.PTM_EMAIL', { defaultValue: 'PTM Email (Optional)' })}
+              value={ptmEmail}
+              onChange={handlePtmEmailChange}
               disabled={disabled || readonly}
-              placeholder={t('FORM.PTM_CODE_PLACEHOLDER', { defaultValue: 'Enter PTM code for exact match' })}
+              placeholder={t('FORM.PTM_EMAIL_PLACEHOLDER', { defaultValue: 'Enter PTM email for exact match' })}
             />
-            {ptmCode && !disabled && !readonly && (
+            {ptmEmail && !disabled && !readonly && (
               <IconButton
                 size="small"
-                onClick={handleClearPtmCode}
+                onClick={handleClearPtmEmail}
                 sx={{
                   mt: 1,
                   color: 'text.secondary',
@@ -850,7 +850,7 @@ const PTMNameWidget = ({
                     backgroundColor: 'error.light',
                   },
                 }}
-                aria-label="Clear PTM code"
+                aria-label="Clear PTM email"
               >
                 <ClearIcon fontSize="small" />
               </IconButton>

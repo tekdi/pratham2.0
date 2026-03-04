@@ -259,6 +259,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           let responseAssign = await assignCohortOrganization(userId, formStepsData?.step4_2?.org_id, "VOLUNTEER");
           if (responseAssign?.success == false) {
             showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
             return;
           }
@@ -267,16 +268,18 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           //also register new organization with cohort status pending
           let responseCreateCohort = await registerOrganization(formStepsData?.step4_3, orgSchema);
           if (responseCreateCohort?.success == false) {
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
             return;
           }
           //get that new organization id
           let org_id = responseCreateCohort?.data?.result?.cohortId || '';
           //assign that org_id to ptm as cohort in active status with role PTM
-          let temp_ptm_id = localStorage.getItem('temp_ptm_id') || '';
+          let temp_ptm_id = formStepsData?.step4_3?.ptm_id || '';
           let responseAssign = await assignCohortOrganization(temp_ptm_id, org_id, "PTM");
           if (responseAssign?.success == false) {
             showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
             return;
           }
@@ -284,6 +287,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           responseAssign = await assignCohortOrganization(userId, org_id, "POC");
           if (responseAssign?.success == false) {
             showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
             return;
           }
@@ -309,6 +313,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           let responseAssign = await assignCohortOrganization(userId, formStepsData?.step4_4?.org_id, "POC");
           if (responseAssign?.success == false) {
             showToastMessage('Failed to assign cohort organization', 'error');
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
             return;
           }
@@ -340,7 +345,8 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
         };
         if (userId) {
           try {
-            /*const updateUserResponse = await updateUserPLP(userId, object);
+            // uncomment below
+            const updateUserResponse = await updateUserPLP(userId, object);
             // console.log('updatedResponse', updateUserResponse);
             if (
               updateUserResponse &&
@@ -355,14 +361,17 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               uponEnrollCompletion?.();
               // Don't redirect here - let the callback handle navigation after showing modal
               return;
-            }*/
+            }
             // Reset submitting state for non-redirect cases
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
           } catch (error) {
             console.error('Error updating user:', error);
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
           }
           finally {
+            setIsSubmitSetActionPerform(false);
             setIsSubmitting(false);
           }
         }
@@ -404,7 +413,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
   const assignCohortOrganization = async (userId: string, orgId: string, role: string) => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || '';
-      const apiUrl = `${baseUrl}/user/v1/cohortmember/bulkCreate`;
+      const apiUrl = `${baseUrl}/cohortmember/bulkCreate`;
 
       const token = localStorage.getItem('token') || '';
 
@@ -412,6 +421,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
         userId: [userId],
         cohortId: [orgId],
         cohortMemberRole: role,
+        // uncomment below
         ...(role !== 'PTM' && { status: 'pending' })
       };
 
@@ -467,9 +477,9 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           filters: {
             type: 'COHORT',
             name: orgName,
-            state: [orgState],
-            district: [orgDistrict],
-            block: [orgBlock]
+            state: orgState,
+            district: orgDistrict,
+            block: orgBlock
           }
         };
         try {
@@ -480,6 +490,10 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           }
         }
         catch (error: any) { }
+      }
+      else {
+        showToastMessage('Name,State, district, and block are required', 'error');
+        isOrganizationExists = true;
       }
       if (isOrganizationExists == true) {
         return { success: false, error: 'Organization name already exists in that location' };
@@ -498,7 +512,12 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
         'academicyearid': tempYearId,
         'tenantid': tempTenantId
       };
-      const response = await post(apiUrl, submitPayload, headers);
+      const response = await post(apiUrl, {
+        ...submitPayload, type: 'COHORT',
+        //enable this when we have status field in cohort create api
+        // uncomment below
+        status: 'pending' //default status is active
+      }, headers);
       if (response?.data?.params?.err === null) {
         console.log('Cohort organization created successfully:', response.data);
         return { success: true, data: response.data };
@@ -556,7 +575,9 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
                 console.log('##########formsteps debug payload', payload);
                 console.log('##########formsteps debug formdata', formData);
                 setFormStepsData({ ...formStepsData, [activeStep]: formData });
-                setAllVisitedSteps([...allVisitedSteps, activeStep]);
+                if (!activeStep.includes('step4')) {
+                  setAllVisitedSteps([...allVisitedSteps, activeStep]);
+                }
                 if (activeStep == 'step1') {
                   setActiveStep('step2');
                 }
@@ -614,7 +635,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               type="submit"
               disabled={isSubmitting}
             >
-              {isSubmitting ? <CircularProgress size={20} /> : null}
+              {isSubmitting ? <CircularProgress color="inherit" size={20} /> : null}
               {activeStep.includes('step4') ? t('COMMON.SUBMIT') : t('COMMON.CONTINUE')}
             </Button>
           </Box>
