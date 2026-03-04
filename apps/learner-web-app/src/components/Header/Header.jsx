@@ -38,6 +38,7 @@ const Header = ({ isShowLogout = false }) => {
     setLanguage(newLang);
     // Save language to localStorage so it persists and can be used by other components
     localStorage.setItem('lang', newLang);
+    localStorage.setItem('preferredLanguage', newLang);
     if (localStorage.getItem('isAndroidApp') == 'yes') {
       // Send message to React Native WebView
       if (window.ReactNativeWebView) {

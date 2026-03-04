@@ -39,6 +39,9 @@ import {
 } from '@learner/utils/API/userService';
 import Header from '../Header/Header';
 
+//volunteer onboarding
+import VolunteerOnboard from '@shared-lib-v2/VolunteerOnboard/VolunteerOnboard';
+
 type UserAccount = {
   name: string;
   username: string;
@@ -108,6 +111,19 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
       router.push('/login');
     }
   }, []);
+
+  const [isVolunteerOnboard, setIsVolunteerOnboard] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const temp_program_type = localStorage.getItem('temp_program_type');
+    if (temp_program_type == 'VolunteerOnboarding') {
+      setIsVolunteerOnboard(true);
+    }
+    else {
+      setIsVolunteerOnboard(false);
+    }
+  }, []);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -174,7 +190,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           console.log('useInfo', useInfo?.result?.userData);
           setuserData(useInfo?.result?.userData);
           const mappedData = mapUserData(useInfo?.result?.userData);
-          
+
           // console.log("responseFormForEnroll", responseFormForEnroll?.schema?.properties)
           const keyNames = Object.keys(responseFormForEnroll?.schema?.properties);
 
@@ -186,11 +202,11 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
               keyNames.push(field);
             }
           });
-          
+
           const filteredData = Object.fromEntries(
             Object.entries(mappedData).filter(([key]) => keyNames.includes(key))
           );
-          
+
           if (isUnderEighteen(useInfo?.result?.userData?.dob)) {
             delete responseForm?.schema.properties.mobile;
           }
@@ -204,15 +220,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             useInfo?.result?.userData
           );
           console.log(updatedSchema);
-           if(enrolledProgram)
-          setUserFormData(filteredData);
-           else
-           setUserFormData(mappedData);
+          if (enrolledProgram)
+            setUserFormData(filteredData);
+          else
+            setUserFormData(mappedData);
           //unit name is missing from required so handled from frotnend
-          let alterSchema = enrolledProgram?responseFormForEnroll?.schema:completeProfile
+          let alterSchema = enrolledProgram ? responseFormForEnroll?.schema : completeProfile
             ? updatedSchema
             : responseForm?.schema;
-          let alterUISchema =enrolledProgram? responseFormForEnroll?.uiSchema: responseForm?.uiSchema;
+          let alterUISchema = enrolledProgram ? responseFormForEnroll?.uiSchema : responseForm?.uiSchema;
 
           // Set mobile field states
           setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
@@ -255,9 +271,9 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             };
           }
           delete alterSchema?.properties?.is_volunteer;
-       if(alterSchema?.properties?.family_member_details){
+          if (alterSchema?.properties?.family_member_details) {
             if (!alterSchema?.required?.includes('family_member_details')) {
-                        alterSchema?.required?.push('family_member_details')
+              alterSchema?.required?.push('family_member_details')
 
             }
             // Add family member fields to schema if they exist in responseFormCopy
@@ -283,7 +299,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
                 alterSchema.required = alterSchema.required.filter((f: string) => f !== 'spouse_name');
               }
             }
-            
+
             // Add family member fields to uiSchema but set them as hidden initially
             // DynamicForm will show the appropriate one based on selection
             if (responseForm?.uiSchema?.father_name) {
@@ -304,14 +320,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
                 'ui:widget': 'hidden'
               };
             }
-            
+
             // Add family member fields to ui:order if it exists
             // They will be hidden initially and DynamicForm will show the appropriate one
             // Insert them right after family_member_details for proper ordering
             if (alterUISchema['ui:order']) {
               const fieldsToAdd = ['father_name', 'mother_name', 'spouse_name'];
               const familyMemberDetailsIndex = alterUISchema['ui:order'].indexOf('family_member_details');
-              
+
               if (familyMemberDetailsIndex !== -1) {
                 // First, remove the fields if they already exist in the order
                 fieldsToAdd.forEach((field) => {
@@ -320,7 +336,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
                     alterUISchema['ui:order'].splice(existingIndex, 1);
                   }
                 });
-                
+
                 // Then insert fields right after family_member_details in the correct order
                 let insertPosition = alterUISchema['ui:order'].indexOf('family_member_details') + 1;
                 fieldsToAdd.forEach((field) => {
@@ -338,7 +354,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             }
           }
           setAddSchema(alterSchema);
-          alterUISchema.mobile=responseForm?.uiSchema?.mobile
+          alterUISchema.mobile = responseForm?.uiSchema?.mobile
           console.log("alterUISchema", alterUISchema);
           setAddUiSchema(alterUISchema);
         }
@@ -348,10 +364,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         setLoading(false);
       }
     };
-    fetchData();
-  }, []);
-console.log("addSchema", addSchema);
-console.log("addUiSchema", addUiSchema);
+    if (isVolunteerOnboard == false) {
+      fetchData();
+    }
+    else {
+      setLoading(false);
+    }
+  }, [isVolunteerOnboard]);
+  console.log("addSchema", addSchema);
+  console.log("addUiSchema", addUiSchema);
   const enhanceUiSchemaWithGrid = (uiSchema: any): any => {
     const enhancedSchema = { ...uiSchema };
 
@@ -415,7 +436,7 @@ console.log("addUiSchema", addUiSchema);
   // formData.firstName = 'karan';
   // formData.lastName = 'patil';
 
-  const onCloseInvalidLinkModal = () => {};
+  const onCloseInvalidLinkModal = () => { };
   const renderHomePage = () => {
     router.push('/');
   };
@@ -426,7 +447,7 @@ console.log("addUiSchema", addUiSchema);
       console.log('Already submitting, ignoring duplicate submission');
       return;
     }
-    
+
     setIsSubmitting(true);
     console.log('formData', formData);
     console.log(userFormData);
@@ -436,14 +457,14 @@ console.log("addUiSchema", addUiSchema);
     console.log('payload', payload);
     const { userData, customFields = [] } = splitUserData(payload);
     //custom field hardcoded for pending status
-    const data= {
+    const data = {
       fieldId:
-       'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+        'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
       value: 'pending'
     }
     const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
     const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
-if(enrolledProgram && userTenantStatus){
+    if (enrolledProgram && userTenantStatus) {
       customFields.push(data);
     }
 
@@ -459,7 +480,7 @@ if(enrolledProgram && userTenantStatus){
     );
 
     if (programFieldIndex === -1) {
-      if(programFieldId) {
+      if (programFieldId) {
         customFields.push({
           fieldId: programFieldId,
           value: [],
@@ -496,14 +517,14 @@ if(enrolledProgram && userTenantStatus){
         ) {
           showToastMessage('Profile Updated succeessfully', 'success');
         }
-        
-        if(enrolledProgram){
+
+        if (enrolledProgram) {
           // Don't reset isSubmitting here - we're navigating away
           uponEnrollCompletion?.();
           // Don't redirect here - let the callback handle navigation after showing modal
           return;
         }
-        
+
         if (completeProfile) {
           const uiConfig =
             typeof window !== 'undefined'
@@ -526,7 +547,7 @@ if(enrolledProgram && userTenantStatus){
           }
           return;
         }
-        
+
         // Reset submitting state for non-redirect cases
         setIsSubmitting(false);
       } catch (error) {
@@ -565,21 +586,22 @@ if(enrolledProgram && userTenantStatus){
         <>
           {directEnroll == 'true' && <Header isShowLogout={true} />}
 
-         {directEnroll != 'true' && (<Box
-              sx={{
-                //   p: 2,
-                mt: 2,
-                ml: 2,
-                cursor: 'pointer',
-                width: 'fit-content',
-                background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
-              }}
-              onClick={() => router.back()}
-            >
-              <ArrowBackIcon
-                sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
-              />
+          {directEnroll != 'true' && (<Box
+            sx={{
+              //   p: 2,
+              mt: 2,
+              ml: 2,
+              cursor: 'pointer',
+              width: 'fit-content',
+              background: 'linear-gradient(to bottom, #fff7e6, #fef9ef)',
+            }}
+            onClick={() => router.back()}
+          >
+            <ArrowBackIcon
+              sx={{ color: '#4B5563', '&:hover': { color: '#000' } }}
+            />
           </Box>)}
+
           <Box
             sx={{
               textAlign: 'center',
@@ -605,13 +627,13 @@ if(enrolledProgram && userTenantStatus){
               }}
             >
               {enrolledProgram &&
-              typeof window !== 'undefined' &&
-              window.localStorage &&
-              localStorage.getItem('userProgram')
+                typeof window !== 'undefined' &&
+                window.localStorage &&
+                localStorage.getItem('userProgram')
                 ? `${t('NAVAPATHAM.ENROLL_INTO')} ${getProgramName()}`
                 : completeProfile
-                ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
-                : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
+                  ? t('LEARNER_APP.EDIT_PROFILE.COMPLETE_PROFILE_TITLE')
+                  : t('LEARNER_APP.EDIT_PROFILE.TITLE')}
             </Typography>
 
             {enrolledProgram &&
@@ -633,75 +655,86 @@ if(enrolledProgram && userTenantStatus){
                 </Typography>
               )}
           </Box>
-          <Box
-            sx={{
-              ml: 'auto',
-              mr: 'auto',
-              width: {
-                xs: '90vw',
-                md: '50vw',
-              },
-              display: 'flex',
-              flexDirection: 'column',
-              bgcolor: '#fff',
-              p: '40px',
-            }}
-          >
-            {completeProfile && !enrolledProgram && (
-              <Box display="flex" alignItems="center" gap={1} mb={2}>
-                <Image src={face} alt="Step Icon" />
-                <Typography fontWeight={600}>
-                  {t('LEARNER_APP.EDIT_PROFILE.BACKGROUND_HELP_TEXT')}
-                </Typography>
-              </Box>
-            )}
-            {enrolledProgram &&
-              typeof window !== 'undefined' &&
-              window.localStorage &&
-              localStorage.getItem('userProgram') && (
-                <Box display="flex" alignItems="center" gap={1} mb={2}>
-                  <Image src={face} alt="Step Icon" />
-                  <Typography fontWeight={600}>
-                    {t('NAVAPATHAM.WELCOME_JOINED')} {getProgramName()}!<br />
-                    {t('NAVAPATHAM.ENROLLMENT_INTRO')}
-                  </Typography>
-                </Box>
+          {isVolunteerOnboard != null && (
+            <>
+              {isVolunteerOnboard == true ? (
+                <>
+                  <VolunteerOnboard t={t} enrolledProgram={enrolledProgram} uponEnrollCompletion={uponEnrollCompletion} />
+                </>
+              ) : (
+                <>
+                  <Box
+                    sx={{
+                      ml: 'auto',
+                      mr: 'auto',
+                      width: {
+                        xs: '90vw',
+                        md: '50vw',
+                      },
+                      display: 'flex',
+                      flexDirection: 'column',
+                      bgcolor: '#fff',
+                      p: '40px',
+                    }}
+                  >
+                    {completeProfile && !enrolledProgram && (
+                      <Box display="flex" alignItems="center" gap={1} mb={2}>
+                        <Image src={face} alt="Step Icon" />
+                        <Typography fontWeight={600}>
+                          {t('LEARNER_APP.EDIT_PROFILE.BACKGROUND_HELP_TEXT')}
+                        </Typography>
+                      </Box>
+                    )}
+                    {enrolledProgram &&
+                      typeof window !== 'undefined' &&
+                      window.localStorage &&
+                      localStorage.getItem('userProgram') && (
+                        <Box display="flex" alignItems="center" gap={1} mb={2}>
+                          <Image src={face} alt="Step Icon" />
+                          <Typography fontWeight={600}>
+                            {t('NAVAPATHAM.WELCOME_JOINED')} {getProgramName()}!<br />
+                            {t('NAVAPATHAM.ENROLLMENT_INTRO')}
+                          </Typography>
+                        </Box>
+                      )}
+                    {addSchema && addUiSchema && (
+                      <DynamicForm
+                        schema={addSchema}
+                        uiSchema={addUiSchema}
+                        mobileAddUiSchema={mobileAddUiSchema}
+                        mobileSchema={mobileSchema}
+                        parentDataAddUiSchema={parentDataAddUiSchema}
+                        parentDataSchema={parentDataSchema}
+                        forEditedschema={responseFormData?.schema?.properties}
+                        FormSubmitFunction={FormSubmitFunction}
+                        prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
+                        hideSubmit={true}
+                        type="learner"
+                        isCompleteProfile={completeProfile}
+                        createNew={false}
+                      />
+                    )}
+                    <Button
+                      sx={{
+                        mt: 3,
+                        backgroundColor: '#FFC107',
+                        color: '#000',
+                        fontWeight: 'bold',
+                        '&:hover': {
+                          backgroundColor: '#ffb300',
+                        },
+                      }}
+                      form="dynamic-form-id"
+                      type="submit"
+                    >
+                      {enrolledProgram
+                        ? t('NAVAPATHAM.FINISH_ENROLL')
+                        : t('COMMON.SUBMIT')}
+                    </Button>
+                  </Box>
+                </>
               )}
-            {addSchema && addUiSchema && (
-              <DynamicForm
-                schema={addSchema}
-                uiSchema={addUiSchema}
-                mobileAddUiSchema={mobileAddUiSchema}
-                mobileSchema={mobileSchema}
-                parentDataAddUiSchema={parentDataAddUiSchema}
-                parentDataSchema={parentDataSchema}
-                forEditedschema={responseFormData?.schema?.properties}
-                FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
-                hideSubmit={true}
-                type="learner"
-                isCompleteProfile={completeProfile}
-                createNew={false}
-              />
-            )}
-            <Button
-              sx={{
-                mt: 3,
-                backgroundColor: '#FFC107',
-                color: '#000',
-                fontWeight: 'bold',
-                '&:hover': {
-                  backgroundColor: '#ffb300',
-                },
-              }}
-              form="dynamic-form-id"
-              type="submit"
-            >
-              {enrolledProgram
-                ? t('NAVAPATHAM.FINISH_ENROLL')
-                : t('COMMON.SUBMIT')}
-            </Button>
-          </Box>
+            </>)}
         </>
       )}
 

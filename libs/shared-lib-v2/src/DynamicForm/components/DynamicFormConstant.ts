@@ -15,6 +15,10 @@ export const FormContext = {
     context: 'COHORTS',
     contextType: 'COHORT',
   },
+  organization: {
+    context: 'COHORTS',
+    contextType: 'COHORT',
+  },
   batch: {
     context: 'COHORTS',
     contextType: 'BATCH',

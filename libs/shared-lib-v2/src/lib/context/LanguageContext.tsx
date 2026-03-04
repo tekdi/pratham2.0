@@ -90,9 +90,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       const title = getTitleFromValue(browserLanguage);
       if (title) {
         localStorage.setItem('lang', title);
+        localStorage.setItem('preferredLanguage', title);
         setLanguageState(title);
       } else {
         localStorage.setItem('lang', 'en');
+        localStorage.setItem('preferredLanguage', 'en');
         setLanguageState('en');
       }
     }
@@ -134,6 +136,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   const handleLanguageChange = useCallback((newLanguage: string) => {
     if (!translations[newLanguage]) return;
     localStorage.setItem('lang', newLanguage);
+    localStorage.setItem('preferredLanguage', newLanguage);
     setLanguageState(newLanguage);
   }, []);
 

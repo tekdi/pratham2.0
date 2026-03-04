@@ -172,6 +172,7 @@ const Header = ({
     setLanguage(newLocale);
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('lang', newLocale);
       await router.replace(router.pathname, router.asPath, {
         locale: newLocale,
       });
@@ -188,6 +189,7 @@ const Header = ({
     setLanguage(newLocale);
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('lang', newLocale);
       await router.replace(router.pathname, router.asPath, {
         locale: newLocale,
       });
