@@ -79,6 +79,7 @@ interface SwitchAccountDialogProps {
   callbackFunction: (
     tenantId: string,
     tenantName: string,
+    tenantType: string,
     roleId: string,
     roleName: string
   ) => void;
@@ -352,6 +353,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         callbackRef.current(
           tenant.tenantId,
           tenant.tenantName,
+          tenant.tenantType,
           role.roleId,
           role.roleName
         );
@@ -383,6 +385,7 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       callbackFunction(
         tenant.tenantId,
         tenant.tenantName,
+        tenant.tenantType,
         role.roleId,
         role.roleName
       );
@@ -413,10 +416,11 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
         return;
       }
 
-      // Call the callback function with the 4 required parameters
+      // Call the callback function with the 5 required parameters
       callbackFunction(
         selectedTenant.tenantId,
         selectedTenant.tenantName,
+        selectedTenant.tenantType,
         selectedRole.roleId,
         selectedRole.roleName
       );

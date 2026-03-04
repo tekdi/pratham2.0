@@ -24,7 +24,7 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { accessControl, TENANT_DATA } from '../utils/app.config';
+import { accessControl, TENANT_DATA, TENANT_TYPE } from '../utils/app.config';
 import config from '../../config.json';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import board from '../assets/images/Board.svg';
@@ -64,6 +64,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   >([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
   const [tenantName, setTenantName] = useState<string>('');
+  const [tenantType, setTenantType] = useState<string>('');
   const queryClient = useQueryClient();
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -78,13 +79,20 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedTenantName = localStorage.getItem('tenantName');
-      
+      const storedTenantType = localStorage.getItem('tenantType');
+      if(storedTenantType) {
+        setTenantType(storedTenantType);
+      }
       // Always set tenantName to one of the tenant types
       if (storedTenantName === TENANT_DATA.YOUTHNET) {
         setTenantName(TENANT_DATA.YOUTHNET);
       } else if (storedTenantName === TENANT_DATA.PRAGYANPATH) {
         setTenantName(TENANT_DATA.PRAGYANPATH);
-      } else {
+      } 
+      else if (storedTenantName === TENANT_DATA.SUMMER_CAMP) {
+        setTenantName(TENANT_DATA.SUMMER_CAMP);
+      }
+      else {
         // Default to empty for all other cases
         setTenantName('');
       }
@@ -246,6 +254,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isSurveys = router.pathname.includes('/surveys');
   const isManualAssessments = router.pathname.includes('/manual-assessments');
   const isManagerDashboard = router.pathname === '/manager-dashboard';
+  const isIndividualVolunteerDashboard = router.pathname === '/individual-volunteer';
+  const isOrganisationDashboard = router.pathname === '/organisation';
+  const isOrganisationVolunteerDashboard = router.pathname === '/organisation-volunteer';
 
   return (
     <Drawer
@@ -624,6 +635,108 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             >
               Manager Dashboard
             </Button>
+          
+          </Box>
+        )}
+        {(tenantName === TENANT_DATA.SUMMER_CAMP || tenantType === TENANT_TYPE.VOLUNTEER_ONBOARDING) && (
+          <Box>
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isIndividualVolunteerDashboard
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isIndividualVolunteerDashboard
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isIndividualVolunteerDashboard ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isIndividualVolunteerDashboard ? '600' : 500,
+                '&:hover': {
+                  background: isIndividualVolunteerDashboard
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                router.push('/individual-volunteer');
+              }}
+            >
+              Individual Volunteer Dashboard
+            </Button>
+
+
+
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isOrganisationDashboard
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isOrganisationDashboard
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isOrganisationDashboard ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isOrganisationDashboard ? '600' : 500,
+                '&:hover': {
+                  background: isOrganisationDashboard
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                router.push('/organisation');
+              }}
+            >
+              Organisation Dashboard
+            </Button>
+
+            <Button
+              className="fs-14"
+              sx={{
+                gap: '10px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isOrganisationVolunteerDashboard
+                  ? theme.palette.primary.main
+                  : 'transparent',
+                padding: isOrganisationVolunteerDashboard
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                marginTop: '25px',
+                color: isOrganisationVolunteerDashboard ? '#2E1500' : theme.palette.warning.A200,
+                fontWeight: isOrganisationVolunteerDashboard ? '600' : 500,
+                '&:hover': {
+                  background: isOrganisationVolunteerDashboard
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+              }}
+              startIcon={
+                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                router.push('/organisation-volunteer');
+              }}
+            >
+              Via Organisation
+            </Button>
           </Box>
         )}
         {!tenantName && (
@@ -666,7 +779,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-
+        
         {!tenantName && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-8">
             <Button

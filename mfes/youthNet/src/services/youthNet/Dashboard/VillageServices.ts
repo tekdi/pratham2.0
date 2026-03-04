@@ -9,6 +9,12 @@ export interface ListParam {
   optionName?: string;
   sort?: [string, string]; //
 }
+export interface cohortListData {
+  limit?: number;
+  offset?: number;
+  filters?: any;
+  sort?: [string, string];
+}
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 const DISTRICT_DETAILS = {
@@ -62,6 +68,18 @@ export const getStateBlockDistrictList = async ({
   } catch (error) {
     console.error("Error in fetching state, block, and district list", error);
     throw error;
+  }
+};
+
+export const getCohortList = async (data: cohortListData): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.cohortSearch;
+
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data?.result;
+  } catch (error) {
+    console.error('Error in Getting cohort List Details', error);
+    return error;
   }
 };
 export const fetchBlockData = async (): Promise<any> => {
