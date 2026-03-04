@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import apartment from '../../public/images/apartment.svg';
 
-import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
 import { HierarchicalSearchUserList, userList } from '@/services/UserList';
 import {
   Box,
@@ -60,6 +60,7 @@ import {
   enhanceUiSchemaWithGrid,
   splitUserData,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import axios from 'axios';
 import {
@@ -69,6 +70,7 @@ import {
 import { getCohortList } from '@/services/GetCohortList';
 import { updateUserTenantStatus } from '@/services/UserService';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
+import { sendCredentialService } from '@/services/NotificationService';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
@@ -1736,6 +1738,10 @@ const Mobilizer = () => {
                   const { userData, customFields } =
                     splitUserData(userDetails);
 
+                  const mappedUserEmail = userData?.email || userDetails?.email;
+                  const mappedUserFirstName =
+                    userData?.firstName || userDetails?.firstName || '';
+
                   delete userData.email;
 
                   // Modify customFields to add/update working_location and workingVillageId
@@ -1812,6 +1818,33 @@ const Mobilizer = () => {
                             cohortMemberResponse
                           );
                           showToastMessage(t(successCreateMessage), 'success');
+
+                          try {
+                            const program =
+                              localStorage.getItem('tenantName') ||
+                              localStorage.getItem('program') ||
+                              '';
+                            // TODO: confirm which env var should provide login link
+                            const loginLink = ROLE_LOGIN_URL_MAP[Role.MOBILIZER];
+
+                            if (mappedUserEmail) {
+                              await sendCredentialService(
+                                buildProgramMappingEmailRequest({
+                                  email: mappedUserEmail,
+                                  firstName: mappedUserFirstName,
+                                  role: 'Mentor',
+                                  program,
+                                  platform: 'Pratham learning Platform (PLP)',
+                                  loginLink,
+                                })
+                              );
+                            }
+                          } catch (notificationError) {
+                            console.error(
+                              'Error sending program mapping notification:',
+                              notificationError
+                            );
+                          }
                         } else {
                           console.error(
                             'Error mapping user to center:',

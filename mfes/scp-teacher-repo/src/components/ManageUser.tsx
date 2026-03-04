@@ -79,6 +79,8 @@ import { HierarchicalSearchUserList } from '@shared-lib-v2/DynamicForm/services/
 import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
+import { sendCredentialService } from '@/services/NotificationService';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 interface Cohort {
   cohortId: string;
@@ -2340,6 +2342,11 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           const { userData, customFields } =
                             splitUserData(userDetails);
 
+                          const mappedUserEmail =
+                            userData?.email || userDetails?.email;
+                          const mappedUserFirstName =
+                            userData?.firstName || userDetails?.firstName || '';
+
                           delete userData.email;
 
                           // Update user details
@@ -2391,6 +2398,34 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                 ),
                                 'success'
                               );
+
+                              try {
+                                const program =
+                                  localStorage.getItem('tenantName') ||
+                                  localStorage.getItem('program') ||
+                                  '';
+                                // TODO: confirm which env var should provide login link
+                                const loginLink = process.env.NEXT_PUBLIC_LOGIN_URL;
+
+                                if (mappedUserEmail) {
+                                  await sendCredentialService(
+                                    buildProgramMappingEmailRequest({
+                                      email: mappedUserEmail,
+                                      firstName: mappedUserFirstName,
+                                      role: Role.TEACHER,
+                                      program,
+                                      platform: 'Pratham learning Platform (PLP)',
+                                      loginLink,
+                                    })
+                                  );
+                                }
+                              } catch (notificationError) {
+                                console.error(
+                                  'Error sending program mapping notification:',
+                                  notificationError
+                                );
+                              }
+
                               // Close dialog
                               handleCloseAddFaciModal();
                               // Refresh the data
