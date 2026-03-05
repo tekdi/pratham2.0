@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -6,6 +6,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Paper,
   Checkbox,
   Chip,
@@ -14,6 +15,7 @@ import {
   MenuItem,
   Typography,
   Box,
+  CircularProgress,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
@@ -42,8 +44,18 @@ interface DataTableProps {
   showActions?: boolean;
   actions?: ActionItem[];
   onRowSelect?: (selectedRows: RowData[]) => void;
+  selectedRows?: RowData[]; // Controlled selection from parent
   emptyMessage?: string;
   maxHeight?: number;
+  loading?: boolean;
+  // Pagination props
+  showPagination?: boolean;
+  page?: number;
+  rowsPerPage?: number;
+  totalCount?: number;
+  onPageChange?: (event: unknown, newPage: number) => void;
+  onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  rowsPerPageOptions?: number[];
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -53,12 +65,36 @@ const DataTable: React.FC<DataTableProps> = ({
   showActions = false,
   actions = [],
   onRowSelect,
+  selectedRows: controlledSelectedRows,
   emptyMessage = "No data available",
   maxHeight = 400,
+  loading = false,
+  // Pagination props
+  showPagination = false,
+  page = 0,
+  rowsPerPage = 10,
+  totalCount = 0,
+  onPageChange,
+  onRowsPerPageChange,
+  rowsPerPageOptions = [5, 10, 25, 50],
 }) => {
   const [selected, setSelected] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuRowId, setMenuRowId] = useState<string | null>(null);
+
+  // Sync internal selection state with controlled prop from parent
+  // This allows parent to clear selection by passing empty array
+  useEffect(() => {
+    if (controlledSelectedRows !== undefined) {
+      const selectedIds = controlledSelectedRows.map(row => row.id);
+      // Only update if the selection actually changed (to avoid unnecessary re-renders)
+      const currentSelectedIds = selected.sort().join(',');
+      const newSelectedIds = selectedIds.sort().join(',');
+      if (currentSelectedIds !== newSelectedIds) {
+        setSelected(selectedIds);
+      }
+    }
+  }, [controlledSelectedRows]);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -139,28 +175,50 @@ const DataTable: React.FC<DataTableProps> = ({
         sx={{ fontWeight: 500 }}
       />
     ),
-    name: (value: any) => (
-      <Box>
-        <Typography variant="body2" fontWeight={500}>
-          {value.name}
-        </Typography>
-        {value.email && (
-          <Typography variant="caption" color="text.secondary">
-            {value.email}
+    name: (value: any) => {
+      // Handle both string and object formats
+      if (typeof value === 'string') {
+        return (
+          <Typography variant="body2" fontWeight={500}>
+            {value}
           </Typography>
-        )}
-      </Box>
-    ),
-    location: (value: any) => (
-      <Box>
-        <Typography variant="body2" fontWeight={500}>
-          {value.state}
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {value.city}, {value.district}
-        </Typography>
-      </Box>
-    ),
+        );
+      }
+      // Handle object format with name and email
+      return (
+        <Box>
+          <Typography variant="body2" fontWeight={500}>
+            {value.name}
+          </Typography>
+          {value.email && (
+            <Typography variant="caption" color="text.secondary">
+              {value.email}
+            </Typography>
+          )}
+        </Box>
+      );
+    },
+    location: (value: any) => {
+      // Handle both string and object formats
+      if (typeof value === 'string') {
+        return (
+          <Typography variant="body2" fontWeight={500}>
+            {value}
+          </Typography>
+        );
+      }
+      // Handle object format with state, city, district
+      return (
+        <Box>
+          <Typography variant="body2" fontWeight={500}>
+            {value.state}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            {value.city}, {value.district}
+          </Typography>
+        </Box>
+      );
+    },
   };
 
   const formatCellValue = (column: Column, value: any) => {
@@ -175,6 +233,19 @@ const DataTable: React.FC<DataTableProps> = ({
     
     return value;
   };
+
+  if (loading) {
+    return (
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <Box sx={{ p: 6, textAlign: 'center' }}>
+          <CircularProgress size={40} />
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 2 }}>
+            Loading data...
+          </Typography>
+        </Box>
+      </Paper>
+    );
+  }
 
   if (rows.length === 0) {
     return (
@@ -324,6 +395,25 @@ const DataTable: React.FC<DataTableProps> = ({
           </MenuItem>
         ))}
       </Menu>
+      
+      {/* Pagination */}
+      {showPagination && (
+        <TablePagination
+          rowsPerPageOptions={rowsPerPageOptions}
+          component="div"
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={onPageChange || (() => {})}
+          onRowsPerPageChange={onRowsPerPageChange || (() => {})}
+          showFirstButton
+          showLastButton
+          sx={{
+            borderTop: '1px solid',
+            borderTopColor: 'divider',
+          }}
+        />
+      )}
     </Paper>
   );
 };

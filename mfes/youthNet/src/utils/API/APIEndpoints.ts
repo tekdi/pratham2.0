@@ -38,6 +38,8 @@ const API_ENDPOINTS = {
   hierarchicalSearch: `${baseurl}/user/hierarchical-search`,
   cohortMemberBulkCreate: `${baseurl}/cohortmember/bulkCreate`,
   cohortSearch: `${baseurl}/cohort/search`,
+  cohortUpdateStatus: `${baseurl}/cohort/updateStatus`,
+  rbacUsersRolesBulkUpdate: `${baseurl}/rbac/usersRoles/bulkUpdate`,
 
 };
 

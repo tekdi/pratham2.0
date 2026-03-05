@@ -15,11 +15,13 @@ import HomeIcon from '@mui/icons-material/Home';
 import { PTMDashboard } from '../../components/PtmComponents';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { DASHBOARD_TYPE } from '../../utils/app.config';
 
 const IndividualVolunteerPage: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   // Handle breadcrumb navigation
   const handleBreadcrumbClick = (path: string) => {
@@ -53,7 +55,7 @@ const IndividualVolunteerPage: React.FC = () => {
                 mb: 1 
               }}
             >
-              Individual Volunteers
+              {t('PAGES.INDIVIDUAL_VOLUNTEERS')}
             </Typography>
             <Typography 
               variant="body1" 
@@ -61,12 +63,12 @@ const IndividualVolunteerPage: React.FC = () => {
                 color: theme.palette.text.secondary 
               }}
               >
-              Overview and management of registrations
+              {t('PAGES.OVERVIEW_MANAGEMENT')}
             </Typography>
           </Box>
 
           {/* PTM Dashboard with Volunteer Type */}
-          <PTMDashboard dashboardType="volunteer" />
+          <PTMDashboard dashboardType={DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER} />
          
         </Container>
       </Box>

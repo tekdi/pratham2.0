@@ -1,86 +1,516 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Box, Paper, Button, Typography } from '@mui/material';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { Box, Paper, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { StatusCardsRow, StatusCardData } from '.';
 import DataTable, { Column, RowData } from './DataTable';
 import DynamicFilterBar, { FilterState, FilterLabels } from './DynamicFilterBar';
+import { fetchUserList, getUserDetails } from '../../services/youthNet/Dashboard/UserServices';
+import { bulkUpdateUsersRoles, updateCohortStatus } from '../../services/ManageUser';
+import { showToastMessage } from '../Toastify';
+import { DASHBOARD_TYPE } from '../../utils/app.config';
+import { useTranslation } from 'next-i18next';
+
+// Role ID for Volunteer role - this should be configured based on your system
+const VOLUNTEER_ROLE_ID = "27375aaa-1aa6-422f-905e-9e7d9e078e13"; // Update this with actual Volunteer role ID
+import { getCohortList } from '../../services/youthNet/Dashboard/VillageServices';
 
 interface PTMDashboardProps {
   dashboardType: 'volunteer' | 'student' | 'teacher' | string;
 }
 
+/**
+ * INSTRUCTIONS TO HIDE ACTIONS FOR APPROVED/REJECTED ITEMS:
+ * 
+ * To hide approve/reject actions for items that are already approved or rejected:
+ * 1. Find lines with commented "// disabled:" or "// Hide" comments
+ * 2. Uncomment those lines and comment out the current disabled lines
+ * 3. For bulk actions bar, uncomment the condition on line ~1029
+ * 
+ * This will:
+ * - Disable individual Approve/Reject buttons for approved/rejected rows
+ * - Disable bulk Approve/Reject buttons when selection contains approved/rejected rows  
+ * - Hide entire bulk actions bar when all selected rows are approved/rejected
+ */
+
+interface CustomField {
+  label: string;
+  selectedValues: Array<{ id?: number; value: string }>;
+}
+
 const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
+  const { t } = useTranslation('common');
+  
+  // Function to get user state from localStorage
+  const getUserStateFromStorage = () => {
+    try {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        const stateField = parsedData.customFields?.find((field: CustomField) => field.label === 'STATE');
+        if (stateField && stateField.selectedValues && stateField.selectedValues.length > 0) {
+          const stateValue = stateField.selectedValues[0];
+          // value should be the ID for matching, label should be the display text
+          const stateId = stateValue.id?.toString() || stateValue.value;
+          return {
+            id: stateId,
+            value: stateId, // Use ID as value for matching in dropdown
+            label: stateValue.value // Use the actual state name as label
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing userData from localStorage:', error);
+    }
+    return null;
+  };
+
+  const userState = getUserStateFromStorage();
   const [loading] = useState(false); // Static loading state for status cards
   const [resetFilters, setResetFilters] = useState(false);
   const [selectedRows, setSelectedRows] = useState<RowData[]>([]);
+  const [approvingUsers, setApprovingUsers] = useState<string[]>([]); // Track which users are being approved
+  
+  // Dialog states
+  const [approveDialog, setApproveDialog] = useState<{
+    open: boolean;
+    user: RowData | null;
+    isBulk: boolean;
+    users: RowData[];
+  }>({
+    open: false,
+    user: null,
+    isBulk: false,
+    users: [],
+  });
+  
+  const [rejectDialog, setRejectDialog] = useState<{
+    open: boolean;
+    user: RowData | null;
+    isBulk: boolean;
+    users: RowData[];
+  }>({
+    open: false,
+    user: null,
+    isBulk: false,
+    users: [],
+  });
 
   // State for filters
   const [filters, setFilters] = useState<FilterState>({
-    state: [],
+    state: userState ? [userState.value] : [],
     district: [],
     block: [],
-    village: [],
-    status: [],
+    // village: [],
+    // status: [],
     organization: [],
-    poc: [],
+    // poc: [],
   });
 
   // State for filter labels
   const [filterLabels, setFilterLabels] = useState<FilterLabels>({
-    state: [],
+    state: userState ? [userState.label] : [],
     district: [],
     block: [],
-    village: [],
-    status: [],
+    // village: [],
+    // status: [],
     organization: [],
-    poc: [],
+    // poc: [],
   });
 
-  // Handle status card clicks - memoized to prevent recreation (moved up)
+
+  // Handle status card clicks - filters table data based on selected status
   const handleStatusCardClick = useCallback((status: string) => {
     console.log(`${status} card clicked`);
-    // Add navigation or filtering logic here
+    setSelectedStatus(status);
+    setCurrentPage(0); // Reset to first page when status filter changes
+    // Table data will be refetched automatically via useEffect dependency on selectedStatus
   }, []);
 
-  // Initial status cards data with memoized onClick handlers
+  // Initial status cards data with memoized onClick handlers  
   const initialStatusCards = useMemo<StatusCardData[]>(() => [
     {
       id: 'total',
-      count: 4,
-      title: 'Total',
+      count: 0,
+      title: t('PTM_DASHBOARD.TOTAL'),
       variant: 'total',
       onClick: () => handleStatusCardClick('total'),
     },
     {
       id: 'pending',
-      count: 3,
-      title: 'Pending Review',
+      count: 0,
+      title: t('PTM_DASHBOARD.PENDING_REVIEW'),
       variant: 'pending',
       onClick: () => handleStatusCardClick('pending'),
     },
     {
       id: 'approved',
-      count: 1,
-      title: 'Approved',
+      count: 0,
+      title: t('PTM_DASHBOARD.APPROVED'),
       variant: 'approved',
       onClick: () => handleStatusCardClick('approved'),
     },
     {
       id: 'rejected',
       count: 0,
-      title: 'Rejected',
+      title: t('PTM_DASHBOARD.REJECTED'),
       variant: 'rejected',
       onClick: () => handleStatusCardClick('rejected'),
     },
-  ], [handleStatusCardClick]);
+  ], [handleStatusCardClick, t]);
 
-  // Status cards data - now static (shows overall application data)
-  const statusCardsData = initialStatusCards;
+  // Pagination state for table data
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalTableRecords, setTotalTableRecords] = useState(0);
+  const [tableLoading, setTableLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState<string>('total'); // Track selected status card
+
+  // Status cards data - dynamic (updated from API)
+  const [statusCardsData, setStatusCardsData] = useState<StatusCardData[]>(initialStatusCards);
+
+  // Update status card highlighting when selectedStatus changes
+  useEffect(() => {
+    setStatusCardsData(prevCards => 
+      prevCards.map(card => ({
+        ...card,
+        customColors: selectedStatus === card.id ? {
+          border: card.id === 'total' ? '#FF9800' :
+                 card.id === 'pending' ? '#FFC107' : 
+                 card.id === 'approved' ? '#4CAF50' : '#f44336',
+          background: card.id === 'total' ? 'rgba(255, 152, 0, 0.2)' :
+                     card.id === 'pending' ? 'rgba(255, 193, 7, 0.2)' : 
+                     card.id === 'approved' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+          iconColor: card.id === 'total' ? '#FF9800' :
+                    card.id === 'pending' ? '#FFC107' : 
+                    card.id === 'approved' ? '#4CAF50' : '#f44336',
+        } : undefined,
+      }))
+    );
+  }, [selectedStatus]);
+
+  // Separate useEffect for fetching and storing user details
+  useEffect(() => {
+    const fetchAndStoreUserData = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          const data = await getUserDetails(userId, true);
+          
+          if (data?.userData) {
+            const userData = data.userData;
+            localStorage.setItem('userData', JSON.stringify(userData));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+      }
+    };
+
+    fetchAndStoreUserData();
+  }, []);
+
+  // Utility function to capitalize first letter
+  const capitalizeFirstLetter = (str: string): string => {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
+
+  // Function to fetch status cards data (extracted for reuse)
+  const fetchStatusCardsData = useCallback(async () => {
+      try {
+        let Pendingfilters = {};
+        let Approvedfilters = {};
+        let Rejectedfilters = {};
+        
+        if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER){
+          Pendingfilters = {
+            role: ["Learner"],
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+            //  ptm_id: localStorage.getItem('userId') || '',
+            //  is_reject:"no",
+             "volunteer_type":"individual_volunteer"
+          };
+          Approvedfilters = {
+            role: "Volunteer",
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+           //  ptm_id: localStorage.getItem('userId') || '',
+             volunteer_type:"individual_volunteer"
+          };
+          Rejectedfilters = {
+            role: "Learner",
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+             //ptm_id: localStorage.getItem('userId') || '',
+             is_reject:"yes",
+             volunteer_type:"individual_volunteer"
+          };
+        }
+        else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
+          Pendingfilters = {
+            role: "Learner",
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+            // ptm_id: localStorage.getItem('userId') || '',
+            // is_reject:"no",
+              volunteer_type:"individual_volunteer_through_an_organisation"
+          };
+          Approvedfilters = {
+            role: "Volunteer",
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+            // ptm_id: localStorage.getItem('userId') || '',
+             volunteer_type:"individual_volunteer_through_an_organisation"
+          };
+          Rejectedfilters = {
+            role: "Learner",
+            "how_would_you_like_to_register": [
+                 "individual_volunteer"
+             ],
+            // ptm_id: localStorage.getItem('userId') || '',
+             is_reject:"yes",
+             volunteer_type:"individual_volunteer_through_an_organisation"
+          };
+        }
+        else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
+          Pendingfilters = {
+            "type": "COHORT",
+            "status": [
+                "pending"
+            ],
+            "ptm_id" :localStorage.getItem('userId') || ''
+          };
+          Approvedfilters = {
+            "type": "COHORT",
+            "status": [
+                "active"
+            ],
+            "ptm_id" :localStorage.getItem('userId') || ''
+          };
+          Rejectedfilters = {
+              "type": "COHORT",
+            "status": [
+                "inactive"
+            ],
+            "ptm_id" :localStorage.getItem('userId') || ''
+          }
+        }
+
+        // Make API calls for each status type to get counts
+        if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
+        
+        const [pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
+          fetchUserList({
+            limit: 0, // We only need totalCount, not actual data
+            filters: Pendingfilters,
+            sort: ["firstName", "asc"],
+            offset: 0
+          }),
+          fetchUserList({
+            limit: 0, // We only need totalCount, not actual data
+            filters: Approvedfilters,
+            sort: ["firstName", "asc"],
+            offset: 0
+          }),
+          fetchUserList({
+            limit: 0, // We only need totalCount, not actual data
+            filters: Rejectedfilters,
+            sort: ["firstName", "asc"],
+            offset: 0
+          })
+        ]);
+
+        // Extract counts from responses
+        const pendingCount = pendingResponse?.totalCount || 0;
+        const approvedCount = approvedResponse?.totalCount || 0;
+        const rejectedCount = rejectedResponse?.totalCount || 0;
+        const totalCount = pendingCount + approvedCount + rejectedCount;
+
+        // Update status cards with actual API counts
+        setStatusCardsData([
+          {
+            id: 'total',
+            count: totalCount,
+            title: t('PTM_DASHBOARD.TOTAL'),
+            variant: 'total',
+            onClick: () => handleStatusCardClick('total'),
+            customColors: selectedStatus === 'total' ? {
+              border: '#FF9800',
+              background: 'rgba(255, 152, 0, 0.2)',
+              iconColor: '#FF9800',
+            } : undefined,
+          },
+          {
+            id: 'pending',
+            count: pendingCount,
+            title: t('PTM_DASHBOARD.PENDING_REVIEW'),
+            variant: 'pending',
+            onClick: () => handleStatusCardClick('pending'),
+            customColors: selectedStatus === 'pending' ? {
+              border: '#FFC107',
+              background: 'rgba(255, 193, 7, 0.2)',
+              iconColor: '#FFC107',
+            } : undefined,
+          },
+          {
+            id: 'approved',
+            count: approvedCount,
+            title: t('PTM_DASHBOARD.APPROVED'),
+            variant: 'approved',
+            onClick: () => handleStatusCardClick('approved'),
+            customColors: selectedStatus === 'approved' ? {
+              border: '#4CAF50',
+              background: 'rgba(76, 175, 80, 0.2)',
+              iconColor: '#4CAF50',
+            } : undefined,
+          },
+          {
+            id: 'rejected',
+            count: rejectedCount,
+            title: t('PTM_DASHBOARD.REJECTED'),
+            variant: 'rejected',
+            onClick: () => handleStatusCardClick('rejected'),
+            customColors: selectedStatus === 'rejected' ? {
+              border: '#f44336',
+              background: 'rgba(244, 67, 54, 0.2)',
+              iconColor: '#f44336',
+            } : undefined,
+          },
+        ]);
+      }
+        if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+          // It appears getCohortList expects a string argument, possibly an endpoint or cohort identifier.
+          // If you need to fetch ALL counts like with fetchUserList, you'll need to implement a similar approach.
+          // For demonstration, we'll assume getCohortList accepts a filter type, e.g. "pending", "approved", "rejected".
+          const [pendingResponse, approvedResponse, rejectedResponse] = await Promise.all([
+            getCohortList({
+              limit: 200,
+              offset: 0,
+              filters:Pendingfilters
+            }),
+            getCohortList({
+              limit: 200,
+              offset: 0,
+              filters:Approvedfilters
+            }),
+            getCohortList({
+              limit: 200,
+              offset: 0,
+              filters:Rejectedfilters
+            }),
+          ]);
+
+          const pendingCount = pendingResponse?.count || 0;
+          const approvedCount = approvedResponse?.count || 0;
+          const rejectedCount = rejectedResponse?.count || 0;
+          const totalCount = pendingCount + approvedCount + rejectedCount;
+
+          setStatusCardsData([
+            {
+              id: 'total',
+              count: totalCount,
+              title: t('PTM_DASHBOARD.TOTAL'),
+              variant: 'total',
+              onClick: () => handleStatusCardClick('total'),
+              customColors: selectedStatus === 'total' ? {
+                border: '#FF9800',
+                background: 'rgba(255, 152, 0, 0.2)',
+                iconColor: '#FF9800',
+              } : undefined,
+            },
+            {
+              id: 'pending',
+              count: pendingCount,
+              title: t('PTM_DASHBOARD.PENDING_REVIEW'),
+              variant: 'pending',
+              onClick: () => handleStatusCardClick('pending'),
+              customColors: selectedStatus === 'pending' ? {
+                border: '#FFC107',
+                background: 'rgba(255, 193, 7, 0.2)',
+                iconColor: '#FFC107',
+              } : undefined,
+            },
+            {
+              id: 'approved',
+              count: approvedCount,
+              title: t('PTM_DASHBOARD.APPROVED'),
+              variant: 'approved',
+              onClick: () => handleStatusCardClick('approved'),
+              customColors: selectedStatus === 'approved' ? {
+                border: '#4CAF50',
+                background: 'rgba(76, 175, 80, 0.2)',
+                iconColor: '#4CAF50',
+              } : undefined,
+            },
+            {
+              id: 'rejected',
+              count: rejectedCount,
+              title: t('PTM_DASHBOARD.REJECTED'),
+              variant: 'rejected',
+              onClick: () => handleStatusCardClick('rejected'),
+              customColors: selectedStatus === 'rejected' ? {
+                border: '#f44336',
+                background: 'rgba(244, 67, 54, 0.2)',
+                iconColor: '#f44336',
+              } : undefined,
+            },
+          ]);
+        }
+        // Fetch actual table data with pending filters (default view)
+        // const tableDataResponse = await fetchUserList({
+        //   limit: 100, // Get actual data for table
+        //   filters: Pendingfilters,
+        //   sort: ["firstName", "asc"],
+        //   offset: 0
+        // });
+        
+        // setApiData(tableDataResponse || []);
+        // console.log('API Response - Counts:', { totalCount, pendingCount, approvedCount, rejectedCount });
+        // console.log('API Response - Table Data:', tableDataResponse);
+      } catch (error) {
+        console.error('Error fetching status cards data:', error);
+      }
+    }, [dashboardType, handleStatusCardClick, selectedStatus, t]);
+
+  // API integration useEffect
+  useEffect(() => {
+    fetchStatusCardsData();
+  }, [fetchStatusCardsData]);
 
   // Table columns definition - memoized by dashboardType
   const columns = useMemo<Column[]>(() => {
     switch (dashboardType) {
+      case DASHBOARD_TYPE.ORGANISATION:
+        return [
+          {
+            id: 'name',
+            label: 'Organization Name',
+            minWidth: 200,
+          },
+          {
+            id: 'location',
+            label: 'Location',
+            minWidth: 160,
+          },
+          {
+            id: 'organization',
+            label: 'Organization Type',
+            minWidth: 150,
+          },
+          {
+            id: 'status',
+            label: 'Status',
+            minWidth: 100,
+            align: 'center',
+          },
+        ];
       case 'volunteer':
       default:
         return [
@@ -88,11 +518,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             id: 'name',
             label: 'Name',
             minWidth: 200,
-          },
-          {
-            id: 'subProgram',
-            label: 'Sub-program',
-            minWidth: 180,
           },
           {
             id: 'location',
@@ -109,73 +534,213 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     }
   }, [dashboardType]);
 
-  // Sample table data - memoized by dashboardType
-  const initialTableData = useMemo<RowData[]>(() => {
-    switch (dashboardType) {
-      case 'volunteer':
-      default:
-        return [
-          {
-            id: '1',
-            name: {
-              name: 'Priya Sharma',
-              email: 'priya.sharma@example.com',
-            },
-            subProgram: "Children's Club (Creativity Club)",
-            location: {
-              state: 'Maharashtra',
-              city: 'Mumbai',
-              district: 'Andheri',
-            },
-            status: 'Pending',
-          },
-          {
-            id: '2',
-            name: {
-              name: 'Rajesh Kumar',
-              email: 'rajesh.kumar@example.com',
-            },
-            subProgram: 'Summer Camp',
-            location: {
-              state: 'Maharashtra',
-              city: 'Mumbai',
-              district: 'Andheri',
-            },
-            status: 'Pending',
-          },
-          {
-            id: '3',
-            name: {
-              name: 'Sunita Patil',
-              email: 'sunita.patil@example.com',
-            },
-            subProgram: "Children's Club (Creativity Club)",
-            location: {
-              state: 'Maharashtra',
-              city: 'Mumbai',
-              district: 'Andheri',
-            },
-            status: 'Pending',
-          },
-          {
-            id: '4',
-            name: {
-              name: 'Arun Mehta',
-              email: 'arun.mehta@example.com',
-            },
-            subProgram: 'Summer Camp',
-            location: {
-              state: 'Maharashtra',
-              city: 'Mumbai',
-              district: 'Andheri',
-            },
-            status: 'Approved',
-          },
-        ];
-    }
-  }, [dashboardType]);
+  // Separate useEffect for fetching table data with pagination
+  useEffect(() => {
+    const fetchTableData = async () => {
+      try {
+        setTableLoading(true);
+        // Base filters for individual volunteers
+        let baseFilters = {};
+        if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER){
+         baseFilters = {
+          "role": ["Learner", "Volunteer"],
+          "how_would_you_like_to_register": ["individual_volunteer"],
+          "volunteer_type":"individual_volunteer",
+          //"ptm_id": localStorage.getItem('userId') || ''
+        };
+      }
+      else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
+        baseFilters = {
+          "role": ["Learner", "Volunteer"],
+          "how_would_you_like_to_register": ["individual_volunteer"],
+          "volunteer_type":"individual_volunteer_through_an_organisation",
+          //"ptm_id": localStorage.getItem('userId') || ''
+        };
+      }
+      else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
+        baseFilters = {
+          "type": "COHORT",
+        //  "status": ["pending"],
+         // "ptm_id": localStorage.getItem('userId') || ''
+        };
+      }
 
-  const [tableData, setTableData] = useState<RowData[]>(initialTableData);
+      // Add status-based filters based on selected status card
+      // This filters table data to show only records matching the clicked status
+      if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
+        if (selectedStatus === 'pending') {
+          baseFilters = { ...baseFilters}; // Learners not rejected
+        } else if (selectedStatus === 'approved') {
+          baseFilters = { ...baseFilters, role: ['Volunteer'] }; // Approved as Volunteers
+        } else if (selectedStatus === 'rejected') {
+          baseFilters = { ...baseFilters, is_reject: 'yes' }; // Explicitly rejected
+        }
+        // For 'total', no additional status filter is added (shows all records)
+      } else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
+        if (selectedStatus === 'pending') {
+          baseFilters = { ...baseFilters, status: ['pending'] }; // Pending cohorts
+        } else if (selectedStatus === 'approved') {
+          baseFilters = { ...baseFilters, status: ['active'] }; // Active/approved cohorts
+        } else if (selectedStatus === 'rejected') {
+          baseFilters = { ...baseFilters, status: ['inactive'] }; // Inactive/rejected cohorts
+        }
+        // For 'total', no additional status filter is added (shows all cohorts)
+      }
+        // Combine with dynamic filters from DynamicFilterBar
+        const dynamicFilters: Record<string, string[] | string> = {};
+        
+        // Add location filters if selected
+        if (filters.state.length > 0) {
+          dynamicFilters.state = filters.state;
+        }
+        if (filters.district.length > 0) {
+          dynamicFilters.district = filters.district;
+        }
+        if (filters.block.length > 0) {
+          dynamicFilters.block = filters.block;
+        }
+        // if (filters.village.length > 0) {
+        //   dynamicFilters.village = filters.village;
+        // }
+        
+        // Add status filter if selected
+        // if (filters.status.length > 0) {
+        //   if (filters.status.includes('pending')) {
+        //     dynamicFilters.is_reject = 'no';
+        //   } else if (filters.status.includes('rejected')) {
+        //     dynamicFilters.is_reject = 'yes';
+        //   }
+        // }
+
+        // Add organization filter if selected
+        if (filters.organization.length > 0) {
+          dynamicFilters.org_id = filters.organization;
+        }
+
+        // Combine base and dynamic filters
+        const tableFilters = {
+          ...baseFilters,
+          ...dynamicFilters
+        };
+
+        if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
+        const response = await fetchUserList({
+          limit: rowsPerPage,
+          offset: currentPage * rowsPerPage,
+          filters: tableFilters,
+          sort: ["firstName", "asc"]
+        });
+        if (response?.getUserDetails && response.getUserDetails.length > 0) {
+          // Transform API response to table format
+          const transformedData = response.getUserDetails.map((user: Record<string, unknown>, index: number) => {
+            const customFields = user.customFields as Array<{
+              fieldId: string;
+              label: string;
+              selectedValues: Array<{ value?: string; label?: string } | string>;
+            }> || [];
+
+            // Extract location data from customFields
+            const getCustomFieldValue = (label: string) => {
+              const field = customFields.find(f => f.label === label);
+              if (!field?.selectedValues?.[0]) return 'N/A';
+              
+              const value = field.selectedValues[0];
+              if (typeof value === 'string') return value;
+              return value?.value || value?.label || 'N/A';
+            };
+
+            const state = getCustomFieldValue('STATE');
+            const district = getCustomFieldValue('DISTRICT');
+            const block = getCustomFieldValue('BLOCK');
+            const is_reject = getCustomFieldValue('IS_REJECT');
+            const village = getCustomFieldValue('VILLAGE');
+            const location = [state, district, block, village].filter(l => l !== 'N/A').join(', ') || 'N/A';
+
+      
+            const transformedRow = {
+              id: user.userId || `user-${currentPage * rowsPerPage + index + 1}`,
+              name: capitalizeFirstLetter(`${user.firstName || ''} ${user.lastName || ''}`.trim() || (user.name as string) || 'N/A'),
+              email: user.email || 'N/A',
+              phone: user.mobile || 'N/A',
+              location: location,
+              organization: getCustomFieldValue('ORG_ID') || 'N/A',
+              status: user.role === 'Volunteer' ? t('PTM_DASHBOARD.APPROVED') : (user.role === 'Learner' && is_reject === 'yes') ? t('PTM_DASHBOARD.REJECTED') : t('PTM_DASHBOARD.PENDING_REVIEW'),
+            };
+            
+            return transformedRow;
+          });
+          
+          setTableData(transformedData);
+          setTotalTableRecords(parseInt(response?.getUserDetails?.[0]?.total_count || '0') || 0);
+        } else {
+          console.log('No data received from API');
+          setTableData([]);
+        }
+        setTableLoading(false);
+      }
+      else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
+        const response = await getCohortList({
+          limit: rowsPerPage,
+          offset: currentPage * rowsPerPage,
+          filters: tableFilters
+        });
+
+        if (response?.results?.cohortDetails && response.results.cohortDetails.length > 0) {
+          // Transform cohort API response to table format
+          const transformedData = response.results.cohortDetails.map((cohort: Record<string, unknown>, index: number) => {
+            const customFields = cohort.customFields as Array<{
+              fieldId: string;
+              label: string;
+              selectedValues: Array<{ value?: string; label?: string } | string>;
+            }> || [];
+
+            // Extract location data from customFields
+            const getCustomFieldValue = (label: string) => {
+              const field = customFields.find(f => f.label === label);
+              if (!field?.selectedValues?.[0]) return 'N/A';
+              
+              const value = field.selectedValues[0];
+              if (typeof value === 'string') return value;
+              return value?.value || value?.label || 'N/A';
+            };
+
+            const state = getCustomFieldValue('STATE');
+            const district = getCustomFieldValue('DISTRICT');
+            const block = getCustomFieldValue('BLOCK');
+            const location = [state, district, block].filter(l => l !== 'N/A').join(', ') || 'N/A';
+
+            const transformedRow = {
+              id: cohort.cohortId || `cohort-${currentPage * rowsPerPage + index + 1}`,
+              name: capitalizeFirstLetter((cohort.name as string) || 'N/A'),
+              email: 'N/A', // Cohorts don't have email
+              phone: 'N/A', // Cohorts don't have phone
+              location: location,
+              organization: getCustomFieldValue('ORGANISATION_TYPE') || 'N/A',
+              status: cohort.status === 'active' ? t('PTM_DASHBOARD.APPROVED') : cohort.status === 'inactive' ? t('PTM_DASHBOARD.REJECTED') : t('PTM_DASHBOARD.PENDING_REVIEW'),
+            };
+            
+            return transformedRow;
+          });
+          
+          setTableData(transformedData);
+          setTotalTableRecords(response.count || 0);
+        } else {
+          console.log('No cohort data received from API');
+          setTableData([]);
+        }
+        setTableLoading(false);
+      }
+      } catch (error) {
+        console.error('Error fetching table data:', error);
+        setTableData([]);
+        setTableLoading(false);
+      }
+    };
+
+    fetchTableData();
+  }, [currentPage, rowsPerPage, filters, dashboardType, selectedStatus, t]);
+
+  const [tableData, setTableData] = useState<RowData[]>([]);
 
   // Table actions - memoized by dashboardType
   const tableActions = useMemo(() => {
@@ -184,82 +749,60 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       default:
         return [
           {
-            label: 'View Details',
+            label: t('PTM_DASHBOARD.VIEW_DETAILS'),
             onClick: (row: RowData) => {
               console.log('View details for:', row);
             },
           },
           {
-            label: 'Edit',
+            label: t('PTM_DASHBOARD.EDIT'),
             onClick: (row: RowData) => {
               console.log('Edit:', row);
             },
           },
           {
-            label: 'Approve',
+            label: t('PTM_DASHBOARD.APPROVE'),
             onClick: (row: RowData) => {
               console.log('Approve:', row);
-              setTableData(prev => 
-                prev.map(item => 
-                  item.id === row.id 
-                    ? { ...item, status: 'Approved' } 
-                    : item
-                )
-              );
+              setApproveDialog({
+                open: true,
+                user: row,
+                isBulk: false,
+                users: [row],
+              });
             },
             color: 'success' as const,
+            disabled: (row: RowData) => approvingUsers.includes(row.id),
+            // disabled: (row: RowData) => approvingUsers.includes(row.id) || row.status === 'Approved' || row.status === 'Rejected', // Also disable for approved/rejected items
           },
           {
-            label: 'Reject',
+            label: t('PTM_DASHBOARD.REJECT'),
             onClick: (row: RowData) => {
               console.log('Reject:', row);
-              setTableData(prev => 
-                prev.map(item => 
-                  item.id === row.id 
-                    ? { ...item, status: 'Rejected' } 
-                    : item
-                )
-              );
+              setRejectDialog({
+                open: true,
+                user: row,
+                isBulk: false,
+                users: [row],
+              });
             },
             color: 'error' as const,
+            // disabled: (row: RowData) => row.status === 'Approved' || row.status === 'Rejected', // Disable for approved/rejected items
           },
         ];
     }
-  }, [dashboardType]);
+  }, [dashboardType, approvingUsers, t]);
 
 
-  // Filter table data based on applied filters - memoized (status cards unaffected)
-  const filterTableData = useCallback((appliedFilters: FilterState) => {
-    let filteredData = [...initialTableData]; // Use memoized initial data
-
-    // Apply status filter
-    if (appliedFilters.status.length > 0) {
-      filteredData = filteredData.filter(item => 
-        appliedFilters.status.some(status => 
-          item.status.toLowerCase() === status.toLowerCase()
-        )
-      );
-    }
-
-    // Apply location filters (demo - in real app, this would be based on actual location data)
-    if (appliedFilters.state.length > 0) {
-      // Filter by state if needed
-    }
-
-    // Update only table data - status cards show overall application data
-    setTableData(filteredData);
-  }, [initialTableData]);
 
   // Handle filter changes - memoized (filters only affect table data, not status cards)
   const handleFiltersChange = useCallback((newFilters: FilterState, newFilterLabels: FilterLabels) => {
     setFilters(newFilters);
     setFilterLabels(newFilterLabels);
-    console.log('Filters applied:', newFilters);
-    console.log('Filter labels:', newFilterLabels);
+    setCurrentPage(0); // Reset to first page when filters change
     
-    // Filter table data based on applied filters (status cards remain unchanged)
-    filterTableData(newFilters);
-  }, [filterTableData]);
+    // Note: Table data will be fetched automatically via useEffect dependency on filters
+  }, []);
 
   // Handle row selection - memoized
   const handleRowSelect = useCallback((selected: RowData[]) => {
@@ -267,32 +810,163 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     console.log('Selected rows:', selected);
   }, []);
 
-  // Handle bulk approve action - memoized
-  const handleApproveAll = useCallback(() => {
-    const selectedIds = selectedRows.map(row => row.id);
+  // Handle actual approve action (called from dialog)
+  const handleConfirmApprove = useCallback(async (users: RowData[]) => {
+    const userIds = users.map(user => user.id);
+    
+    // Set loading state
+    setApprovingUsers(prev => [...prev, ...userIds]);
+    
+    try {
+      // Call API based on dashboard type
+      if (dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER) {
+        await bulkUpdateUsersRoles({
+          userIds: userIds,
+          roleId: VOLUNTEER_ROLE_ID
+        });
+        console.log('Successfully approved users:', userIds);
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.APPROVED_SUCCESS_SINGLE', { name: users[0].name })
+            : t('PTM_DASHBOARD.APPROVED_SUCCESS_BULK_VOLUNTEERS', { count: users.length }),
+          'success'
+        );
+      } else if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+        await updateCohortStatus({
+          cohortIds: userIds,
+          status: 'active'
+        });
+        console.log('Successfully approved cohorts:', userIds);
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.APPROVED_SUCCESS_SINGLE_ORG', { name: users[0].name })
+            : t('PTM_DASHBOARD.APPROVED_SUCCESS_BULK_ORGS', { count: users.length }),
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('Error approving:', error);
+      setApprovingUsers(prev => prev.filter(id => !userIds.includes(id)));
+      if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.APPROVE_FAILED_SINGLE_ORG')
+            : t('PTM_DASHBOARD.APPROVE_FAILED_BULK_ORGS'),
+          'error'
+        );
+      } else {
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.APPROVE_FAILED_SINGLE_VOLUNTEER')
+            : t('PTM_DASHBOARD.APPROVE_FAILED_BULK_VOLUNTEERS'),
+          'error'
+        );
+      }
+      return;
+    }
+    
+    // Update local state
     setTableData(prev => 
       prev.map(item => 
-        selectedIds.includes(item.id) 
-          ? { ...item, status: 'Approved' } 
+        userIds.includes(item.id) 
+          ? { ...item, status: t('PTM_DASHBOARD.APPROVED') } 
           : item
       )
     );
-    setSelectedRows([]); // Clear selection after action
-    console.log('Approved all selected rows:', selectedIds);
+    
+    // Remove from loading state and clear selection (both single and bulk)
+    setApprovingUsers(prev => prev.filter(id => !userIds.includes(id)));
+    setSelectedRows([]); // Clear all selected rows after action completes
+    
+    // Refresh status cards to update counts
+    await fetchStatusCardsData();
+  }, [dashboardType, t, fetchStatusCardsData]);
+
+  // Handle actual reject action (called from dialog)
+  const handleConfirmReject = useCallback(async (users: RowData[]) => {
+    const userIds = users.map(user => user.id);
+    
+    try {
+      // Call API based on dashboard type
+      if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+        await updateCohortStatus({
+          cohortIds: userIds,
+          status: 'inactive'
+        });
+        console.log('Successfully rejected cohorts:', userIds);
+      }
+      // For individual volunteers, we might not have a reject API, so just update local state
+    } catch (error) {
+      console.error('Error rejecting:', error);
+      if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.REJECT_FAILED_SINGLE_ORG')
+            : t('PTM_DASHBOARD.REJECT_FAILED_BULK_ORGS'),
+          'error'
+        );
+      } else {
+        showToastMessage(
+          users.length === 1 
+            ? t('PTM_DASHBOARD.REJECT_FAILED_SINGLE_VOLUNTEER')
+            : t('PTM_DASHBOARD.REJECT_FAILED_BULK_VOLUNTEERS'),
+          'error'
+        );
+      }
+      return;
+    }
+    
+    // Update local state
+    setTableData(prev => 
+      prev.map(item => 
+        userIds.includes(item.id) 
+          ? { ...item, status: t('PTM_DASHBOARD.REJECTED') } 
+          : item
+      )
+    );
+    
+    // Show success message
+    if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+      showToastMessage(
+        users.length === 1 
+          ? t('PTM_DASHBOARD.REJECTED_SUCCESS_SINGLE_ORG', { name: users[0].name })
+          : t('PTM_DASHBOARD.REJECTED_SUCCESS_BULK_ORGS', { count: users.length }),
+        'info'
+      );
+    } else {
+      showToastMessage(
+        users.length === 1 
+          ? t('PTM_DASHBOARD.REJECTED_SUCCESS_SINGLE_VOLUNTEER', { name: users[0].name })
+          : t('PTM_DASHBOARD.REJECTED_SUCCESS_BULK_VOLUNTEERS', { count: users.length }),
+        'info'
+      );
+    }
+    
+    // Clear all selected rows after action completes (both single and bulk)
+    setSelectedRows([]);
+    
+    // Refresh status cards to update counts
+    await fetchStatusCardsData();
+  }, [dashboardType, t, fetchStatusCardsData]);
+
+  // Handle bulk approve action - memoized (shows dialog)
+  const handleApproveAll = useCallback(() => {
+    setApproveDialog({
+      open: true,
+      user: null,
+      isBulk: true,
+      users: selectedRows,
+    });
   }, [selectedRows]);
 
-  // Handle bulk reject action - memoized
+  // Handle bulk reject action - memoized (shows dialog)
   const handleRejectAll = useCallback(() => {
-    const selectedIds = selectedRows.map(row => row.id);
-    setTableData(prev => 
-      prev.map(item => 
-        selectedIds.includes(item.id) 
-          ? { ...item, status: 'Rejected' } 
-          : item
-      )
-    );
-    setSelectedRows([]); // Clear selection after action
-    console.log('Rejected all selected rows:', selectedIds);
+    setRejectDialog({
+      open: true,
+      user: null,
+      isBulk: true,
+      users: selectedRows,
+    });
   }, [selectedRows]);
 
   // Clear all filters - memoized
@@ -304,31 +978,40 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
   // Handle reset complete - memoized (status cards remain unchanged)
   const handleResetComplete = useCallback(() => {
     setResetFilters(false);
+    setCurrentPage(0); // Reset to first page when filters are reset
     // Reset filters
     setFilters({
-      state: [],
+      state: userState ? [userState.value] : [], // Keep user's state from localStorage
       district: [],
       block: [],
-      village: [],
-      status: [],
+      // village: [],
+      // status: [],
       organization: [],
-      poc: [],
+      // poc: [],
     });
     // Reset filter labels
     setFilterLabels({
-      state: [],
+      state: userState ? [userState.label] : [], // Keep user's state label from localStorage
       district: [],
       block: [],
-      village: [],
-      status: [],
+      // village: [],
+      // status: [],
       organization: [],
-      poc: [],
+      // poc: [],
     });
-    // Reset table data to show all data
-    setTableData(initialTableData);
+    // Note: Table data will be fetched automatically via useEffect dependency on filters
     // Status cards remain unchanged - they show overall application data
-  }, [initialTableData]);
+  }, [userState]);
 
+  // Pagination handlers
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0); // Reset to first page when changing rows per page
+  };
 
   return (
     <>
@@ -355,12 +1038,13 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           onFiltersChange={handleFiltersChange} 
           resetFilters={resetFilters}
           onResetComplete={handleResetComplete}
+          showOrganizationFilter={dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER}
         />
       </Box>
 
-      {/* Filter Summary */}
-      {(filters.state.length > 0 || filters.district.length > 0 || filters.block.length > 0 || 
-        filters.village.length > 0 || filters.status.length > 0 || filters.organization.length > 0) && (
+      {/* Filter Summary - Don't show if only state is selected (state is auto-populated and disabled) */}
+      {(filters.district.length > 0 || filters.block.length > 0 || 
+        /* filters.village.length > 0 || filters.status.length > 0 || */ filters.organization.length > 0) && (
         <Box sx={{ mb: 3 }}>
           <Paper
             elevation={0}
@@ -374,32 +1058,28 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              <strong>Applied Filters:</strong>{' '}
-              {filterLabels.state.length > 0 && 
-                `States: ${filterLabels.state.length > 2 
-                  ? `${filterLabels.state.slice(0, 2).join(', ')} +${filterLabels.state.length - 2} more` 
-                  : filterLabels.state.join(', ')
-                }; `}
+              <strong>{t('PTM_DASHBOARD.APPLIED_FILTERS')}:</strong>{' '}
+              {/* State filter is not shown as it's auto-populated and disabled */}
               {filterLabels.district.length > 0 && 
-                `Districts: ${filterLabels.district.length > 2 
-                  ? `${filterLabels.district.slice(0, 2).join(', ')} +${filterLabels.district.length - 2} more` 
+                `${t('PTM_DASHBOARD.DISTRICTS')}: ${filterLabels.district.length > 2 
+                  ? `${filterLabels.district.slice(0, 2).join(', ')} +${filterLabels.district.length - 2} ${t('PTM_DASHBOARD.MORE')}` 
                   : filterLabels.district.join(', ')
                 }; `}
               {filterLabels.block.length > 0 && 
-                `Blocks: ${filterLabels.block.length > 2 
-                  ? `${filterLabels.block.slice(0, 2).join(', ')} +${filterLabels.block.length - 2} more` 
+                `${t('PTM_DASHBOARD.BLOCKS')}: ${filterLabels.block.length > 2 
+                  ? `${filterLabels.block.slice(0, 2).join(', ')} +${filterLabels.block.length - 2} ${t('PTM_DASHBOARD.MORE')}` 
                   : filterLabels.block.join(', ')
                 }; `}
-              {filterLabels.village.length > 0 && 
+              {/* {filterLabels.village.length > 0 && 
                 `Villages: ${filterLabels.village.length > 2 
                   ? `${filterLabels.village.slice(0, 2).join(', ')} +${filterLabels.village.length - 2} more` 
                   : filterLabels.village.join(', ')
-                }; `}
-              {filterLabels.status.length > 0 && 
-                `Status: ${filterLabels.status.join(', ')}; `}
+                }; `} */}
+              {/* {filterLabels.status.length > 0 && 
+                `Status: ${filterLabels.status.join(', ')}; `} */}
               {filterLabels.organization.length > 0 && 
-                `Organizations: ${filterLabels.organization.length > 2 
-                  ? `${filterLabels.organization.slice(0, 2).join(', ')} +${filterLabels.organization.length - 2} more` 
+                `${t('PTM_DASHBOARD.ORGANIZATIONS')}: ${filterLabels.organization.length > 2 
+                  ? `${filterLabels.organization.slice(0, 2).join(', ')} +${filterLabels.organization.length - 2} ${t('PTM_DASHBOARD.MORE')}` 
                   : filterLabels.organization.join(', ')
                 }`}
             </Typography>
@@ -409,7 +1089,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
               onClick={clearAllFilters}
               sx={{ minWidth: 'auto' }}
             >
-              Clear All
+              {t('PTM_DASHBOARD.CLEAR_ALL')}
             </Button>
           </Paper>
         </Box>
@@ -417,6 +1097,9 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
 
       {/* Bulk Actions Bar - Shows when rows are selected */}
       {selectedRows.length > 0 && (
+      /* Uncomment below line and comment above line to hide bulk actions when all selected rows are approved/rejected:
+      {selectedRows.length > 0 && !selectedRows.every(row => row.status === 'Approved' || row.status === 'Rejected') && (
+      */
         <Box sx={{ mb: 3 }}>
           <Paper
             elevation={2}
@@ -432,7 +1115,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                {selectedRows.length} selected
+                {selectedRows.length} {t('PTM_DASHBOARD.SELECTED')}
               </Typography>
             </Box>
             
@@ -442,6 +1125,8 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                 size="small"
                 startIcon={<CheckIcon />}
                 onClick={handleApproveAll}
+                disabled={selectedRows.some(row => approvingUsers.includes(row.id))}
+                // disabled={selectedRows.some(row => approvingUsers.includes(row.id) || row.status === 'Approved' || row.status === 'Rejected')} // Also disable when approved/rejected items are selected
                 sx={{
                   backgroundColor: '#00c851',
                   color: 'white',
@@ -456,9 +1141,13 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                     backgroundColor: '#00a842',
                     boxShadow: 'none',
                   },
+                  '&:disabled': {
+                    backgroundColor: '#cccccc',
+                    color: 'white',
+                  },
                 }}
               >
-                Approve All
+                {selectedRows.some(row => approvingUsers.includes(row.id)) ? t('PTM_DASHBOARD.APPROVING') : t('PTM_DASHBOARD.APPROVE_ALL')}
               </Button>
               
               <Button
@@ -466,6 +1155,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                 size="small"
                 startIcon={<CloseIcon />}
                 onClick={handleRejectAll}
+                // disabled={selectedRows.some(row => row.status === 'Approved' || row.status === 'Rejected')} // Disable when approved/rejected items are selected
                 sx={{
                   borderColor: '#ff4444',
                   color: '#ff4444',
@@ -485,7 +1175,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                   },
                 }}
               >
-                Reject All
+                {t('PTM_DASHBOARD.REJECT_ALL')}
               </Button>
             </Box>
           </Paper>
@@ -501,10 +1191,122 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           showActions={true}
           actions={tableActions}
           onRowSelect={handleRowSelect}
-          emptyMessage={`No ${dashboardType} data found`}
+          selectedRows={selectedRows}
+          emptyMessage={t('PTM_DASHBOARD.NO_DATA_FOUND', { type: dashboardType })}
           maxHeight={600}
+          loading={tableLoading}
+          showPagination={true}
+          page={currentPage}
+          rowsPerPage={rowsPerPage}
+          totalCount={totalTableRecords}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          rowsPerPageOptions={[5, 10, 25, 50]}
         />
       </Box>
+
+      {/* Approve Confirmation Dialog */}
+      <Dialog
+        open={approveDialog.open}
+        onClose={() => setApproveDialog(prev => ({ ...prev, open: false }))}
+        aria-labelledby="approve-dialog-title"
+        aria-describedby="approve-dialog-description"
+      >
+        <DialogTitle id="approve-dialog-title">
+          {approveDialog.isBulk ? t('PTM_DASHBOARD.CONFIRM_BULK_APPROVAL') : t('PTM_DASHBOARD.CONFIRM_APPROVAL')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="approve-dialog-description">
+            {(() => {
+              if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+                return approveDialog.isBulk
+                  ? t('PTM_DASHBOARD.APPROVE_CONFIRM_BULK_ORGS', { 
+                      count: approveDialog.users.length, 
+                      plural: approveDialog.users.length > 1 ? 's' : '' 
+                    })
+                  : t('PTM_DASHBOARD.APPROVE_CONFIRM_SINGLE_ORG', { name: approveDialog.user?.name || '' });
+              } else {
+                return approveDialog.isBulk
+                  ? t('PTM_DASHBOARD.APPROVE_CONFIRM_BULK_VOLUNTEERS', { 
+                      count: approveDialog.users.length, 
+                      plural: approveDialog.users.length > 1 ? 's' : '' 
+                    })
+                  : t('PTM_DASHBOARD.APPROVE_CONFIRM_SINGLE_VOLUNTEER', { name: approveDialog.user?.name || '' });
+              }
+            })()}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setApproveDialog(prev => ({ ...prev, open: false }))} 
+            color="inherit"
+          >
+            {t('PTM_DASHBOARD.CANCEL')}
+          </Button>
+          <Button
+            onClick={() => {
+              handleConfirmApprove(approveDialog.users);
+              setApproveDialog(prev => ({ ...prev, open: false }));
+            }}
+            color="success"
+            variant="contained"
+            disabled={approveDialog.users.some(user => approvingUsers.includes(user.id))}
+          >
+            {approveDialog.users.some(user => approvingUsers.includes(user.id)) ? t('PTM_DASHBOARD.APPROVING') : t('PTM_DASHBOARD.APPROVE')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reject Confirmation Dialog */}
+      <Dialog
+        open={rejectDialog.open}
+        onClose={() => setRejectDialog(prev => ({ ...prev, open: false }))}
+        aria-labelledby="reject-dialog-title"
+        aria-describedby="reject-dialog-description"
+      >
+        <DialogTitle id="reject-dialog-title">
+          {rejectDialog.isBulk ? t('PTM_DASHBOARD.CONFIRM_BULK_REJECTION') : t('PTM_DASHBOARD.CONFIRM_REJECTION')}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="reject-dialog-description">
+            {(() => {
+              if (dashboardType === DASHBOARD_TYPE.ORGANISATION) {
+                return rejectDialog.isBulk
+                  ? t('PTM_DASHBOARD.REJECT_CONFIRM_BULK_ORGS', { 
+                      count: rejectDialog.users.length, 
+                      plural: rejectDialog.users.length > 1 ? 's' : '' 
+                    })
+                  : t('PTM_DASHBOARD.REJECT_CONFIRM_SINGLE_ORG', { name: rejectDialog.user?.name || '' });
+              } else {
+                return rejectDialog.isBulk
+                  ? t('PTM_DASHBOARD.REJECT_CONFIRM_BULK_VOLUNTEERS', { 
+                      count: rejectDialog.users.length, 
+                      plural: rejectDialog.users.length > 1 ? 's' : '' 
+                    })
+                  : t('PTM_DASHBOARD.REJECT_CONFIRM_SINGLE_VOLUNTEER', { name: rejectDialog.user?.name || '' });
+              }
+            })()}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setRejectDialog(prev => ({ ...prev, open: false }))} 
+            color="inherit"
+          >
+            {t('PTM_DASHBOARD.CANCEL')}
+          </Button>
+          <Button
+            onClick={() => {
+              handleConfirmReject(rejectDialog.users);
+              setRejectDialog(prev => ({ ...prev, open: false }));
+            }}
+            color="error"
+            variant="contained"
+          >
+            {t('PTM_DASHBOARD.REJECT')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

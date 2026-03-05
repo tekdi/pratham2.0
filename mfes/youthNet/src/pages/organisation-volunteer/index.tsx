@@ -15,11 +15,13 @@ import HomeIcon from '@mui/icons-material/Home';
 import { PTMDashboard } from '../../components/PtmComponents';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { DASHBOARD_TYPE } from '../../utils/app.config';
 
 const OrganisationVolunteerPage: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   // Handle breadcrumb navigation
   const handleBreadcrumbClick = (path: string) => {
@@ -53,8 +55,7 @@ const OrganisationVolunteerPage: React.FC = () => {
                 mb: 1 
               }}
             >
-              Via Organisation
-
+              {t('PAGES.VIA_ORGANISATION')}
             </Typography>
             <Typography 
               variant="body1" 
@@ -62,7 +63,7 @@ const OrganisationVolunteerPage: React.FC = () => {
                 color: theme.palette.text.secondary 
               }}
             >
-              Overview and management of registrations
+              {t('PAGES.OVERVIEW_MANAGEMENT')}
             </Typography>
           </Box>
 

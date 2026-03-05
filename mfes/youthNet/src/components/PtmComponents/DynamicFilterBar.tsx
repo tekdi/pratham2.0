@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { getStateBlockDistrictList, getCohortList } from '../../services/youthNet/Dashboard/VillageServices';
+import { useTranslation } from 'next-i18next';
 
 interface FilterOption {
   id: string | number;
@@ -21,26 +22,27 @@ interface FilterBarProps {
   onFiltersChange?: (filters: FilterState, filterLabels: FilterLabels) => void;
   resetFilters?: boolean;
   onResetComplete?: () => void;
+  showOrganizationFilter?: boolean; // Optional prop to show/hide organization filter
 }
 
 interface FilterLabels {
   state: string[];
   district: string[];
   block: string[];
-  village: string[];
-  status: string[];
+  // village: string[];
+  // status: string[];
   organization: string[];
-  poc: string[];
+  // poc: string[];
 }
 
 interface FilterState {
   state: string[];
   district: string[];
   block: string[];
-  village: string[];
-  status: string[];
+  // village: string[];
+  // status: string[];
   organization: string[];
-  poc: string[];
+  // poc: string[];
 }
 
 interface LocationData {
@@ -51,29 +53,66 @@ interface LocationData {
   organizations: FilterOption[];
 }
 
-const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilters, onResetComplete }) => {
+interface CustomField {
+  label: string;
+  selectedValues: Array<{ id?: number; value: string }>;
+}
+
+const DynamicFilterBar: React.FC<FilterBarProps> = ({ 
+  onFiltersChange, 
+  resetFilters, 
+  onResetComplete,
+  showOrganizationFilter = false // Default to false
+}) => {
+  const { t } = useTranslation('common');
+  
+  // Function to get user state from localStorage
+  const getUserStateFromStorage = () => {
+    try {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        const stateField = parsedData.customFields?.find((field: CustomField) => field.label === 'STATE');
+        if (stateField && stateField.selectedValues && stateField.selectedValues.length > 0) {
+          const stateValue = stateField.selectedValues[0];
+          // value should be the ID for matching, label should be the display text
+          const stateId = stateValue.id?.toString() || stateValue.value;
+          return {
+            id: stateId,
+            value: stateId, // Use ID as value for matching in dropdown
+            label: stateValue.value // Use the actual state name as label
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing userData from localStorage:', error);
+    }
+    return null;
+  };
+
+  const userState = getUserStateFromStorage();
   const [filters, setFilters] = useState<FilterState>({
-    state: [],
+    state: userState ? [userState.value] : [],
     district: [],
     block: [],
-    village: [],
-    status: [],
+    // village: [],
+    // status: [],
     organization: [],
-    poc: [],
+    // poc: [],
   });
 
   const [filterLabels, setFilterLabels] = useState<FilterLabels>({
-    state: [],
+    state: userState ? [userState.label] : [],
     district: [],
     block: [],
-    village: [],
-    status: [],
+    // village: [],
+    // status: [],
     organization: [],
-    poc: [],
+    // poc: [],
   });
 
   const [locationData, setLocationData] = useState<LocationData>({
-    states: [],
+    states: userState ? [userState] : [],
     districts: [],
     blocks: [],
     villages: [],
@@ -98,6 +137,11 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
   useEffect(() => {
     loadStates();
     loadOrganizations(); // Load all organizations initially
+    
+    // Auto-load districts if user has a state from localStorage
+    if (userState && userState.value) {
+      loadDistricts([userState.value]);
+    }
   }, []);
 
   // Trigger callback when filters change
@@ -109,22 +153,22 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
   useEffect(() => {
     if (resetFilters) {
       setFilters({
-        state: [],
+        state: userState ? [userState.value] : [], // Preserve user's state from localStorage
         district: [],
         block: [],
-        village: [],
-        status: [],
+        // village: [],
+        // status: [],
         organization: [],
-        poc: [],
+        // poc: [],
       });
       setFilterLabels({
-        state: [],
+        state: userState ? [userState.label] : [], // Preserve user's state label from localStorage
         district: [],
         block: [],
-        village: [],
-        status: [],
+        // village: [],
+        // status: [],
         organization: [],
-        poc: [],
+        // poc: [],
       });
       setLocationData({
         states: locationData.states, // Keep states loaded
@@ -133,11 +177,15 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
         villages: [],
         organizations: [],
       });
+      // Reload districts if user has a state from localStorage
+      if (userState && userState.value) {
+        loadDistricts([userState.value]);
+      }
       // Load all organizations again
       loadOrganizations();
       onResetComplete?.();
     }
-  }, [resetFilters, onResetComplete, locationData.states]);
+  }, [resetFilters, onResetComplete, locationData.states, userState]);
 
   const loadStates = async () => {
     setLoading(prev => ({ ...prev, states: true }));
@@ -153,7 +201,17 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
           value: item.value,
           label: item.label,
         }));
-        setLocationData(prev => ({ ...prev, states: stateOptions }));
+        
+        // Ensure userState is included in the states list if it exists
+        let finalStateOptions = stateOptions;
+        if (userState) {
+          const userStateExists = stateOptions.some(opt => opt.value === userState.value);
+          if (!userStateExists) {
+            finalStateOptions = [userState, ...stateOptions];
+          }
+        }
+        
+        setLocationData(prev => ({ ...prev, states: finalStateOptions }));
       }
     } catch (error) {
       console.error('Error loading states:', error);
@@ -264,10 +322,16 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
       const response = await getCohortList(requestData);
 
       if (response?.results?.cohortDetails) {
+        // Helper function to capitalize first letter
+        const capitalizeFirstLetter = (str: string): string => {
+          if (!str) return str;
+          return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        };
+        
         const organizationOptions = response.results.cohortDetails.map((item: any) => ({
           id: item.cohortId,
           value: item.cohortId,
-          label: item.name,
+          label: capitalizeFirstLetter(item.name || ''),
         }));
         setLocationData(prev => ({ ...prev, organizations: organizationOptions }));
       }
@@ -400,7 +464,11 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
         IconComponent={KeyboardArrowDownIcon}
         renderValue={(selected) => {
           if (selected.length === 0) {
-            return <em style={{ color: '#999', fontStyle: 'italic' }}>Select {label}</em>;
+            const selectKey = name === 'state' ? 'SELECT_STATE' : 
+                             name === 'district' ? 'SELECT_DISTRICT' : 
+                             name === 'block' ? 'SELECT_BLOCK' : 
+                             'SELECT_ORGANISATION';
+            return <em style={{ color: '#999', fontStyle: 'italic' }}>{t(`DYNAMIC_FILTER_BAR.${selectKey}`)}</em>;
           }
           const selectedLabels = selected.map(val => {
             const option = options.find(opt => opt.value === val);
@@ -466,6 +534,11 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
     </FormControl>
   );
 
+  // Calculate grid size based on whether organization filter is shown
+  // If organization filter is shown: 4 filters, each md={3} (12/4 = 3)
+  // If organization filter is hidden: 3 filters, each md={4} (12/3 = 4)
+  const gridSize = showOrganizationFilter ? 3 : 4;
+
   return (
     <Grid 
       container 
@@ -478,31 +551,31 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
         border: '1px solid #e0e0e0',
       }}
     >
-        <Grid item xs={12} sm={6} md={2}>
-          {renderDropdown('state', 'State', locationData.states, false, loading.states)}
+        <Grid item xs={12} sm={6} md={gridSize}>
+          {renderDropdown('state', t('DYNAMIC_FILTER_BAR.STATE'), locationData.states, !!userState, loading.states)}
         </Grid>
         
-        <Grid item xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={gridSize}>
           {renderDropdown(
             'district',
-            'District',
+            t('DYNAMIC_FILTER_BAR.DISTRICT'),
             locationData.districts,
             filters.state.length === 0,
             loading.districts
           )}
         </Grid>
         
-        <Grid item xs={12} sm={6} md={1.5}>
+        <Grid item xs={12} sm={6} md={gridSize}>
           {renderDropdown(
             'block',
-            'Block',
+            t('DYNAMIC_FILTER_BAR.BLOCK'),
             locationData.blocks,
             filters.district.length === 0,
             loading.blocks
           )}
         </Grid>
         
-        <Grid item xs={12} sm={6} md={1.5}>
+        {/* <Grid item xs={12} sm={6} md={1.5}>
           {renderDropdown(
             'village',
             'Village',
@@ -510,25 +583,27 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({ onFiltersChange, resetFilt
             filters.block.length === 0,
             loading.villages
           )}
-        </Grid>
+        </Grid> */}
         
-        <Grid item xs={12} sm={6} md={1.5}>
+        {/* <Grid item xs={12} sm={6} md={1.5}>
           {renderDropdown('status', 'Status', statusOptions)}
-        </Grid>
+        </Grid> */}
         
-        <Grid item xs={12} sm={6} md={2}>
-          {renderDropdown(
-            'organization',
-            'Organisation Name',
-            locationData.organizations,
-            false,
-            loading.organizations
-          )}
-        </Grid>
+        {showOrganizationFilter && (
+          <Grid item xs={12} sm={6} md={gridSize}>
+            {renderDropdown(
+              'organization',
+              t('DYNAMIC_FILTER_BAR.ORGANISATION_NAME'),
+              locationData.organizations,
+              false,
+              loading.organizations
+            )}
+          </Grid>
+        )}
         
-        <Grid item xs={12} sm={6} md={1.5}>
-          {renderDropdown('poc', 'POC Name', [], true)} {/* Disabled as requested */}
-        </Grid>
+        {/* <Grid item xs={12} sm={6} md={1.5}>
+          {renderDropdown('poc', 'POC Name', [], true)}
+        </Grid> */}
       </Grid>
   );
 };
