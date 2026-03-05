@@ -186,6 +186,27 @@ export const bulkAttendance = async ({
   }
 };
 
+export const bulkAttendanceV2 = async ({
+  attendanceDate,
+  contextId,
+  userAttendance,
+  context = 'cohort',
+}: BulkAttendanceParams): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.bulkAttendanceV2;
+  try {
+    const response = await post(apiUrl, {
+      attendanceDate,
+      contextId,
+      userAttendance,
+      context,
+    });
+    return response?.data;
+  } catch (error) {
+    console.error('error in marking bulk attendance (V2)', error);
+    throw error;
+  }
+};
+
 export const markAttendance = async ({
   userId,
   attendanceDate,
