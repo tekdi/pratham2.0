@@ -67,38 +67,94 @@ const NdaPolicyAcknowledgementWidget = ({
   }
   return (
     <Box>
-    {/* Header Section */}
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: 2,
-      }}
-    >
-      <SecurityIcon
+      {/* Header Section */}
+      <Box
         sx={{
-          color: '#ffc107', // Yellow color
-          fontSize: 28,
-          marginRight: 1,
-        }}
-      />
-      <Typography
-        variant="h2"
-        sx={{
-          fontWeight: 600,
-          color: '#424242', // Dark grey
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: 2,
         }}
       >
-        {t('FORM.POLICY_ACKNOWLEDGEMENTS', { defaultValue: 'Policy Acknowledgements' })}
-      </Typography>
-    </Box>
+        <SecurityIcon
+          sx={{
+            color: '#ffc107', // Yellow color
+            fontSize: 28,
+            marginRight: 1,
+          }}
+        />
+        <Typography
+          variant="h1"
+          sx={{
+            fontWeight: 600,
+            color: '#424242', // Dark grey
+          }}
+        >
+          {t('FORM.POLICY_ACKNOWLEDGEMENTS', { defaultValue: 'Policy Acknowledgements' })}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: 2,
+        }}
+      >
+        <Typography
+          variant="body1"
+          sx={{
+            color: '#424242',
+          }}
+        >
+          {t('FORM.REVIEW_AND_ACCEPT_THE_REQUIRED_POLICIES',
+            { defaultValue: 'Review and accept the required policies.' })}
+        </Typography>
+      </Box>
 
+      <Box
+        sx={{
+          backgroundColor: '#e0f7fa', // Very light blue
+          borderRadius: 2,
+          padding: 2,
+          border: '1px solid #e0e0e0',
+          mb: 2,
+        }}
+      >
+
+        {/* Circular Checkbox */}
+        <Box
+          sx={{
+            display: 'flex',
+            borderRadius: '50%',
+          }}
+        >
+          <SecurityIcon
+            sx={{
+              fontSize: 16,
+              color: '#424242',
+              fontWeight: 'bold', mr: 1, mt: 0.5
+            }}
+          />
+          {/* Label */}
+          <Typography
+            component="span"
+            sx={{
+              color: '#424242',
+              fontSize: '0.95rem',
+            }}
+          >
+            {t('FORM.PLEASE_READ_AND_ACKNOWLEDGE_THE_FOLLOWING_POLICIES_BEFORE_PROCEEDING', {
+              defaultValue: 'Please read and acknowledge the following policies before proceeding.',
+            })}
+          </Typography>
+        </Box>
+      </Box>
       {/* Checkbox Section */}
       <Box
         sx={{
           backgroundColor: '#fafafa', // Light beige/off-white
           borderRadius: 2,
           padding: 2,
+          border: '1px solid #e0e0e0',
         }}
       >
         <FormControl
@@ -211,10 +267,10 @@ const NdaPolicyAcknowledgementWidget = ({
                   *
                 </Typography>
               )}
-                  {" "}
-                  {t('FORM.AND_TO_MAINTAIN_CONFIDENTIALITY', {
-                    defaultValue: ' and agree to maintain confidentiality.',
-                  })}
+              {" "}
+              {t('FORM.AND_TO_MAINTAIN_CONFIDENTIALITY', {
+                defaultValue: ' and agree to maintain confidentiality.',
+              })}
             </Typography>
           </Box>
         </FormControl>

@@ -29,7 +29,6 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import ClearIcon from '@mui/icons-material/Clear';
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
-import { fetchActiveAcademicYearId } from '../../../utils/Helper';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
 interface CohortDetail {
@@ -47,6 +46,14 @@ interface OrganizationOption {
 interface LocationOption {
   value: string;
   label: string;
+}
+
+interface User {
+  userId: string;
+  firstName: string;
+  middleName: string | null;
+  lastName: string;
+  name: string;
 }
 
 const OrganizationSearchWidget = ({
@@ -73,6 +80,9 @@ const OrganizationSearchWidget = ({
   const [selectedOrganization, setSelectedOrganization] = useState<OrganizationOption | null>(null);
   const [academicYearId, setAcademicYearId] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
+  const [selectedPtmId, setSelectedPtmId] = useState<string | null>(null);
+  const [mappedPtmName, setMappedPtmName] = useState<string | null>(null);
+  const [loadingPtm, setLoadingPtm] = useState<boolean>(false);
 
   // State, District, Block filters
   const [stateOptions, setStateOptions] = useState<LocationOption[]>([]);
@@ -88,9 +98,9 @@ const OrganizationSearchWidget = ({
   });
 
   // Get user role and state from localStorage
-  const stateId = typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
-  const userRole = typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
-  const isCentralAdmin = userRole === 'Central Lead' || userRole === 'Central Admin';
+  const stateId = null;
+  const userRole = null;
+  const isCentralAdmin = false;
 
   const anchorRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -104,14 +114,17 @@ const OrganizationSearchWidget = ({
   });
   const previousSearchQueryRef = useRef<string>('');
   const [popperWidth, setPopperWidth] = useState<number | undefined>(undefined);
+  const lastFetchedOrgIdRef = useRef<string | null>(null);
 
   const limit = 10;
 
   // Fetch active academic year ID on mount
   useEffect(() => {
     const loadAcademicYear = async () => {
-      const yearId = await fetchActiveAcademicYearId();
-      setAcademicYearId(yearId);
+      if (typeof window !== 'undefined') {
+        const yearId = localStorage.getItem('temp_academicYearId') || '';
+        setAcademicYearId(yearId);
+      }
     };
     loadAcademicYear();
   }, []);
@@ -350,6 +363,96 @@ const OrganizationSearchWidget = ({
     [academicYearId, selectedState, selectedDistrict, selectedBlock]
   );
 
+  // Format user name: firstName + middleName (if exists) + lastName
+  const formatUserName = useCallback((user: User): string => {
+    const parts = [user.firstName];
+    if (user.middleName) {
+      parts.push(user.middleName);
+    }
+    if (user.lastName) {
+      parts.push(user.lastName);
+    }
+    return parts.join(' ');
+  }, []);
+
+  // Fetch mapped PTM user for selected organization
+  const fetchMappedPtm = useCallback(
+    async (organizationId: string) => {
+      if (!academicYearId || !organizationId) {
+        return;
+      }
+
+      try {
+        setLoadingPtm(true);
+
+        const tenantId = localStorage.getItem('onboardTenantId') || '';
+        const token = localStorage.getItem('token') || '';
+
+        if (!tenantId || !token) {
+          setError('Missing tenant ID or token');
+          return;
+        }
+
+        const requestBody: any = {
+          limit: 1,
+          offset: 0,
+          filters: {
+            cohortId:organizationId,
+            cohortMemberRole: ['PTM'],
+            status: ['active'],
+          },
+          sort: ['name', 'asc'],
+        };
+
+        const response = await axios.post(
+          API_ENDPOINTS.cohortMemberList,
+          requestBody,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+              tenantid: tenantId,
+              academicyearid: academicYearId,
+            },
+          }
+        );
+
+        const result = response.data?.result || {};
+        const fetchedUsers: User[] = result.userDetails || [];
+
+        if (fetchedUsers.length > 0) {
+          const ptmUser = fetchedUsers[0];
+          const ptmName = formatUserName(ptmUser);
+          const ptmId = ptmUser.userId;
+
+          setMappedPtmName(ptmName);
+          setSelectedPtmId(ptmId);
+
+          // Store in localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('temp_ptm_id', ptmId);
+          }
+        } else {
+          setMappedPtmName(null);
+          setSelectedPtmId(null);
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('temp_ptm_id');
+          }
+        }
+      } catch (err: any) {
+        console.error('Error fetching mapped PTM:', err);
+        setMappedPtmName(null);
+        setSelectedPtmId(null);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('temp_ptm_id');
+        }
+      } finally {
+        setLoadingPtm(false);
+      }
+    },
+    [academicYearId, formatUserName]
+  );
+
   // Fetch organizations when filters or search change (only when dropdown is open)
   useEffect(() => {
     if (!academicYearId || !open) return;
@@ -442,6 +545,10 @@ const OrganizationSearchWidget = ({
       // Clear selection when user starts typing or changes search
       setSelectedOrganization(null);
       onChange(undefined);
+      // Remove from localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('temp_org_id');
+      }
     }
 
     previousSearchQueryRef.current = searchQuery;
@@ -449,25 +556,46 @@ const OrganizationSearchWidget = ({
 
   // Set selected organization when value changes
   useEffect(() => {
-    if (value && organizations.length > 0) {
-      const found = organizations.find((org) => org.value === value);
-      if (found) {
-        setSelectedOrganization(found);
-      } else {
-        // If value exists but not in current list, we might need to fetch it
-        // For now, just set a placeholder
-        setSelectedOrganization({ label: 'Selected', value });
+    if (value) {
+      if (organizations.length > 0) {
+        const found = organizations.find((org) => org.value === value);
+        if (found) {
+          setSelectedOrganization(found);
+        } else {
+          // If value exists but not in current list, we might need to fetch it
+          // For now, just set a placeholder
+          setSelectedOrganization({ label: 'Selected', value });
+        }
       }
-    } else if (!value) {
+      // Fetch mapped PTM when organization value is set (only once per value change)
+      // Prevent duplicate calls by checking if we've already fetched for this organization
+      if (lastFetchedOrgIdRef.current !== value) {
+        lastFetchedOrgIdRef.current = value;
+        fetchMappedPtm(value);
+      }
+    } else {
       setSelectedOrganization(null);
+      lastFetchedOrgIdRef.current = null;
+      // Clear mapped PTM when organization is cleared
+      setMappedPtmName(null);
+      setSelectedPtmId(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('temp_ptm_id');
+        localStorage.removeItem('temp_org_id');
+      }
     }
-  }, [value, organizations]);
+  }, [value, organizations, fetchMappedPtm]);
 
   // Handle organization selection
   const handleOrganizationSelect = (organization: OrganizationOption) => {
     setSelectedOrganization(organization);
     onChange(organization.value);
     setOpen(false);
+    // Store in localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('temp_org_id', organization.value);
+    }
+    // Note: fetchMappedPtm will be called automatically by useEffect when value changes
   };
 
   // Handle dropdown toggle
@@ -499,6 +627,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle district change
@@ -508,6 +643,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle block change
@@ -516,6 +658,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock(newBlock);
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle clear state filter
@@ -534,6 +683,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle clear district filter
@@ -551,6 +707,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle clear block filter
@@ -567,6 +730,13 @@ const OrganizationSearchWidget = ({
     setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
   };
 
   // Handle clear filters
@@ -592,8 +762,37 @@ const OrganizationSearchWidget = ({
     setSelectedOrganization(null);
     setSearchQuery('');
     onChange(undefined);
+    // Clear mapped PTM when organization is cleared
+    setMappedPtmName(null);
+    setSelectedPtmId(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('temp_ptm_id');
+      localStorage.removeItem('temp_org_id');
+    }
     // The useEffect that watches for filter changes will automatically reload organizations
   };
+
+  // Format region from customFields array (priority: STATE > DISTRICT > BLOCK)
+  const formatOrganisationType = useCallback((cohort: any): string => {
+    const customFields = cohort.customFields || [];
+
+    // Helper function to get value from customFields by label
+    const getFieldValue = (label: string): string | null => {
+      const field = customFields.find((field: any) => field.label === label);
+      if (field?.selectedValues && field.selectedValues.length > 0) {
+        return field.selectedValues[0].value;
+      }
+      return null;
+    };
+
+    // Check in priority order: ORGANISATION_TYPE
+    const organisationTypeValue = getFieldValue('ORGANISATION_TYPE');
+    if (organisationTypeValue) {
+      return `(${organisationTypeValue})`;
+    }
+
+    return '';
+  }, []);
 
   // Check if any filters are active
   const hasActiveFilters = selectedState || selectedDistrict || selectedBlock;
@@ -994,7 +1193,7 @@ const OrganizationSearchWidget = ({
                           }}
                         >
                           <ListItemText
-                            primary={organization.label}
+                            primary={organization.label + formatOrganisationType(organization)}
                             primaryTypographyProps={{
                               sx: {
                                 fontWeight: selectedOrganization?.value === organization.value ? 500 : 400,
@@ -1035,6 +1234,61 @@ const OrganizationSearchWidget = ({
           </Typography>
         )} */}
       </FormControl>
+
+      {/* Mapped PTM Name Display */}
+      {selectedOrganization && (
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            backgroundColor: '#f5f5f5',
+            borderRadius: '8px',
+            border: '1px solid #e0e0e0',
+          }}
+        >
+          {loadingPtm ? (
+            <Box display="flex" alignItems="center" gap={1}>
+              <CircularProgress size={16} />
+              <Typography variant="body2" color="text.secondary">
+                {t('FORM.LOADING_PTM', { defaultValue: 'Loading PTM...' })}
+              </Typography>
+            </Box>
+          ) : mappedPtmName ? (
+            <>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontSize: '0.875rem',
+                  color: '#757575',
+                  marginBottom: 0.5,
+                }}
+              >
+                {t('FORM.MAPPED_PTM', { defaultValue: 'Mapped PTM' })}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: '1rem',
+                  fontWeight: 600,
+                  color: '#212121',
+                }}
+              >
+                {mappedPtmName}
+              </Typography>
+            </>
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: '0.875rem',
+                color: '#757575',
+              }}
+            >
+              {t('FORM.NO_PTM_MAPPED', { defaultValue: 'No PTM mapped to this organization' })}
+            </Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 };

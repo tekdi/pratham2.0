@@ -256,7 +256,7 @@ const SubProgramListWidget = ({
 
                 {!loading && !error && cohorts.length === 0 && (
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        No active cohorts found
+                        {t('FORM.NO_ACTIVE_COHORTS_FOUND', { defaultValue: 'No active cohorts found' })}
                     </Typography>
                 )}
 
