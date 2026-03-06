@@ -7,6 +7,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import BusinessIcon from '@mui/icons-material/Business';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import {
   Button,
   FormControl,
@@ -663,13 +666,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 },
               }}
               startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+                <PersonOutlineIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={() => {
                 router.push('/individual-volunteer');
               }}
             >
-              Individual Volunteer Dashboard
+              Individual Volunteer 
             </Button>
 
 
@@ -697,13 +700,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 },
               }}
               startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+                <BusinessIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={() => {
                 router.push('/organisation');
               }}
             >
-              Organisation Dashboard
+              Organisation 
             </Button>
 
             <Button
@@ -729,7 +732,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 },
               }}
               startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
+                <PersonAddIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={() => {
                 router.push('/organisation-volunteer');

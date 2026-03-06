@@ -229,24 +229,24 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-            //  ptm_id: localStorage.getItem('userId') || '',
+              ptm_id: localStorage.getItem('userId') || '',
             //  is_reject:"no",
              "volunteer_type":"individual_volunteer"
           };
           Approvedfilters = {
-            role: "Volunteer",
+            role: ["Volunteer"],
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-           //  ptm_id: localStorage.getItem('userId') || '',
-             volunteer_type:"individual_volunteer"
+             ptm_id: localStorage.getItem('userId') || '',
+             "volunteer_type":"individual_volunteer"
           };
           Rejectedfilters = {
             role: "Learner",
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-             //ptm_id: localStorage.getItem('userId') || '',
+             ptm_id: localStorage.getItem('userId') || '',
              is_reject:"yes",
              volunteer_type:"individual_volunteer"
           };
@@ -257,7 +257,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-            // ptm_id: localStorage.getItem('userId') || '',
+             ptm_id: localStorage.getItem('userId') || '',
             // is_reject:"no",
               volunteer_type:"individual_volunteer_through_an_organisation"
           };
@@ -266,7 +266,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-            // ptm_id: localStorage.getItem('userId') || '',
+            ptm_id: localStorage.getItem('userId') || '',
              volunteer_type:"individual_volunteer_through_an_organisation"
           };
           Rejectedfilters = {
@@ -274,7 +274,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             "how_would_you_like_to_register": [
                  "individual_volunteer"
              ],
-            // ptm_id: localStorage.getItem('userId') || '',
+           ptm_id: localStorage.getItem('userId') || '',
              is_reject:"yes",
              volunteer_type:"individual_volunteer_through_an_organisation"
           };
@@ -285,22 +285,26 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             "status": [
                 "pending"
             ],
-            "ptm_id" :localStorage.getItem('userId') || ''
+            "customFieldsName": {
+              "ptm_id" :localStorage.getItem('userId') || ''
+            }
           };
           Approvedfilters = {
             "type": "COHORT",
             "status": [
                 "active"
             ],
-            "ptm_id" :localStorage.getItem('userId') || ''
-          };
+            "customFieldsName": {
+              "ptm_id" :localStorage.getItem('userId') || ''
+            }          };
           Rejectedfilters = {
               "type": "COHORT",
             "status": [
                 "inactive"
             ],
-            "ptm_id" :localStorage.getItem('userId') || ''
-          }
+            "customFieldsName": {
+              "ptm_id" :localStorage.getItem('userId') || ''
+            }          }
         }
 
         // Make API calls for each status type to get counts
@@ -546,7 +550,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           "role": ["Learner", "Volunteer"],
           "how_would_you_like_to_register": ["individual_volunteer"],
           "volunteer_type":"individual_volunteer",
-          //"ptm_id": localStorage.getItem('userId') || ''
+          "ptm_id": localStorage.getItem('userId') || ''
         };
       }
       else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
@@ -554,14 +558,17 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           "role": ["Learner", "Volunteer"],
           "how_would_you_like_to_register": ["individual_volunteer"],
           "volunteer_type":"individual_volunteer_through_an_organisation",
-          //"ptm_id": localStorage.getItem('userId') || ''
+          "ptm_id": localStorage.getItem('userId') || ''
         };
       }
       else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
         baseFilters = {
           "type": "COHORT",
+          "customFieldsName": {
+            "ptm_id" :localStorage.getItem('userId') || ''
+          },
         //  "status": ["pending"],
-         // "ptm_id": localStorage.getItem('userId') || ''
+          "ptm_id": localStorage.getItem('userId') || ''
         };
       }
 
