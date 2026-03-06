@@ -746,8 +746,10 @@
     "INDIVIDUAL_VOLUNTEER_THROUGH_ORGANISATION_HELP_TEXT": "Select this option if you are volunteering through an organisation that is already registered.",
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "I am volunteering on my own",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "Select this option if you are volunteering independently.",
-    "NO_ACTIVE_COHORTS_FOUND": "No active cohorts found"
+    "NO_ACTIVE_COHORTS_FOUND": "No active cohorts found",
+    "ORGANISATION_TYPE": "நிறுவனத்தின் வகை"
   },
+  "ORGANISATION_NAME": "நிறுவனத்தின் பெயர்",
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "தவறான உள்ளீடு.",
     "FIELD_REQUIRED": "{{field}} தேவை",

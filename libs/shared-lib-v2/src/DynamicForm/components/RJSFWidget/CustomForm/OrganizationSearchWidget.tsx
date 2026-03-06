@@ -317,6 +317,7 @@ const OrganizationSearchWidget = ({
           .map((cohort) => ({
             label: cohort.name,
             value: cohort.cohortId,
+            customFields: cohort.customFields,
           }));
 
         // Client-side filtering if search term exists and API doesn't filter properly
@@ -397,7 +398,7 @@ const OrganizationSearchWidget = ({
           limit: 1,
           offset: 0,
           filters: {
-            cohortId:organizationId,
+            cohortId: organizationId,
             cohortMemberRole: ['PTM'],
             status: ['active'],
           },
@@ -1173,38 +1174,40 @@ const OrganizationSearchWidget = ({
 
                 {organizations.length > 0 && (
                   <List sx={{ p: 0 }}>
-                    {organizations.map((organization) => (
-                      <ListItem key={organization.value} disablePadding>
-                        <ListItemButton
-                          onClick={() => handleOrganizationSelect(organization)}
-                          selected={selectedOrganization?.value === organization.value}
-                          sx={{
-                            px: 2,
-                            py: 1.5,
-                            '&.Mui-selected': {
-                              backgroundColor: '#e3f2fd',
-                              '&:hover': {
-                                backgroundColor: '#bbdefb',
+                    {organizations.map((organization) => {
+                      const formattedOrganization = organization.label+' ' + formatOrganisationType(organization);
+                      return (
+                        <ListItem key={organization.value} disablePadding>
+                          <ListItemButton
+                            onClick={() => handleOrganizationSelect(organization)}
+                            selected={selectedOrganization?.value === organization.value}
+                            sx={{
+                              px: 2,
+                              py: 1.5,
+                              '&.Mui-selected': {
+                                backgroundColor: '#e3f2fd',
+                                '&:hover': {
+                                  backgroundColor: '#bbdefb',
+                                },
                               },
-                            },
-                            '&:hover': {
-                              backgroundColor: '#f5f5f5',
-                            },
-                          }}
-                        >
-                          <ListItemText
-                            primary={organization.label + formatOrganisationType(organization)}
-                            primaryTypographyProps={{
-                              sx: {
-                                fontWeight: selectedOrganization?.value === organization.value ? 500 : 400,
-                                fontSize: '0.9375rem',
-                                color: '#212121',
+                              '&:hover': {
+                                backgroundColor: '#f5f5f5',
                               },
                             }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    ))}
+                          >
+                            <ListItemText
+                              primary={formattedOrganization}
+                              primaryTypographyProps={{
+                                sx: {
+                                  fontWeight: selectedOrganization?.value === organization.value ? 500 : 400,
+                                  fontSize: '0.9375rem',
+                                  color: '#212121',
+                                },
+                              }}
+                            />
+                          </ListItemButton>
+                        </ListItem>)
+                    })}
                     {loadingMore && (
                       <ListItem disablePadding>
                         <Box
