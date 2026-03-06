@@ -87,6 +87,7 @@ const PTMNameWidget = ({
     district: false,
     block: false,
   });
+  const [isOrganizationRegister, setIsOrganizationRegister] = useState<boolean>(false);
 
   // Get user role and state from localStorage
   const stateId = null;
@@ -106,13 +107,175 @@ const PTMNameWidget = ({
     ptmEmail: '',
     search: '',
   });
+  const previousLocalStorageValuesRef = useRef<{ state: string; district: string; block: string }>({
+    state: '',
+    district: '',
+    block: '',
+  });
 
   const limit = 10;
+
+  // Check if organization register mode
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const orgRegister = localStorage.getItem('temp_organization_register');
+      setIsOrganizationRegister(orgRegister === 'yes');
+    }
+  }, []);
+
+  // Load state, district, block from localStorage when in organization register mode
+  useEffect(() => {
+    if (isOrganizationRegister && typeof window !== 'undefined') {
+      const tempState = localStorage.getItem('temp_State') ?? '';
+      const tempDistrict = localStorage.getItem('temp_District') ?? '';
+      const tempBlock = localStorage.getItem('temp_Block') ?? '';
+
+      // Initialize the ref with current values
+      previousLocalStorageValuesRef.current = {
+        state: tempState,
+        district: tempDistrict,
+        block: tempBlock,
+      };
+
+      if (tempState && !selectedState) {
+        setSelectedState(tempState);
+      } else if (!tempState && selectedState) {
+        // If key is removed, clear the state
+        setSelectedState('');
+      }
+      if (tempDistrict && !selectedDistrict) {
+        setSelectedDistrict(tempDistrict);
+      } else if (!tempDistrict && selectedDistrict) {
+        // If key is removed, clear the district
+        setSelectedDistrict('');
+      }
+      if (tempBlock && !selectedBlock) {
+        setSelectedBlock(tempBlock);
+      } else if (!tempBlock && selectedBlock) {
+        // If key is removed, clear the block
+        setSelectedBlock('');
+      }
+    }
+  }, [isOrganizationRegister, selectedState, selectedDistrict, selectedBlock]);
+
+  // Watch for changes to localStorage values in organization register mode
+  useEffect(() => {
+    if (!isOrganizationRegister || typeof window === 'undefined') return;
+
+    const checkLocalStorageChanges = () => {
+      // Check if keys exist, if not, treat as empty string
+      const tempState = localStorage.getItem('temp_State') ?? '';
+      const tempDistrict = localStorage.getItem('temp_District') ?? '';
+      const tempBlock = localStorage.getItem('temp_Block') ?? '';
+
+      const prevValues = previousLocalStorageValuesRef.current;
+
+      // Check if any value has changed (including removal - null becomes empty string)
+      const stateChanged = prevValues.state !== tempState;
+      const districtChanged = prevValues.district !== tempDistrict;
+      const blockChanged = prevValues.block !== tempBlock;
+
+      if (stateChanged || districtChanged || blockChanged) {
+        // Update the state values
+        if (stateChanged) {
+          setSelectedState(tempState);
+          // If state is removed, also clear district and block
+          if (!tempState) {
+            setSelectedDistrict('');
+            setSelectedBlock('');
+          }
+        }
+        if (districtChanged) {
+          setSelectedDistrict(tempDistrict);
+          // If district is removed, also clear block
+          if (!tempDistrict) {
+            setSelectedBlock('');
+          }
+        }
+        if (blockChanged) {
+          setSelectedBlock(tempBlock);
+        }
+
+        // Clear selected user and users list to allow reselection
+        setSelectedUser(null);
+        onChange(undefined);
+        setUsers([]);
+        setOffset(0);
+        setHasMore(true);
+        setTotalCount(0);
+        currentDataSearchQueryRef.current = '';
+        previousFiltersRef.current = {
+          state: tempState,
+          district: tempDistrict,
+          block: tempBlock,
+          ptmEmail: ptmEmail || '',
+          search: '',
+        };
+
+        // Update the ref with new values
+        previousLocalStorageValuesRef.current = {
+          state: tempState,
+          district: tempDistrict,
+          block: tempBlock,
+        };
+      }
+    };
+
+    // Initial check - use nullish coalescing to handle key removal
+    const tempState = localStorage.getItem('temp_State') ?? '';
+    const tempDistrict = localStorage.getItem('temp_District') ?? '';
+    const tempBlock = localStorage.getItem('temp_Block') ?? '';
+    previousLocalStorageValuesRef.current = {
+      state: tempState,
+      district: tempDistrict,
+      block: tempBlock,
+    };
+
+    // Storage event listener for cross-tab/window changes
+    const handleStorageChange = (e: StorageEvent) => {
+      if (
+        e.key === 'temp_State' ||
+        e.key === 'temp_District' ||
+        e.key === 'temp_Block' ||
+        e.key === null // null means storage was cleared
+      ) {
+        checkLocalStorageChanges();
+      }
+    };
+
+    // Custom event listener for same-tab changes (if custom events are dispatched)
+    const handleCustomStorageChange = (e: CustomEvent) => {
+      const key = e.detail?.key;
+      if (
+        key === 'temp_State' ||
+        key === 'temp_District' ||
+        key === 'temp_Block'
+      ) {
+        checkLocalStorageChanges();
+      }
+    };
+
+    // Listen for storage events (works for cross-tab changes)
+    window.addEventListener('storage', handleStorageChange);
+
+    // Listen for custom storage change events (for same-tab changes if implemented)
+    window.addEventListener('localStorageChange', handleCustomStorageChange as EventListener);
+
+    // Check for changes periodically (every 300ms) for same-tab changes
+    // Note: storage event doesn't fire in the same tab, so we need polling
+    const intervalId = setInterval(checkLocalStorageChanges, 300);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
+      clearInterval(intervalId);
+    };
+  }, [isOrganizationRegister, onChange, ptmEmail]);
 
   // Fetch active academic year ID on mount
   useEffect(() => {
     const loadAcademicYear = async () => {
-      if(typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         const yearId = localStorage.getItem('temp_academicYearId') || '';
         setAcademicYearId(yearId);
       }
@@ -164,7 +327,9 @@ const PTMNameWidget = ({
       const stateToUse = selectedState || stateId;
       if (!stateToUse) {
         setDistrictOptions([]);
-        setSelectedDistrict('');
+        if (!isOrganizationRegister) {
+          setSelectedDistrict('');
+        }
         return;
       }
 
@@ -200,7 +365,9 @@ const PTMNameWidget = ({
     const loadBlockOptions = async () => {
       if (!selectedDistrict) {
         setBlockOptions([]);
-        setSelectedBlock('');
+        if (!isOrganizationRegister) {
+          setSelectedBlock('');
+        }
         return;
       }
 
@@ -279,6 +446,19 @@ const PTMNameWidget = ({
     async (searchTerm: string = '', currentOffset: number = 0, append: boolean = false) => {
       if (!academicYearId) {
         return;
+      }
+
+      // In organization register mode, check if all 3 values exist
+      if (isOrganizationRegister) {
+        const tempState = typeof window !== 'undefined' ? localStorage.getItem('temp_State') : '';
+        const tempDistrict = typeof window !== 'undefined' ? localStorage.getItem('temp_District') : '';
+        const tempBlock = typeof window !== 'undefined' ? localStorage.getItem('temp_Block') : '';
+
+        if (!tempState || !tempDistrict || !tempBlock) {
+          setError('MISSING_LOCATION_DATA');
+          setUsers([]);
+          return;
+        }
       }
 
       try {
@@ -400,7 +580,7 @@ const PTMNameWidget = ({
         }
       }
     },
-    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmEmail, formatUserName, formatRegion]
+    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmEmail, formatUserName, formatRegion, isOrganizationRegister]
   );
 
   // Fetch users when filters or search change (only when dropdown is open)
@@ -672,159 +852,191 @@ const PTMNameWidget = ({
       >
         {t('FORM.COMPLETE_YOUR_REGISTRATION', { defaultValue: 'Complete your registration.' })}
       </Typography>
-      <Typography
-        variant="body1"
-        sx={{
-          marginBottom: 1,
-          color: 'grey',
-        }}
-      >
-        {t('FORM.FIND_YOUR_REGISTRED_ORGANISATION', { defaultValue: 'Select your PTM (Pratham Team Member) for the Summer Camp program.' })}
-      </Typography>
+      {!isOrganizationRegister && (
+        <Typography
+          variant="body1"
+          sx={{
+            marginBottom: 1,
+            color: 'grey',
+          }}
+        >
+          {t('FORM.FIND_YOUR_REGISTRED_ORGANISATION', { defaultValue: 'Select your PTM (Pratham Team Member) for the Summer Camp program.' })}
+        </Typography>
+      )}
       {/* State, District, Block Filters - 3 in one row */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        {/* State Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-state-label`}>
-                {t('FORM.STATE', { defaultValue: 'State' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-state-label`}
-                value={selectedState}
-                onChange={handleStateChange}
-                label={t('FORM.STATE', { defaultValue: 'State' })}
-                disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
-              >
-                {loadingStates.state ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  stateOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
+      {!isOrganizationRegister && (
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          {/* State Dropdown */}
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+              <FormControl fullWidth>
+                <InputLabel id={`${id}-state-label`}>
+                  {t('FORM.STATE', { defaultValue: 'State' })}
+                </InputLabel>
+                <Select
+                  labelId={`${id}-state-label`}
+                  value={selectedState}
+                  onChange={handleStateChange}
+                  label={t('FORM.STATE', { defaultValue: 'State' })}
+                  disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
+                >
+                  {loadingStates.state ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} />
                     </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedState && !disabled && !readonly && (isCentralAdmin || !stateId) && (
-              <IconButton
-                size="small"
-                onClick={handleClearState}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear state"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
+                  ) : (
+                    stateOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+              {selectedState && !disabled && !readonly && (isCentralAdmin || !stateId) && (
+                <IconButton
+                  size="small"
+                  onClick={handleClearState}
+                  sx={{
+                    mt: 1,
+                    color: 'text.secondary',
+                    '&:hover': {
+                      color: 'error.main',
+                      backgroundColor: 'error.light',
+                    },
+                  }}
+                  aria-label="Clear state"
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          </Grid>
 
-        {/* District Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-district-label`}>
-                {t('FORM.DISTRICT', { defaultValue: 'District' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-district-label`}
-                value={selectedDistrict}
-                onChange={handleDistrictChange}
-                label={t('FORM.DISTRICT', { defaultValue: 'District' })}
-                disabled={disabled || readonly || !selectedState || loadingStates.district}
-              >
-                {loadingStates.district ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  districtOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
+          {/* District Dropdown */}
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+              <FormControl fullWidth>
+                <InputLabel id={`${id}-district-label`}>
+                  {t('FORM.DISTRICT', { defaultValue: 'District' })}
+                </InputLabel>
+                <Select
+                  labelId={`${id}-district-label`}
+                  value={selectedDistrict}
+                  onChange={handleDistrictChange}
+                  label={t('FORM.DISTRICT', { defaultValue: 'District' })}
+                  disabled={disabled || readonly || !selectedState || loadingStates.district}
+                >
+                  {loadingStates.district ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} />
                     </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedDistrict && !disabled && !readonly && selectedState && (
-              <IconButton
-                size="small"
-                onClick={handleClearDistrict}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear district"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
+                  ) : (
+                    districtOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+              {selectedDistrict && !disabled && !readonly && selectedState && (
+                <IconButton
+                  size="small"
+                  onClick={handleClearDistrict}
+                  sx={{
+                    mt: 1,
+                    color: 'text.secondary',
+                    '&:hover': {
+                      color: 'error.main',
+                      backgroundColor: 'error.light',
+                    },
+                  }}
+                  aria-label="Clear district"
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          </Grid>
 
-        {/* Block Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-block-label`}>
-                {t('FORM.BLOCK', { defaultValue: 'Block' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-block-label`}
-                value={selectedBlock}
-                onChange={handleBlockChange}
-                label={t('FORM.BLOCK', { defaultValue: 'Block' })}
-                disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
-              >
-                {loadingStates.block ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  blockOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
+          {/* Block Dropdown */}
+          <Grid item xs={12} sm={12} md={4}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+              <FormControl fullWidth>
+                <InputLabel id={`${id}-block-label`}>
+                  {t('FORM.BLOCK', { defaultValue: 'Block' })}
+                </InputLabel>
+                <Select
+                  labelId={`${id}-block-label`}
+                  value={selectedBlock}
+                  onChange={handleBlockChange}
+                  label={t('FORM.BLOCK', { defaultValue: 'Block' })}
+                  disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
+                >
+                  {loadingStates.block ? (
+                    <MenuItem disabled>
+                      <CircularProgress size={20} />
                     </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedBlock && !disabled && !readonly && selectedDistrict && (
-              <IconButton
-                size="small"
-                onClick={handleClearBlock}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear block"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
+                  ) : (
+                    blockOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))
+                  )}
+                </Select>
+              </FormControl>
+              {selectedBlock && !disabled && !readonly && selectedDistrict && (
+                <IconButton
+                  size="small"
+                  onClick={handleClearBlock}
+                  sx={{
+                    mt: 1,
+                    color: 'text.secondary',
+                    '&:hover': {
+                      color: 'error.main',
+                      backgroundColor: 'error.light',
+                    },
+                  }}
+                  aria-label="Clear block"
+                >
+                  <ClearIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+          </Grid>
 
-      </Grid>
+        </Grid>
+      )}
+
+      {/* Show message if location data is missing in organization register mode */}
+      {isOrganizationRegister && (() => {
+        const tempState = typeof window !== 'undefined' ? localStorage.getItem('temp_State') : '';
+        const tempDistrict = typeof window !== 'undefined' ? localStorage.getItem('temp_District') : '';
+        const tempBlock = typeof window !== 'undefined' ? localStorage.getItem('temp_Block') : '';
+
+        if (!tempState || !tempDistrict || !tempBlock) {
+          if (selectedUser !== null) {
+            setUsers([]);
+            setSelectedUser(null);
+            onChange(undefined);
+          }
+          return (
+            <Typography
+              variant="body2"
+              sx={{
+                marginBottom: 2,
+                color: 'warning.main',
+                fontStyle: 'italic',
+              }}
+            >
+              {t('FORM.SELECT_STATE_DISTRICT_BLOCK_FIRST', { defaultValue: 'Please first select State, District, and Block in organization register.' })}
+            </Typography>
+          );
+        }
+        return null;
+      })()}
 
       {/* PTM Email TextField - Full Width on Next Line */}
       <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -863,7 +1075,12 @@ const PTMNameWidget = ({
         fullWidth
         required={required}
         error={rawErrors.length > 0}
-        disabled={disabled || readonly}
+        disabled={disabled || readonly || (isOrganizationRegister && (() => {
+          const tempState = typeof window !== 'undefined' ? localStorage.getItem('temp_State') : '';
+          const tempDistrict = typeof window !== 'undefined' ? localStorage.getItem('temp_District') : '';
+          const tempBlock = typeof window !== 'undefined' ? localStorage.getItem('temp_Block') : '';
+          return !tempState || !tempDistrict || !tempBlock;
+        })())}
       >
         <FormLabel
           sx={{
@@ -1028,7 +1245,9 @@ const PTMNameWidget = ({
                     color="text.secondary"
                     sx={{ p: 2, textAlign: 'center' }}
                   >
-                    {t('FORM.NO_USER_DATA_FOUND', { defaultValue: 'No user data found' })}
+                    {error === 'MISSING_LOCATION_DATA'
+                      ? t('FORM.SELECT_STATE_DISTRICT_BLOCK_FIRST', { defaultValue: 'Please first select State, District, and Block in organization register.' })
+                      : t('FORM.NO_USER_DATA_FOUND', { defaultValue: 'No user data found' })}
                   </Typography>
                 )}
 
