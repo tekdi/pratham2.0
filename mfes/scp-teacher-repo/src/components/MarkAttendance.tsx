@@ -21,9 +21,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 // import RemoveCircleIcon from '@mui/icons-material/RemoveCircle'; //Half-Day
 // import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import { MarkAttendanceParams, MarkAttendanceProps } from '../utils/Interfaces';
+import { BulkAttendanceParams, MarkAttendanceProps } from '../utils/Interfaces';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
-import { markAttendance } from '@/services/AttendanceService';
+import { bulkAttendanceV2 } from '@/services/AttendanceService';
 
 interface State extends SnackbarOrigin {
   openModal: boolean;
@@ -91,15 +91,13 @@ const MarkAttendance: React.FC<MarkAttendanceProps> = ({
             : '') || localStorage.getItem('classId');
 
       if (contextId && learnerId) {
-        const markAttendanceRequest: MarkAttendanceParams = {
-          userId: learnerId,
+        const markAttendanceRequest: BulkAttendanceParams = {
           attendanceDate: date,
           contextId,
-          attendance: updatedStatus,
-          ...(isEventContext && { context: 'event' as const }),
+          userAttendance: [{ userId: learnerId, attendance: updatedStatus }],
+          context: isEventContext ? 'event' : 'cohort',
         };
-        const response = await markAttendance(markAttendanceRequest);
-        setUpdatedStatus(response?.data?.attendance);
+        await bulkAttendanceV2(markAttendanceRequest);
         onAttendanceUpdate();
         handleClick({ vertical: 'bottom', horizontal: 'center' })();
       }
