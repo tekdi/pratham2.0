@@ -756,18 +756,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       default:
         return [
           {
-            label: t('PTM_DASHBOARD.VIEW_DETAILS'),
-            onClick: (row: RowData) => {
-              console.log('View details for:', row);
-            },
-          },
-          {
-            label: t('PTM_DASHBOARD.EDIT'),
-            onClick: (row: RowData) => {
-              console.log('Edit:', row);
-            },
-          },
-          {
             label: t('PTM_DASHBOARD.APPROVE'),
             onClick: (row: RowData) => {
               console.log('Approve:', row);
@@ -780,7 +768,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             },
             color: 'success' as const,
             disabled: (row: RowData) => approvingUsers.includes(row.id),
-            // disabled: (row: RowData) => approvingUsers.includes(row.id) || row.status === 'Approved' || row.status === 'Rejected', // Also disable for approved/rejected items
           },
           {
             label: t('PTM_DASHBOARD.REJECT'),
@@ -794,7 +781,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
               });
             },
             color: 'error' as const,
-            // disabled: (row: RowData) => row.status === 'Approved' || row.status === 'Rejected', // Disable for approved/rejected items
           },
         ];
     }
@@ -1132,8 +1118,8 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                 size="small"
                 startIcon={<CheckIcon />}
                 onClick={handleApproveAll}
-                disabled={selectedRows.some(row => approvingUsers.includes(row.id))}
-                // disabled={selectedRows.some(row => approvingUsers.includes(row.id) || row.status === 'Approved' || row.status === 'Rejected')} // Also disable when approved/rejected items are selected
+                // disabled={selectedRows.some(row => approvingUsers.includes(row.id))}
+                disabled={selectedRows.some(row => approvingUsers.includes(row.id) || row.status === 'Approved' || row.status === 'Rejected')} // Also disable when approved/rejected items are selected
                 sx={{
                   backgroundColor: '#00c851',
                   color: 'white',
@@ -1162,7 +1148,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                 size="small"
                 startIcon={<CloseIcon />}
                 onClick={handleRejectAll}
-                // disabled={selectedRows.some(row => row.status === 'Approved' || row.status === 'Rejected')} // Disable when approved/rejected items are selected
+                disabled={selectedRows.some(row => row.status === 'Approved' || row.status === 'Rejected')} // Disable when approved/rejected items are selected
                 sx={{
                   borderColor: '#ff4444',
                   color: '#ff4444',
@@ -1219,7 +1205,10 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         aria-labelledby="approve-dialog-title"
         aria-describedby="approve-dialog-description"
       >
-        <DialogTitle id="approve-dialog-title">
+        <DialogTitle 
+          id="approve-dialog-title"
+          sx={{ fontSize: '1.5rem', fontWeight: 600 }}
+        >
           {approveDialog.isBulk ? t('PTM_DASHBOARD.CONFIRM_BULK_APPROVAL') : t('PTM_DASHBOARD.CONFIRM_APPROVAL')}
         </DialogTitle>
         <DialogContent>
@@ -1271,7 +1260,10 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         aria-labelledby="reject-dialog-title"
         aria-describedby="reject-dialog-description"
       >
-        <DialogTitle id="reject-dialog-title">
+        <DialogTitle 
+          id="reject-dialog-title"
+          sx={{ fontSize: '1.5rem', fontWeight: 600 }}
+        >
           {rejectDialog.isBulk ? t('PTM_DASHBOARD.CONFIRM_BULK_REJECTION') : t('PTM_DASHBOARD.CONFIRM_REJECTION')}
         </DialogTitle>
         <DialogContent>

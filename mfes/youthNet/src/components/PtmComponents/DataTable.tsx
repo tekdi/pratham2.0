@@ -35,6 +35,7 @@ interface ActionItem {
   label: string;
   onClick: (row: RowData) => void;
   color?: 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  disabled?: (row: RowData) => boolean;
 }
 
 interface DataTableProps {
@@ -97,10 +98,17 @@ const DataTable: React.FC<DataTableProps> = ({
   }, [controlledSelectedRows]);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Only select/deselect pending rows
+    const pendingRows = rows.filter(row => {
+      const status = row.status?.toLowerCase() || '';
+      const pendingStatuses = ['pending', 'pending review'];
+      return pendingStatuses.some(pending => status.includes(pending));
+    });
+    
     if (event.target.checked) {
-      const newSelected = rows.map((row) => row.id);
+      const newSelected = pendingRows.map((row) => row.id);
       setSelected(newSelected);
-      onRowSelect?.(rows);
+      onRowSelect?.(pendingRows);
     } else {
       setSelected([]);
       onRowSelect?.([]);
@@ -146,6 +154,17 @@ const DataTable: React.FC<DataTableProps> = ({
     }
     handleActionsClose();
   };
+
+  // Get current row for menu
+  const currentRow = menuRowId ? rows.find(r => r.id === menuRowId) : null;
+  // Filter actions to only show when status is "Pending" (case-insensitive check)
+  const filteredActions = currentRow 
+    ? actions.filter(action => {
+        const status = currentRow.status?.toLowerCase() || '';
+        const pendingStatuses = ['pending', 'pending review'];
+        return pendingStatuses.some(pending => status.includes(pending));
+      })
+    : [];
 
   const isSelected = (id: string) => selected.indexOf(id) !== -1;
 
@@ -265,21 +284,56 @@ const DataTable: React.FC<DataTableProps> = ({
         <Table stickyHeader aria-label="data table">
           <TableHead>
             <TableRow>
-              {showCheckbox && (
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    indeterminate={selected.length > 0 && selected.length < rows.length}
-                    checked={rows.length > 0 && selected.length === rows.length}
-                    onChange={handleSelectAllClick}
-                    sx={{
-                      '&.Mui-checked': {
-                        color: 'primary.main',
-                      },
-                    }}
-                  />
-                </TableCell>
-              )}
+              {showCheckbox && (() => {
+                // Only show header checkbox when there are pending rows
+                const pendingRows = rows.filter(row => {
+                  const status = row.status?.toLowerCase() || '';
+                  const pendingStatuses = ['pending', 'pending review'];
+                  return pendingStatuses.some(pending => status.includes(pending));
+                });
+                
+                return pendingRows.length > 0 ? (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      color="primary"
+                      indeterminate={
+                        (() => {
+                          // Only count pending rows for select all
+                          const pendingSelected = selected.filter(id => {
+                            const row = rows.find(r => r.id === id);
+                            if (!row) return false;
+                            const status = row.status?.toLowerCase() || '';
+                            const pendingStatuses = ['pending', 'pending review'];
+                            return pendingStatuses.some(pending => status.includes(pending));
+                          });
+                          return pendingRows.length > 0 && pendingSelected.length > 0 && pendingSelected.length < pendingRows.length;
+                        })()
+                      }
+                      checked={
+                        (() => {
+                          // Only count pending rows for select all
+                          const pendingSelected = selected.filter(id => {
+                            const row = rows.find(r => r.id === id);
+                            if (!row) return false;
+                            const status = row.status?.toLowerCase() || '';
+                            const pendingStatuses = ['pending', 'pending review'];
+                            return pendingStatuses.some(pending => status.includes(pending));
+                          });
+                          return pendingRows.length > 0 && pendingSelected.length === pendingRows.length;
+                        })()
+                      }
+                      onChange={handleSelectAllClick}
+                      sx={{
+                        '&.Mui-checked': {
+                          color: 'primary.main',
+                        },
+                      }}
+                    />
+                  </TableCell>
+                ) : (
+                  <TableCell padding="checkbox"></TableCell>
+                );
+              })()}
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
@@ -312,6 +366,11 @@ const DataTable: React.FC<DataTableProps> = ({
           <TableBody>
             {rows.map((row) => {
               const isItemSelected = isSelected(row.id);
+              // Only show checkbox when status is "Pending"
+              const status = row.status?.toLowerCase() || '';
+              const pendingStatuses = ['pending', 'pending review'];
+              const isPending = pendingStatuses.some(pending => status.includes(pending));
+              const showRowCheckbox = showCheckbox && isPending;
               
               return (
                 <TableRow
@@ -322,14 +381,14 @@ const DataTable: React.FC<DataTableProps> = ({
                   key={row.id}
                   selected={isItemSelected}
                   sx={{
-                    cursor: showCheckbox ? 'pointer' : 'default',
+                    cursor: showRowCheckbox ? 'pointer' : 'default',
                     '&:hover': {
                       backgroundColor: '#f8f9fa',
                     },
                   }}
-                  onClick={showCheckbox ? () => handleRowClick(row.id) : undefined}
+                  onClick={showRowCheckbox ? () => handleRowClick(row.id) : undefined}
                 >
-                  {showCheckbox && (
+                  {showRowCheckbox && (
                     <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
@@ -342,29 +401,41 @@ const DataTable: React.FC<DataTableProps> = ({
                       />
                     </TableCell>
                   )}
+                  {!showRowCheckbox && showCheckbox && (
+                    <TableCell padding="checkbox"></TableCell>
+                  )}
                   {columns.map((column) => (
                     <TableCell key={column.id} align={column.align}>
                       {formatCellValue(column, row[column.id])}
                     </TableCell>
                   ))}
-                  {showActions && (
-                    <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleActionsClick(event, row.id);
-                        }}
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: 'primary.light',
-                          },
-                        }}
-                      >
-                        <MoreVertIcon />
-                      </IconButton>
-                    </TableCell>
-                  )}
+                  {showActions && (() => {
+                    // Only show action icon when status is "Pending"
+                    const status = row.status?.toLowerCase() || '';
+                    const pendingStatuses = ['pending', 'pending review'];
+                    const isPending = pendingStatuses.some(pending => status.includes(pending));
+                    
+                    return isPending ? (
+                      <TableCell align="center">
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleActionsClick(event, row.id);
+                          }}
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: 'primary.light',
+                            },
+                          }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </TableCell>
+                    ) : (
+                      <TableCell align="center"></TableCell>
+                    );
+                  })()}
                 </TableRow>
               );
             })}
@@ -380,10 +451,11 @@ const DataTable: React.FC<DataTableProps> = ({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {actions.map((action, index) => (
+        {filteredActions.map((action, index) => (
           <MenuItem 
             key={index} 
             onClick={() => handleActionClick(action)}
+            disabled={action.disabled && currentRow ? action.disabled(currentRow) : false}
             sx={{
               color: action.color === 'error' ? 'error.main' : 'inherit',
               '&:hover': {
