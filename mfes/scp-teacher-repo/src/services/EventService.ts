@@ -10,6 +10,7 @@ export interface EventListApiEvent {
   startDateTime: string;
   endDateTime: string;
   title?: string;
+  shortDescription?: string;
   eventType?: string;
   attendees?: string[];
   onlineDetails?: {
@@ -33,7 +34,7 @@ export interface DaySessionFromApi {
 function formatTime(isoDateTime: string): string {
   try {
     const date = parseISO(isoDateTime);
-    return format(date, 'HH:mm');
+    return format(date, 'hh:mm aaa');
   } catch {
     return '--:--';
   }
@@ -50,7 +51,7 @@ export function mapEventToDaySession(ev: EventListApiEvent): DaySessionFromApi {
   return {
     id: ev.eventRepetitionId,
     eventRepetitionId: ev.eventRepetitionId,
-    name: ev.title ?? 'Session',
+    name: ev.shortDescription ?? ev.title ?? 'Session',
     startTime: formatTime(ev.startDateTime),
     endTime: formatTime(ev.endDateTime),
     type,

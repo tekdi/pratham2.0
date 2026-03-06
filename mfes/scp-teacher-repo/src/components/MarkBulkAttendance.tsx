@@ -1,4 +1,4 @@
-import { bulkAttendance } from '@/services/AttendanceService';
+import { bulkAttendanceV2 } from '@/services/AttendanceService';
 import { Box, Button, Divider, Fade, Modal, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import {
@@ -169,15 +169,42 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
     setIsAllAttendanceMarked(allMarked);
   }, [open, memberList, presentCount, absentCount, bulkStatus]);
 
+  const isSelectedDateToday = (date: Date): boolean => {
+    const today = new Date();
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  };
+
   const handleSave = () => {
     onClose();
-    const userAttendance = cohortMemberList?.map((user: any) => {
-      return {
-        userId: user.userId,
-        attendance: user.attendance,
-      };
-    });
-    if (userAttendance) {
+
+    const isToday = isSelectedDateToday(selectedDate);
+
+    // For past dates, send only entries whose attendance changed from the original.
+    // For today, send all entries.
+    const originalAttendanceMap = new Map(
+      (memberList as any[]).map((user: any) => [user.userId, user.attendance])
+    );
+
+    const userAttendance = isToday
+      ? cohortMemberList?.map((user: any) => ({
+          userId: user.userId,
+          attendance: user.attendance,
+        }))
+      : cohortMemberList
+          ?.filter(
+            (user: any) =>
+              user.attendance !== originalAttendanceMap.get(user.userId)
+          )
+          .map((user: any) => ({
+            userId: user.userId,
+            attendance: user.attendance,
+          }));
+
+    if (userAttendance && userAttendance.length > 0) {
       const date = shortDateFormat(selectedDate);
       const isSessionLevel = Boolean(selectedSession?.eventRepetitionId);
       const data = {
@@ -189,7 +216,7 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
       const markBulkAttendance = async () => {
         setLoading(true);
         try {
-          const response = await bulkAttendance(data);
+          const response = await bulkAttendanceV2(data);
           const resp = response?.responses;
 
           if (resp) {

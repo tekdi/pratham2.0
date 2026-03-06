@@ -41,7 +41,8 @@ const LearnerAttendanceHistory = () => {
   const { t } = useTranslation();
   const { isRTL } = useDirection();
   const theme = useTheme<any>();
-  const { push } = useRouter();
+  const { push, query, isReady } = useRouter();
+  const [learnerName, setLearnerName] = useState('');
   const store = useStore();
   const isActiveYear = store.isActiveYearSelected;
   const userCohorts = store.cohorts;
@@ -62,17 +63,19 @@ const LearnerAttendanceHistory = () => {
   const [extractedAttendanceDates, setExtractedAttendanceDates] = useState([]);
 
   useEffect(() => {
+    if (isReady && query?.userName) {
+      setLearnerName(query.userName as string);
+    }
+  }, [isReady, query?.userName]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const token = localStorage.getItem('token');
       setLoading(false);
-      if (token) {
-        if (isActiveYear) {
-          push('/learner-attendance-history');
-        } else {
-          push('/centers');
-        }
-      } else {
+      if (!token) {
         push('/login', undefined, { locale: 'en' });
+      } else if (!isActiveYear) {
+        push('/centers');
       }
     }
   }, []);
@@ -287,13 +290,23 @@ const LearnerAttendanceHistory = () => {
                 </Box>
               </Box>
 
-              <Typography
-                marginBottom={'0px'}
-                fontSize={'22px'}
-                color={theme.palette.warning['A200']}
-              >
-                {t('ATTENDANCE.DAY_WISE_ATTENDANCE')}
-              </Typography>
+              <Box display={'flex'} flexDirection={'column'} alignItems={'flex-start'}>
+                <Typography
+                  marginBottom={'0px'}
+                  fontSize={'22px'}
+                  color={theme.palette.warning['A200']}
+                >
+                  {t('ATTENDANCE.DAY_WISE_ATTENDANCE')}
+                </Typography>
+                {learnerName && (
+                  <Typography
+                    fontSize={'14px'}
+                    color={theme.palette.warning['A200']}
+                  >
+                    {learnerName}
+                  </Typography>
+                )}
+              </Box>
             </Box>
           </Box>
         </Box>
