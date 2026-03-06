@@ -1,0 +1,987 @@
+in this case district is depend on state, block is depend on district and village is depend on block by below apis
+curl 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-GB,en-US;q=0.9,en;q=0.8,ur;q=0.7' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://dev-lap.prathamdigital.org' \
+  -H 'Referer: https://dev-lap.prathamdigital.org/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw '{"fieldName":"state","sort":["state_name","asc"]}'
+
+
+
+curl 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-GB,en;q=0.9' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://dev-lap.prathamdigital.org' \
+  -H 'Referer: https://dev-lap.prathamdigital.org/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw '{"fieldName":"district","controllingfieldfk":["35"],"sort":["district_name","asc"]}'
+
+curl 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-GB,en;q=0.9' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://dev-lap.prathamdigital.org' \
+  -H 'Referer: https://dev-lap.prathamdigital.org/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw '{"fieldName":"block","controllingfieldfk":["638"],"sort":["block_name","asc"]}'
+
+
+curl 'https://dev-interface.prathamdigital.org/interface/v1/fields/options/read' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-GB,en;q=0.9' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://dev-lap.prathamdigital.org' \
+  -H 'Referer: https://dev-lap.prathamdigital.org/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  --data-raw '{"fieldName":"village","controllingfieldfk":["1427"],"sort":["village_name","asc"]}'
+
+
+
+
+sample result is like this for stae values:
+
+
+{
+    "id": "api.fieldValues.search",
+    "ver": "1.0",
+    "ts": "2026-02-26T08:01:53.370Z",
+    "params": {
+        "resmsgid": "ba6fae50-8013-4170-a026-31a749205add",
+        "status": "successful",
+        "err": null,
+        "errmsg": null,
+        "successmessage": "Field options fetched successfully."
+    },
+    "responseCode": 200,
+    "result": {
+        "totalCount": 41,
+        "fieldId": "6469c3ac-8c46-49d7-852a-00f9589737c5",
+        "values": [
+            {
+                "value": 35,
+                "label": "Andaman And Nicobar Islands",
+                "state_id": 35,
+                "state_name": "Andaman And Nicobar Islands",
+                "state_code": "AN",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 28,
+                "label": "Andhra Pradesh",
+                "state_id": 28,
+                "state_name": "Andhra Pradesh",
+                "state_code": "AP",
+                "state_id_pc": 1,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 12,
+                "label": "Arunachal Pradesh",
+                "state_id": 12,
+                "state_name": "Arunachal Pradesh",
+                "state_code": "AR",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 18,
+                "label": "Assam",
+                "state_id": 18,
+                "state_name": "Assam",
+                "state_code": "AS",
+                "state_id_pc": 2,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 10,
+                "label": "Bihar",
+                "state_id": 10,
+                "state_name": "Bihar",
+                "state_code": "BH",
+                "state_id_pc": 3,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 4,
+                "label": "Chandigarh",
+                "state_id": 4,
+                "state_name": "Chandigarh",
+                "state_code": "CH",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 22,
+                "label": "Chhattisgarh",
+                "state_id": 22,
+                "state_name": "Chhattisgarh",
+                "state_code": "CG",
+                "state_id_pc": 4,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 26,
+                "label": "Dadra And Nagar Haveli And Daman And Diu",
+                "state_id": 26,
+                "state_name": "Dadra And Nagar Haveli And Daman And Diu",
+                "state_code": "DH",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 25,
+                "label": "Daman & Diu",
+                "state_id": 25,
+                "state_name": "Daman & Diu",
+                "state_code": "DD",
+                "state_id_pc": 6,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 7,
+                "label": "Delhi",
+                "state_id": 7,
+                "state_name": "Delhi",
+                "state_code": "DL",
+                "state_id_pc": 7,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 123,
+                "label": "Example State",
+                "state_id": 123,
+                "state_name": "Example State",
+                "state_code": "ES",
+                "state_id_pc": 456,
+                "state_id_finance": "FIN123",
+                "is_found_in_census": 1,
+                "created_at": "2025-09-23T15:43:52.531Z",
+                "updated_at": "2025-09-23T15:43:52.531Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 1234,
+                "label": "Example State1",
+                "state_id": 1234,
+                "state_name": "Example State1",
+                "state_code": "ES",
+                "state_id_pc": 456,
+                "state_id_finance": "FIN1234",
+                "is_found_in_census": 1,
+                "created_at": "2025-09-23T15:45:25.203Z",
+                "updated_at": "2025-09-23T15:45:25.203Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 12345,
+                "label": "Example State123",
+                "state_id": 12345,
+                "state_name": "Example State123",
+                "state_code": "ES",
+                "state_id_pc": 456,
+                "state_id_finance": "FIN1234",
+                "is_found_in_census": 1,
+                "created_at": "2025-09-23T15:48:12.021Z",
+                "updated_at": "2025-09-23T15:48:12.021Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 30,
+                "label": "Goa",
+                "state_id": 30,
+                "state_name": "Goa",
+                "state_code": "GA",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 24,
+                "label": "Gujarat",
+                "state_id": 24,
+                "state_name": "Gujarat",
+                "state_code": "GJ",
+                "state_id_pc": 8,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 6,
+                "label": "Haryana",
+                "state_id": 6,
+                "state_name": "Haryana",
+                "state_code": "HR",
+                "state_id_pc": 9,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 2,
+                "label": "Himachal Pradesh",
+                "state_id": 2,
+                "state_name": "Himachal Pradesh",
+                "state_code": "HP",
+                "state_id_pc": 10,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 20,
+                "label": "Jharkhand",
+                "state_id": 20,
+                "state_name": "Jharkhand",
+                "state_code": "JH",
+                "state_id_pc": 22,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 29,
+                "label": "Karnataka",
+                "state_id": 29,
+                "state_name": "Karnataka",
+                "state_code": "KR",
+                "state_id_pc": 11,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 32,
+                "label": "Kerala",
+                "state_id": 32,
+                "state_name": "Kerala",
+                "state_code": "KL",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 37,
+                "label": "Ladakh",
+                "state_id": 37,
+                "state_name": "Ladakh",
+                "state_code": "LA",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 0,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 31,
+                "label": "Lakshadweep",
+                "state_id": 31,
+                "state_name": "Lakshadweep",
+                "state_code": "LD",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 23,
+                "label": "Madhya Pradesh",
+                "state_id": 23,
+                "state_name": "Madhya Pradesh",
+                "state_code": "MP",
+                "state_id_pc": 12,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 27,
+                "label": "Maharashtra",
+                "state_id": 27,
+                "state_name": "Maharashtra",
+                "state_code": "MH",
+                "state_id_pc": 13,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 14,
+                "label": "Manipur",
+                "state_id": 14,
+                "state_name": "Manipur",
+                "state_code": "MN",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 17,
+                "label": "Meghalaya",
+                "state_id": 17,
+                "state_name": "Meghalaya",
+                "state_code": "ML",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 15,
+                "label": "Mizoram",
+                "state_id": 15,
+                "state_name": "Mizoram",
+                "state_code": "MZ",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 13,
+                "label": "Nagaland",
+                "state_id": 13,
+                "state_name": "Nagaland",
+                "state_code": "NL",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 21,
+                "label": "Odisha",
+                "state_id": 21,
+                "state_name": "Odisha",
+                "state_code": "OD",
+                "state_id_pc": 14,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 34,
+                "label": "Puducherry",
+                "state_id": 34,
+                "state_name": "Puducherry",
+                "state_code": "PY",
+                "state_id_pc": 24,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 3,
+                "label": "Punjab",
+                "state_id": 3,
+                "state_name": "Punjab",
+                "state_code": "PB",
+                "state_id_pc": 15,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 8,
+                "label": "Rajasthan",
+                "state_id": 8,
+                "state_name": "Rajasthan",
+                "state_code": "RJ",
+                "state_id_pc": 16,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 11,
+                "label": "Sikkim",
+                "state_id": 11,
+                "state_name": "Sikkim",
+                "state_code": "SK",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 33,
+                "label": "Tamil Nadu",
+                "state_id": 33,
+                "state_name": "Tamil Nadu",
+                "state_code": "TN",
+                "state_id_pc": 17,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 36,
+                "label": "Telangana",
+                "state_id": 36,
+                "state_name": "Telangana",
+                "state_code": "TL",
+                "state_id_pc": 18,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 1,
+                "label": "Test State",
+                "state_id": 1,
+                "state_name": "Test State",
+                "state_code": "TS",
+                "state_id_pc": 101,
+                "state_id_finance": "WB2234",
+                "is_found_in_census": 1,
+                "created_at": "2025-12-29T18:48:12.078Z",
+                "updated_at": "2025-12-29T18:48:12.078Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 16,
+                "label": "Tripura",
+                "state_id": 16,
+                "state_name": "Tripura",
+                "state_code": "TR",
+                "state_id_pc": null,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 5,
+                "label": "Uttarakhand",
+                "state_id": 5,
+                "state_name": "Uttarakhand",
+                "state_code": "UK",
+                "state_id_pc": 20,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 9,
+                "label": "Uttar Pradesh",
+                "state_id": 9,
+                "state_name": "Uttar Pradesh",
+                "state_code": "UP",
+                "state_id_pc": 19,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 19,
+                "label": "West Bengal",
+                "state_id": 19,
+                "state_name": "West Bengal",
+                "state_code": "WB",
+                "state_id_pc": 21,
+                "state_id_finance": null,
+                "is_found_in_census": 1,
+                "created_at": "2025-03-10T05:21:48.000Z",
+                "updated_at": "2025-03-10T05:21:48.000Z",
+                "is_active": 1,
+                "total_count": "41"
+            },
+            {
+                "value": 500,
+                "label": "West Bengal2234",
+                "state_id": 500,
+                "state_name": "West Bengal2234",
+                "state_code": "Wx",
+                "state_id_pc": 101,
+                "state_id_finance": "WB2234",
+                "is_found_in_census": 1,
+                "created_at": "2025-09-18T12:26:30.696Z",
+                "updated_at": "2025-09-18T12:26:30.696Z",
+                "is_active": 1,
+                "total_count": "41"
+            }
+        ]
+    }
+}
+
+
+Then again if state district village block is not slected then oraganization value should be fetch by below api
+curl --location 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search' \
+--header 'Accept: */*' \
+--header 'Accept-Language: en-GB,en;q=0.9' \
+--header 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPc3NtSUhXaW1NMDN2MUxsVnFvNHBqaS0ydEMwTGhLY0o5dmtwQTlJZV9zIn0.eyJleHAiOjE3NzIxNzkxNjAsImlhdCI6MTc3MjA5Mjc2MCwianRpIjoiNDkzYThmNDktZTY3OS00NTQ3LWEyODktYjUzMWUxNDdlYWIzIiwiaXNzIjoiaHR0cHM6Ly9kZXYtbG1wLnByYXRoYW1kaWdpdGFsLm9yZy9hdXRoL3JlYWxtcy9wcmF0aGFtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImJmNWNhYjUxLTY0ZDAtNDA2Zi1hMDYyLTQyOWM4YTAyODBjYSIsInR5cCI6IkJlYXJlciIsImF6cCI6InByYXRoYW0iLCJzZXNzaW9uX3N0YXRlIjoiMTBhMGQ0M2ItMTAxMC00Nzg0LWFmYTYtODNmYzg1NzUxM2E4IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtcHJhdGhhbSJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoiZW1haWwgcHJvZmlsZSBwcmF0aGFtLXJvbGUiLCJzaWQiOiIxMGEwZDQzYi0xMDEwLTQ3ODQtYWZhNi04M2ZjODU3NTEzYTgiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJDZW50cmFsIExlYWQgU0NQIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2NwLWNlbnRyYWwtbGVhZCIsInVzZXJfcm9sZXMiOiJDZW50cmFsIExlYWQiLCJnaXZlbl9uYW1lIjoiQ2VudHJhbCBMZWFkIiwiZmFtaWx5X25hbWUiOiJTQ1AiLCJlbWFpbCI6InNjcF9jbEB5b3BtYWlsLmNvbSJ9.hFHbQiYn1n3lVwYWPyhVF1Ez4vB0FuVqr7ftf-RP2Wuya-tEXHsE-AmdW6J-ivc4iPBLpnAWw8zN2E39VESkMh2vliWOReL-CQlXgBfozlmbNDGDVtjXLl2rD3MFQwvP2l3hYoc7gwhFT8yZpDX4XOXYKao9NOQsv0z3b3Beb7u5_R6ZqBGCzxBItErh2wN9CZN_p8ZpTooIkj98YqlQfesFc41Xmyx2UEHpeeqQTpnBuwCs1mO8vnaOS5z72Rf8ecmi2PHfnSxKWcK2PZeFLyPmKJyBTxLi2S8xjtIEFH8mCaHM08nugdAiGyFK2tUAvAxQ-f5lkPV4TADgWt-PVw' \
+--header 'Connection: keep-alive' \
+--header 'Content-Type: application/json' \
+--header 'Origin: https://dev-lap.prathamdigital.org' \
+--header 'Referer: https://dev-lap.prathamdigital.org/' \
+--header 'Sec-Fetch-Dest: empty' \
+--header 'Sec-Fetch-Mode: cors' \
+--header 'Sec-Fetch-Site: same-site' \
+--header 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+--header 'academicyearid: 9a9e0daa-50dd-4d0e-8d10-36e7bc808f88' \
+--header 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+--header 'sec-ch-ua-mobile: ?0' \
+--header 'sec-ch-ua-platform: "Linux"' \
+--header 'tenantId: ef99949b-7f3a-4a5f-806a-e67e683e38f3' \
+--data '{
+    "limit": 200,
+    "offset": 0,
+    "filters": {
+        "type": "COHORT",
+        "status": [
+            "active"
+        ]
+       
+    }
+}'
+
+
+Getting result like below:
+{
+    "id": "api.cohort.list",
+    "ver": "1.0",
+    "ts": "2026-02-26T07:58:51.203Z",
+    "params": {
+        "resmsgid": "c26585d7-0c6e-40ec-8a28-1a7f9dcae382",
+        "status": "successful",
+        "err": null,
+        "errmsg": null,
+        "successmessage": "Cohort details fetched successfully"
+    },
+    "responseCode": 200,
+    "result": {
+        "count": 1,
+        "results": {
+            "cohortDetails": [
+                  {
+                    "cohortId": "cbec3f92-383b-42ce-84d7-def05dc3c071",
+                    "parentId": null,
+                    "name": "aa10",
+                    "type": "COHORT",
+                    "status": "active",
+                    "image": null,
+                    "referenceId": null,
+                    "metadata": null,
+                    "tenantId": "ef99949b-7f3a-4a5f-806a-e67e683e38f3",
+                    "programId": null,
+                    "attendanceCaptureImage": false,
+                    "createdAt": "2025-10-16T13:35:58.247Z",
+                    "updatedAt": "2025-10-16T13:35:58.247Z",
+                    "createdBy": "3546647a-1da1-4fb6-b040-cffa8cee6466",
+                    "updatedBy": "3546647a-1da1-4fb6-b040-cffa8cee6466",
+                    "customFields": [
+                        {
+                            "fieldId": "000a7469-2721-4c7b-8180-52812a0f6fe7",
+                            "label": "TYPE_OF_CENTER",
+                            "type": "radio",
+                            "selectedValues": [
+                                {
+                                    "id": "regular",
+                                    "value": "regular",
+                                    "label": "REGULAR",
+                                    "order": "0"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "4aab68ae-8382-43aa-a45a-e9b239319857",
+                            "label": "BLOCK",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 1427,
+                                    "value": "Campbell Bay"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "5a2dbb89-bbe6-4aa8-b541-93e01ab07b70",
+                            "label": "GRADE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Grade 10"
+                            ]
+                        },
+                        {
+                            "fieldId": "6469c3ac-8c46-49d7-852a-00f9589737c5",
+                            "label": "STATE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 35,
+                                    "value": "Andaman And Nicobar Islands"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "7b214a17-5a07-4ee0-bedc-271429862d30",
+                            "label": "MEDIUM",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Telugu"
+                            ]
+                        },
+                        {
+                            "fieldId": "8e9bb321-ff99-4e2e-9269-61e863dd0c54",
+                            "label": "VILLAGE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 639471,
+                                    "value": "Afra Bay"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "b61edfc6-3787-4079-86d3-37262bf23a9e",
+                            "label": "DISTRICT",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 638,
+                                    "value": "Nicobars"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "dfe6ea54-de89-473a-9319-c7e01b16d2ad",
+                            "label": "ADDRESS",
+                            "type": "text",
+                            "selectedValues": [
+                                "ssss"
+                            ]
+                        },
+                        {
+                            "fieldId": "e9f8acbb-b10d-4b46-9584-f5ec453c250e",
+                            "label": "GOOGLE_MAP_LINK",
+                            "type": "text",
+                            "selectedValues": [
+                                ""
+                            ]
+                        },
+                        {
+                            "fieldId": "f93c0ac3-f827-4794-9457-441fa1057b42",
+                            "label": "BOARD",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Andhra Pradesh Open School Society"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "cohortId": "d32a4ad9-90b0-4ef9-8e2f-b498a8e9e39b",
+                    "parentId": null,
+                    "name": "aa11",
+                    "type": "COHORT",
+                    "status": "active",
+                    "image": null,
+                    "referenceId": null,
+                    "metadata": null,
+                    "tenantId": "ef99949b-7f3a-4a5f-806a-e67e683e38f3",
+                    "programId": null,
+                    "attendanceCaptureImage": false,
+                    "createdAt": "2025-10-16T13:37:22.061Z",
+                    "updatedAt": "2025-10-16T13:37:22.061Z",
+                    "createdBy": "3546647a-1da1-4fb6-b040-cffa8cee6466",
+                    "updatedBy": "3546647a-1da1-4fb6-b040-cffa8cee6466",
+                    "customFields": [
+                        {
+                            "fieldId": "000a7469-2721-4c7b-8180-52812a0f6fe7",
+                            "label": "TYPE_OF_CENTER",
+                            "type": "radio",
+                            "selectedValues": [
+                                {
+                                    "id": "regular",
+                                    "value": "regular",
+                                    "label": "REGULAR",
+                                    "order": "0"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "4aab68ae-8382-43aa-a45a-e9b239319857",
+                            "label": "BLOCK",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 1427,
+                                    "value": "Campbell Bay"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "5a2dbb89-bbe6-4aa8-b541-93e01ab07b70",
+                            "label": "GRADE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Grade 10"
+                            ]
+                        },
+                        {
+                            "fieldId": "6469c3ac-8c46-49d7-852a-00f9589737c5",
+                            "label": "STATE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 35,
+                                    "value": "Andaman And Nicobar Islands"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "7b214a17-5a07-4ee0-bedc-271429862d30",
+                            "label": "MEDIUM",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Telugu"
+                            ]
+                        },
+                        {
+                            "fieldId": "8e9bb321-ff99-4e2e-9269-61e863dd0c54",
+                            "label": "VILLAGE",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 639471,
+                                    "value": "Afra Bay"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "b61edfc6-3787-4079-86d3-37262bf23a9e",
+                            "label": "DISTRICT",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                {
+                                    "id": 638,
+                                    "value": "Nicobars"
+                                }
+                            ]
+                        },
+                        {
+                            "fieldId": "dfe6ea54-de89-473a-9319-c7e01b16d2ad",
+                            "label": "ADDRESS",
+                            "type": "text",
+                            "selectedValues": [
+                                "ssss"
+                            ]
+                        },
+                        {
+                            "fieldId": "e9f8acbb-b10d-4b46-9584-f5ec453c250e",
+                            "label": "GOOGLE_MAP_LINK",
+                            "type": "text",
+                            "selectedValues": [
+                                ""
+                            ]
+                        },
+                        {
+                            "fieldId": "f93c0ac3-f827-4794-9457-441fa1057b42",
+                            "label": "BOARD",
+                            "type": "drop_down",
+                            "selectedValues": [
+                                "Andhra Pradesh Open School Society"
+                            ]
+                        }
+                    ]
+                },
+            ]
+        }
+    }
+}
+
+so wanna to add these option with name as lable and cohortid as value
+
+
+and if state or district or block are being slected then add that perticukar filter in api to fetch organization like below
+
+
+curl 'https://dev-interface.prathamdigital.org/interface/v1/cohort/search' \
+  -H 'Accept: application/json, text/plain, */*' \
+  -H 'Accept-Language: en-GB,en;q=0.9' \
+  -H 'Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJPc3NtSUhXaW1NMDN2MUxsVnFvNHBqaS0ydEMwTGhLY0o5dmtwQTlJZV9zIn0.eyJleHAiOjE3NzIxNzkxNjAsImlhdCI6MTc3MjA5Mjc2MCwianRpIjoiNDkzYThmNDktZTY3OS00NTQ3LWEyODktYjUzMWUxNDdlYWIzIiwiaXNzIjoiaHR0cHM6Ly9kZXYtbG1wLnByYXRoYW1kaWdpdGFsLm9yZy9hdXRoL3JlYWxtcy9wcmF0aGFtIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImJmNWNhYjUxLTY0ZDAtNDA2Zi1hMDYyLTQyOWM4YTAyODBjYSIsInR5cCI6IkJlYXJlciIsImF6cCI6InByYXRoYW0iLCJzZXNzaW9uX3N0YXRlIjoiMTBhMGQ0M2ItMTAxMC00Nzg0LWFmYTYtODNmYzg1NzUxM2E4IiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyIvKiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtcHJhdGhhbSJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoiZW1haWwgcHJvZmlsZSBwcmF0aGFtLXJvbGUiLCJzaWQiOiIxMGEwZDQzYi0xMDEwLTQ3ODQtYWZhNi04M2ZjODU3NTEzYTgiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsIm5hbWUiOiJDZW50cmFsIExlYWQgU0NQIiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2NwLWNlbnRyYWwtbGVhZCIsInVzZXJfcm9sZXMiOiJDZW50cmFsIExlYWQiLCJnaXZlbl9uYW1lIjoiQ2VudHJhbCBMZWFkIiwiZmFtaWx5X25hbWUiOiJTQ1AiLCJlbWFpbCI6InNjcF9jbEB5b3BtYWlsLmNvbSJ9.hFHbQiYn1n3lVwYWPyhVF1Ez4vB0FuVqr7ftf-RP2Wuya-tEXHsE-AmdW6J-ivc4iPBLpnAWw8zN2E39VESkMh2vliWOReL-CQlXgBfozlmbNDGDVtjXLl2rD3MFQwvP2l3hYoc7gwhFT8yZpDX4XOXYKao9NOQsv0z3b3Beb7u5_R6ZqBGCzxBItErh2wN9CZN_p8ZpTooIkj98YqlQfesFc41Xmyx2UEHpeeqQTpnBuwCs1mO8vnaOS5z72Rf8ecmi2PHfnSxKWcK2PZeFLyPmKJyBTxLi2S8xjtIEFH8mCaHM08nugdAiGyFK2tUAvAxQ-f5lkPV4TADgWt-PVw' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Type: application/json' \
+  -H 'Origin: https://dev-lap.prathamdigital.org' \
+  -H 'Referer: https://dev-lap.prathamdigital.org/' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-site' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'academicyearid: 9a9e0daa-50dd-4d0e-8d10-36e7bc808f88' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Linux"' \
+  -H 'tenantid: ef99949b-7f3a-4a5f-806a-e67e683e38f3' \
+  --data-raw '{"limit":10,"offset":0,"sort":["name","asc"],"filters":{"type":"COHORT","district":["638"],"state":["35"]}}'
+
+
+according to that if district  block village are being slected then add that perticukar filter in api to fetch organization like below
+
+got it
+
+
+
+
