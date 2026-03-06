@@ -556,6 +556,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               {allVisitedSteps.length > 0 && (
                 <IconButton
                   onClick={() => {
+                    localStorage.removeItem('temp_organization_register');
                     setFormStepsData({ ...formStepsData, [activeStep]: {} });
                     const lastStep = allVisitedSteps[allVisitedSteps.length - 1];
                     setActiveStep(lastStep);
@@ -579,29 +580,36 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
                   setAllVisitedSteps([...allVisitedSteps, activeStep]);
                 }
                 if (activeStep == 'step1') {
+                  localStorage.removeItem('temp_organization_register');
                   setActiveStep('step2');
                 }
                 else if (activeStep == 'step2') {
                   if (formData.how_would_you_like_to_register == 'individual_volunteer') {
+                    localStorage.removeItem('temp_organization_register');
                     setActiveStep('step3_1');
                   }
                   else if (formData.how_would_you_like_to_register == 'register_an_organisation_as_poc') {
+                    localStorage.removeItem('temp_organization_register');
                     setActiveStep('step3_2');
                   }
                 }
                 else if (activeStep == 'step3_1') {
                   if (formData.volunteer_type == 'individual_volunteer') {
+                    localStorage.removeItem('temp_organization_register');
                     setActiveStep('step4_1');
                   }
                   else if (formData.volunteer_type == 'individual_volunteer_through_an_organisation') {
+                    localStorage.removeItem('temp_organization_register');
                     setActiveStep('step4_2');
                   }
                 }
                 else if (activeStep == 'step3_2') {
                   if (formData.organisation_registered == 'this_is_the_first_time_my_organisation_is_registering') {
+                    localStorage.setItem('temp_organization_register', 'yes');
                     setActiveStep('step4_3');
                   }
                   else if (formData.organisation_registered == 'my_organisation_is_already_registered') {
+                    localStorage.removeItem('temp_organization_register');
                     setActiveStep('step4_4');
                   }
                 }

@@ -163,6 +163,7 @@ export enum TenantName {
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
   LEARNING_AND_DEVELOPMENT = 'Learning and Development',
+  SUMMER_CAMP = 'Summer Camp',
 }
 
 export enum FilterKey {

@@ -127,6 +127,7 @@ export const TENANT_DATA = {
   CAMP_TO_CLUB: 'Camp to Club',
   POS : 'Open School',
   PRAGYANPATH :'Pragyanpath',
+  SUMMER_CAMP : 'Summer Camp',
 };
 
 export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';
