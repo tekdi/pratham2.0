@@ -174,7 +174,8 @@ const UserLeader = () => {
         alterUISchema.email['ui:disabled'] = true;
       }
       if (alterUISchema?.mobile) {
-        alterUISchema.mobile['ui:disabled'] = true;
+        //if mobile is not required, then disable it
+        // alterUISchema.mobile['ui:disabled'] = true;
       }
 
       //bug fix for bakcend multiple times same fields in both form
