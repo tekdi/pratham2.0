@@ -1,6 +1,7 @@
 import { modalStyles } from '@/styles/modalStyles';
 import { toPascalCase } from '@/utils/Helper';
 import { SessionsModalProps } from '@/utils/Interfaces';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';
 import CloseIcon from '@mui/icons-material/Close';
 import { Divider } from '@mui/material';
@@ -23,6 +24,7 @@ const CenterSessionModal: React.FC<SessionsModalProps> = ({
   handlePrimaryModel,
   handleEditModal,
   disable = false,
+  handleBack,
 }) => {
   const theme = useTheme<any>();
 
@@ -62,49 +64,62 @@ const CenterSessionModal: React.FC<SessionsModalProps> = ({
         <Box
           display={'flex'}
           justifyContent={'space-between'}
+          alignItems={'center'}
           sx={{ padding: '18px 16px' }}
         >
-          <Box marginBottom={0}>
-            <Typography
-              variant="h2"
-              sx={{
-                color: theme?.palette?.warning['A200'],
-                fontSize: '14px',
-                fontWeight: '500',
-              }}
-              component="h2"
-            >
-              {title}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Typography
-                variant="h2"
+          <Box display={'flex'} alignItems={'center'} gap={'8px'}>
+            {handleBack && (
+              <ArrowBackIcon
+                onClick={handleBack}
                 sx={{
+                  cursor: 'pointer',
                   color: theme?.palette?.warning['A200'],
-                  fontSize: '14px',
-                  fontWeight: '400',
-                }}
-                component="h2"
-              >
-                {toPascalCase(center)}
-              </Typography>
-              <CircleIcon
-                sx={{
-                  fontSize: '6px',
-                  color: theme.palette.secondary.contrastText,
+                  fontSize: '20px',
                 }}
               />
+            )}
+            <Box marginBottom={0}>
               <Typography
                 variant="h2"
                 sx={{
                   color: theme?.palette?.warning['A200'],
                   fontSize: '14px',
-                  fontWeight: '400',
+                  fontWeight: '500',
                 }}
                 component="h2"
               >
-                {date}
+                {title}
               </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    color: theme?.palette?.warning['A200'],
+                    fontSize: '14px',
+                    fontWeight: '400',
+                  }}
+                  component="h2"
+                >
+                  {toPascalCase(center)}
+                </Typography>
+                <CircleIcon
+                  sx={{
+                    fontSize: '6px',
+                    color: theme.palette.secondary.contrastText,
+                  }}
+                />
+                <Typography
+                  variant="h2"
+                  sx={{
+                    color: theme?.palette?.warning['A200'],
+                    fontSize: '14px',
+                    fontWeight: '400',
+                  }}
+                  component="h2"
+                >
+                  {date}
+                </Typography>
+              </Box>
             </Box>
           </Box>
           <CloseIcon
