@@ -1926,16 +1926,16 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                   mt: 3,
                   mb: 2,
                   alignItems: 'center',
+                  cursor: 'pointer',
                 }}
+                onClick={handleOpenModel}
               >
                 <Box
                   sx={{
                     fontSize: '14px',
                     color: theme?.palette?.secondary.main,
                     fontWeight: '500',
-                    cursor: 'pointer',
                   }}
-                  onClick={handleOpenModel}
                 >
                   {editSelection === t('CENTER_SESSION.EDIT_THIS_SESSION')
                     ? t('CENTER_SESSION.DELETE_THIS_SESSION')

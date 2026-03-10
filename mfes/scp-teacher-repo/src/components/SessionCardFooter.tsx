@@ -52,7 +52,10 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   const [topicList, setTopicList] = React.useState([]);
   const [transformedTasks, setTransformedTasks] = React.useState();
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    setEditTopic(false);
+  };
   const [selectedTopic, setSelectedTopic] = useState<any | null>(null);
   const [selectedSubtopics, setSelectedSubtopics] = useState<string[]>([]);
   const [learningResources, setLearningResources] = useState<any>();
@@ -534,6 +537,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
         date={EventDate}
         primary={t('COMMON.SAVE')}
         handlePrimaryModel={updateTopicSubtopic}
+        handleBack={editTopic ? () => setEditTopic(false) : undefined}
       >
         {item?.erMetaData?.topic && !editTopic ? (
           <TopicDetails
