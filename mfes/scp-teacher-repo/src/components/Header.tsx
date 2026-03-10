@@ -236,6 +236,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
   const callBackSwitchDialog = async (
     tenantId: string,
     tenantName: string,
+    tenantType: string,
     roleId: string,
     roleName: string
   ) => {
