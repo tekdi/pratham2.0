@@ -1,5 +1,5 @@
 //@ts-nocheck
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle,forwardRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
@@ -42,7 +42,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import { showToastMessage } from './Toastify';
 
 // import { useTranslation } from '@shared-lib'; // Updated import
-const DynamicForm = ({
+const DynamicForm = forwardRef(({
   schema,
   uiSchema,
   SubmitaFunction,
@@ -61,7 +61,7 @@ const DynamicForm = ({
   parentDataAddUiSchema = {},
   parentDataSchema = {},
   id
-}: any) => {
+}: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
   const { t } = useTranslation();
@@ -831,13 +831,22 @@ const DynamicForm = ({
     GuardianInfoField,
   };
 
+  useImperativeHandle(ref, () => ({
+      resetForm: (newFormData) => {
+        setFormData(newFormData);
+        handleChange({ formData: newFormData });
+      },
+    }));
   useEffect(() => {
     if (isInitialCompleted === true) {
       // setFormData;
       //fix for auto submit and render
       if (!prefilledFormData || Object.keys(prefilledFormData).length === 0) {
-        if (type !== 'centers') prefilledFormData = { test: 'test' };
-        else prefilledFormData = { type: 'COHORT' };
+        if (isCallSubmitInHandle == undefined || isCallSubmitInHandle == null || isCallSubmitInHandle == false)
+        {
+          if (type !== 'centers') prefilledFormData = { test: 'test' };
+          else prefilledFormData = { type: 'COHORT' };
+        }
       }
       renderPrefilledForm();
     }
@@ -1234,7 +1243,8 @@ const DynamicForm = ({
                               : api.header.tenantId,
                           Authorization:
                             api.header.Authorization === '**'
-                              ? `Bearer ${localStorage.getItem('token') || ''
+                                ? `Bearer ${
+                                    localStorage.getItem('token') || ''
                               }`
                               : api.header.Authorization,
                           academicyearid:
@@ -2195,7 +2205,7 @@ const DynamicForm = ({
       )}
     </>
   );
-};
+});
 
 export default DynamicForm;
 
