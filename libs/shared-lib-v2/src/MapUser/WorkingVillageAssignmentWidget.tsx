@@ -1810,7 +1810,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                         ? 'No centers found'
                         : 'Select center...'}
                     </MenuItem>
-                    {centerOptions.map((center) => (
+                    {centerOptions
+                      .filter((center, index, self) => self.findIndex((c) => c.id === center.id) === index)
+                      .map((center) => (
                       <MenuItem key={center.id} value={center.id}>
                         {center.name}
                       </MenuItem>
