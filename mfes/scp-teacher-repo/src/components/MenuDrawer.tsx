@@ -40,6 +40,8 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import LinkIcon from '@mui/icons-material/Link';
+import { showToastMessage } from './Toastify';
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
   open: boolean;
@@ -174,6 +176,35 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
+  const handleCopyRegistrationLink = async () => {
+    try {
+      // Get the registration link from environment variable or construct it
+      const registrationBase = process.env.NEXT_PUBLIC_PLP_REGISTERATION || '';
+      
+      if (registrationBase) {
+        const enroll = localStorage.getItem('tenantName') || '';
+        
+        // Construct the proper registration link
+        // Format: https://domain/registration?tenantId=Pratham&enroll=Second%20Chance%20Program
+        const registrationLink = `${registrationBase}&enroll=${encodeURIComponent(enroll)}`;
+
+        // Copy to clipboard
+        await navigator.clipboard.writeText(registrationLink);
+        
+        // Show success toast message
+        showToastMessage(
+          t('COMMON.REGISTRATION_LINK_COPIED'),
+          'success'
+        );
+      } else {
+        showToastMessage('Registration link not configured', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to copy registration link:', error);
+      showToastMessage('Failed to copy registration link', 'error');
+    }
+  };
+
   const navigateToYouthBoard = () => {
     closeDrawer();
     router.push('/youthboard');
@@ -237,30 +268,38 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       }}
     >
       <Box
-        sx={{ padding: '16px 16px 12px 16px', width: '350px' }}
+        sx={{ 
+          padding: '16px 16px 12px 16px', 
+          width: '350px',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between'
+        }}
         role="presentation"
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Box sx={{ overflowY: 'auto', flex: 1 }}>
           <Box
-            className="fs-14 fw-500"
-            sx={{ color: theme.palette.warning['A200'] }}
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
           >
-            {t('DASHBOARD.MENU')}
-          </Box>
-          {!isDesktop && (
-            <Box>
-              <IconButton onClick={closeDrawer}>
-                <ClearIcon sx={{ color: theme.palette.warning['300'] }} />
-              </IconButton>
+            <Box
+              className="fs-14 fw-500"
+              sx={{ color: theme.palette.warning['A200'] }}
+            >
+              {t('DASHBOARD.MENU')}
             </Box>
-          )}
-        </Box>
+            {!isDesktop && (
+              <Box>
+                <IconButton onClick={closeDrawer}>
+                  <ClearIcon sx={{ color: theme.palette.warning['300'] }} />
+                </IconButton>
+              </Box>
+            )}
+          </Box>
         <Box
           sx={{
             display: 'flex',
@@ -371,6 +410,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
+            
           </Box>
         )}
         {tenantName === TENANT_DATA.YOUTHNET && (
@@ -895,9 +935,12 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        {isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
-          <Box sx={{ marginTop: '18px' }}>
-            <Button
+        </Box>
+        
+        {/* Bottom Section - Fixed at bottom */}
+        {(
+          <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
+            { process.env.NEXT_PUBLIC_PLP_REGISTERATION &&(<Button
               className="fs-14"
               sx={{
                 width: '100%',
@@ -906,15 +949,39 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 background: 'transparent',
                 padding: '0px 18px !important',
                 gap: '10px',
-                color: theme.palette.secondary.main,
+                color: 'black',
                 fontWeight: 500,
                 '&:hover': {
                   background: 'transparent',
                 },
-                marginTop: '15px',
+                marginTop: '8px',
               }}
-              endIcon={
-                <ErrorOutlineIcon sx={{ fontSize: '18px !important' }} />
+              startIcon={
+                <LinkIcon sx={{ fontSize: '18px !important', color:  '#FDBE16' }} />
+              }
+              onClick={handleCopyRegistrationLink}
+            >
+{ t('COMMON.COPY_REGISTRATION_LINK')}
+            </Button>)}
+            {        isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && 
+(<Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: 'transparent',
+                padding: '0px 18px !important',
+                gap: '10px',
+                color: '#FDBE16',
+                fontWeight: 500,
+                '&:hover': {
+                  background: 'transparent',
+                },
+                marginTop: '8px',
+              }}
+              startIcon={
+                <ErrorOutlineIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />
               }
               onClick={() => {
                 localStorage.removeItem('hasSeenTutorial');
@@ -925,7 +992,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }}
             >
               {t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
-            </Button>
+            </Button>)}
           </Box>
         )}
       </Box>

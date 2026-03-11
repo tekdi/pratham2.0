@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   formatSelectedDate,
   getAfterDate,
@@ -33,7 +34,7 @@ import { getCohortDetails } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
 import reassignLearnerStore from '@/store/reassignLearnerStore';
 import { CustomField } from '@/utils/Interfaces';
-import { Role, Telemetry, sessionType } from '@/utils/app.constant';
+import { Role, Status, Telemetry, sessionType } from '@/utils/app.constant';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -78,6 +79,7 @@ import { setTimeout } from 'timers';
 import { isEliminatedFromBuild } from '../../../../featureEliminationUtil';
 import LearnerManage from '@/shared/LearnerManage/LearnerManage';
 import ManageUser from '@/components/ManageUser';
+import { HierarchicalSearchUserList } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 let SessionCardFooter: ComponentType<any> | null = null;
 if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
@@ -349,28 +351,65 @@ const CohortPage = () => {
     const getCohortMemberList = async () => {
       if (cohortId) {
         try {
-          const page = 0;
-          const filters = { cohortId: cohortId };
-          const facilitatorResponse = await getMyCohortFacilitatorList({
-            filters,
-          });
-          if (facilitatorResponse?.result?.userDetails) {
+        const bodyPayload = {
+          limit: 1,
+          offset: 0,
+          role: [Role.TEACHER],
+          tenantStatus: [Status.ACTIVE],
+          filters: {
+            batch: [cohortId],
+            status: [Status.ACTIVE],
+          },
+          customfields: [
+            'state',
+            'district',
+            'block',
+            'village',
+            'main_subject',
+            'subject_taught',
+          ],
+          sort: [
+            "firstName",
+            "asc"
+          ]
+        };
+          const facilitatorResponse = await HierarchicalSearchUserList(bodyPayload);
+          if (facilitatorResponse?.totalCount) {
             setCohortFacilitatorListCount(
-              facilitatorResponse?.result?.userDetails.length
+              facilitatorResponse?.totalCount
             );
           } else setCohortFacilitatorListCount(0);
         } catch (error) {
           setCohortFacilitatorListCount(0);
         }
         try {
-          const filters = { cohortId: cohortId };
+          const bodyPayload = {
+            limit: 1,
+            offset: 0,
+            role: [Role.STUDENT],
+            tenantStatus: [Status.ACTIVE],
+            filters: {
+              batch: [cohortId],
+              status: [Status.ACTIVE],
+            },
+            customfields: [
+              'state',
+              'district',
+              'block',
+              'village',
+              'main_subject',
+              'subject_taught',
+            ],
+            sort: [
+              "firstName",
+              "asc"
+            ]
+          };
 
-          const learnerResponse = await getMyCohortMemberList({
-            filters,
-          });
-          if (learnerResponse?.result?.userDetails) {
+          const learnerResponse = await HierarchicalSearchUserList(bodyPayload);
+          if (learnerResponse?.totalCount) {
             setCohortLearnerListCount(
-              learnerResponse?.result?.userDetails.filter((user: any) => user.status !== "reassigned").length
+              learnerResponse?.totalCount
             );
           } else {
             setCohortLearnerListCount(0);

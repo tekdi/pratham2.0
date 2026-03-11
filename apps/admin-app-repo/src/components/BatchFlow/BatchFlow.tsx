@@ -44,6 +44,7 @@ interface BatchFlowProps {
   centerBoards?: string[];
   centerMediums?: string[];
   centerGrades?: string[];
+  centerType?: string | null;
 }
 
 const BatchFlow: React.FC<BatchFlowProps> = ({
@@ -51,6 +52,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   centerBoards = [],
   centerMediums = [],
   centerGrades = [],
+  centerType = null,
 }) => {
   const theme = useTheme<any>();
   const [isLoading, setIsLoading] = useState(false);
@@ -144,6 +146,27 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
 
+    // Modify batch_type based on centerType
+    if (centerType && alterSchema?.properties?.batch_type) {
+      if (centerType === 'remote') {
+        // For remote center: show "remote" and "hybrid" options
+        alterSchema.properties.batch_type.enum = ['remote', 'hybrid'];
+        alterSchema.properties.batch_type.enumNames = ['REMOTE', 'HYBRID'];
+        alterSchema.properties.batch_type.default = 'remote';
+        if (alterUiSchema?.batch_type?.['ui:disabled']) {
+          delete alterUiSchema.batch_type['ui:disabled'];
+        }
+      } else if (centerType === 'regular') {
+        // For regular center: show only "regular" option (disabled)
+        alterSchema.properties.batch_type.enum = ['regular'];
+        alterSchema.properties.batch_type.enumNames = ['REGULAR'];
+        alterSchema.properties.batch_type.default = 'regular';
+        if (alterUiSchema?.batch_type) {
+          alterUiSchema.batch_type['ui:disabled'] = true;
+        }
+      }
+    }
+
     if (!isEditMode) {
       if (centerBoards?.length === 1 && alterUiSchema?.board) {
         alterUiSchema.board['ui:disabled'] = true;
@@ -188,7 +211,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     );
     setPrefilledFormData(withParent);
     fetchData();
-  }, [initialParentId]);
+  }, [initialParentId, centerType, centerBoards, centerMediums, centerGrades]);
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -351,6 +374,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         };
         buildSchemaAndUi(true, existingValues);
         let tempFormData = extractMatchingKeys(row, addSchema);
+        // Force batch_type to "remote" if centerType is "remote"
+        if (centerType === 'regular') {
+          tempFormData.batch_type = 'regular';
+        }
         setPrefilledAddFormData(tempFormData);
         setIsEdit(true);
         setEditableUserId(row?.cohortId);
@@ -419,7 +446,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   const failureUpdateMessage = 'BATCH.BATCH_UPDATE_FAILED';
   const successCreateMessage = 'BATCH.BATCH_CREATED_SUCCESSFULLY';
   const telemetryCreateKey = 'batch-created-successfully';
-  const failureCreateMessage = 'BATCH.BATCH_UPDATE_FAILED';
+  const failureCreateMessage = 'BATCH.BATCH_CREATE_FAILED';
 
   return (
     <>
@@ -460,6 +487,11 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
                 prefillWithBMGS.medium = [centerMediums[0]];
               if (centerGrades?.length === 1)
                 prefillWithBMGS.grade = [centerGrades[0]];
+
+              // Prefill batch_type for remote center
+              if (centerType === 'remote') {
+                prefillWithBMGS.batch_type = 'remote';
+              }
 
               buildSchemaAndUi(false);
 

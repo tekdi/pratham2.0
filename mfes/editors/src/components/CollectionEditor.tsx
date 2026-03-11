@@ -171,7 +171,78 @@ const CollectionEditor: React.FC = () => {
   const isAppendedRef = useRef(false);
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  // Store all API calls made by the editor for debugging/monitoring
+  const [apiCalls, setApiCalls] = useState<any[]>([]);
+  
+  // Expose API calls to window for debugging (optional - remove in production)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).editorApiCalls = apiCalls;
+    }
+  }, [apiCalls]);
 
+  /**
+   * Response modifier function - modify this to change API responses before they reach the editor
+   * 
+   * @param url - The API endpoint URL (e.g., "action/object/category/definition/v1/read?fields=...")
+   * @param responseData - The original response data (can be string or object)
+   * @returns Modified response data (or original if no modification needed)
+   * 
+   * @example
+   * // Modify category definition response
+   * if (url.includes('action/object/category/definition/v1/read')) {
+   *   const parsed = typeof responseData === 'string' ? JSON.parse(responseData) : responseData;
+   *   // Modify parsed.result.objectCategoryDefinition here
+   *   return typeof responseData === 'string' ? JSON.stringify(parsed) : parsed;
+   * }
+   */
+  const modifyApiResponse = (url: string, responseData: any): any => {
+    // Modify ONLY category definition API
+    if (url.includes('action/object/category/definition/v1/read')) {
+      console.log('Modifying category definition response:', responseData);
+  
+      // 1️⃣ Parse response if string
+      let parsedData = responseData;
+      if (typeof responseData === 'string') {
+        try {
+          parsedData = JSON.parse(responseData);
+        } catch (e) {
+          console.warn('Could not parse response as JSON:', e);
+          return responseData;
+        }
+      }
+  
+      // 2️⃣ Modify ONLY the needed part
+      if (parsedData?.result?.objectCategoryDefinition) {
+        const tenantName = localStorage.getItem('tenantName');
+  
+        if (tenantName) {
+          const objectDef = parsedData.result.objectCategoryDefinition;
+  
+          // ONLY: forms.create -> properties -> fields -> program
+          objectDef.forms?.create?.properties?.forEach((section: any) => {
+            section.fields?.forEach((field: any) => {
+              if (field.code === 'program' &&  field.default.length === 0) {
+                field.range = [tenantName];
+                field.default = [tenantName];
+              }
+            });
+          });
+        }
+  
+        console.log('Modified response:', parsedData);
+  
+        // 3️⃣ Return in original format
+        return typeof responseData === 'string'
+          ? JSON.stringify(parsedData)
+          : parsedData;
+      }
+    }
+  
+    // No change → return original
+    return responseData;
+  };
+  
   useEffect(() => {
     const loadJQuery = () => {
       if (!document.getElementById('jquery-script')) {
@@ -276,7 +347,8 @@ const CollectionEditor: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (assetsLoaded && editorRef.current && !isAppendedRef.current) {
+    // Only set up interceptors when identifier is available and assets are loaded
+    if (assetsLoaded && editorRef.current && !isAppendedRef.current && identifier) {
       const collectionEditorElement = document.createElement('lib-editor');
 
       collectionEditorElement.setAttribute(
@@ -284,10 +356,352 @@ const CollectionEditor: React.FC = () => {
         JSON.stringify(editorConfig)
       );
 
+      /**
+       * API CALL INTERCEPTION
+       * Only intercepts the specific category definition API endpoint
+       * to avoid interfering with other critical APIs (content read, etc.)
+       */
+
+      // Helper function to check if URL should be intercepted
+      const shouldIntercept = (url: string): boolean => {
+        // Only intercept the specific category definition API
+        return url.includes('action/object/category/definition/v1/read');
+      };
+
+      // Intercept API calls (fetch) made by the editor
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        const [url, options] = args;
+        const urlString = String(url);
+        
+        // Only intercept and modify the specific API we care about
+        const shouldModify = shouldIntercept(urlString);
+        
+        if (shouldModify) {
+          const apiCallData = {
+            url: urlString,
+            method: options?.method || 'GET',
+            headers: options?.headers,
+            body: options?.body,
+            timestamp: new Date().toISOString(),
+            type: 'fetch',
+          };
+          
+          console.log('Editor API Call - Fetch (intercepted):', apiCallData);
+          setApiCalls((prev) => [...prev, { ...apiCallData, status: 'pending' }]);
+        }
+        
+        try {
+          const response = await originalFetch(...args);
+          
+          // Only modify if this is the API we care about
+          if (shouldModify) {
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            const isJson = contentType?.includes('application/json');
+            
+            if (isJson) {
+              // Clone response to read it without consuming the original
+              const clonedResponse = response.clone();
+              const originalData = await clonedResponse.json();
+              
+              // Modify the response data
+              const modifiedData = modifyApiResponse(urlString, originalData);
+              
+              const responseData = {
+                url: urlString,
+                status: response.status,
+                data: originalData,
+                modifiedData: modifiedData !== originalData ? modifiedData : undefined,
+                timestamp: new Date().toISOString(),
+              };
+              
+              console.log('Editor API Response (modified):', responseData);
+              if (modifiedData !== originalData) {
+                console.log('✅ Response was modified:', { original: originalData, modified: modifiedData });
+              }
+              
+              setApiCalls((prev) => {
+                const updated = [...prev];
+                const lastCall = updated[updated.length - 1];
+                if (lastCall && lastCall.url === urlString) {
+                  updated[updated.length - 1] = { ...lastCall, ...responseData, status: 'completed' };
+                }
+                return updated;
+              });
+              
+              // Return modified response if it was changed
+              if (modifiedData !== originalData) {
+                return new Response(JSON.stringify(modifiedData), {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers,
+                });
+              }
+            } else {
+              // Handle non-JSON responses
+              const clonedResponse = response.clone();
+              const text = await clonedResponse.text();
+              const modifiedText = modifyApiResponse(urlString, text);
+              
+              const responseData = {
+                url: urlString,
+                status: response.status,
+                data: text.substring(0, 500), // Limit text length for logging
+                timestamp: new Date().toISOString(),
+              };
+              
+              console.log('Editor API Response (text, modified):', responseData);
+              setApiCalls((prev) => {
+                const updated = [...prev];
+                const lastCall = updated[updated.length - 1];
+                if (lastCall && lastCall.url === urlString) {
+                  updated[updated.length - 1] = { ...lastCall, ...responseData, status: 'completed' };
+                }
+                return updated;
+              });
+              
+              // Return modified response if it was changed
+              if (modifiedText !== text) {
+                return new Response(modifiedText, {
+                  status: response.status,
+                  statusText: response.statusText,
+                  headers: response.headers,
+                });
+              }
+            }
+          }
+          
+          return response;
+        } catch (error) {
+          if (shouldModify) {
+            const errorData = {
+              url: urlString,
+              error: error instanceof Error ? error.message : String(error),
+              timestamp: new Date().toISOString(),
+            };
+            console.error('Editor API Call Error:', errorData);
+            setApiCalls((prev) => {
+              const updated = [...prev];
+              const lastCall = updated[updated.length - 1];
+              if (lastCall && lastCall.url === urlString) {
+                updated[updated.length - 1] = { ...lastCall, ...errorData, status: 'error' };
+              }
+              return updated;
+            });
+          }
+          throw error;
+        }
+      };
+
+      // Intercept XMLHttpRequest calls made by the editor
+      // Only intercept the specific API endpoint we need to modify
+      const originalXHROpen = XMLHttpRequest.prototype.open;
+      const originalXHRSend = XMLHttpRequest.prototype.send;
+      
+      // Store original getters BEFORE we override them
+      const originalResponseTextGetter = (function() {
+        const descriptor = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'responseText');
+        return descriptor?.get;
+      })();
+      
+      const originalResponseGetter = (function() {
+        const descriptor = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'response');
+        return descriptor?.get;
+      })();
+      
+      XMLHttpRequest.prototype.open = function(method: string, url: string | URL, ...rest: any[]) {
+        const urlString = String(url);
+        (this as any)._url = urlString;
+        (this as any)._method = method;
+        (this as any)._shouldIntercept = shouldIntercept(urlString);
+        (this as any)._responseModified = false;
+        (this as any)._originalResponseText = null;
+        (this as any)._modifiedResponseText = null;
+        (this as any)._originalResponse = null;
+        (this as any)._modifiedResponse = null;
+        return originalXHROpen.apply(this, [method, url, ...rest] as any);
+      };
+      
+      // Override responseText to return modified data (only for intercepted URLs)
+      Object.defineProperty(XMLHttpRequest.prototype, 'responseText', {
+        get: function() {
+          const xhr = this as any;
+          const urlString = String(xhr._url);
+          
+          // Only modify when response is ready
+          if (xhr.readyState !== 4) {
+            return originalResponseTextGetter?.call(this) || '';
+          }
+          
+          // Only intercept if this is the API we care about
+          if (!xhr._shouldIntercept) {
+            return originalResponseTextGetter?.call(this) || '';
+          }
+          
+          // Get original response text if not cached
+          if (xhr._originalResponseText === null) {
+            if (originalResponseTextGetter) {
+              xhr._originalResponseText = originalResponseTextGetter.call(this);
+            } else {
+              xhr._originalResponseText = '';
+            }
+          }
+          
+          // Modify response if not already modified
+          if (!xhr._responseModified && xhr._originalResponseText !== null) {
+            const modified = modifyApiResponse(urlString, xhr._originalResponseText);
+            xhr._modifiedResponseText = modified;
+            xhr._responseModified = true;
+            
+            if (modified !== xhr._originalResponseText) {
+              console.log('✅ XHR ResponseText was modified:', {
+                url: urlString,
+                originalLength: xhr._originalResponseText.length,
+                modifiedLength: typeof modified === 'string' ? modified.length : JSON.stringify(modified).length,
+              });
+            }
+          }
+          
+          return xhr._modifiedResponseText !== null ? xhr._modifiedResponseText : (xhr._originalResponseText || '');
+        },
+        configurable: true,
+        enumerable: true,
+      });
+      
+      // Override response property (for JSON responses) - only for intercepted URLs
+      Object.defineProperty(XMLHttpRequest.prototype, 'response', {
+        get: function() {
+          const xhr = this as any;
+          const urlString = String(xhr._url);
+          
+          // Only modify when response is ready
+          if (xhr.readyState !== 4) {
+            return originalResponseGetter?.call(this) || null;
+          }
+          
+          // Only intercept if this is the API we care about
+          if (!xhr._shouldIntercept) {
+            return originalResponseGetter?.call(this) || null;
+          }
+          
+          // Get original response if not cached
+          if (xhr._originalResponse === null) {
+            if (originalResponseGetter) {
+              xhr._originalResponse = originalResponseGetter.call(this);
+            } else {
+              xhr._originalResponse = null;
+            }
+          }
+          
+          // Modify response if not already modified
+          if (!xhr._responseModified && xhr._originalResponse !== null) {
+            let modified: any;
+            
+            // If response is a string, modify it
+            if (typeof xhr._originalResponse === 'string') {
+              modified = modifyApiResponse(urlString, xhr._originalResponse);
+            } else {
+              // If response is already parsed JSON, modify it
+              modified = modifyApiResponse(urlString, xhr._originalResponse);
+            }
+            
+            xhr._modifiedResponse = modified;
+            xhr._responseModified = true;
+            
+            // Also update responseText if it's a string response
+            if (typeof xhr._originalResponse === 'string' && modified !== xhr._originalResponse) {
+              xhr._modifiedResponseText = modified;
+            }
+            
+            if (JSON.stringify(modified) !== JSON.stringify(xhr._originalResponse)) {
+              console.log('✅ XHR Response (object) was modified:', {
+                url: urlString,
+                hasChanges: true,
+              });
+            }
+            
+            return modified;
+          }
+          
+          return xhr._modifiedResponse !== null ? xhr._modifiedResponse : (xhr._originalResponse || null);
+        },
+        configurable: true,
+        enumerable: true,
+      });
+      
+      XMLHttpRequest.prototype.send = function(body?: any) {
+        const xhr = this as any;
+        const urlString = String(xhr._url);
+        const shouldModify = xhr._shouldIntercept;
+        
+        if (shouldModify) {
+          const apiCallData = {
+            url: urlString,
+            method: xhr._method,
+            body: body,
+            timestamp: new Date().toISOString(),
+            type: 'xhr',
+          };
+          
+          console.log('Editor API Call - XHR (intercepted):', apiCallData);
+          setApiCalls((prev) => [...prev, { ...apiCallData, status: 'pending' }]);
+        }
+        
+        xhr.addEventListener('load', function() {
+          if (shouldModify && xhr.status === 200) {
+            // Force modification by accessing responseText/response
+            // This ensures our getters are called and response is modified
+            void xhr.responseText; // This will trigger modification
+            void xhr.response; // This will also trigger modification
+            console.log('✅ Load event - response accessed and modified');
+            
+            const responseData = {
+              url: urlString,
+              method: xhr._method,
+              status: xhr.status,
+              response: (xhr._modifiedResponseText || xhr.responseText || '').substring(0, 500),
+              timestamp: new Date().toISOString(),
+            };
+            console.log('Editor API Response - XHR (modified):', responseData);
+            setApiCalls((prev) => {
+              const updated = [...prev];
+              const lastCall = updated[updated.length - 1];
+              if (lastCall && lastCall.url === urlString) {
+                updated[updated.length - 1] = { ...lastCall, ...responseData, status: 'completed' };
+              }
+              return updated;
+            });
+          }
+        });
+        
+        xhr.addEventListener('error', function() {
+          if (shouldModify) {
+            const errorData = {
+              url: urlString,
+              method: xhr._method,
+              timestamp: new Date().toISOString(),
+            };
+            console.error('Editor API Error - XHR:', errorData);
+            setApiCalls((prev) => {
+              const updated = [...prev];
+              const lastCall = updated[updated.length - 1];
+              if (lastCall && lastCall.url === urlString) {
+                updated[updated.length - 1] = { ...lastCall, ...errorData, status: 'error' };
+              }
+              return updated;
+            });
+          }
+        });
+        
+        return originalXHRSend.apply(this, [body]);
+      };
+
       collectionEditorElement.addEventListener(
         'editorEmitter',
         (event: any) => {
-          console.log('Editor event:', event);
+          // Log complete event data to see all available information
+          // console.log('Editor event (full):', event);
           if (
             event.detail?.action === 'backContent' ||
             event.detail?.action === 'submitContent' ||
@@ -349,8 +763,20 @@ const CollectionEditor: React.FC = () => {
 
       editorRef.current.appendChild(collectionEditorElement);
       isAppendedRef.current = true;
+
+      // Cleanup function to restore original fetch and XMLHttpRequest
+      return () => {
+        // Restore original fetch
+        if (window.fetch !== originalFetch) {
+          window.fetch = originalFetch;
+        }
+        
+        // Restore original XMLHttpRequest methods
+        XMLHttpRequest.prototype.open = originalXHROpen;
+        XMLHttpRequest.prototype.send = originalXHRSend;
+      };
     }
-  }, [assetsLoaded]);
+  }, [assetsLoaded, identifier]); // Add identifier as dependency
 
   return (
     <div>
