@@ -740,12 +740,23 @@ const Facilitator = () => {
           const cohortResponse = await getCohortList(selectedUserId);
           const cohortList = cohortResponse?.result || [];
           
-          // Filter batches where cohortMemberStatus = "archived", cohortStatus = "active", and type = "BATCH"
-          const filteredBatches = cohortList.filter((cohort: any) => 
-            cohort.cohortMemberStatus === 'archived' &&
-            cohort.cohortStatus === 'active' &&
-            cohort.type === 'BATCH'
-          );
+          // Filter and remove duplicates based on cohortId
+          const filteredBatches = [];
+          const seenCohortIds = new Set();
+          for (const cohort of cohortList) {
+            if (
+              cohort.cohortMemberStatus === 'archived' &&
+              cohort.cohortStatus === 'active' &&
+              cohort.type === 'BATCH'
+            ) {
+              if (!seenCohortIds.has(cohort.cohortId)) {
+                filteredBatches.push(cohort);
+                seenCohortIds.add(cohort.cohortId);
+              }
+            }
+          }
+
+          
           
           setAvailableBatches(filteredBatches);
         } catch (error) {
