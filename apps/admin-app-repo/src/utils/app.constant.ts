@@ -50,6 +50,7 @@ export enum Role {
   CONTENT_REVIEWER = 'Content Reviewer',
   SCTA = 'Content creator',
   CCTA = 'Content reviewer',
+  MOBILIZER = 'Mobilizer',
 }
 
 export enum TenantName {
@@ -112,12 +113,14 @@ export enum RoleId {
   CONTENT_CREATOR = '45b8b0d7-e5c6-4f3f-a7bf-70f86e9357ce',
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
   STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
+  MOBILIZER = 'a4694781-65c1-4b92-8ff1-ad490ab6d140',
 }
 
 export enum RoleName {
   CONTENT_CREATOR = 'Content creator',
   CONTENT_REVIEWER = 'Content reviewer',
   STATE_LEAD = 'State Lead',
+  MOBILIZER = 'Mobilizer',
 }
 
 export enum DataKey {
@@ -262,3 +265,16 @@ export enum fieldKeys {
 }
 
 export const DEFAULT_TEMPLATE_CONTEXT = ['USER', 'OTP', 'CMS'];
+
+const DEFAULT_LOGIN_URL = process.env.NEXT_PUBLIC_LOGIN_URL;
+const ADMIN_LOGIN_URL = process.env.NEXT_PUBLIC_ADMIN_LOGIN_URL;
+
+export const ROLE_LOGIN_URL_MAP: Record<string, string | undefined> = {
+  'Learner': DEFAULT_LOGIN_URL,
+  'Instructor': DEFAULT_LOGIN_URL,
+  'Lead': DEFAULT_LOGIN_URL,
+  'State Lead': ADMIN_LOGIN_URL,
+  'Content Creator': ADMIN_LOGIN_URL,
+  'Content Reviewer': ADMIN_LOGIN_URL,
+  'Mobilizer': DEFAULT_LOGIN_URL
+};

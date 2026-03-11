@@ -208,7 +208,7 @@ export interface PlayerConfig {
 }
 
 export interface PasswordCreateProps {
-  handleResetPassword: (password: string) => void;
+  handleResetPassword: (password: string, username?: string) => void;
   editPassword?: boolean;
 }
 

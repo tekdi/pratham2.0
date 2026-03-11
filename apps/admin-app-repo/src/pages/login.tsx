@@ -119,7 +119,7 @@ const LoginPage = () => {
               role?.role === Role.ADMIN &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         } else {
@@ -146,7 +146,7 @@ const LoginPage = () => {
                 role?.role === Role.ADMIN) &&
               role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
             ) {
-              router.push('/central-head');
+              router.push('/user-leader');
             }
           }
         }
@@ -214,6 +214,10 @@ const LoginPage = () => {
         const program = tenantName;
 
         const response = await getUserDetailsInfo(userId, fieldValue);
+        localStorage.setItem(
+          'temporaryPassword',
+          response?.userData?.temporaryPassword ?? 'false'
+        );
 
         const userInfo = response?.userData;
         // Override role with selected role from SwitchAccount (ensures correct redirect)
@@ -268,14 +272,14 @@ const LoginPage = () => {
           }
           const selectedStateName = transformLabel(
             userInfo?.customFields?.find(
-              (field: { label: string }) => field?.label === 'STATE'
+              (field: { label: string }) => field?.label === 'WORKING_STATE'
             )?.selectedValues?.[0]?.value
           );
           if (selectedStateName) {
             localStorage.setItem('stateName', selectedStateName);
           }
           const selectedStateId = userInfo?.customFields?.find(
-            (field: { label: string }) => field?.label === 'STATE'
+            (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
           if (selectedStateId) {
             localStorage.setItem('stateId', selectedStateId);
@@ -359,8 +363,8 @@ const LoginPage = () => {
                 (Role.CENTRAL_ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head', undefined, { locale: locale });
+                window.location.href = '/user-leader';
+                router.push('/user-leader', undefined, { locale: locale });
               }
             } else {
               if (
@@ -379,9 +383,9 @@ const LoginPage = () => {
                 userInfo?.role === Role.ADMIN &&
                 tenantData?.tenantName == TenantName.YOUTHNET
               ) {
-                window.location.href = '/central-head';
-                router.push('/central-head');
-              }
+                window.location.href = '/user-leader';
+                router.push('/user-leader');
+              } 
             }
           }
         } else {
@@ -446,8 +450,8 @@ const LoginPage = () => {
                       (Role.CENTRAL_ADMIN &&
                         tenantData?.tenantName == TenantName.YOUTHNET)
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head', undefined, {
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader', undefined, {
                         locale: locale,
                       });
                     }
@@ -468,8 +472,8 @@ const LoginPage = () => {
                       userInfo?.role === Role.ADMIN &&
                       userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
                     ) {
-                      window.location.href = '/central-head';
-                      router.push('/central-head');
+                      window.location.href = '/user-leader';
+                      router.push('/user-leader');
                     }
                   }
                 }

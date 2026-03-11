@@ -22,6 +22,7 @@ interface DeleteDetailsProps {
   reason: string;
   setReason: (reason: string) => void;
   isForFacilitator?: boolean;
+  customLabel?: string;
 }
 
 const DeleteDetails: React.FC<DeleteDetailsProps> = ({
@@ -34,8 +35,12 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
   reason,
   setReason,
   isForFacilitator = false,
+  customLabel
 }) => {
   const { t } = useTranslation();
+  const centerCount = center?.split(',')
+  ?.map((c: string) => c.trim())
+  ?.filter(Boolean)?.length || 0;
   return (
     <>
       <Box
@@ -47,7 +52,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
         }}
       >
         <Typography fontWeight="bold">
-          { firstName } { lastName } {center? t("FORM.BELONG_TO"): t("FORM.WAS_BELONG_TO")}
+          { firstName } { lastName } {center? (centerCount > 1? t("FORM.BELONG_TO_MULTIPLE_CENTERS"): t("FORM.BELONG_TO")): t("FORM.WAS_BELONG_TO")}
         </Typography>
         <TextField fullWidth value={center? center: village} disabled sx={{ mt: 1 }} />
       </Box>
@@ -59,7 +64,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
             onChange={(e) => setChecked(e.target.checked)}
           />
         }
-        label={t('FORM.DO_YOU_WANT_TO_DELETE')}
+        label={customLabel || (centerCount > 1 ? t('FORM.DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS') : t('FORM.DO_YOU_WANT_TO_DELETE'))} 
         sx={{ mb: checked ? 2 : 0 }}
       />
 

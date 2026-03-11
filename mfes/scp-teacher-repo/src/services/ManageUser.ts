@@ -143,7 +143,7 @@ export const updateUserTenantStatus = async (
     typeof userTenantEndpoint === 'function'
       ? userTenantEndpoint(userId, tenantId)
       : `${userTenantEndpoint}?userId=${userId}&tenantId=${tenantId}`;
-
+  
   // Validate URL is a proper absolute URL, not JavaScript code or relative path
   if (!apiUrl || typeof apiUrl !== 'string' || !apiUrl.startsWith('http://') && !apiUrl.startsWith('https://')) {
     const errorMsg = `Invalid API URL: ${apiUrl}. Check NEXT_PUBLIC_MIDDLEWARE_URL environment variable.`;
