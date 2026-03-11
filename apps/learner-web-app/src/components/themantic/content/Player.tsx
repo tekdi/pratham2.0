@@ -1,7 +1,7 @@
 // pages/content-details/[identifier].tsx
 
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Avatar,
@@ -27,6 +27,8 @@ import {
 } from '@shared-lib';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { fetchContent } from '@learner/utils/API/contentService';
 import BreadCrumb from '@content-mfes/components/BreadCrumb';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
@@ -585,16 +587,106 @@ const PlayerBox = ({
   const router = useRouter();
   const { t } = useTranslation();
   const [play, setPlay] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreenSupported, setIsFullscreenSupported] = useState(false);
+  const playerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPlay(true);
   }, []);
 
+  // Check if fullscreen is supported
+  useEffect(() => {
+    const checkFullscreenSupport = () => {
+      const element = document.documentElement;
+      const supported =
+        !!(
+          element.requestFullscreen ||
+          (element as any).webkitRequestFullscreen ||
+          (element as any).mozRequestFullScreen ||
+          (element as any).msRequestFullscreen
+        );
+      setIsFullscreenSupported(supported);
+    };
+
+    checkFullscreenSupport();
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const isFullscreenActive =
+        !!(
+          document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement
+        );
+      setIsFullscreen(isFullscreenActive);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, []);
+
   const handlePlay = () => {
     setPlay(true);
   };
+
+  const toggleFullscreen = async () => {
+    if (!playerRef.current) return;
+
+    try {
+      const isCurrentlyFullscreen =
+        !!(
+          document.fullscreenElement ||
+          (document as any).webkitFullscreenElement ||
+          (document as any).mozFullScreenElement ||
+          (document as any).msFullscreenElement
+        );
+
+      if (!isCurrentlyFullscreen) {
+        // Enter fullscreen
+        const element = playerRef.current;
+        if (element.requestFullscreen) {
+          await element.requestFullscreen();
+        } else if ((element as any).webkitRequestFullscreen) {
+          await (element as any).webkitRequestFullscreen();
+        } else if ((element as any).webkitEnterFullscreen) {
+          // iOS Safari alternative (for video elements)
+          await (element as any).webkitEnterFullscreen();
+        } else if ((element as any).mozRequestFullScreen) {
+          await (element as any).mozRequestFullScreen();
+        } else if ((element as any).msRequestFullscreen) {
+          await (element as any).msRequestFullscreen();
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen();
+        } else if ((document as any).mozCancelFullScreen) {
+          await (document as any).mozCancelFullScreen();
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen();
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling fullscreen:', error);
+    }
+  };
   return (
     <Box
+      ref={playerRef}
       sx={{
         flex: { xs: 1, sm: 1, md: 8 },
         position: 'relative',
@@ -602,6 +694,36 @@ const PlayerBox = ({
         justifyContent: 'center',
       }}
     >
+      {/* Fullscreen button */}
+      {play && isFullscreenSupported && (
+        <IconButton
+          onClick={toggleFullscreen}
+          sx={{
+            position: 'absolute',
+            top: { xs: 4, sm: 8 },
+            right: { xs: 4, sm: 8 },
+            zIndex: 1000,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            color: '#fff',
+            width: { xs: 44, sm: 40 },
+            height: { xs: 44, sm: 40 },
+            minWidth: { xs: 44, sm: 40 },
+            padding: { xs: 1.5, sm: 1 },
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            },
+            '&:active': {
+              backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            },
+            '& svg': {
+              fontSize: { xs: '1.75rem', sm: '1.5rem' },
+            },
+          }}
+          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+        >
+          {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+        </IconButton>
+      )}
       {!play ? (
         <Box
           sx={{
@@ -705,10 +827,10 @@ const PlayerBox = ({
             width="100%"
             height="100%"
             title="Embedded Localhost"
-            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
             frameBorder="0"
             scrolling="no"
-            sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
+            sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation allow-fullscreen"
           />
         </Box>
       )}
