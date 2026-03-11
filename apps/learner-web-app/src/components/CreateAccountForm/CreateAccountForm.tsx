@@ -94,13 +94,40 @@ const CreateAccountForm = ({
         ? localStorage.getItem('isForNavaPatham') === 'true'
         : false;
 
+    // Get the selected language from localStorage (same key as Header.jsx uses)
+    const selectedLanguage =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('lang') || 'en'
+        : 'en';
+
+    // Map language codes to lowercase language names for PDF file naming
+    // Using the same language codes as Header.jsx
+    const languageFileMap: { [key: string]: string } = {
+      en: 'english',
+      hi: 'hindi',
+      mr: 'marathi',
+      bn: 'bengali',
+      as: 'assamese',
+      guj: 'gujarati',
+      kan: 'kannada',
+      odi: 'odia',
+      tam: 'tamil',
+      tel: 'telugu',
+      ur: 'urdu',
+    };
+
     if (isForNavaPatham) {
       window.open('/files/telugu_consent_form.pdf', '_blank');
     } else {
+      // Get the language name from the map, default to 'hindi'
+      const languageName = languageFileMap[selectedLanguage] || 'hindi';
+      
       if (belowEighteen) {
-        window.open('/files/consent_form_below_18_hindi.pdf', '_blank');
+        // Use PDF file naming convention: consent_form_below_18_<language>.pdf
+        window.open(`/files/consent_form_below_18_${languageName}.pdf`, '_blank');
       } else {
-        window.open('/files/consent_form_above_18_hindi.pdf', '_blank');
+        // Use PDF file naming convention: consent_form_above_18_<language>.pdf
+        window.open(`/files/consent_form_above_18_${languageName}.pdf`, '_blank');
       }
     }
   };

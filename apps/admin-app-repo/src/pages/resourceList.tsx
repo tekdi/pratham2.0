@@ -179,7 +179,29 @@ console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
             {t('COURSE_PLANNER.NO_DATA_PRE')}
           </Typography>
         )}
-
+<Typography variant="h4" fontWeight={500} mb={2}>
+          {t('COURSE_PLANNER.DURING_COURSE')}
+        </Typography>
+        {duringCourse?.length > 0 ? (
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            {duringCourse.map((item, index) => (
+              <Grid xs={12} md={4} lg={3} item key={index}>
+                <ResourceCard
+                  title={item.name}
+                  // type={item.app}
+                  resource={item.contentType}
+                  appIcon={item?.appIcon}
+                  identifier={item.identifier}
+                  mimeType={item.mimeType}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+            {t('COURSE_PLANNER.NO_DATA_POST')}
+          </Typography>
+        )}
         <Typography variant="h4" fontWeight={500} mb={2}>
           {t('COURSE_PLANNER.LEARNERS_POSTREQISITE')}
         </Typography>
@@ -204,29 +226,7 @@ console.log('preRequisitefetchedLearningResources', fetchedLearningResources);
           </Typography>
         )}
 
-<Typography variant="h4" fontWeight={500} mb={2}>
-          {t('COURSE_PLANNER.DURING_COURSE')}
-        </Typography>
-        {duringCourse?.length > 0 ? (
-          <Grid container spacing={2} sx={{ mb: 4 }}>
-            {duringCourse.map((item, index) => (
-              <Grid xs={12} md={4} lg={3} item key={index}>
-                <ResourceCard
-                  title={item.name}
-                  // type={item.app}
-                  resource={item.contentType}
-                  appIcon={item?.appIcon}
-                  identifier={item.identifier}
-                  mimeType={item.mimeType}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        ) : (
-          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-            {t('COURSE_PLANNER.NO_DATA_POST')}
-          </Typography>
-        )}
+
 
         <Typography variant="h4" fontWeight={500} mb={2}>
           {t('COURSE_PLANNER.FACILITATORS')}

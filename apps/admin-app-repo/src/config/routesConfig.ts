@@ -10,7 +10,8 @@ export const PUBLIC_ROUTES = [
   '/unauthorized',
   '/importCsv',
   '/resourceList',
-  '/play'
+  '/play',
+  '/edit-password'
 ];
 export const ROLE_BASED_ROUTES = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {

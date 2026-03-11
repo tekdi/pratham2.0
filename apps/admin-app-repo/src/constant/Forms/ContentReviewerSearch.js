@@ -25,6 +25,40 @@ export const ContentReviewerSearchSchema = {
       isMultiSelect: true,
       maxSelection: 1000,
     },
+    board: {
+      "type": "array",
+      "title": "BOARD",
+      "coreField": 0,
+      "fieldId": "f93c0ac3-f827-4794-9457-441fa1057b42",
+      "field_type": "drop_down",
+      "maxSelection": 10000,
+      "isMultiSelect": true,
+      "uniqueItems": true,
+      "isRequired": true,
+      "items": {
+          "type": "string",
+          "enum": [
+              "Select"
+          ],
+          "enumNames": [
+              "Select"
+          ]
+      },
+      "api": {
+          "url": "/api/dynamic-form/get-framework",
+          "method": "POST",
+          "options": {
+              "label": "label",
+              "value": "value",
+              "optionObj": "options"
+          },
+          "payload": {
+              "code": "board",
+              "fetchUrl": `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/scp-framework`
+          },
+          "callType": "initial"
+      }
+  },
     name: {
       type: 'string',
       title: 'Search Content Reviewer',
@@ -35,7 +69,7 @@ export const ContentReviewerSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
       enum: ['active', 'archived'],
@@ -45,7 +79,7 @@ export const ContentReviewerSearchSchema = {
 };
 
 export const ContentReviewerUISchema = {
-  'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
+  'ui:order': ['state', 'name', 'sortBy', 'status'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -53,6 +87,14 @@ export const ContentReviewerUISchema = {
       multiple: true,
       uniqueItems: true,
     },
+  },
+  board: {
+    "ui:widget": "AutoCompleteMultiSelectWidget",
+    "ui:options": {
+        "multiple": true,
+        "uniqueItems": true,
+        "hideError": false
+    }
   },
 
   firstName: {
@@ -63,7 +105,7 @@ export const ContentReviewerUISchema = {
     'ui:widget': 'select',
   },
 
-  tenantStatus: {
+  status: {
     'ui:widget': 'select',
   },
 };

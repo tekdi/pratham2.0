@@ -404,5 +404,6 @@ export const YOUTHNET_USER_ROLE = {
   MENTOR_LEAD: '',
   LEAD:"Lead",
   INSTRUCTOR:"Instructor",
-  LEARNER:"Learner"
+  LEARNER:"Learner",
+  MOBILIZER:"Mobilizer"
 };

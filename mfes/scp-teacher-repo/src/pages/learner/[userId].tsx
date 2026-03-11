@@ -384,7 +384,7 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
                   genericFormResponse.fields =
                     genericFormResponse.fields.filter(
                       (item: { name: string }) =>
-                        !['password', 'confirm_password', 'program'].includes(
+                        !['password', 'confirm_password', 'program' ].includes(
                           item.name
                         )
                     );
@@ -613,7 +613,7 @@ if (familyField?.displayValue) {
   } else if (role === 'mother') {
     removeSet.add('SPOUSE_NAME').add('FATHER_NAME');
   }
-
+  removeSet.add("INTERESTED_TO_JOIN")
   learnerDetailsByOrder = learnerDetailsByOrder.filter(
     (f) => !removeSet.has(f.label?.toUpperCase())
   );

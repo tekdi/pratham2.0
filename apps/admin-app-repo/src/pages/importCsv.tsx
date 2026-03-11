@@ -265,10 +265,10 @@ const ImportCsv = () => {
     const csvRows = allTasks.map((task) => {
       const row: any = {
         name: task.name || '',
-        externalId: task.externalId || '',
+        externalId:'',
         type: task.type || '',
         hasAParentTask: task.metaInformation?.hasAParentTask || '',
-        parentTaskId: task.metaInformation?.parentTaskId || '',
+        parentTaskId: '',
         startDate: task.metaInformation?.startDate || '',
         endDate: task.metaInformation?.endDate || ''
       };
