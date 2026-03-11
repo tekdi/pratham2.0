@@ -700,7 +700,7 @@ const PlayerBox = ({
           onClick={toggleFullscreen}
           sx={{
             position: 'absolute',
-            top: { xs: 4, sm: 8 },
+            bottom: { xs: 12, sm: 16 },
             right: { xs: 4, sm: 8 },
             zIndex: 1000,
             backgroundColor: 'rgba(0, 0, 0, 0.6)',
