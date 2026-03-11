@@ -589,11 +589,95 @@ const PlayerBox = ({
   const [play, setPlay] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isFullscreenSupported, setIsFullscreenSupported] = useState(false);
+  const [iframeHasFullscreen, setIframeHasFullscreen] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Detect if player already has fullscreen - check for video mimeTypes
+  const isVideoPlayer = (mimeType: string): boolean => {
+    if (!mimeType) return false;
+    const videoMimeTypes = [
+      'video/x-youtube',
+      'video/mp4',
+      'video/webm',
+      'video/ogg',
+      'video/quicktime',
+      'video/x-msvideo',
+      'video/x-matroska',
+    ];
+    return videoMimeTypes.some((type) => mimeType.toLowerCase().includes(type.toLowerCase()));
+  };
+
+  const playerHasNativeFullscreen = isVideoPlayer(item?.content?.mimeType || '');
 
   useEffect(() => {
     setPlay(true);
   }, []);
+
+  // Listen for messages from iframe indicating it has fullscreen controls
+  useEffect(() => {
+    if (!play) return;
+
+    const handleMessage = (event: MessageEvent) => {
+      // Check if message is from our iframe player
+      if (event.data && typeof event.data === 'object') {
+        if (event.data.hasFullscreen !== undefined) {
+          setIframeHasFullscreen(event.data.hasFullscreen);
+        }
+        if (event.data.type === 'player-ready' && event.data.hasFullscreenControl !== undefined) {
+          setIframeHasFullscreen(event.data.hasFullscreenControl);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Check iframe after it loads
+    const checkIframeFullscreen = () => {
+      try {
+        const iframe = iframeRef.current;
+        if (!iframe) return;
+
+        // Check if iframe has video element with controls (native fullscreen)
+        try {
+          const iframeDoc = iframe.contentDocument;
+          if (iframeDoc) {
+            const videoElements = iframeDoc.querySelectorAll('video[controls]');
+            if (videoElements.length > 0) {
+              setIframeHasFullscreen(true);
+              return;
+            }
+          }
+        } catch (e) {
+          // Cross-origin - cannot check directly
+        }
+      } catch (error) {
+        // Error checking iframe
+      }
+    };
+
+    const iframe = iframeRef.current;
+    if (iframe) {
+      const handleIframeLoad = () => {
+        setTimeout(checkIframeFullscreen, 500);
+        setTimeout(checkIframeFullscreen, 1500);
+      };
+      iframe.addEventListener('load', handleIframeLoad);
+      
+      if (iframe.contentDocument?.readyState === 'complete') {
+        setTimeout(checkIframeFullscreen, 500);
+      }
+
+      return () => {
+        window.removeEventListener('message', handleMessage);
+        iframe.removeEventListener('load', handleIframeLoad);
+      };
+    }
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [play]);
 
   // Check if fullscreen is supported
   useEffect(() => {
@@ -694,8 +778,8 @@ const PlayerBox = ({
         justifyContent: 'center',
       }}
     >
-      {/* Fullscreen button */}
-      {play && isFullscreenSupported && (
+      {/* Fullscreen button - only show if player doesn't have native fullscreen */}
+      {play && isFullscreenSupported && !playerHasNativeFullscreen && !iframeHasFullscreen && (
         <IconButton
           onClick={toggleFullscreen}
           sx={{
@@ -805,6 +889,7 @@ const PlayerBox = ({
           }}
         >
           <iframe
+            ref={iframeRef}
             name={JSON.stringify({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
