@@ -1,5 +1,5 @@
 //@ts-nocheck
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle,forwardRef } from 'react';
 import Form from '@rjsf/mui';
 import validator from '@rjsf/validator-ajv8';
 import axios from 'axios';
@@ -32,7 +32,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import { showToastMessage } from './Toastify';
 
 // import { useTranslation } from '@shared-lib'; // Updated import
-const DynamicForm = ({
+const DynamicForm = forwardRef(({
   schema,
   uiSchema,
   SubmitaFunction,
@@ -50,7 +50,7 @@ const DynamicForm = ({
   mobileSchema = {},
   parentDataAddUiSchema = {},
   parentDataSchema = {},
-}: any) => {
+}: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
   const { t } = useTranslation();
@@ -225,7 +225,7 @@ const DynamicForm = ({
   }, [formUiSchema]);
 
   // Helper function to reorder fields in UI schema
-   const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
+  const reorderUiSchemaFields = (uiSchema: any, moveField: any, afterField: any) => {
     if (!uiSchema['ui:order']) {
       return uiSchema;
     }
@@ -377,12 +377,12 @@ const DynamicForm = ({
 
             // Reorder guardian fields to appear right after DOB
             let reorderedUiSchema = updatedUiSchema;
-            
+
             // Ensure ui:order exists and add guardian_info_note to it if not present
             if (!reorderedUiSchema['ui:order']) {
               reorderedUiSchema['ui:order'] = Object.keys(oldFormSchema.properties);
             }
-            
+
             // Only add guardian_info_note to ui:order if it's not already there
             if (!reorderedUiSchema['ui:order'].includes('guardian_info_note')) {
               const dobIndex = reorderedUiSchema['ui:order'].indexOf('dob');
@@ -392,7 +392,7 @@ const DynamicForm = ({
                 reorderedUiSchema['ui:order'].push('guardian_info_note');
               }
             }
-            
+
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_name', 'guardian_info_note');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'guardian_relation', 'guardian_name');
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
@@ -723,49 +723,49 @@ const DynamicForm = ({
           return updatedSchema;
         });
       };
-      
+
       if(formSchema.properties?.own_phone_check){ 
         if (formData.phone_type_accessible === 'nophone') {
-        removeFields(['own_phone_check']);
+          removeFields(['own_phone_check']);
       } else if (formData.phone_type_accessible ) {
-        // 1. Add back to schema if missing
-        setFormSchema((prevSchema) => {
-          if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
-            return {
-              ...prevSchema,
-              properties: {
-                ...prevSchema.properties,
-                own_phone_check: {
-                  type: 'string',
-                  title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
-                  coreField: 0,
-                  fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
-                  field_type: 'radio',
-                  isRequired: true,
-                  enum: ['yes', 'no'],
-                  enumNames: ['YES', 'NO'],
+          // 1. Add back to schema if missing
+          setFormSchema((prevSchema) => {
+            if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
+              return {
+                ...prevSchema,
+                properties: {
+                  ...prevSchema.properties,
+                  own_phone_check: {
+                    type: 'string',
+                    title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
+                    coreField: 0,
+                    fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
+                    field_type: 'radio',
+                    isRequired: true,
+                    enum: ['yes', 'no'],
+                    enumNames: ['YES', 'NO'],
+                  },
                 },
-              },
-              required: prevSchema.required?.includes('own_phone_check')
-                ? prevSchema.required
-                : [...(prevSchema.required || []), 'own_phone_check'],
-            };
-          }
-          return prevSchema;
-        });
+                required: prevSchema.required?.includes('own_phone_check')
+                  ? prevSchema.required
+                  : [...(prevSchema.required || []), 'own_phone_check'],
+              };
+            }
+            return prevSchema;
+          });
 
-        // 2. Add back to uiSchema
-        setFormUiSchema((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: {
-            'ui:widget': 'CustomRadioWidget',
-            'ui:options': {
-              hideError: true,
+          // 2. Add back to uiSchema
+          setFormUiSchema((prevUiSchema) => ({
+            ...prevUiSchema,
+            own_phone_check: {
+              'ui:widget': 'CustomRadioWidget',
+              'ui:options': {
+                hideError: true,
+              },
             },
-          },
-        }));
-      }
-      
+          }));
+        }
+
     }}
   }, [formData]);
 
@@ -809,13 +809,22 @@ const DynamicForm = ({
     GuardianInfoField,
   };
 
+  useImperativeHandle(ref, () => ({
+      resetForm: (newFormData) => {
+        setFormData(newFormData);
+        handleChange({ formData: newFormData });
+      },
+    }));
   useEffect(() => {
     if (isInitialCompleted === true) {
       // setFormData;
       //fix for auto submit and render
       if (!prefilledFormData || Object.keys(prefilledFormData).length === 0) {
-        if (type !== 'centers') prefilledFormData = { test: 'test' };
-        else prefilledFormData = { type: 'COHORT' };
+        if (isCallSubmitInHandle == undefined || isCallSubmitInHandle == null || isCallSubmitInHandle == false)
+        {
+          if (type !== 'centers') prefilledFormData = { test: 'test' };
+          else prefilledFormData = { type: 'COHORT' };
+        }
       }
       renderPrefilledForm();
     }
@@ -868,19 +877,19 @@ const DynamicForm = ({
           // If header exists, replace values with localStorage values
           let customHeader = api?.header
             ? {
-                tenantId:
-                  api.header.tenantId === '**'
-                    ? localStorage.getItem('tenantId') || ''
-                    : api.header.tenantId,
-                Authorization:
-                  api.header.Authorization === '**'
-                    ? `Bearer ${localStorage.getItem('token') || ''}`
-                    : api.header.Authorization,
-                academicyearid:
-                  api.header.academicyearid === '**'
-                    ? localStorage.getItem('academicYearId') || ''
-                    : api.header.academicyearid,
-              }
+              tenantId:
+                api.header.tenantId === '**'
+                  ? localStorage.getItem('tenantId') || ''
+                  : api.header.tenantId,
+              Authorization:
+                api.header.Authorization === '**'
+                  ? `Bearer ${localStorage.getItem('token') || ''}`
+                  : api.header.Authorization,
+              academicyearid:
+                api.header.academicyearid === '**'
+                  ? localStorage.getItem('academicYearId') || ''
+                  : api.header.academicyearid,
+            }
             : {};
           const config = {
             method: api.method,
@@ -920,8 +929,8 @@ const DynamicForm = ({
                       : ['Select'],
                     enumNames: data
                       ? data?.map((item) =>
-                          transformLabel(item?.[label].toString())
-                        )
+                        transformLabel(item?.[label].toString())
+                      )
                       : ['Select'],
                   },
                 };
@@ -933,8 +942,8 @@ const DynamicForm = ({
                     : ['Select'],
                   enumNames: data
                     ? data?.map((item) =>
-                        transformLabel(item?.[label].toString())
-                      )
+                      transformLabel(item?.[label].toString())
+                    )
                     : ['Select'],
                 };
               }
@@ -1140,19 +1149,19 @@ const DynamicForm = ({
             // If header exists, replace values with localStorage values
             let customHeader = api?.header
               ? {
-                  tenantId:
-                    api.header.tenantId === '**'
-                      ? localStorage.getItem('tenantId') || ''
-                      : api.header.tenantId,
-                  Authorization:
-                    api.header.Authorization === '**'
-                      ? `Bearer ${localStorage.getItem('token') || ''}`
-                      : api.header.Authorization,
-                  academicyearid:
-                    api.header.academicyearid === '**'
-                      ? localStorage.getItem('academicYearId') || ''
-                      : api.header.academicyearid,
-                }
+                tenantId:
+                  api.header.tenantId === '**'
+                    ? localStorage.getItem('tenantId') || ''
+                    : api.header.tenantId,
+                Authorization:
+                  api.header.Authorization === '**'
+                    ? `Bearer ${localStorage.getItem('token') || ''}`
+                    : api.header.Authorization,
+                academicyearid:
+                  api.header.academicyearid === '**'
+                    ? localStorage.getItem('academicYearId') || ''
+                    : api.header.academicyearid,
+              }
               : {};
             const config = {
               method: api.method,
@@ -1206,21 +1215,21 @@ const DynamicForm = ({
                       // If header exists, replace values with localStorage values
                       let customHeader = api?.header
                         ? {
-                            tenantId:
-                              api.header.tenantId === '**'
-                                ? localStorage.getItem('tenantId') || ''
-                                : api.header.tenantId,
-                            Authorization:
-                              api.header.Authorization === '**'
+                          tenantId:
+                            api.header.tenantId === '**'
+                              ? localStorage.getItem('tenantId') || ''
+                              : api.header.tenantId,
+                          Authorization:
+                            api.header.Authorization === '**'
                                 ? `Bearer ${
                                     localStorage.getItem('token') || ''
-                                  }`
-                                : api.header.Authorization,
-                            academicyearid:
-                              api.header.academicyearid === '**'
-                                ? localStorage.getItem('academicYearId') || ''
-                                : api.header.academicyearid,
-                          }
+                              }`
+                              : api.header.Authorization,
+                          academicyearid:
+                            api.header.academicyearid === '**'
+                              ? localStorage.getItem('academicYearId') || ''
+                              : api.header.academicyearid,
+                        }
                         : {};
                       const config = {
                         method: api.method,
@@ -1670,19 +1679,19 @@ const DynamicForm = ({
                 // If header exists, replace values with localStorage values
                 let customHeader = api?.header
                   ? {
-                      tenantId:
-                        api.header.tenantId === '**'
-                          ? localStorage.getItem('tenantId') || ''
-                          : api.header.tenantId,
-                      Authorization:
-                        api.header.Authorization === '**'
-                          ? `Bearer ${localStorage.getItem('token') || ''}`
-                          : api.header.Authorization,
-                      academicyearid:
-                        api.header.academicyearid === '**'
-                          ? localStorage.getItem('academicYearId') || ''
-                          : api.header.academicyearid,
-                    }
+                    tenantId:
+                      api.header.tenantId === '**'
+                        ? localStorage.getItem('tenantId') || ''
+                        : api.header.tenantId,
+                    Authorization:
+                      api.header.Authorization === '**'
+                        ? `Bearer ${localStorage.getItem('token') || ''}`
+                        : api.header.Authorization,
+                    academicyearid:
+                      api.header.academicyearid === '**'
+                        ? localStorage.getItem('academicYearId') || ''
+                        : api.header.academicyearid,
+                  }
                   : {};
                 const config = {
                   method: api.method,
@@ -2174,7 +2183,7 @@ const DynamicForm = ({
       )}
     </>
   );
-};
+});
 
 export default DynamicForm;
 
