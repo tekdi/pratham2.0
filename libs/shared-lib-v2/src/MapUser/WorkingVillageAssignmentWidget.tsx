@@ -301,7 +301,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
           // Extract assigned village IDs
           const assignedVillageIds = new Set<number>();
           if (userListResponse?.data?.result?.getUserDetails) {
-            const filteredResponse = userListResponse.data.result.getUserDetails;
+            const userListResponseData = userListResponse.data.result.getUserDetails;
+            const filteredResponse = userListResponseData?.filter(
+              user => user.tenantStatus === "active"
+            );
             // console.log("filteredResponse>>>>", filteredResponse);
             
             // Filter out the current user's data to avoid marking their own villages as assigned
@@ -1807,7 +1810,9 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                         ? 'No centers found'
                         : 'Select center...'}
                     </MenuItem>
-                    {centerOptions.map((center) => (
+                    {centerOptions
+                      .filter((center, index, self) => self.findIndex((c) => c.id === center.id) === index)
+                      .map((center) => (
                       <MenuItem key={center.id} value={center.id}>
                         {center.name}
                       </MenuItem>

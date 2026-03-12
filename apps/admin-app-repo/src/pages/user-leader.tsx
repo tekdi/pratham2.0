@@ -12,7 +12,7 @@ import {
   TeamLeaderSearchSchema,
   TeamLeaderSearchUISchema,
 } from '../constant/Forms/TeamLeaderSearch';
-import { Role, RoleId, Status } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, Status, TenantName } from '@/utils/app.constant';
 import { HierarchicalSearchUserList, userList } from '@/services/UserList';
 import {
   Box,
@@ -80,6 +80,8 @@ import { updateUser } from '@/services/CreateUserService';
 import { splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUserTenantStatus } from '@/services/UserService';
+import { sendCredentialService } from '@/services/NotificationService';
+import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
 const UserLeader = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -172,7 +174,8 @@ const UserLeader = () => {
         alterUISchema.email['ui:disabled'] = true;
       }
       if (alterUISchema?.mobile) {
-        alterUISchema.mobile['ui:disabled'] = true;
+        //if mobile is not required, then disable it
+        // alterUISchema.mobile['ui:disabled'] = true;
       }
 
       //bug fix for bakcend multiple times same fields in both form
@@ -569,11 +572,21 @@ const UserLeader = () => {
           const cohortList = cohortResponse?.result || [];
           
           // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
-          const filteredCenters = cohortList.filter((cohort: any) => 
-            cohort.cohortMemberStatus === 'archived' &&
-            cohort.cohortStatus === 'active' &&
-            (cohort.type === 'CENTER' || cohort.type === 'COHORT')
-          );
+          // Filter and remove duplicates based on cohortId
+          const filteredCenters = [];
+          const seenCohortIds = new Set();
+          for (const cohort of cohortList) {
+            if (
+              cohort.cohortMemberStatus === 'archived' &&
+              cohort.cohortStatus === 'active' &&
+              (cohort.type === 'CENTER' || cohort.type === 'COHORT')
+            ) {
+              if (!seenCohortIds.has(cohort.cohortId)) {
+                filteredCenters.push(cohort);
+                seenCohortIds.add(cohort.cohortId);
+              }
+            }
+          }
           
           setAvailableCenters(filteredCenters);
         } catch (error) {
@@ -1027,6 +1040,10 @@ const UserLeader = () => {
                     const { userData, customFields } =
                       splitUserData(userDetails);
 
+                    const mappedUserEmail = userData?.email || userDetails?.email;
+                    const mappedUserFirstName =
+                      userData?.firstName || userDetails?.firstName || '';
+
                     delete userData.email;
 
                     const object = {
@@ -1080,6 +1097,38 @@ const UserLeader = () => {
                         response?.status === 201
                       ) {
                         showToastMessage(t(successCreateMessage), 'success');
+
+                        try {
+                          const program =
+                            localStorage.getItem('tenantName') ||
+                            localStorage.getItem('program') ||
+                            '';
+                          // TODO: confirm which env var should provide login link
+                          const loginLink = ROLE_LOGIN_URL_MAP[Role.TEAM_LEADER];
+                          const roleForNotification =
+                            program === TenantName.YOUTHNET
+                              ? 'Center Head'
+                              : 'Team Leader';
+
+                          if (mappedUserEmail) {
+                            await sendCredentialService(
+                              buildProgramMappingEmailRequest({
+                                email: mappedUserEmail,
+                                firstName: mappedUserFirstName,
+                                role: roleForNotification,
+                                program,
+                                platform: 'Pratham learning Platform (PLP)',
+                                loginLink,
+                              })
+                            );
+                          }
+                        } catch (notificationError) {
+                          console.error(
+                            'Error sending program mapping notification:',
+                            notificationError
+                          );
+                        }
+
                         // Close dialog
                         setMapModalOpen(false);
                         setSelectedCenterId(null);
