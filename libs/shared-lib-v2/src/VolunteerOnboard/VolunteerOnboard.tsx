@@ -337,6 +337,12 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
         if (enrolledProgram && userTenantStatus) {
           customFields.push(data);
         }
+        if(localStorage.getItem('temp_program_type') == 'VolunteerOnboarding'){
+          customFields.push({
+            fieldId: "4a04adbe-af01-4dea-92e3-688eab9935ca",
+            value: "No"
+          });
+        }
         const object = {
           userData: {
             ...userData,
