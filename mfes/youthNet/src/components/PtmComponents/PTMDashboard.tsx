@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { StatusCardsRow, StatusCardData } from '.';
 import DataTable, { Column, RowData } from './DataTable';
 import DynamicFilterBar, { FilterState, FilterLabels } from './DynamicFilterBar';
-import { fetchUserList, getUserDetails } from '../../services/youthNet/Dashboard/UserServices';
+import { fetchUserList, getUserDetails, updateUser } from '../../services/youthNet/Dashboard/UserServices';
 import { bulkUpdateUsersRoles, updateCohortStatus } from '../../services/ManageUser';
 import { showToastMessage } from '../Toastify';
 import { DASHBOARD_TYPE } from '../../utils/app.config';
@@ -230,7 +230,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                  "individual_volunteer"
              ],
               ptm_id: localStorage.getItem('userId') || '',
-            //  is_reject:"no",
+              is_rejected:"No",
              "volunteer_type":"individual_volunteer"
           };
           Approvedfilters = {
@@ -247,7 +247,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
                  "individual_volunteer"
              ],
              ptm_id: localStorage.getItem('userId') || '',
-             is_reject:"yes",
+             is_rejected:"Yes",
              volunteer_type:"individual_volunteer"
           };
         }
@@ -255,28 +255,25 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           Pendingfilters = {
             role: "Learner",
             "how_would_you_like_to_register": [
-                 "individual_volunteer"
+                 "register_an_organisation_as_poc"
              ],
              ptm_id: localStorage.getItem('userId') || '',
-            // is_reject:"no",
-              volunteer_type:"individual_volunteer_through_an_organisation"
+             is_rejected:"No",
           };
           Approvedfilters = {
             role: "Volunteer",
             "how_would_you_like_to_register": [
-                 "individual_volunteer"
+                 "register_an_organisation_as_poc"
              ],
             ptm_id: localStorage.getItem('userId') || '',
-             volunteer_type:"individual_volunteer_through_an_organisation"
           };
           Rejectedfilters = {
             role: "Learner",
             "how_would_you_like_to_register": [
-                 "individual_volunteer"
+                 "register_an_organisation_as_poc"
              ],
            ptm_id: localStorage.getItem('userId') || '',
-             is_reject:"yes",
-             volunteer_type:"individual_volunteer_through_an_organisation"
+             is_rejected:"Yes",
           };
         }
         else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
@@ -556,8 +553,8 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
         baseFilters = {
           "role": ["Learner", "Volunteer"],
-          "how_would_you_like_to_register": ["individual_volunteer"],
-          "volunteer_type":"individual_volunteer_through_an_organisation",
+          "how_would_you_like_to_register": ["register_an_organisation_as_poc"],
+         // "volunteer_type":"individual_volunteer_through_an_organisation",
           "ptm_id": localStorage.getItem('userId') || ''
         };
       }
@@ -580,7 +577,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         } else if (selectedStatus === 'approved') {
           baseFilters = { ...baseFilters, role: ['Volunteer'] }; // Approved as Volunteers
         } else if (selectedStatus === 'rejected') {
-          baseFilters = { ...baseFilters, is_reject: 'yes' }; // Explicitly rejected
+          baseFilters = { ...baseFilters, is_reject: 'Yes' }; // Explicitly rejected
         }
         // For 'total', no additional status filter is added (shows all records)
       } else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
@@ -659,7 +656,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             const state = getCustomFieldValue('STATE');
             const district = getCustomFieldValue('DISTRICT');
             const block = getCustomFieldValue('BLOCK');
-            const is_reject = getCustomFieldValue('IS_REJECT');
+            const is_rejected = getCustomFieldValue('IS_REJECTED');
             const village = getCustomFieldValue('VILLAGE');
             const location = [state, district, block, village].filter(l => l !== 'N/A').join(', ') || 'N/A';
 
@@ -671,7 +668,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
               phone: user.mobile || 'N/A',
               location: location,
               organization: getCustomFieldValue('ORG_ID') || 'N/A',
-              status: user.role === 'Volunteer' ? t('PTM_DASHBOARD.APPROVED') : (user.role === 'Learner' && is_reject === 'yes') ? t('PTM_DASHBOARD.REJECTED') : t('PTM_DASHBOARD.PENDING_REVIEW'),
+              status: user.role === 'Volunteer' ? t('PTM_DASHBOARD.APPROVED') : (user.role === 'Learner' && is_rejected === 'Yes') ? t('PTM_DASHBOARD.REJECTED') : t('PTM_DASHBOARD.PENDING_REVIEW'),
             };
             
             return transformedRow;
@@ -812,7 +809,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     
     try {
       // Call API based on dashboard type
-      if (dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER) {
+      if (dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER) {
         await bulkUpdateUsersRoles({
           userIds: userIds,
           roleId: VOLUNTEER_ROLE_ID
@@ -888,6 +885,23 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         });
         console.log('Successfully rejected cohorts:', userIds);
       }
+      else if (dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER) {
+        // Update each user with custom field for rejection
+        const updatePromises = userIds.map(userId => 
+          updateUser(userId, {
+            userData: {},
+            customFields: [
+              {
+                fieldId: "4a04adbe-af01-4dea-92e3-688eab9935ca",
+                value: "Yes"
+              }
+            ]
+          })
+        );
+        await Promise.all(updatePromises);
+        console.log('Successfully rejected volunteers:', userIds);
+      }
+      
       // For individual volunteers, we might not have a reject API, so just update local state
     } catch (error) {
       console.error('Error rejecting:', error);
