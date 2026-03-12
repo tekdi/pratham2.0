@@ -572,11 +572,21 @@ const UserLeader = () => {
           const cohortList = cohortResponse?.result || [];
           
           // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
-          const filteredCenters = cohortList.filter((cohort: any) => 
-            cohort.cohortMemberStatus === 'archived' &&
-            cohort.cohortStatus === 'active' &&
-            (cohort.type === 'CENTER' || cohort.type === 'COHORT')
-          );
+          // Filter and remove duplicates based on cohortId
+          const filteredCenters = [];
+          const seenCohortIds = new Set();
+          for (const cohort of cohortList) {
+            if (
+              cohort.cohortMemberStatus === 'archived' &&
+              cohort.cohortStatus === 'active' &&
+              (cohort.type === 'CENTER' || cohort.type === 'COHORT')
+            ) {
+              if (!seenCohortIds.has(cohort.cohortId)) {
+                filteredCenters.push(cohort);
+                seenCohortIds.add(cohort.cohortId);
+              }
+            }
+          }
           
           setAvailableCenters(filteredCenters);
         } catch (error) {
