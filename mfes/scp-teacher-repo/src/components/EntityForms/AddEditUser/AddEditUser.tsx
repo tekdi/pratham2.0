@@ -336,12 +336,17 @@ const AddEditUser = ({
           // console.log('userData', userData);
           // console.log('customFields', customFields);
           if (type == 'learner') {
-            const parentPhoneField = customFields.find(
-              (field: any) => field.value === formData.parent_phone
-            );
-            console.log('Parent Phone Field:', parentPhoneField);
-            if (parentPhoneField) {
-              userData.mobile = parentPhoneField.value;
+            if (isUnderEighteen(userData?.dob)) {
+              const parentPhoneField = customFields.find(
+                (field: any) => field.value === formData.parent_phone
+              );
+              console.log('Parent Phone Field:', parentPhoneField);
+              if (parentPhoneField) {
+                userData.mobile = parentPhoneField.value;
+              }
+            } else {
+              // For users 18 or older, use the mobile field directly
+              userData.mobile = formData?.mobile || userData?.mobile;
             }
           }
           const object = {
@@ -496,6 +501,9 @@ const AddEditUser = ({
             }
             if (isUnderEighteen(payload?.dob)) {
               payload.mobile = formData?.parent_phone;
+            } else {
+              // For users 18 or older, use the mobile field directly
+              payload.mobile = formData?.mobile || payload?.mobile;
             }
           }
           const responseUserData = await createUser(payload, t);
