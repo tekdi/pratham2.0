@@ -896,13 +896,20 @@ export const extractTasks = (
 export const extractWorkingLocationVillages = (row: any): string => {
   if (!row?.customfield?.working_location) return '';
 
-  let parsedLocation;
+  let parsedLocation: any[] = [];
 
   try {
-    parsedLocation =
-      typeof row.customfield.working_location === 'string'
-        ? JSON.parse(row.customfield.working_location)
-        : row.customfield.working_location;
+    const location = row.customfield.working_location;
+
+    if (typeof location === 'string') {
+      // Convert invalid JSON objects list into valid JSON array
+      const formatted = `[${location}]`;
+      parsedLocation = JSON.parse(formatted);
+    } else if (Array.isArray(location)) {
+      parsedLocation = location;
+    } else {
+      parsedLocation = [location];
+    }
   } catch (error) {
     console.error('Invalid working_location JSON', error);
     return '';
@@ -910,12 +917,14 @@ export const extractWorkingLocationVillages = (row: any): string => {
 
   const villages: string[] = [];
 
-  parsedLocation?.districts?.forEach((district: any) => {
-    district?.blocks?.forEach((block: any) => {
-      block?.villages?.forEach((village: any) => {
-        if (village?.name) {
-          villages.push(village.name);
-        }
+  parsedLocation?.forEach((state: any) => {
+    state?.districts?.forEach((district: any) => {
+      district?.blocks?.forEach((block: any) => {
+        block?.villages?.forEach((village: any) => {
+          if (village?.name) {
+            villages.push(village.name);
+          }
+        });
       });
     });
   });

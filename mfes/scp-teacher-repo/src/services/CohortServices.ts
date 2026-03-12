@@ -54,10 +54,22 @@ export const getCohortList = async (
   try {
     const response = await get(apiUrl);
     if (isCustomFields) {
-      return response?.data?.result;
+      const result = response?.data?.result;
+      const filtered = result?.filter(
+        (item: any) =>
+          item?.cohortMemberStatus === Status.ACTIVE &&
+          item?.cohortStatus === Status.ACTIVE
+      );
+      return filtered;
     }
     if (response?.data?.result.length > 0) {
-      let res = response?.data?.result;
+      const result = response?.data?.result;
+      const filtered = result?.filter(
+        (item: any) =>
+          item?.cohortMemberStatus === Status.ACTIVE &&
+          item?.cohortStatus === Status.ACTIVE
+      );
+      let res = filtered;
 
       res = res.filter((block: any) => {
         if (
@@ -92,7 +104,13 @@ export const getCohortList = async (
       }
     }
 
-    return response?.data?.result;
+    const result = response?.data?.result;
+      const filtered = result?.filter(
+        (item: any) =>
+          item?.cohortMemberStatus === Status.ACTIVE &&
+          item?.cohortStatus === Status.ACTIVE
+      );
+      return filtered;
   } catch (error) {
     console.error('Error in getting cohort details', error);
     return [];

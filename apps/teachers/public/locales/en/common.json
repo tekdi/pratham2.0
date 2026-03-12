@@ -157,7 +157,8 @@
     "MODIFY_CENTER_ATTENDANCE": "Modify Center Attendance",
     "NO_VILLAGES": "No Villages",
     "ALL_VILLAGES": "All Villages",
-    "FAQS": "FAQ's"
+    "FAQS": "FAQ's",
+    "REASSIGN":"Re-assign"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",
