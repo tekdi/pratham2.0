@@ -28,7 +28,7 @@ export const mapUserData = (userData: any) => {
     const getSelectedValue = (label: any) =>
       userData.customFields
         .find((f: any) => f.label === label)
-        ?.selectedValues.map((v: any) => v?.id?.toString()) || '';
+        ?.selectedValues.map((v: any) => v?.id?.toString() || v?.value?.toString()) || '';
 
     const getSingleSelectedValue = (label: any) =>
       userData.customFields
