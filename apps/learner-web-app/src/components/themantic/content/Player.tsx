@@ -303,13 +303,13 @@ const App = ({
   // };
 
   return (
-    <Box className="bs-px-5" sx={{ mx: '2vh', position: 'relative' }}>
+    <Box className="bs-px-5" sx={{ mx: { xs: '0.5vh', sm: '1vh', md: '2vh' }, position: 'relative' }}>
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          mb: 3,
+          mb: { xs: 1.5, sm: 2, md: 3 },
           position: 'relative',
           zIndex: 10,
           '& .MuiBreadcrumbs-root': {
@@ -333,8 +333,8 @@ const App = ({
           customPlayerMarginTop={25}
         />
       </Box>
-      <Box sx={{ pb: 5, px: '12px', position: 'relative', zIndex: 1 }}>
-        <Grid container spacing={5}>
+      <Box sx={{ pb: { xs: 2, sm: 3, md: 5 }, px: { xs: '4px', sm: '8px', md: '12px' }, position: 'relative', zIndex: 1 }}>
+        <Grid container spacing={{ xs: 2, sm: 3, md: 5 }}>
           <Grid item xs={12} sm={12} md={3.5} lg={3.5}>
             <Box
               sx={{
@@ -361,7 +361,7 @@ const App = ({
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    py: 3,
+                    py: { xs: 1.5, sm: 2, md: 3 },
                     position: 'relative',
                     zIndex: 1,
                   }}
@@ -370,7 +370,7 @@ const App = ({
                     <Grid
                       container
                       sx={{
-                        px: 3,
+                        px: { xs: 1, sm: 2, md: 3 },
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -401,12 +401,12 @@ const App = ({
                       fontWeight: '600',
                       textAlign: 'center',
                       color: '#000',
-                      fontSize: '23px',
+                      fontSize: { xs: '18px', sm: '20px', md: '23px' },
                       letterSpacing: '1px',
                       lineHeight: 1.2,
-                      mt: 2,
-                      mb: 2,
-                      px: 2,
+                      mt: { xs: 1, sm: 1.5, md: 2 },
+                      mb: { xs: 1, sm: 1.5, md: 2 },
+                      px: { xs: 1, sm: 1.5, md: 2 },
                       fontFamily: '"Montserrat", sans-serif',
                       textDecoration: 'underline',
                     }}
@@ -417,8 +417,8 @@ const App = ({
                   <Divider
                     sx={{
                       width: '100%',
-                      mt: 2,
-                      mb: 2,
+                      mt: { xs: 1, sm: 1.5, md: 2 },
+                      mb: { xs: 1, sm: 1.5, md: 2 },
                       height: '4px',
                       backgroundColor: '#9EB6BE',
                     }}
@@ -426,10 +426,10 @@ const App = ({
 
                   <Typography
                     sx={{
-                      fontSize: '16px',
+                      fontSize: { xs: '14px', sm: '15px', md: '16px' },
                       color: '#363d47',
                       fontWeight: '400',
-                      px: 2,
+                      px: { xs: 1, sm: 1.5, md: 2 },
                       fontFamily: '"Montserrat", sans-serif',
                     }}
                   >
@@ -451,7 +451,7 @@ const App = ({
             {item?.content?.artifactUrl &&
               isDownloadableMimeType(item?.content?.mimeType) &&
               isDownloadContentEnabled() && (
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ mt: { xs: 1.5, sm: 2, md: 3 }, display: 'flex', justifyContent: 'center' }}>
                   <Button
                     variant="contained"
                     onClick={handleDownloadButtonClick}
@@ -575,350 +575,134 @@ const App = ({
 
 export default App;
 
+
+
+
 const PlayerBox = ({
-  item,
   identifier,
   courseId,
   unitId,
   userIdLocalstorageName,
-  isGenerateCertificate,
-  trackable,
+  item,
 }: any) => {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const [play, setPlay] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isFullscreenSupported, setIsFullscreenSupported] = useState(false);
-  const [iframeHasFullscreen, setIframeHasFullscreen] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  // Detect if player already has fullscreen - check for video mimeTypes
-  const isVideoPlayer = (mimeType: string): boolean => {
-    if (!mimeType) return false;
-    const videoMimeTypes = [
-      'video/x-youtube',
-      'video/mp4',
-      'video/webm',
-      'video/ogg',
-      'video/quicktime',
-      'video/x-msvideo',
-      'video/x-matroska',
-    ];
-    return videoMimeTypes.some((type) => mimeType.toLowerCase().includes(type.toLowerCase()));
-  };
-
-  const playerHasNativeFullscreen = isVideoPlayer(item?.content?.mimeType || '');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Check if content is video type (videos have their own fullscreen controls)
+  const isVideoType = item?.content?.mimeType?.startsWith('video/');
 
   useEffect(() => {
-    setPlay(true);
-  }, []);
-
-  // Listen for messages from iframe indicating it has fullscreen controls
-  useEffect(() => {
-    if (!play) return;
-
-    const handleMessage = (event: MessageEvent) => {
-      // Check if message is from our iframe player
-      if (event.data && typeof event.data === 'object') {
-        if (event.data.hasFullscreen !== undefined) {
-          setIframeHasFullscreen(event.data.hasFullscreen);
-        }
-        if (event.data.type === 'player-ready' && event.data.hasFullscreenControl !== undefined) {
-          setIframeHasFullscreen(event.data.hasFullscreenControl);
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    // Check iframe after it loads
-    const checkIframeFullscreen = () => {
-      try {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-
-        // Check if iframe has video element with controls (native fullscreen)
-        try {
-          const iframeDoc = iframe.contentDocument;
-          if (iframeDoc) {
-            const videoElements = iframeDoc.querySelectorAll('video[controls]');
-            if (videoElements.length > 0) {
-              setIframeHasFullscreen(true);
-              return;
-            }
-          }
-        } catch (e) {
-          // Cross-origin - cannot check directly
-        }
-      } catch (error) {
-        // Error checking iframe
-      }
-    };
-
-    const iframe = iframeRef.current;
-    if (iframe) {
-      const handleIframeLoad = () => {
-        setTimeout(checkIframeFullscreen, 500);
-        setTimeout(checkIframeFullscreen, 1500);
-      };
-      iframe.addEventListener('load', handleIframeLoad);
-      
-      if (iframe.contentDocument?.readyState === 'complete') {
-        setTimeout(checkIframeFullscreen, 500);
-      }
-
-      return () => {
-        window.removeEventListener('message', handleMessage);
-        iframe.removeEventListener('load', handleIframeLoad);
-      };
-    }
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [play]);
-
-  // Check if fullscreen is supported
-  useEffect(() => {
-    const checkFullscreenSupport = () => {
-      const element = document.documentElement;
-      const supported =
-        !!(
-          element.requestFullscreen ||
-          (element as any).webkitRequestFullscreen ||
-          (element as any).mozRequestFullScreen ||
-          (element as any).msRequestFullscreen
-        );
-      setIsFullscreenSupported(supported);
-    };
-
-    checkFullscreenSupport();
-  }, []);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      const isFullscreenActive =
-        !!(
-          document.fullscreenElement ||
-          (document as any).webkitFullscreenElement ||
-          (document as any).mozFullScreenElement ||
-          (document as any).msFullscreenElement
-        );
-      setIsFullscreen(isFullscreenActive);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
-    };
-  }, []);
-
-  const handlePlay = () => {
-    setPlay(true);
-  };
+    document.body.style.overflow = isFullscreen ? "hidden" : "auto";
+  }, [isFullscreen]);
 
   const toggleFullscreen = async () => {
-    if (!playerRef.current) return;
+    const element = playerRef.current;
+    if (!element) return;
+
+    const isFs =
+      document.fullscreenElement ||
+      (document as any).webkitFullscreenElement;
 
     try {
-      const isCurrentlyFullscreen =
-        !!(
-          document.fullscreenElement ||
-          (document as any).webkitFullscreenElement ||
-          (document as any).mozFullScreenElement ||
-          (document as any).msFullscreenElement
-        );
-
-      if (!isCurrentlyFullscreen) {
-        // Enter fullscreen
-        const element = playerRef.current;
+      if (!isFs && !isFullscreen) {
         if (element.requestFullscreen) {
           await element.requestFullscreen();
+          setIsFullscreen(true);
         } else if ((element as any).webkitRequestFullscreen) {
           await (element as any).webkitRequestFullscreen();
-        } else if ((element as any).webkitEnterFullscreen) {
-          // iOS Safari alternative (for video elements)
-          await (element as any).webkitEnterFullscreen();
-        } else if ((element as any).mozRequestFullScreen) {
-          await (element as any).mozRequestFullScreen();
-        } else if ((element as any).msRequestFullscreen) {
-          await (element as any).msRequestFullscreen();
+          setIsFullscreen(true);
+        } else {
+          // iOS fallback
+          element.style.position = "fixed";
+          element.style.top = "0";
+          element.style.left = "0";
+          element.style.width = "100vw";
+          element.style.height = "100dvh";
+          element.style.zIndex = "999999";
+          element.style.background = "#000";
+          element.style.paddingTop = "0";
+          
+          setIsFullscreen(true);
+
+
+          
         }
       } else {
-        // Exit fullscreen
         if (document.exitFullscreen) {
           await document.exitFullscreen();
+          setIsFullscreen(false);
         } else if ((document as any).webkitExitFullscreen) {
           await (document as any).webkitExitFullscreen();
-        } else if ((document as any).mozCancelFullScreen) {
-          await (document as any).mozCancelFullScreen();
-        } else if ((document as any).msExitFullscreen) {
-          await (document as any).msExitFullscreen();
+          setIsFullscreen(false);
+        } else {
+          // exit fallback
+          element.removeAttribute("style");
+          setIsFullscreen(false);
         }
       }
-    } catch (error) {
-      console.error('Error toggling fullscreen:', error);
+    } catch (err) {
+      console.error("Fullscreen error:", err);
     }
   };
+
   return (
-    <Box
-      ref={playerRef}
-      sx={{
-        flex: { xs: 1, sm: 1, md: 8 },
-        position: 'relative',
-        display: 'flex',
-        justifyContent: 'center',
-      }}
-    >
-      {/* Fullscreen button - only show if player doesn't have native fullscreen */}
-      {play && isFullscreenSupported && !playerHasNativeFullscreen && !iframeHasFullscreen && (
-        <IconButton
-          onClick={toggleFullscreen}
-          sx={{
-            position: 'absolute',
-            bottom: { xs: 12, sm: 16 },
-            right: { xs: 4, sm: 8 },
-            zIndex: 1000,
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            color: '#fff',
-            width: { xs: 44, sm: 40 },
-            height: { xs: 44, sm: 40 },
-            minWidth: { xs: 44, sm: 40 },
-            padding: { xs: 1.5, sm: 1 },
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            },
-            '&:active': {
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-            },
-            '& svg': {
-              fontSize: { xs: '1.75rem', sm: '1.5rem' },
-            },
-          }}
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-        >
-          {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-        </IconButton>
-      )}
-      {!play ? (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            // alignItems: 'center',
-            position: 'relative',
-            width: '85%',
-            backgroundColor: '#f5f5f5',
-            justifyContent: 'center',
-            height: '100%',
-          }}
-        >
-          {/* Show content poster image as preview instead of iframe */}
-          <Box
+    <Box sx={{ width: "100%", position: "relative" }}>
+      <Box
+        ref={playerRef}
+        sx={{
+          position: "relative",
+          width: "100%",
+          paddingTop: isFullscreen ? "0" : "56.25%",
+          height: isFullscreen ? "100vh" : "auto",
+          background: "#000",
+        }}
+      >
+      <iframe
+  src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${identifier}${
+    courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ""
+  }${
+    userIdLocalstorageName
+      ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
+      : ""
+  }`}
+  style={{
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    border: "none",
+  }}
+  allowFullScreen
+/>
+
+        {/* Fullscreen toggle INSIDE container - Hide for video types as they have their own fullscreen controls */}
+        {!isVideoType && (
+          <IconButton
+            onClick={toggleFullscreen}
             sx={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
+              position: "absolute",
+              bottom: 16,
+              right: 12,
+              zIndex: 99999,
+              background: "rgba(0,0,0,0.6)",
+              color: "#fff",
+              width: 42,
+              height: 42,
+              "&:hover": {
+                background: "rgba(0,0,0,0.8)",
+              },
             }}
           >
-            <img
-              src={item?.content?.posterImage || '/images/image_ver.png'}
-              alt={
-                item?.content?.name || item?.content?.title || 'Content Preview'
-              }
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-            {/* Play button overlay */}
-            <Button
-              variant="contained"
-              onClick={handlePlay}
-              sx={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '50px',
-                height: '50px',
-                minWidth: 'unset',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                border: '3px solid #666666',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 1)',
-                  transform: 'translate(-50%, -50%) scale(1.05)',
-                  boxShadow: '0 6px 12px rgba(0, 0, 0, 0.4)',
-                },
-                '&::before': {
-                  content: '""',
-                  width: 0,
-                  height: 0,
-                  borderLeft: '25px solid #000000',
-                  borderTop: '15px solid transparent',
-                  borderBottom: '15px solid transparent',
-                  marginLeft: '6px',
-                },
-              }}
-            >
-              <span style={{ display: 'none' }}>{t('Play')}</span>
-            </Button>
-          </Box>
-        </Box>
-      ) : (
-        <Box
-          sx={{
-            width: '100%',
-          }}
-        >
-          <iframe
-            ref={iframeRef}
-            name={JSON.stringify({
-              isGenerateCertificate: isGenerateCertificate,
-              trackable: trackable,
-            })}
-            src={`${
-              process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
-            }?identifier=${identifier}${
-              courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
-            }${
-              userIdLocalstorageName
-                ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
-                : ''
-            }`}
-            style={{
-              border: 'none',
-              objectFit: 'contain',
-              aspectRatio: '16 / 9',
-            }}
-            allowFullScreen
-            width="100%"
-            height="100%"
-            title="Embedded Localhost"
-            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen"
-            frameBorder="0"
-            scrolling="no"
-            sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation allow-fullscreen"
-          />
-        </Box>
-      )}
+            {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+          </IconButton>
+        )}
+      </Box>
     </Box>
   );
 };
+
+
+
+
+
+

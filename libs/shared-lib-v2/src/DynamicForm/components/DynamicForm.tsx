@@ -842,7 +842,7 @@ const DynamicForm = forwardRef(({
       // setFormData;
       //fix for auto submit and render
       if (!prefilledFormData || Object.keys(prefilledFormData).length === 0) {
-        if (isCallSubmitInHandle == undefined || isCallSubmitInHandle == null || isCallSubmitInHandle == false)
+        if (isCallSubmitInHandle == undefined || isCallSubmitInHandle == null || isCallSubmitInHandle == false || type === 'centers')
         {
           if (type !== 'centers') prefilledFormData = { test: 'test' };
           else prefilledFormData = { type: 'COHORT' };
