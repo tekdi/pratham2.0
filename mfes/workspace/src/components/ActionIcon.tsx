@@ -61,7 +61,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
           <img src={'/delete.png'} height="20px" alt="Image" />
         </Box>
       </Tooltip>
-
+{/* 
       {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
         <Tooltip title="Unpublish">
           <Box
@@ -102,7 +102,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
             <PublishIcon sx={{ color: 'green' }} />
           </Box>
         </Tooltip>
-      )}
+      )} */}
 
       <DeleteConfirmation
         open={open}
