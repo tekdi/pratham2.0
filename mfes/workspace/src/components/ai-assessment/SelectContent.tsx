@@ -140,9 +140,18 @@ const SelectContent: React.FC<SelectContentProps> = ({
           },
         });
         // No need to filter for PDF mimeType here, API already does it
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays
+        const combinedList = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Sort by lastUpdatedOn in descending order (most recent first)
+        const contentList = combinedList.sort((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         if (page === 0) {
           setContentSources(contentList);
         } else {

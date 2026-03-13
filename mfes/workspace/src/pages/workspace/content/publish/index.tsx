@@ -72,7 +72,7 @@ const PublishPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
-  const [contentList, setContentList] = React.useState([]);
+  const [contentList, setContentList] = React.useState<any[]>([]);
   const [contentDeleted, setContentDeleted] = React.useState(false);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -180,9 +180,18 @@ const PublishPage = () => {
           sort_by,
           tenantConfig?.CHANNEL_ID
         );
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays
+        const combinedList = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Sort by lastUpdatedOn in descending order (most recent first)
+        const contentList = combinedList.sort((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         setContentList(contentList);
         setTotalCount(response?.count);
       } catch (error) {
