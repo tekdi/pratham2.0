@@ -132,11 +132,11 @@ const UserLeader = () => {
   const searchStoreKey = 'teamLeader';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
-    localStorage.getItem(searchStoreKey) != '{}'
+      localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
-      ? { state: [localStorage.getItem('stateId')] }
-      : {};
+        ? { state: [localStorage.getItem('stateId')] }
+        : {};
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -238,7 +238,7 @@ const UserLeader = () => {
 
       // Update cohort member status for each selected center
       const membershipIds = selectedCenters.map((center) => center.cohortMembershipId);
-      
+
       for (const membershipId of membershipIds) {
         try {
           const updateResponse = await updateCohortMemberStatus({
@@ -278,7 +278,7 @@ const UserLeader = () => {
       const resp = await updateUserTenantStatus(userID, tenantId, {
         status: 'active',
       });
-      
+
       if (resp?.responseCode === 200) {
         showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
         // Reset state
@@ -337,7 +337,7 @@ const UserLeader = () => {
       render: (row) =>
         `${transformLabel(row.firstName) || ''} ${
           transformLabel(row.middleName) || ''
-        } ${transformLabel(row.lastName) || ''}`.trim(),
+          } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
       keys: ['age'],
@@ -358,7 +358,7 @@ const UserLeader = () => {
         const block = transformLabel(row?.customfield?.block) || '';
         return `${state == '' ? '' : `${state}`}${
           district == '' ? '' : `, ${district}`
-        }${block == '' ? '' : `, ${block}`}`;
+          }${block == '' ? '' : `, ${block}`}`;
       },
     },
     {
@@ -499,11 +499,14 @@ const UserLeader = () => {
             district.blocks?.forEach((block) => {
               block.centers?.forEach((center) => {
                 // Check if centerId exists in cohortData with active status
-                const cohortCenter = cohortData?.find(
+                // Filter all entries for the same centerId and check if any has both statuses active
+                const cohortCenters = cohortData?.filter(
                   (item: any) => item?.centerId === center.centerId
                 );
-                const isActiveCenter =
-                  cohortCenter?.cohortMember?.status === 'active' && cohortCenter?.centerStatus === 'active';
+                const isActiveCenter = cohortCenters?.some(
+                  (cohortCenter: any) =>
+                    cohortCenter?.cohortMember?.status === 'active' && cohortCenter?.centerStatus === 'active'
+                );
 
                 // Only push if center has active cohortMember status
                 if (isActiveCenter) {
@@ -565,12 +568,12 @@ const UserLeader = () => {
         setAvailableCenters([]);
         setLoadingCenters(true);
         setArchiveToActiveOpen(true);
-        
+
         try {
           // Fetch cohort list for the user
           const cohortResponse = await getCohortList(selectedUserId);
           const cohortList = cohortResponse?.result || [];
-          
+
           // Filter centers where cohortMemberStatus = "archived", cohortStatus = "active", and type = "CENTER" or "COHORT"
           // Filter and remove duplicates based on cohortId
           const filteredCenters = [];
@@ -587,7 +590,7 @@ const UserLeader = () => {
               }
             }
           }
-          
+
           setAvailableCenters(filteredCenters);
         } catch (error) {
           console.error('Error fetching cohort list:', error);
@@ -1139,7 +1142,7 @@ const UserLeader = () => {
                       } else {
                         showToastMessage(
                           response?.data?.params?.errmsg ||
-                            t(failureCreateMessage),
+                          t(failureCreateMessage),
                           'error'
                         );
                       }
@@ -1151,7 +1154,7 @@ const UserLeader = () => {
                     console.error('Error creating cohort member:', error);
                     showToastMessage(
                       error?.response?.data?.params?.errmsg ||
-                        t(failureCreateMessage),
+                      t(failureCreateMessage),
                       'error'
                     );
                   } finally {
@@ -1312,7 +1315,7 @@ const UserLeader = () => {
                   console.error('Error creating cohort member:', error);
                   showToastMessage(
                     error?.response?.data?.params?.errmsg ||
-                      t(failureCreateMessage),
+                    t(failureCreateMessage),
                     'error'
                   );
                 } finally {
@@ -1398,21 +1401,21 @@ const UserLeader = () => {
                     try {
                       const { userData, customFields } =
                         splitUserData(userDetails);
-  
+
                       delete userData.email;
-  
+
                       const object = {
                         userData: userData,
                         customFields: customFields,
                       };
-  
+
                       //update user details
                       const updateUserResponse = await updateUser(selectedUserIdEdit, object);
                       console.log(
                         '######### updatedResponse',
                         updateUserResponse
                       );
-  
+
                       if (
                         updateUserResponse &&
                         updateUserResponse?.status == 200
@@ -1430,7 +1433,7 @@ const UserLeader = () => {
                       console.error('Error creating cohort member:', error);
                       showToastMessage(
                         error?.response?.data?.params?.errmsg ||
-                          t(failureCreateMessage),
+                        t(failureCreateMessage),
                         'error'
                       );
                     } finally {
@@ -1455,29 +1458,29 @@ const UserLeader = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
-            <Button
-              sx={{
-                backgroundColor: '#FFC107',
-                color: '#000',
-                fontFamily: 'Poppins',
-                fontWeight: 500,
-                fontSize: '14px',
-                height: '40px',
-                lineHeight: '20px',
-                letterSpacing: '0.1px',
-                textAlign: 'center',
-                verticalAlign: 'middle',
-                '&:hover': {
-                  backgroundColor: '#ffb300',
-                },
-                width: '100%',
-              }}
-              disabled={!selectedUserIdEdit || isEditInProgress}
-              form="dynamic-form-id"
-              type="submit"
-            >
-              {t('COMMON.SAVE')}
-            </Button>
+          <Button
+            sx={{
+              backgroundColor: '#FFC107',
+              color: '#000',
+              fontFamily: 'Poppins',
+              fontWeight: 500,
+              fontSize: '14px',
+              height: '40px',
+              lineHeight: '20px',
+              letterSpacing: '0.1px',
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              '&:hover': {
+                backgroundColor: '#ffb300',
+              },
+              width: '100%',
+            }}
+            disabled={!selectedUserIdEdit || isEditInProgress}
+            form="dynamic-form-id"
+            type="submit"
+          >
+            {t('COMMON.SAVE')}
+          </Button>
         </DialogActions>
       </Dialog>
 
