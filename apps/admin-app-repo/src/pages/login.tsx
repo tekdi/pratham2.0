@@ -910,6 +910,64 @@ const LoginPage = () => {
                   {t('LOGIN_PAGE.LOGIN')}
                 </Button>
               </Box>
+              
+              {/* SSO Login Button */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  width: '100%',
+                  mt: 2,
+                  justifyContent: 'center',
+                }}
+              >
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                  type="button"
+                  sx={{
+                    borderRadius: 50,
+                    backgroundColor: 'transparent',
+                    borderColor: '#1976d2',
+                    color: '#1976d2',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                      borderColor: '#1565c0',
+                      color: '#1565c0',
+                    },
+                    '@media (min-width: 900px)': {
+                      width: '50%',
+                    },
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Construct SSO URL with callback parameters
+                    const currentBaseUrl =
+                      typeof window !== 'undefined'
+                        ? window.location.origin
+                        : '';
+                    const callbackUrl = `${currentBaseUrl}/sso?env=newton`;
+                    const encodedCallbackUrl = callbackUrl;
+                    
+                    // Get SSO URL from environment variable
+                    const ssoBaseUrl = "https://prathamerp.org/Config/OAuthLogin/PRATHAM";
+                    
+                    // Construct SSO URL - use ? if no existing query params, otherwise use &
+                    const hasQueryParams = ssoBaseUrl.includes('?');
+                    const ssoUrl = `${ssoBaseUrl}${hasQueryParams ? '&' : '?'}callbackurl=${encodedCallbackUrl}`;
+                    
+                    console.log('Redirecting to SSO URL:', ssoUrl);
+
+                    // Open SSO URL in new tab (matching OurProgramCarousel behavior)
+                    window.open(ssoUrl, '_blank');
+                  }}
+                >
+                  {t('Login with Newton ERP') || 'Login with ERP'}
+                </Button>
+              </Box>
             </form>
           </Box>
         </Grid>
