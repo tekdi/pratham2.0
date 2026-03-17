@@ -122,7 +122,7 @@ const AllContentsPage = () => {
     setStatusBy(status?.toString() || 'All');
   }, [status]);
 
-  const [contentList, setContentList] = React.useState<content[]>([]);
+  const [contentList, setContentList] = React.useState<any[]>([]);
   const [data, setData] = React.useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);

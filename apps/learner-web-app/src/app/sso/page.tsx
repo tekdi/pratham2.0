@@ -204,6 +204,9 @@ const SSOContent = () => {
       localStorage.setItem('tenantId', userResponse?.tenantData?.find(
         (tenant: any) => tenant.tenantName === "Pragyanpath"
        )?.tenantId);
+      localStorage.setItem('templtateId', userResponse?.tenantData?.find(
+        (tenant: any) => tenant.tenantName === "Pragyanpath"
+       )?.templateId);
       localStorage.setItem('firstName', userResponse?.firstName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
