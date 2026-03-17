@@ -76,7 +76,7 @@ const PublishPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
-  const [contentList, setContentList] = React.useState([]);
+  const [contentList, setContentList] = React.useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [data, setData] = React.useState<any[]>([]);

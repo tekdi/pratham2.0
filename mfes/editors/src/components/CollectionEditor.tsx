@@ -371,8 +371,25 @@ const CollectionEditor: React.FC = () => {
       // Intercept API calls (fetch) made by the editor
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
-        const [url, options] = args;
+        let [url, options] = args;
         const urlString = String(url);
+        
+        // Modify request body for composite/v3/search to remove "Failed" from status
+        if (urlString.includes('composite/v3/search') && options?.body) {
+          try {
+            const bodyData = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+              const statusArray = bodyData.request.filters.status;
+              if (statusArray.includes('Failed')) {
+                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                options = { ...options, body: typeof options.body === 'string' ? JSON.stringify(bodyData) : bodyData };
+                args = [url, options];
+              }
+            }
+          } catch {
+            // Ignore parsing errors
+          }
+        }
         
         // Only intercept and modify the specific API we care about
         const shouldModify = shouldIntercept(urlString);
@@ -634,6 +651,22 @@ const CollectionEditor: React.FC = () => {
         const xhr = this as any;
         const urlString = String(xhr._url);
         const shouldModify = xhr._shouldIntercept;
+        
+        // Modify request body for composite/v3/search to remove "Failed" from status
+        if (urlString.includes('composite/v3/search') && body) {
+          try {
+            const bodyData = typeof body === 'string' ? JSON.parse(body) : body;
+            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+              const statusArray = bodyData.request.filters.status;
+              if (statusArray.includes('Failed')) {
+                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                body = typeof body === 'string' ? JSON.stringify(bodyData) : bodyData;
+              }
+            }
+          } catch {
+            // Ignore parsing errors
+          }
+        }
         
         if (shouldModify) {
           const apiCallData = {
