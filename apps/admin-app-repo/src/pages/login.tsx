@@ -946,8 +946,8 @@ const LoginPage = () => {
                     e.stopPropagation();
                     // Construct SSO URL with callback parameters
                     const currentBaseUrl =
-                      typeof window !== 'undefined'
-                        ? window.location.origin
+                      typeof globalThis.window !== 'undefined'
+                        ? globalThis.window.location.origin
                         : '';
                     const callbackUrl = `${currentBaseUrl}/sso?env=newton`;
                     const encodedCallbackUrl = callbackUrl;

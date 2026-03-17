@@ -147,7 +147,7 @@ const SelectContent: React.FC<SelectContentProps> = ({
         ];
         
         // Sort by lastUpdatedOn in descending order (most recent first)
-        const contentList = combinedList.sort((a, b) => {
+        const contentList = combinedList.toSorted((a, b) => {
           const dateA = new Date(a.lastUpdatedOn || 0).getTime();
           const dateB = new Date(b.lastUpdatedOn || 0).getTime();
           return dateB - dateA; // Descending order
