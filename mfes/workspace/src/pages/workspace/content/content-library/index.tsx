@@ -108,7 +108,7 @@ const ContentsPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
-  const [contentList, setContentList] = React.useState<content[]>([]);
+  const [contentList, setContentList] = React.useState<any[]>([]);
   const [data, setData] = React.useState<any[]>([]);
   const prevFilterRef = useRef(filter);
 
@@ -216,9 +216,18 @@ const ContentsPage = () => {
           selectedNames
         );
 
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays
+        const combinedList = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Sort by lastUpdatedOn in descending order (most recent first)
+        const contentList = combinedList.toSorted((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         setContentList(contentList);
         setTotalCount(response?.count);
         setLoading(false);
