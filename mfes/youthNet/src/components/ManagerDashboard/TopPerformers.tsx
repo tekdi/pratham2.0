@@ -8,6 +8,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
+import { useTranslation } from 'next-i18next';
 import { User } from './types';
 
 interface TopPerformersProps {
@@ -19,8 +20,9 @@ interface TopPerformersProps {
 const TopPerformers: React.FC<TopPerformersProps> = ({
   usersData,
 }) => {
+  const { t } = useTranslation();
   // Hardcoded category
-  const currentCategory = '5 Highest Course Completing Users';
+  const currentCategory = t('FIVE_HIGHEST_COURSE_COMPLETING_USERS');
   const currentUsers = usersData[currentCategory] || [];
 
   // Check if data is still loading
@@ -255,7 +257,7 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 2 }}>
-            No users found for this category
+            {t('NO_USERS_FOUND_FOR_CATEGORY')}
           </Typography>
         )}
       </Box>
