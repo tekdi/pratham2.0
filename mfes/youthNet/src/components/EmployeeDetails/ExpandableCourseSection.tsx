@@ -8,6 +8,7 @@ import {
   Grid,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useTranslation } from 'next-i18next';
 import { ExpandableCourseSectionProps } from './types';
 import CourseCard from './CourseCard';
 
@@ -17,6 +18,7 @@ const ExpandableCourseSection: React.FC<ExpandableCourseSectionProps> = ({
   courses,
   defaultExpanded = false,
 }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   const handleChange = () => {
@@ -83,7 +85,7 @@ const ExpandableCourseSection: React.FC<ExpandableCourseSectionProps> = ({
         ) : (
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="body2" color="text.secondary">
-              No courses found
+              {t('NO_COURSES_FOUND')}
             </Typography>
           </Box>
         )}

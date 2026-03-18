@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import {
   Box,
   Typography,
@@ -48,6 +49,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   onSearch,
   
 }) => {
+  const { t } = useTranslation();
   // Function to get initials from name (First + Last name initials)
   const getInitials = (name: string) => {
     const nameParts = name.trim().split(' ').filter(part => part.length > 0);
@@ -271,11 +273,11 @@ console.log('filteredData', filteredData);
         sx={{ mb: 2 }}
       >
         <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
-          Individual Progress
+          {t('INDIVIDUAL_PROGRESS')}
         </Typography>
         <Stack direction="row" spacing={{ xs: 1, sm: 2 }} alignItems="center">
           <TextField
-            placeholder="Search employee.."
+            placeholder={t('SEARCH_EMPLOYEE')}
             size="small"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -331,11 +333,11 @@ console.log('filteredData', filteredData);
                   onChange={handleSelectAll}
                 />
               </TableCell> */}
-              <TableCell sx={{ fontWeight: 600 }}>Employee</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t('EMPLOYEE')}</TableCell>
               {/* <TableCell sx={{ fontWeight: 600 }}>Department</TableCell> */}
-              <TableCell sx={{ fontWeight: 600 }}>Mandatory Courses</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Non-Mandatory Courses</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t('MANDATORY_COURSES')}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t('NON_MANDATORY_COURSES_TABLE')}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t('ACTIONS')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -480,7 +482,7 @@ console.log('filteredData', filteredData);
                       </IconButton>
                     </Tooltip> */}
                     <Tooltip 
-                      title="View Employee Details" 
+                      title={t('VIEW_EMPLOYEE_DETAILS')} 
                       arrow
                       componentsProps={{
                         tooltip: {
@@ -526,7 +528,7 @@ console.log('filteredData', filteredData);
         }}
       >
         <Typography variant="body2" color="text.secondary">
-          Showing {((currentPage - 1) * 10) + 1}-{Math.min(currentPage * 10, totalEmployees)} of {totalEmployees} employees
+          {t('SHOWING')} {((currentPage - 1) * 10) + 1}-{Math.min(currentPage * 10, totalEmployees)} {t('OF')} {totalEmployees} {t('EMPLOYEES')}
         </Typography>
         
         <Pagination
