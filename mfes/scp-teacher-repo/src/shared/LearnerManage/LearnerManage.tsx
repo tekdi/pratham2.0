@@ -115,8 +115,8 @@ const LearnerManage = ({
       ];
       // Merge only missing items from required2 into required1
       mustRequired.forEach((item) => {
-        if (!requiredArray.includes(item)) {
-          requiredArray.push(item);
+        if (!requiredArray?.includes(item)) {
+          requiredArray?.push(item);
         }
       });
       //no required

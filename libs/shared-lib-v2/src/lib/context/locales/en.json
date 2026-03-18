@@ -956,5 +956,16 @@
     "VIEW": "View",
     "REUPLOAD": "Reupload",
     "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
+  },
+  "LMP_SINGLE_BATCH_WIDGET": {
+    "TITLE": "Select batch",
+    "CENTER": "Center",
+    "SELECT_CENTER": "Select center",
+    "NO_CENTERS_AVAILABLE": "No centers available",
+    "BATCH": "Batch",
+    "SELECT_CENTER_FIRST": "Select a center first",
+    "LOADING_BATCHES": "Loading batches…",
+    "SELECT_BATCH": "Select batch",
+    "VALUE_NOT_IN_LIST": "Current value not in loaded list; pick a batch again if needed."
   }
 }

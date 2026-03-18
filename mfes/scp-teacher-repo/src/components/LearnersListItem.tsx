@@ -1,4 +1,5 @@
-import { Role, Status } from '@/utils/app.constant';
+//@ts-nocheck
+import { Role, Status, Telemetry } from '@/utils/app.constant';
 import {
   BulkCreateCohortMembersRequest,
   LearnerListProps,
@@ -8,7 +9,7 @@ import {
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Avatar, Box, Typography } from '@mui/material';
+import { Avatar, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import BottomDrawer from './BottomDrawer';
@@ -37,6 +38,10 @@ import ReactGA from 'react-ga4';
 import manageUserStore from '../store/manageUserStore';
 import { showToastMessage } from './Toastify';
 import LearnerManage from '@/shared/LearnerManage/LearnerManage';
+import axios from 'axios';
+import { telemetryFactory } from '@/utils/telemetry';
+import LMPSingleBatchListWidget from '@shared-lib-v2/MapUser/LMPSingleBatchListWidget';
+import CloseIcon from '@mui/icons-material/Close';
 
 type Anchor = 'bottom';
 
@@ -56,6 +61,8 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   onLearnerDelete,
   isFromProfile = false,
   customFields,
+  myCenterList,
+  myCenterIds,
 }) => {
   const [state, setState] = React.useState({
     bottom: false,
@@ -103,6 +110,29 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   );
   const isActiveYear = userStore.isActiveYearSelected;
 
+  const [reassignModalOpen, setReassignModalOpen] =
+    React.useState<boolean>(false);
+
+  //reassign modal variables
+  // const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [selectedCenterIdReassign, setSelectedCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [originalCenterIdReassign, setOriginalCenterIdReassign] = useState<
+    string | string[] | null
+  >(null);
+  const [selectedCenterListReassign, setSelectedCenterListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedBatchListReassign, setSelectedBatchListReassign] = useState<
+    any[]
+  >([]);
+  const [selectedUserIdReassign, setSelectedUserIdReassign] = useState<
+    string | null
+  >(null);
+  const [isReassignInProgress, setReassignInProgress] = useState(false);
+  const [isReassignModelProgress, setIsReassignModelProgress] = useState(false);
+
   useEffect(() => {
     if (reloadState) {
       setReloadState(false);
@@ -123,20 +153,20 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
 
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
-    (event: React.KeyboardEvent | React.MouseEvent) => {
-      setCohortLearnerDeleteId(cohortMembershipId);
-      setReassignId(userId);
+      (event: React.KeyboardEvent | React.MouseEvent) => {
+        setCohortLearnerDeleteId(cohortMembershipId);
+        setReassignId(userId);
 
-      if (
-        event.type === 'keydown' &&
-        ((event as React.KeyboardEvent).key === 'Tab' ||
-          (event as React.KeyboardEvent).key === 'Shift')
-      ) {
-        return;
-      }
+        if (
+          event.type === 'keydown' &&
+          ((event as React.KeyboardEvent).key === 'Tab' ||
+            (event as React.KeyboardEvent).key === 'Shift')
+        ) {
+          return;
+        }
 
-      setState({ ...state, bottom: open });
-    };
+        setState({ ...state, bottom: open });
+      };
 
   const setLoading = (loading: boolean) => {
     setLearnerState((prevState) => ({ ...prevState, loading }));
@@ -194,7 +224,7 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
           });
           throw new Error(
             response.params?.errmsg ||
-              'An error occurred while updating the user.'
+            'An error occurred while updating the user.'
           );
         } else {
           ReactGA.event('unmark-dropout-student-successful', {
@@ -212,7 +242,16 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
     }
   };
 
-  const listItemClick = (event: React.MouseEvent, name: string) => {
+  // Helper function to transform cohorts array into cohortData format
+  const transformCohortsToCohortData = (cohorts: any[]): any[] => {
+    if (!cohorts || !Array.isArray(cohorts)) {
+      return [];
+    }
+
+    return cohorts.map((cohort: any) => (cohort));
+  };
+
+  const listItemClick = async (event: React.MouseEvent, name: string) => {
     if (name === 'mark-drop-out') {
       setShowModal(true);
     } else if (name === 'unmark-drop-out') {
@@ -220,8 +259,160 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
     }
     if (name === 'reassign-batch') {
       //handle reassign batch functionality here
-      setOpenCentersModal(true);
+      // setOpenCentersModal(true);
       // console.log('CustomeFields!!!!!!!!!!!!!', customFields);
+      //new flow of reassign learner batch
+
+      //TODO: Add reassign logic here
+      const reassignuserId = userId;
+
+      //reassign data fetch code
+
+      setReassignModalOpen(true);
+      setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+      setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+      setSelectedCenterListReassign([]); // Reset center list when dialog closes
+      setSelectedBatchListReassign([]); // Reset batch list when dialog closes
+      setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+      setIsReassignModelProgress(true);
+
+      //get cohortdata
+      // Extract centers from response
+      // Response structure: response.data.result is an array of cohorts
+      let centerId = localStorage.getItem('centerId');
+      let batchId = localStorage.getItem('cohortId');
+      const cohortData = [{
+        "centerId": centerId,
+        "centerName": "",
+        "centerStatus": "active",
+        "batchId": batchId,
+        "batchName": "",
+        "batchStatus": "active",
+        "cohortMember": {
+          "status": "active",
+          "membershipId": ""
+        }
+      }];
+
+      //load prefilled value
+      // Transform cohorts to cohortData format
+      // console.log('sasasasasselectedUser', selectedUser);
+      // const cohortData = selectedUser?.cohorts
+      //   ? transformCohortsToCohortData(selectedUser.cohorts)
+      //   : [];
+      const headers = {
+        'Content-Type': 'application/json',
+        Accept: 'application/json, text/plain, */*',
+        tenantId: localStorage.getItem('tenantId') || '',
+        Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        academicyearid: localStorage.getItem('academicYearId') || '',
+      };
+      setSelectedUserIdReassign(userId);
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
+      let response = null;
+      try {
+        const centerIds = myCenterList?.length > 0
+          ? myCenterList.map((center: any) => center.value).filter((id: any) => id)
+          : [];
+        response = await axios.post(apiUrl, { userId: userId, filters: { parentId: centerIds } }, { headers });
+      }
+      catch (e) { }
+      const geographicalData = response?.data?.result?.data || [];
+
+      // Transform geographicalData into centerList
+      let centerList = [];
+      const batchList = [];
+      const centerIdArray = [];
+
+
+      geographicalData.forEach((state) => {
+        state.districts?.forEach((district) => {
+          district.blocks?.forEach((block) => {
+            block.centers?.forEach((center) => {
+              center.batches?.forEach((batch) => {
+                // Check if centerId exists in cohortData with active status
+                // Filter all entries for the same centerId and check if any has both statuses active
+                const cohortCenterBatch = cohortData?.filter(
+                  (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
+                );
+                const isActiveCenterBatch = cohortCenterBatch?.some(
+                  (cohortCenterBatchs: any) =>
+                    cohortCenterBatchs?.cohortMember?.status === 'active' && cohortCenterBatchs?.centerStatus === 'active' && cohortCenterBatchs?.batchStatus === 'active'
+                );
+
+                // Only push if center has active cohortMember status
+                if (isActiveCenterBatch) {
+                  const centerObject = {
+                    value: center.centerId,
+                    label: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  centerList.push(centerObject);
+                  const centerBatchObject = {
+                    id: batch.batchId,
+                    name: batch.batchName,
+                    centerId: center.centerId,
+                    centerName: center.centerName,
+                    state: state.stateName,
+                    district: district.districtName,
+                    block: block.blockName,
+                    village: null, // villageName might not exist in the structure
+                    stateId: state.stateId,
+                    districtId: district.districtId,
+                    blockId: block.blockId,
+                    villageId: null, // villageId might not exist in the structure
+                  };
+                  batchList.push(centerBatchObject);
+                  centerIdArray.push(batch.batchId);
+                }
+              });
+            });
+          });
+        });
+      });
+
+      // Remove duplicates from centerList based on value field
+      const uniqueCenterMap = new Map();
+      centerList.forEach((center) => {
+        if (!uniqueCenterMap.has(center.value)) {
+          uniqueCenterMap.set(center.value, center);
+        }
+      });
+      centerList = Array.from(uniqueCenterMap.values());
+
+      setSelectedCenterIdReassign(
+        centerIdArray.length > 0 ? centerIdArray : null
+      );
+      setOriginalCenterIdReassign(
+        centerIdArray.length > 0 ? centerIdArray : null
+      );
+      setSelectedCenterListReassign(centerList);
+      setSelectedBatchListReassign(batchList);
+      setIsReassignModelProgress(false);
+
+      const telemetryInteract = {
+        context: {
+          env: 'teaching-center',
+          cdata: [],
+        },
+        edata: {
+          id: 'click-on-reassign-batch:' + userId,
+          type: Telemetry.CLICK,
+          subtype: '',
+          pageid: 'learner-batch-reassign',
+        },
+      };
+      telemetryFactory.interact(telemetryInteract);
+
+
     }
     if (name === 'delete-User') {
       setOpenDeleteUserModal(true);
@@ -256,7 +447,7 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
           });
           throw new Error(
             response.params?.errmsg ||
-              'An error occurred while updating the user.'
+            'An error occurred while updating the user.'
           );
         } else {
           ReactGA.event('remove-student-successful', {
@@ -298,6 +489,10 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   const handleTeacherFullProfile = (userId: string) => {
     router.push(`/user-profile/${userId}`);
   };
+
+  //message constants
+  const successCreateMessage = 'LEARNERS.LEARNER_UPDATED_SUCCESSFULLY';
+  const failureCreateMessage = 'COMMON.NOT_ABLE_UPDATE_LEARNER';
 
   const fetchUserDetails = async (userId: string) => {
     try {
@@ -671,108 +866,108 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
         optionList={
           block
             ? [
-                // TODO: Integrate todo service
-                // {
-                //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),
-                //   icon: (
-                //     <LocationOnOutlinedIcon
-                //       sx={{ color: theme.palette.warning['300'] }}
-                //     />
-                //   ),
-                //   name: 'reassign-block-request',
-                // },
-                {
-                  label: t('COMMON.REASSIGN_CENTERS'),
-                  icon: (
-                    <ApartmentIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: 'reassign-centers',
-                },
-                {
-                  label: isDropout
-                    ? t('COMMON.UNMARK_DROP_OUT')
-                    : t('COMMON.MARK_DROP_OUT'),
-                  icon: (
-                    <NoAccountsIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: isDropout ? 'unmark-drop-out' : 'mark-drop-out',
-                },
-                {
-                  label: t('COMMON.DELETE_USER'),
-                  icon: (
-                    <DeleteOutlineIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: 'delete-User',
-                },
-              ].filter((option) => {
-                // If isDropout is true, only show unmark-drop-out option
-                if (isDropout) {
-                  return option.name === 'unmark-drop-out';
-                }
-                // Otherwise, apply existing filter logic
-                return (
-                  (type === Role.STUDENT ||
-                    (option.name !== 'mark-drop-out' &&
-                      option.name !== 'unmark-drop-out')) &&
-                  (!(isFromProfile || isDropout) ||
-                    option.name !== 'reassign-centers')
-                );
-              })
+              // TODO: Integrate todo service
+              // {
+              //   label: t('COMMON.REASSIGN_BLOCKS_REQUEST'),
+              //   icon: (
+              //     <LocationOnOutlinedIcon
+              //       sx={{ color: theme.palette.warning['300'] }}
+              //     />
+              //   ),
+              //   name: 'reassign-block-request',
+              // },
+              {
+                label: t('COMMON.REASSIGN_CENTERS'),
+                icon: (
+                  <ApartmentIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ),
+                name: 'reassign-centers',
+              },
+              {
+                label: isDropout
+                  ? t('COMMON.UNMARK_DROP_OUT')
+                  : t('COMMON.MARK_DROP_OUT'),
+                icon: (
+                  <NoAccountsIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ),
+                name: isDropout ? 'unmark-drop-out' : 'mark-drop-out',
+              },
+              {
+                label: t('COMMON.DELETE_USER'),
+                icon: (
+                  <DeleteOutlineIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ),
+                name: 'delete-User',
+              },
+            ].filter((option) => {
+              // If isDropout is true, only show unmark-drop-out option
+              if (isDropout) {
+                return option.name === 'unmark-drop-out';
+              }
+              // Otherwise, apply existing filter logic
+              return (
+                (type === Role.STUDENT ||
+                  (option.name !== 'mark-drop-out' &&
+                    option.name !== 'unmark-drop-out')) &&
+                (!(isFromProfile || isDropout) ||
+                  option.name !== 'reassign-centers')
+              );
+            })
             : [
-                // Only TL will see this option
-                ...(loggedInUserRole === Role.TEAM_LEADER
-                  ? [
-                      {
-                        label: t('COMMON.REASSIGN_BATCH'),
-                        icon: (
-                          <ApartmentIcon
-                            sx={{ color: theme.palette.warning['300'] }}
-                          />
-                        ),
-                        name: 'reassign-batch',
-                      },
-                    ]
-                  : []),
-                {
-                  label: isDropout
-                    ? t('COMMON.UNMARK_DROP_OUT')
-                    : t('COMMON.MARK_DROP_OUT'),
-                  icon: (
-                    <NoAccountsIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: isDropout ? 'unmark-drop-out' : 'mark-drop-out',
-                },
-                {
-                  label: t('COMMON.DELETE_USER_FROM_CENTER'),
-                  icon: (
-                    <DeleteOutlineIcon
-                      sx={{ color: theme.palette.warning['300'] }}
-                    />
-                  ),
-                  name: 'delete-User',
-                },
-              ].filter((option) => {
-                // If isDropout is true, only show unmark-drop-out option
-                if (isDropout) {
-                  return option.name === 'unmark-drop-out';
-                }
-                // Otherwise, apply existing filter logic
-                return (
-                  (type === Role.STUDENT ||
-                    (option.name !== 'mark-drop-out' &&
-                      option.name !== 'unmark-drop-out')) &&
-                  (!(isFromProfile || isDropout) ||
-                    option.name !== 'reassign-centers')
-                );
-              })
+              // Only TL will see this option
+              ...(loggedInUserRole === Role.TEAM_LEADER
+                ? [
+                  {
+                    label: t('COMMON.REASSIGN_BATCH'),
+                    icon: (
+                      <ApartmentIcon
+                        sx={{ color: theme.palette.warning['300'] }}
+                      />
+                    ),
+                    name: 'reassign-batch',
+                  },
+                ]
+                : []),
+              {
+                label: isDropout
+                  ? t('COMMON.UNMARK_DROP_OUT')
+                  : t('COMMON.MARK_DROP_OUT'),
+                icon: (
+                  <NoAccountsIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ),
+                name: isDropout ? 'unmark-drop-out' : 'mark-drop-out',
+              },
+              {
+                label: t('COMMON.DELETE_USER_FROM_CENTER'),
+                icon: (
+                  <DeleteOutlineIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ),
+                name: 'delete-User',
+              },
+            ].filter((option) => {
+              // If isDropout is true, only show unmark-drop-out option
+              if (isDropout) {
+                return option.name === 'unmark-drop-out';
+              }
+              // Otherwise, apply existing filter logic
+              return (
+                (type === Role.STUDENT ||
+                  (option.name !== 'mark-drop-out' &&
+                    option.name !== 'unmark-drop-out')) &&
+                (!(isFromProfile || isDropout) ||
+                  option.name !== 'reassign-centers')
+              );
+            })
         }
         renderCustomContent={renderCustomContent}
       />
@@ -831,6 +1026,215 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
           onLearnerReassigned={handleLearnerReassigned}
           userId={userId}
         />
+      )}
+
+      {reassignModalOpen && (
+        //TODO: Add new reassign popup here
+        //new reassign flow
+
+
+        <Dialog
+          open={reassignModalOpen}
+          onClose={(event, reason) => {
+            // Prevent closing on backdrop click
+            if (reason !== 'backdropClick') {
+              setReassignModalOpen(false);
+              setSelectedCenterIdReassign(null); // Reset center selection when dialog closes
+              setOriginalCenterIdReassign(null); // Reset original center selection when dialog closes
+              setSelectedCenterListReassign(null); // Reset center list selection when dialog closes
+              setSelectedBatchListReassign(null); // Reset batch selection when dialog closes
+              setSelectedUserIdReassign(null); // Reset user selection when dialog closes
+            }
+          }}
+          // maxWidth={false}
+          // fullWidth={true}
+          PaperProps={{
+            sx: {
+              width: { xs: '100%', md: '40%' },
+              maxWidth: { xs: '100%', md: '40%' },
+              maxHeight: { xs: '100vh', md: '100vh' },
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid #eee',
+              p: 2,
+            }}
+          >
+            <Typography variant="h1" component="div">
+              {t('COMMON.REASSIGN_LEARNER_TO_BATCH')}
+            </Typography>
+            <IconButton
+              aria-label={t('COMMON.CLOSE')}
+              onClick={() => setReassignModalOpen(false)}
+              sx={{
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+            {isReassignModelProgress ? (
+              <Box sx={{ mb: 3 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minHeight: '150px',
+                  }}
+                >
+                  <CircularProgress />
+                  <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                    {t('COMMON.LOADING_ELLIPSIS')}
+                  </Typography>
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ mb: 3 }}>
+                <LMPSingleBatchListWidget
+                  value={selectedCenterIdReassign}
+                  onChange={(batchId) => {
+                    setSelectedCenterIdReassign(batchId);
+                  }}
+                  onCenterList={(centerList) => {
+                    setSelectedCenterListReassign(centerList || []);
+                  }}
+                  selectedCenterList={selectedCenterListReassign}
+                  onBatchList={(batchList) => {
+                    setSelectedBatchListReassign(batchList || []);
+                  }}
+                  selectedBatchList={selectedBatchListReassign}
+                  label={t('COMMON.SELECT_BATCH_WIDGET_TITLE')}
+                  required={true}
+                  centerList={myCenterList}
+                />
+              </Box>
+            )}
+          </DialogContent>
+          <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={async () => {
+                if (selectedUserIdReassign && selectedCenterIdReassign != null && selectedCenterIdReassign !== '') {
+                  setReassignInProgress(true);
+                  try {
+                    const raw = selectedCenterIdReassign;
+                    const cohortIds =
+                      Array.isArray(raw)
+                        ? raw.filter((id) => id != null && id !== '')
+                        : [raw];
+
+                    if (cohortIds.length === 0) {
+                      showToastMessage(
+                        t('COMMON.PLEASE_SELECT_BATCH'),
+                        'error'
+                      );
+                      setReassignInProgress(false);
+                      return;
+                    }
+
+                    const removedIds = originalCenterIdReassign?.filter(
+                      (item: any) =>
+                        !cohortIds.some(
+                          (id) => String(id) === String(item)
+                        )
+                    );
+
+                    const response = await bulkCreateCohortMembers({
+                      userId: [selectedUserIdReassign],
+                      cohortId: cohortIds,
+                      //add remove cohort id check
+                      ...(removedIds?.length > 0
+                        ? { removeCohortId: removedIds }
+                        : {}),
+                    });
+
+                    if (
+                      response?.responseCode === 201 ||
+                      response?.data?.responseCode === 201 ||
+                      response?.status === 201
+                    ) {
+                      showToastMessage(t(successCreateMessage), 'success');
+                      // Close dialog
+                      setReassignModalOpen(false);
+                      setSelectedCenterIdReassign(null);
+                      setOriginalCenterIdReassign(null);
+                      setSelectedCenterListReassign(null);
+                      setSelectedBatchListReassign(null);
+                      setSelectedUserIdReassign(null);
+                      // Refresh the data
+                      handleLearnerReassigned();
+                    } else {
+                      showToastMessage(
+                        response?.data?.params?.errmsg ||
+                        t(failureCreateMessage),
+                        'error'
+                      );
+                    }
+                  } catch (error) {
+                    console.error('Error creating cohort member:', error);
+                    showToastMessage(
+                      error?.response?.data?.params?.errmsg ||
+                      t(failureCreateMessage),
+                      'error'
+                    );
+                  } finally {
+                    setReassignInProgress(false);
+                  }
+                } else if (!selectedUserIdReassign) {
+                  showToastMessage(
+                    t('COMMON.PLEASE_SEARCH_AND_SELECT_USER'),
+                    'error'
+                  );
+                } else {
+                  showToastMessage(t('COMMON.PLEASE_SELECT_BATCH'), 'error');
+                }
+              }}
+              disabled={
+                !selectedUserIdReassign || !selectedCenterIdReassign || isReassignInProgress
+              }
+            >
+              {t('COMMON.REASSIGN')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+
+        // <FacilitatorManage
+        //   open={reassignModalOpen}
+        //   onClose={handleCloseReassignModal}
+        //   isReassign={true}
+        //   reassignuserId={
+        //     isFromFLProfile ? teacherUserId : selectedUser?.userId
+        //   }
+        //   selectedUserData={
+        //     isFromCenterDetailPage ? selectedUser : selectedUserData
+        //   }
+        //   // onFacilitatorAdded={handleFacilitatorAdded}
+        // />
+
+        //Old Reassign flow
+        // <ReassignModal
+        //   cohortNames={reassignCohortNames}
+        //   message={t('COMMON.ADD_OR_REASSIGN_CENTERS')}
+        //   handleAction={handleRequestBlockAction}
+        //   handleCloseReassignModal={handleCloseReassignModal}
+        //   modalOpen={reassignModalOpen}
+        //   reloadState={reloadState}
+        //   setReloadState={setReloadState}
+        //   buttonNames={{ primary: t('COMMON.SAVE') }}
+        //   selectedUser={selectedUser}
+        // />
+
       )}
 
       {/* Old Reassign flow implementation */}

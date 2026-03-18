@@ -189,7 +189,12 @@
     "NEXT": "આગળ",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "કૃપા કરીને ઓછામાં ઓછી એક બેચ પસંદ કરો",
     "PLEASE_SEARCH_AND_SELECT_USER": "કૃપા કરીને વપરાશકર્તા શોધો અને પસંદ કરો.",
-    "PLEASE_SELECT_CENTER": "કૃપા કરીને એક કેન્દ્ર પસંદ કરો."
+    "PLEASE_SELECT_CENTER": "કૃપા કરીને એક કેન્દ્ર પસંદ કરો.",
+    "REASSIGN": "ફરીથી સોંપો",
+    "REASSIGN_LEARNER_TO_BATCH": "શીખનારને બેચમાં ફરીથી સોંપો",
+    "LOADING_ELLIPSIS": "લોડ થઈ રહ્યું છે...",
+    "SELECT_BATCH_WIDGET_TITLE": "બેચ પસંદ કરો",
+    "PLEASE_SELECT_BATCH": "કૃપા કરીને એક બેચ પસંદ કરો"
   },
   "LOGIN_PAGE": {
     "USERNAME": "વપરાશકર્તા નામ",
