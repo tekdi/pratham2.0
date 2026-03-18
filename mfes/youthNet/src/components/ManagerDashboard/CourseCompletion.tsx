@@ -41,7 +41,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // ✅ FINAL USER-BASED LOGIC
+  // ✅ FINAL COMBINED LOGIC
   const calculateUserCompletion = (
     courses: CourseStatus[],
     courseIds?: string[]
@@ -49,10 +49,10 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
     let completed = 0;
     let inProgress = 0;
 
+    // ✅ USER-BASED LOGIC
     if (userIds && courseIds && userIds.length > 0 && courseIds.length > 0) {
       const userCourseMap = new Map<string, Set<string>>();
 
-      // Build user → completed courseIds map
       courses.forEach((course) => {
         if (course.status === 'completed') {
           if (!userCourseMap.has(course.userId)) {
@@ -62,7 +62,6 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
         }
       });
 
-      // 🔥 Evaluate each user
       userIds.forEach((userId) => {
         const completedCourses = userCourseMap.get(userId) || new Set();
 
@@ -71,14 +70,17 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
         ).length;
 
         if (completedCount === courseIds.length) {
-          // ✅ all courses completed
-          completed++;
+          completed++; // ✅ all completed
         } else if (completedCount > 0) {
-          // ⏳ partially completed
-          inProgress++;
+          inProgress++; // ⏳ partial
         }
-        // ❌ 0 completed → ignored
+        // ❌ 0 → ignore
       });
+
+    } else {
+      // ✅ FALLBACK LOGIC (your original)
+      completed = courses.filter(c => c.status === 'completed').length;
+      inProgress = courses.filter(c => c.status === 'inprogress').length;
     }
 
     return [
@@ -100,12 +102,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
 
     return (
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <Typography
-          variant="body2"
-          fontWeight={500}
-          color="text.secondary"
-          gutterBottom
-        >
+        <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom>
           {title}
         </Typography>
 
