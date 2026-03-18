@@ -270,10 +270,14 @@ const AllContentsPage = () => {
           ...(response?.content || []),
           ...(response?.QuestionSet || [])
         ];
-        
+        let contentSortList = allContent.sort((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         // Deduplicate based on identifier to avoid showing same content twice
         const contentMap = new Map();
-        allContent.forEach(item => {
+        contentSortList.forEach(item => {
           if (item?.identifier && !contentMap.has(item.identifier)) {
             contentMap.set(item.identifier, item);
           }
