@@ -41,7 +41,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // ✅ FINAL COMBINED LOGIC
+  // ✅ FINAL LOGIC WITH INPROGRESS SUPPORT
   const calculateUserCompletion = (
     courses: CourseStatus[],
     courseIds?: string[]
@@ -49,36 +49,51 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
     let completed = 0;
     let inProgress = 0;
 
-    // ✅ USER-BASED LOGIC
     if (userIds && courseIds && userIds.length > 0 && courseIds.length > 0) {
-      const userCourseMap = new Map<string, Set<string>>();
+      // user → completed courses
+      const completedMap = new Map<string, Set<string>>();
+      // user → any activity (completed OR inprogress)
+      const activityMap = new Map<string, boolean>();
 
       courses.forEach((course) => {
+        // track activity
+        if (!activityMap.has(course.userId)) {
+          activityMap.set(course.userId, false);
+        }
+
+        if (course.status === 'completed' || course.status === 'inprogress') {
+          activityMap.set(course.userId, true);
+        }
+
+        // track completed
         if (course.status === 'completed') {
-          if (!userCourseMap.has(course.userId)) {
-            userCourseMap.set(course.userId, new Set());
+          if (!completedMap.has(course.userId)) {
+            completedMap.set(course.userId, new Set());
           }
-          userCourseMap.get(course.userId)?.add(course.courseId);
+          completedMap.get(course.userId)?.add(course.courseId);
         }
       });
 
       userIds.forEach((userId) => {
-        const completedCourses = userCourseMap.get(userId) || new Set();
+        const completedCourses = completedMap.get(userId) || new Set();
+        const hasActivity = activityMap.get(userId) || false;
 
         const completedCount = courseIds.filter((courseId) =>
           completedCourses.has(courseId)
         ).length;
 
         if (completedCount === courseIds.length) {
-          completed++; // ✅ all completed
-        } else if (completedCount > 0) {
-          inProgress++; // ⏳ partial
+          // ✅ all completed
+          completed++;
+        } else if (hasActivity) {
+          // ⏳ has at least one completed OR inprogress
+          inProgress++;
         }
-        // ❌ 0 → ignore
+        // ❌ no activity → ignore
       });
 
     } else {
-      // ✅ FALLBACK LOGIC (your original)
+      // ✅ FALLBACK LOGIC
       completed = courses.filter(c => c.status === 'completed').length;
       inProgress = courses.filter(c => c.status === 'inprogress').length;
     }
