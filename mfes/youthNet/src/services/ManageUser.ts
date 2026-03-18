@@ -25,6 +25,7 @@ export interface UsersByManagerParam {
   limit?: number;
   filters: {
     emp_manager: string;
+    role?: string;
     [key: string]: any;
   };
   sort?: [string, string];

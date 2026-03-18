@@ -17,11 +17,12 @@ interface ProfileDetailsProps {
   gender?: string;
   age?: number;
   dob?: string;
-  village?: any
+  village?: any;
   middleName?: string | null;
   userName?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  workingVillages?: string | null;
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -42,20 +43,21 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   middleName,
   firstName,
   lastName,
+  workingVillages,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const [userProgram, setUserProgram] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const program = localStorage.getItem('userProgram');
       setUserProgram(program);
     }
   }, []);
-  
+
   const isPragyanpath = userProgram === 'Pragyanpath';
-  
+
   console.log('designation', designation);
   return (
     <Card
@@ -264,7 +266,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               </Typography>
             </Grid>
           )}
-          
+
           {!isPragyanpath && district && (
             <Grid item xs={6}>
               <Typography
@@ -282,7 +284,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               </Typography>
             </Grid>
           )}
-          
+
           {!isPragyanpath && block && designation !== Role.LEAD && (
             <Grid item xs={6}>
               <Typography
@@ -300,7 +302,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
               </Typography>
             </Grid>
           )}
-          
+
           {village && (
             <Grid item xs={6}>
               <Typography
@@ -315,6 +317,24 @@ const Profile: React.FC<ProfileDetailsProps> = ({
                 gutterBottom
               >
                 {village}
+              </Typography>
+            </Grid>
+          )}
+
+          {workingVillages && (
+            <Grid item xs={12}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {t('YOUTHNET_PROFILE.WORKING_VILLAGES')}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {workingVillages}
               </Typography>
             </Grid>
           )}

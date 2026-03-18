@@ -153,10 +153,22 @@
     "NO_CONTENT_CREATOR_FOUND": "కంటెంట్ క్రియేటర్ (SCTA) కనుగొనబడలేదు",
     "NO_CONTENT_REVIEWER_FOUND": "కంటెంట్ సమీక్షకులు (CCTA) కనుగొనబడలేదు",
     "LOADING": "స్వయం ఉపాధి",
+    "USER_DELETE_SUCCSSFULLY": "వినియోగదారు విజయవంతంగా తొలగించబడ్డారు",
     "SURE_REASSIGN_CENTER": "వలస",
     "SORT": "ఉద్యోగం ప్రారంభించారు",
     "ARE_YOU_SURE_DELETE_STATE": "ఈ రాష్ట్రంలో {{జిల్లా}} యాక్టివ్ జిల్లాలు ఉన్నాయి, మీరు దానిని తొలగించలేరు.",
-    "USER_DELETE_SUCCSSFULLY": "వినియోగదారు విజయవంతంగా తొలగించబడ్డారు"
+    "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "మీ అభ్యర్థనను సమర్పించండి మరియు ఏవైనా సమస్యలు లేదా ఆందోళనలతో మేము మీకు సహాయం చేస్తాము.",
+    "WE_ARE_HERE_TO_HELP": "మేము సహాయం చేయడానికి ఇక్కడ ఉన్నాము",
+    "NO_STATE_LEAD_FOUND": "రాష్ట్ర నాయకుడు ఎవరూ కనుగొనబడలేదు",
+    "FAQS": "తరచుగా అడిగే ప్రశ్నలు",
+    "RESET_FILTERS": "ఫిల్టర్‌లను రీసెట్ చేయండి",
+    "ACTIVATE_USER": "యూజర్‌ను యాక్టివేట్ చేయండి",
+    "ACTIVATE": "యాక్టివేట్ చేయండి",
+    "RESIGNED_FROM_COMPANY": "కంపెనీకి రాజీనామా చేశారు",
+    "MOVED_TO_DIFFERENT_ROLE": "వేరే పాత్రకు మారారు",
+    "NO_MOBILIZER_FOUND": "గురువు ఎవరూ కనుగొనబడలేదు",
+    "MAP": "మ్యాప్",
+    "NEXT": "తరువాతి"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ఫోన్ లేదు",
@@ -218,7 +230,22 @@
     "CERTIFICATE_ISSUANCE": "సర్టిఫికెట్ జారీ",
     "SUPPORT_REQUEST": "సహాయం అభ్యర్థన",
     "CONTENT_CREATOR": "కంటెంట్ క్రియేటర్",
-    "CONTENT_REVIEWER": "కంటెంట్ సమీక్షకులు"
+    "CONTENT_REVIEWER": "కంటెంట్ సమీక్షకులు",
+    "TAXONOMY_EDITOR": "వర్గీకరణ ఎడిటర్",
+    "MANAGE_NOTIFICATION": "నోటిఫికేషన్ టెంప్లేట్‌లను నిర్వహించండి",
+    "YOUTH": "యువత",
+    "FAQS": "తరచుగా అడిగే ప్రశ్నలు",
+    "STATE_LEAD": "రాష్ట్ర నాయకుడు",
+    "MASTER": "మాస్టర్",
+    "STATES": "రాష్ట్రాలు",
+    "DISTRICTS": "జిల్లాలు",
+    "BLOCKS": "బ్లాక్స్",
+    "VILLAGES": "గ్రామాలు",
+    "PROGRAMS": "కార్యక్రమాలు",
+    "SKILLING_CENTERS": "నైపుణ్య కేంద్రాలు",
+    "CURRICULUM_PLANNER": "పాఠ్య ప్రణాళిక ప్రణాళికదారు",
+    "BATCH": "బ్యాచ్",
+    "MOBILIZER": "గురువు"
   },
   "FACILITATORS": {
     "STATE": "రాష్ట్రం",
@@ -235,7 +262,11 @@
     "FINISH_ASSIGN": "ముగించండి & కేటాయించండి",
     "BATCHES_SELECTED": "ఎక్కువ ఎంపికలు చేసిన బ్యాచిలు",
     "CENTERS": "కేంద్రములు",
-    "RE_ASSIGN_facilitator": "ఫ్యాసిలిటేటర్‌ని పునఃప్రత్యయీకరించు"
+    "RE_ASSIGN_facilitator": "ఫ్యాసిలిటేటర్‌ని పునఃప్రత్యయీకరించు",
+    "ASSIGN_BATCHES_FINISH": "మీరు దీన్ని తర్వాత మీ స్వంత వేగంతో పూర్తి చేయవచ్చు. అయితే, మీరు ‘ముగించు & కేటాయించు’పై క్లిక్ చేసిన తర్వాత మాత్రమే బ్యాచ్‌లు కేటాయించబడతాయి.",
+    "ASSIGN_BATCHES_FROM_VILLAGES": "కేంద్రం నుండి బ్యాచ్‌లను కేటాయించండి",
+    "BACK_TO_FORM": "తిరిగి ఫారమ్‌కి",
+    "SEARCH_BATCHES": "శోధన బ్యాచ్‌లు.."
   },
   "NAVBAR": {
     "SEARCHBAR_PLACEHOLDER": "కోర్సు, టాపిక్, విద్యార్థి, పిడిఎఫ్ మొదలైనవి శోధించండి.."
@@ -249,7 +280,8 @@
     "LEARNER_UPDATED_SUCCESSFULLY": "లెర్నర్ విజయవంతంగా నవీకరించబడింది!",
     "EDIT_LEARNER": "లెర్నర్‌ను సవరించండి",
     "NO_LEARNERS_FOUND": "లెర్నర్స్ కనుగొనబడలేదు",
-    "RE_ASSIGN_LEARNER": "లెర్నర్‌ను పునఃప్రత్యయీకరించు"
+    "RE_ASSIGN_LEARNER": "లెర్నర్‌ను పునఃప్రత్యయీకరించు",
+    "ACTIVATE_USER_SUCCESS": "యూజర్ విజయవంతంగా యాక్టివేట్ చేయబడ్డాడు."
   },
   "MENTOR_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "మెంటార్ లీడర్లను శోధించండి..",
@@ -264,7 +296,8 @@
     "NOT_ABLE_CREATE_MENTOR_LEAD": "మెంటార్ లీడర్‌ను సృష్టించడంలో విఫలమయ్యారు",
     "UPDATE_MENTOR_LEAD": "మెంటార్ లీడర్‌ను నవీకరించండి",
     "NEW_MENTOR_LEAD": "కొత్త మెంటర్ లీడ్",
-    "ER": "కొత్త మెంటార్ లీడర్స్"
+    "ER": "కొత్త మెంటార్ లీడర్స్",
+    "RE_ASSIGN_MENTOR_LEAD": "సెంటర్ హెడ్‌ని తిరిగి కేటాయించండి"
   },
   "TEAM_LEADERS": {
     "SEARCHBAR_PLACEHOLDER": "టీమ్ లీడర్లను శోధించండి..",
@@ -320,7 +353,15 @@
     "SUBTOPICS": "ఉప అంశాలు",
     "RESOURCES": "వనరులు",
     "TOPIC": "అంశం",
-    "DURATION/MONTH": "వ్యవధి/నెల"
+    "DURATION/MONTH": "వ్యవధి/నెల",
+    "UPLOAD_FAILED": "అప్‌లోడ్ విఫలమైంది",
+    "IMPORT_NEW_PLANNER": "కొత్త ప్లానర్‌ను దిగుమతి చేయి",
+    "ADD_NEW_TOPIC": "కొత్త అంశాన్ని జోడించండి",
+    "DELETE_PLANNER": "ప్లానర్‌ను తొలగించు",
+    "CSV_TEMPLATE": "CSV టెంప్లేట్",
+    "NEW_TOPIC": "కొత్త అంశం",
+    "DOWNLOAD_CSV": "అప్‌లోడ్ చేసిన CSVని డౌన్‌లోడ్ చేయండి",
+    "DURING_COURSE": "తెలుసుకోండి"
   },
   "MASTER": {
     "STATE": "రాష్ట్రం",
@@ -370,7 +411,8 @@
     "CENTER_CREATED_SUCCESSFULLY": "కేంద్రం విజయవంతంగా సృష్టించబడింది",
     "SEARCHBAR_PLACEHOLDER": "శోధన కేంద్రం..",
     "CENTER_UPDATE_FAILED": "కేంద్రాన్ని నవీకరించేటప్పుడు ఏదో తప్పు జరిగింది",
-    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "మీరు కేంద్రాన్ని తొలగించలేరు ఎందుకంటే దానిలో {{activeMembers}} యాక్టివ్ లెర్నర్లు ఉన్నారు"
+    "YOU_CANT_DELETE_CENTER_HAS_ACTIVE_LEARNERS": "మీరు కేంద్రాన్ని తొలగించలేరు ఎందుకంటే దానిలో {{activeMembers}} యాక్టివ్ లెర్నర్లు ఉన్నారు",
+    "BATCHES_FOR_CENTER": "{{centerName}} కోసం బ్యాచ్‌లు"
   },
   "BATCH": {
     "NEW_BATCH": "కొత్త బ్యాచ్",
@@ -379,7 +421,11 @@
     "BATCH_UPDATE_SUCCESSFULLY": "బ్యాచ్ విజయవంతంగా నవీకరించబడింది",
     "BATCH_DELETE_SUCCESSFULLY": "బ్యాచ్ విజయవంతంగా తొలగించబడింది",
     "BATCH_CREATED_SUCCESSFULLY": "బ్యాచ్ విజయవంతంగా సృష్టించబడింది",
-    "BATCH_UPDATE_FAILED": "బ్యాచ్‌ను అప్‌డేట్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది"
+    "BATCH_UPDATE_FAILED": "బ్యాచ్‌ను అప్‌డేట్ చేస్తున్నప్పుడు ఏదో తప్పు జరిగింది",
+    "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "మీరు బ్యాచ్‌ను తొలగించలేరు ఎందుకంటే దానికి {{activeMembers}} యాక్టివ్ లెర్నర్‌లు ఉన్నారు.",
+    "NO_BATCH_FOUND": "బ్యాచ్ కనుగొనబడలేదు",
+    "TYPE_OF_BATCH": "బ్యాచ్ రకం",
+    "BATCH_CREATE_FAILED": "బ్యాచ్‌ను సృష్టిస్తున్నప్పుడు ఏదో తప్పు జరిగింది."
   },
   "FORM": {
     "FULL_NAME": "పూర్తి పేరు",
@@ -490,7 +536,22 @@
     "PROGRAM_DESCRIPTION": "ప్రోగ్రామ్ వివరణ",
     "PROGRAM_TYPE": "ప్రోగ్రామ్ రకం",
     "PROGRAM_HEAD_NAME": "ప్రోగ్రామ్ హెడ్ పేరు",
-    "PROGRAM_IMAGE": "ప్రోగ్రామ్ ఇమేజ్"
+    "PROGRAM_IMAGE": "ప్రోగ్రామ్ ఇమేజ్",
+    "CONTACT": "సంప్రదించండి",
+    "BATCH": "బ్యాచ్",
+    "PREFERRED_LANGUAGE": "ప్రాధాన్య భాష",
+    "FIRST_NAME": "పేరు",
+    "MIDDLE_NAME_OR_FATHER_NAME": "మధ్య పేరు లేదా తండ్రి పేరు",
+    "LAST_NAME": "ఇంటిపేరు",
+    "MOTHER_NAME": "తల్లి పేరు",
+    "DATE_OF_BIRTH": "పుట్టిన తేదీ",
+    "TEST_BELONG_TO": "పరీక్ష కింది కేంద్రానికి చెందినది",
+    "BELONG_TO": "దిగువ కేంద్రానికి చెందినది",
+    "WAS_BELONG_TO": "కింది స్థానంలో ఆర్కైవ్ చేయబడింది",
+    "CONFIRM_TO_ACTIVATE": "మీరు ఈ వినియోగదారుని మళ్ళీ సక్రియం చేయాలనుకుంటున్నారా?",
+    "WORKING_LOCATION": "పని చేసే ప్రదేశం",
+    "CATCHMENT_AREA": "పరీవాహక ప్రాంతం",
+    "TYPE_OF_BATCH": "బ్యాచ్ రకం"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "చెల్లని ఇన్‌పుట్.",
@@ -509,7 +570,10 @@
     "NAME_CANNOT_INCLUDE_DIGITS": "పేరులో అంకెలు ఉండకూడదు",
     "INVALID_EMAIL_FORMAT": "చెల్లని ఇమెయిల్ ఫార్మాట్",
     "ENTER_VALID_EMAIL": "చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి",
-    "ENTER_VALID_MOBILE_NUMBER": "చెల్లుబాటు అయ్యే మొబైల్ నంబర్‌ను నమోదు చేయండి"
+    "ENTER_VALID_MOBILE_NUMBER": "చెల్లుబాటు అయ్యే మొబైల్ నంబర్‌ను నమోదు చేయండి",
+    "SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ఖాళీలు మరియు ప్రత్యేక అక్షరాలు అనుమతించబడవు.",
+    "DATE_MUST_BE_ON_OR_BEFORE": "తేదీ తప్పనిసరిగా {{date}} తేదీన లేదా అంతకు ముందు ఉండాలి.",
+    "DATE_MUST_BE_ON_OR_AFTER": "తేదీ తప్పనిసరిగా {{date}} తేదీన లేదా తర్వాత ఉండాలి."
   },
   "TABLE_TITLE": {
     "NAME": "పేరు",
@@ -542,7 +606,9 @@
     "COURSE_STATUS": "కోర్సు స్థితి",
     "ISSUED_DATE": "జారీ చేసిన తేదీ",
     "USER_ID": "యూజర్ ఐడి",
-    "COURSE_ID": "కోర్సు ఐడి"
+    "COURSE_ID": "కోర్సు ఐడి",
+    "LOCATION": "స్థానం (రాష్ట్రం / జిల్లా / బ్లాక్ / గ్రామం)",
+    "WORKING_VILLAGE": "వర్కింగ్ విలేజ్"
   },
   "WORKSPACE": {
     "EDITOR_WORKSPACE": "ఎడిటర్ వర్క్‌స్పేస్",
@@ -583,7 +649,8 @@
     "EDIT_PROGRAM": "ప్రోగ్రామ్‌ను సవరించండి",
     "DELETE_PROGRAM": "ప్రోగ్రామ్‌ను తొలగించండి",
     "SEARCH_PROGRAM": "ప్రోగ్రామ్‌ను శోధించండి...",
-    "NO_PROGRAMS_FOUND": "ఏ ప్రోగ్రామ్ కనుగొనబడలేదు"
+    "NO_PROGRAMS_FOUND": "ఏ ప్రోగ్రామ్ కనుగొనబడలేదు",
+    "EDIT": "సవరించు"
   },
   "NOTIFICATION": {
     "CONTEXT_TYPE": "సందర్భ రకం",
@@ -638,9 +705,13 @@
     "ASSIGN_VILLAGES_FINISH": "మీరు దీన్ని తర్వాత మీ స్వంత వేగంతో పూర్తి చేయవచ్చు. అయితే, మీరు ‘ముగించు’పై క్లిక్ చేసిన తర్వాత మాత్రమే గ్రామాలు కేటాయించబడతాయి.",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "బ్లాక్‌ల నుండి గ్రామాలను కేటాయించండి",
     "BACK_TO_FORM": "ఫారమ్‌కి తిరిగి వెళ్లండి",
-    "SEARCH_VILLAGES": "గ్రామాలను శోధించండి.."
+    "SEARCH_VILLAGES": "గ్రామాలను శోధించండి..",
+    "BACK": "వెనుకకు",
+    "SAVE_SELECTION": "ఎంపికను సేవ్ చేయి",
+    "SELECTED_VILLAGE_COUNT": "ఎంచుకున్న గ్రామ గణన: {{totalVillageCount}}"
   },
   "WHATS_YOUR_GENDER": "లింగం",
+  "WORKING_STATE": "పని చేసే రాష్ట్రం",
   "first_name": "మొదటి పేరు",
   "last_name": "చివరి పేరు",
   "phone_number": "ఫోన్ నంబర్",
@@ -735,12 +806,73 @@
     "EDIT_MENTOR": "మెంటార్‌ను ఎడిట్ చేయండి",
     "NOT_ABLE_UPDATE_MENTOR": "మెంటార్‌ను నవీకరించడంలో విఫలమయ్యారు",
     "NOT_ABLE_CREATE_MENTOR": "మెంటార్‌ను సృష్టించడంలో విఫలమయ్యారు",
-    "UPDATE_MENTOR": "మెంటార్‌ను నవీకరించండి"
+    "UPDATE_MENTOR": "మెంటార్‌ను నవీకరించండి",
+    "RE_ASSIGN_MENTOR": "మెంటర్‌ను తిరిగి కేటాయించండి"
   },
   "GOOGLE MAP_LINK": "గూగుల్ మ్యాప్ లింక్",
   "District": "జిల్లా",
   "State": "రాష్ట్రం",
   "Village": "గ్రామం",
   "GOOGLE_MAP_LINK": "గూగుల్ మ్యాప్ లింక్",
-  "DISTRICTS": "జిల్లా"
+  "DISTRICTS": "జిల్లా",
+  "TYPE_OF_BATCH": "బ్యాచ్ రకం",
+  "CATCHMENT_AREA": "పరీవాహక ప్రాంతం",
+  "DISTRICT": "జిల్లా",
+  "CENTER:": "కేంద్రం:",
+  "SKILLING_CENTER_IMAGE": "స్కల్లింగ్ సెంటర్ చిత్రం",
+  "INDUSTRY": "పరిశ్రమ",
+  "ADDRESS": "చిరునామా",
+  "DOB": "పుట్టిన తేదీ",
+  "SUBJECT": "విషయం",
+  "UNMARRIED": "అవివాహితుడు",
+  "MARRIED": "వివాహితులు",
+  "DIVORCED": "విడాకులు తీసుకున్నారు",
+  "SELF_PLACED": "స్వీయ స్థానము",
+  "DESIGNATION": "హోదా",
+  "YOUTH": {
+    "UPDATE_YOUTH": "యువతను నవీకరించండి",
+    "NEW_YOUTH": "న్యూ యూత్",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "యూజర్ ఆధారాలు త్వరలో పంపబడతాయి.",
+    "NOT_ABLE_CREATE_YOUTH": "యువతను సృష్టించలేకపోయారు.",
+    "YOUTH_CREATED_SUCCESSFULLY": "యువత విజయవంతంగా సృష్టించబడింది!",
+    "NOT_ABLE_UPDATE_YOUTH": "యువతను నవీకరించలేకపోతున్నారు",
+    "YOUTH_UPDATED_SUCCESSFULLY": "యువత విజయవంతంగా నవీకరించబడింది!",
+    "SELF_PLACED": "స్వీయ స్థానము",
+    "REGULAR": "రెగ్యులర్",
+    "ENROLLED_IN_EDUCATIONAL_INSTITUTE": "విద్యా సంస్థలో చేరాడు",
+    "OWN_FARMING": "సొంత వ్యవసాయం",
+    "AGRICULTURAL_FARM_LABORER": "వ్యవసాయ కార్మికుడు",
+    "NON_AGRICULTURAL_LABORER": "వ్యవసాయేతర కార్మికుడు",
+    "SALARIED_WORK": "జీతంతో కూడిన పని",
+    "SELF_EMPLOYMENT": "స్వయం ఉపాధి",
+    "UNEMPLOYED_OR_DOMESTIC_WORK": "నిరుద్యోగులు లేదా ఇంటి పని",
+    "MARK_AS_VOLUNTEER": "వాలంటీర్‌గా గుర్తించండి",
+    "DO_YOU_WANT_TO_MARK_AS_VOLUNTEER": "మీరు స్వచ్ఛంద సేవకుడిగా గుర్తించాలనుకుంటున్నారా?",
+    "MARK_AS_VOLUNTEER_SUCCESSFULLY": "విజయవంతంగా స్వచ్ఛంద సేవకుడిగా గుర్తించబడింది",
+    "MARK_AS_VOLUNTEER_FAILED": "స్వచ్ఛంద సేవకుడిగా గుర్తించడం విఫలమైంది.",
+    "PLEASE_GO_BACK_MSG": "దయచేసి ఎంపిక తర్వాత ముందుకు సాగడానికి తిరిగి వెళ్ళండి.",
+    "UNMARK_AS_VOLUNTEER": "స్వచ్ఛంద సేవకుడిగా గుర్తు తీసివేయి",
+    "DO_YOU_WANT_TO_UNMARK_AS_VOLUNTEER": "మీరు వాలంటీర్‌గా మార్క్‌ను తీసివేయాలనుకుంటున్నారా?",
+    "UNMARK_AS_VOLUNTEER_SUCCESSFULLY": "స్వచ్ఛంద సేవకుడిగా విజయవంతంగా గుర్తు తీసివేయబడింది",
+    "UNMARK_AS_VOLUNTEER_FAILED": "స్వచ్ఛంద సేవకుడిగా గుర్తును తీసివేయడంలో విఫలమైంది."
+  },
+  "MOBILIZER": {
+    "ACTIVATE_USER_SUCCESS": "యూజర్ విజయవంతంగా యాక్టివేట్ చేయబడ్డాడు.",
+    "MOBILIZER_UPDATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా నవీకరించబడింది!",
+    "NOT_ABLE_UPDATE_MOBILIZER": "మెంటర్‌ను అప్‌డేట్ చేయడం సాధ్యం కాలేదు",
+    "MOBILIZER_CREATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా సృష్టించబడింది!",
+    "NOT_ABLE_CREATE_MOBILIZER": "మెంటర్‌ను సృష్టించలేకపోయాను",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "మెంటర్ సృష్టించబడింది, ఆధారాలు త్వరలో పంపబడతాయి.",
+    "MAP_USER_AS_LEAD": "మ్యాప్ యూజర్‌ను లీడ్‌గా",
+    "MAP_USER_AS_MOBILIZER": "మెంటర్‌గా మ్యాప్ యూజర్",
+    "PLEASE_SEARCH_AND_SELECT_USER": "దయచేసి శోధించి వినియోగదారుని ఎంచుకోండి.",
+    "UNKNOWN_STATE": "తెలియని రాష్ట్రం",
+    "UNKNOWN_DISTRICT": "తెలియని జిల్లా",
+    "UNKNOWN_BLOCK": "తెలియని బ్లాక్",
+    "WORKING_LOCATION_REQUIRED": "పని చేసే ప్రదేశం అవసరం. దయచేసి అన్ని బ్లాక్‌లకు గ్రామాలను ఎంచుకోండి.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "పని చేసే ప్రదేశం అవసరం. దయచేసి అన్ని బ్లాక్‌లకు గ్రామాలను ఎంచుకోండి. {{బ్లాక్స్}} మరియు {{count}} మరిన్ని బ్లాక్(లు)లో గ్రామాలు లేవు.",
+    "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "పని చేసే ప్రదేశం అవసరం. దయచేసి అన్ని బ్లాక్‌లకు గ్రామాలను ఎంచుకోండి. {{బ్లాక్స్}}లో గ్రామాలు లేవు.",
+    "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "పని చేసే ప్రదేశం అవసరం. దయచేసి అన్ని బ్లాక్‌లలో కనీసం ఒక గ్రామాన్ని ఎంచుకోండి.",
+    "MOBILIZER_NAME": "గురువు పేరు"
+  }
 }

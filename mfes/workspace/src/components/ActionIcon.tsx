@@ -61,8 +61,8 @@ const ActionIcon: React.FC<ActionCellProps> = ({
           <img src={'/delete.png'} height="20px" alt="Image" />
         </Box>
       </Tooltip>
-
-      {/* {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
+{/* 
+      {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {

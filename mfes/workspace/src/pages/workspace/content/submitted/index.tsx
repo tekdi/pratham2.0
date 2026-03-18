@@ -80,7 +80,7 @@ const SubmittedForReviewPage = () => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [contentList, setContentList] = useState([]);
+  const [contentList, setContentList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = useState(false);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
@@ -168,9 +168,18 @@ const SubmittedForReviewPage = () => {
           sort_by,
           tenantConfig?.CHANNEL_ID
         );
-        const contentList = (response?.content || []).concat(
-          response?.QuestionSet || []
-        );
+        // Combine content and QuestionSet arrays
+        const combinedList = [
+          ...(response?.content || []),
+          ...(response?.QuestionSet || [])
+        ];
+        
+        // Sort by lastUpdatedOn in descending order (most recent first)
+        const contentList = combinedList.toSorted((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         setContentList(contentList);
         setTotalCount(response?.count);
       } catch (error) {

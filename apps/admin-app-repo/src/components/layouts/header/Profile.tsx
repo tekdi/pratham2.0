@@ -422,7 +422,7 @@ const Profile = () => {
               }}
               endIcon={<EditIcon />}
             >
-              {t('LOGIN_PAGE.RESET_PASSWORD')}
+              {typeof window !== 'undefined' && localStorage.getItem('temporaryPassword') === 'true' ? t('LOGIN_PAGE.SET_PASSWORD') : t('LOGIN_PAGE.RESET_PASSWORD')}
             </Button>
             <Button
               fullWidth

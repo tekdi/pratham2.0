@@ -122,7 +122,7 @@ const AllContentsPage = () => {
     setStatusBy(status?.toString() || 'All');
   }, [status]);
 
-  const [contentList, setContentList] = React.useState<content[]>([]);
+  const [contentList, setContentList] = React.useState<any[]>([]);
   const [data, setData] = React.useState<any[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -270,10 +270,14 @@ const AllContentsPage = () => {
           ...(response?.content || []),
           ...(response?.QuestionSet || [])
         ];
-        
+        let contentSortList = allContent.sort((a, b) => {
+          const dateA = new Date(a.lastUpdatedOn || 0).getTime();
+          const dateB = new Date(b.lastUpdatedOn || 0).getTime();
+          return dateB - dateA; // Descending order
+        });
         // Deduplicate based on identifier to avoid showing same content twice
         const contentMap = new Map();
-        allContent.forEach(item => {
+        contentSortList.forEach(item => {
           if (item?.identifier && !contentMap.has(item.identifier)) {
             contentMap.set(item.identifier, item);
           }
@@ -300,6 +304,7 @@ const AllContentsPage = () => {
   ]);
 
   useEffect(() => {
+    console.log('contentList=======>', contentList);
     const filteredArray = contentList.map((item: any) => ({
       image: item?.appIcon,
       contentType: item.primaryCategory,
@@ -309,7 +314,8 @@ const AllContentsPage = () => {
       englishName: item?.englishName,
       primaryCategory: item.primaryCategory,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
-      lastUpdatedBy: item.lastUpdatedBy,
+      lastUpdatedBy: item.lastUpdatedBy || item.createdBy,
+      lastPublishedBy: item.lastPublishedBy || item.createdBy,
       status: item.status,
       identifier: item.identifier,
       mimeType: item.mimeType,

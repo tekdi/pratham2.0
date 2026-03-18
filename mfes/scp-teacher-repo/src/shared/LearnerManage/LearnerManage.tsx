@@ -115,8 +115,8 @@ const LearnerManage = ({
       ];
       // Merge only missing items from required2 into required1
       mustRequired.forEach((item) => {
-        if (!requiredArray.includes(item)) {
-          requiredArray.push(item);
+        if (!requiredArray?.includes(item)) {
+          requiredArray?.push(item);
         }
       });
       //no required
@@ -144,7 +144,7 @@ const LearnerManage = ({
 
       const requiredKeys = isReassign
         ? ['state', 'district', 'block']
-        : ['state', 'district', 'block', 'center', 'batch'];
+        : ['center', 'batch']; // Removed 'state', 'district', 'block' to keep them visible
       //set ui schema hide
       const updatedUiSchema = { ...alterUISchema };
       // Clone each key's config and set widget to 'hidden'
@@ -252,9 +252,9 @@ const LearnerManage = ({
           const blockIds = getSelectedValueIds('BLOCK');
           // const villageIds = getSelectedValueIds('VILLAGE');
           initialFormData = {
-            state: stateIds,
-            district: districtIds,
-            block: blockIds,
+            // state: stateIds,
+            // district: districtIds,
+            // block: blockIds,
             // village: villageIds,
             center: [localStorage.getItem('centerId')],
             batch: [cohortId],

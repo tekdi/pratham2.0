@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {
   formatSelectedDate,
   getAfterDate,
@@ -33,7 +34,7 @@ import { getCohortDetails } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
 import reassignLearnerStore from '@/store/reassignLearnerStore';
 import { CustomField } from '@/utils/Interfaces';
-import { Role, Telemetry, sessionType } from '@/utils/app.constant';
+import { Role, Status, Telemetry, sessionType } from '@/utils/app.constant';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -70,6 +71,7 @@ import useNotification from '@/hooks/useNotification';
 import {
   getMyCohortFacilitatorList,
   getMyCohortMemberList,
+  getMyCohortMemberListLearner,
 } from '@/services/MyClassDetailsService';
 import useStore from '@/store/store';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -78,6 +80,7 @@ import { setTimeout } from 'timers';
 import { isEliminatedFromBuild } from '../../../../featureEliminationUtil';
 import LearnerManage from '@/shared/LearnerManage/LearnerManage';
 import ManageUser from '@/components/ManageUser';
+import { HierarchicalSearchUserList } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 
 let SessionCardFooter: ComponentType<any> | null = null;
 if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
@@ -122,8 +125,8 @@ const CohortPage = () => {
     return isEliminatedFromBuild('Events', 'feature') || !isActiveYear
       ? 2
       : router.query.tab
-      ? Number(router.query.tab)
-      : 1;
+        ? Number(router.query.tab)
+        : 1;
   });
   const [showDetails, setShowDetails] = React.useState(false);
   const [classId, setClassId] = React.useState('');
@@ -349,28 +352,49 @@ const CohortPage = () => {
     const getCohortMemberList = async () => {
       if (cohortId) {
         try {
-          const page = 0;
-          const filters = { cohortId: cohortId };
-          const facilitatorResponse = await getMyCohortFacilitatorList({
-            filters,
-          });
-          if (facilitatorResponse?.result?.userDetails) {
+          const bodyPayload = {
+            limit: 1,
+            offset: 0,
+            role: [Role.TEACHER],
+            tenantStatus: [Status.ACTIVE],
+            filters: {
+              batch: [cohortId],
+              status: [Status.ACTIVE],
+            },
+            customfields: [
+              'state',
+              'district',
+              'block',
+              'village',
+              'main_subject',
+              'subject_taught',
+            ],
+            sort: [
+              "firstName",
+              "asc"
+            ]
+          };
+          const facilitatorResponse = await HierarchicalSearchUserList(bodyPayload);
+          if (facilitatorResponse?.totalCount) {
             setCohortFacilitatorListCount(
-              facilitatorResponse?.result?.userDetails.length
+              facilitatorResponse?.totalCount
             );
           } else setCohortFacilitatorListCount(0);
         } catch (error) {
           setCohortFacilitatorListCount(0);
         }
         try {
+          const page = 0;
           const filters = { cohortId: cohortId };
-
-          const learnerResponse = await getMyCohortMemberList({
+          const response = await getMyCohortMemberListLearner({
+            limit: 1,
+            page,
             filters,
           });
-          if (learnerResponse?.result?.userDetails) {
+          const learnerResponse = response?.result;
+          if (learnerResponse?.totalCount) {
             setCohortLearnerListCount(
-              learnerResponse?.result?.userDetails.filter((user: any) => user.status !== "reassigned").length
+              learnerResponse?.totalCount
             );
           } else {
             setCohortLearnerListCount(0);
@@ -529,8 +553,8 @@ const CohortPage = () => {
           newValue === 1
             ? 'change-tab-to-center-session'
             : newValue === 2
-            ? 'change-tab-to-learners-list'
-            : 'change-tab-to-facilitators-list',
+              ? 'change-tab-to-learners-list'
+              : 'change-tab-to-facilitators-list',
         type: Telemetry.CLICK,
         subtype: '',
         pageid: cleanedUrl,
@@ -840,29 +864,29 @@ const CohortPage = () => {
                     deleteModal
                       ? t('CENTER_SESSION.DELETE_SESSION')
                       : openSchedule
-                      ? clickedBox === 'EXTRA_SESSION'
-                        ? 'Extra Session'
-                        : t('CENTER_SESSION.PLANNED_SESSION')
-                      : t('CENTER_SESSION.SCHEDULE')
+                        ? clickedBox === 'EXTRA_SESSION'
+                          ? 'Extra Session'
+                          : t('CENTER_SESSION.PLANNED_SESSION')
+                        : t('CENTER_SESSION.SCHEDULE')
                   }
                   primary={
                     deleteModal
                       ? t('COMMON.OK')
                       : openSchedule
-                      ? t('CENTER_SESSION.SCHEDULE')
-                      : onEditEvent
-                      ? t('CENTER_SESSION.UPDATE')
-                      : t('GUIDE_TOUR.NEXT')
+                        ? t('CENTER_SESSION.SCHEDULE')
+                        : onEditEvent
+                          ? t('CENTER_SESSION.UPDATE')
+                          : t('GUIDE_TOUR.NEXT')
                   }
                   secondary={deleteModal ? t('COMMON.CANCEL') : undefined}
                   handlePrimaryModel={
                     deleteModal
                       ? undefined
                       : openSchedule
-                      ? handleSchedule
-                      : onEditEvent
-                      ? handleEditEvent
-                      : handleCentermodel
+                        ? handleSchedule
+                        : onEditEvent
+                          ? handleEditEvent
+                          : handleCentermodel
                   }
                   handleEditModal={handleEditEvent}
                   disable={onEditEvent ? false : disableNextButton}
@@ -870,7 +894,7 @@ const CohortPage = () => {
                   {deleteModal
                     ? DeleteSession && <DeleteSession />
                     : openSchedule
-                    ? PlannedSession && (
+                      ? PlannedSession && (
                         <PlannedSession
                           clickedBox={clickedBox}
                           removeModal={removeModal}
@@ -885,7 +909,7 @@ const CohortPage = () => {
                           grade={grade}
                         />
                       )
-                    : Schedule && (
+                      : Schedule && (
                         <>
                           {!clickedBox && (
                             <Typography sx={{ m: 2 }}>

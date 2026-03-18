@@ -121,10 +121,10 @@ const AddEditUser = ({
         keysToRemove = ['state', 'district', 'block', 'village', 'parentId'];
       } else if (type == 'learner') {
         keysToRemove = [
-          'state',
-          'district',
-          'block',
-          'village',
+          // 'state',
+          // 'district',
+          // 'block',
+          // 'village',
           'password',
           'confirm_password',
           'board',
@@ -135,6 +135,8 @@ const AddEditUser = ({
           'grade',
           'center',
           'program',
+          'privacy_consent',
+          'parent_guardian_consent',
           //  'class',
           // 'marital_status',
           // 'phone_type_available',
@@ -226,7 +228,7 @@ const AddEditUser = ({
         keysToHave.includes(key)
       );
     } else {
-      const keysToRemove = ['password', 'confirm_password', 'program'];
+      const keysToRemove = ['password', 'confirm_password', 'program', 'privacy_consent', 'parent_guardian_consent'];
       keysToRemove.forEach((key) => delete isEditSchema?.properties[key]);
       keysToRemove.forEach((key) => delete isEditUiSchema[key]);
       //also remove from required if present
@@ -334,12 +336,17 @@ const AddEditUser = ({
           // console.log('userData', userData);
           // console.log('customFields', customFields);
           if (type == 'learner') {
-            const parentPhoneField = customFields.find(
-              (field: any) => field.value === formData.parent_phone
-            );
-            console.log('Parent Phone Field:', parentPhoneField);
-            if (parentPhoneField) {
-              userData.mobile = parentPhoneField.value;
+            if (isUnderEighteen(userData?.dob)) {
+              const parentPhoneField = customFields.find(
+                (field: any) => field.value === formData.parent_phone
+              );
+              console.log('Parent Phone Field:', parentPhoneField);
+              if (parentPhoneField) {
+                userData.mobile = parentPhoneField.value;
+              }
+            } else {
+              // For users 18 or older, use the mobile field directly
+              userData.mobile = formData?.mobile || userData?.mobile;
             }
           }
           const object = {
@@ -471,6 +478,12 @@ const AddEditUser = ({
         };
       }
 
+      // Ensure batch is included from formData or prefilledFormData if missing from payload
+      // This handles cases where hidden fields might not be included in the submitted payload
+      if (!payload.batch && (formData?.batch || editPrefilledFormData?.batch)) {
+        payload.batch = formData?.batch || editPrefilledFormData?.batch;
+      }
+
       if (payload.batch) {
         const cohortIds = payload.batch;
         // payload.tenantCohortRoleMapping.push(cohortIds);
@@ -488,6 +501,9 @@ const AddEditUser = ({
             }
             if (isUnderEighteen(payload?.dob)) {
               payload.mobile = formData?.parent_phone;
+            } else {
+              // For users 18 or older, use the mobile field directly
+              payload.mobile = formData?.mobile || payload?.mobile;
             }
           }
           const responseUserData = await createUser(payload, t);

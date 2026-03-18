@@ -7,6 +7,10 @@ export const FormContext = {
     context: 'USERS',
     contextType: 'LEAD',
   },
+  mobilizer: {
+    context: 'USERS',
+    contextType: 'MOBILIZER',
+  },
   cohort: {
     context: 'COHORTS',
     contextType: 'COHORT',

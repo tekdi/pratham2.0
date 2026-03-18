@@ -869,27 +869,57 @@ const DynamicForm = ({
         // // console.log('workingSchema', workingSchema);
         if (workingSchema.length > 0) {
           const changedFieldValue = formData[changedField];
+          
+          // Check if the changed field itself is multi-select
+          const isChangedFieldMultiSelect = schema?.properties?.[changedField]?.isMultiSelect === true ||
+                                           schema?.properties?.[changedField]?.type === 'array' ||
+                                           Array.isArray(schema?.properties?.[changedField]?.items);
 
-          const getNestedValue = (obj, path) => {
-            if (path === '') {
-              return obj;
-            } else {
-              return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+          // Validate that the controlling field value is not empty before making API calls
+          const isValidControllingValue = (value: any, isMultiSelect: boolean): boolean => {
+            if (isMultiSelect) {
+              return Array.isArray(value) && value.length > 0 && value.every(v => v !== null && v !== undefined && v !== '');
             }
+            return value !== null && value !== undefined && value !== '' && value !== 'Select';
           };
 
-          const fetchDependentApis = async () => {
-            // Filter only the dependent APIs based on the changed field
-            const dependentApis = workingSchema;
-            try {
-              const apiRequests = dependentApis.map((field) => {
-                const { api, key } = field;
-                let isMultiSelect = field?.isMultiSelect;
-                let updatedPayload = replaceControllingField(
-                  api.payload,
-                  changedFieldValue,
-                  isMultiSelect
-                );
+          // Only proceed with API calls if the controlling field value is valid
+          // This prevents API calls with empty controllingfieldfk (e.g., when village is selected but block is empty)
+          if (isValidControllingValue(changedFieldValue, isChangedFieldMultiSelect)) {
+            const getNestedValue = (obj, path) => {
+              if (path === '') {
+                return obj;
+              } else {
+                return path.split('.').reduce((acc, key) => acc && acc[key], obj);
+              }
+            };
+
+            const fetchDependentApis = async () => {
+              // Filter only the dependent APIs based on the changed field
+              const dependentApis = workingSchema;
+              try {
+                const apiRequests = dependentApis.map((field) => {
+                  const { api, key } = field;
+                  let isMultiSelect = field?.isMultiSelect;
+                  
+                  // Additional validation: ensure the controlling field value is valid
+                  const controllingValue = isMultiSelect 
+                    ? (Array.isArray(changedFieldValue) ? changedFieldValue : [changedFieldValue])
+                    : changedFieldValue;
+                  
+                  if (!isValidControllingValue(controllingValue, isMultiSelect)) {
+                    // Return a rejected promise to skip this API call
+                    return Promise.reject({ 
+                      error: new Error(`Invalid controlling field value for ${key}`), 
+                      fieldKey: key 
+                    });
+                  }
+                  
+                  let updatedPayload = replaceControllingField(
+                    api.payload,
+                    changedFieldValue,
+                    isMultiSelect
+                  );
                 // console.log('updatedPayload', updatedPayload);
 
                 // let changedFieldValuePayload = changedFieldValue;
@@ -1008,8 +1038,12 @@ const DynamicForm = ({
             }
           };
 
-          // Call the function
-          fetchDependentApis();
+            // Call the function
+            fetchDependentApis();
+          } else {
+            // Log warning when controlling field value is invalid
+            console.warn(`Skipping API call for dependent fields of ${changedField} - controlling field value is empty or invalid. Value:`, changedFieldValue);
+          }
         }
       }
 
