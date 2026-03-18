@@ -125,7 +125,9 @@ const EmployeeDetailsPage = () => {
             id: course.identifier,
             title: course.name,
             description: course.description,
-            image: (course.appIcon) 
+            image: (course.posterImage) 
+              ? course.posterImage 
+              : (course.appIcon) 
               ? course.appIcon 
               : '/youthnet/images/image_ver.png'
           }));
@@ -136,7 +138,9 @@ const EmployeeDetailsPage = () => {
             id: course.identifier,
             title: course.name,
             description: course.description,
-            image: (course.appIcon ) 
+            image: (course.posterImage) 
+              ? course.posterImage 
+              : (course.appIcon) 
               ? course.appIcon 
               : '/youthnet/images/image_ver.png'
           }));
@@ -148,7 +152,9 @@ const EmployeeDetailsPage = () => {
             title: course.name,
             description: course.description,
             completedDate: null, // null as requested
-            image: (course.appIcon ) 
+            image: (course.posterImage) 
+              ? course.posterImage 
+              : (course.appIcon) 
               ? course.appIcon 
               : '/youthnet/images/image_ver.png',
             //certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
@@ -161,7 +167,9 @@ const EmployeeDetailsPage = () => {
             title: course.name,
             description: course.description,
             completedDate: null, // null as requested
-            image: (course.appIcon) 
+            image: (course.posterImage) 
+              ? course.posterImage 
+              : (course.appIcon) 
               ? course.appIcon 
               : '/youthnet/images/image_ver.png',
             //certificateUrl: `https://example.com/certificate/${course.identifier}` // placeholder
@@ -405,6 +413,9 @@ const EmployeeDetailsPage = () => {
                 </Box>
               ) : (
                 <CourseCompletion
+                  // userIds={[userData?.employeeId || ''] as string[]}
+                  // mandatoryCourseIds={mandatoryInProgressIdentifiers}
+                  // optionalCourseIds={optionalInProgressIdentifiers}
                   mandatoryCourses={mandatoryCertificateData}
                   nonMandatoryCourses={optionalCertificateData}
                 />

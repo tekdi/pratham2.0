@@ -121,10 +121,10 @@ const AddEditUser = ({
         keysToRemove = ['state', 'district', 'block', 'village', 'parentId'];
       } else if (type == 'learner') {
         keysToRemove = [
-          'state',
-          'district',
-          'block',
-          'village',
+          // 'state',
+          // 'district',
+          // 'block',
+          // 'village',
           'password',
           'confirm_password',
           'board',

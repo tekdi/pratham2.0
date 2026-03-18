@@ -21,16 +21,66 @@ interface CourseStatus {
 interface CourseCompletionProps {
   mandatoryCourses: CourseStatus[];
   nonMandatoryCourses: CourseStatus[];
+  userIds?: string[];
+  mandatoryCourseIds?: string[];
+  optionalCourseIds?: string[];
 }
 const CourseCompletion: React.FC<CourseCompletionProps> = ({
   mandatoryCourses,
   nonMandatoryCourses,
+  userIds,
+  mandatoryCourseIds,
+  optionalCourseIds,
 }) => {
+  console.log('userIds=========>', userIds);
+  console.log('mandatoryCourseIds=========>', mandatoryCourseIds);
+  console.log('optionalCourseIds=========>', optionalCourseIds);
+  console.log('nonMandatoryCoursesCourseCompletion', nonMandatoryCourses);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const prepareMandatoryData = (): ChartDataItem[] => {
-    const completed = mandatoryCourses.filter(course => course.status === 'completed').length;
-    const inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
+    let completed = 0;
+    let inProgress = 0;
+
+    // Check if we have the required props for validation
+    if (userIds && mandatoryCourseIds && userIds.length > 0 && mandatoryCourseIds.length > 0) {
+      // Group courses by courseId to check completion status per course
+      const coursesByCourseId = new Map<string, Map<string, string>>();
+      
+      mandatoryCourses.forEach((course) => {
+        if (!coursesByCourseId.has(course.courseId)) {
+          coursesByCourseId.set(course.courseId, new Map());
+        }
+        const userStatusMap = coursesByCourseId.get(course.courseId);
+        if (userStatusMap) {
+          userStatusMap.set(course.userId, course.status);
+        }
+      });
+
+      // Check each mandatory course
+      mandatoryCourseIds.forEach((courseId) => {
+        const userStatusMap = coursesByCourseId.get(courseId);
+        // Check if all users have completed this course
+        // A user must have an entry with status 'completed' to be considered completed
+        const allUsersCompleted = userIds.every((userId) => {
+          const status = userStatusMap?.get(userId);
+          return status === 'completed';
+        });
+
+        if (allUsersCompleted) {
+          completed++;
+        } else {
+          // If not all users completed, count as inProgress
+          // This includes: some users in progress, some not started, or mix of both
+          inProgress++;
+        }
+      });
+    } else {
+      // Fallback to original logic if props are not available
+      completed = mandatoryCourses.filter(course => course.status === 'completed').length;
+      inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
+    }
+
     return [
       {
         name: 'Completed',
@@ -45,8 +95,48 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
     ];
   };
   const prepareNonMandatoryData = (): ChartDataItem[] => {
-    const completed = nonMandatoryCourses.filter(course => course.status === 'completed').length;
-    const inProgress = nonMandatoryCourses.filter(course => course.status === 'inprogress').length;
+    let completed = 0;
+    let inProgress = 0;
+
+    // Check if we have the required props for validation
+    if (userIds && optionalCourseIds && userIds.length > 0 && optionalCourseIds.length > 0) {
+      // Group courses by courseId to check completion status per course
+      const coursesByCourseId = new Map<string, Map<string, string>>();
+      
+      nonMandatoryCourses.forEach((course) => {
+        if (!coursesByCourseId.has(course.courseId)) {
+          coursesByCourseId.set(course.courseId, new Map());
+        }
+        const userStatusMap = coursesByCourseId.get(course.courseId);
+        if (userStatusMap) {
+          userStatusMap.set(course.userId, course.status);
+        }
+      });
+
+      // Check each optional course
+      optionalCourseIds.forEach((courseId) => {
+        const userStatusMap = coursesByCourseId.get(courseId);
+        // Check if all users have completed this course
+        // A user must have an entry with status 'completed' to be considered completed
+        const allUsersCompleted = userIds.every((userId) => {
+          const status = userStatusMap?.get(userId);
+          return status === 'completed';
+        });
+
+        if (allUsersCompleted) {
+          completed++;
+        } else {
+          // If not all users completed, count as inProgress
+          // This includes: some users in progress, some not started, or mix of both
+          inProgress++;
+        }
+      });
+    } else {
+      // Fallback to original logic if props are not available
+      completed = nonMandatoryCourses.filter(course => course.status === 'completed').length;
+      inProgress = nonMandatoryCourses.filter(course => course.status === 'inprogress').length;
+    }
+
     return [
       {
         name: 'Completed',
