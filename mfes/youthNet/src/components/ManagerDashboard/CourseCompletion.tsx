@@ -9,16 +9,19 @@ import {
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
+
 interface ChartDataItem {
   name: string;
   value: number;
   color: string;
 }
+
 interface CourseStatus {
   userId: string;
   courseId: string;
   status: 'completed' | 'inprogress';
 }
+
 interface CourseCompletionProps {
   mandatoryCourses: CourseStatus[];
   nonMandatoryCourses: CourseStatus[];
@@ -26,6 +29,7 @@ interface CourseCompletionProps {
   mandatoryCourseIds?: string[];
   optionalCourseIds?: string[];
 }
+
 const CourseCompletion: React.FC<CourseCompletionProps> = ({
   mandatoryCourses,
   nonMandatoryCourses,
@@ -34,137 +38,98 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   optionalCourseIds,
 }) => {
   const { t } = useTranslation();
-  console.log('userIds=========>', userIds);
-  console.log('mandatoryCourseIds=========>', mandatoryCourseIds);
-  console.log('optionalCourseIds=========>', optionalCourseIds);
-  console.log('nonMandatoryCoursesCourseCompletion', nonMandatoryCourses);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const prepareMandatoryData = (): ChartDataItem[] => {
+
+  // ✅ FINAL LOGIC WITH INPROGRESS SUPPORT
+  const calculateUserCompletion = (
+    courses: CourseStatus[],
+    courseIds?: string[]
+  ): ChartDataItem[] => {
     let completed = 0;
     let inProgress = 0;
 
-    // Check if we have the required props for validation
-    if (userIds && mandatoryCourseIds && userIds.length > 0 && mandatoryCourseIds.length > 0) {
-      // Group courses by courseId to check completion status per course
-      const coursesByCourseId = new Map<string, Map<string, string>>();
-      
-      mandatoryCourses.forEach((course) => {
-        if (!coursesByCourseId.has(course.courseId)) {
-          coursesByCourseId.set(course.courseId, new Map());
+    if (userIds && courseIds && userIds.length > 0 && courseIds.length > 0) {
+      // user → completed courses
+      const completedMap = new Map<string, Set<string>>();
+      // user → any activity (completed OR inprogress)
+      const activityMap = new Map<string, boolean>();
+
+      courses.forEach((course) => {
+        // track activity
+        if (!activityMap.has(course.userId)) {
+          activityMap.set(course.userId, false);
         }
-        const userStatusMap = coursesByCourseId.get(course.courseId);
-        if (userStatusMap) {
-          userStatusMap.set(course.userId, course.status);
+
+        if (course.status === 'completed' || course.status === 'inprogress') {
+          activityMap.set(course.userId, true);
+        }
+
+        // track completed
+        if (course.status === 'completed') {
+          if (!completedMap.has(course.userId)) {
+            completedMap.set(course.userId, new Set());
+          }
+          completedMap.get(course.userId)?.add(course.courseId);
         }
       });
 
-      // Check each mandatory course
-      mandatoryCourseIds.forEach((courseId) => {
-        const userStatusMap = coursesByCourseId.get(courseId);
-        // Check if all users have completed this course
-        // A user must have an entry with status 'completed' to be considered completed
-        const allUsersCompleted = userIds.every((userId) => {
-          const status = userStatusMap?.get(userId);
-          return status === 'completed';
-        });
+      userIds.forEach((userId) => {
+        const completedCourses = completedMap.get(userId) || new Set();
+        const hasActivity = activityMap.get(userId) || false;
 
-        if (allUsersCompleted) {
+        const completedCount = courseIds.filter((courseId) =>
+          completedCourses.has(courseId)
+        ).length;
+
+        if (completedCount === courseIds.length) {
+          // ✅ all completed
           completed++;
-        } else {
-          // If not all users completed, count as inProgress
-          // This includes: some users in progress, some not started, or mix of both
+        } else if (hasActivity) {
+          // ⏳ has at least one completed OR inprogress
           inProgress++;
         }
+        // ❌ no activity → ignore
       });
+
     } else {
-      // Fallback to original logic if props are not available
-      completed = mandatoryCourses.filter(course => course.status === 'completed').length;
-      inProgress = mandatoryCourses.filter(course => course.status === 'inprogress').length;
+      // ✅ FALLBACK LOGIC
+      completed = courses.filter(c => c.status === 'completed').length;
+      inProgress = courses.filter(c => c.status === 'inprogress').length;
     }
 
     return [
-      {
-        name: t('COMPLETED'),
-        value: completed,
-        color: '#4CAF50',
-      },
-      {
-        name: t('IN_PROGRESS'),
-        value: inProgress,
-        color: '#FFC107',
-      },
+      { name: t('COMPLETED'), value: completed, color: '#4CAF50' },
+      { name: t('IN_PROGRESS'), value: inProgress, color: '#FFC107' },
     ];
   };
-  const prepareNonMandatoryData = (): ChartDataItem[] => {
-    let completed = 0;
-    let inProgress = 0;
 
-    // Check if we have the required props for validation
-    if (userIds && optionalCourseIds && userIds.length > 0 && optionalCourseIds.length > 0) {
-      // Group courses by courseId to check completion status per course
-      const coursesByCourseId = new Map<string, Map<string, string>>();
-      
-      nonMandatoryCourses.forEach((course) => {
-        if (!coursesByCourseId.has(course.courseId)) {
-          coursesByCourseId.set(course.courseId, new Map());
-        }
-        const userStatusMap = coursesByCourseId.get(course.courseId);
-        if (userStatusMap) {
-          userStatusMap.set(course.userId, course.status);
-        }
-      });
+  const prepareMandatoryData = () =>
+    calculateUserCompletion(mandatoryCourses, mandatoryCourseIds);
 
-      // Check each optional course
-      optionalCourseIds.forEach((courseId) => {
-        const userStatusMap = coursesByCourseId.get(courseId);
-        // Check if all users have completed this course
-        // A user must have an entry with status 'completed' to be considered completed
-        const allUsersCompleted = userIds.every((userId) => {
-          const status = userStatusMap?.get(userId);
-          return status === 'completed';
-        });
+  const prepareNonMandatoryData = () =>
+    calculateUserCompletion(nonMandatoryCourses, optionalCourseIds);
 
-        if (allUsersCompleted) {
-          completed++;
-        } else {
-          // If not all users completed, count as inProgress
-          // This includes: some users in progress, some not started, or mix of both
-          inProgress++;
-        }
-      });
-    } else {
-      // Fallback to original logic if props are not available
-      completed = nonMandatoryCourses.filter(course => course.status === 'completed').length;
-      inProgress = nonMandatoryCourses.filter(course => course.status === 'inprogress').length;
-    }
-
-    return [
-      {
-        name: t('COMPLETED'),
-        value: completed,
-        color: '#4CAF50',
-      },
-      {
-        name: t('IN_PROGRESS'),
-        value: inProgress,
-        color: '#FFC107',
-      },
-    ];
-  };
   const renderDonutChart = (data: ChartDataItem[], title: string) => {
     const backgroundData = [{ value: 100 }];
-    // Responsive radius values: smaller for mobile, original for desktop
     const innerRadius = isMobile ? 38 : 48;
     const outerRadius = isMobile ? 55 : 68;
-    
+
     return (
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, maxWidth: '100%' }}>
-        <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom sx={{ mb: { xs: 1, sm: 2 }, fontSize: { xs: '0.875rem', sm: '0.875rem' }, flexShrink: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <Typography variant="body2" fontWeight={500} color="text.secondary" gutterBottom>
           {title}
         </Typography>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row', lg: 'row' }, alignItems: 'center', gap: { xs: 1.5, sm: 2, lg: 1.5 }, width: '100%', minWidth: 0, flex: 1 }}>
-          <Box sx={{ position: 'relative', height: { xs: 120, sm: 150, lg: 130, xl: 140 }, width: { xs: 120, sm: 150, lg: 130, xl: 140 }, flexShrink: 0 }}>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <Box sx={{ position: 'relative', height: 140, width: 140 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -174,8 +139,6 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   innerRadius={innerRadius}
                   outerRadius={outerRadius}
                   dataKey="value"
-                  startAngle={0}
-                  endAngle={360}
                   fill="#E0E0E0"
                 />
                 <Pie
@@ -189,54 +152,26 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
                   endAngle={-270}
                 >
                   {data.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip />
               </PieChart>
             </ResponsiveContainer>
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                textAlign: 'center',
-                width: { xs: '60px', sm: '80px' },
-              }}
-            >
-              {/* <Typography variant="caption" color="text.secondary" sx={{ fontSize: '9px', textTransform: 'uppercase', lineHeight: 1.2 }}>
-                NO. OF EMPLOYEES
-              </Typography> */}
-            </Box>
           </Box>
-          <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
+
+          <Stack spacing={1}>
             {data.map((item, index) => (
-              <Stack
-                key={index}
-                direction="row"
-                alignItems="center"
-                spacing={1}
-                sx={{ minWidth: 0 }}
-              >
+              <Stack key={index} direction="row" alignItems="center" spacing={1}>
                 <Box
                   sx={{
                     width: 10,
                     height: 10,
                     borderRadius: '50%',
                     backgroundColor: item.color,
-                    flexShrink: 0,
                   }}
                 />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: theme.palette.primary.main,
-                    fontSize: { xs: '12px', sm: '13px', lg: '12px', xl: '13px' },
-                    minWidth: 0,
-                    wordBreak: 'break-word'
-                  }}
-                >
+                <Typography variant="body2" color="primary">
                   {item.name} : {item.value}
                 </Typography>
               </Stack>
@@ -246,32 +181,33 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
       </Box>
     );
   };
+
   return (
-    <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #E0E0E0', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'visible' }}>
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' }, flexShrink: 0 }}>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2,
+        border: '1px solid #E0E0E0',
+        borderRadius: 2,
+        height: '100%',
+      }}
+    >
+      <Typography variant="subtitle1" fontWeight={600}>
         {t('COURSE_COMPLETION')}
       </Typography>
-      <Stack 
-        direction={{ xs: 'column', sm: 'column', lg: 'row', xl: 'row' }} 
-        spacing={{ xs: 2, sm: 2, lg: 2, xl: 2.5 }} 
-        sx={{ 
-          mt: 2,
-          flex: 1,
-          minHeight: 0,
-          width: '100%',
-          alignItems: { xs: 'stretch', sm: 'stretch', lg: 'flex-start', xl: 'flex-start' },
-          '& > *': {
-            flex: { lg: '1 1 auto', xl: '1 1 auto' },
-            minWidth: 0,
-            maxWidth: { lg: 'calc(50% - 4px)', xl: 'calc(50% - 5px)' }
-          }
-        }}
-      >
-        {renderDonutChart(prepareMandatoryData(), t('MANDATORY_COURSES'))}
-        {renderDonutChart(prepareNonMandatoryData(), t('NON_MANDATORY_COURSES'))}
+
+      <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} sx={{ mt: 2 }}>
+        {renderDonutChart(
+          prepareMandatoryData(),
+          t('MANDATORY_COURSES')
+        )}
+        {renderDonutChart(
+          prepareNonMandatoryData(),
+          t('NON_MANDATORY_COURSES')
+        )}
       </Stack>
     </Paper>
   );
 };
-export default CourseCompletion;
 
+export default CourseCompletion;
