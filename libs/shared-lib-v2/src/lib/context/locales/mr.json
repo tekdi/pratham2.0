@@ -951,5 +951,16 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• जर उत्तरपत्रिकेत अनेक पाने असतील तर प्रत्येक पानाचा स्वतंत्रपणे फोटो काढा आणि अपलोड करा.",
     "READ_LESS": "कमी वाचा",
     "READ_MORE": "पुढे वाचा"
+  },
+  "LMP_SINGLE_BATCH_WIDGET": {
+    "TITLE": "बॅच निवडा",
+    "CENTER": "केंद्र",
+    "SELECT_CENTER": "केंद्र निवडा",
+    "NO_CENTERS_AVAILABLE": "कोणतेही केंद्र उपलब्ध नाही",
+    "BATCH": "बॅच",
+    "SELECT_CENTER_FIRST": "प्रथम एक केंद्र निवडा",
+    "LOADING_BATCHES": "बॅच लोड होत आहेत…",
+    "SELECT_BATCH": "बॅच निवडा",
+    "VALUE_NOT_IN_LIST": "सध्याचे मूल्य सूचीत नाही; कृपया पुन्हा बॅच निवडा."
   }
 }

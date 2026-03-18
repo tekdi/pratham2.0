@@ -71,6 +71,7 @@ import useNotification from '@/hooks/useNotification';
 import {
   getMyCohortFacilitatorList,
   getMyCohortMemberList,
+  getMyCohortMemberListLearner,
 } from '@/services/MyClassDetailsService';
 import useStore from '@/store/store';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -124,8 +125,8 @@ const CohortPage = () => {
     return isEliminatedFromBuild('Events', 'feature') || !isActiveYear
       ? 2
       : router.query.tab
-      ? Number(router.query.tab)
-      : 1;
+        ? Number(router.query.tab)
+        : 1;
   });
   const [showDetails, setShowDetails] = React.useState(false);
   const [classId, setClassId] = React.useState('');
@@ -351,42 +352,10 @@ const CohortPage = () => {
     const getCohortMemberList = async () => {
       if (cohortId) {
         try {
-        const bodyPayload = {
-          limit: 1,
-          offset: 0,
-          role: [Role.TEACHER],
-          tenantStatus: [Status.ACTIVE],
-          filters: {
-            batch: [cohortId],
-            status: [Status.ACTIVE],
-          },
-          customfields: [
-            'state',
-            'district',
-            'block',
-            'village',
-            'main_subject',
-            'subject_taught',
-          ],
-          sort: [
-            "firstName",
-            "asc"
-          ]
-        };
-          const facilitatorResponse = await HierarchicalSearchUserList(bodyPayload);
-          if (facilitatorResponse?.totalCount) {
-            setCohortFacilitatorListCount(
-              facilitatorResponse?.totalCount
-            );
-          } else setCohortFacilitatorListCount(0);
-        } catch (error) {
-          setCohortFacilitatorListCount(0);
-        }
-        try {
           const bodyPayload = {
             limit: 1,
             offset: 0,
-            role: [Role.STUDENT],
+            role: [Role.TEACHER],
             tenantStatus: [Status.ACTIVE],
             filters: {
               batch: [cohortId],
@@ -405,8 +374,24 @@ const CohortPage = () => {
               "asc"
             ]
           };
-
-          const learnerResponse = await HierarchicalSearchUserList(bodyPayload);
+          const facilitatorResponse = await HierarchicalSearchUserList(bodyPayload);
+          if (facilitatorResponse?.totalCount) {
+            setCohortFacilitatorListCount(
+              facilitatorResponse?.totalCount
+            );
+          } else setCohortFacilitatorListCount(0);
+        } catch (error) {
+          setCohortFacilitatorListCount(0);
+        }
+        try {
+          const page = 0;
+          const filters = { cohortId: cohortId };
+          const response = await getMyCohortMemberListLearner({
+            limit: 1,
+            page,
+            filters,
+          });
+          const learnerResponse = response?.result;
           if (learnerResponse?.totalCount) {
             setCohortLearnerListCount(
               learnerResponse?.totalCount
@@ -568,8 +553,8 @@ const CohortPage = () => {
           newValue === 1
             ? 'change-tab-to-center-session'
             : newValue === 2
-            ? 'change-tab-to-learners-list'
-            : 'change-tab-to-facilitators-list',
+              ? 'change-tab-to-learners-list'
+              : 'change-tab-to-facilitators-list',
         type: Telemetry.CLICK,
         subtype: '',
         pageid: cleanedUrl,
@@ -879,29 +864,29 @@ const CohortPage = () => {
                     deleteModal
                       ? t('CENTER_SESSION.DELETE_SESSION')
                       : openSchedule
-                      ? clickedBox === 'EXTRA_SESSION'
-                        ? 'Extra Session'
-                        : t('CENTER_SESSION.PLANNED_SESSION')
-                      : t('CENTER_SESSION.SCHEDULE')
+                        ? clickedBox === 'EXTRA_SESSION'
+                          ? 'Extra Session'
+                          : t('CENTER_SESSION.PLANNED_SESSION')
+                        : t('CENTER_SESSION.SCHEDULE')
                   }
                   primary={
                     deleteModal
                       ? t('COMMON.OK')
                       : openSchedule
-                      ? t('CENTER_SESSION.SCHEDULE')
-                      : onEditEvent
-                      ? t('CENTER_SESSION.UPDATE')
-                      : t('GUIDE_TOUR.NEXT')
+                        ? t('CENTER_SESSION.SCHEDULE')
+                        : onEditEvent
+                          ? t('CENTER_SESSION.UPDATE')
+                          : t('GUIDE_TOUR.NEXT')
                   }
                   secondary={deleteModal ? t('COMMON.CANCEL') : undefined}
                   handlePrimaryModel={
                     deleteModal
                       ? undefined
                       : openSchedule
-                      ? handleSchedule
-                      : onEditEvent
-                      ? handleEditEvent
-                      : handleCentermodel
+                        ? handleSchedule
+                        : onEditEvent
+                          ? handleEditEvent
+                          : handleCentermodel
                   }
                   handleEditModal={handleEditEvent}
                   disable={onEditEvent ? false : disableNextButton}
@@ -909,7 +894,7 @@ const CohortPage = () => {
                   {deleteModal
                     ? DeleteSession && <DeleteSession />
                     : openSchedule
-                    ? PlannedSession && (
+                      ? PlannedSession && (
                         <PlannedSession
                           clickedBox={clickedBox}
                           removeModal={removeModal}
@@ -924,7 +909,7 @@ const CohortPage = () => {
                           grade={grade}
                         />
                       )
-                    : Schedule && (
+                      : Schedule && (
                         <>
                           {!clickedBox && (
                             <Typography sx={{ m: 2 }}>

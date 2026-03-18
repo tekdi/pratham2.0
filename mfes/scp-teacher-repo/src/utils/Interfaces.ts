@@ -376,6 +376,8 @@ export interface LearnerListProps {
   isFromProfile?: boolean;
   gender?: string;
   customFields?: any;
+  myCenterList?: any[] | null | undefined;
+  myCenterIds?: any[] | null | undefined;
 }
 export interface UserData {
   email: string;
