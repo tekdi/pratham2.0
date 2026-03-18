@@ -300,7 +300,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         // Build filters object
         const filters: any = {
-          emp_manager: managerUserId
+          emp_manager: managerUserId,
+          role: "Learner",
         };
         
         // Add name filter if search query exists
@@ -585,7 +586,9 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         if(userId) {
            employeeDataResponse = await fetchUserList({
            
-            filters: {emp_manager:userId},
+            filters: {emp_manager:userId,
+              role: "Learner",
+            },
           });
           console.log('employeeDataResponse', employeeDataResponse);
           
@@ -746,6 +749,9 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
               <CourseCompletion
                 mandatoryCourses={mandatoryCertificateData}
                 nonMandatoryCourses={optionalCertificateData}
+                userIds={employeeUserIds}
+                mandatoryCourseIds={mandatoryIdentifiers}
+                optionalCourseIds={optionalIdentifiers}
               />
             )}
           </Grid>
