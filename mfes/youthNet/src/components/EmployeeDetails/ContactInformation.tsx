@@ -1,11 +1,13 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 import { ContactInformationProps } from './types';
 
 const ContactInformation: React.FC<ContactInformationProps> = ({
   email,
   phone,
 }) => {
+  const { t } = useTranslation();
   return (
     <Paper 
       elevation={0} 
@@ -17,12 +19,12 @@ const ContactInformation: React.FC<ContactInformationProps> = ({
       }}
     >
       <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ mb: 2 }}>
-        Contact Information
+        {t('CONTACT_INFORMATION')}
       </Typography>
       
       <Box sx={{ mb: 2 }}>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-          Email Address
+          {t('EMAIL_ADDRESS')}
         </Typography>
         <Typography variant="body2" color="text.primary">
           {email}
@@ -31,7 +33,7 @@ const ContactInformation: React.FC<ContactInformationProps> = ({
 
       <Box>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-          Phone Number
+          {t('PHONE_NUMBER_LABEL')}
         </Typography>
         <Typography variant="body2" color="text.primary">
           {phone}

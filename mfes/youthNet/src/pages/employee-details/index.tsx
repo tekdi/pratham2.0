@@ -19,6 +19,7 @@ import Header from '../../components/Header';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { getUserDetails } from '../../services/ProfileService';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { getData } from '@shared-lib-v2/utils/DataClient';
 import { fetchCourses } from '../../services/PlayerService';
 
@@ -38,6 +39,7 @@ interface UserData {
 }
 
 const EmployeeDetailsPage = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(0);
   const [employeeData, setEmployeeData] = useState<EmployeeDetailsData | null>(null);
@@ -370,7 +372,7 @@ const EmployeeDetailsPage = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h5" fontWeight={600}>
-            {userDataLoading ? "Loading Employee..." : (userData?.name || "Employee Details")}
+            {userDataLoading ? t('LOADING_EMPLOYEE') : (userData?.name || t('EMPLOYEE_DETAILS'))}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           {/* <IconButton
@@ -409,7 +411,7 @@ const EmployeeDetailsPage = () => {
                     backgroundColor: 'white'
                   }}
                 >
-                  <Typography variant="h6">Loading Course Completion Data...</Typography>
+                  <Typography variant="h6">{t('LOADING_COURSE_COMPLETION_DATA')}</Typography>
                 </Box>
               ) : (
                 <CourseCompletion
@@ -441,8 +443,8 @@ const EmployeeDetailsPage = () => {
                     },
                   }}
                 >
-                  <Tab label="Mandatory Courses" />
-                  <Tab label="Non-mandatory Courses" />
+                  <Tab label={t('MANDATORY_COURSES')} />
+                  <Tab label={t('NON_MANDATORY_COURSES')} />
                 </Tabs>
 
                 {/* Tab Content */}
@@ -458,19 +460,19 @@ const EmployeeDetailsPage = () => {
                           p: 3
                         }}
                       >
-                        <Typography variant="body2" color="text.secondary">Loading Mandatory Course Details...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t('LOADING_MANDATORY_COURSE_DETAILS')}</Typography>
                       </Box>
                     ) : (
                       <>
                         <ExpandableCourseSection
-                          title="Ongoing Mandatory Courses"
+                          title={t('ONGOING_MANDATORY_COURSES')}
                           count={transformedMandatoryInProgressCourses.length}
                           courses={transformedMandatoryInProgressCourses}
                           defaultExpanded={false}
                         />
                         
                         <ExpandableCourseSection
-                          title="Completed Mandatory Courses"
+                          title={t('COMPLETED_MANDATORY_COURSES')}
                           count={transformedMandatoryCompletedCourses.length}
                           courses={transformedMandatoryCompletedCourses}
                           defaultExpanded={false}
@@ -492,19 +494,19 @@ const EmployeeDetailsPage = () => {
                           p: 3
                         }}
                       >
-                        <Typography variant="body2" color="text.secondary">Loading Optional Course Details...</Typography>
+                        <Typography variant="body2" color="text.secondary">{t('LOADING_OPTIONAL_COURSE_DETAILS')}</Typography>
                       </Box>
                     ) : (
                       <>
                         <ExpandableCourseSection
-                          title="Ongoing Optional Courses"
+                          title={t('ONGOING_OPTIONAL_COURSES')}
                           count={transformedOptionalInProgressCourses.length}
                           courses={transformedOptionalInProgressCourses}
                           defaultExpanded={false}
                         />
                         
                         <ExpandableCourseSection
-                          title="Completed Optional Courses"
+                          title={t('COMPLETED_OPTIONAL_COURSES')}
                           count={transformedOptionalCompletedCourses.length}
                           courses={transformedOptionalCompletedCourses}
                           defaultExpanded={false}
@@ -532,7 +534,7 @@ const EmployeeDetailsPage = () => {
                     minHeight: '120px'
                   }}
                 >
-                  <Typography variant="body2" color="text.secondary">Loading Contact Information...</Typography>
+                  <Typography variant="body2" color="text.secondary">{t('LOADING_CONTACT_INFORMATION')}</Typography>
                 </Box>
               ) : (
                 <ContactInformation

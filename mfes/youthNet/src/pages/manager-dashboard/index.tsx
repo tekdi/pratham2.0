@@ -12,6 +12,7 @@ import {
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { fetchCourses, getCourseHierarchy } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { fetchUserList } from '../../services/ManageUser';
@@ -19,6 +20,7 @@ import { getAssessmentStatus } from '../../services/AssesmentService';
 
 
 const ManagerDashboard = () => {
+  const { t } = useTranslation();
   // State for API data
   const [mandatoryCertificateData, setMandatoryCertificateData] = useState<any[]>([]);
   const [optionalCertificateData, setOptionalCertificateData] = useState<any[]>([]);
@@ -59,6 +61,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
   }>({
     usersData: {},
   });
+  const [topPerformersLoading, setTopPerformersLoading] = useState(true);
 
   const [individualProgressData, setIndividualProgressData] = useState<EmployeeProgress[]>([]);
 
@@ -155,8 +158,37 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
 
   // Extract completed course IDs without storing in state
   useEffect(() => {
+    // If initial data fetch is still loading, wait
+    if (courseDataLoading) {
+      return;
+    }
+    
+    // Initialize with empty data if dependencies aren't ready yet
+    if (!employeeUserIds.length || !employeeDataResponse.length) {
+      // Initial fetch is complete but no employees, set empty data and stop loading
+      setTopPerformersData({
+        usersData: {
+          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+        }
+      });
+      setTopPerformersLoading(false);
+      return;
+    }
+
+    // If employees exist but no certificate data yet, set empty data and stop loading
+    if (mandatoryCertificateData.length === 0 && optionalCertificateData.length === 0) {
+      setTopPerformersData({
+        usersData: {
+          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+        }
+      });
+      setTopPerformersLoading(false);
+      return;
+    }
+
     // Check if arrays are not empty
     if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0 && employeeDataResponse.length > 0) {
+      setTopPerformersLoading(true);
       // Find completed course IDs from mandatory courses
       const completedMandatoryCourseIds = mandatoryCertificateData
         .filter(course => course.status === 'completed')
@@ -182,9 +214,10 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('No completed courses found, setting empty top performers data');
         setTopPerformersData({
           usersData: {
-            '5 Highest Course Completing Users': []
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
           }
         });
+        setTopPerformersLoading(false);
         return;
       }
       
@@ -248,7 +281,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         // Create TopPerformers data structure
         const topPerformersDataStructure = {
           usersData: {
-            '5 Highest Course Completing Users': topPerformerEmployees.map((employee: any) => ({
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: topPerformerEmployees.map((employee: any) => ({
               id: employee.userId,
               name: employee.name || `${employee.firstName} ${employee.lastName}`.trim(),
               role: 'Learner'
@@ -261,6 +294,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         // Set the top performers data
         setTopPerformersData(topPerformersDataStructure);
+        setTopPerformersLoading(false);
         
         return { allStructuredData, topPerformerUserIds };
       };
@@ -271,13 +305,20 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('Top 5 Performer User IDs:', result?.topPerformerUserIds);
       }).catch((error) => {
         console.error('Error processing structured course data:', error);
+        setTopPerformersLoading(false);
+        // Set empty data on error
+        setTopPerformersData({
+          usersData: {
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+          }
+        });
       });
 
       
 
       
     }
-  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse]);
+  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse, courseDataLoading, t]);
 
   // Function to fetch individual progress data with pagination and search
   const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
@@ -663,10 +704,28 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         setMandatoryCertificateData(filteredMandatory);
         setOptionalCertificateData(filteredOptional);
         setCourseDataLoading(false);
+        
+        // If no employees or no certificate data, set top performers to empty and stop loading
+        if (employeeUserIds.length === 0 || employeeDataResponse.length === 0 || 
+            (filteredMandatory.length === 0 && filteredOptional.length === 0)) {
+          setTopPerformersData({
+            usersData: {
+              [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+            }
+          });
+          setTopPerformersLoading(false);
+        }
 
       } catch (error) {
         console.error('Error fetching course data:', error);
         setCourseDataLoading(false);
+        // On error, set top performers to empty and stop loading
+        setTopPerformersData({
+          usersData: {
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+          }
+        });
+        setTopPerformersLoading(false);
       }
 
 
@@ -720,10 +779,10 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         {/* Header */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600} display="inline">
-            Team Learning Overview
+            {t('TEAM_LEARNING_OVERVIEW')}
           </Typography>
           <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: { xs: 1, sm: 2 } }}>
-            Total Employees : {totalEmployees}
+            {t('TOTAL_EMPLOYEES')} : {totalEmployees}
           </Typography>
         </Box>
 
@@ -732,19 +791,19 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           {/* Course Completion */}
           <Grid item xs={12} md={6}>
             {courseDataLoading ? (
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  minHeight: '300px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 2,
-                  backgroundColor: 'white'
-                }}
-              >
-                <Typography variant="h6">Loading Course Completion Data...</Typography>
-              </Box>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '300px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <Typography variant="h6">{t('LOADING_COURSE_COMPLETION_DATA')}</Typography>
+                </Box>
             ) : (
               <CourseCompletion
                 mandatoryCourses={mandatoryCertificateData}
@@ -759,19 +818,19 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           {/* Course Allocation */}
           <Grid item xs={12} md={6}>
             {courseDataLoading ? (
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  minHeight: '200px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 2,
-                  backgroundColor: 'white'
-                }}
-              >
-                <Typography variant="h6">Loading Course Allocation Data...</Typography>
-              </Box>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '200px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <Typography variant="h6">{t('LOADING_COURSE_ALLOCATION_DATA')}</Typography>
+                </Box>
             ) : (
               <CourseAllocation
                 mandatory={courseAllocationData.mandatory}
@@ -785,6 +844,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           <Grid item xs={12}>
             <TopPerformers
               usersData={topPerformersData.usersData}
+              isLoading={topPerformersLoading}
             />
           </Grid>
 

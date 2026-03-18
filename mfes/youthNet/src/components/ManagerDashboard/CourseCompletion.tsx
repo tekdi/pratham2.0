@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { useTheme } from '@mui/material/styles';
+import { useTranslation } from 'next-i18next';
 interface ChartDataItem {
   name: string;
   value: number;
@@ -32,6 +33,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   mandatoryCourseIds,
   optionalCourseIds,
 }) => {
+  const { t } = useTranslation();
   console.log('userIds=========>', userIds);
   console.log('mandatoryCourseIds=========>', mandatoryCourseIds);
   console.log('optionalCourseIds=========>', optionalCourseIds);
@@ -83,12 +85,12 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
 
     return [
       {
-        name: 'Completed',
+        name: t('COMPLETED'),
         value: completed,
         color: '#4CAF50',
       },
       {
-        name: 'In Progress',
+        name: t('IN_PROGRESS'),
         value: inProgress,
         color: '#FFC107',
       },
@@ -139,12 +141,12 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
 
     return [
       {
-        name: 'Completed',
+        name: t('COMPLETED'),
         value: completed,
         color: '#4CAF50',
       },
       {
-        name: 'In Progress',
+        name: t('IN_PROGRESS'),
         value: inProgress,
         color: '#FFC107',
       },
@@ -247,7 +249,7 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
   return (
     <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #E0E0E0', borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', overflowY: 'visible' }}>
       <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' }, flexShrink: 0 }}>
-        Course Completion
+        {t('COURSE_COMPLETION')}
       </Typography>
       <Stack 
         direction={{ xs: 'column', sm: 'column', lg: 'row', xl: 'row' }} 
@@ -265,8 +267,8 @@ const CourseCompletion: React.FC<CourseCompletionProps> = ({
           }
         }}
       >
-        {renderDonutChart(prepareMandatoryData(), 'Mandatory Courses')}
-        {renderDonutChart(prepareNonMandatoryData(), 'Non Mandatory Courses')}
+        {renderDonutChart(prepareMandatoryData(), t('MANDATORY_COURSES'))}
+        {renderDonutChart(prepareNonMandatoryData(), t('NON_MANDATORY_COURSES'))}
       </Stack>
     </Paper>
   );
