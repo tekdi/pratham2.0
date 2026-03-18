@@ -15,18 +15,21 @@ interface TopPerformersProps {
   usersData: {
     [key: string]: User[];
   };
+  isLoading?: boolean;
 }
 
 const TopPerformers: React.FC<TopPerformersProps> = ({
   usersData,
+  isLoading: externalLoading = false,
 }) => {
   const { t } = useTranslation();
   // Hardcoded category
   const currentCategory = t('FIVE_HIGHEST_COURSE_COMPLETING_USERS');
   const currentUsers = usersData[currentCategory] || [];
 
-  // Check if data is still loading
-  const isLoading = !usersData || Object.keys(usersData).length === 0 || !usersData[currentCategory];
+  // Check if data is still loading - use external loading state if provided
+  // Only show loading if explicitly set to true, not if data is just empty
+  const isLoading = externalLoading === true;
 
   // Get today's date in the format "5th Sep"
   const getTodayDate = () => {
