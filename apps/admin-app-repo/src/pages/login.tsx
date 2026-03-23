@@ -266,6 +266,7 @@ const LoginPage = () => {
 
             localStorage.setItem('tenantId', tenantId || '');
             localStorage.setItem('tenantName', tenantName || '');
+            localStorage.setItem('uiConfig', JSON.stringify(userInfo?.tenantData?.[0]?.params?.uiConfig || {}));
             localStorage.setItem('roleId', roleId || '');
             localStorage.setItem('roleName', roleName || '');
             localStorage.setItem('program', program || '');

@@ -281,10 +281,14 @@ const SSOContent = () => {
     setRoleName(roleName);
 
     if (userResponse) {
+      const selectedTenantData = userResponse?.tenantData?.find(
+        (tenant: any) => tenant.tenantId === tenantId
+      );
       const token = localStorage.getItem('token');
       localStorage.setItem('userId', userResponse?.userId);
       localStorage.setItem('templtateId', tenantId);
       localStorage.setItem('tenantName', tenantName);
+      localStorage.setItem('uiConfig', JSON.stringify(selectedTenantData?.params?.uiConfig || {}));
       localStorage.setItem('roleId', roleId);
       localStorage.setItem('roleName', roleName);
       localStorage.setItem('userIdName', userResponse?.username);
@@ -297,8 +301,8 @@ const SSOContent = () => {
 
       localStorage.setItem('name', userResponse?.firstName);
       localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
-      const frameworkId = userResponse?.tenantData?.[0]?.collectionFramework;
-      const channel = userResponse?.tenantData?.[0]?.channelId;
+      const frameworkId = selectedTenantData?.collectionFramework;
+      const channel = selectedTenantData?.channelId;
       TenantService.setTenantId(tenantId);
       localStorage.setItem('collectionFramework', frameworkId);
       localStorage.setItem('channelId', channel);
