@@ -189,7 +189,12 @@
     "NEXT": "తరువాతి",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "దయచేసి కనీసం ఒక బ్యాచ్‌ని ఎంచుకోండి.",
     "PLEASE_SEARCH_AND_SELECT_USER": "దయచేసి శోధించి వినియోగదారుని ఎంచుకోండి.",
-    "PLEASE_SELECT_CENTER": "దయచేసి ఒక కేంద్రాన్ని ఎంచుకోండి."
+    "PLEASE_SELECT_CENTER": "దయచేసి ఒక కేంద్రాన్ని ఎంచుకోండి.",
+    "REASSIGN": "మళ్లీ కేటాయించు",
+    "REASSIGN_LEARNER_TO_BATCH": "అభ్యాసకుడిని బ్యాచ్‌కు మళ్లీ కేటాయించు",
+    "LOADING_ELLIPSIS": "లోడ్ అవుతోంది...",
+    "SELECT_BATCH_WIDGET_TITLE": "బ్యాచ్ ఎంచుకోండి",
+    "PLEASE_SELECT_BATCH": "దయచేసి ఒక బ్యాచ్ ఎంచుకోండి"
   },
   "LOGIN_PAGE": {
     "USERNAME": "యూజర్‌నేమ్",

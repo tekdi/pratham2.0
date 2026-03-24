@@ -189,7 +189,12 @@
     "NEXT": "அடுத்து",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "குறைந்தது ஒரு தொகுப்பையாவது தேர்ந்தெடுக்கவும்.",
     "PLEASE_SEARCH_AND_SELECT_USER": "தயவுசெய்து தேடி ஒரு பயனரைத் தேர்ந்தெடுக்கவும்.",
-    "PLEASE_SELECT_CENTER": "தயவுசெய்து ஒரு மையத்தைத் தேர்ந்தெடுக்கவும்."
+    "PLEASE_SELECT_CENTER": "தயவுசெய்து ஒரு மையத்தைத் தேர்ந்தெடுக்கவும்.",
+    "REASSIGN": "மீண்டும் ஒதுக்கு",
+    "REASSIGN_LEARNER_TO_BATCH": "கற்பவரைத் தொகுப்பிற்கு மீண்டும் ஒதுக்கு",
+    "LOADING_ELLIPSIS": "ஏற்றுகிறது...",
+    "SELECT_BATCH_WIDGET_TITLE": "தொகுப்பைத் தேர்ந்தெடுக்கவும்",
+    "PLEASE_SELECT_BATCH": "தயவுசெய்து ஒரு தொகுப்பைத் தேர்ந்தெடுக்கவும்"
   },
   "LOGIN_PAGE": {
     "USERNAME": "பயனர் பெயர்",

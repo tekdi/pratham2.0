@@ -171,7 +171,15 @@
     "WE_SEND_AN_EMAIL": "{{maskEmail}} ലേക്ക് പാസ്വേഡ് പുനഃസജ്ജമാക്കാനുള്ള ലിങ്ക് ഞങ്ങൾ അയച്ചിരിക്കുന്നു",
     "CURRENT_PASSWORD_NOT": "ഇപ്പോഴത്തെ പാസ്വേഡ് പൊരുത്തപ്പെടുന്നില്ല",
     "NO_USERNAME": "ഉപയോക്തൃനാമം കണ്ടെത്തിയില്ല",
-    "PASSWORD_SAME_AS_OLD": "പുതിയ പാസ്വേഡ് പഴയതോടു സമമാണ്"
+    "PASSWORD_SAME_AS_OLD": "പുതിയ പാസ്വേഡ് പഴയതോടു സമമാണ്",
+    "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "കുറഞ്ഞത് ഒരു ബാച്ച് തിരഞ്ഞെടുക്കുക",
+    "PLEASE_SEARCH_AND_SELECT_USER": "ഉപയോക്താവിനെ തിരയുകയും തിരഞ്ഞെടുക്കുകയും ചെയ്യുക",
+    "PLEASE_SELECT_CENTER": "ഒരു സെന്റർ തിരഞ്ഞെടുക്കുക",
+    "REASSIGN": "വീണ്ടും നിയോഗിക്കുക",
+    "REASSIGN_LEARNER_TO_BATCH": "പഠിതാവിനെ ബാച്ചിലേക്ക് വീണ്ടും നിയോഗിക്കുക",
+    "LOADING_ELLIPSIS": "ലോഡ് ചെയ്യുന്നു...",
+    "SELECT_BATCH_WIDGET_TITLE": "ബാച്ച് തിരഞ്ഞെടുക്കുക",
+    "PLEASE_SELECT_BATCH": "ഒരു ബാച്ച് തിരഞ്ഞെടുക്കുക"
   },
   "DASHBOARD": {
     "DASHBOARD": "ഡാഷ്ബോർഡ്",

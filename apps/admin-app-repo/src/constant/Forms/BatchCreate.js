@@ -106,7 +106,7 @@ export const BatchCreateSchema = {
       coreField: 1,
       fieldId: null,
       field_type: 'text',
-      pattern: '^[a-zA-Z][a-zA-Z ]*[a-zA-Z]$',
+      pattern: '^[a-zA-Z0-9][a-zA-Z0-9 ]*[a-zA-Z0-9]$',
     },
     batch_type: {
       type: 'string',

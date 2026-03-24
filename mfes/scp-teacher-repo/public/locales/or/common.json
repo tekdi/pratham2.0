@@ -189,7 +189,12 @@
     "NEXT": "ପରବର୍ତ୍ତୀ",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "ଦୟାକରି ଅତି କମରେ ଗୋଟିଏ ବ୍ୟାଚ୍ ଚୟନ କରନ୍ତୁ",
     "PLEASE_SEARCH_AND_SELECT_USER": "ଦୟାକରି ସନ୍ଧାନ କରନ୍ତୁ ଏବଂ ଜଣେ ଉପଯୋଗକର୍ତ୍ତା ଚୟନ କରନ୍ତୁ।",
-    "PLEASE_SELECT_CENTER": "ଦୟାକରି ଏକ କେନ୍ଦ୍ର ଚୟନ କରନ୍ତୁ।"
+    "PLEASE_SELECT_CENTER": "ଦୟାକରି ଏକ କେନ୍ଦ୍ର ଚୟନ କରନ୍ତୁ।",
+    "REASSIGN": "ପୁନଃ ନିଯୁକ୍ତି",
+    "REASSIGN_LEARNER_TO_BATCH": "ଶିକ୍ଷାର୍ଥୀଙ୍କୁ ବ୍ୟାଚ୍‌କୁ ପୁନଃ ନିଯୁକ୍ତି କରନ୍ତୁ",
+    "LOADING_ELLIPSIS": "ଲୋଡ୍ ହେଉଛି...",
+    "SELECT_BATCH_WIDGET_TITLE": "ବ୍ୟାଚ୍ ବାଛନ୍ତୁ",
+    "PLEASE_SELECT_BATCH": "ଦୟାକରି ଏକ ବ୍ୟାଚ୍ ବାଛନ୍ତୁ"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ଉପଯୋଗକର୍ତା ନାମ",

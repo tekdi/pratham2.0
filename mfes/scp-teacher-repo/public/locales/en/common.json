@@ -200,7 +200,11 @@
     "DELETE_FROM_BATCH_WARNING": "I confirm I want to remove this user from batches as well",
     "COPY_REGISTRATION_LINK": "Copy Registration Link",
     "REGISTRATION_LINK_COPIED":"Registration link copied!\nShare this link with learners for program registration.",
-    "REASSIGN":"Re-assign"
+    "REASSIGN": "Re-assign",
+    "REASSIGN_LEARNER_TO_BATCH": "Reassign Learner to Batch",
+    "LOADING_ELLIPSIS": "Loading...",
+    "SELECT_BATCH_WIDGET_TITLE": "Select batch",
+    "PLEASE_SELECT_BATCH": "Please select a batch"
   },
   "LOGIN_PAGE": {
     "USERNAME": "Username",

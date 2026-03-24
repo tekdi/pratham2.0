@@ -185,7 +185,15 @@
     "REASSIGN_BATCH": "بیچ دوبارہ تفویض کریں",
     "NOT_ABLE_UPDATE_FACILITATOR": "فیسلیٹیٹر کو اپڈیٹ نہیں کیا جا سکا",
     "HI": "ہیلو، {{name}}",
-    "FAQS": "اکثر پوچھے جانے والے سوالات (FAQ's)"
+    "FAQS": "اکثر پوچھے جانے والے سوالات (FAQ's)",
+    "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "براہ کرم کم از کم ایک بیچ منتخب کریں",
+    "PLEASE_SEARCH_AND_SELECT_USER": "براہ کرم صارف تلاش کریں اور منتخب کریں",
+    "PLEASE_SELECT_CENTER": "براہ کرم ایک مرکز منتخب کریں",
+    "REASSIGN": "دوبارہ تفویض",
+    "REASSIGN_LEARNER_TO_BATCH": "طالب علم کو بیچ میں دوبارہ تفویض کریں",
+    "LOADING_ELLIPSIS": "لوڈ ہو رہا ہے...",
+    "SELECT_BATCH_WIDGET_TITLE": "بیچ منتخب کریں",
+    "PLEASE_SELECT_BATCH": "براہ کرم ایک بیچ منتخب کریں"
   },
   "LOGIN_PAGE": {
     "USERNAME": "صارف کا نام",

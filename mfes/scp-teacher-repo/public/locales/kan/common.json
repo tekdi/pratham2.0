@@ -189,7 +189,12 @@
     "NEXT": "ಮುಂದೆ",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "ದಯವಿಟ್ಟು ಕನಿಷ್ಠ ಒಂದು ಬ್ಯಾಚ್ ಅನ್ನು ಆಯ್ಕೆ ಮಾಡಿ.",
     "PLEASE_SEARCH_AND_SELECT_USER": "ದಯವಿಟ್ಟು ಹುಡುಕಿ ಮತ್ತು ಬಳಕೆದಾರರನ್ನು ಆಯ್ಕೆ ಮಾಡಿ.",
-    "PLEASE_SELECT_CENTER": "ದಯವಿಟ್ಟು ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ."
+    "PLEASE_SELECT_CENTER": "ದಯವಿಟ್ಟು ಕೇಂದ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "REASSIGN": "ಮರುನಿಯೋಜಿಸಿ",
+    "REASSIGN_LEARNER_TO_BATCH": "ಕಲಿಯುವವರನ್ನು ಬ್ಯಾಚ್‌ಗೆ ಮರುನಿಯೋಜಿಸಿ",
+    "LOADING_ELLIPSIS": "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    "SELECT_BATCH_WIDGET_TITLE": "ಬ್ಯಾಚ್ ಆಯ್ಕೆಮಾಡಿ",
+    "PLEASE_SELECT_BATCH": "ದಯವಿಟ್ಟು ಒಂದು ಬ್ಯಾಚ್ ಆಯ್ಕೆಮಾಡಿ"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ಬಳಕೆದಾರಹೆಸರು",

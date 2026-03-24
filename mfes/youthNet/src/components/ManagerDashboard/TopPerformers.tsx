@@ -8,23 +8,28 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
+import { useTranslation } from 'next-i18next';
 import { User } from './types';
 
 interface TopPerformersProps {
   usersData: {
     [key: string]: User[];
   };
+  isLoading?: boolean;
 }
 
 const TopPerformers: React.FC<TopPerformersProps> = ({
   usersData,
+  isLoading: externalLoading = false,
 }) => {
+  const { t } = useTranslation();
   // Hardcoded category
-  const currentCategory = '5 Highest Course Completing Users';
+  const currentCategory = t('FIVE_HIGHEST_COURSE_COMPLETING_USERS');
   const currentUsers = usersData[currentCategory] || [];
 
-  // Check if data is still loading
-  const isLoading = !usersData || Object.keys(usersData).length === 0 || !usersData[currentCategory];
+  // Check if data is still loading - use external loading state if provided
+  // Only show loading if explicitly set to true, not if data is just empty
+  const isLoading = externalLoading === true;
 
   // Get today's date in the format "5th Sep"
   const getTodayDate = () => {
@@ -255,7 +260,7 @@ const TopPerformers: React.FC<TopPerformersProps> = ({
           </Box>
         ) : (
           <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 2 }}>
-            No users found for this category
+            {t('NO_USERS_FOUND_FOR_CATEGORY')}
           </Typography>
         )}
       </Box>

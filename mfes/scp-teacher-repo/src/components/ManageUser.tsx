@@ -915,12 +915,15 @@ const ManageUser: React.FC<ManageUsersProps> = ({
             block.centers?.forEach((center) => {
               center.batches?.forEach((batch) => {
                 // Check if centerId exists in cohortData with active status
-                const cohortCenterBatch = cohortData?.find(
+                // Filter all entries for the same centerId and check if any has both statuses active
+                const cohortCenterBatch = cohortData?.filter(
                   (item: any) => item?.centerId === center.centerId && item?.batchId === batch.batchId
                 );
-                const isActiveCenterBatch =
-                  cohortCenterBatch?.cohortMember?.status === 'active' && cohortCenterBatch?.centerStatus === 'active' && cohortCenterBatch?.batchStatus === 'active';
-
+                const isActiveCenterBatch = cohortCenterBatch?.some(
+                  (cohortCenterBatchs: any) =>
+                    cohortCenterBatchs?.cohortMember?.status === 'active' && cohortCenterBatchs?.centerStatus === 'active' && cohortCenterBatchs?.batchStatus === 'active'
+                );
+                
                 // Only push if center has active cohortMember status
                 if (isActiveCenterBatch) {
                   const centerObject = {
