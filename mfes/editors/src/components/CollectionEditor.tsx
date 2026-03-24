@@ -215,16 +215,33 @@ const CollectionEditor: React.FC = () => {
       // 2️⃣ Modify ONLY the needed part
       if (parsedData?.result?.objectCategoryDefinition) {
         const tenantName = localStorage.getItem('tenantName');
+        const uiConfig = localStorage.getItem('uiConfig');
+        let selectedPrograms: string[] = [];
+
+        if (uiConfig) {
+          try {
+            const parsedUiConfig = JSON.parse(uiConfig);
+            if (Array.isArray(parsedUiConfig?.program) && parsedUiConfig.program.length > 0) {
+              selectedPrograms = parsedUiConfig.program.filter((program: any) => typeof program === 'string' && program.trim());
+            }
+          } catch (e) {
+            console.warn('Could not parse uiconfig from localStorage:', e);
+          }
+        }
+
+        if (selectedPrograms.length === 0 && tenantName) {
+          selectedPrograms = [tenantName];
+        }
   
-        if (tenantName) {
+        if (selectedPrograms.length > 0) {
           const objectDef = parsedData.result.objectCategoryDefinition;
   
           // ONLY: forms.create -> properties -> fields -> program
           objectDef.forms?.create?.properties?.forEach((section: any) => {
             section.fields?.forEach((field: any) => {
               if (field.code === 'program' &&  field.default.length === 0) {
-                field.range = [tenantName];
-                field.default = [tenantName];
+                field.range = selectedPrograms;
+                field.default = selectedPrograms;
               }
             });
           });
