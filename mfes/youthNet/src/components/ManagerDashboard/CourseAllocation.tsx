@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Paper, Stack } from '@mui/material';
+import { useTranslation } from 'next-i18next';
 
 interface CourseAllocationProps {
   mandatory: number;
@@ -12,19 +13,20 @@ const CourseAllocation: React.FC<CourseAllocationProps> = ({
   nonMandatory,
   total,
 }) => {
+  const { t } = useTranslation();
   const mandatoryPercentage = total > 0 ? (mandatory / total) * 100 : 0;
   const nonMandatoryPercentage = total > 0 ? (nonMandatory / total) * 100 : 0;
 
   return (
     <Paper elevation={0} sx={{ p: { xs: 1.5, sm: 2 }, border: '1px solid #e0e0e0', borderRadius: 2, width: '100%', boxSizing: 'border-box' }}>
       <Typography variant="subtitle1" fontWeight={600} gutterBottom sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}>
-        Course Allocation
+        {t('COURSE_ALLOCATION')}
       </Typography>
 
       <Box sx={{ mt: 2, width: '100%' }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5, flexWrap: 'wrap', gap: { xs: 0.5, sm: 0 } }}>
           <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' }, flex: { xs: '1 1 auto', sm: 'none' } }}>
-            Total Courses Allocated
+            {t('TOTAL_COURSES_ALLOCATED')}
           </Typography>
           <Typography variant="h6" fontWeight={600} sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' }, flexShrink: 0 }}>
             {total}
@@ -78,7 +80,7 @@ const CourseAllocation: React.FC<CourseAllocationProps> = ({
                 }}
               />
               <Typography variant="caption" color="text.primary" sx={{ fontSize: { xs: '0.75rem', sm: '0.75rem' }, wordBreak: 'break-word' }}>
-                Mandatory : {mandatory}
+                {t('MANDATORY')} : {mandatory}
               </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={0.8} sx={{ flexWrap: 'wrap' }}>
@@ -92,7 +94,7 @@ const CourseAllocation: React.FC<CourseAllocationProps> = ({
                 }}
               />
               <Typography variant="caption" color="text.primary" sx={{ fontSize: { xs: '0.75rem', sm: '0.75rem' }, wordBreak: 'break-word' }}>
-                Non Mandatory : {nonMandatory}
+                {t('NON_MANDATORY')} : {nonMandatory}
               </Typography>
             </Stack>
           </Stack>

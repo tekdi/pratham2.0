@@ -1014,5 +1014,16 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• જો ઉત્તરપત્રમાં બહુવિધ પાનાં હોય, તો દરેક પાનાંનો અલગથી ફોટો લો અને અપલોડ કરો.",
     "READ_LESS": "ઓછું વાંચો",
     "READ_MORE": "વધારે વાચો"
+  },
+  "LMP_SINGLE_BATCH_WIDGET": {
+    "TITLE": "બેચ પસંદ કરો",
+    "CENTER": "કેન્દ્ર",
+    "SELECT_CENTER": "કેન્દ્ર પસંદ કરો",
+    "NO_CENTERS_AVAILABLE": "કોઈ કેન્દ્ર ઉપલબ્ધ નથી",
+    "BATCH": "બેચ",
+    "SELECT_CENTER_FIRST": "પહેલા એક કેન્દ્ર પસંદ કરો",
+    "LOADING_BATCHES": "બેચ લોડ થઈ રહ્યા છે…",
+    "SELECT_BATCH": "બેચ પસંદ કરો",
+    "VALUE_NOT_IN_LIST": "વર્તમાન મૂલ્ય યાદીમાં નથી; કૃપા કરીને ફરીથી બેચ પસંદ કરો."
   }
 }

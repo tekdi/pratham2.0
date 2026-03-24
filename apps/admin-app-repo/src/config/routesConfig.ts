@@ -11,7 +11,8 @@ export const PUBLIC_ROUTES = [
   '/importCsv',
   '/resourceList',
   '/play',
-  '/edit-password'
+  '/edit-password',
+  '/sso'
 ];
 export const ROLE_BASED_ROUTES = {
   [TenantName.SECOND_CHANCE_PROGRAM]: {
