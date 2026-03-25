@@ -93,10 +93,60 @@ const App = ({
   }, []);
 
   let activeLink = null;
+  let previousPage = null;
+  let exitLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    previousPage = searchParams.get('previousPage');
+    exitLink = searchParams.get('exitLink');
   }
+
+  // Intercept SBPlayer iframe's Exit button which calls window.history.back()
+  // When exitLink param is present, redirect there instead of going back in history
+  useEffect(() => {
+    if (!exitLink) return;
+
+    // Push a dummy state so when SBPlayer calls history.back(), popstate fires
+    window.history.pushState({ playerPage: true }, '', window.location.href);
+
+    const handlePopState = () => {
+      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      const landingPage = localStorage.getItem('landingPage') || '/home';
+      const decodedExitLink = decodeURIComponent(exitLink as string);
+
+      // If exitLink matches the landingPage AND running inside Android WebView
+      // → fire the native ENROLL_PROGRAM_EVENT instead of web redirect
+      if (isAndroid && decodedExitLink === landingPage) {
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
+        }
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              },
+            })
+          );
+        }
+      } else {
+        // Web: simply navigate to the exitLink
+        window.location.href = exitLink as string;
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [exitLink]);
+
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
@@ -186,6 +236,10 @@ const App = ({
     // } else {
     //   router.push(`${activeLink ? activeLink : '/content'}`);
     // }
+    if (previousPage) {
+      router.push(previousPage);
+      return;
+    }
     router.back();
   };
 

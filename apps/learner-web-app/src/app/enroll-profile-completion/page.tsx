@@ -8,9 +8,12 @@ import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { TenantName } from '@learner/utils/app.constant';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
-import { Box } from '@mui/material';
+import AssessmentRequiredModal from '@learner/components/AssessmentRequiredModal/AssessmentRequiredModal';
+import { Box, Typography } from '@mui/material';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
+import { ContentSearch } from '@learner/utils/API/contentService';
+import { useTranslation } from '@shared-lib';
 declare global {
   interface Window {
     ReactNativeWebView?: {
@@ -19,8 +22,11 @@ declare global {
   }
 }
 const EnrollProfileCompletionInner = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   const [signupSuccessModal, setSignupSuccessModal] = useState(false);
+  const [assessmentRequiredModal, setAssessmentRequiredModal] = useState(false);
+  const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
   const [landingPage, setLandingPage] = useState<string>('');
 
   const handleAccessProgram = async () => {
@@ -133,7 +139,48 @@ const EnrollProfileCompletionInner = () => {
 
     // Show success modal instead of redirecting immediately
     console.log('Opening signup success modal');
-    setSignupSuccessModal(true);
+
+    const isRegisterationTestEnabled =
+    uiConfig?.RegisterationTest === true || uiConfig?.RegisterationTest === 'true';
+console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
+if(isRegisterationTestEnabled){
+  let questionSetIdentifier: string | undefined;
+
+  try {
+    
+    const response = await ContentSearch({
+      query: '',
+      filters: {
+        status: ['Live'],
+        primaryCategory: ['Practice Question Set'],
+        assessmentType: 'Zatpat Test',
+        program: ['Second Chance'],
+      },
+      sort_by: {
+        lastUpdatedOn: 'desc',
+      },
+      limit: 1,
+      offset: 0,
+    });
+    questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
+    if(questionSetIdentifier){
+      localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
+      setAssessmentRequiredModal(true);
+    }
+    else{
+      setAssessmentUnavailableModal(true);
+    }
+ // questionSetIdentifier = 'do_2143742581853798401105';
+    console.log('questionSetIdentifier from API:', questionSetIdentifier);
+  } catch (error) {
+    console.error('ContentSearch failed, will use stored identifier:', error);
+  }
+
+
+}
+else{
+  setSignupSuccessModal(true);
+}
   }
     } catch (error) {
       console.error('Failed to access program:', error);
@@ -203,6 +250,40 @@ const EnrollProfileCompletionInner = () => {
     }
   };
 
+  const onAssessmentUnavailableOk = () => {
+    setAssessmentUnavailableModal(false);
+    router.push('/programs');
+  };
+
+  const handleStartAssessment = async () => {
+     const questionSetIdentifier = localStorage.getItem('registerationTestQuestionSetIdentifier');
+
+    // Step 1: Try to get identifier from API (non-blocking — failure won't prevent navigation)
+  
+    // Step 2: Fallback to previously stored identifier if API failed or returned nothing
+    // if (!questionSetIdentifier) {
+    //   questionSetIdentifier =
+    //     localStorage.getItem('registerationTestQuestionSetIdentifier') || undefined;
+    //   console.log('questionSetIdentifier from localStorage:', questionSetIdentifier);
+    // }
+
+    // if (!questionSetIdentifier) {
+    //   console.error('No questionSetIdentifier found, cannot navigate to player');
+    //   return;
+    // }
+
+    // // Step 3: Store and navigate
+    // localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
+    // setAssessmentRequiredModal(false);
+
+    // Use window.location.href for guaranteed navigation (router.push can silently fail in modals)
+     if(questionSetIdentifier){
+      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent(localStorage.getItem('landingPage') || '/home')}`;
+
+   
+   }
+  };
+
   return (
     <>
       {!signupSuccessModal && (
@@ -222,6 +303,28 @@ const EnrollProfileCompletionInner = () => {
       >
         <Box p="10px">
           <SignupSuccess withProgramName={true} />
+        </Box>
+      </SimpleModal>
+
+      <AssessmentRequiredModal
+        open={assessmentRequiredModal}
+        onClose={() => {
+          setAssessmentRequiredModal(false);
+          setTimeout(() => router.push('/programs'), 100);
+        }}
+        onStartAssessment={handleStartAssessment}
+      />
+      <SimpleModal
+        open={assessmentUnavailableModal}
+        onClose={onAssessmentUnavailableOk}
+        showFooter={true}
+        primaryText={t('COMMON.OK')}
+        primaryActionHandler={onAssessmentUnavailableOk}
+      >
+        <Box p="10px">
+          <Typography variant="body1">
+            {t('LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_UNAVAILABLE_MESSAGE')}
+          </Typography>
         </Box>
       </SimpleModal>
     </>
