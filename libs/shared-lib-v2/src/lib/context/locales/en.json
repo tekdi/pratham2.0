@@ -456,7 +456,7 @@
       "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham",
       "ASSESSMENT_REQUIRED_MESSAGE": "Before you go forward, you need to complete the assessment.",
       "ASSESSMENT_UNAVAILABLE_MESSAGE": "Before you proceed, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
-      "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "You have to complete the assessment before accessing this course.",
+      "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "You have to complete the assessment before accessing your Program course.",
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Before accessing this course, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
       "BACK_TO_PROGRAMS": "Back to Programs"
     }

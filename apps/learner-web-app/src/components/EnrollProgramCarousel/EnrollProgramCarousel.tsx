@@ -502,12 +502,16 @@ console.log('result=====>', result);
         program?.name
       );
       if (assessmentStatus === 'assessmentPending') {
+        localStorage.setItem('registerationTestGiven', "No");
+
         setAssessmentPendingModal(true);
       }
       // Redirect to landing page
       else if (assessmentStatus === 'assessmentUnavailable') {
         return;
       } else if (enrolledProgram) {
+       // localStorage.setItem('registerationTestGiven', "Yes");
+
         router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
       }
       else{

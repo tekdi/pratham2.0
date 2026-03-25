@@ -165,6 +165,8 @@ if(isRegisterationTestEnabled){
     questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
     if(questionSetIdentifier){
       localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
+      localStorage.setItem('registerationTestGiven', "No");
+
       setAssessmentRequiredModal(true);
     }
     else{
@@ -310,7 +312,9 @@ else{
         open={assessmentRequiredModal}
         onClose={() => {
           setAssessmentRequiredModal(false);
-          setTimeout(() => router.push('/programs'), 100);
+          setTimeout(() => {
+            window.location.href = '/programs';
+          }, 100);
         }}
         onStartAssessment={handleStartAssessment}
       />

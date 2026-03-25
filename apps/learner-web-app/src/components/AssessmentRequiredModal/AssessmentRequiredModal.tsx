@@ -112,7 +112,7 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
 
         <Divider />
 
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
           <Button variant="outlined" onClick={onClose}>
             {t('COMMON.CLOSE')}
           </Button>

@@ -137,6 +137,8 @@ const App = ({
         }
       } else {
         // Web: simply navigate to the exitLink
+        localStorage.setItem('registerationTestGiven', "Yes");
+
         window.location.href = exitLink as string;
       }
     };
