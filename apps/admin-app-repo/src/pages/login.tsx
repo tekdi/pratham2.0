@@ -282,7 +282,7 @@ const LoginPage = () => {
           const selectedStateId = userInfo?.customFields?.find(
             (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
-          if (selectedStateId) {
+          if (selectedStateId !== undefined && selectedStateId !== null) {
             localStorage.setItem('stateId', selectedStateId);
           }
         }
