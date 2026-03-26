@@ -23,6 +23,7 @@ import { logEvent } from '@learner/utils/googleAnalytics';
 import { FilterKey, TenantName } from '../../utils/app.constant';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 
 const Login = dynamic(
@@ -39,13 +40,51 @@ export type RegistrationTestStatus =
 
 export const checkRegistrationTestStatus = async (
   uiConfig: any,
-  enrolledProgramName?: string
+  enrolledProgramName?: string,
+  tenantDataDetails?:any
 ): Promise<RegistrationTestStatus> => {
   const isRegistrationTestEnabled =
     uiConfig?.RegisterationTest === true || uiConfig?.RegisterationTest === 'true';
 
   if (!isRegistrationTestEnabled) {
     return 'clear';
+  }
+
+  const storedUserId = localStorage.getItem('userId');
+  if (!storedUserId) return 'clear';
+
+  try {
+    
+
+    if (tenantDataDetails?.[0]?.tenantType !== 'elearning') {
+      const academicYearList = await getAcademicYear();
+    const activeAcademicYear = Array.isArray(academicYearList)
+      ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+      : undefined;
+
+    if (activeAcademicYear?.id) {
+      localStorage.setItem('academicYearId', activeAcademicYear.id);
+    }
+      const cohortResponse = await getCohortList(storedUserId, true, true);
+      const userHasActiveBatch = Array.isArray(cohortResponse?.result)
+        ? cohortResponse.result.some(
+            (cohort: {
+              type?: string;
+              cohortStatus?: string;
+              cohortMemberStatus?: string;
+            }) =>
+              cohort?.type === 'BATCH' &&
+              cohort?.cohortStatus === 'active' &&
+              cohort?.cohortMemberStatus === 'active'
+          )
+        : false;
+
+      if (userHasActiveBatch) {
+        return 'clear';
+      }
+    }
+  } catch (error) {
+    console.error('checkRegistrationTestStatus: getCohortList failed', error);
   }
 
   let questionSetIdentifier: string | undefined;
@@ -78,9 +117,6 @@ export const checkRegistrationTestStatus = async (
   if (!questionSetIdentifier) {
     return 'assessmentUnavailable';
   }
-
-  const storedUserId = localStorage.getItem('userId');
-  if (!storedUserId) return 'clear';
 
   try {
     const result = await getAssessmentStatus({
@@ -407,11 +443,12 @@ const LoginPage = () => {
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
         } else {
-        console.log('tenantData', tenantDataDetails);
+        console.log('tenantData===>', tenantDataDetails);
         if(tenantDataDetails.length ===1) {
           const assessmentStatus = await checkRegistrationTestStatus(
             uiConfig,
-            selectedTenantName
+            selectedTenantName,
+            tenantDataDetails
           );
           if (assessmentStatus === 'assessmentPending') {
             localStorage.setItem('registerationTestGiven', "No");

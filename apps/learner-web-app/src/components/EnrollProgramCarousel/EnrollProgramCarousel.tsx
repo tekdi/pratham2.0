@@ -32,6 +32,7 @@ import { TenantName } from '@learner/utils/app.constant';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
 declare global {
   interface Window {
     ReactNativeWebView?: {
@@ -102,7 +103,8 @@ const EnrollProgramCarousel = ({
 
   const checkRegistrationTestStatus = async (
     uiConfig: any,
-    enrolledProgramName?: string
+    enrolledProgramName?: string,
+    tenantDataDetails?: any
   ): Promise<RegistrationTestStatus> => {
     console.log('uiConfig=====>', uiConfig);
     // Step 1: Check if registration test is enabled for this program
@@ -114,16 +116,53 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
       return 'clear'; // No test required — allow access
     }
 
+    const storedUserId = localStorage.getItem('userId');
+    console.log('storedUserId=====>', storedUserId);
+    if (!storedUserId) return 'clear';
+
+    try {
+      
+
+      if (tenantDataDetails?.tenantType !== 'elearning') {
+        const academicYearList = await getAcademicYear();
+      const activeAcademicYear = Array.isArray(academicYearList)
+        ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+        : undefined;
+
+      if (activeAcademicYear?.id) {
+        localStorage.setItem('academicYearId', activeAcademicYear.id);
+      }
+        const cohortResponse = await getCohortList(storedUserId, true, true);
+        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
+          ? cohortResponse.result.some(
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
+                cohort?.type === 'BATCH' &&
+                cohort?.cohortStatus === 'active' &&
+                cohort?.cohortMemberStatus === 'active'
+            )
+          : false;
+
+        if (userHasActiveBatch) {
+          return 'clear';
+        }
+      }
+    } catch (error) {
+      console.error('checkRegistrationTestStatus: getCohortList/getAcademicYear failed', error);
+    }
+
     // Step 2: Fetch the registration question set identifier
     let questionSetIdentifier: string | undefined;
-    const targetProgramName =
-      enrolledProgramName || localStorage.getItem('userProgram') 
-      const programFilter =
-        targetProgramName === 'Second Chance Program'
-          ? [targetProgramName, 'Second Chance']
-          : targetProgramName
-          ? [targetProgramName]
-          : [];
+    const targetProgramName = enrolledProgramName || localStorage.getItem('userProgram');
+    const programFilter =
+      targetProgramName === 'Second Chance Program'
+        ? [targetProgramName, 'Second Chance']
+        : targetProgramName
+        ? [targetProgramName]
+        : [];
     try {
       const response = await ContentSearch({
         query: '',
@@ -151,10 +190,6 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
     }
 
     // Step 3: Check if this user has already submitted the assessment
-    const storedUserId = localStorage.getItem('userId');
-    console.log('storedUserId=====>', storedUserId);
-    if (!storedUserId) return 'clear';
-
     try {
       const result = await getAssessmentStatus({
         userId: storedUserId,
@@ -415,7 +450,8 @@ console.log('result=====>', result);
       {
         const assessmentStatus = await checkRegistrationTestStatus(
           tenantData?.params?.uiConfig,
-          program?.name
+          program?.name,
+          tenantData
         );
         if (assessmentStatus === 'assessmentPending') {
           setAssessmentPendingModal(true);
@@ -499,7 +535,8 @@ console.log('result=====>', result);
       console.log('enrolledProgram=====>', enrolledProgram);
       const assessmentStatus = await checkRegistrationTestStatus(
         uiConfig,
-        program?.name
+        program?.name,
+        tenantData
       );
       if (assessmentStatus === 'assessmentPending') {
         localStorage.setItem('registerationTestGiven', "No");
@@ -515,6 +552,7 @@ console.log('result=====>', result);
         router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
       }
       else{
+        localStorage.setItem('registerationTestGiven', "Yes");
       router.push(landingPage || '/home');
     }
     }
