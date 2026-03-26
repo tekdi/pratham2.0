@@ -194,11 +194,17 @@ export const bulkAttendanceV2 = async ({
 }: BulkAttendanceParams): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.bulkAttendanceV2;
   try {
+    const classId =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('classId')
+        : null;
+
     const response = await post(apiUrl, {
       attendanceDate,
       contextId,
       userAttendance,
       context,
+      ...(classId ? { cohortId: classId } : {}),
     });
     return response?.data;
   } catch (error) {
