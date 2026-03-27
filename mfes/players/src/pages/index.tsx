@@ -34,6 +34,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
     unitId,
     userId,
     identifier: queryIdentifier,
+    firstName,
   } = router.query ?? {}; // Get identifier from the query
   const identifier = propIdentifier || queryIdentifier; // Prefer prop over query
   const [playerConfig, setPlayerConfig] = useState<PlayerConfig | undefined>(
@@ -130,6 +131,7 @@ const Players: React.FC<SunbirdPlayerProps> = ({
             unitId={unitId as string}
             userId={userId as string}
             configFunctionality={{ isGenerateCertificate, trackable }}
+            firstName={firstName as string}
           />
         </Box>
       )}
