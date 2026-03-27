@@ -45,6 +45,8 @@ const ReattemptCheckPage = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        localStorage.setItem('registerationTestGiven', "Yes");
+
         const canReattempt = await checkReattemptStatus();
         if (canReattempt) {
           setReattempt(true);
