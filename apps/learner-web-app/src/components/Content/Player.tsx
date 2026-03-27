@@ -111,37 +111,8 @@ const App = ({
     window.history.pushState({ playerPage: true }, '', window.location.href);
 
     const handlePopState = () => {
-      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
-      const landingPage = localStorage.getItem('landingPage') || '/home';
-      const decodedExitLink = decodeURIComponent(exitLink as string);
-
-      // If exitLink matches the landingPage AND running inside Android WebView
-      // → fire the native ENROLL_PROGRAM_EVENT instead of web redirect
-      if (isAndroid && decodedExitLink === landingPage) {
-        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
-        if (!refreshToken || refreshToken === '') {
-          refreshToken = localStorage.getItem('refreshToken');
-        }
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'ENROLL_PROGRAM_EVENT',
-              data: {
-                userId: localStorage.getItem('userId'),
-                tenantId: localStorage.getItem('tenantId'),
-                token: localStorage.getItem('token'),
-                refreshToken: refreshToken,
-              },
-            })
-          );
-        }
-      } else {
-        // Web: simply navigate to the exitLink
-        localStorage.setItem('registerationTestGiven', "Yes");
-
-        window.location.href = exitLink as string;
-      }
-    };
+       window.location.href = exitLink as string;
+       };
 
     window.addEventListener('popstate', handlePopState);
     return () => {

@@ -696,7 +696,7 @@ const LoginPage = () => {
           );
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent(localStorage.getItem('landingPage') || '/home')}`;
+              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}

@@ -975,6 +975,14 @@
     "READ_LESS": "Read Less",
     "READ_MORE": "Read More"
   },
+  "REATTEMPT_CHECK": {
+    "PLEASE_WAIT": "Please wait...",
+    "MODAL_TITLE": "Assessment",
+    "REATTEMPT_BUTTON": "Reattempt",
+    "CONTINUE_BUTTON": "Continue",
+    "MAIN_MESSAGE": "Would you like to reattempt the assessment or continue into the app?",
+    "SUB_MESSAGE": "You can reattempt the registration assessment or skip it and continue to your dashboard."
+  },
   "ASSESSMENTS": {
     "ASSESSMENTS": "Assessments",
     "AI_ASSESSMENT": "AI Assessment",

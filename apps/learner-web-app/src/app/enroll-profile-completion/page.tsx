@@ -280,7 +280,7 @@ else{
 
     // Use window.location.href for guaranteed navigation (router.push can silently fail in modals)
      if(questionSetIdentifier){
-      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent(localStorage.getItem('landingPage') || '/home')}`;
+      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
 
    
    }
