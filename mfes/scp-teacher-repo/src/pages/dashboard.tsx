@@ -1274,7 +1274,18 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                   disabled={
                                     currentAttendance === 'notMarked' ||
                                     currentAttendance === 'futureDate' ||
-                                    classId === 'all'
+                                    classId === 'all' ||
+                                    Number(
+                                      attendanceData?.numberOfCohortMembers &&
+                                        attendanceData.numberOfCohortMembers !==
+                                          0
+                                        ? (
+                                            (attendanceData.presentCount /
+                                              attendanceData.numberOfCohortMembers) *
+                                            100
+                                          ).toFixed(2)
+                                        : '0'
+                                    ) === 0
                                   }
                                 >
                                   {t('COMMON.RESET')}
