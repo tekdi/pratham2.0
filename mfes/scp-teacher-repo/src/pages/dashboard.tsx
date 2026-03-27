@@ -330,16 +330,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
           });
           const resp = response?.result?.userDetails;
           if (resp) {
-            const nameUserIdArray = resp
-              ?.map((entry: any) => ({
+            const nameUserIdArray = resp?.map((entry: any) => ({
                 userId: entry.userId,
                 name: toPascalCase(entry.firstName),
                 memberStatus: entry.status,
                 createdAt: entry.createdAt,
                 updatedAt: entry.updatedAt,
                 userName: entry.username,
-              }))
-              .filter(
+              }));
+            const selectedDateFilteredMemberList = nameUserIdArray?.filter(
                 (member: {
                   createdAt: string | number | Date;
                   updatedAt: string | number | Date;
@@ -363,12 +362,23 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
             // Filter latest entries
             const filteredEntries = getLatestEntries(
-              nameUserIdArray,
+              selectedDateFilteredMemberList,
               selectedDate
             );
             if (filteredEntries) {
               const fromDate = startDateRange;
               const toDate = endDateRange;
+              const dynamicEndDate = new Date();
+              dynamicEndDate.setDate(dynamicEndDate.getDate() - 1);
+              const dynamicStartDate = new Date(dynamicEndDate);
+              dynamicStartDate.setDate(dynamicStartDate.getDate() - 6);
+              const expectedFromDate = shortDateFormat(dynamicStartDate);
+              const expectedToDate = shortDateFormat(dynamicEndDate);
+              const isLast7DaysRange =
+                fromDate === expectedFromDate && toDate === expectedToDate;
+              const lowAttendanceMergeEntries = isLast7DaysRange
+                ? getLatestEntries(nameUserIdArray, String(toDate))
+                : filteredEntries;
               const filters = {
                 contextId: classId,
                 fromDate,
@@ -389,7 +399,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                 }));
                 if (filteredData) {
                   let mergedArray = filteredData.map((attendance) => {
-                    const user = filteredEntries.find(
+                    const user = lowAttendanceMergeEntries.find(
                       (user: { userId: string }) =>
                         user.userId === attendance.userId
                     );
