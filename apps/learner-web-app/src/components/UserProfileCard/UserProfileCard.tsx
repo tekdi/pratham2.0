@@ -20,14 +20,25 @@ import settingImage from '../../../public/images/settings.png';
 import Image from 'next/image';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useRouter } from 'next/navigation';
 import { getUserDetails, getMentorList } from '@learner/utils/API/userService';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { Loader, useTranslation } from '@shared-lib';
 import { isUnderEighteen, toPascalCase } from '@learner/utils/helper';
-import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
+import { fetchForm, enhanceUiSchemaWithGrid, splitUserData } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import DocumentViewer from '@shared-lib-v2/DynamicForm/components/DocumentViewer/DocumentViewer';
-
+import EditSearchUser from '@shared-lib-v2/MapUser/EditSearchUser';
+import { RoleId} from '@shared-lib-v2/utils/app.constant';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
+import { updateUser } from '@learner/utils/API/userService';
+import CircularProgress from '@mui/material/CircularProgress';
+import {  enrollUserTenant } from '@learner/utils/API/EnrollmentService';
+import PersonIcon from '@mui/icons-material/Person';
+import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import CongratulationsModal from './CongratulationsModal';
 // Helper function to get field value from userData based on schema
 const getFieldValue = (fieldName: string, fieldSchema: Record<string, unknown>, userData: Record<string, unknown>, customFields: Array<Record<string, unknown>> = []) => {
   // Check if it's a core field
@@ -116,11 +127,50 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const [previewTitle, setPreviewTitle] = useState<string>('');
   const [villageId, setVillageId] = useState<number | null>(null);
   const [mentorData, setMentorData] = useState<Record<string, unknown> | null>(null);
+  
+  // PTM Registration Modal States
+  const [ptmModalOpen, setPtmModalOpen] = useState(false);
+  const [ptmNextModalOpen, setPtmNextModalOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [addSchema, setAddSchema] = useState<Record<string, unknown> | null>(null);
+  const [addUiSchema, setAddUiSchema] = useState<Record<string, unknown> | null>(null);
+  const [roleId, setRoleId] = useState<string>('');
+  const [tenantId, setTenantId] = useState<string>('');
+  const [isEditInProgress, setIsEditInProgress] = useState(false);
+  const [isVolunteerProgramLead, setIsVolunteerProgramLead] = useState(false);
+  const [isPragyanpathLearner, setIsPragyanpathLearner] = useState(false);
+  const [otherRegisterVolunteerProgram, setOtherRegisterVolunteerProgram] = useState(false);
+  const [userDetailsForPtm, setUserDetailsForPtm] = useState<any>(null);
+  const [subProgramFormData, setSubProgramFormData] = useState<any>(null);
+  const [congratulationsModalOpen, setCongratulationsModalOpen] = useState(false);
+
 
   const storedConfig =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
       : {};
+      const subProgramSchema = {
+        type: 'object',
+        properties: {
+          sub_program: {
+            "type": "array", // Always use array type, even for single selection
+            "items": {
+              "type": "string"
+            },
+          },
+        },
+        "required": [
+          "sub_program",
+        ]
+      };
+      const subProgramUISchema = {
+        sub_program: {
+          'ui:widget': 'SubProgramListWidget',
+          'ui:options': {
+            multiple: true,
+          },
+        },
+      };
 
   const options = [
     // t('LEARNER_APP.USER_PROFILE_CARD.EDIT_PROFILE'),
@@ -159,8 +209,14 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
         const userId = localStorage.getItem('userId');
         if (!userId) return;
 
-        // Fetch both user data and form schema in parallel
-        const [userInfoResponse, formResponse] = await Promise.all([
+        // Initialize tenantId state from localStorage
+        const storedTenantId = localStorage.getItem('tenantId');
+        if (storedTenantId) {
+          setTenantId(storedTenantId);
+        }
+
+        // Fetch user data, form schema, and tenant info in parallel
+        const [userInfoResponse, formResponse, tenantInfoResponse] = await Promise.all([
           getUserDetails(userId, true),
           fetchForm([
             {
@@ -174,11 +230,56 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
               },
             },
           ]),
+          getTenantInfo(),
         ]);
 
         console.log('useInfo', userInfoResponse?.result?.userData);
         console.log('responseForm', formResponse);
-        
+        const tenants = userInfoResponse?.result?.userData?.tenantData;
+        const isVolunteerProgramLeadExists = tenants.some((tenant : any) =>
+          tenant.tenantType === 'VolunteerOnboarding' &&
+          tenant.roles?.some((role : any) => role.roleName?.toLowerCase() === 'lead')
+        );
+        console.log('isVolunteerProgramLeadExists', isVolunteerProgramLeadExists);
+        setIsVolunteerProgramLead(isVolunteerProgramLeadExists)
+
+        const isPragyanpathLearnerExists = tenants.some((tenant : any) =>
+          tenant.tenantName === 'Pragyanpath' &&
+          tenant.roles?.some((role : any) => role.roleName?.toLowerCase() === 'learner')
+        );
+        console.log('isPragyanpathLearnerExists', isPragyanpathLearnerExists);
+        setIsPragyanpathLearner(isPragyanpathLearnerExists)
+
+        // Check for other VolunteerOnboarding tenants available for registration
+        const volunteerProgramLeadTenantIds = tenants
+          .filter((tenant: any) =>
+            tenant.tenantType === 'VolunteerOnboarding' &&
+            tenant.roles?.some(
+              (role: any) => role.roleName?.toLowerCase() === 'lead'
+            )
+          )
+          .map((tenant: any) => tenant.tenantId);
+
+        console.log('volunteerProgramLeadTenantIds', volunteerProgramLeadTenantIds);
+
+        // Check if there are other VolunteerOnboarding tenants in getTenantInfo API response
+        const availableVolunteerTenants = tenantInfoResponse?.result?.filter((tenant: any) => 
+          tenant.tenantType === 'VolunteerOnboarding'
+        ) || [];
+
+        const availableVolunteerTenantIds = availableVolunteerTenants.map((tenant: any) => tenant.tenantId);
+        console.log('availableVolunteerTenantIds', availableVolunteerTenantIds);
+
+        // Check if there are other VolunteerOnboarding tenants apart from the ones user already has
+        const otherVolunteerTenants = availableVolunteerTenantIds.filter(
+          (tenantId: string) => !volunteerProgramLeadTenantIds.includes(tenantId)
+        );
+
+        console.log('otherVolunteerTenants', otherVolunteerTenants);
+        const hasOtherVolunteerPrograms = otherVolunteerTenants.length > 0;
+        setOtherRegisterVolunteerProgram(hasOtherVolunteerPrograms);
+        console.log('otherRegisterVolunteerProgram set to:', hasOtherVolunteerPrograms);
+
         // Extract village ID for mentor lookup
         const extractedVillageId =
           userInfoResponse?.result?.userData?.customFields?.find(
@@ -234,6 +335,70 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     fetchMentorData();
   }, [villageId]);
 
+  // Fetch teamLead form schema for PTM registration
+  useEffect(() => {
+    const fetchTeamLeadSchema = async () => {
+      try {
+        const responseForm = await fetchForm([
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+            header: {},
+          },
+          {
+            fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.teamLead.context}&contextType=${FormContext.teamLead.contextType}`,
+            header: {
+              tenantid: localStorage.getItem('tenantId'),
+            },
+          },
+        ]) as { schema?: Record<string, unknown>; uiSchema?: Record<string, unknown> } | null;
+
+        if (!responseForm || !responseForm.schema || !responseForm.uiSchema) {
+          console.error('Invalid response form structure');
+          return;
+        }
+
+        const alterSchema = { ...responseForm.schema } as Record<string, unknown>;
+        let alterUISchema = { ...responseForm.uiSchema } as Record<string, unknown>;
+        
+        // Disable certain fields similar to user-leader.tsx
+        if (alterUISchema?.firstName) {
+          (alterUISchema.firstName as Record<string, unknown>)['ui:disabled'] = true;
+        }
+        if (alterUISchema?.lastName) {
+          (alterUISchema.lastName as Record<string, unknown>)['ui:disabled'] = true;
+        }
+        if (alterUISchema?.dob) {
+          (alterUISchema.dob as Record<string, unknown>)['ui:disabled'] = true;
+        }
+        if (alterUISchema?.email) {
+          (alterUISchema.email as Record<string, unknown>)['ui:disabled'] = true;
+        }
+        if (alterUISchema?.mobile) {
+          (alterUISchema.mobile as Record<string, unknown>)['ui:disabled'] = true;
+        }
+
+        // Remove duplicates from requiredArray
+        let requiredArray = alterSchema?.required;
+        if (Array.isArray(requiredArray)) {
+          requiredArray = Array.from(new Set(requiredArray));
+          alterSchema.required = requiredArray;
+        }
+
+        // Set 2 grid layout
+        alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+        setAddSchema(alterSchema);
+        setAddUiSchema(alterUISchema);
+        setRoleId(RoleId.TEAM_LEADER);
+        setTenantId(localStorage.getItem('tenantId') || '');
+      } catch (error) {
+        console.error('Error fetching teamLead schema:', error);
+      }
+    };
+
+    fetchTeamLeadSchema();
+  }, []);
+
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -252,6 +417,94 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     setIsPreviewOpen(false);
     setPreviewUrl(null);
     setPreviewTitle('');
+  };
+
+  const handlePtmRegistration = async ( payload: any) => {
+    console.log('######### payload', payload);
+    if (!selectedUserId || !userDetailsForPtm) {
+      showToastMessage('User details not available', 'error');
+      return;
+    }
+
+    setIsEditInProgress(true);
+    try {
+      const { userData, customFields } = splitUserData(userDetailsForPtm);
+
+      delete userData.email;
+
+      const object = {
+        userData: userData,
+        customFields: customFields,
+      };
+
+      // Update user details
+      const updateUserResponse = await updateUser(selectedUserId, object);
+      
+      // Iterate over payload.sub_program and call enrollUserTenant for each element
+      const enrollmentResponses = [];
+      if (payload.sub_program && Array.isArray(payload.sub_program)) {
+        for (const subProgram of payload.sub_program) {
+          try {
+            // Set onboardTenantId in localStorage for each sub-program before API call
+            const tenantIdToUse =  subProgram || '';
+            if (tenantIdToUse) {
+              localStorage.setItem('onboardTenantId', tenantIdToUse);
+              console.log(`######### Set onboardTenantId: ${tenantIdToUse}`);
+            }
+
+            const endrollResponse = await enrollUserTenant({
+              userId: selectedUserId,
+              tenantId: tenantIdToUse,
+              roleId: roleId,
+              customField: customFields,
+              userData: userData,
+            });
+            enrollmentResponses.push(endrollResponse);
+            console.log(`######### Enrolled user in tenant: ${tenantIdToUse}`, endrollResponse);
+          } catch (error: unknown) {
+            console.error(`Error enrolling user in tenant ${subProgram.tenantId || subProgram}:`, error);
+            // Continue with other enrollments even if one fails
+          }
+        }
+      }
+
+      setPtmNextModalOpen(false);
+      setPtmModalOpen(false)
+
+      // Check if all enrollment responses were successful
+      const allEnrollmentsSuccessful = enrollmentResponses.length > 0 && 
+        enrollmentResponses.every(response => 
+          response?.responseCode === 200 || response?.responseCode === 201
+        );
+        console.log('######### enrollmentResponses', enrollmentResponses);
+console.log('######### allEnrollmentsSuccessful', allEnrollmentsSuccessful);
+console.log('######### updateUserResponse', updateUserResponse);
+      if (
+        updateUserResponse &&
+        updateUserResponse?.status === 200 && 
+        allEnrollmentsSuccessful
+      ) {
+        // Show congratulations modal on success
+        setCongratulationsModalOpen(true);
+        setSelectedUserId(null);
+        setUserDetailsForPtm(null);
+        setSubProgramFormData(null);
+      } else {
+        showToastMessage(
+          t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER', { defaultValue: 'Failed to update user' }),
+          'error'
+        );
+      }
+
+
+    } catch (error: unknown) {
+      console.error('Error updating user:', error);
+      const errorMessage = 'Failed to update user'
+      showToastMessage(errorMessage, 'error');
+    } finally {
+      setIsEditInProgress(false);
+        
+    }
   };
 
   // Helper function to check if a field is a file field
@@ -356,6 +609,7 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
     dob?: string;
     mobile?: string | number;
     username?: string;
+    email?: string;
     customFields?: Array<Record<string, unknown>>;
   };
 
@@ -478,6 +732,10 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
   const personalFieldsFiltered = personalSectionFields.filter(
     (field) => !['state', 'district', 'block', 'village', 'firstName', 'middleName', 'lastName'].includes(field.name)
   );
+  {console.log('personalFieldsFiltered==========>', personalFieldsFiltered)
+    console.log('getLocationFields==========>', getLocationFields())
+    console.log('getNameFields==========>', getNameFields())
+    }
 
   const sectionCardStyle = {
     backgroundColor: '#fff',
@@ -562,6 +820,126 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           {username}
           {/* • Joined on June 16, 2024 */}
         </Typography>
+        {isPragyanpathLearner && (
+          <Box>
+            {!isVolunteerProgramLead ? (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  const userId = localStorage.getItem('userId');
+                  const tenantIdValue = localStorage.getItem('tenantId');
+                  if (userId) {
+                    if (tenantIdValue) {
+                      setTenantId(tenantIdValue);
+                      if (!roleId) {
+                        setRoleId(RoleId.TEAM_LEADER);
+                      }
+                      setSelectedUserId(userId);
+                      setPtmModalOpen(true);
+                    } else {
+                      showToastMessage('Tenant ID not found', 'error');
+                    }
+                  } else {
+                    showToastMessage('User ID not found', 'error');
+                  }
+                }}
+                startIcon={<PersonAddIcon />}
+                sx={{
+                  backgroundColor: '#FF8C00',
+                  color: '#FFFFFF',
+                  textTransform: 'none',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  px: 3,
+                  py: 1.5,
+                  borderRadius: '8px',
+                  minWidth: '200px',
+                  '&:hover': {
+                    backgroundColor: '#FF7700',
+                  },
+                }}
+              >
+                {t('LEARNER_APP.USER_PROFILE_CARD.REGISTER_AS_PTM', { defaultValue: 'Register as PTM' })}
+              </Button>
+            ) : (
+              <Box>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    const lmpDomain = process.env.NEXT_PUBLIC_LMP_DOMAIN;
+                    if (lmpDomain) {
+                      window.open(lmpDomain, '_blank');
+                    } else {
+                      showToastMessage('PTM Portal URL not configured', 'error');
+                    }
+                  }}
+                  startIcon={<PersonIcon />}
+                  sx={{
+                    backgroundColor: '#FFE4B5',
+                    color: '#FF8C00',
+                    textTransform: 'none',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    px: 3,
+                    py: 1.5,
+                    borderRadius: '8px',
+                  //  mb: 1,
+                    minWidth: '200px',
+                    width: 'fit-content',
+                    '&:hover': {
+                      backgroundColor: '#FFD700',
+                    },
+                  }}
+                >
+                  {t('LEARNER_APP.USER_PROFILE_CARD.GO_TO_PTM_PORTAL')} 
+                </Button>
+                {otherRegisterVolunteerProgram && (
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      const userId = localStorage.getItem('userId');
+                      const tenantIdValue = localStorage.getItem('tenantId');
+                      if (userId) {
+                        if (tenantIdValue) {
+                          setTenantId(tenantIdValue);
+                          if (!roleId) {
+                            setRoleId(RoleId.TEAM_LEADER);
+                          }
+                          setSelectedUserId(userId);
+                          setPtmModalOpen(true);
+                        } else {
+                          showToastMessage('Tenant ID not found', 'error');
+                        }
+                      } else {
+                        showToastMessage('User ID not found', 'error');
+                      }
+                    }}
+                    startIcon={<PersonAddIcon />}
+                    sx={{
+                      backgroundColor: '#FFE4B5',
+                      color: '#FF8C00',
+                      textTransform: 'none',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      px: 3,
+                      py: 1.5,
+                      ml:1,
+                      borderRadius: '8px',
+                      minWidth: '200px',
+                      width: 'fit-content',
+                      '&:hover': {
+                        backgroundColor: '#FFD700',
+                      },
+                    }}
+                  >
+                    {t('LEARNER_APP.USER_PROFILE_CARD.ADD_MORE_PROGRAMS', { defaultValue: 'Add More Programs' })} 
+                  </Button>
+                )}
+              </Box>
+            )}
+          </Box>
+        )}
+
       </Box>
 
       <Box
@@ -767,6 +1145,10 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
             </Box>
           </>
         )}
+
+        {/* Register as PTM Button */}
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                 </Box>
       </Box>
 
       <Menu
@@ -854,6 +1236,242 @@ const UserProfileCard = ({ maxWidth = '600px' }) => {
           
         </DialogActions>
       </Dialog>
+
+      {/* Register as PTM Modal Dialog */}
+      <Dialog
+        open={ptmModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setPtmModalOpen(false);
+            setSelectedUserId(null);
+            setIsEditInProgress(false);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('LEARNER_APP.USER_PROFILE_CARD.REGISTER_AS_PTM', { defaultValue: 'Register as PTM' })}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              setPtmModalOpen(false);
+              setSelectedUserId(null);
+              setIsEditInProgress(false);
+            }}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isEditInProgress ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                {t('COMMON.LOADING', { defaultValue: 'Loading...' })}
+              </Typography>
+            </Box>
+          ) : (
+            addSchema && addUiSchema && selectedUserId && (
+              <Box sx={{ mb: 3 }}>
+                <EditSearchUser
+                  onUserDetails=
+                  {async (userDetails) => {
+                    console.log('############# userDetails', userDetails);
+                    if (selectedUserId) {
+                      setIsEditInProgress(true);
+                      try {
+                        // Store user details for use in second modal
+                        setUserDetailsForPtm(userDetails);
+                       // setPtmModalOpen(false);
+                        setPtmNextModalOpen(true);
+                      } catch (error: unknown) {
+                        console.error('Error processing user details:', error);
+                        const errorMessage = (error as { response?: { data?: { params?: { errmsg?: string } } } })?.response?.data?.params?.errmsg ||
+                          t('TEAM_LEADERS.NOT_ABLE_UPDATE_TEAM_LEADER', { defaultValue: 'Failed to process user details' });
+                        showToastMessage(errorMessage, 'error');
+                      } finally {
+                        setIsEditInProgress(false);
+                      }
+                    }
+                  }}
+                  selectedUserRow={userData}
+                  schema={addSchema}
+                  uiSchema={addUiSchema}
+                  userId={selectedUserId}
+                  roleId={roleId}
+                  tenantId={tenantId}
+                  type="leader"
+                />
+              </Box>
+            )
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee', display: 'flex', gap: 2 }}>
+          {!isEditInProgress && selectedUserId && (
+            <>
+              <Button
+                sx={{
+                  backgroundColor: '#FFC107',
+                  color: '#000',
+                  fontFamily: 'Poppins',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  height: '40px',
+                  lineHeight: '20px',
+                  letterSpacing: '0.1px',
+                  textAlign: 'center',
+                  verticalAlign: 'middle',
+                  '&:hover': {
+                    backgroundColor: '#ffb300',
+                  },
+                  flex: 1,
+                }}
+                disabled={!selectedUserId || isEditInProgress}
+                form="dynamic-form-id"
+                type="submit"
+              >
+                {t('COMMON.NEXT', { defaultValue: 'Next' })}
+              </Button>
+              {/* <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  height: '40px',
+                  flex: 1,
+                }}
+                disabled={!selectedUserId || isEditInProgress}
+                onClick={() => {
+                  setPtmModalOpen(false);
+                  setPtmNextModalOpen(true);
+                }}
+              >
+                {t('COMMON.NEXT', { defaultValue: 'Next' })}
+              </Button> */}
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+
+      {/* PTM Next Step Modal - Empty modal for future data */}
+      <Dialog
+        open={ptmNextModalOpen}
+        onClose={(event, reason) => {
+          // Prevent closing on backdrop click
+          if (reason !== 'backdropClick') {
+            setPtmModalOpen(false);
+            setPtmNextModalOpen(false);
+          }
+        }}
+        maxWidth={false}
+        fullWidth={true}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: '100%',
+            maxHeight: '100vh',
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '1px solid #eee',
+            p: 2,
+          }}
+        >
+          <Typography variant="h1" component="div">
+            {t('LEARNER_APP.USER_PROFILE_CARD.REGISTER_AS_PTM', { defaultValue: 'Register as PTM' })}
+          </Typography>
+          <IconButton
+            aria-label="close"
+            onClick={() => {
+              setPtmNextModalOpen(false);
+            }}
+            sx={{
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          <Box sx={{ mb: 3 }}>
+          <DynamicForm
+                  schema={subProgramSchema}
+                  uiSchema={subProgramUISchema}
+                  FormSubmitFunction={(formData: any, payload: any) => {
+                    console.log('########## debug payload', payload);
+                    console.log('########## debug formdata', formData);
+                    // Store form data for use in onClick handler
+                 //  setSubProgramFormData({ formData, payload });
+                   handlePtmRegistration( payload);
+                  }}
+                  prefilledFormData={{}}
+                  hideSubmit={true}
+                  type={''}
+                  id="submit-ptm-form"
+                />
+                  {/* <Button type="submit">{t('COMMON.NEXT', { defaultValue: 'Next' })}</Button> */}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              
+              setPtmNextModalOpen(false);
+            }}
+            sx={{
+              mr: 2,
+            }}
+          >
+            {t('COMMON.BACK', { defaultValue: 'Back' })}
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+         //   onClick={handlePtmRegistration}
+            disabled={isEditInProgress || !selectedUserId || !userDetailsForPtm}
+            form="submit-ptm-form"
+            type="submit"
+          >
+            {t('LEARNER_APP.USER_PROFILE_CARD.REGISTER_AS_PTM', { defaultValue: 'Register as PTM' })}
+            </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Congratulations Modal */}
+      <CongratulationsModal
+        open={congratulationsModalOpen}
+        onClose={() => setCongratulationsModalOpen(false)}
+      />
     </Box>
   );
 };

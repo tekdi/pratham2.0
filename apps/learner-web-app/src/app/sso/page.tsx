@@ -282,6 +282,7 @@ const SSOContent = () => {
   const callBackSwitchDialog = async (
     tenantId: string,
     tenantName: string,
+    tenantType: string,
     roleId: string,
     roleName: string
   ) => {

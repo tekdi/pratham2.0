@@ -1,4 +1,4 @@
-import { post, patch, put } from '@shared-lib';
+import { post, patch } from '@shared-lib';
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export interface userListParam {
@@ -33,6 +33,16 @@ export interface UsersByManagerParam {
   fields?: any;
 }
 
+export interface UpdateCohortStatusParam {
+  cohortIds: string[];
+  status: string;
+}
+
+export interface BulkUpdateUsersRolesParam {
+  userIds: string[];
+  roleId: string;
+}
+
 export const fetchUserList = async ({
   limit,
   //  page,
@@ -63,3 +73,46 @@ export const fetchUserList = async ({
   }
 };
 
+export const updateCohortStatus = async ({
+  cohortIds,
+  status,
+}: UpdateCohortStatusParam): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.cohortUpdateStatus;
+  try {
+    const response = await patch(apiUrl, {
+      cohortIds,
+      status,
+    });
+    return response?.data?.result;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('API error:', error.response.status, error.response.data);
+      throw error;
+    } else {
+      console.error('Network or unknown error:', error);
+      throw error;
+    }
+  }
+};
+
+export const bulkUpdateUsersRoles = async ({
+  userIds,
+  roleId,
+}: BulkUpdateUsersRolesParam): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.rbacUsersRolesBulkUpdate;
+  try {
+    const response = await patch(apiUrl, {
+      userIds,
+      roleId,
+    });
+    return response?.data?.result;
+  } catch (error: any) {
+    if (error.response) {
+      console.error('API error:', error.response.status, error.response.data);
+      throw error;
+    } else {
+      console.error('Network or unknown error:', error);
+      throw error;
+    }
+  }
+};

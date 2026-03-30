@@ -130,7 +130,16 @@ export const TENANT_DATA = {
   CAMP_TO_CLUB : 'Camp to Club',
   POS : 'Open School',
   PRAGYANPATH :'Pragyanpath',
+  SUMMER_CAMP : 'Summer Camp',
 
+}; 
+export const TENANT_TYPE = {
+  VOLUNTEER_ONBOARDING: 'VolunteerOnboarding',
+};
+export const DASHBOARD_TYPE = {
+  INDIVIDUAL_VOLUNTEER: 'individualVolunteer',
+  ORGANISATION_VOLUNTEER: 'organisationVolunteer',
+  ORGANISATION: 'organisation',
 };
 
 export const jotFormId = process.env.NEXT_PUBLIC_JOTFORM_ID || '';

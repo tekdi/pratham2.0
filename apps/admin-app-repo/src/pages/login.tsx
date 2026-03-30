@@ -282,7 +282,7 @@ const LoginPage = () => {
           const selectedStateId = userInfo?.customFields?.find(
             (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
-          if (selectedStateId) {
+          if (selectedStateId !== undefined && selectedStateId !== null) {
             localStorage.setItem('stateId', selectedStateId);
           }
         }
@@ -556,6 +556,7 @@ const LoginPage = () => {
   const callBackSwitchDialog = async (
     tenantId: string,
     tenantName: string,
+    tenantType: string,
     roleId: string,
     roleName: string
   ) => {
@@ -640,6 +641,7 @@ const LoginPage = () => {
     const newLocale = event.target.value;
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('lang', newLocale);
       setLanguage(newLocale);
       ReactGA.event('select-language-login-page', {
         selectedLanguage: newLocale,

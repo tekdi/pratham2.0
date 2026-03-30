@@ -80,6 +80,17 @@ const getDynamicNavConfig = ({
       return;
     }
     
+    // Skip Survey item if isVolunteer is not true in localStorage
+    if (key.toLowerCase() === 'survey') {
+      const isVolunteer = typeof window !== 'undefined' 
+        ? localStorage.getItem('isVolunteer') === 'true'
+        : false;
+      if (!isVolunteer) {
+        console.log('Skipping Survey navbar item: isVolunteer is not true');
+        return;
+      }
+    }
+    
     // Get appropriate icon based on key
     const getIcon = () => {
       const keyLower = key.toLowerCase();

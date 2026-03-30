@@ -80,6 +80,23 @@ const AutoCompleteMultiSelectWidget = ({
       const values = limitedValue.map((option) => option.value);
       onChange(values.length > 0 ? values : []);
 
+      //set to local storage for ptm auto filter
+      if (values.length > 0) {
+        if (label == 'State' || label == 'District' || label == 'Block') {
+          localStorage.setItem(`temp_${label}`, newValue[0].value);
+        }
+      }
+      else {
+        localStorage.removeItem(`temp_${label}`);
+        if (label == 'State') {
+          localStorage.removeItem('temp_District');
+          localStorage.removeItem('temp_Block');
+        }
+        if (label == 'District') {
+          localStorage.removeItem('temp_Block');
+        }
+      }
+
       // Close dropdown only if max selections reached
       if (values.length >= maxSelections) {
         setTimeout(() => setOpen(false), 100);
@@ -176,12 +193,11 @@ const AutoCompleteMultiSelectWidget = ({
         renderInput={(params) => (
           <TextField
             {...params}
-            label={`${t(`FORM.${label}`, { defaultValue: label })} ${
-              required && selectedOptions.length !== 0 ? '*' : ''
-            }`}
+            label={`${t(`FORM.${label}`, { defaultValue: label })} ${required && selectedOptions.length !== 0 ? '*' : ''
+              }`}
             placeholder={
               selectedOptions.length === 0
-                ? `Type to search ${label?.toLowerCase() || 'options'}...`
+                ? `Type to search ${t(`FORM.${label}`, { defaultValue: label })}...`
                 : ''
             }
             error={rawErrors.length > 0}

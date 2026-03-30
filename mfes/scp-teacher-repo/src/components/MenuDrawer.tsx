@@ -142,6 +142,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     setLanguage(newLocale);
     if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('preferredLanguage', newLocale);
+      localStorage.setItem('lang', newLocale);
       router.replace(router.pathname, router.asPath, { locale: newLocale });
     }
   };

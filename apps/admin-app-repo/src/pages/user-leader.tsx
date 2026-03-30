@@ -483,11 +483,11 @@ const UserLeader = () => {
         const cohortData = row?.cohortData;
         setSelectedUserIdReassign(userId);
         const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/geographical-hierarchy`;
-        let response=null; 
-        try{
+        let response = null;
+        try {
           response = await axios.post(apiUrl, { userId: userId }, { headers });
         }
-        catch(e){}
+        catch (e) { }
         const geographicalData = response?.data?.result?.data || [];
 
         // Transform geographicalData into centerList
@@ -1394,7 +1394,7 @@ const UserLeader = () => {
           ) : (
             <Box sx={{ mb: 3 }}>
               <EditSearchUser
-                onUserDetails={async(userDetails) => {
+                onUserDetails={async (userDetails) => {
                   console.log('############# userDetails', userDetails);
                   if (selectedUserIdEdit) {
                     setIsEditInProgress(true);

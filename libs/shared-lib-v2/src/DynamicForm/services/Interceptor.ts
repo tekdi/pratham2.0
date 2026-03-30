@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { refresh } from '../services/LoginService';
-import { tenantId } from '../utils/app.config';
 
 const instance = axios.create();
 
@@ -34,10 +33,12 @@ instance.interceptors.request.use(
       if (academicYearId) {
         config.headers.academicyearid = academicYearId;
       }
+      // Read tenantId dynamically from localStorage on each request
+      const currentTenantId = localStorage.getItem('tenantId');
+      if (currentTenantId) {
+        config.headers.tenantid = currentTenantId;
+      }
     }
-    // config.headers.tenantid = '4783a636-1191-487a-8b09-55eca51b5036';
-    // config.headers.tenantid = 'fbe108db-e236-48a7-8230-80d34c370800';
-    config.headers.tenantid = tenantId;
     return config;
   },
   (error) => {

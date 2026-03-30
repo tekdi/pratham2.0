@@ -20,6 +20,16 @@ import CustomFileUpload from './RJSFWidget/CustomFileUpload';
 import CustomCenterListWidget from './RJSFWidget/CustomCenterListWidget';
 import CatchmentAreaWidget from './RJSFWidget/CatchmentAreaWidget';
 import WorkingLocationWidget from './RJSFWidget/WorkingLocationWidget';
+//custom form
+import SubProgramListWidget from './RJSFWidget/CustomForm/SubProgramListWidget';
+import ChildPocsoFraudPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/ChildPocsoFraudPolicyAcknowledgementWidget';
+import NdaPolicyAcknowledgementWidget from './RJSFWidget/CustomForm/NdaPolicyAcknowledgementWidget';
+import PTMNameWidget from './RJSFWidget/CustomForm/PTMNameWidget';
+import OrganizationSearchWidget from './RJSFWidget/CustomForm/OrganizationSearchWidget';
+import POCNameSelectWidget from './RJSFWidget/CustomForm/POCNameSelectWidget';
+import RegisterTypeWidget from './RJSFWidget/CustomForm/RegisterTypeWidget';
+import VolunteerTypeWidget from './RJSFWidget/CustomForm/VolunteerTypeWidget';
+import OrganizationRegistredWidget from './RJSFWidget/CustomForm/OrganizationRegistredWidget';
 
 import {
   calculateAgeFromDate,
@@ -50,6 +60,7 @@ const DynamicForm = forwardRef(({
   mobileSchema = {},
   parentDataAddUiSchema = {},
   parentDataSchema = {},
+  id
 }: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -724,10 +735,10 @@ const DynamicForm = forwardRef(({
         });
       };
 
-      if(formSchema.properties?.own_phone_check){ 
+      if (formSchema.properties?.own_phone_check) {
         if (formData.phone_type_accessible === 'nophone') {
           removeFields(['own_phone_check']);
-      } else if (formData.phone_type_accessible ) {
+        } else if (formData.phone_type_accessible) {
           // 1. Add back to schema if missing
           setFormSchema((prevSchema) => {
             if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
@@ -766,7 +777,8 @@ const DynamicForm = forwardRef(({
           }));
         }
 
-    }}
+      }
+    }
   }, [formData]);
 
   const widgets = {
@@ -783,6 +795,16 @@ const DynamicForm = forwardRef(({
     //custom widget
     CatchmentAreaWidget,
     WorkingLocationWidget,
+    //custom form
+    SubProgramListWidget,
+    ChildPocsoFraudPolicyAcknowledgementWidget,
+    NdaPolicyAcknowledgementWidget,
+    PTMNameWidget,
+    OrganizationSearchWidget,
+    POCNameSelectWidget,
+    RegisterTypeWidget,
+    VolunteerTypeWidget,
+    OrganizationRegistredWidget
   };
 
   // Custom field for Guardian Information Note
@@ -2129,7 +2151,7 @@ const DynamicForm = forwardRef(({
           transformErrors={transformErrors} // ✅ Suppress default pattern errors
           widgets={widgets}
           fields={customFields}
-          id="dynamic-form-id"
+          id={id ||"dynamic-form-id"}
           // template
           templates={{ ObjectFieldTemplate: CustomObjectFieldTemplate }}
         >
