@@ -42,6 +42,9 @@ const List: React.FC<ListProps> = ({
 
   const [totalCount, setTotalCount] = useState<number>(0);
   const [selectedFilter, setSelectedFilter] = useState<any>('');
+  const selectedLanguageFilter = selectedFilter
+    ? { contentLanguage: [selectedFilter] }
+    : {};
 
   // Load selectedFilter from localStorage on component mount
   useEffect(() => {
@@ -110,7 +113,7 @@ const List: React.FC<ListProps> = ({
                       limit: 4,
                       filters: {
                         program: 'Experimento India',
-                        contentLanguage: [selectedFilter || 'English'],
+                        ...selectedLanguageFilter,
                       },
                     }}
                     _config={{
@@ -208,7 +211,7 @@ const List: React.FC<ListProps> = ({
                   sort_by: { lastUpdatedOn: 'desc' },
                   filters: {
                     program: 'Experimento India',
-                    contentLanguage: [selectedFilter || 'English'],
+                    ...selectedLanguageFilter,
                   },
                 }}
                 _config={{
