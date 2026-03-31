@@ -36,8 +36,8 @@ const List: React.FC<ListProps> = ({
 }) => {
   const pathname = usePathname();
   console.log(pathname, 'pathname');
- const { pageViews, loading, error } = usePageViewCount("/");
- const { pageViews: pageViewsCount, loading: loadingCount, error: errorCount } = usePageViewCount("/themantic");
+ // No path → fetches total page_view count across all pages
+ const { pageViews } = usePageViewCount();
 
 
   const [totalCount, setTotalCount] = useState<number>(0);
@@ -240,7 +240,7 @@ const List: React.FC<ListProps> = ({
             </Box>
            
           </Box>
-        {pageViews && pageViewsCount && <Box sx={{ 
+        {pageViews != null && <Box sx={{ 
           fontSize: '16px', 
           color: '#363d47', 
           fontWeight: 500, 
@@ -252,7 +252,7 @@ const List: React.FC<ListProps> = ({
           width: 'fit-content',
           mx: 'auto'
         }}>
-         Total Visitors: {pageViews+pageViewsCount}
+         Total views: {pageViews}
         </Box>}
         </Box>
       </Box>

@@ -7,14 +7,14 @@ type PageViewResponse = {
   error?: string;
 };
 
-export function usePageViewCount(path: string | null | undefined) {
+// Pass a specific path to get views for that page, or omit (pass null/undefined)
+// to get the total page_view count across ALL pages.
+export function usePageViewCount(path?: string | null) {
   const [pageViews, setPageViews] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!path) return undefined;
-
     let cancelled = false;
 
     const fetchPageViews = async () => {
@@ -22,9 +22,13 @@ export function usePageViewCount(path: string | null | undefined) {
       setError(null);
 
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER?.replace("/sbplayer", "")}/api/analytics/pageviews?path=${encodeURIComponent(path)}`
-        );
+        const baseUrl = `${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER?.replace("/sbplayer", "")}/api/analytics/pageviews`;
+        // If a path is provided, filter by that page; otherwise fetch the grand total
+        const url = path
+          ? `${baseUrl}?path=${encodeURIComponent(path)}`
+          : baseUrl;
+
+        const response = await fetch(url);
         
          
         const data: PageViewResponse = await response.json();
