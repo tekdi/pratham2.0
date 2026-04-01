@@ -335,7 +335,8 @@ const UserLeader = () => {
       keys: ['firstName', 'middleName', 'lastName'],
       label: 'Team Lead Name',
       render: (row) =>
-        `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
+        `${transformLabel(row.firstName) || ''} ${
+          transformLabel(row.middleName) || ''
           } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
@@ -355,7 +356,8 @@ const UserLeader = () => {
         const state = transformLabel(row?.customfield?.state) || '';
         const district = transformLabel(row?.customfield?.district) || '';
         const block = transformLabel(row?.customfield?.block) || '';
-        return `${state == '' ? '' : `${state}`}${district == '' ? '' : `, ${district}`
+        return `${state == '' ? '' : `${state}`}${
+          district == '' ? '' : `, ${district}`
           }${block == '' ? '' : `, ${block}`}`;
       },
     },
@@ -497,11 +499,14 @@ const UserLeader = () => {
             district.blocks?.forEach((block) => {
               block.centers?.forEach((center) => {
                 // Check if centerId exists in cohortData with active status
-                const cohortCenter = cohortData?.find(
+                // Filter all entries for the same centerId and check if any has both statuses active
+                const cohortCenters = cohortData?.filter(
                   (item: any) => item?.centerId === center.centerId
                 );
-                const isActiveCenter =
-                  cohortCenter?.cohortMember?.status === 'active' && cohortCenter?.centerStatus === 'active';
+                const isActiveCenter = cohortCenters?.some(
+                  (cohortCenter: any) =>
+                    cohortCenter?.cohortMember?.status === 'active' && cohortCenter?.centerStatus === 'active'
+                );
 
                 // Only push if center has active cohortMember status
                 if (isActiveCenter) {
@@ -585,7 +590,7 @@ const UserLeader = () => {
               }
             }
           }
-          
+
           setAvailableCenters(filteredCenters);
         } catch (error) {
           console.error('Error fetching cohort list:', error);

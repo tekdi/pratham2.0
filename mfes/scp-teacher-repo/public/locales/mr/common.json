@@ -189,7 +189,12 @@
     "NEXT": "पुढे",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "कृपया किमान एक बॅच निवडा.",
     "PLEASE_SEARCH_AND_SELECT_USER": "कृपया वापरकर्ता शोधा आणि निवडा.",
-    "PLEASE_SELECT_CENTER": "कृपया एक केंद्र निवडा."
+    "PLEASE_SELECT_CENTER": "कृपया एक केंद्र निवडा.",
+    "REASSIGN": "पुन्हा नियुक्त करा",
+    "REASSIGN_LEARNER_TO_BATCH": "शिकणाऱ्याला बॅचमध्ये पुन्हा नियुक्त करा",
+    "LOADING_ELLIPSIS": "लोड होत आहे...",
+    "SELECT_BATCH_WIDGET_TITLE": "बॅच निवडा",
+    "PLEASE_SELECT_BATCH": "कृपया एक बॅच निवडा"
   },
   "LOGIN_PAGE": {
     "USERNAME": "वापरकर्ता नाव",

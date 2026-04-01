@@ -1015,5 +1015,16 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• यदि उत्तर पुस्तिका में कई पृष्ठ हैं, तो प्रत्येक पृष्ठ की अलग-अलग तस्वीर लें और अपलोड करें।",
     "READ_LESS": "कम पढ़ें",
     "READ_MORE": "और पढ़ें"
+  },
+  "LMP_SINGLE_BATCH_WIDGET": {
+    "TITLE": "बैच चुनें",
+    "CENTER": "केंद्र",
+    "SELECT_CENTER": "केंद्र चुनें",
+    "NO_CENTERS_AVAILABLE": "कोई केंद्र उपलब्ध नहीं",
+    "BATCH": "बैच",
+    "SELECT_CENTER_FIRST": "पहले एक केंद्र चुनें",
+    "LOADING_BATCHES": "बैच लोड हो रहे हैं…",
+    "SELECT_BATCH": "बैच चुनें",
+    "VALUE_NOT_IN_LIST": "वर्तमान मान सूची में नहीं है; कृपया फिर से बैच चुनें।"
   }
 }

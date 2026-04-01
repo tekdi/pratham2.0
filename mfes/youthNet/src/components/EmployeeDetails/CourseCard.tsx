@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Card, CardContent, CardMedia, Typography, Button, Stack, Tooltip } from '@mui/material';
-import { ArrowForward } from '@mui/icons-material';
+import { Box, Card, CardContent, CardMedia, Typography, Tooltip } from '@mui/material';
 import { CourseCardProps } from './types';
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
@@ -20,13 +19,29 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       }}
     >
       {/* Course Image */}
-      <Box sx={{ position: 'relative' }}>
+      <Box sx={{ position: 'relative', overflow: 'hidden', width: '100%' }}>
         <CardMedia
           component="img"
           height="160"
           image={course.image}
           alt={course.title}
-          sx={{ objectFit: 'cover' }}
+          loading="eager"
+          fetchPriority="high"
+          sx={{ 
+            objectFit: 'cover',
+            width: '100%',
+            height: '160px',
+            minHeight: '160px',
+            maxHeight: '160px',
+            imageRendering: 'auto',
+            WebkitBackfaceVisibility: 'hidden',
+            backfaceVisibility: 'hidden',
+            WebkitTransform: 'translateZ(0) scale(1)',
+            transform: 'translateZ(0) scale(1)',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            display: 'block',
+          }}
         />
         {course.completedDate && (
           <Box

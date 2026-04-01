@@ -215,16 +215,33 @@ const CollectionEditor: React.FC = () => {
       // 2️⃣ Modify ONLY the needed part
       if (parsedData?.result?.objectCategoryDefinition) {
         const tenantName = localStorage.getItem('tenantName');
+        const uiConfig = localStorage.getItem('uiConfig');
+        let selectedPrograms: string[] = [];
+
+        if (uiConfig) {
+          try {
+            const parsedUiConfig = JSON.parse(uiConfig);
+            if (Array.isArray(parsedUiConfig?.program) && parsedUiConfig.program.length > 0) {
+              selectedPrograms = parsedUiConfig.program.filter((program: any) => typeof program === 'string' && program.trim());
+            }
+          } catch (e) {
+            console.warn('Could not parse uiconfig from localStorage:', e);
+          }
+        }
+
+        if (selectedPrograms.length === 0 && tenantName) {
+          selectedPrograms = [tenantName];
+        }
   
-        if (tenantName) {
+        if (selectedPrograms.length > 0) {
           const objectDef = parsedData.result.objectCategoryDefinition;
   
           // ONLY: forms.create -> properties -> fields -> program
           objectDef.forms?.create?.properties?.forEach((section: any) => {
             section.fields?.forEach((field: any) => {
               if (field.code === 'program' &&  field.default.length === 0) {
-                field.range = [tenantName];
-                field.default = [tenantName];
+                field.range = selectedPrograms;
+                field.default = selectedPrograms;
               }
             });
           });
@@ -371,8 +388,25 @@ const CollectionEditor: React.FC = () => {
       // Intercept API calls (fetch) made by the editor
       const originalFetch = window.fetch;
       window.fetch = async (...args) => {
-        const [url, options] = args;
+        let [url, options] = args;
         const urlString = String(url);
+        
+        // Modify request body for composite/v3/search to remove "Failed" from status
+        if (urlString.includes('composite/v3/search') && options?.body) {
+          try {
+            const bodyData = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+              const statusArray = bodyData.request.filters.status;
+              if (statusArray.includes('Failed')) {
+                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                options = { ...options, body: typeof options.body === 'string' ? JSON.stringify(bodyData) : bodyData };
+                args = [url, options];
+              }
+            }
+          } catch {
+            // Ignore parsing errors
+          }
+        }
         
         // Only intercept and modify the specific API we care about
         const shouldModify = shouldIntercept(urlString);
@@ -634,6 +668,22 @@ const CollectionEditor: React.FC = () => {
         const xhr = this as any;
         const urlString = String(xhr._url);
         const shouldModify = xhr._shouldIntercept;
+        
+        // Modify request body for composite/v3/search to remove "Failed" from status
+        if (urlString.includes('composite/v3/search') && body) {
+          try {
+            const bodyData = typeof body === 'string' ? JSON.parse(body) : body;
+            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+              const statusArray = bodyData.request.filters.status;
+              if (statusArray.includes('Failed')) {
+                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                body = typeof body === 'string' ? JSON.stringify(bodyData) : bodyData;
+              }
+            }
+          } catch {
+            // Ignore parsing errors
+          }
+        }
         
         if (shouldModify) {
           const apiCallData = {

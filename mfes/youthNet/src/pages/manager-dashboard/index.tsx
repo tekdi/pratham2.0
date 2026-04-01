@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import {
   CourseCompletion,
@@ -12,6 +12,7 @@ import {
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { fetchCourses, getCourseHierarchy } from '../../services/PlayerService';
 import { fetchUserCertificateStatus } from '../../services/TrackingService';
 import { fetchUserList } from '../../services/ManageUser';
@@ -19,6 +20,7 @@ import { getAssessmentStatus } from '../../services/AssesmentService';
 
 
 const ManagerDashboard = () => {
+  const { t } = useTranslation();
   // State for API data
   const [mandatoryCertificateData, setMandatoryCertificateData] = useState<any[]>([]);
   const [optionalCertificateData, setOptionalCertificateData] = useState<any[]>([]);
@@ -59,6 +61,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
   }>({
     usersData: {},
   });
+  const [topPerformersLoading, setTopPerformersLoading] = useState(true);
 
   const [individualProgressData, setIndividualProgressData] = useState<EmployeeProgress[]>([]);
 
@@ -71,9 +74,14 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Ref to track the latest request ID to prevent race conditions
+  const requestIdRef = useRef(0);
+  const isLoadingRef = useRef(false);
 
   // Function to find top 5 performers from assessment data
   const findTopPerformers = (assessmentData: any[]): string[] => {
+    console.log('assessmentData', assessmentData);
     const userPerformance: { userId: string; avgPercentage: number }[] = [];
     
     assessmentData.forEach((user) => {
@@ -96,7 +104,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
     // Sort by average percentage in descending order and get top 5
     const top5Performers = userPerformance
       .sort((a, b) => b.avgPercentage - a.avgPercentage)
-      .slice(0, 5)
+      .slice(0,5)
       .map(performer => performer.userId);
     
     console.log('User Performance Data:', userPerformance);
@@ -150,8 +158,37 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
 
   // Extract completed course IDs without storing in state
   useEffect(() => {
+    // If initial data fetch is still loading, wait
+    if (courseDataLoading) {
+      return;
+    }
+    
+    // Initialize with empty data if dependencies aren't ready yet
+    if (!employeeUserIds.length || !employeeDataResponse.length) {
+      // Initial fetch is complete but no employees, set empty data and stop loading
+      setTopPerformersData({
+        usersData: {
+          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+        }
+      });
+      setTopPerformersLoading(false);
+      return;
+    }
+
+    // If employees exist but no certificate data yet, set empty data and stop loading
+    if (mandatoryCertificateData.length === 0 && optionalCertificateData.length === 0) {
+      setTopPerformersData({
+        usersData: {
+          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+        }
+      });
+      setTopPerformersLoading(false);
+      return;
+    }
+
     // Check if arrays are not empty
     if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0 && employeeDataResponse.length > 0) {
+      setTopPerformersLoading(true);
       // Find completed course IDs from mandatory courses
       const completedMandatoryCourseIds = mandatoryCertificateData
         .filter(course => course.status === 'completed')
@@ -177,9 +214,10 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('No completed courses found, setting empty top performers data');
         setTopPerformersData({
           usersData: {
-            '5 Highest Course Completing Users': []
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
           }
         });
+        setTopPerformersLoading(false);
         return;
       }
       
@@ -243,7 +281,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         // Create TopPerformers data structure
         const topPerformersDataStructure = {
           usersData: {
-            '5 Highest Course Completing Users': topPerformerEmployees.map((employee: any) => ({
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: topPerformerEmployees.map((employee: any) => ({
               id: employee.userId,
               name: employee.name || `${employee.firstName} ${employee.lastName}`.trim(),
               role: 'Learner'
@@ -256,6 +294,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         // Set the top performers data
         setTopPerformersData(topPerformersDataStructure);
+        setTopPerformersLoading(false);
         
         return { allStructuredData, topPerformerUserIds };
       };
@@ -266,16 +305,35 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         console.log('Top 5 Performer User IDs:', result?.topPerformerUserIds);
       }).catch((error) => {
         console.error('Error processing structured course data:', error);
+        setTopPerformersLoading(false);
+        // Set empty data on error
+        setTopPerformersData({
+          usersData: {
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+          }
+        });
       });
 
       
 
       
     }
-  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse]);
+  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse, courseDataLoading, t]);
 
   // Function to fetch individual progress data with pagination and search
   const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
+    // Prevent multiple simultaneous requests
+    if (isLoadingRef.current) {
+      return;
+    }
+    
+    // Generate a unique request ID for this call
+    const currentRequestId = ++requestIdRef.current;
+    isLoadingRef.current = true;
+    
+    // Clear existing data immediately to prevent showing stale data
+    setIndividualProgressData([]);
+    
     try {
       const managerUserId = localStorage.getItem('managrUserId');
       if (managerUserId) {
@@ -283,7 +341,8 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         
         // Build filters object
         const filters: any = {
-          emp_manager: managerUserId
+          emp_manager: managerUserId,
+          role: "Learner",
         };
         
         // Add name filter if search query exists
@@ -297,8 +356,16 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           filters: filters,
         });
         
+        // Check if this response is still the latest request
+        if (currentRequestId !== requestIdRef.current) {
+          console.log('Ignoring stale response for page:', page);
+          return;
+        }
+        
         console.log('individualProgressData', apiResponse?.getUserDetails);
         console.log('totalCount', apiResponse?.totalCount);
+        console.log('Current page:', page, 'Offset:', offset);
+        
         // Handle empty array or undefined getUserDetails
         const userDetails = apiResponse?.getUserDetails || [];
         const currentEmployeeIds = userDetails.length > 0 
@@ -322,6 +389,13 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
               fetchUserCertificateStatus(currentEmployeeIds, activeMandatoryIds),
               fetchUserCertificateStatus(currentEmployeeIds, activeOptionalIds)
             ]);
+            
+            // Check again if this is still the latest request after certificate status fetch
+            if (currentRequestId !== requestIdRef.current) {
+              console.log('Ignoring stale certificate status response for page:', page);
+              return;
+            }
+            
             console.log('Individual Progress - userMandatoryCertificateStatus', userMandatoryCertificateStatus);
             console.log('Individual Progress - userOptionalCertificateStatus', userOptionalCertificateStatus);
           } catch (error) {
@@ -390,6 +464,12 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           }
         });
         
+        // Final check before updating state
+        if (currentRequestId !== requestIdRef.current) {
+          console.log('Ignoring stale transformed data for page:', page);
+          return;
+        }
+        
         // Transform API data to EmployeeProgress format with calculated progress
         const transformedProgressData: EmployeeProgress[] = userDetails.length > 0 
           ? userDetails.map((user: any) => {
@@ -454,10 +534,18 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         setTotalPages(0);
       }
     } catch (error) {
-      console.error('Error fetching individual progress data:', error);
-      setIndividualProgressData([]);
-      setTotalEmployees(0);
-      setTotalPages(0);
+      // Only update state if this is still the latest request
+      if (currentRequestId === requestIdRef.current) {
+        console.error('Error fetching individual progress data:', error);
+        setIndividualProgressData([]);
+        setTotalEmployees(0);
+        setTotalPages(0);
+      }
+    } finally {
+      // Only clear loading flag if this is still the latest request
+      if (currentRequestId === requestIdRef.current) {
+        isLoadingRef.current = false;
+      }
     }
   };
 
@@ -539,7 +627,9 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         if(userId) {
            employeeDataResponse = await fetchUserList({
            
-            filters: {emp_manager:userId},
+            filters: {emp_manager:userId,
+              role: "Learner",
+            },
           });
           console.log('employeeDataResponse', employeeDataResponse);
           
@@ -614,10 +704,28 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         setMandatoryCertificateData(filteredMandatory);
         setOptionalCertificateData(filteredOptional);
         setCourseDataLoading(false);
+        
+        // If no employees or no certificate data, set top performers to empty and stop loading
+        if (employeeUserIds.length === 0 || employeeDataResponse.length === 0 || 
+            (filteredMandatory.length === 0 && filteredOptional.length === 0)) {
+          setTopPerformersData({
+            usersData: {
+              [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+            }
+          });
+          setTopPerformersLoading(false);
+        }
 
       } catch (error) {
         console.error('Error fetching course data:', error);
         setCourseDataLoading(false);
+        // On error, set top performers to empty and stop loading
+        setTopPerformersData({
+          usersData: {
+            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
+          }
+        });
+        setTopPerformersLoading(false);
       }
 
 
@@ -671,10 +779,10 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
         {/* Header */}
         <Box sx={{ mb: 2 }}>
           <Typography variant="h5" fontWeight={600} display="inline">
-            Team Learning Overview
+            {t('TEAM_LEARNING_OVERVIEW')}
           </Typography>
           <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: { xs: 1, sm: 2 } }}>
-            Total Employees : {totalEmployees}
+            {t('TOTAL_EMPLOYEES')} : {totalEmployees}
           </Typography>
         </Box>
 
@@ -683,23 +791,26 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           {/* Course Completion */}
           <Grid item xs={12} md={6}>
             {courseDataLoading ? (
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  minHeight: '300px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 2,
-                  backgroundColor: 'white'
-                }}
-              >
-                <Typography variant="h6">Loading Course Completion Data...</Typography>
-              </Box>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '300px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <Typography variant="h6">{t('LOADING_COURSE_COMPLETION_DATA')}</Typography>
+                </Box>
             ) : (
               <CourseCompletion
                 mandatoryCourses={mandatoryCertificateData}
                 nonMandatoryCourses={optionalCertificateData}
+                userIds={employeeUserIds}
+                mandatoryCourseIds={mandatoryIdentifiers}
+                optionalCourseIds={optionalIdentifiers}
               />
             )}
           </Grid>
@@ -707,19 +818,19 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           {/* Course Allocation */}
           <Grid item xs={12} md={6}>
             {courseDataLoading ? (
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'center', 
-                  alignItems: 'center', 
-                  minHeight: '200px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 2,
-                  backgroundColor: 'white'
-                }}
-              >
-                <Typography variant="h6">Loading Course Allocation Data...</Typography>
-              </Box>
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '200px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <Typography variant="h6">{t('LOADING_COURSE_ALLOCATION_DATA')}</Typography>
+                </Box>
             ) : (
               <CourseAllocation
                 mandatory={courseAllocationData.mandatory}
@@ -733,6 +844,7 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
           <Grid item xs={12}>
             <TopPerformers
               usersData={topPerformersData.usersData}
+              isLoading={topPerformersLoading}
             />
           </Grid>
 

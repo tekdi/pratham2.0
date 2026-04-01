@@ -147,7 +147,8 @@
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "Job family": "Job family",
-    "Group Membership": "Group Membership",
+  "Job Family": "Job Family",
+"Group Membership": "Group Membership",
     "PSU": "PSU",
     "UNAUTHORIZED": "You are not authorized to access this site",
     "For Children": "For Children",
@@ -1043,5 +1044,16 @@
     "VIEW": "View",
     "REUPLOAD": "Reupload",
     "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
+  },
+  "LMP_SINGLE_BATCH_WIDGET": {
+    "TITLE": "Select batch",
+    "CENTER": "Center",
+    "SELECT_CENTER": "Select center",
+    "NO_CENTERS_AVAILABLE": "No centers available",
+    "BATCH": "Batch",
+    "SELECT_CENTER_FIRST": "Select a center first",
+    "LOADING_BATCHES": "Loading batches…",
+    "SELECT_BATCH": "Select batch",
+    "VALUE_NOT_IN_LIST": "Current value not in loaded list; pick a batch again if needed."
   }
 }
