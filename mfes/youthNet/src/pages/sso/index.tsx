@@ -72,11 +72,12 @@ const SSOContent = () => {
 
   const getActiveAcademicYearId = async () => {
     const academicYearResponse = await getAcademicYear();
-    const academicYearList = Array.isArray(academicYearResponse)
-      ? academicYearResponse
-      : Array.isArray(academicYearResponse?.data)
-      ? academicYearResponse.data
-      : [];
+    let academicYearList: any[] = [];
+    if (Array.isArray(academicYearResponse)) {
+      academicYearList = academicYearResponse;
+    } else if (Array.isArray(academicYearResponse?.data)) {
+      academicYearList = academicYearResponse.data;
+    }
 
     if (academicYearList.length) {
       localStorage.setItem('academicYearList', JSON.stringify(academicYearList));

@@ -104,13 +104,13 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
             const roles = Array.isArray(tenant?.roles) ? tenant.roles : [];
             if (roles.length < 2) return false;
 
-            const normalizedRoles = roles.map((role: any) =>
-              role?.roleName?.trim().toLowerCase()
+            const normalizedRoles = new Set(
+              roles.map((role: any) => role?.roleName?.trim().toLowerCase())
             );
 
             return (
-              normalizedRoles.includes('lead') &&
-              normalizedRoles.includes('instructor')
+              normalizedRoles.has('lead') &&
+              normalizedRoles.has('instructor')
             );
           });
           setShowSwitchButton(shouldShowButton);
