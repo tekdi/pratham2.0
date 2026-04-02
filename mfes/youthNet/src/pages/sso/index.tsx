@@ -70,6 +70,44 @@ const SSOContent = () => {
   const authenticationRef = useRef(false); // Additional safeguard with useRef
   const [loading, setLoading] = useState(false);
 
+  const getActiveAcademicYearId = async () => {
+    const academicYearResponse = await getAcademicYear();
+    let academicYearList: any[] = [];
+    if (Array.isArray(academicYearResponse)) {
+      academicYearList = academicYearResponse;
+    } else if (Array.isArray(academicYearResponse?.data)) {
+      academicYearList = academicYearResponse.data;
+    }
+
+    if (academicYearList.length) {
+      localStorage.setItem('academicYearList', JSON.stringify(academicYearList));
+      const activeSession = academicYearList.find((item: any) => item?.isActive);
+      return activeSession?.id || '';
+    }
+
+    return '';
+  };
+
+  const getRouteByProgramAndRole = (tenantName?: string, roleName?: string) => {
+    const normalizedTenant = tenantName?.trim().toLowerCase();
+    const normalizedRole = roleName?.trim().toLowerCase();
+
+    if (
+      normalizedTenant === TenantName.PRAGYANPATH.toLowerCase() &&
+      normalizedRole?.includes('lead')
+    ) {
+      return '/manager-dashboard';
+    }
+
+    if (
+      normalizedTenant === TenantName.YOUTHNET.toLowerCase() 
+    ) {
+      return '/';
+    }
+
+    return '/unauthorized';
+  };
+
   useEffect(() => {
     // Prevent duplicate authentication calls using both state and ref
     if (hasAuthenticated || authenticationRef.current) {
@@ -140,13 +178,6 @@ const SSOContent = () => {
             { remember: false }
           );
           showToastMessage('Authentication successful!', 'success');
-
-          // Redirect after brief success display
-          setTimeout(() => {
-           
-              router.push('/manager-dashboard');
-            
-          }, 3000);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -190,6 +221,9 @@ const SSOContent = () => {
       }
 
       const userResponse = await getUserId();
+        if (userResponse?.tenantData) {
+          localStorage.setItem('tenantData', JSON.stringify(userResponse.tenantData));
+        }
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem('temporaryPassword', userResponse?.temporaryPassword);
         // Safely set tenantId with fallback - try userResponse first, then URL param
@@ -272,10 +306,12 @@ const SSOContent = () => {
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
         localStorage.setItem('userProgram', tenantName);
-        if (tenantName === TenantName.YOUTHNET) {
-          const academicYearResponse = await getAcademicYear();
-          if (academicYearResponse[0]?.id) {
-            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        const isYouthnetTenant =
+          tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
+        if (isYouthnetTenant) {
+          const activeAcademicYearId = await getActiveAcademicYearId();
+          if (activeAcademicYearId) {
+            localStorage.setItem('academicYearId', activeAcademicYearId);
           }
         }
         const telemetryInteract = {
@@ -310,10 +346,10 @@ const SSOContent = () => {
           label: 'Login Button Clicked',
         });
         setTimeout(() => {
-           
-          router.push('/manager-dashboard');
-        
-      }, 3000);      } else {
+          const targetRoute = getRouteByProgramAndRole(tenantName, roleName);
+          router.push(targetRoute);
+        }, 3000);
+      } else {
         console.log("Authentication failed - invalid user role");
         showToastMessage('Authentication failed - invalid user role', 'error');
         const telemetryInteract = {
