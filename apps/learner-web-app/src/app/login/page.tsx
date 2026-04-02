@@ -283,7 +283,7 @@ const LoginPage = () => {
         localStorage.setItem('templtateId', tenantData?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
-
+        localStorage.setItem('lastName', userResponse?.lastName || '');
         const uiConfig = tenantData?.params?.uiConfig;
         const landingPage = tenantData?.params?.uiConfig?.landingPage;
         localStorage.setItem('landingPage', landingPage);

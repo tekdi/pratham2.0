@@ -209,6 +209,7 @@ const SSOContent = () => {
       }
 
       localStorage.setItem('firstName', userResponse?.firstName);
+      localStorage.setItem('lastName', userResponse?.lastName);
       localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
 
       setTimeout(async () => {

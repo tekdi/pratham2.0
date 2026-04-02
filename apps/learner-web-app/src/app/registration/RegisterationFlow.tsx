@@ -772,7 +772,7 @@ const RegisterationFlow = () => {
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('name', userResponse?.firstName);
         localStorage.setItem('firstName', userResponse?.firstName || '');
-
+        localStorage.setItem('lastName', userResponse?.lastName || '');
         // Persist selected tenant/role
         localStorage.setItem('tenantName', selectedTenantName);
         localStorage.setItem('roleId', selectedRoleId);
