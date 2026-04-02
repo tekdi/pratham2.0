@@ -8,6 +8,7 @@ import { useTranslation } from 'next-i18next';
 import router from 'next/router';
 import { useEffect, useState } from 'react';
 import { RequisiteType } from '../../app.config';
+import ConfirmationModal from './ConfirmationModal';
 import RequisitesAccordion from './RequisitesAccordion';
 import { showToastMessage } from './Toastify';
 
@@ -36,6 +37,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const [contentData, setContentData] = useState<LearningResource[]>([]);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
 
   useEffect(() => {
     const content = learningResources?.filter((resource: any) => {
@@ -53,6 +55,11 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
   };
 
   const onRemoveTopicSubtopic = () => {
+    setConfirmationOpen(true);
+  };
+
+  const handleConfirmRemove = () => {
+    setConfirmationOpen(false);
     handleRemove();
   };
 
@@ -137,7 +144,16 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
             gap: '5px',
             mt: 2,
             alignItems: 'center',
+            cursor:
+              eventStatus === EventStatus.UPCOMING ? 'pointer' : 'not-allowed',
+            pointerEvents:
+              eventStatus === EventStatus.UPCOMING ? 'auto' : 'none',
           }}
+          onClick={
+            eventStatus === EventStatus.UPCOMING
+              ? onRemoveTopicSubtopic
+              : undefined
+          }
         >
           <Box
             sx={{
@@ -147,18 +163,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
                   ? theme?.palette?.secondary.main
                   : theme?.palette?.grey[500],
               fontWeight: '500',
-              cursor:
-                eventStatus === EventStatus.UPCOMING
-                  ? 'pointer'
-                  : 'not-allowed',
-              pointerEvents:
-                eventStatus === EventStatus.UPCOMING ? 'auto' : 'none',
             }}
-            onClick={
-              eventStatus === EventStatus.UPCOMING
-                ? onRemoveTopicSubtopic
-                : undefined
-            }
           >
             {t('CENTER_SESSION.REMOVE_TOPIC_SUBTOPIC')}
           </Box>
@@ -196,6 +201,16 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
           subTopic={subTopic}
         />
       </Box>
+      <ConfirmationModal
+        message={t('CENTER_SESSION.REMOVE_TOPIC_SUBTOPIC_CONFIRMATION')}
+        buttonNames={{
+          primary: t('COMMON.YES'),
+          secondary: t('COMMON.NO_GO_BACK'),
+        }}
+        handleCloseModal={() => setConfirmationOpen(false)}
+        handleAction={handleConfirmRemove}
+        modalOpen={confirmationOpen}
+      />
     </>
   );
 };

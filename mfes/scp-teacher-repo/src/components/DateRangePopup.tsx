@@ -147,10 +147,16 @@ const DateRangePopup: React.FC<CustomSelectModalProps> = ({
     let toDate = formatDate(today);
 
     switch (index) {
-      case 0:
-        fromDate = new Date(today);
-        fromDate.setDate(today.getDate() - 6);
+      case 0: {
+        // Last 7 Days: up to yesterday (batch-level attendance from cron at EOD)
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const start = new Date(yesterday);
+        start.setDate(yesterday.getDate() - 6);
+        fromDate = formatDate(start);
+        toDate = formatDate(yesterday);
         break;
+      }
       case 1:
         fromDate = new Date(today);
         break;
