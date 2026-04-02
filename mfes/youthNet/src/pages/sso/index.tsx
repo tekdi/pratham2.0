@@ -211,6 +211,7 @@ const SSOContent = () => {
           console.warn('No tenantId available from response or URL parameters');
         }
         localStorage.setItem('firstName', userResponse?.firstName);
+        localStorage.setItem('lastName', userResponse?.lastName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
@@ -256,6 +257,7 @@ const SSOContent = () => {
         localStorage.setItem('templtateId', tenantData?.templateId || '');
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
+        localStorage.setItem('lastName', userResponse?.lastName || '');
         localStorage.setItem('userName', userResponse?.firstName);
         localStorage.setItem('userData', JSON.stringify(userResponse));
 

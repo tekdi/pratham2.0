@@ -208,6 +208,7 @@ const SSOContent = () => {
         (tenant: any) => tenant.tenantName === "Pragyanpath"
        )?.templateId);
       localStorage.setItem('firstName', userResponse?.firstName);
+      localStorage.setItem('lastName', userResponse?.lastName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
@@ -313,7 +314,7 @@ const SSOContent = () => {
          )?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
-
+        localStorage.setItem('lastName', userResponse?.lastName || '');
         const uiConfig = tenantData?.find(
           (tenant: any) => tenant.tenantName === "Pragyanpath"
          )?.params?.uiConfig;

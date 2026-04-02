@@ -83,7 +83,7 @@ const EnrollProfileCompletionInner = () => {
         localStorage.setItem('templtateId', tenantData?.templateId);
       localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
       localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
-
+      localStorage.setItem('lastName', userResponse?.result?.userData?.lastName || '');
         const tenantId = tenantData?.tenantId;
         const tenantName = tenantData?.tenantName;
         const uiConfig = tenantData?.params?.uiConfig;

@@ -27,6 +27,7 @@ interface PlayerProps {
   userId?: string;
   configFunctionality?: any;
   firstName?: string;
+  lastName?: string;
 }
 
 const SunbirdPlayers = ({
@@ -36,6 +37,7 @@ const SunbirdPlayers = ({
   userId,
   configFunctionality,
   firstName,
+  lastName,
 }: PlayerProps) => {
   console.log('workspace playerconfig', playerConfig);
 
@@ -46,12 +48,15 @@ const SunbirdPlayers = ({
     if (typeof updatedPlayerConfig?.context !== 'object' || updatedPlayerConfig?.context === null) {
       updatedPlayerConfig.context = {};
     }
-    if (firstName) {
-      updatedPlayerConfig.context.userData = { firstName: firstName, lastName: '' };
+    let playerFirstName = firstName;
+    let playerLastName = lastName;
+    if(!playerFirstName) {
+      playerFirstName = 'Guest';
     }
-    else {
-      updatedPlayerConfig.context.userData = { firstName: 'Guest', lastName: 'User' };
+    if(!playerLastName) {
+      playerLastName = 'User';
     }
+    updatedPlayerConfig.context.userData = { firstName: playerFirstName, lastName: playerLastName };
   }
   switch (mimeType) {
     case 'application/pdf':
