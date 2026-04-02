@@ -250,7 +250,7 @@ const CreateAccountForm = ({
         <TextField
           label={t('NAVAPATHAM.USERNAME')}
           value={username}
-          onChange={(e) => handleUsernameChange(e.target.value.replace(/\s+/g, ''))}
+          onChange={(e) => handleUsernameChange(e.target.value.replaceAll(/\s+/g, ''))}
           onBlur={(e) => handleUsernameBlur(e.target.value)}
           fullWidth
           margin="normal"

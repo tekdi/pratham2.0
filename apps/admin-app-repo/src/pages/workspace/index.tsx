@@ -1,5 +1,4 @@
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 const HomePage = () => {
@@ -15,7 +14,9 @@ const HomePage = () => {
     // router.push() is only for internal Next.js routes — using it with
     // an external URL causes a crash/abort in the router.
     if (path) {
-      window.location.href = path;
+      if (typeof globalThis !== 'undefined' && globalThis.location) {
+        globalThis.location.href = path;
+      }
     }
   }, [path]);
 

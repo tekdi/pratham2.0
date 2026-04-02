@@ -4,7 +4,7 @@ import { TextField } from '@mui/material';
 import { WidgetProps } from '@rjsf/utils';
 
 // Fields for which spaces should be stripped entirely
-const NO_SPACE_FIELDS = ['firstName', 'lastName', 'middleName', 'username'];
+const NO_SPACE_FIELDS = new Set(['firstName', 'lastName', 'middleName', 'username']);
 
 const CustomTextFieldWidget = ({
   id,
@@ -23,12 +23,12 @@ const CustomTextFieldWidget = ({
 }: WidgetProps) => {
   // Derive the field name from the RJSF id (e.g. "root_firstName" -> "firstName")
   const fieldName = id ? id.replace(/^root[_.]/, '') : '';
-  const isNoSpaceField = NO_SPACE_FIELDS.includes(fieldName);
+  const isNoSpaceField = NO_SPACE_FIELDS.has(fieldName);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     let val = event.target.value;
     if (isNoSpaceField) {
-      val = val.replace(/\s/g, ''); // Remove all whitespace characters
+      val = val.replaceAll(/\s/g, ''); // Remove all whitespace characters
     }
     onChange(val === '' ? undefined : val);
   };
@@ -36,7 +36,7 @@ const CustomTextFieldWidget = ({
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     let val = event.target.value;
     if (isNoSpaceField) {
-      val = val.replace(/\s/g, '');
+      val = val.replaceAll(/\s/g, '');
     }
     onBlur(id, val);
   };
@@ -46,7 +46,7 @@ const CustomTextFieldWidget = ({
 
   // Reflect stripped value in the displayed input for no-space fields
   const displayValue = isNoSpaceField
-    ? (value ?? '').replace(/\s/g, '')
+    ? (value ?? '').replaceAll(/\s/g, '')
     : (value ?? '');
 
   // Filter out 'is a required property' messages

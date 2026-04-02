@@ -128,7 +128,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             {typeof centers === "string"
               ? centers.split(", ").map((center: string, index: number) => (
                   <Typography
-                    key={index}
+                    key={center.trim()}
                     variant="body2"
                     sx={{
                       padding: "4px 6px",
