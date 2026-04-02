@@ -1,7 +1,10 @@
 import "server-only";
 
 import { NextRequest, NextResponse } from "next/server";
-import { BetaAnalyticsDataClient } from "@google-analytics/data";
+import { BetaAnalyticsDataClient, protos } from "@google-analytics/data";
+
+type IFilterExpression = protos.google.analytics.data.v1beta.IFilterExpression;
+type IRunReportResponse = protos.google.analytics.data.v1beta.IRunReportResponse;
 // import serviceAccount from "../../../../utils/service-account";
 interface ServiceAccountConfig {
   type?: string;
@@ -160,13 +163,6 @@ export async function GET(request: NextRequest) {
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
 
-    if (!pagePath) {
-      return NextResponse.json(
-        { error: "Query parameter 'path' is required" },
-        { status: 400 }
-      );
-    }
-
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     let startDate: string;
     let endDate: string;
@@ -196,48 +192,60 @@ export async function GET(request: NextRequest) {
       endDate = end;
     }
 
+    // Build dimension filter:
+    // - If pagePath is provided: filter by BOTH pagePath AND eventName=page_view
+    // - If no pagePath: filter only by eventName=page_view (returns total across all pages)
+    const dimensionFilter: IFilterExpression = pagePath
+      ? {
+          andGroup: {
+            expressions: [
+              {
+                filter: {
+                  fieldName: "pagePath",
+                  stringFilter: { matchType: "EXACT" as const, value: pagePath },
+                },
+              },
+              {
+                filter: {
+                  fieldName: "eventName",
+                  stringFilter: { matchType: "EXACT" as const, value: "page_view" },
+                },
+              },
+            ],
+          },
+        }
+      : {
+          filter: {
+            fieldName: "eventName",
+            stringFilter: { matchType: "EXACT" as const, value: "page_view" },
+          },
+        };
+
     const analyticsDataClient = getAnalyticsClient();
-    const [report] = await analyticsDataClient.runReport({
+    const reportResponse = await analyticsDataClient.runReport({
       property: `properties/${PROPERTY_ID}`,
-      //dimensions: [{ name: "pagePath" }],
-      dimensions: [
-        { name: "pagePath" },
-        { name: "eventName" },
-      ],
-    //  metrics: [{ name: "screenPageViews" }],
-    metrics: [{ name: "eventCount" }],
- 
-dimensionFilter: {
-  andGroup: {
-    expressions: [
-      {
-        filter: {
-          fieldName: "pagePath",
-          stringFilter: { matchType: "EXACT", value: pagePath },
-        },
-      },
-      {
-        filter: {
-          fieldName: "eventName",
-          stringFilter: { matchType: "EXACT", value: "page_view" },
-        },
-      },
-    ],
-  },
-},
-
-      // dimensionFilter: {
-      //   filter: {
-      //     fieldName: "pagePath",
-      //     stringFilter: { matchType: "EXACT", value: pagePath },
-      //   },
-      // },
+      dimensions: pagePath
+        ? [{ name: "pagePath" }, { name: "eventName" }]
+        : [{ name: "eventName" }],
+      metrics: [{ name: "eventCount" }],
+      dimensionFilter,
       dateRanges: [{ startDate, endDate }],
-      limit: 1,
+      limit: pagePath ? 1 : undefined,
     });
+    const report = (reportResponse as unknown as [IRunReportResponse])[0];
 
-    const rawValue = report.rows?.[0]?.metricValues?.[0]?.value ?? "0";
-    const pageViews = Number.parseInt(rawValue, 10) || 0;
+    // When pagePath is provided, take the single matched row.
+    // When no pagePath, sum all rows to get the total page_view count across all pages.
+    let pageViews: number;
+    if (pagePath) {
+      const rawValue = report.rows?.[0]?.metricValues?.[0]?.value ?? "0";
+      pageViews = Number.parseInt(rawValue, 10) || 0;
+    } else {
+      pageViews = (report.rows ?? []).reduce((sum: number, row: protos.google.analytics.data.v1beta.IRow) => {
+        const val = Number.parseInt(row.metricValues?.[0]?.value ?? "0", 10) || 0;
+        return sum + val;
+      }, 0);
+    }
 
     return NextResponse.json({ pageViews });
   } catch (error) {
