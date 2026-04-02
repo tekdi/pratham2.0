@@ -99,10 +99,20 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
           setTenantData(filteredTenantData);
 
           
-          // Show switch button if there are multiple tenants or multiple roles in any tenant
-          const shouldShowButton = 
-          filteredTenantData.length > 1 || 
-          filteredTenantData.some((tenant: any) => tenant?.roles?.length > 1);
+          // Show switch button only when a tenant has both Lead and Instructor roles
+          const shouldShowButton = filteredTenantData.some((tenant: any) => {
+            const roles = Array.isArray(tenant?.roles) ? tenant.roles : [];
+            if (roles.length < 2) return false;
+
+            const normalizedRoles = roles.map((role: any) =>
+              role?.roleName?.trim().toLowerCase()
+            );
+
+            return (
+              normalizedRoles.includes('lead') &&
+              normalizedRoles.includes('instructor')
+            );
+          });
           setShowSwitchButton(shouldShowButton);
         } catch (error) {
           console.error('Error parsing tenantData:', error);
