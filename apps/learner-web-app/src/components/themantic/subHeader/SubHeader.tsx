@@ -57,13 +57,13 @@ const SubHeader = ({
           filters: {
             program: 'Experimento India',
             status: ['live'],
-            channel: 'scp-channel',
             primaryCategory: [
               'Learning Resource',
               'Practice Question Set',
               'Activity',
               'Story',
               'Interactive',
+              'Course',
             ],
           },
           fields: ['contentLanguage'],
