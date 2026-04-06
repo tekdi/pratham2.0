@@ -22,7 +22,6 @@ function AssessmentAttemptDetail() {
   const theme = useTheme<any>();
   const { t } = useTranslation();
   const { isRTL } = useDirection();
-  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const params = useParams<{ 
     userId: string; 
@@ -136,19 +135,20 @@ function AssessmentAttemptDetail() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-GB', {
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return (
+      date.toLocaleDateString('en-GB', {
         day: '2-digit',
-        month: '2-digit', 
-        year: 'numeric'
-      }) + ' ' + date.toLocaleTimeString('en-GB', {
+        month: '2-digit',
+        year: 'numeric',
+      }) +
+      ' ' +
+      date.toLocaleTimeString('en-GB', {
         hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      return 'N/A';
-    }
+        minute: '2-digit',
+      })
+    );
   };
 
   const getScoreColor = (pass: string) => {

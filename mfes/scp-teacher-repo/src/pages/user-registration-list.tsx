@@ -74,8 +74,6 @@ const UserRegistrationList = () => {
   const [locationFilters, setLocationFilters] = useState<LocationFilters>(storedFilters?.locationFilters || {});
   const [chartTrigger, setChartTrigger] = useState(false);
   const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
-  const [userAssessments, setUserAssessments] = useState<{[userId: string]: any}>({});
-  const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
   const hasLocationFilters =
@@ -199,7 +197,7 @@ const UserRegistrationList = () => {
       const response = await getZatpatTestIdentifiers();
       console.log('🔍 Zatpat API response:', response);
       
-      if (response && response.result && response.result.QuestionSet) {
+      if (response?.result?.QuestionSet) {
         const identifiers = response.result.QuestionSet.map((item: any) => item.identifier);
         console.log('🔍 Extracted zatpat identifiers:', identifiers);
         setZatpatTestIdentifiers(identifiers);
@@ -288,7 +286,6 @@ const UserRegistrationList = () => {
           }
         });
         
-        setUserAssessments(prev => ({ ...prev, ...assessmentMap }));
         return assessmentMap;
       }
       return {};
@@ -296,7 +293,7 @@ const UserRegistrationList = () => {
       console.error('Error fetching user assessments:', error);
       return {};
     } finally {
-      setAssessmentLoading(false);
+     // setAssessmentLoading(false);
     }
   }, [zatpatTestIdentifiers]);
 
@@ -540,15 +537,15 @@ const UserRegistrationList = () => {
 
   // Make reset function available globally for debugging (development only)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).resetUserRegistrationFilters = resetFiltersToDefault;
+  if (typeof globalThis.window !== 'undefined') {
+    (globalThis.window as any).resetUserRegistrationFilters = resetFiltersToDefault;
       console.log('🛠️ Reset filters function available as window.resetUserRegistrationFilters()');
     }
     
     // Cleanup function
     return () => {
-      if (typeof window !== 'undefined') {
-        delete (window as any).resetUserRegistrationFilters;
+      if (typeof globalThis.window !== 'undefined') {
+      delete (globalThis.window as any).resetUserRegistrationFilters;
       }
     };
   }, []);
