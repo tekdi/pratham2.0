@@ -71,13 +71,18 @@ export const getCohortList = async (
       );
       let res = filtered;
 
+      // When role is not set in localStorage, default to Teacher behaviour so
+      // that the flresponsetotl path reconstructs the proper center hierarchy
+      // from BATCH-level parentIds instead of returning raw BATCH items.
+      const effectiveRole = localStorage.getItem('role') ?? localStorage.getItem('roleName')
+
       res = res.filter((block: any) => {
         if (
           block?.cohortStatus === Status.ACTIVE &&
           //if no center then also show in list only for facilitator
-          ((localStorage.getItem('role') === Role.TEACHER &&
+          ((effectiveRole === Role.TEACHER &&
             block?.childData.length > 0) ||
-            localStorage.getItem('role') !== Role.TEACHER)
+            effectiveRole !== Role.TEACHER)
           //
         ) {
           return block;
@@ -95,7 +100,8 @@ export const getCohortList = async (
         });
         //patch for alter response for facilitator
         try {
-          if (localStorage.getItem('role') === Role.TEACHER) {
+          // Also call flresponsetotl when role is null (defaults to Teacher)
+          if (effectiveRole === Role.TEACHER) {
             res = await flresponsetotl(res);
             // console.log('########## response', res);
           }

@@ -260,9 +260,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
       setRole(role);
       const storedUserId = localStorage.getItem('userId');
       setClassId(localStorage.getItem('classId') ?? '');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d2b738fb-79d4-4559-93b3-73b712825063',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:auth-check',message:'H-A: dashboard token check fired',data:{hasToken:!!token,hasRole:!!role,hasUserId:!!storedUserId,userProgram:localStorage.getItem('userProgram'),tenantName:localStorage.getItem('tenantName'),willRedirectToLogin:!token},timestamp:Date.now(),hypothesisId:'H-A'})}).catch(()=>{});
-      // #endregion
       if (token) {
         setIsAuthenticated(true);
         setUserId(storedUserId);
