@@ -70,6 +70,48 @@ const SSOContent = () => {
   const authenticationRef = useRef(false); // Additional safeguard with useRef
   const [loading, setLoading] = useState(false);
 
+  const getActiveAcademicYearId = async () => {
+    const academicYearResponse = await getAcademicYear();
+    let academicYearList: any[] = [];
+    if (Array.isArray(academicYearResponse)) {
+      academicYearList = academicYearResponse;
+    } else if (Array.isArray(academicYearResponse?.data)) {
+      academicYearList = academicYearResponse.data;
+    }
+
+    if (academicYearList.length) {
+      localStorage.setItem('academicYearList', JSON.stringify(academicYearList));
+      const activeSession = academicYearList.find((item: any) => item?.isActive);
+      return activeSession?.id || '';
+    }
+
+    return '';
+  };
+
+  const getRouteByProgramAndRole = (tenantName?: string, roleName?: string) => {
+    const normalizedTenant = tenantName?.trim().toLowerCase();
+    const normalizedRole = roleName?.trim().toLowerCase();
+
+    if (
+      normalizedTenant === TenantName.PRAGYANPATH.toLowerCase() &&
+      normalizedRole?.includes('lead')
+    ) {
+      return '/manager-dashboard';
+    }
+
+    if (
+      normalizedTenant === TenantName.YOUTHNET.toLowerCase() 
+    ) {
+      return '/';
+    }
+
+    if (normalizedTenant === TenantName.SECOND_CHANCE_PROGRAM.toLowerCase()) {
+      return '/teacher';
+    }
+
+    return '/unauthorized';
+  };
+
   useEffect(() => {
     // Prevent duplicate authentication calls using both state and ref
     if (hasAuthenticated || authenticationRef.current) {
@@ -140,13 +182,6 @@ const SSOContent = () => {
             { remember: false }
           );
           showToastMessage('Authentication successful!', 'success');
-
-          // Redirect after brief success display
-          setTimeout(() => {
-           
-              router.push('/manager-dashboard');
-            
-          }, 3000);
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -190,6 +225,9 @@ const SSOContent = () => {
       }
 
       const userResponse = await getUserId();
+        if (userResponse?.tenantData) {
+          localStorage.setItem('tenantData', JSON.stringify(userResponse.tenantData));
+        }
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem('temporaryPassword', userResponse?.temporaryPassword);
         // Safely set tenantId with fallback - try userResponse first, then URL param
@@ -197,12 +235,21 @@ const SSOContent = () => {
         const tenantIdFromUrl = searchParams.get('tenantid');
         const finalTenantId = tenantIdFromResponse || tenantIdFromUrl;
 
-        const hasLead = userResponse?.tenantData[0]?.roles.some((role: any) =>
-          role.roleName.toLowerCase().includes("lead")
+        // Check across ALL tenants: allow Lead roles (Pragyanpath/YouthNet)
+        // OR Instructor/Teacher roles in Second Chance Program
+        const hasValidRole = userResponse?.tenantData?.some((tenant: any) =>
+          tenant.roles.some((role: any) => {
+            const rn = role.roleName.toLowerCase();
+            const tn = tenant.tenantName?.toLowerCase();
+            return (
+              rn.includes('lead') ||
+              (tn === TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
+                (rn.includes('instructor') || rn.includes('teacher')))
+            );
+          })
         );
-        if(!hasLead) {
+        if (!hasValidRole) {
           window.location.href = '/unauthorized';
-        //  router.push('/unauthorized');
         }
         if (finalTenantId) {
           localStorage.setItem('tenantId', finalTenantId);
@@ -211,6 +258,7 @@ const SSOContent = () => {
           console.warn('No tenantId available from response or URL parameters');
         }
         localStorage.setItem('firstName', userResponse?.firstName);
+        localStorage.setItem('lastName', userResponse?.lastName);
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
         console.log('response=========>', res?.result);
@@ -248,7 +296,14 @@ const SSOContent = () => {
         typeof window !== 'undefined' && window.localStorage
           ? localStorage.getItem('token')
           : '';
-      if (roleName === 'Lead') {
+      const isLeadRole = roleName?.toLowerCase().includes('lead');
+      const isSecondChanceProgramRole =
+        tenantName?.trim().toLowerCase() ===
+          TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
+        (roleName?.toLowerCase().includes('instructor') ||
+          roleName?.toLowerCase().includes('teacher'));
+
+      if (isLeadRole || isSecondChanceProgramRole) {
         const tenantData = userResponse?.tenantData?.find(
           (tenant: any) => tenant.tenantId === tenantId
         );
@@ -256,6 +311,7 @@ const SSOContent = () => {
         localStorage.setItem('templtateId', tenantData?.templateId || '');
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
+        localStorage.setItem('lastName', userResponse?.lastName || '');
         localStorage.setItem('userName', userResponse?.firstName);
         localStorage.setItem('userData', JSON.stringify(userResponse));
 
@@ -270,11 +326,36 @@ const SSOContent = () => {
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
         localStorage.setItem('userProgram', tenantName);
-        if (tenantName === TenantName.YOUTHNET) {
-          const academicYearResponse = await getAcademicYear();
-          if (academicYearResponse[0]?.id) {
-            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        const isYouthnetTenant =
+          tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
+        if (isYouthnetTenant) {
+          const activeAcademicYearId = await getActiveAcademicYearId();
+          if (activeAcademicYearId) {
+            localStorage.setItem('academicYearId', activeAcademicYearId);
           }
+        }
+
+        const isSecondChanceProgramTenant =
+          tenantName?.trim().toLowerCase() ===
+          TenantName.SECOND_CHANCE_PROGRAM.toLowerCase();
+        if (isSecondChanceProgramTenant) {
+          const activeAcademicYearId = await getActiveAcademicYearId();
+          if (activeAcademicYearId) {
+            localStorage.setItem('academicYearId', activeAcademicYearId);
+          }
+          // Seed the scp-teacher-repo Zustand store (persisted under 'teacherApp')
+          // so that withAccessControl finds a valid accessToken + userRole on load
+          const existingTeacherApp = localStorage.getItem('teacherApp');
+          const teacherAppStore = existingTeacherApp
+            ? JSON.parse(existingTeacherApp)
+            : { state: {}, version: 0 };
+          teacherAppStore.state = {
+            ...teacherAppStore.state,
+            accessToken: token,
+            userRole: roleName, // 'Instructor' for SCP teacher
+            isActiveYearSelected: activeAcademicYearId || true,
+          };
+          localStorage.setItem('teacherApp', JSON.stringify(teacherAppStore));
         }
         const telemetryInteract = {
           context: { env: 'sign-in', cdata: [] },
@@ -308,10 +389,16 @@ const SSOContent = () => {
           label: 'Login Button Clicked',
         });
         setTimeout(() => {
-           
-          router.push('/manager-dashboard');
-        
-      }, 3000);      } else {
+          const targetRoute = getRouteByProgramAndRole(tenantName, roleName);
+          if (isSecondChanceProgramTenant) {
+            // Use window.location.href to escape the '/youthnet' basePath
+            // so we land on http://host/teacher instead of http://host/youthnet/teacher
+            window.location.href = targetRoute;
+          } else {
+            router.push(targetRoute);
+          }
+        }, 3000);
+      } else {
         console.log("Authentication failed - invalid user role");
         showToastMessage('Authentication failed - invalid user role', 'error');
         const telemetryInteract = {

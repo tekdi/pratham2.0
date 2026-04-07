@@ -26,6 +26,8 @@ interface PlayerProps {
   unitId?: string;
   userId?: string;
   configFunctionality?: any;
+  firstName?: string;
+  lastName?: string;
 }
 
 const SunbirdPlayers = ({
@@ -34,15 +36,33 @@ const SunbirdPlayers = ({
   unitId,
   userId,
   configFunctionality,
+  firstName,
+  lastName,
 }: PlayerProps) => {
   console.log('workspace playerconfig', playerConfig);
 
   const mimeType = playerConfig?.metadata?.mimeType;
+  let updatedPlayerConfig = playerConfig;
+  //set firname and lastname
+  if (updatedPlayerConfig) {
+    if (typeof updatedPlayerConfig?.context !== 'object' || updatedPlayerConfig?.context === null) {
+      updatedPlayerConfig.context = {};
+    }
+    let playerFirstName = firstName;
+    let playerLastName = lastName;
+    if(!playerFirstName) {
+      playerFirstName = 'Guest';
+    }
+    if(!playerLastName) {
+      playerLastName = 'User';
+    }
+    updatedPlayerConfig.context.userData = { firstName: playerFirstName, lastName: playerLastName };
+  }
   switch (mimeType) {
     case 'application/pdf':
       return (
         <SunbirdPdfPlayer
-          playerConfig={playerConfig}
+          playerConfig={updatedPlayerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
         />
@@ -53,7 +73,7 @@ const SunbirdPlayers = ({
     case 'audio/wav':
       return (
         <SunbirdVideoPlayer
-          playerConfig={playerConfig}
+          playerConfig={updatedPlayerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
         />
@@ -61,7 +81,7 @@ const SunbirdPlayers = ({
     case 'application/vnd.sunbird.questionset':
       return (
         <SunbirdQuMLPlayer
-          playerConfig={playerConfig}
+          playerConfig={updatedPlayerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
         />
@@ -69,7 +89,7 @@ const SunbirdPlayers = ({
     case 'application/epub':
       return (
         <SunbirdEpubPlayer
-          playerConfig={playerConfig}
+          playerConfig={updatedPlayerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
         />
@@ -81,7 +101,7 @@ const SunbirdPlayers = ({
       //case 'application/vnd.ekstep.ecml-archive':
       return (
         <SunbirdV1Player
-          playerConfig={playerConfig}
+          playerConfig={updatedPlayerConfig}
           relatedData={{ courseId, unitId, userId }}
           configFunctionality={configFunctionality}
         />

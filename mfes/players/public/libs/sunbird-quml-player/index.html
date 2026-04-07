@@ -58,6 +58,7 @@
         let qumlPlayerConfig = null;
         let questionListUrl = null;
         let questionsData = null;
+        let contentId = null;
         if (localStorage.getItem('qumlPlayerObject')) {
           let jsonObj = JSON.parse(localStorage.getItem('qumlPlayerObject'));
           qumlPlayerConfig = jsonObj?.qumlPlayerConfig;
@@ -80,6 +81,8 @@
         ) {
           //alert("in if ");
           const playerConfig = qumlPlayerConfig;
+          contentId = qumlPlayerConfig?.metadata?.identifier;
+          localStorage.removeItem(contentId+"_trackDATA");
           let sectionContent = qumlPlayerConfig.metadata;
           const identifierWithoutImg = sectionContent.identifier.replace(
             '.img',
@@ -198,7 +201,10 @@
                   });
                 }
               }
-              localStorage.setItem('trackDATA', JSON.stringify(trackData));
+              localStorage.setItem(
+                contentId + '_trackDATA',
+                JSON.stringify(trackData)
+              );
             } else if (telemetry?.eid === 'END') {
               let originalDuration = event?.detail?.edata?.duration;
               let newDuration = originalDuration / 10;
@@ -214,7 +220,7 @@
             if (endPageSeen && endPageSeen.value === 'true' && !apiCalled) {
               apiCalled = true;
 
-              let trackDataOld = localStorage.getItem('trackDATA');
+              let trackDataOld = localStorage.getItem(contentId + '_trackDATA');
               let trackDataParsed = JSON.parse(trackDataOld);
               let scoreDetails;
 
@@ -249,6 +255,7 @@
                   maxScore: maxScore,
                   seconds: seconds,
                 };
+                localStorage.removeItem(contentId + '_trackDATA');
                 window.parent.postMessage(JSON.stringify(result_submit));
               } catch (error) {
                 console.error('Error submitting assessment:', error);

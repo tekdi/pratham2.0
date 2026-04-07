@@ -35,15 +35,22 @@ export const labelsToExtractForMiniProfile = [
 export const getMenuItems = (
   t: TFunction,
   dateRange: string | Date,
-  currentDayMonth: string | Date
+  currentDayMonth: string | Date,
+  options?: { useYesterdayLabel?: boolean; yesterdayDate?: string }
 ) => {
+  const secondItem =
+    options?.useYesterdayLabel && options?.yesterdayDate
+      ? t('DASHBOARD.AS_OF_YESTERDAY_DATE', {
+          day_date: options.yesterdayDate,
+        })
+      : t('DASHBOARD.AS_OF_TODAY_DATE', {
+          day_date: currentDayMonth,
+        });
   return [
     t('DASHBOARD.LAST_SEVEN_DAYS_RANGE', {
       date_range: dateRange,
     }),
-    t('DASHBOARD.AS_OF_TODAY_DATE', {
-      day_date: currentDayMonth,
-    }),
+    secondItem,
     t('COMMON.LAST_MONTH'),
     t('COMMON.LAST_SIX_MONTHS'),
     t('COMMON.CUSTOM_RANGE'),

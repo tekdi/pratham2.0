@@ -1,4 +1,4 @@
-import { bulkAttendance } from '@/services/AttendanceService';
+import { bulkAttendanceV2 } from '@/services/AttendanceService';
 import { Box, Button, Divider, Fade, Modal, Typography } from '@mui/material';
 import React, { useEffect } from 'react';
 import {
@@ -9,8 +9,10 @@ import {
 
 import { Telemetry } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
+import IconButton from '@mui/material/IconButton';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import ReactGA from 'react-ga4';
@@ -22,11 +24,21 @@ import Loader from './Loader';
 import { showToastMessage } from './Toastify';
 import { modalStyles } from '@/styles/modalStyles';
 
+/** When provided, attendance is marked at session/event level (contextId = eventRepetitionId, context = 'event') */
+export interface SelectedSessionForAttendance {
+  eventRepetitionId: string;
+}
+
 interface MarkBulkAttendanceProps {
   open: boolean;
   onClose: () => void;
+  onBack?: () => void;
   classId: string;
   selectedDate: Date;
+  /** When set, bulk attendance is submitted with contextId = eventRepetitionId and context = 'event' */
+  selectedSession?: SelectedSessionForAttendance | null;
+  /** Show loader until session-level prefill data is loaded (when opened from session card) */
+  prefillLoading?: boolean;
   onSaveSuccess?: (isModified?: boolean) => void;
   memberList: Array<{}>;
   presentCount: number;
@@ -40,8 +52,11 @@ interface MarkBulkAttendanceProps {
 const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
   open,
   onClose,
+  onBack,
   classId,
   selectedDate,
+  selectedSession,
+  prefillLoading = false,
   onSaveSuccess,
   memberList,
   presentCount,
@@ -138,25 +153,70 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
     }
   }, []);
 
+  // Sync from props when modal is open so session-level attendance (loaded async) is shown
+  useEffect(() => {
+    if (!open) return;
+    setCohortMemberList(deepClone(memberList ?? []));
+    setDynamicPresentCount(presentCount ?? 0);
+    setDynamicAbsentCount(absentCount ?? 0);
+    setBulkAttendanceStatus(bulkStatus ?? '');
+    const list = memberList ?? [];
+    const allMarked =
+      list.length > 0 &&
+      list.every(
+        (u: any) => u.attendance === 'present' || u.attendance === 'absent'
+      );
+    setIsAllAttendanceMarked(allMarked);
+  }, [open, memberList, presentCount, absentCount, bulkStatus]);
+
+  const isSelectedDateToday = (date: Date): boolean => {
+    const today = new Date();
+    return (
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate()
+    );
+  };
+
   const handleSave = () => {
     onClose();
-    const userAttendance = cohortMemberList?.map((user: any) => {
-      return {
-        userId: user.userId,
-        attendance: user.attendance,
-      };
-    });
-    if (userAttendance) {
+
+    const isToday = isSelectedDateToday(selectedDate);
+
+    // For past dates, send only entries whose attendance changed from the original.
+    // For today, send all entries.
+    const originalAttendanceMap = new Map(
+      (memberList as any[]).map((user: any) => [user.userId, user.attendance])
+    );
+
+    const userAttendance = isToday
+      ? cohortMemberList?.map((user: any) => ({
+          userId: user.userId,
+          attendance: user.attendance,
+        }))
+      : cohortMemberList
+          ?.filter(
+            (user: any) =>
+              user.attendance !== originalAttendanceMap.get(user.userId)
+          )
+          .map((user: any) => ({
+            userId: user.userId,
+            attendance: user.attendance,
+          }));
+
+    if (userAttendance && userAttendance.length > 0) {
       const date = shortDateFormat(selectedDate);
+      const isSessionLevel = Boolean(selectedSession?.eventRepetitionId);
       const data = {
         attendanceDate: date,
-        contextId: classId,
+        contextId: isSessionLevel ? selectedSession!.eventRepetitionId : classId,
         userAttendance,
+        context: isSessionLevel ? ('event' as const) : ('cohort' as const),
       };
       const markBulkAttendance = async () => {
         setLoading(true);
         try {
-          const response = await bulkAttendance(data);
+          const response = await bulkAttendanceV2(data);
           const resp = response?.responses;
 
           if (resp) {
@@ -260,40 +320,57 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
               <Box
                 display={'flex'}
                 justifyContent={'space-between'}
+                alignItems={'flex-start'}
                 sx={{ padding: '0 10px' }}
               >
-                <Box marginBottom={'0px'}>
-                  <Typography 
-                    variant="h2"
-                    component="h2"
-                    marginBottom={'0px'}
-                    fontWeight={'500'}
-                    fontSize={'16px'}
-                    sx={{ color: theme.palette.warning['A200'] }}
-                  >
-                    {presentCount == 0 && absentCount == 0 ? t('COMMON.MARK_CENTER_ATTENDANCE'): t('COMMON.MODIFY_CENTER_ATTENDANCE')}
-                  </Typography>
-                  <Typography
-                    variant="h2"
-                    sx={{
-                      paddingBottom: '10px',
-                      color: theme.palette.warning['A200'],
-                      fontSize: '14px',
-                    }}
-                    component="h2"
-                  >
-                    {getDayMonthYearFormat(shortDateFormat(selectedDate))}
-                  </Typography>
-                  <ConfirmationModal
-                    message={getMessage()}
-                    handleAction={handleAction}
-                    handleCloseModal={handleCloseModel}
-                    buttonNames={{
-                      primary: t('COMMON.YES'),
-                      secondary: t('COMMON.NO_GO_BACK'),
-                    }}
-                    modalOpen={modalOpen}
-                  />
+                <Box display="flex" alignItems="center" gap={0.5} marginBottom={'0px'}>
+                  {onBack && (
+                    <IconButton
+                      size="small"
+                      onClick={onBack}
+                      aria-label={t('COMMON.BACK')}
+                      sx={{
+                        color: theme.palette.warning['A200'],
+                        padding: '4px',
+                        marginRight: '4px',
+                      }}
+                    >
+                      <ArrowBackIcon sx={{ fontSize: '24px' }} />
+                    </IconButton>
+                  )}
+                  <Box>
+                    <Typography 
+                      variant="h2"
+                      component="h2"
+                      marginBottom={'0px'}
+                      fontWeight={'500'}
+                      fontSize={'16px'}
+                      sx={{ color: theme.palette.warning['A200'] }}
+                    >
+                      {presentCount == 0 && absentCount == 0 ? t('COMMON.MARK_CENTER_ATTENDANCE'): t('COMMON.MODIFY_CENTER_ATTENDANCE')}
+                    </Typography>
+                    <Typography
+                      variant="h2"
+                      sx={{
+                        paddingBottom: '10px',
+                        color: theme.palette.warning['A200'],
+                        fontSize: '14px',
+                      }}
+                      component="h2"
+                    >
+                      {getDayMonthYearFormat(shortDateFormat(selectedDate))}
+                    </Typography>
+                    <ConfirmationModal
+                      message={getMessage()}
+                      handleAction={handleAction}
+                      handleCloseModal={handleCloseModel}
+                      buttonNames={{
+                        primary: t('COMMON.YES'),
+                        secondary: t('COMMON.NO_GO_BACK'),
+                      }}
+                      modalOpen={modalOpen}
+                    />
+                  </Box>
                 </Box>
                 <Box>
                   <CloseIcon
@@ -306,7 +383,7 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
                 </Box>
               </Box>
               <Box sx={{ height: '1px', background: '#D0C5B4' }}></Box>
-              {loading && (
+              {(loading || prefillLoading) && (
                 <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
               )}
 

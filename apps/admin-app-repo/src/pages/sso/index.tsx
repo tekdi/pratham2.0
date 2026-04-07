@@ -209,6 +209,7 @@ const SSOContent = () => {
       }
 
       localStorage.setItem('firstName', userResponse?.firstName);
+      localStorage.setItem('lastName', userResponse?.lastName);
       localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
 
       setTimeout(async () => {
@@ -247,7 +248,7 @@ const SSOContent = () => {
           const selectedStateId = userInfo?.customFields?.find(
             (field: { label: string }) => field?.label === 'WORKING_STATE'
           )?.selectedValues?.[0]?.id;
-          if (selectedStateId) {
+          if (selectedStateId !== undefined && selectedStateId !== null) {
             localStorage.setItem('stateId', selectedStateId);
           }
         }
