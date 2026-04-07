@@ -152,6 +152,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(currentDate.getDate() - modifyAttendanceLimit);
   const formattedSevenDaysAgo = shortDateFormat(sevenDaysAgo);
+  const fifteenDaysAgo = new Date();
+  fifteenDaysAgo.setDate(currentDate.getDate() - 15);
+  const formattedFifteenDaysAgo = shortDateFormat(fifteenDaysAgo);
   const [userId, setUserId] = React.useState<string | null>(null);
   const [blockName, setBlockName] = React.useState<string>('');
   const [role, setRole] = React.useState<any>('');
@@ -257,6 +260,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
       setRole(role);
       const storedUserId = localStorage.getItem('userId');
       setClassId(localStorage.getItem('classId') ?? '');
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/d2b738fb-79d4-4559-93b3-73b712825063',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dashboard.tsx:auth-check',message:'H-A: dashboard token check fired',data:{hasToken:!!token,hasRole:!!role,hasUserId:!!storedUserId,userProgram:localStorage.getItem('userProgram'),tenantName:localStorage.getItem('tenantName'),willRedirectToLogin:!token},timestamp:Date.now(),hypothesisId:'H-A'})}).catch(()=>{});
+      // #endregion
       if (token) {
         setIsAuthenticated(true);
         setUserId(storedUserId);
@@ -1326,7 +1332,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
                                     (modifyAttendanceLimit > 0 &&
-                                      formattedSevenDaysAgo > selectedDate)
+                                      formattedSevenDaysAgo > selectedDate) ||
+                                    formattedFifteenDaysAgo > selectedDate
                                   }
                                 >
                                   {currentAttendance === 'notMarked' ||
