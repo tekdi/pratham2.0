@@ -236,6 +236,12 @@ export const contentWithTelemetryData = async ({
       const randomFourDigit = Math.floor(1000 + Math.random() * 9000);
       await customStoreSet(`${userId}_${randomFourDigit}`, {
         createdAt: new Date().toISOString(),
+        configFunctionality: configFunctionality,
+        extraObject: {
+          course: course,
+          unitId: unitId,
+        },
+        //below are api payload object
         userId: userId,
         contentId: identifier,
         courseId: courseId && unitId ? courseId : identifier,

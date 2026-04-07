@@ -1,7 +1,8 @@
 /**
  * Service worker (origin-scoped): connectivity + offline tracking queue flush.
  * Queue: IndexedDB "tracking-db" / "tracking-store" — entries (non-__ keys) are JSON with createdAt + ContentCreate fields.
- * Auth URL: synced from page via postMessage (SW cannot read localStorage).
+ * Auth URL + userId: synced from page via postMessage (SW cannot read localStorage).
+ * Queue rows are processed only when userId is set and the IDB key string includes that userId.
  */
 const DB_NAME = 'tracking-db';
 const STORE_NAME = 'tracking-store';
@@ -18,8 +19,17 @@ const LS_IN_PROGRESS_KEY = 'trackingApiSyncInProgress';
 
 let syncConfig = {
   contentCreateUrl: '',
+  courseStatusUrl: '',
+  userCertificateStatusUpdateUrl: '',
+  authUrl: '',
+  userCertificateStatusGetUrl: '',
+  courseHierarchyUrl: '',
+  issueCertificateUrl: '',
+  assessmentStatusUrl: '',
   token: '',
   tenantId: '',
+  /** From page localStorage key `userId`; only queue keys containing this substring are synced. */
+  userId: '',
 };
 
 /** Prevents overlapping drains (interval / online / message won’t start another until this run finishes). */
@@ -52,7 +62,7 @@ function getCreatedAtMs(v) {
 /** Request body: full entry minus createdAt (API matches createContentTracking). */
 function buildRequestBody(value) {
   if (!value || typeof value !== 'object') return null;
-  const { createdAt, ...body } = value;
+  const { createdAt, configFunctionality, extraObject, ...body } = value;
   return body;
 }
 
@@ -95,6 +105,10 @@ function notifyTrackingLock(inProgress) {
 }
 
 function getAllQueueEntries(db) {
+  const userIdFilter = syncConfig.userId;
+  if (!userIdFilter) {
+    return Promise.resolve([]);
+  }
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly');
     const store = tx.objectStore(STORE_NAME);
@@ -109,6 +123,10 @@ function getAllQueueEntries(db) {
       const k = cursor.key;
       const keyStr = String(k);
       if (!keyStr.startsWith(RESERVED_PREFIX)) {
+        if (!keyStr.includes(userIdFilter)) {
+          cursor.continue();
+          return;
+        }
         const v = parseValue(cursor.value);
         if (v != null && v.createdAt != null) {
           list.push({ key: k, value: v });
@@ -169,11 +187,31 @@ async function processTrackingQueue() {
   if (!self.navigator.onLine) return;
 
   const url = syncConfig.contentCreateUrl;
+  const courseStatusUrl = syncConfig.courseStatusUrl;
+  const userCertificateStatusUpdateUrl =
+    syncConfig.userCertificateStatusUpdateUrl;
+  const authUrl = syncConfig.authUrl;
+  const userCertificateStatusGetUrl = syncConfig.userCertificateStatusGetUrl;
+  const courseHierarchyUrl = syncConfig.courseHierarchyUrl;
+  const issueCertificateUrl = syncConfig.issueCertificateUrl;
+  const assessmentStatusUrl = syncConfig.assessmentStatusUrl;
   const token = syncConfig.token;
-  if (!url || !token) {
+  console.log('#agsjhasgasjg syncConfig', syncConfig);
+  if (
+    !url ||
+    !token ||
+    !syncConfig.userId ||
+    !courseStatusUrl ||
+    !userCertificateStatusUpdateUrl ||
+    !authUrl ||
+    !userCertificateStatusGetUrl ||
+    !courseHierarchyUrl ||
+    !issueCertificateUrl ||
+    !assessmentStatusUrl
+  ) {
     return;
   }
-
+  
   let db;
   try {
     db = await openDatabase();
@@ -199,73 +237,105 @@ async function processTrackingQueue() {
       if (entries.length === 0) break;
 
       entries.sort((a, b) => getCreatedAtMs(a.value) - getCreatedAtMs(b.value));
-      const { key, value } = entries[0];
-      const body = buildRequestBody(value);
-      if (!body || Object.keys(body).length === 0) {
-        console.warn('[learner-sw] drop entry: empty body', key);
-        await idbDelete(db, key);
-        continue;
-      }
+      for (const entry of entries) {
+        const { key, value } = entry;
+        const body = buildRequestBody(value);
+        if (!body || Object.keys(body).length === 0) {
+          console.warn('[learner-sw] drop entry: empty body', key);
+          await idbDelete(db, key);
+          continue;
+        }
 
-      if (!weHoldLock) {
-        await idbPut(db, LOCK_KEY, { v: true, at: Date.now() });
-        weHoldLock = true;
-        await notifyTrackingLock(true);
-      } else {
-        await idbPut(db, LOCK_KEY, { v: true, at: Date.now() });
-      }
+        if (!weHoldLock) {
+          await idbPut(db, LOCK_KEY, { v: true, at: Date.now() });
+          weHoldLock = true;
+          await notifyTrackingLock(true);
+        } else {
+          await idbPut(db, LOCK_KEY, { v: true, at: Date.now() });
+        }
 
-      const headers = {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      };
-      if (syncConfig.tenantId) {
-        headers.tenantid = syncConfig.tenantId;
-      }
+        const headers = {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        };
+        if (syncConfig.tenantId) {
+          headers.tenantid = syncConfig.tenantId;
+        }
 
-      let ok = false;
-      let lastErr = null;
-      for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
-        if (!self.navigator.onLine) break;
-        try {
-          const res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(body),
-          });
-          if (res.ok) {
-            ok = true;
-            console.log('[learner-sw] tracking synced', key, 'attempt', attempt);
-            break;
+        let ok = false;
+        let lastErr = null;
+        for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
+          if (!self.navigator.onLine) break;
+          try {
+            const res = await fetch(url, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify(body),
+            });
+            if (res.ok) {
+              //other process to certificate issue
+              const response = await res.json();
+              console.log('#agsjhasgasjg response', response);
+              console.log(
+                '#agsjhasgasjg configFunctionality',
+                value.configFunctionality
+              );
+              if (
+                response &&
+                value.configFunctionality.isGenerateCertificate !== false
+              ) {
+                await updateCOurseAndIssueCertificate({
+                  userId: syncConfig.userId,
+                  course: value?.extraObject?.course,
+                  unitId: value?.extraObject?.unitId,
+                  isGenerateCertificate:
+                    value?.configFunctionality?.isGenerateCertificate,
+                });
+              }
+              //end other process to certificate issue
+
+              ok = true;
+              console.log(
+                '[learner-sw] tracking synced',
+                key,
+                'attempt',
+                attempt
+              );
+              break;
+            }
+            const text = await res.text().catch(() => '');
+            lastErr = `${res.status} ${text}`;
+            console.error(
+              '[learner-sw] tracking API failed',
+              key,
+              'attempt',
+              attempt,
+              lastErr
+            );
+          } catch (err) {
+            lastErr = err;
+            console.error(
+              '[learner-sw] tracking fetch error',
+              key,
+              attempt,
+              err
+            );
           }
-          const text = await res.text().catch(() => '');
-          lastErr = `${res.status} ${text}`;
-          console.error(
-            '[learner-sw] tracking API failed',
+          if (attempt < MAX_FETCH_ATTEMPTS && self.navigator.onLine) {
+            await delay(RETRY_DELAY_MS);
+          }
+        }
+
+        await idbDelete(db, key);
+        if (!ok) {
+          console.warn(
+            '[learner-sw] removed queue key after failed attempts',
             key,
-            'attempt',
-            attempt,
+            MAX_FETCH_ATTEMPTS,
             lastErr
           );
-        } catch (err) {
-          lastErr = err;
-          console.error('[learner-sw] tracking fetch error', key, attempt, err);
-        }
-        if (attempt < MAX_FETCH_ATTEMPTS && self.navigator.onLine) {
-          await delay(RETRY_DELAY_MS);
         }
       }
-
-      await idbDelete(db, key);
-      if (!ok) {
-        console.warn(
-          '[learner-sw] removed queue key after failed attempts',
-          key,
-          MAX_FETCH_ATTEMPTS,
-          lastErr
-        );
-      }
-
       if (!self.navigator.onLine) break;
     }
   } catch (err) {
@@ -286,6 +356,355 @@ async function processTrackingQueue() {
     }
   }
 }
+
+//certificate issue function
+async function updateCOurseAndIssueCertificate ({
+  course,
+  userId,
+  unitId,
+  isGenerateCertificate,
+}) {
+  const apiUrl = syncConfig?.courseStatusUrl;
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      },
+      body: JSON.stringify({
+        courseId: [course?.identifier],
+        userId: [userId],
+      }),
+    });
+    const response = await res.json();
+
+    const courseStatus = await calculateCourseStatus({
+      statusData: response?.data?.data?.[0]?.course?.[0],
+      allCourseIds: course.leafNodes ?? [],
+      courseId: course?.identifier,
+    });
+
+    if (courseStatus?.status === 'in progress') {
+      await updateUserCourseStatus({
+        userId,
+        courseId: course?.identifier,
+        status: 'inprogress',
+      });
+    } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
+      const userResponse = await getUserId();
+      const data = await fetchCertificateStatus({
+        userId: userId,
+        courseId: course?.identifier,
+      });
+      if (data !== 'viewCertificate') {
+        const responseCriteria = await checkCriteriaForCertificate({
+          userId: userId,
+          courseId: course?.identifier,
+        });
+
+        if (responseCriteria === true) {
+          try {
+            await issueCertificate({
+              userId: userId,
+              courseId: course?.identifier,
+              unitId: unitId,
+              issuanceDate: new Date().toISOString(),
+              expirationDate: new Date(
+                new Date().setFullYear(new Date().getFullYear() + 20)
+              ).toISOString(),
+              // credentialId: data?.result?.usercertificateId,
+              firstName: userResponse?.firstName ?? '',
+              middleName: userResponse?.middleName ?? '',
+              lastName: userResponse?.lastName ?? '',
+              courseName: course?.name ?? '',
+            });
+          } catch (error) {
+            await updateUserCourseStatus({
+              userId,
+              courseId: course?.identifier,
+              status: 'completed',
+            });
+          }
+        } else if (data !== 'completed') {
+          await updateUserCourseStatus({
+            userId,
+            courseId: course?.identifier,
+            status: 'completed',
+          });
+        }
+      }
+    } else {
+      await updateUserCourseStatus({
+        userId,
+        courseId: course?.identifier,
+        status: 'completed',
+      });
+    }
+  } catch (error) {
+    console.error('Error in updateCOurseAndIssueCertificate:', error);
+    throw error;
+  }
+};
+async function calculateCourseStatus ({ statusData, allCourseIds, courseId }) {
+  const completedList = new Set(statusData.completed_list || []);
+  const inProgressList = new Set(statusData.in_progress_list || []);
+
+  let completedCount = 0;
+  let inProgressCount = 0;
+  const completed_list = [];
+  const in_progress_list = [];
+
+  for (const id of allCourseIds) {
+    if (completedList.has(id)) {
+      completedCount++;
+      completed_list.push(id);
+    } else if (inProgressList.has(id)) {
+      inProgressCount++;
+      in_progress_list.push(id);
+    }
+  }
+
+  const total = allCourseIds.length;
+  let status = 'not started';
+
+  if (completedCount === total && total > 0) {
+    status = 'completed';
+  } else if (completedCount > 0 || inProgressCount > 0) {
+    status = 'in progress';
+  }
+
+  const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+  return {
+    completed_list,
+    in_progress_list,
+    completed: completedCount,
+    in_progress: inProgressCount,
+    courseId,
+    status,
+    percentage: percentage,
+  };
+};
+async function updateUserCourseStatus ({ userId, courseId, status }) {
+  const apiUrl = syncConfig?.userCertificateStatusUpdateUrl;
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      },
+      body: JSON.stringify({
+        userId,
+        courseId,
+        status,
+      }),
+    });
+    const response = await res.json();
+    return response?.data?.result;
+  } catch (error) {
+    console.error('error in updating user course status', error);
+    throw error;
+  }
+};
+async function getUserId () {
+  const apiUrl = syncConfig?.authUrl;
+
+  try {
+    const token = syncConfig.token;
+    if (!token) {
+      throw new Error('Authorization token not found');
+    }
+
+    const res = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const response = await res.json();
+
+    return response?.data?.result;
+  } catch (error) {
+    console.error('Error in fetching user details', error);
+    throw error;
+  }
+};
+async function fetchCertificateStatus ({ userId, courseId }) {
+  try {
+    const res = await fetch(syncConfig?.userCertificateStatusGetUrl, {
+      method: 'POST',
+      body: JSON.stringify({ userId, courseId }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      },
+    });
+    const response = await res.json();
+    const status = response?.data?.result?.status;
+    return status || 'No status found';
+  } catch (error) {
+    console.error('API call failed:', error);
+    // return { error: error.message };
+  }
+};
+async function checkCriteriaForCertificate (reqBody) {
+  const userId = reqBody?.userId;
+  const courseId = reqBody?.courseId;
+  const apiUrl = syncConfig?.courseHierarchyUrl+courseId;
+
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      },
+    });
+    const response = await res.json();
+    if (Object.keys(response?.data?.result?.content).length > 0) {
+      const content = response?.data?.result?.content;
+
+      // Extract question set identifiers with their parent unit IDs
+      const questionSetData = [];
+
+      function extractQuestionSets (node, parentId) {
+        // Check if current node is a question set
+        if (node.mimeType === 'application/vnd.sunbird.questionset') {
+          questionSetData.push({
+            contentId: node.identifier,
+            unitId: parentId || node.parent || '',
+          });
+        }
+
+        // Recursively traverse children if they exist
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child) => {
+            // Pass the current node's identifier as parent for its children
+            extractQuestionSets(child, node.identifier);
+          });
+        }
+      };
+
+      // Start extraction from the root content
+      extractQuestionSets(content);
+
+      console.log('Question Set Data:', questionSetData);
+
+      //tenantId
+      const tenantId = syncConfig.tenantId;
+      const headers = {
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      };
+
+      // You can now use questionSetData array for further processing
+      // Example output: [{contentId: "do_214302433656496128152", unitId: "do_214373529013116928121"}]
+
+      // Add your additional logic here using questionSetData
+      if (questionSetData.length > 0) {
+        // Process each question set data
+        let criteriaCompleted = false;
+        let statusUrl = syncConfig.assessmentStatusUrl;
+        // Collect all contentIds and unitIds
+        const contentIds = questionSetData.map((item) => item.contentId);
+        const unitIds = questionSetData.map((item) => item.unitId);
+        const options = {
+          userId: [userId],
+          courseId: [courseId], // temporary added here assessmentList(contentId)... if assessment is done then need to pass actual course id and unit id here
+          unitId: unitIds,
+          contentId: contentIds,
+        };
+        const res = await fetch(statusUrl, {
+          method: 'POST',
+          body: JSON.stringify(options),
+          headers: headers,
+        });
+        const response = await res.json();
+        console.log(response?.data?.data);
+
+        if (response?.data?.data?.length > 0) {
+          // Filter data for specific userId
+          const userData = response?.data?.data.find(
+            (item) => item.userId === userId
+          );
+
+          if (userData) {
+            const assessments = userData?.assessments || [];
+
+            // Check if all contentIds are present in the response
+            const foundContentIds = assessments.map(
+              (assessment) => assessment.contentId
+            );
+            const allContentIdsFound = contentIds.every((contentId) =>
+              foundContentIds.includes(contentId)
+            );
+
+            if (allContentIdsFound) {
+              // Check if all assessments have percentage >= 40%
+              const allPassed = assessments.every((assessment) => {
+                const percentage = parseFloat(assessment.percentage);
+                //percentage comparison from program specific configuration
+                let percentageComparision = 40;
+                if(tenantId === '914ca990-9b45-4385-a06b-05054f35d0b9'){
+                  percentageComparision = 80;
+                }
+                return percentage >= percentageComparision;
+              });
+
+              criteriaCompleted = allPassed;
+            } else {
+              criteriaCompleted = false;
+            }
+          } else {
+            criteriaCompleted = false;
+          }
+        } else {
+          criteriaCompleted = false;
+        }
+
+        if (criteriaCompleted) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+async function issueCertificate (reqBody) {
+  const apiUrl = syncConfig.issueCertificateUrl;
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify(reqBody),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${syncConfig.token}`,
+        ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
+      },
+    });
+    const response = await res.json();
+    return response?.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+//end certificate issue function
 
 function logAndBroadcastConnectivity(reason) {
   const online = self.navigator.onLine;
@@ -380,8 +799,20 @@ self.addEventListener('message', (event) => {
   if (data.type === 'SET_TRACKING_SYNC_CONFIG') {
     syncConfig = {
       contentCreateUrl: String(data.contentCreateUrl || ''),
+      courseStatusUrl: String(data.courseStatusUrl || ''),
+      userCertificateStatusUpdateUrl: String(
+        data.userCertificateStatusUpdateUrl || ''
+      ),
+      authUrl: String(data.authUrl || ''),
+      userCertificateStatusGetUrl: String(
+        data.userCertificateStatusGetUrl || ''
+      ),
+      courseHierarchyUrl: String(data.courseHierarchyUrl || ''),
+      issueCertificateUrl: String(data.issueCertificateUrl || ''),
+      assessmentStatusUrl: String(data.assessmentStatusUrl || ''),
       token: String(data.token || ''),
       tenantId: String(data.tenantId || ''),
+      userId: String(data.userId || ''),
     };
     console.log('[learner-sw] tracking config updated');
     void runQueueSafely();

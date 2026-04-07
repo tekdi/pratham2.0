@@ -7,18 +7,37 @@ const SW_PATH = '/sw.js';
 /** Must match shared-lib Interceptor (Bearer token). */
 const TOKEN_STORAGE_KEY = 'token';
 const TENANT_STORAGE_KEY = 'tenantId';
+/** Must match learner tracking queue key convention in IndexedDB (SW filters by this substring). */
+const USER_ID_STORAGE_KEY = 'userId';
 
 /** Must match `LS_IN_PROGRESS_KEY` in public/sw.js (page mirror of SW lock). */
 export const TRACKING_API_SYNC_LS_KEY = 'trackingApiSyncInProgress';
 
 function buildTrackingSyncPayload() {
-  const base = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || '';
-  const contentCreateUrl = `${base.replace(/\/$/, '')}/tracking/content/create`;
+  let temp_base = process.env.NEXT_PUBLIC_MIDDLEWARE_URL || '';
+  const base = temp_base.replace(/\/$/, '');
+
+  const contentCreateUrl = `${base}/tracking/content/create`;
+  const courseStatusUrl = `${base}/tracking/content/course/status`;
+  const userCertificateStatusUpdateUrl = `${base}/tracking/user_certificate/status/update`;
+  const authUrl = `${base}/user/auth`;
+  const userCertificateStatusGetUrl = `${base}/tracking/user_certificate/status/get`;
+  const courseHierarchyUrl = `${base}/api/course/v1/hierarchy/`;
+  const issueCertificateUrl = `${base}/tracking/certificate/issue`;
+  const assessmentStatusUrl = `${base}/tracking/assessment/search/status`;
   return {
     type: 'SET_TRACKING_SYNC_CONFIG' as const,
     contentCreateUrl,
+    courseStatusUrl,
+    userCertificateStatusUpdateUrl,
+    authUrl,
+    userCertificateStatusGetUrl,
+    courseHierarchyUrl,
+    issueCertificateUrl,
+    assessmentStatusUrl,
     token: localStorage.getItem(TOKEN_STORAGE_KEY) || '',
     tenantId: localStorage.getItem(TENANT_STORAGE_KEY) || '',
+    userId: localStorage.getItem(USER_ID_STORAGE_KEY) || '',
   };
 }
 
@@ -81,7 +100,11 @@ export default function ServiceWorkerRegister() {
     navigator.serviceWorker.addEventListener('message', onMessage);
 
     const onStorage = (e: StorageEvent) => {
-      if (e.key === TOKEN_STORAGE_KEY || e.key === TENANT_STORAGE_KEY) {
+      if (
+        e.key === TOKEN_STORAGE_KEY ||
+        e.key === TENANT_STORAGE_KEY ||
+        e.key === USER_ID_STORAGE_KEY
+      ) {
         void navigator.serviceWorker.ready.then(pushTrackingConfig);
       }
     };
