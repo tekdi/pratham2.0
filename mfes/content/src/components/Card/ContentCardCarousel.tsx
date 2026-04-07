@@ -87,6 +87,10 @@ const ContentCardCarousel = ({
           prevEl: prevRef.current,
           nextEl: nextRef.current,
         }}
+        onBeforeInit={(swiper: any) => {
+          swiper.params.navigation.prevEl = prevRef.current;
+          swiper.params.navigation.nextEl = nextRef.current;
+        }}
         breakpoints={{
           640: { slidesPerView: 2 },
           900: { slidesPerView: 3 },
