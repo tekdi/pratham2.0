@@ -1013,7 +1013,7 @@ console.log('result=====>', result);
           setAssessmentPendingModal(false);
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent(localStorage.getItem('landingPage') || '/home')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}

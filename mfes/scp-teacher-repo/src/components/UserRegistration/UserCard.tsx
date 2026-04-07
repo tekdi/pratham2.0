@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { Box, Grid, Checkbox, Button, Chip, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -13,6 +14,7 @@ import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import CallLogModal from './CallLogModal';
 import { editEditUser } from '../../services/ProfileService';
 
@@ -41,6 +43,9 @@ interface User {
   preTestStatus?: string;
   modeType?: 'in-person' | 'remote';
   username?: string;
+  assessmentStats?: {[contentId: string]: any};
+  totalAssessmentAttempts?: number;
+  hasAssessments?: boolean;
 }
 
 interface UserCardProps {
@@ -191,6 +196,87 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                        {[user.location.village, user.location.block, user.location.district, user.location.state].filter(Boolean).join(', ')}
                   </Typography>
                </Box>
+
+               {/* Assessment Score Section */}
+               {user.assessmentStats && Object.keys(user.assessmentStats).length > 0 && (
+                 <Box sx={{ mt: 1, mb: 1 }}>
+                   <Typography variant="body2" sx={{ fontSize: '14px', fontWeight: 600, color: '#1E1B16', mb: 1 }}>
+                     {t('USER_REGISTRATION.ASSESSMENT_SCORES') || 'Assessment Scores'}
+                   </Typography>
+                   {Object.entries(user.assessmentStats).map(([contentId, assessmentData]: [string, any]) => (
+                     <Box key={contentId} sx={{ mb: 1.5 }}>
+                       {/* Assessment Header */}
+                       <Typography variant="body2" sx={{ 
+                         fontSize: '12px', 
+                         color: '#4A4640', 
+                         fontWeight: 600, 
+                         mb: 0.5,
+                         bgcolor: '#E3F2FD',
+                         p: 0.5,
+                         borderRadius: '4px'
+                       }}>
+                         {assessmentData.testName} ({assessmentData.attempts.length} attempt{assessmentData.attempts.length > 1 ? 's' : ''})
+                       </Typography>
+                       
+                       {/* Individual Attempts */}
+                       {assessmentData.attempts.map((attempt: any, index: number) => (
+                         <Link 
+                           key={attempt.attemptId} 
+                           href={`/assessments/user/${user.userId}/attempt/${attempt.assessmentTrackingId}/${contentId}`}
+                           passHref
+                           style={{ textDecoration: 'none' }}
+                         >
+                           <Box sx={{ 
+                             display: 'flex', 
+                             justifyContent: 'space-between', 
+                             alignItems: 'center',
+                             bgcolor: '#F8F9FA',
+                             borderRadius: '4px',
+                             p: 1,
+                             mb: 0.5,
+                             borderLeft: '3px solid',
+                             borderLeftColor: attempt.percentage >= 60 ? '#2E7D32' : attempt.percentage >= 40 ? '#F57C00' : '#D32F2F',
+                             cursor: 'pointer',
+                             transition: 'all 0.2s ease',
+                             '&:hover': {
+                               bgcolor: '#E9ECEF',
+                               transform: 'translateX(2px)'
+                             }
+                           }}>
+                             <Box>
+                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                 <Typography variant="body2" sx={{ fontSize: '11px', color: '#6C757D', fontWeight: 500 }}>
+                                   Attempt {attempt.attemptNumber}
+                                 </Typography>
+                                 <VisibilityOutlinedIcon sx={{ fontSize: '12px', color: '#6C757D' }} />
+                               </Box>
+                               <Typography variant="body2" sx={{ fontSize: '10px', color: '#8E9297' }}>
+                                 {new Date(attempt.lastAttempted).toLocaleDateString()} {new Date(attempt.lastAttempted).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                               </Typography>
+                             </Box>
+                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                               <Typography variant="body2" sx={{ 
+                                 fontSize: '11px', 
+                                 fontWeight: 600,
+                                 color: attempt.percentage >= 60 ? '#2E7D32' : attempt.percentage >= 40 ? '#F57C00' : '#D32F2F'
+                               }}>
+                                 {attempt.totalScore}/{attempt.maxScore}
+                               </Typography>
+                               <Typography variant="body2" sx={{ 
+                                 fontSize: '10px', 
+                                 fontWeight: 500,
+                                 color: attempt.percentage >= 60 ? '#2E7D32' : attempt.percentage >= 40 ? '#F57C00' : '#D32F2F'
+                               }}>
+                                 ({attempt.percentage}%)
+                               </Typography>
+                             </Box>
+                           </Box>
+                         </Link>
+                       ))}
+                     </Box>
+                   ))}
+                 </Box>
+               )}
 
               {/* Expanded Info Section (Phone, Email, DOB) - Shown when expanded */}
               {expanded && (
