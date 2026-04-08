@@ -24,7 +24,6 @@ import Loader from '../../components/Loader';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import welcomeGIF from '../../../public/images/welcome.gif';
-import { TENANT_TYPE } from '../../utils/app.config';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -70,6 +69,48 @@ const SSOContent = () => {
   const [hasAuthenticated, setHasAuthenticated] = useState(false); // Prevent duplicate calls
   const authenticationRef = useRef(false); // Additional safeguard with useRef
   const [loading, setLoading] = useState(false);
+
+  const getActiveAcademicYearId = async () => {
+    const academicYearResponse = await getAcademicYear();
+    let academicYearList: any[] = [];
+    if (Array.isArray(academicYearResponse)) {
+      academicYearList = academicYearResponse;
+    } else if (Array.isArray(academicYearResponse?.data)) {
+      academicYearList = academicYearResponse.data;
+    }
+
+    if (academicYearList.length) {
+      localStorage.setItem('academicYearList', JSON.stringify(academicYearList));
+      const activeSession = academicYearList.find((item: any) => item?.isActive);
+      return activeSession?.id || '';
+    }
+
+    return '';
+  };
+
+  const getRouteByProgramAndRole = (tenantName?: string, roleName?: string) => {
+    const normalizedTenant = tenantName?.trim().toLowerCase();
+    const normalizedRole = roleName?.trim().toLowerCase();
+
+    if (
+      normalizedTenant === TenantName.PRAGYANPATH.toLowerCase() &&
+      normalizedRole?.includes('lead')
+    ) {
+      return '/manager-dashboard';
+    }
+
+    if (
+      normalizedTenant === TenantName.YOUTHNET.toLowerCase() 
+    ) {
+      return '/';
+    }
+
+    if (normalizedTenant === TenantName.SECOND_CHANCE_PROGRAM.toLowerCase()) {
+      return '/teacher';
+    }
+
+    return '/unauthorized';
+  };
 
   useEffect(() => {
     // Prevent duplicate authentication calls using both state and ref
@@ -141,9 +182,6 @@ const SSOContent = () => {
             { remember: false }
           );
           showToastMessage('Authentication successful!', 'success');
-
-          // Don't auto-redirect here - let user choose account/program first
-          // Success message will be shown and SwitchAccountDialog will handle routing
         } else {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
@@ -187,22 +225,31 @@ const SSOContent = () => {
       }
 
       const userResponse = await getUserId();
+        if (userResponse?.tenantData) {
+          localStorage.setItem('tenantData', JSON.stringify(userResponse.tenantData));
+        }
         localStorage.setItem('userId', userResponse?.userId);
         localStorage.setItem('temporaryPassword', userResponse?.temporaryPassword);
         // Safely set tenantId with fallback - try userResponse first, then URL param
         const tenantIdFromResponse = userResponse?.tenantData?.[0]?.tenantId;
-        const tenantType=userResponse?.tenantData?.[0]?.type;
         const tenantIdFromUrl = searchParams.get('tenantid');
         const finalTenantId = tenantIdFromResponse || tenantIdFromUrl;
-        if(tenantType) {
-          localStorage.setItem('tenantType', tenantType);
-        }
-        const hasLead = userResponse?.tenantData[0]?.roles.some((role: any) =>
-          role.roleName.toLowerCase().includes("lead")
+
+        // Check across ALL tenants: allow Lead roles (Pragyanpath/YouthNet)
+        // OR Instructor/Teacher roles in Second Chance Program
+        const hasValidRole = userResponse?.tenantData?.some((tenant: any) =>
+          tenant.roles.some((role: any) => {
+            const rn = role.roleName.toLowerCase();
+            const tn = tenant.tenantName?.toLowerCase();
+            return (
+              rn.includes('lead') ||
+              (tn === TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
+                (rn.includes('instructor') || rn.includes('teacher')))
+            );
+          })
         );
-        if(!hasLead) {
+        if (!hasValidRole) {
           window.location.href = '/unauthorized';
-        //  router.push('/unauthorized');
         }
         if (finalTenantId) {
           localStorage.setItem('tenantId', finalTenantId);
@@ -236,11 +283,10 @@ const SSOContent = () => {
   const callBackSwitchDialog = async (
     tenantId: string,
     tenantName: string,
-    tenantType: string,
     roleId: string,
     roleName: string
   ) => {
-    console.log("callBackSwitchDialog", tenantId, tenantName, tenantType, roleId, roleName);
+    console.log("callBackSwitchDialog", tenantId, tenantName, roleId, roleName);
     setSwitchDialogOpen(false);
     setLoading(true);
 
@@ -249,7 +295,14 @@ const SSOContent = () => {
         typeof window !== 'undefined' && window.localStorage
           ? localStorage.getItem('token')
           : '';
-      if (roleName === 'Lead') {
+      const isLeadRole = roleName?.toLowerCase().includes('lead');
+      const isSecondChanceProgramRole =
+        tenantName?.trim().toLowerCase() ===
+          TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
+        (roleName?.toLowerCase().includes('instructor') ||
+          roleName?.toLowerCase().includes('teacher'));
+
+      if (isLeadRole || isSecondChanceProgramRole) {
         const tenantData = userResponse?.tenantData?.find(
           (tenant: any) => tenant.tenantId === tenantId
         );
@@ -264,7 +317,6 @@ const SSOContent = () => {
         localStorage.setItem('roleId', roleId);
         localStorage.setItem('roleName', roleName);
         localStorage.setItem('tenantName', tenantName);
-        localStorage.setItem('tenantType', tenantType);
         localStorage.setItem('tenantId', tenantId);
 
         const uiConfig = tenantData?.params?.uiConfig;
@@ -272,11 +324,36 @@ const SSOContent = () => {
         localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 
         localStorage.setItem('userProgram', tenantName);
-        if (tenantName === TenantName.YOUTHNET || tenantName === TenantName.SUMMER_CAMP || tenantType === TENANT_TYPE.VOLUNTEER_ONBOARDING) { // need to change here by tenanat type condition call academic year id..butbackend academic year logic will be changing (as in discussion)
-          const academicYearResponse = await getAcademicYear();
-          if (academicYearResponse?.[0]?.id) {
-            localStorage.setItem('academicYearId', academicYearResponse[0]?.id);
+        const isYouthnetTenant =
+          tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
+        if (isYouthnetTenant) {
+          const activeAcademicYearId = await getActiveAcademicYearId();
+          if (activeAcademicYearId) {
+            localStorage.setItem('academicYearId', activeAcademicYearId);
           }
+        }
+
+        const isSecondChanceProgramTenant =
+          tenantName?.trim().toLowerCase() ===
+          TenantName.SECOND_CHANCE_PROGRAM.toLowerCase();
+        if (isSecondChanceProgramTenant) {
+          const activeAcademicYearId = await getActiveAcademicYearId();
+          if (activeAcademicYearId) {
+            localStorage.setItem('academicYearId', activeAcademicYearId);
+          }
+          // Seed the scp-teacher-repo Zustand store (persisted under 'teacherApp')
+          // so that withAccessControl finds a valid accessToken + userRole on load
+          const existingTeacherApp = localStorage.getItem('teacherApp');
+          const teacherAppStore = existingTeacherApp
+            ? JSON.parse(existingTeacherApp)
+            : { state: {}, version: 0 };
+          teacherAppStore.state = {
+            ...teacherAppStore.state,
+            accessToken: token,
+            userRole: roleName, // 'Instructor' for SCP teacher
+            isActiveYearSelected: activeAcademicYearId || true,
+          };
+          localStorage.setItem('teacherApp', JSON.stringify(teacherAppStore));
         }
         const telemetryInteract = {
           context: { env: 'sign-in', cdata: [] },
@@ -309,24 +386,17 @@ const SSOContent = () => {
           category: 'SSO ERP',
           label: 'Login Button Clicked',
         });
-        // Only redirect to manager-dashboard if tenant is Pragyanpath and role is Lead
         setTimeout(() => {
-          if (tenantName === TenantName.PRAGYANPATH && roleName === 'Lead') {
-            router.push('/manager-dashboard');
-          } 
-          else if ((tenantName === TenantName.SUMMER_CAMP || tenantType === TENANT_TYPE.VOLUNTEER_ONBOARDING) && roleName === 'Lead') {
-            router.push('/individual-volunteer');
+          const targetRoute = getRouteByProgramAndRole(tenantName, roleName);
+          if (isSecondChanceProgramTenant) {
+            // Use window.location.href to escape the '/youthnet' basePath
+            // so we land on http://host/teacher instead of http://host/youthnet/teacher
+            window.location.href = targetRoute;
+          } else {
+            router.push(targetRoute);
           }
-          else {
-            // For other tenant/role combinations, redirect to home or appropriate page
-            // Remove auto-redirect to let user choose their destination
-            console.log('SSO login successful but not redirecting to manager-dashboard', {
-              tenantName,
-              roleName,
-              shouldRedirect: tenantName === TenantName.PRAGYANPATH && roleName === 'Lead'
-            });
-          }
-        }, 1000);      } else {
+        }, 3000);
+      } else {
         console.log("Authentication failed - invalid user role");
         showToastMessage('Authentication failed - invalid user role', 'error');
         const telemetryInteract = {
@@ -536,4 +606,3 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 export default SSOPage;
-
