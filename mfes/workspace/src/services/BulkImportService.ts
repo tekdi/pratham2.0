@@ -486,7 +486,7 @@ export async function updateHierarchyWithSectionsAndQuestions(
   frameworkId: string,
   channelId: string
 ): Promise<void> {
-  const userId = getLocalStoredUserId();
+  const userId = getLocalStoredUserId() ?? '';
   const nodesModified: Record<string, unknown> = {};
   const hierarchy: Record<string, unknown> = {};
 
