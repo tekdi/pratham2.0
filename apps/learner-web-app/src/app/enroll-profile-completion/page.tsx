@@ -245,6 +245,7 @@ else{
           // Use setTimeout to ensure modal closes before navigation
           setTimeout(() => {
             console.log('Executing router.push to:', landingPage || '/home');
+            localStorage.removeItem('temp_program_type');
             router.push(landingPage || '/home');
           }, 100);
       }
