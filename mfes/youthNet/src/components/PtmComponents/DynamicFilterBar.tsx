@@ -19,11 +19,18 @@ interface FilterOption {
   label: string;
 }
 
+interface UserStateOption {
+  id: string;
+  value: string;
+  label: string;
+}
+
 interface FilterBarProps {
   onFiltersChange?: (filters: FilterState, filterLabels: FilterLabels) => void;
   resetFilters?: boolean;
   onResetComplete?: () => void;
-  showOrganizationFilter?: boolean; // Optional prop to show/hide organization filter
+  showOrganizationFilter?: boolean;
+  initialUserState?: UserStateOption | null;
 }
 
 interface FilterLabels {
@@ -63,12 +70,13 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
   onFiltersChange, 
   resetFilters, 
   onResetComplete,
-  showOrganizationFilter = false // Default to false
+  showOrganizationFilter = false,
+  initialUserState = null,
 }) => {
   const { t } = useTranslation('common');
-  
-  // Function to get user state from localStorage
-  const getUserStateFromStorage = () => {
+
+  // Fallback: read from localStorage if prop not provided
+  const getUserStateFromStorage = (): UserStateOption | null => {
     try {
       const userData = localStorage.getItem('userData');
       if (userData) {
@@ -76,13 +84,8 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
         const stateField = parsedData.customFields?.find((field: CustomField) => field.label === 'STATE');
         if (stateField && stateField.selectedValues && stateField.selectedValues.length > 0) {
           const stateValue = stateField.selectedValues[0];
-          // value should be the ID for matching, label should be the display text
           const stateId = stateValue.id?.toString() || stateValue.value;
-          return {
-            id: stateId,
-            value: stateId, // Use ID as value for matching in dropdown
-            label: stateValue.value // Use the actual state name as label
-          };
+          return { id: stateId, value: stateId, label: stateValue.value };
         }
       }
     } catch (error) {
@@ -91,9 +94,13 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
     return null;
   };
 
-  const userState = getUserStateFromStorage();
+  // Use prop if available, otherwise fall back to localStorage
+  const [userState, setUserState] = useState<UserStateOption | null>(
+    () => initialUserState ?? getUserStateFromStorage()
+  );
+
   const [filters, setFilters] = useState<FilterState>({
-    state: userState ? [userState.value] : [],
+    state: [],
     district: [],
     block: [],
     // village: [],
@@ -103,7 +110,7 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
   });
 
   const [filterLabels, setFilterLabels] = useState<FilterLabels>({
-    state: userState ? [userState.label] : [],
+    state: [],
     district: [],
     block: [],
     // village: [],
@@ -113,7 +120,7 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
   });
 
   const [locationData, setLocationData] = useState<LocationData>({
-    states: userState ? [userState] : [],
+    states: [],
     districts: [],
     blocks: [],
     villages: [],
@@ -134,15 +141,29 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
     { id: 'pending', value: 'pending', label: 'Pending' },
   ];
 
-  // Load initial states
+  // Apply user state whenever it becomes available (from prop or localStorage fallback)
+  useEffect(() => {
+    const stateToApply = initialUserState ?? getUserStateFromStorage();
+    if (stateToApply) {
+      setUserState(stateToApply);
+      setFilters(prev => ({ ...prev, state: [stateToApply.value] }));
+      setFilterLabels(prev => ({ ...prev, state: [stateToApply.label] }));
+      setLocationData(prev => ({
+        ...prev,
+        states: prev.states.some(s => s.value === stateToApply.value)
+          ? prev.states
+          : [stateToApply, ...prev.states],
+      }));
+      loadDistricts([stateToApply.value]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialUserState]);
+
+  // Load location data on mount
   useEffect(() => {
     loadStates();
-    loadOrganizations(); // Load all organizations initially
-    
-    // Auto-load districts if user has a state from localStorage
-    if (userState && userState.value) {
-      loadDistricts([userState.value]);
-    }
+    loadOrganizations();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Trigger callback when filters change
@@ -153,8 +174,9 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
   // Handle external reset
   useEffect(() => {
     if (resetFilters) {
+      const currentState = userState || getUserStateFromStorage();
       setFilters({
-        state: userState ? [userState.value] : [], // Preserve user's state from localStorage
+        state: currentState ? [currentState.value] : [],
         district: [],
         block: [],
         // village: [],
@@ -163,7 +185,7 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
         // poc: [],
       });
       setFilterLabels({
-        state: userState ? [userState.label] : [], // Preserve user's state label from localStorage
+        state: currentState ? [currentState.label] : [],
         district: [],
         block: [],
         // village: [],
@@ -171,22 +193,21 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
         organization: [],
         // poc: [],
       });
-      setLocationData({
-        states: locationData.states, // Keep states loaded
+      setLocationData(prev => ({
+        states: prev.states,
         districts: [],
         blocks: [],
         villages: [],
         organizations: [],
-      });
-      // Reload districts if user has a state from localStorage
-      if (userState && userState.value) {
-        loadDistricts([userState.value]);
+      }));
+      if (currentState?.value) {
+        loadDistricts([currentState.value]);
       }
-      // Load all organizations again
       loadOrganizations();
       onResetComplete?.();
     }
-  }, [resetFilters, onResetComplete, locationData.states, userState]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetFilters, onResetComplete, userState]);
 
   const loadStates = async () => {
     setLoading(prev => ({ ...prev, states: true }));
@@ -553,7 +574,7 @@ const DynamicFilterBar: React.FC<FilterBarProps> = ({
       }}
     >
         <Grid item xs={12} sm={6} md={gridSize}>
-          {renderDropdown('state', t('DYNAMIC_FILTER_BAR.STATE'), locationData.states, !!userState, loading.states)}
+          {renderDropdown('state', t('DYNAMIC_FILTER_BAR.STATE'), locationData.states, true, loading.states)}
         </Grid>
         
         <Grid item xs={12} sm={6} md={gridSize}>
