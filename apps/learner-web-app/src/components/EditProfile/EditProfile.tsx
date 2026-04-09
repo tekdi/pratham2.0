@@ -163,6 +163,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.consent_file;
         delete responseFormForEnroll?.schema?.properties?.privacy_consent;
         delete responseFormForEnroll?.schema?.properties?.parent_guardian_consent;
+        delete responseFormForEnroll?.schema?.properties?.nda_policy;
+        delete responseFormForEnroll?.schema?.properties?.child_pocso_fraud_policy;
+        delete responseFormForEnroll?.schema?.properties?.how_would_you_like_to_register;
+        delete responseFormForEnroll?.schema?.properties?.organisation_registered;
+        delete responseFormForEnroll?.schema?.properties?.volunteer_type;
+        delete responseFormForEnroll?.schema?.properties?.ptm_id;
+        delete responseFormForEnroll?.schema?.properties?.poc_id;
+        delete responseFormForEnroll?.schema?.properties?.org_id;
         responseFormForEnroll?.schema?.required?.pop('batch');
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
@@ -182,6 +190,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseForm?.schema?.properties.village;
         delete responseForm?.schema?.properties?.privacy_consent;
         delete responseForm?.schema?.properties?.parent_guardian_consent;
+        delete responseForm?.schema?.properties?.nda_policy;
+        delete responseForm?.schema?.properties?.child_pocso_fraud_policy;
+        delete responseForm?.schema?.properties?.how_would_you_like_to_register;
+        delete responseForm?.schema?.properties?.organisation_registered;
+        delete responseForm?.schema?.properties?.volunteer_type;
+        delete responseForm?.schema?.properties?.ptm_id;
+        delete responseForm?.schema?.properties?.poc_id;
+        delete responseForm?.schema?.properties?.org_id;
 
         responseForm?.schema?.required.pop('batch');
         let userId = localStorage.getItem('userId');
