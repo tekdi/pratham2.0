@@ -415,6 +415,9 @@ const CohortSelectionSection: React.FC<CohortSelectionSectionProps> = ({
           if (!response?.length) {
             setLoading(false);
           }
+          // Guaranteed fallback: always reset loading after fetchCohorts
+          // regardless of response type, to prevent infinite loader.
+          setLoading(false);
         } catch (error) {
           console.error('Error fetching cohort list', error);
           setLoading(false);
