@@ -253,25 +253,20 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         }
         else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
           Pendingfilters = {
-            role: "Learner",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Learner"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
              ptm_id: localStorage.getItem('userId') || '',
-             is_rejected:"No",
+             // No is_rejected filter here — new users don't have the field set to "No"
+             // We compute pendingCount = totalLearners - rejectedCount after the API calls
           };
           Approvedfilters = {
-            role: "Volunteer",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Volunteer"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
             ptm_id: localStorage.getItem('userId') || '',
           };
           Rejectedfilters = {
-            role: "Learner",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Learner"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
            ptm_id: localStorage.getItem('userId') || '',
              is_rejected:"Yes",
           };
@@ -329,9 +324,14 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         ]);
 
         // Extract counts from responses
-        const pendingCount = pendingResponse?.totalCount || 0;
         const approvedCount = approvedResponse?.totalCount || 0;
         const rejectedCount = rejectedResponse?.totalCount || 0;
+        // For ORGANISATION_VOLUNTEER, Pendingfilters returns all Learners (no is_rejected filter),
+        // because new pending users don't have is_rejected set to "No" — they simply have no value.
+        // So pendingCount = total Learners - explicitly rejected Learners.
+        const pendingCount = dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER
+          ? Math.max(0, (pendingResponse?.totalCount || 0) - rejectedCount)
+          : (pendingResponse?.totalCount || 0);
         const totalCount = pendingCount + approvedCount + rejectedCount;
 
         // Update status cards with actual API counts
@@ -553,8 +553,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
         baseFilters = {
           "role": ["Learner", "Volunteer"],
-          "how_would_you_like_to_register": ["register_an_organisation_as_poc"],
-         // "volunteer_type":"individual_volunteer_through_an_organisation",
+          "volunteer_type":"individual_volunteer_through_an_organisation",
           "ptm_id": localStorage.getItem('userId') || ''
         };
       }
@@ -573,11 +572,11 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       // This filters table data to show only records matching the clicked status
       if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
         if (selectedStatus === 'pending') {
-          baseFilters = { ...baseFilters}; // Learners not rejected
+          baseFilters = { ...baseFilters, role: ['Learner'] }; // Pending = Learners (not yet approved as Volunteer)
         } else if (selectedStatus === 'approved') {
           baseFilters = { ...baseFilters, role: ['Volunteer'] }; // Approved as Volunteers
         } else if (selectedStatus === 'rejected') {
-          baseFilters = { ...baseFilters, is_reject: 'Yes' }; // Explicitly rejected
+          baseFilters = { ...baseFilters, role: ['Learner'], is_rejected: 'Yes' }; // Explicitly rejected Learners
         }
         // For 'total', no additional status filter is added (shows all records)
       } else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
@@ -660,7 +659,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             const village = getCustomFieldValue('VILLAGE');
             const location = [state, district, block, village].filter(l => l !== 'N/A').join(', ') || 'N/A';
 
-      
             const transformedRow = {
               id: user.userId || `user-${currentPage * rowsPerPage + index + 1}`,
               name: capitalizeFirstLetter(`${user.firstName || ''} ${user.lastName || ''}`.trim() || (user.name as string) || 'N/A'),
@@ -673,8 +671,15 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             
             return transformedRow;
           });
-          
-          setTableData(transformedData);
+
+          // For pending view: client-side exclude rejected Learners
+          // (API has no "NOT" operator, so role:["Learner"] returns pending + rejected Learners)
+          const pendingRejectedStatus = t('PTM_DASHBOARD.REJECTED');
+          const displayData = selectedStatus === 'pending'
+            ? transformedData.filter((row: RowData) => row.status !== pendingRejectedStatus)
+            : transformedData;
+
+          setTableData(displayData);
           setTotalTableRecords(parseInt(response?.getUserDetails?.[0]?.total_count || '0') || 0);
         } else {
           console.log('No data received from API');
