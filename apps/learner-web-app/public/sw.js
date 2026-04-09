@@ -196,7 +196,6 @@ async function processTrackingQueue() {
   const issueCertificateUrl = syncConfig.issueCertificateUrl;
   const assessmentStatusUrl = syncConfig.assessmentStatusUrl;
   const token = syncConfig.token;
-  console.log('#agsjhasgasjg syncConfig', syncConfig);
   if (
     !url ||
     !token ||
@@ -211,7 +210,7 @@ async function processTrackingQueue() {
   ) {
     return;
   }
-  
+
   let db;
   try {
     db = await openDatabase();
@@ -264,6 +263,8 @@ async function processTrackingQueue() {
 
         let ok = false;
         let lastErr = null;
+        // Only retry the tracking POST when the response is not OK or fetch throws.
+        // Certificate / course-status work runs at most once after a successful POST.
         for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
           if (!self.navigator.onLine) break;
           try {
@@ -272,17 +273,31 @@ async function processTrackingQueue() {
               headers,
               body: JSON.stringify(body),
             });
-            if (res.ok) {
-              //other process to certificate issue
-              const response = await res.json();
-              console.log('#agsjhasgasjg response', response);
-              console.log(
-                '#agsjhasgasjg configFunctionality',
-                value.configFunctionality
+
+            if (!res.ok) {
+              const text = await res.text().catch(() => '');
+              lastErr = `${res.status} ${text}`;
+              console.error(
+                '[learner-sw] tracking API failed',
+                key,
+                'attempt',
+                attempt,
+                lastErr
               );
+              if (attempt < MAX_FETCH_ATTEMPTS && self.navigator.onLine) {
+                await delay(RETRY_DELAY_MS);
+              }
+              continue;
+            }
+
+            const response = await res.json();
+
+            try {
               if (
                 response &&
-                value.configFunctionality.isGenerateCertificate !== false
+                value?.configFunctionality?.isGenerateCertificate !== false &&
+                value?.extraObject?.course &&
+                value?.extraObject?.unitId
               ) {
                 await updateCOurseAndIssueCertificate({
                   userId: syncConfig.userId,
@@ -292,37 +307,34 @@ async function processTrackingQueue() {
                     value?.configFunctionality?.isGenerateCertificate,
                 });
               }
-              //end other process to certificate issue
-
-              ok = true;
-              console.log(
-                '[learner-sw] tracking synced',
+            } catch (certErr) {
+              console.error(
+                '[learner-sw] certificate / course flow failed (queue item still cleared)',
                 key,
-                'attempt',
-                attempt
+                certErr
               );
-              break;
             }
-            const text = await res.text().catch(() => '');
-            lastErr = `${res.status} ${text}`;
-            console.error(
-              '[learner-sw] tracking API failed',
+
+            ok = true;
+            console.log(
+              '[learner-sw] tracking synced',
               key,
               'attempt',
-              attempt,
-              lastErr
+              attempt
             );
+            break;
           } catch (err) {
             lastErr = err;
             console.error(
               '[learner-sw] tracking fetch error',
               key,
+              'attempt',
               attempt,
               err
             );
-          }
-          if (attempt < MAX_FETCH_ATTEMPTS && self.navigator.onLine) {
-            await delay(RETRY_DELAY_MS);
+            if (attempt < MAX_FETCH_ATTEMPTS && self.navigator.onLine) {
+              await delay(RETRY_DELAY_MS);
+            }
           }
         }
 
@@ -358,7 +370,7 @@ async function processTrackingQueue() {
 }
 
 //certificate issue function
-async function updateCOurseAndIssueCertificate ({
+async function updateCOurseAndIssueCertificate({
   course,
   userId,
   unitId,
@@ -381,7 +393,7 @@ async function updateCOurseAndIssueCertificate ({
     const response = await res.json();
 
     const courseStatus = await calculateCourseStatus({
-      statusData: response?.data?.data?.[0]?.course?.[0],
+      statusData: response?.data?.[0]?.course?.[0],
       allCourseIds: course.leafNodes ?? [],
       courseId: course?.identifier,
     });
@@ -393,17 +405,16 @@ async function updateCOurseAndIssueCertificate ({
         status: 'inprogress',
       });
     } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
-      const userResponse = await getUserId();
       const data = await fetchCertificateStatus({
         userId: userId,
         courseId: course?.identifier,
       });
       if (data !== 'viewCertificate') {
+        const userResponse = await getUserId();
         const responseCriteria = await checkCriteriaForCertificate({
           userId: userId,
           courseId: course?.identifier,
         });
-
         if (responseCriteria === true) {
           try {
             await issueCertificate({
@@ -435,7 +446,7 @@ async function updateCOurseAndIssueCertificate ({
           });
         }
       }
-    } else {
+    } else if (courseStatus?.status != 'not started') {
       await updateUserCourseStatus({
         userId,
         courseId: course?.identifier,
@@ -446,10 +457,10 @@ async function updateCOurseAndIssueCertificate ({
     console.error('Error in updateCOurseAndIssueCertificate:', error);
     throw error;
   }
-};
-async function calculateCourseStatus ({ statusData, allCourseIds, courseId }) {
-  const completedList = new Set(statusData.completed_list || []);
-  const inProgressList = new Set(statusData.in_progress_list || []);
+}
+async function calculateCourseStatus({ statusData, allCourseIds, courseId }) {
+  const completedList = new Set(statusData?.completed_list || []);
+  const inProgressList = new Set(statusData?.in_progress_list || []);
 
   let completedCount = 0;
   let inProgressCount = 0;
@@ -486,8 +497,8 @@ async function calculateCourseStatus ({ statusData, allCourseIds, courseId }) {
     status,
     percentage: percentage,
   };
-};
-async function updateUserCourseStatus ({ userId, courseId, status }) {
+}
+async function updateUserCourseStatus({ userId, courseId, status }) {
   const apiUrl = syncConfig?.userCertificateStatusUpdateUrl;
   try {
     const res = await fetch(apiUrl, {
@@ -509,8 +520,8 @@ async function updateUserCourseStatus ({ userId, courseId, status }) {
     console.error('error in updating user course status', error);
     throw error;
   }
-};
-async function getUserId () {
+}
+async function getUserId() {
   const apiUrl = syncConfig?.authUrl;
 
   try {
@@ -533,8 +544,8 @@ async function getUserId () {
     console.error('Error in fetching user details', error);
     throw error;
   }
-};
-async function fetchCertificateStatus ({ userId, courseId }) {
+}
+async function fetchCertificateStatus({ userId, courseId }) {
   try {
     const res = await fetch(syncConfig?.userCertificateStatusGetUrl, {
       method: 'POST',
@@ -546,17 +557,17 @@ async function fetchCertificateStatus ({ userId, courseId }) {
       },
     });
     const response = await res.json();
-    const status = response?.data?.result?.status;
+    const status = response?.result?.status;
     return status || 'No status found';
   } catch (error) {
     console.error('API call failed:', error);
     // return { error: error.message };
   }
-};
-async function checkCriteriaForCertificate (reqBody) {
+}
+async function checkCriteriaForCertificate(reqBody) {
   const userId = reqBody?.userId;
   const courseId = reqBody?.courseId;
-  const apiUrl = syncConfig?.courseHierarchyUrl+courseId;
+  const apiUrl = syncConfig?.courseHierarchyUrl + courseId;
 
   try {
     const res = await fetch(apiUrl, {
@@ -568,13 +579,13 @@ async function checkCriteriaForCertificate (reqBody) {
       },
     });
     const response = await res.json();
-    if (Object.keys(response?.data?.result?.content).length > 0) {
-      const content = response?.data?.result?.content;
+    if (Object.keys(response?.result?.content).length > 0) {
+      const content = response?.result?.content;
 
       // Extract question set identifiers with their parent unit IDs
       const questionSetData = [];
 
-      function extractQuestionSets (node, parentId) {
+      function extractQuestionSets(node, parentId) {
         // Check if current node is a question set
         if (node.mimeType === 'application/vnd.sunbird.questionset') {
           questionSetData.push({
@@ -590,7 +601,7 @@ async function checkCriteriaForCertificate (reqBody) {
             extractQuestionSets(child, node.identifier);
           });
         }
-      };
+      }
 
       // Start extraction from the root content
       extractQuestionSets(content);
@@ -600,6 +611,7 @@ async function checkCriteriaForCertificate (reqBody) {
       //tenantId
       const tenantId = syncConfig.tenantId;
       const headers = {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${syncConfig.token}`,
         ...(syncConfig.tenantId && { tenantid: syncConfig.tenantId }),
       };
@@ -627,11 +639,10 @@ async function checkCriteriaForCertificate (reqBody) {
           headers: headers,
         });
         const response = await res.json();
-        console.log(response?.data?.data);
 
-        if (response?.data?.data?.length > 0) {
+        if (response?.data?.length > 0) {
           // Filter data for specific userId
-          const userData = response?.data?.data.find(
+          const userData = response?.data.find(
             (item) => item.userId === userId
           );
 
@@ -652,7 +663,7 @@ async function checkCriteriaForCertificate (reqBody) {
                 const percentage = parseFloat(assessment.percentage);
                 //percentage comparison from program specific configuration
                 let percentageComparision = 40;
-                if(tenantId === '914ca990-9b45-4385-a06b-05054f35d0b9'){
+                if (tenantId === '914ca990-9b45-4385-a06b-05054f35d0b9') {
                   percentageComparision = 80;
                 }
                 return percentage >= percentageComparision;
@@ -684,8 +695,8 @@ async function checkCriteriaForCertificate (reqBody) {
     console.log(error);
     return false;
   }
-};
-async function issueCertificate (reqBody) {
+}
+async function issueCertificate(reqBody) {
   const apiUrl = syncConfig.issueCertificateUrl;
   try {
     const res = await fetch(apiUrl, {
@@ -698,12 +709,12 @@ async function issueCertificate (reqBody) {
       },
     });
     const response = await res.json();
-    return response?.data;
+    return response;
   } catch (error) {
     console.log(error);
     throw error;
   }
-};
+}
 //end certificate issue function
 
 function logAndBroadcastConnectivity(reason) {
