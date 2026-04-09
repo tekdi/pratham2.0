@@ -85,6 +85,7 @@ export const mapUserData = (userData: any) => {
 
       preferred_mode_of_learning:
         getSelectedValue('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || [],
+        what_is_your_preferred_language: getSelectedValue('WHAT_IS_YOUR_PREFERRED_LANGUAGE') || [],
     };
     if (userData.middleName) {
       result.middleName = userData.middleName;

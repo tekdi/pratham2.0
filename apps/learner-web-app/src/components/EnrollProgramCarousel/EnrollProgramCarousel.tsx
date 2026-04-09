@@ -164,12 +164,14 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
         ? [targetProgramName]
         : [];
     try {
+      const preferredLanguage = localStorage.getItem('preferred_language');
       const response = await ContentSearch({
         query: '',
         filters: {
           status: ['Live'],
           primaryCategory: ['Practice Question Set'],
           assessmentType: 'Zatpat Test',
+          ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
           program: programFilter,
         },
         sort_by: { lastUpdatedOn: 'desc' },

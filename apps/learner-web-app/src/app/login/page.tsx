@@ -369,9 +369,7 @@ const LoginPage = () => {
             if(label === 'PSU') {
               localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
             }
-           
-  
-           
+
           });
         }
         const uiConfig = userResponse?.tenantData?.find(
@@ -397,7 +395,35 @@ const LoginPage = () => {
         localStorage.setItem('templtateId', tenantData?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
-        localStorage.setItem('lastName', userResponse?.lastName || '');
+        localStorage.setItem('tenantId', selectedTenantId || '');
+
+        // Fetch user details and store preferred language for every tenant
+        try {
+          const userDetails = await getUserDetails(userResponse?.userId, true);
+          if (userDetails?.result?.userData?.customFields) {
+            userDetails.result.userData.customFields.forEach((field: any) => {
+              const { label, selectedValues } = field;
+              if (label === 'WHAT_IS_YOUR_PREFERRED_LANGUAGE') {
+                let preferred = '';
+                if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+                  const first = selectedValues[0] as unknown;
+                  preferred =
+                    typeof first === 'string'
+                      ? first
+                      : (first as { value?: string })?.value ?? String(first);
+                } else if (typeof selectedValues === 'string') {
+                  preferred = selectedValues;
+                }
+                if (preferred) {
+                  localStorage.setItem('preferred_language', preferred);
+                }
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch user details for preferred language', error);
+        }
+
         const uiConfig = tenantData?.params?.uiConfig;
         const landingPage = tenantData?.params?.uiConfig?.landingPage;
         localStorage.setItem('landingPage', landingPage);
