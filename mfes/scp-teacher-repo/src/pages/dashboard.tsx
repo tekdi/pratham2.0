@@ -152,6 +152,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(currentDate.getDate() - modifyAttendanceLimit);
   const formattedSevenDaysAgo = shortDateFormat(sevenDaysAgo);
+  const fifteenDaysAgo = new Date();
+  fifteenDaysAgo.setDate(currentDate.getDate() - 15);
+  const formattedFifteenDaysAgo = shortDateFormat(fifteenDaysAgo);
   const [userId, setUserId] = React.useState<string | null>(null);
   const [blockName, setBlockName] = React.useState<string>('');
   const [role, setRole] = React.useState<any>('');
@@ -1326,7 +1329,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
                                     (modifyAttendanceLimit > 0 &&
-                                      formattedSevenDaysAgo > selectedDate)
+                                      formattedSevenDaysAgo > selectedDate) ||
+                                    formattedFifteenDaysAgo > selectedDate
                                   }
                                 >
                                   {currentAttendance === 'notMarked' ||
