@@ -442,12 +442,14 @@ export const hierarchyContent = async (content_do_id: string) => {
 // New function to fetch Zatpat test identifiers
 export const getZatpatTestIdentifiers = async () => {
   const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const preferredLanguage = localStorage.getItem('preferred_language');
   const data = {
     request: {
       filters: {
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
         assessmentType: 'Zatpat Test',
+        ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
         program: ['Second Chance Program', 'Second Chance']
       },
       fields: ['name', 'englishName', 'appIcon', 'description', 'posterImage', 'mimeType', 'identifier', 'leafNodes', 'se_subjects'],
