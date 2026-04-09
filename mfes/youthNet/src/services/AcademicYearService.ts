@@ -1,8 +1,9 @@
 import { post } from '@shared-lib';
-import API_ENDPOINTS from '../utils/API/APIEndpoints';
 
 export const getAcademicYear = async (): Promise<any> => {
-  const apiUrl: string =  API_ENDPOINTS.academicYearsList;
+  const interfaceUrl =
+    process.env.NEXT_PUBLIC_MIDDLEWARE_URL; 
+  const apiUrl: string = `${interfaceUrl}/academicyears/list`;
   try {
     const response = await post(apiUrl, {});
     return response?.data?.result;

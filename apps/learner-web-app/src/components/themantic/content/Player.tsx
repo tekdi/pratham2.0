@@ -664,7 +664,7 @@ const PlayerBox = ({
     userIdLocalstorageName
       ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
       : ""
-  }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}` : ''}`}
+  }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
   style={{
     position: "absolute",
     inset: 0,

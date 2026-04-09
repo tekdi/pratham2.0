@@ -125,7 +125,24 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               overflowY: "auto",
             }}
           >
-            {centers}
+            {typeof centers === "string"
+              ? centers.split(", ").map((center: string, index: number) => (
+                  <Typography
+                    key={center.trim()}
+                    variant="body2"
+                    sx={{
+                      padding: "4px 6px",
+                      borderBottom:
+                        index < centers.split(", ").length - 1
+                          ? "1px solid #f0f0f0"
+                          : "none",
+                      color: "#333",
+                    }}
+                  >
+                    {center.trim()}
+                  </Typography>
+                ))
+              : centers}
           </Box>
 
           <FormControlLabel

@@ -2,23 +2,22 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   Typography,
-  InputBase,
-  IconButton,
-  Menu,
   MenuItem,
   Select,
   FormControl,
 } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import SearchIcon from '@mui/icons-material/Search';
 import { SearchButton } from '../SearchButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import { ContentSearch } from '@learner/utils/API/contentService';
 
-const languages = ['English', 'Marathi', 'Hindi'];
 const STORAGE_KEY = 'selectedLanguage';
+type SearchLanguageItem = {
+  contentLanguage?: string;
+};
 
 const SubHeader = ({
   showFilter,
@@ -32,26 +31,74 @@ const SubHeader = ({
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams?.get('q') || '');
 
+  const [languageOptions, setLanguageOptions] = useState<string[]>(['English']);
+
   // Initialize selectedLang with value from localStorage to prevent flash
-  const getInitialLanguage = () => {
+  const getInitialLanguage = (availableLanguages: string[]) => {
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem(STORAGE_KEY);
-      if (savedLang && languages.includes(savedLang)) {
+      if (savedLang && availableLanguages.includes(savedLang)) {
         return savedLang;
       }
     }
-    return 'English';
+    return availableLanguages[0] || 'English';
   };
 
-  const [selectedLang, setSelectedLang] = React.useState(getInitialLanguage);
+  const [selectedLang, setSelectedLang] = React.useState(() =>
+    getInitialLanguage(['English'])
+  );
   const router = useRouter();
 
-  // Load selected language from localStorage on component mount and call getFilter
+  // Load language options from content search API and align selected language.
   useEffect(() => {
-    const savedLang = localStorage.getItem(STORAGE_KEY);
-    if (savedLang && languages.includes(savedLang) && getFilter) {
-      getFilter(savedLang);
-    }
+    const loadLanguages = async () => {
+      try {
+        const response = await ContentSearch({
+          filters: {
+            program: 'Experimento India',
+            status: ['live'],
+            primaryCategory: [
+              'Learning Resource',
+              'Practice Question Set',
+              'Activity',
+              'Story',
+              'Interactive',
+              'Course',
+            ],
+          },
+          fields: ['contentLanguage'],
+          limit: 200,
+          offset: 0,
+        });
+
+        const uniqueLanguages = Array.from(
+          new Set(
+            (response?.result?.content || [])
+              .map((item: SearchLanguageItem) => item?.contentLanguage)
+              .filter(
+                (lang: string | undefined): lang is string =>
+                  typeof lang === 'string' && !!lang.trim()
+              )
+          )
+        ) as string[];
+
+        const nextLanguages = uniqueLanguages.length > 0 ? uniqueLanguages : ['English'];
+        setLanguageOptions(nextLanguages);
+
+        const nextSelectedLang = getInitialLanguage(nextLanguages);
+        setSelectedLang(nextSelectedLang);
+        localStorage.setItem(STORAGE_KEY, nextSelectedLang);
+        if (getFilter) getFilter(nextSelectedLang);
+      } catch {
+        const fallbackLang = getInitialLanguage(['English']);
+        setLanguageOptions(['English']);
+        setSelectedLang(fallbackLang);
+        localStorage.setItem(STORAGE_KEY, fallbackLang);
+        if (getFilter) getFilter(fallbackLang);
+      }
+    };
+
+    loadLanguages();
   }, [getFilter]);
 
   useEffect(() => {
@@ -59,7 +106,7 @@ const SubHeader = ({
     setSearch(queryParam);
   }, [searchParams]);
 
-  const handleLanguageChange = (event: any) => {
+  const handleLanguageChange = (event: SelectChangeEvent<string>) => {
     const lang = event.target.value;
     setSelectedLang(lang);
     // Save selected language to localStorage
@@ -160,7 +207,7 @@ const SubHeader = ({
                   },
                 }}
               >
-                {languages.map((lang) => (
+                {languageOptions.map((lang) => (
                   <MenuItem key={lang} value={lang}>
                     {lang}
                   </MenuItem>

@@ -204,6 +204,7 @@ const LoginComponent = () => {
       localStorage.setItem('userEmail', receivedToken?.email);
       localStorage.setItem('userName', receivedToken?.firstName);
       localStorage.setItem('firstName', receivedToken?.firstName || '');
+      localStorage.setItem('lastName', receivedToken?.lastName || '');
       localStorage.setItem('userIdName', receivedToken?.username);
       localStorage.setItem(
         'temporaryPassword',
