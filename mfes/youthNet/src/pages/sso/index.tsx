@@ -349,7 +349,7 @@ const SSOContent = () => {
         localStorage.setItem('userProgram', tenantName);
         const isYouthnetTenant =
           tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
-        if (isYouthnetTenant) {
+        if (tenantType !== 'elearning') {
           const activeAcademicYearId = await getActiveAcademicYearId();
           if (activeAcademicYearId) {
             localStorage.setItem('academicYearId', activeAcademicYearId);
