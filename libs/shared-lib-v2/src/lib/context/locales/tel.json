@@ -107,7 +107,8 @@
       "completed": "పూర్తయింది",
       "in_progress": "ప్రోగ్రెస్‌లో",
       "enrolled_not_started": "నమోదు చేయబడింది, ప్రారంభం కాలేదు",
-      "not_started": "ప్రారంభం కాలేదు"
+      "not_started": "ప్రారంభం కాలేదు",
+      "tracking_sync_pending": "ట్రేకింగ్ సింక్ పెండింగ్"
     },
     "BACK": "వెనక్కి",
     "RETURN_TO_LOGIN": "లాగిన్‌కు తిరిగి వెళ్లండి",

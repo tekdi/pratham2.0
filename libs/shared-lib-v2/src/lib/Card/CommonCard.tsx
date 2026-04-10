@@ -9,7 +9,7 @@ import CardActions from '@mui/material/CardActions';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
-import { Box, LinearProgress, useTheme } from '@mui/material';
+import { Box, IconButton, LinearProgress, useTheme } from '@mui/material';
 import { CircularProgressWithLabel } from '../Progress/CircularProgressWithLabel';
 import SpeakableText from '../textToSpeech/SpeakableText';
 import { capitalize } from 'lodash';
@@ -18,6 +18,7 @@ import TripOriginOutlinedIcon from '@mui/icons-material/TripOriginOutlined';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import { useTranslation } from '../context/LanguageContext';
+import { hasQueuedTrackingForContentId } from '../../utils/trackingContentQueueLookup';
 
 export interface ContentItem {
   name: string;
@@ -105,6 +106,20 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   const [statusBar, setStatusBar] = React.useState<StatuPorps>();
   const { t } = useTranslation();
 
+  const [isTrackingSyncPending, setIsTrackingSyncPending] =
+    React.useState(false);
+
+  React.useEffect(() => {
+    const checkTrackingSyncPending = async () => {
+      const isPending = await hasQueuedTrackingForContentId(item?.identifier);
+      
+      // console.log('#asaasdas isPending===>', isPending);
+      // console.log('#asaasdas item?.identifier===>', item?.identifier);
+      setIsTrackingSyncPending(isPending);
+    };
+    checkTrackingSyncPending();
+  }, [item?.identifier]);
+
   React.useEffect(() => {
     const init = () => {
       try {
@@ -188,10 +203,16 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           />
         )}
 
-        {/* Progress Bar Overlay */}
-        {/* Progress Bar Overlay */}
-        {!_card?.isHideProgressStatus && (
-          <StatusBar {...statusBar} _card={_card} />
+        {isTrackingSyncPending === true ? (
+          <OfflineStatusBar />
+        ) : (
+          <>
+            {/* Progress Bar Overlay */}
+            {/* Progress Bar Overlay */}
+            {!_card?.isHideProgressStatus && (
+              <StatusBar {...statusBar} _card={_card} />
+            )}
+          </>
         )}
       </Box>
       {avatarLetter && subheader && (
@@ -360,6 +381,75 @@ export const CommonCard: React.FC<CommonCardProps> = ({
           </Box>
         )}
     </Card>
+  );
+};
+
+export const OfflineStatusBar: React.FC = () => {
+  const { t } = useTranslation();
+
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          pl: '6px',
+          pr: '6px',
+          py: '6px',
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: '500',
+          color: '#50EE42',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <Typography
+          variant="h3"
+          component="div"
+          sx={{
+            minWidth: '81px',
+            letterSpacing: '0.1px',
+            verticalAlign: 'middle',
+          }}
+        >
+          <SpeakableText>
+          ⓘ {t('COMMON.STATUS.tracking_sync_pending')}
+          </SpeakableText>
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label="reload"
+          onClick={() => window.location.reload()}
+          sx={{ ml: 1, color: '#50EE42', background: 'rgba(255,255,255,0.1)' }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.37 5.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </IconButton>
+      </Box>
+    </Box>
   );
 };
 

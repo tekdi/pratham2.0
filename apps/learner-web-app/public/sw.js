@@ -268,6 +268,9 @@ async function processTrackingQueue() {
         for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt++) {
           if (!self.navigator.onLine) break;
           try {
+            // Wait for 100 seconds before making the fetch call for testing
+            // await new Promise((resolve) => setTimeout(resolve, 100000));
+    
             const res = await fetch(url, {
               method: 'POST',
               headers,
