@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Box, Fade } from '@mui/material';
+import { Box, Fade, IconButton, Typography } from '@mui/material';
 import {
   calculateTrackData,
   calculateTrackDataItem,

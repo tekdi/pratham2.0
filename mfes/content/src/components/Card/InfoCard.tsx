@@ -16,6 +16,7 @@ import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import LoginIcon from '@mui/icons-material/Login';
 import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import HoverableText from '../HoverableText';
+import { hasQueuedTrackingForContentId } from '@shared-lib';
 
 interface InfoCardProps {
   item: any;
@@ -23,6 +24,7 @@ interface InfoCardProps {
   onBackClick?: () => void;
   _config?: any;
   checkLocalAuth?: boolean;
+  isTrackingSyncPending?: boolean;
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({
@@ -37,6 +39,16 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const [openModal, setOpenModal] = useState(false);
   const [courseScoreResponse, setCourseScoreResponse] = useState<any>({});
   const [isLoadingScore, setIsLoadingScore] = useState(false);
+
+  const [isTrackingSyncPending, setIsTrackingSyncPending] = useState(false);
+
+  useEffect(() => {
+    const checkTrackingSyncPending = async () => {
+      const isPending = await hasQueuedTrackingForContentId(item?.identifier as string);
+      setIsTrackingSyncPending(isPending);
+    }
+    checkTrackingSyncPending();
+  }, [item?.identifier]);
 
   // Call checkCourseScore function
   useEffect(() => {
@@ -262,6 +274,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
                     </SpeakableText>
                   </Typography>
                 )}
+                {isTrackingSyncPending===true && 
+                  <OfflineStatusBarLocal />
+                }
             </Box>
           </Box>
         </Box>
@@ -331,3 +346,70 @@ const InfoCard: React.FC<InfoCardProps> = ({
 };
 
 export default React.memo(InfoCard);
+
+const OfflineStatusBarLocal = () => {
+  const { t } = useTranslation();
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        background: 'rgba(0, 0, 0, 0.5)',
+        mt: 1,
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          pl: '6px',
+          pr: '6px',
+          py: '6px',
+          fontSize: '14px',
+          lineHeight: '20px',
+          fontWeight: '500',
+          color: '#50EE42',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
+      >
+        <Typography
+          variant="h3"
+          component="div"
+          sx={{
+            minWidth: '81px',
+            letterSpacing: '0.1px',
+            verticalAlign: 'middle',
+          }}
+        >
+          <SpeakableText>
+          ⓘ {t('COMMON.STATUS.tracking_sync_pending')}
+          </SpeakableText>
+        </Typography>
+        <IconButton
+          size="small"
+          aria-label="reload"
+          onClick={() => window.location.reload()}
+          sx={{ ml: 1, color: '#50EE42', background: 'rgba(255,255,255,0.1)' }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.37 5.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </IconButton>
+      </Box>
+    </Box>
+  );
+};

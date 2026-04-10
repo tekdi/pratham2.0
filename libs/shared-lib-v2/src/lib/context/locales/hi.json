@@ -107,7 +107,8 @@
       "completed": "पूरा हुआ",
       "in_progress": "प्रगति पर",
       "enrolled_not_started": "नामांकित, शुरू नहीं हुआ",
-      "not_started": "शुरू नहीं हुआ"
+      "not_started": "शुरू नहीं हुआ",
+      "tracking_sync_pending": "ट्रैकिंग सिंक पेंडिंग"
     },
     "BACK": "पीछे",
     "RETURN_TO_LOGIN": "लॉगिन पर वापस लौटें",

@@ -4,6 +4,7 @@ import {
   fetchBulkContents,
   updateCOurseAndIssueCertificate,
 } from './PlayerService';
+import { customStoreSet } from '@shared-lib-v2/utils/customIdbStore';
 
 const lastAccessOn = new Date().toISOString();
 
@@ -231,7 +232,26 @@ export const contentWithTelemetryData = async ({
       const ContentTypeReverseMap = Object.fromEntries(
         Object.entries(ContentType).map(([key, value]) => [value, key])
       );
-      const reqBody: ContentCreate = {
+      // Generate a random 4-digit number
+      const randomFourDigit = Math.floor(1000 + Math.random() * 9000);
+      await customStoreSet(`${userId}_${randomFourDigit}`, {
+        createdAt: new Date().toISOString(),
+        configFunctionality: configFunctionality,
+        extraObject: {
+          course: course,
+          unitId: unitId,
+        },
+        //below are api payload object
+        userId: userId,
+        contentId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
+        contentType: ContentTypeReverseMap[resolvedMimeType] || '',
+        contentMime: resolvedMimeType,
+        lastAccessOn: lastAccessOn,
+        detailsObject: detailsObject,
+      });
+      /*const reqBody: ContentCreate = {
         userId: userId,
         contentId: identifier,
         courseId: courseId && unitId ? courseId : identifier,
@@ -250,7 +270,7 @@ export const contentWithTelemetryData = async ({
           unitId,
           isGenerateCertificate: configFunctionality.isGenerateCertificate,
         });
-      }
+      }*/
     }
   } catch (error) {
     console.error('Error in contentWithTelemetryData:', error);

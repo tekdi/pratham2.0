@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { FontSizeProvider } from '../context/FontSizeContext';
 import { UnderlineLinksProvider } from '../context/UnderlineLinksContext';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
+import ServiceWorkerRegister from '@learner/components/ServiceWorkerRegister/ServiceWorkerRegister';
 
 export default function ClientLayout({
   children,
@@ -16,6 +17,7 @@ export default function ClientLayout({
 
   return (
     <FontSizeProvider>
+      <ServiceWorkerRegister />
       <UnderlineLinksProvider>{children}</UnderlineLinksProvider>
     </FontSizeProvider>
   );
