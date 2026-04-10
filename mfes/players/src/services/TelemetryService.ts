@@ -4,7 +4,7 @@ import {
   fetchBulkContents,
   updateCOurseAndIssueCertificate,
 } from './PlayerService';
-import { customStoreSet } from '@shared-lib-v2/utils/customIdbStore';
+import { customStoreSet } from '../utils/customIdbStore';
 
 const lastAccessOn = new Date().toISOString();
 

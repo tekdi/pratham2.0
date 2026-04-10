@@ -16,7 +16,7 @@ import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import LoginIcon from '@mui/icons-material/Login';
 import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import HoverableText from '../HoverableText';
-import { hasQueuedTrackingForContentId } from '@shared-lib';
+import { hasQueuedTrackingForContentId } from '@shared-lib-v2/utils/trackingContentQueueLookup';
 
 interface InfoCardProps {
   item: any;
