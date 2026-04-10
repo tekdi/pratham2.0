@@ -21,6 +21,10 @@ import prathamQRCode from '../../../public/images/prathamQR.png';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { FilterKey, TenantName } from '../../utils/app.constant';
+import { ContentSearch } from '@learner/utils/API/contentService';
+import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
+import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 
 const Login = dynamic(
   () => import('@login/Components/LoginComponent/LoginComponent'),
@@ -28,6 +32,114 @@ const Login = dynamic(
     ssr: false,
   }
 );
+
+export type RegistrationTestStatus =
+  | 'clear'
+  | 'assessmentPending'
+  | 'assessmentUnavailable';
+
+export const checkRegistrationTestStatus = async (
+  uiConfig: any,
+  enrolledProgramName?: string,
+  tenantDataDetails?:any
+): Promise<RegistrationTestStatus> => {
+  const isRegistrationTestEnabled =
+    uiConfig?.RegisterationTest === true || uiConfig?.RegisterationTest === 'true';
+
+  if (!isRegistrationTestEnabled) {
+    return 'clear';
+  }
+
+  const storedUserId = localStorage.getItem('userId');
+  if (!storedUserId) return 'clear';
+
+  try {
+    
+
+    if (tenantDataDetails?.[0]?.tenantType !== 'elearning') {
+      const academicYearList = await getAcademicYear();
+    const activeAcademicYear = Array.isArray(academicYearList)
+      ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+      : undefined;
+
+    if (activeAcademicYear?.id) {
+      localStorage.setItem('academicYearId', activeAcademicYear.id);
+    }
+      const cohortResponse = await getCohortList(storedUserId, true, true);
+      const userHasActiveBatch = Array.isArray(cohortResponse?.result)
+        ? cohortResponse.result.some(
+            (cohort: {
+              type?: string;
+              cohortStatus?: string;
+              cohortMemberStatus?: string;
+            }) =>
+              cohort?.type === 'BATCH' &&
+              cohort?.cohortStatus === 'active' &&
+              cohort?.cohortMemberStatus === 'active'
+          )
+        : false;
+
+      if (userHasActiveBatch) {
+        return 'clear';
+      }
+    }
+  } catch (error) {
+    console.error('checkRegistrationTestStatus: getCohortList failed', error);
+  }
+
+  let questionSetIdentifier: string | undefined;
+  const targetProgramName = enrolledProgramName || localStorage.getItem('userProgram');
+  const programFilter =
+    targetProgramName === 'Second Chance Program'
+      ? [targetProgramName, 'Second Chance']
+      : targetProgramName
+      ? [targetProgramName]
+      : [];
+
+  try {
+    const response = await ContentSearch({
+      query: '',
+      filters: {
+        status: ['Live'],
+        primaryCategory: ['Practice Question Set'],
+        assessmentType: 'Zatpat Test',
+        program: programFilter,
+      },
+      sort_by: { lastUpdatedOn: 'desc' },
+      limit: 1,
+      offset: 0,
+    });
+    questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
+  } catch (error) {
+    console.error('checkRegistrationTestStatus: ContentSearch failed', error);
+  }
+
+  if (!questionSetIdentifier) {
+    return 'assessmentUnavailable';
+  }
+
+  try {
+    const result = await getAssessmentStatus({
+      userId: storedUserId,
+      courseId: questionSetIdentifier,
+      unitId: questionSetIdentifier,
+      contentId: questionSetIdentifier,
+    });
+
+    if (Array.isArray(result) && result.length === 0) {
+      localStorage.setItem(
+        'registerationTestQuestionSetIdentifier',
+        questionSetIdentifier
+      );
+      return 'assessmentPending';
+    }
+
+    return 'clear';
+  } catch (error) {
+    console.error('checkRegistrationTestStatus: getAssessmentStatus failed', error);
+    return 'clear';
+  }
+};
 
 const AppDownloadSection = () => {
   const { t } = useTranslation();
@@ -169,6 +281,8 @@ const LoginPage = () => {
   const [roleId, setRoleId] = useState<string>('');
   const [roleName, setRoleName] = useState<string>('');
   const [isAndroidApp, setIsAndroidApp] = useState(true);
+  const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
+  const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
 
   const handleSuccessfulLogin = useCallback(
     async (
@@ -255,9 +369,7 @@ const LoginPage = () => {
             if(label === 'PSU') {
               localStorage.setItem(FilterKey.PSU, JSON.stringify(selectedValues));
             }
-           
-  
-           
+
           });
         }
         const uiConfig = userResponse?.tenantData?.find(
@@ -283,6 +395,34 @@ const LoginPage = () => {
         localStorage.setItem('templtateId', tenantData?.templateId);
         localStorage.setItem('userIdName', userResponse?.username);
         localStorage.setItem('firstName', userResponse?.firstName || '');
+        localStorage.setItem('tenantId', selectedTenantId || '');
+
+        // Fetch user details and store preferred language for every tenant
+        try {
+          const userDetails = await getUserDetails(userResponse?.userId, true);
+          if (userDetails?.result?.userData?.customFields) {
+            userDetails.result.userData.customFields.forEach((field: any) => {
+              const { label, selectedValues } = field;
+              if (label === 'WHAT_IS_YOUR_PREFERRED_LANGUAGE') {
+                let preferred = '';
+                if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+                  const first = selectedValues[0] as unknown;
+                  preferred =
+                    typeof first === 'string'
+                      ? first
+                      : (first as { value?: string })?.value ?? String(first);
+                } else if (typeof selectedValues === 'string') {
+                  preferred = selectedValues;
+                }
+                if (preferred) {
+                  localStorage.setItem('preferred_language', preferred);
+                }
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Failed to fetch user details for preferred language', error);
+        }
 
         const uiConfig = tenantData?.params?.uiConfig;
         const landingPage = tenantData?.params?.uiConfig?.landingPage;
@@ -329,9 +469,24 @@ const LoginPage = () => {
             `${redirectUrl}${activeLink ? `?activeLink=${activeLink}` : ''}`
           );
         } else {
-        console.log('tenantData', tenantDataDetails);
+        console.log('tenantData===>', tenantDataDetails);
         if(tenantDataDetails.length ===1) {
-          if(localStorage.getItem('isAndroidApp') == 'yes')
+          const assessmentStatus = await checkRegistrationTestStatus(
+            uiConfig,
+            selectedTenantName,
+            tenantDataDetails
+          );
+          if (assessmentStatus === 'assessmentPending') {
+            localStorage.setItem('registerationTestGiven', "No");
+    
+            setAssessmentPendingModal(true);
+          }
+          // Redirect to landing page
+          else if (assessmentStatus === 'assessmentUnavailable') {
+            setAssessmentUnavailableModal(true);
+            return;
+          }
+        else  if(localStorage.getItem('isAndroidApp') == 'yes')
             {
              // Send message to React Native WebView
              // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
@@ -554,6 +709,46 @@ const LoginPage = () => {
       {loading && (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )}
+
+      <SimpleModal
+        open={assessmentPendingModal}
+        onClose={() => setAssessmentPendingModal(false)}
+        showFooter={true}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
+        primaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          const pendingAssessmentIdentifier = localStorage.getItem(
+            'registerationTestQuestionSetIdentifier'
+          );
+          if (pendingAssessmentIdentifier) {
+            setTimeout(() => {
+              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+            }, 100);
+          }
+        }}
+        secondaryText={t('COMMON.CANCEL')}
+        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+      >
+        <Box p="10px">
+          <Typography variant="body1" textAlign="center">
+            {t('LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_BEFORE_ACCESS_MESSAGE')}
+          </Typography>
+        </Box>
+      </SimpleModal>
+
+      <SimpleModal
+        open={assessmentUnavailableModal}
+        onClose={() => setAssessmentUnavailableModal(false)}
+        showFooter={true}
+        primaryText={t('COMMON.OK')}
+        primaryActionHandler={() => setAssessmentUnavailableModal(false)}
+      >
+        <Box p="10px">
+          <Typography variant="body1">
+            {t('LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_UNAVAILABLE_MESSAGE')}
+          </Typography>
+        </Box>
+      </SimpleModal>
     </Suspense>
   );
 };

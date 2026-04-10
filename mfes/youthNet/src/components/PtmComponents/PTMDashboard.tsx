@@ -40,24 +40,28 @@ interface CustomField {
 
 const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
   const { t } = useTranslation('common');
-  
+
+  // Helper to extract state from a parsed userData object
+  const extractStateFromUserData = (parsedData: { customFields?: CustomField[] }) => {
+    try {
+      const stateField = parsedData?.customFields?.find((field: CustomField) => field.label === 'STATE');
+      if (stateField && stateField.selectedValues && stateField.selectedValues.length > 0) {
+        const stateValue = stateField.selectedValues[0];
+        const stateId = stateValue.id?.toString() || stateValue.value;
+        return { id: stateId, value: stateId, label: stateValue.value };
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  };
+
   // Function to get user state from localStorage
   const getUserStateFromStorage = () => {
     try {
       const userData = localStorage.getItem('userData');
       if (userData) {
-        const parsedData = JSON.parse(userData);
-        const stateField = parsedData.customFields?.find((field: CustomField) => field.label === 'STATE');
-        if (stateField && stateField.selectedValues && stateField.selectedValues.length > 0) {
-          const stateValue = stateField.selectedValues[0];
-          // value should be the ID for matching, label should be the display text
-          const stateId = stateValue.id?.toString() || stateValue.value;
-          return {
-            id: stateId,
-            value: stateId, // Use ID as value for matching in dropdown
-            label: stateValue.value // Use the actual state name as label
-          };
-        }
+        return extractStateFromUserData(JSON.parse(userData));
       }
     } catch (error) {
       console.error('Error parsing userData from localStorage:', error);
@@ -65,7 +69,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     return null;
   };
 
-  const userState = getUserStateFromStorage();
+  const [resolvedUserState, setResolvedUserState] = useState<{ id: string; value: string; label: string } | null>(() => getUserStateFromStorage());
   const [loading] = useState(false); // Static loading state for status cards
   const [resetFilters, setResetFilters] = useState(false);
   const [selectedRows, setSelectedRows] = useState<RowData[]>([]);
@@ -98,7 +102,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
 
   // State for filters
   const [filters, setFilters] = useState<FilterState>({
-    state: userState ? [userState.value] : [],
+    state: resolvedUserState ? [resolvedUserState.value] : [],
     district: [],
     block: [],
     // village: [],
@@ -109,7 +113,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
 
   // State for filter labels
   const [filterLabels, setFilterLabels] = useState<FilterLabels>({
-    state: userState ? [userState.label] : [],
+    state: resolvedUserState ? [resolvedUserState.label] : [],
     district: [],
     block: [],
     // village: [],
@@ -189,17 +193,23 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     );
   }, [selectedStatus]);
 
-  // Separate useEffect for fetching and storing user details
+  // Fetch and store full user details (including customFields with STATE)
   useEffect(() => {
     const fetchAndStoreUserData = async () => {
       try {
         const userId = localStorage.getItem('userId');
         if (userId) {
           const data = await getUserDetails(userId, true);
-          
+
           if (data?.userData) {
             const userData = data.userData;
             localStorage.setItem('userData', JSON.stringify(userData));
+
+            // Resolve user state from the freshly fetched data
+            const state = extractStateFromUserData(userData);
+            if (state) {
+              setResolvedUserState(state);
+            }
           }
         }
       } catch (error) {
@@ -253,25 +263,20 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         }
         else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
           Pendingfilters = {
-            role: "Learner",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Learner"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
              ptm_id: localStorage.getItem('userId') || '',
-             is_rejected:"No",
+             // No is_rejected filter here — new users don't have the field set to "No"
+             // We compute pendingCount = totalLearners - rejectedCount after the API calls
           };
           Approvedfilters = {
-            role: "Volunteer",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Volunteer"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
             ptm_id: localStorage.getItem('userId') || '',
           };
           Rejectedfilters = {
-            role: "Learner",
-            "how_would_you_like_to_register": [
-                 "register_an_organisation_as_poc"
-             ],
+            role: ["Learner"],
+             "volunteer_type":"individual_volunteer_through_an_organisation",
            ptm_id: localStorage.getItem('userId') || '',
              is_rejected:"Yes",
           };
@@ -329,9 +334,14 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
         ]);
 
         // Extract counts from responses
-        const pendingCount = pendingResponse?.totalCount || 0;
         const approvedCount = approvedResponse?.totalCount || 0;
         const rejectedCount = rejectedResponse?.totalCount || 0;
+        // For ORGANISATION_VOLUNTEER, Pendingfilters returns all Learners (no is_rejected filter),
+        // because new pending users don't have is_rejected set to "No" — they simply have no value.
+        // So pendingCount = total Learners - explicitly rejected Learners.
+        const pendingCount = dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER
+          ? Math.max(0, (pendingResponse?.totalCount || 0) - rejectedCount)
+          : (pendingResponse?.totalCount || 0);
         const totalCount = pendingCount + approvedCount + rejectedCount;
 
         // Update status cards with actual API counts
@@ -553,8 +563,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       else if(dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
         baseFilters = {
           "role": ["Learner", "Volunteer"],
-          "how_would_you_like_to_register": ["register_an_organisation_as_poc"],
-         // "volunteer_type":"individual_volunteer_through_an_organisation",
+          "volunteer_type":"individual_volunteer_through_an_organisation",
           "ptm_id": localStorage.getItem('userId') || ''
         };
       }
@@ -573,11 +582,11 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       // This filters table data to show only records matching the clicked status
       if(dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER || dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER){
         if (selectedStatus === 'pending') {
-          baseFilters = { ...baseFilters}; // Learners not rejected
+          baseFilters = { ...baseFilters, role: ['Learner'] }; // Pending = Learners (not yet approved as Volunteer)
         } else if (selectedStatus === 'approved') {
           baseFilters = { ...baseFilters, role: ['Volunteer'] }; // Approved as Volunteers
         } else if (selectedStatus === 'rejected') {
-          baseFilters = { ...baseFilters, is_reject: 'Yes' }; // Explicitly rejected
+          baseFilters = { ...baseFilters, role: ['Learner'], is_rejected: 'Yes' }; // Explicitly rejected Learners
         }
         // For 'total', no additional status filter is added (shows all records)
       } else if(dashboardType === DASHBOARD_TYPE.ORGANISATION){
@@ -660,7 +669,6 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             const village = getCustomFieldValue('VILLAGE');
             const location = [state, district, block, village].filter(l => l !== 'N/A').join(', ') || 'N/A';
 
-      
             const transformedRow = {
               id: user.userId || `user-${currentPage * rowsPerPage + index + 1}`,
               name: capitalizeFirstLetter(`${user.firstName || ''} ${user.lastName || ''}`.trim() || (user.name as string) || 'N/A'),
@@ -673,8 +681,15 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
             
             return transformedRow;
           });
-          
-          setTableData(transformedData);
+
+          // For pending view: client-side exclude rejected Learners
+          // (API has no "NOT" operator, so role:["Learner"] returns pending + rejected Learners)
+          const pendingRejectedStatus = t('PTM_DASHBOARD.REJECTED');
+          const displayData = selectedStatus === 'pending'
+            ? transformedData.filter((row: RowData) => row.status !== pendingRejectedStatus)
+            : transformedData;
+
+          setTableData(displayData);
           setTotalTableRecords(parseInt(response?.getUserDetails?.[0]?.total_count || '0') || 0);
         } else {
           console.log('No data received from API');
@@ -988,7 +1003,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     setCurrentPage(0); // Reset to first page when filters are reset
     // Reset filters
     setFilters({
-      state: userState ? [userState.value] : [], // Keep user's state from localStorage
+      state: resolvedUserState ? [resolvedUserState.value] : [],
       district: [],
       block: [],
       // village: [],
@@ -996,9 +1011,8 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
       organization: [],
       // poc: [],
     });
-    // Reset filter labels
     setFilterLabels({
-      state: userState ? [userState.label] : [], // Keep user's state label from localStorage
+      state: resolvedUserState ? [resolvedUserState.label] : [],
       district: [],
       block: [],
       // village: [],
@@ -1008,7 +1022,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
     });
     // Note: Table data will be fetched automatically via useEffect dependency on filters
     // Status cards remain unchanged - they show overall application data
-  }, [userState]);
+  }, [resolvedUserState]);
 
   // Pagination handlers
   const handlePageChange = (event: unknown, newPage: number) => {
@@ -1046,6 +1060,7 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           resetFilters={resetFilters}
           onResetComplete={handleResetComplete}
           showOrganizationFilter={dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER}
+          initialUserState={resolvedUserState}
         />
       </Box>
 
@@ -1199,7 +1214,16 @@ const PTMDashboard: React.FC<PTMDashboardProps> = ({ dashboardType }) => {
           actions={tableActions}
           onRowSelect={handleRowSelect}
           selectedRows={selectedRows}
-          emptyMessage={t('PTM_DASHBOARD.NO_DATA_FOUND', { type: dashboardType })}
+          emptyMessage={t('PTM_DASHBOARD.NO_DATA_FOUND', {
+                type:
+                  dashboardType === DASHBOARD_TYPE.INDIVIDUAL_VOLUNTEER
+                    ? 'Individual Volunteer'
+                    : dashboardType === DASHBOARD_TYPE.ORGANISATION_VOLUNTEER
+                    ? 'Organisation Volunteer'
+                    : dashboardType === DASHBOARD_TYPE.ORGANISATION
+                    ? 'Organisation'
+                    : dashboardType,
+              })}
           maxHeight={600}
           loading={tableLoading}
           showPagination={true}

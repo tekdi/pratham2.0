@@ -452,8 +452,14 @@
       "OKAY": "Okay",
       "START_EXPLORING": "Start Exploring",
       "START_LEARNING": "Start learning",
+      "START_ASSESSMENT": "Start Assessment",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "You have successfully signed up for",
-      "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham"
+      "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham",
+      "ASSESSMENT_REQUIRED_MESSAGE": "Before you go forward, you need to complete the assessment.",
+      "ASSESSMENT_UNAVAILABLE_MESSAGE": "Before you proceed, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
+      "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "You have to complete the assessment before accessing your Program course.",
+      "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Before accessing this course, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
+      "BACK_TO_PROGRAMS": "Back to Programs"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
@@ -746,9 +752,17 @@
     "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
     "SELF_PLACED": "Self Placed",
     "TRANSGENDER": "Other",
-    "HINDI": "Hindi",
-    "MARATHI": "Marathi",
-    "URDU": "Urdu",
+    "HINDI": "हिंदी",
+    "MARATHI": "मराठी",
+    "URDU": "اردو",
+    "ODIA": "ଓଡ଼ିଆ",
+    "TELUGU": "తెలుగు",
+    "KANNADA": "ಕನ್ನಡ",
+    "TAMIL": "தமிழ்",
+    "GUJARATI": "ગુજરાતી",
+    "BENGALI": "বাংলা",
+    "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "What is your preferred language",
+    
     "DIVORCED/WIDOW": "Divorced/Widow",
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate",
@@ -969,6 +983,14 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• If the answer sheet has multiple pages, take a picture of each page separately and upload",
     "READ_LESS": "Read Less",
     "READ_MORE": "Read More"
+  },
+  "REATTEMPT_CHECK": {
+    "PLEASE_WAIT": "Please wait...",
+    "MODAL_TITLE": "Assessment",
+    "REATTEMPT_BUTTON": "Reattempt",
+    "CONTINUE_BUTTON": "Continue",
+    "MAIN_MESSAGE": "Would you like to reattempt the assessment or continue into the app?",
+    "SUB_MESSAGE": "You can reattempt the registration assessment or skip it and continue to your dashboard."
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "Assessments",

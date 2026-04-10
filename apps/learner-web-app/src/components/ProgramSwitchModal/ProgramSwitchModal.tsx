@@ -145,7 +145,9 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
       if (userData?.firstName) {
         localStorage.setItem('firstName', userData.firstName);
       }
-
+      if (userData?.lastName) {
+        localStorage.setItem('lastName', userData.lastName);
+      }
       // Set tenant-specific data
       const tenantId = tenantData.tenantId;
       const tenantName = tenantData.tenantName;

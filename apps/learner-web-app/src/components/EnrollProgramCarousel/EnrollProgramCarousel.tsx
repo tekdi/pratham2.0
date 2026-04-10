@@ -30,6 +30,9 @@ import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { TenantName } from '@learner/utils/app.constant';
 import { logEvent } from '@learner/utils/googleAnalytics';
+import { ContentSearch } from '@learner/utils/API/contentService';
+import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
 declare global {
   interface Window {
     ReactNativeWebView?: {
@@ -77,6 +80,140 @@ const EnrollProgramCarousel = ({
     action: 'enrolling' | 'accessing';
   } | null>(null);
   const [enrolledProgram, setEnrolledProgram] = useState<Program | null>(null);
+
+  // States for registration assessment gate
+  const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
+  const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
+  const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+
+  /**
+   * checkRegistrationTestStatus
+   *
+   * Call this before allowing access to a program.
+   * Returns:
+   *   - true  → assessment already done (or not required) — caller can proceed
+   *   - false → assessment pending; modal is shown internally — caller should NOT proceed
+   *
+   * @param uiConfig  The tenantData.params.uiConfig object for the program being accessed
+   */
+  type RegistrationTestStatus =
+    | 'clear'
+    | 'assessmentPending'
+    | 'assessmentUnavailable';
+
+  const checkRegistrationTestStatus = async (
+    uiConfig: any,
+    enrolledProgramName?: string,
+    tenantDataDetails?: any
+  ): Promise<RegistrationTestStatus> => {
+    console.log('uiConfig=====>', uiConfig);
+    // Step 1: Check if registration test is enabled for this program
+    const isRegistrationTestEnabled =
+      uiConfig?.RegisterationTest === true ||
+      uiConfig?.RegisterationTest === 'true';
+console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
+    if (!isRegistrationTestEnabled) {
+      return 'clear'; // No test required — allow access
+    }
+
+    const storedUserId = localStorage.getItem('userId');
+    console.log('storedUserId=====>', storedUserId);
+    if (!storedUserId) return 'clear';
+
+    try {
+      
+
+      if (tenantDataDetails?.tenantType !== 'elearning') {
+        const academicYearList = await getAcademicYear();
+      const activeAcademicYear = Array.isArray(academicYearList)
+        ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+        : undefined;
+
+      if (activeAcademicYear?.id) {
+        localStorage.setItem('academicYearId', activeAcademicYear.id);
+      }
+        const cohortResponse = await getCohortList(storedUserId, true, true);
+        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
+          ? cohortResponse.result.some(
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
+                cohort?.type === 'BATCH' &&
+                cohort?.cohortStatus === 'active' &&
+                cohort?.cohortMemberStatus === 'active'
+            )
+          : false;
+
+        if (userHasActiveBatch) {
+          return 'clear';
+        }
+      }
+    } catch (error) {
+      console.error('checkRegistrationTestStatus: getCohortList/getAcademicYear failed', error);
+    }
+
+    // Step 2: Fetch the registration question set identifier
+    let questionSetIdentifier: string | undefined;
+    const targetProgramName = enrolledProgramName || localStorage.getItem('userProgram');
+    const programFilter =
+      targetProgramName === 'Second Chance Program'
+        ? [targetProgramName, 'Second Chance']
+        : targetProgramName
+        ? [targetProgramName]
+        : [];
+    try {
+      const preferredLanguage = localStorage.getItem('preferred_language');
+      const response = await ContentSearch({
+        query: '',
+        filters: {
+          status: ['Live'],
+          primaryCategory: ['Practice Question Set'],
+          assessmentType: 'Zatpat Test',
+          ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
+          program: programFilter,
+        },
+        sort_by: { lastUpdatedOn: 'desc' },
+        limit: 1,
+        offset: 0,
+      });
+      questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
+      console.log('questionSetIdentifier=====>', questionSetIdentifier);
+    } catch (error) {
+      console.error('checkRegistrationTestStatus: ContentSearch failed', error);
+    }
+
+    if (!questionSetIdentifier) {
+      // No question set available — block access and show unavailable modal
+      console.warn('checkRegistrationTestStatus: No question set found');
+      setAssessmentUnavailableModal(true);
+      return 'assessmentUnavailable';
+    }
+
+    // Step 3: Check if this user has already submitted the assessment
+    try {
+      const result = await getAssessmentStatus({
+        userId: storedUserId,
+        courseId: questionSetIdentifier,
+        unitId: questionSetIdentifier,
+        contentId: questionSetIdentifier,
+      });
+console.log('result=====>', result);
+      // Empty array → assessment not yet completed → block access and show modal
+      if (Array.isArray(result) && result.length === 0) {
+        localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
+        setPendingAssessmentIdentifier(questionSetIdentifier);
+        return 'assessmentPending'; // Block access
+      }
+
+      // Has data → assessment already completed → allow access
+      return 'clear';
+    } catch (error) {
+      console.error('checkRegistrationTestStatus: getAssessmentStatus failed', error);
+      return 'clear'; // On API failure, allow access gracefully
+    }
+  };
 
   const handleSlideChange = (swiper: SwiperClass) => {
     setActiveSlide(swiper.realIndex);
@@ -313,6 +450,18 @@ const EnrollProgramCarousel = ({
       }
  if(localStorage.getItem('isAndroidApp') == 'yes')
       {
+        const assessmentStatus = await checkRegistrationTestStatus(
+          tenantData?.params?.uiConfig,
+          program?.name,
+          tenantData
+        );
+        if (assessmentStatus === 'assessmentPending') {
+          setAssessmentPendingModal(true);
+          return;
+        }
+        if (assessmentStatus === 'assessmentUnavailable') {
+          return;
+        } else {
        // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
        // Fallback to refreshToken if refreshTokenForAndroid is null or empty
@@ -332,7 +481,7 @@ const EnrollProgramCarousel = ({
            
              // Add any data you want to send
            }
-         }));
+         }));}
        }
        
       }
@@ -378,7 +527,7 @@ const EnrollProgramCarousel = ({
 
       // Set cookie
       document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
-
+      
       // Log analytics event
       logEvent({
         action: 'access-program-from-my-programs',
@@ -386,11 +535,28 @@ const EnrollProgramCarousel = ({
         label: 'Access Program Button Clicked',
       });
       console.log('enrolledProgram=====>', enrolledProgram);
+      const assessmentStatus = await checkRegistrationTestStatus(
+        uiConfig,
+        program?.name,
+        tenantData
+      );
+      if (assessmentStatus === 'assessmentPending') {
+        localStorage.setItem('registerationTestGiven', "No");
+
+        setAssessmentPendingModal(true);
+      }
       // Redirect to landing page
-      if (enrolledProgram) {
+      else if (assessmentStatus === 'assessmentUnavailable') {
+        return;
+      } else if (enrolledProgram) {
+       // localStorage.setItem('registerationTestGiven', "Yes");
+
         router.push(enrolledProgram?.params?.uiConfig?.landingPage || '/home');
       }
+      else{
+        localStorage.setItem('registerationTestGiven', "Yes");
       router.push(landingPage || '/home');
+    }
     }
     } catch (error) {
       console.error('Failed to access program:', error);
@@ -831,11 +997,59 @@ const EnrollProgramCarousel = ({
         open={signupSuccessModal}
         onClose={onCloseSignupSuccessModal}
         showFooter={true}
-        primaryText={'Start learning'}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_LEARNING')}
         primaryActionHandler={onSigin}
       >
         <Box p="10px">
           <SignupSuccess />
+        </Box>
+      </SimpleModal>
+
+      {/* Assessment Gate Modal — shown when registration test is pending */}
+      <SimpleModal
+        open={assessmentPendingModal}
+        onClose={() => setAssessmentPendingModal(false)}
+        showFooter={true}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
+        primaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          if (pendingAssessmentIdentifier) {
+            setTimeout(() => {
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+            }, 100);
+          }
+        }}
+        secondaryText={t('COMMON.CANCEL')}
+        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+      >
+        <Box p="10px">
+          <Typography variant="body1" textAlign="center">
+            {t(
+              'LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_BEFORE_ACCESS_MESSAGE'
+            )}
+          </Typography>
+        </Box>
+      </SimpleModal>
+
+      <SimpleModal
+        open={assessmentUnavailableModal}
+        onClose={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/programs');
+        }}
+        showFooter={true}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryActionHandler={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/programs');
+        }}
+      >
+        <Box p="10px">
+          <Typography variant="body1" textAlign="center">
+            {t(
+              'LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE'
+            )}
+          </Typography>
         </Box>
       </SimpleModal>
     </Container>
