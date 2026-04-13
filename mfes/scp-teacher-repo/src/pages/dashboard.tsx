@@ -937,7 +937,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
               after: afterDate,
               before: beforeDate,
             },
-            // cohortId: classId,
+            cohortId: classId,
             createdBy: userId,
             status: ['live'],
           };
@@ -967,7 +967,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       }
     };
 
-    if (userId && myCohortList) {
+    if (userId && myCohortList && classId) {
       getSessionsData();
     }
   }, [
