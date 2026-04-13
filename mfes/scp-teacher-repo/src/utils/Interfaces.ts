@@ -107,6 +107,7 @@ export interface CohortMemberList {
     tenantStatus?: string[];
     name?: string | undefined;
     firstName?: string;
+    status?: string[];
   };
   includeArchived?: boolean;
 }
