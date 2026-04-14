@@ -1185,7 +1185,7 @@ if (familyField?.displayValue) {
         // }}
         >
           {/* Hiding button for edit learner until edit functionality is developed */}
-          {isActiveYear && (
+          {isActiveYear && userData?.createdBy !== userId && (
             <Button
               sx={{
                 fontSize: '14px',
