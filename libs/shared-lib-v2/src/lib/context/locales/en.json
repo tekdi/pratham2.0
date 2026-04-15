@@ -1063,5 +1063,9 @@
     "LOADING_BATCHES": "Loading batches…",
     "SELECT_BATCH": "Select batch",
     "VALUE_NOT_IN_LIST": "Current value not in loaded list; pick a batch again if needed."
-  }
+  },
+  "During": "Learn",
+  "Postrequisite": "Practice",
+  "Facilitator-requisite": "Facilitator-requisite",
+  "Prerequisite": "Prepare"
 }
