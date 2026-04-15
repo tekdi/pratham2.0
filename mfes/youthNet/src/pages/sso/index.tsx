@@ -339,6 +339,7 @@ const SSOContent = () => {
 
         localStorage.setItem('roleId', roleId);
         localStorage.setItem('roleName', roleName);
+        localStorage.setItem('role', roleName);
         localStorage.setItem('tenantName', tenantName);
         localStorage.setItem('tenantId', tenantId);
 
@@ -349,7 +350,7 @@ const SSOContent = () => {
         localStorage.setItem('userProgram', tenantName);
         const isYouthnetTenant =
           tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
-        if (isYouthnetTenant) {
+        if (tenantType !== 'elearning') {
           const activeAcademicYearId = await getActiveAcademicYearId();
           if (activeAcademicYearId) {
             localStorage.setItem('academicYearId', activeAcademicYearId);

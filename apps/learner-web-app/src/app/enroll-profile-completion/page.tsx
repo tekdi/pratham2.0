@@ -147,13 +147,14 @@ if(isRegisterationTestEnabled){
   let questionSetIdentifier: string | undefined;
 
   try {
-    
+    const preferredLanguage = localStorage.getItem('preferred_language');
     const response = await ContentSearch({
       query: '',
       filters: {
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
         assessmentType: 'Zatpat Test',
+        ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
         program: ['Second Chance'],
       },
       sort_by: {
@@ -244,6 +245,7 @@ else{
           // Use setTimeout to ensure modal closes before navigation
           setTimeout(() => {
             console.log('Executing router.push to:', landingPage || '/home');
+            localStorage.removeItem('temp_program_type');
             router.push(landingPage || '/home');
           }, 100);
       }
@@ -254,7 +256,9 @@ else{
 
   const onAssessmentUnavailableOk = () => {
     setAssessmentUnavailableModal(false);
-    router.push('/programs');
+    setTimeout(() => {
+      window.location.href = '/programs';
+    }, 100);
   };
 
   const handleStartAssessment = async () => {

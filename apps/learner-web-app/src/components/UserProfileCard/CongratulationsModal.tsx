@@ -23,7 +23,7 @@ const CongratulationsModal: React.FC<CongratulationsModalProps> = ({
   onClose,
 }) => {
   const { t } = useTranslation();
-  const lmpDomain = process.env.NEXT_PUBLIC_LMP_DOMAIN 
+  const lmpDomain = process.env.NEXT_PUBLIC_LOGIN_URL;
 
   return (
     <Dialog

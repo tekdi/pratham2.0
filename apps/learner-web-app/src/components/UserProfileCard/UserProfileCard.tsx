@@ -820,7 +820,7 @@ console.log('######### updateUserResponse', updateUserResponse);
           {username}
           {/* • Joined on June 16, 2024 */}
         </Typography>
-        {isPragyanpathLearner && (
+        {/* {isPragyanpathLearner && (
           <Box>
             {!isVolunteerProgramLead ? (
               <Button
@@ -866,7 +866,7 @@ console.log('######### updateUserResponse', updateUserResponse);
                 <Button
                   variant="contained"
                   onClick={() => {
-                    const lmpDomain = process.env.NEXT_PUBLIC_LMP_DOMAIN;
+                    const lmpDomain = process.env.NEXT_PUBLIC_LOGIN_URL;
                     if (lmpDomain) {
                       window.open(lmpDomain, '_blank');
                     } else {
@@ -938,7 +938,7 @@ console.log('######### updateUserResponse', updateUserResponse);
               </Box>
             )}
           </Box>
-        )}
+        )} */}
 
       </Box>
 

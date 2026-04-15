@@ -752,9 +752,17 @@
     "UNEMPLOYED_OR_DOMESTIC_WORK": "Unemployed or Domestic Work",
     "SELF_PLACED": "Self Placed",
     "TRANSGENDER": "Other",
-    "HINDI": "Hindi",
-    "MARATHI": "Marathi",
-    "URDU": "Urdu",
+    "HINDI": "हिंदी",
+    "MARATHI": "मराठी",
+    "URDU": "اردو",
+    "ODIA": "ଓଡ଼ିଆ",
+    "TELUGU": "తెలుగు",
+    "KANNADA": "ಕನ್ನಡ",
+    "TAMIL": "தமிழ்",
+    "GUJARATI": "ગુજરાતી",
+    "BENGALI": "বাংলা",
+    "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "What is your preferred language",
+    
     "DIVORCED/WIDOW": "Divorced/Widow",
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate",
@@ -1055,5 +1063,9 @@
     "LOADING_BATCHES": "Loading batches…",
     "SELECT_BATCH": "Select batch",
     "VALUE_NOT_IN_LIST": "Current value not in loaded list; pick a batch again if needed."
-  }
+  },
+  "During": "Learn",
+  "Postrequisite": "Practice",
+  "Facilitator-requisite": "Facilitator-requisite",
+  "Prerequisite": "Prepare"
 }

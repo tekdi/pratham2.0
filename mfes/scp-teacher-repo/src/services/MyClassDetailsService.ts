@@ -72,8 +72,9 @@ export const getMyCohortMemberListLearner = async ({
   limit,
   page,
   filters,
-}: CohortMemberList & { includeArchived?: boolean }): Promise<any> => {
-  const statusFilters = [ Status.ACTIVE];
+  status = [Status.ACTIVE],
+}: CohortMemberList & { includeArchived?: boolean; status?: string[] }): Promise<any> => {
+  const statusFilters = status;
 
   const studentFilters = {
     role: Role.STUDENT,

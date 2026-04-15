@@ -13,10 +13,20 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { TenantName } from '@learner/utils/app.constant';
+import { ContentSearch } from '@learner/utils/API/contentService';
+import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
+import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
+
+type RegistrationTestStatus =
+  | 'clear'
+  | 'assessmentPending'
+  | 'assessmentUnavailable';
 
 interface TenantData {
   tenantId: string;
   tenantName: string;
+  tenantType?: string;
   templateId?: string;
   channelId?: string;
   collectionFramework?: string;
@@ -54,6 +64,10 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [loading, setLoading] = useState(true);
   const [isAllProgramRegistred, setIsAllProgramRegistred] = useState<string | null>(null);
   const [userProgram, setUserProgram] = useState<string | null>(null);
+
+  const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
+  const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
+  const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -109,6 +123,123 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
       fetchEnrolledPrograms();
     }
   }, [open]);
+
+  const checkRegistrationTestStatus = async (
+    uiConfig: any,
+    enrolledProgramName?: string,
+    tenantDataDetails?: any
+  ): Promise<RegistrationTestStatus> => {
+    const isRegistrationTestEnabled =
+      uiConfig?.RegisterationTest === true ||
+      uiConfig?.RegisterationTest === 'true';
+
+    if (!isRegistrationTestEnabled) {
+      return 'clear';
+    }
+
+    const storedUserId = localStorage.getItem('userId');
+    if (!storedUserId) return 'clear';
+
+    try {
+      if (tenantDataDetails?.tenantType !== 'elearning') {
+        const academicYearList = await getAcademicYear();
+        const activeAcademicYear = Array.isArray(academicYearList)
+          ? academicYearList.find(
+              (year: { id?: string; isActive?: boolean }) => year?.isActive
+            )
+          : undefined;
+
+        if (activeAcademicYear?.id) {
+          localStorage.setItem('academicYearId', activeAcademicYear.id);
+        }
+
+        const cohortResponse = await getCohortList(storedUserId, true, true);
+        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
+          ? cohortResponse.result.some(
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
+                cohort?.type === 'BATCH' &&
+                cohort?.cohortStatus === 'active' &&
+                cohort?.cohortMemberStatus === 'active'
+            )
+          : false;
+
+        if (userHasActiveBatch) {
+          return 'clear';
+        }
+      }
+    } catch (error) {
+      console.error(
+        'checkRegistrationTestStatus: getCohortList/getAcademicYear failed',
+        error
+      );
+    }
+
+    let questionSetIdentifier: string | undefined;
+    const targetProgramName =
+      enrolledProgramName || localStorage.getItem('userProgram');
+    const programFilter =
+      targetProgramName === 'Second Chance Program'
+        ? [targetProgramName, 'Second Chance']
+        : targetProgramName
+        ? [targetProgramName]
+        : [];
+
+    try {
+      const preferredLanguage = localStorage.getItem('preferred_language');
+      const response = await ContentSearch({
+        query: '',
+        filters: {
+          status: ['Live'],
+          primaryCategory: ['Practice Question Set'],
+          assessmentType: 'Zatpat Test',
+          ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
+          program: programFilter,
+        },
+        sort_by: { lastUpdatedOn: 'desc' },
+        limit: 1,
+        offset: 0,
+      });
+      questionSetIdentifier =
+        response?.result?.QuestionSet?.[0]?.identifier;
+    } catch (error) {
+      console.error('checkRegistrationTestStatus: ContentSearch failed', error);
+    }
+
+    if (!questionSetIdentifier) {
+      setAssessmentUnavailableModal(true);
+      return 'assessmentUnavailable';
+    }
+
+    try {
+      const result = await getAssessmentStatus({
+        userId: storedUserId,
+        courseId: questionSetIdentifier,
+        unitId: questionSetIdentifier,
+        contentId: questionSetIdentifier,
+      });
+
+      if (Array.isArray(result) && result.length === 0) {
+        localStorage.setItem(
+          'registerationTestQuestionSetIdentifier',
+          questionSetIdentifier
+        );
+        setPendingAssessmentIdentifier(questionSetIdentifier);
+        return 'assessmentPending';
+      }
+
+      return 'clear';
+    } catch (error) {
+      console.error(
+        'checkRegistrationTestStatus: getAssessmentStatus failed',
+        error
+      );
+      return 'clear';
+    }
+  };
 
   const handleProgramSwitch = async (program: TenantData) => {
     try {
@@ -194,6 +325,20 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         }
       }
 
+      // Check registration test gate before allowing access
+      const assessmentStatus = await checkRegistrationTestStatus(
+        uiConfig,
+        tenantName,
+        tenantData
+      );
+      if (assessmentStatus === 'assessmentPending') {
+        setAssessmentPendingModal(true);
+        return;
+      }
+      if (assessmentStatus === 'assessmentUnavailable') {
+        return;
+      }
+
       // Close modal
       onClose();
 
@@ -261,6 +406,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   };
 
   return (
+    <>
     <Popover
       open={open}
       anchorEl={anchorEl}
@@ -453,6 +599,58 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         </Box>
       </Box>
     </Popover>
+
+      {/* Assessment Gate Modal — shown when registration test is pending */}
+      <SimpleModal
+        open={assessmentPendingModal}
+        onClose={() => setAssessmentPendingModal(false)}
+        showFooter={true}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
+        primaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          onClose();
+          if (pendingAssessmentIdentifier) {
+            setTimeout(() => {
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+            }, 100);
+          }
+        }}
+        secondaryText={t('COMMON.CANCEL')}
+        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+      >
+        <Box p="10px">
+          <Typography variant="body1" textAlign="center">
+            {t(
+              'LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_BEFORE_ACCESS_MESSAGE'
+            )}
+          </Typography>
+        </Box>
+      </SimpleModal>
+
+      <SimpleModal
+        open={assessmentUnavailableModal}
+        onClose={() => {
+          setAssessmentUnavailableModal(false);
+          onClose();
+          router.push('/programs');
+        }}
+        showFooter={true}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryActionHandler={() => {
+          setAssessmentUnavailableModal(false);
+          onClose();
+          router.push('/programs');
+        }}
+      >
+        <Box p="10px">
+          <Typography variant="body1" textAlign="center">
+            {t(
+              'LEARNER_APP.REGISTRATION_FLOW.ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE'
+            )}
+          </Typography>
+        </Box>
+      </SimpleModal>
+    </>
   );
 };
 
