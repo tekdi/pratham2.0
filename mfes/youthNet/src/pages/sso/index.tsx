@@ -339,6 +339,7 @@ const SSOContent = () => {
 
         localStorage.setItem('roleId', roleId);
         localStorage.setItem('roleName', roleName);
+        localStorage.setItem('role', roleName);
         localStorage.setItem('tenantName', tenantName);
         localStorage.setItem('tenantId', tenantId);
 
