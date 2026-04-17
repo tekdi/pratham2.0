@@ -426,7 +426,7 @@ function buildMCQNodeMetadata(
     ...(meta.domain ? { domain: meta.domain } : {}),
     ...(meta.subDomain ? { subDomain: [meta.subDomain] } : {}),
     ...(meta.subject ? { subject: [meta.subject] } : {}),
-    ...(meta.language ? { contentLanguage: meta.language } : {}),
+    ...(meta.language ? { language: [resolveLanguage(meta.language)] } : {}),
     ...(meta.program ? { program: [meta.program] } : {}),
   };
 }
@@ -513,7 +513,7 @@ export async function updateHierarchyWithSectionsAndQuestions(
       ...(qs.meta.domain ? { domain: qs.meta.domain } : {}),
       ...(qs.meta.subDomain ? { subDomain: [qs.meta.subDomain] } : {}),
       ...(qs.meta.subject ? { subject: [qs.meta.subject] } : {}),
-      ...(qs.meta.language ? { contentLanguage: resolveLanguage(qs.meta.language) } : {}),
+      ...(qs.meta.language ? { language: [resolveLanguage(qs.meta.language)] } : {}),
       ...(qs.meta.assessmentType ? { assessmentType: qs.meta.assessmentType } : {}),
       ...(qs.meta.program ? { program: [qs.meta.program] } : {}),
       outcomeDeclaration: {
