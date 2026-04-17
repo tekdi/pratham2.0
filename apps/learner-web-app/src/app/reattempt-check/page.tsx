@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
+import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
 import Loader from '@learner/components/Loader/Loader';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import { useTranslation } from '@shared-lib';
@@ -37,6 +38,30 @@ const checkReattemptStatus = async (): Promise<boolean> => {
   );
 };
 
+const enrollIntoTenant = async () => {
+  try {
+    const storedUserId = localStorage.getItem('userId');
+    const storedRoleId = localStorage.getItem('roleId');
+    const tenantId = localStorage.getItem('tenantId');
+    const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+    const userTenantStatus = uiConfig?.isTenantPendingStatus;
+
+    if (!storedUserId || !storedRoleId || !tenantId) {
+      console.error('enrollIntoTenant: missing required fields');
+      return;
+    }
+
+    if (userTenantStatus) {
+      await enrollUserTenant({ userId: storedUserId, tenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
+    } else {
+      await enrollUserTenant({ userId: storedUserId, tenantId, roleId: storedRoleId });
+    }
+    console.log('Enrolled into tenant:', tenantId);
+  } catch (error) {
+    console.error('enrollIntoTenant failed:', error);
+  }
+};
+
 const ReattemptCheckPage = () => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -45,43 +70,43 @@ const ReattemptCheckPage = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        localStorage.setItem('registerationTestGiven', "Yes");
+        localStorage.setItem('registerationTestGiven', 'Yes');
 
         const canReattempt = await checkReattemptStatus();
         if (canReattempt) {
           setReattempt(true);
         } else {
           setReattempt(false);
-            const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
-      const landingPage = localStorage.getItem('landingPage') || '/home';
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          const landingPage = localStorage.getItem('landingPage') || '/home';
 
-      // If exitLink matches the landingPage AND running inside Android WebView
-      // → fire the native ENROLL_PROGRAM_EVENT instead of web redirect
-      if (isAndroid ) {
-        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
-        if (!refreshToken || refreshToken === '') {
-          refreshToken = localStorage.getItem('refreshToken');
-        }
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({
-              type: 'ENROLL_PROGRAM_EVENT',
-              data: {
-                userId: localStorage.getItem('userId'),
-                tenantId: localStorage.getItem('tenantId'),
-                token: localStorage.getItem('token'),
-                refreshToken: refreshToken,
-              },
-            })
-          );
-        }
-      } else {
-    
-          router.replace(landingPage);
-        }
+          // Enroll user into the tenant now that assessment is complete
+          await enrollIntoTenant();
+
+          if (isAndroid) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'ENROLL_PROGRAM_EVENT',
+                  data: {
+                    userId: localStorage.getItem('userId'),
+                    tenantId: localStorage.getItem('tenantId'),
+                    token: localStorage.getItem('token'),
+                    refreshToken: refreshToken,
+                  },
+                })
+              );
+            }
+          } else {
+            router.replace(landingPage);
+          }
         }
       } catch (error) {
-        console.error('ReattemptCheckPage: checkReattemptStatus failed', error);
+        console.error('ReattemptCheckPage: init failed', error);
         const landingPage = localStorage.getItem('landingPage') || '/home';
         router.replace(landingPage);
       }
@@ -90,7 +115,9 @@ const ReattemptCheckPage = () => {
     init();
   }, [router]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    // Enroll user into the tenant when they choose to continue without reattempting
+    await enrollIntoTenant();
     const landingPage = localStorage.getItem('landingPage') || '/home';
     router.replace(landingPage);
   };

@@ -11,8 +11,8 @@ import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import AssessmentRequiredModal from '@learner/components/AssessmentRequiredModal/AssessmentRequiredModal';
 import { Box, Typography } from '@mui/material';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
-import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
 import { ContentSearch } from '@learner/utils/API/contentService';
+import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
 import { useTranslation } from '@shared-lib';
 declare global {
   interface Window {
@@ -32,159 +32,128 @@ const EnrollProfileCompletionInner = () => {
   const handleAccessProgram = async () => {
     try {
       const storedUserId = localStorage.getItem('userId');
-      const storedRoleId = localStorage.getItem('roleId');
       const token = localStorage.getItem('token');
       const enrolledProgramData = localStorage.getItem('enrolledProgramData');
 
-      if (!storedUserId || !storedRoleId || !token || !enrolledProgramData) {
+      if (!storedUserId || !token || !enrolledProgramData) {
         console.error('Missing required data for program access');
         router.push('/programs');
         return;
       }
 
       const program = JSON.parse(enrolledProgramData);
-      const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-      const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
-      console.log('userTenantStatus', userTenantStatus);
-      if(userTenantStatus){
-        console.log('enrolling user to tenant');
-        await enrollUserTenant({
-          userId: storedUserId,
-          tenantId: program.tenantId,
-          roleId: storedRoleId,
-          userTenantStatus: 'pending',
-        });
-      }
-      else{
-        // Enroll user to tenant
-        await enrollUserTenant({
-          userId: storedUserId,
-          tenantId: program.tenantId,
-          roleId: storedRoleId,
-        });
-      }
-      // Get user details to find tenant data
+
+      // Use program data directly (no enrollment needed)
+      const tenantId = program.tenantId;
+      const tenantName = program.name;
+      const uiConfig = program.params?.uiConfig;
+      const landingPage = program.params?.uiConfig?.landingPage;
+
+      // Get user details for identity fields only
       const userResponse = await getUserDetails(storedUserId, true);
-      const tenantData = userResponse?.result?.userData?.tenantData?.find(
-        (tenant: any) => tenant.tenantId === program.tenantId
-      );
-
-      if (!tenantData) {
-        console.error('Tenant data not found for this program');
-        router.push('/programs');
-        return;
-      }
-
-      // Check if user has Learner role
-      const roles = tenantData?.roles || [];
-      const hasLearnerRole = roles.some((role: any) => role?.roleName === 'Learner');
-
-      if (!hasLearnerRole && roles.length > 0) {
-        console.error('User does not have Learner role for this program');
-        router.push('/programs');
-        return;
-      } else {
-        // Set localStorage values similar to callBackSwitchDialog
-        localStorage.setItem('userId', storedUserId);
-        localStorage.setItem('templtateId', tenantData?.templateId);
+      localStorage.setItem('userId', storedUserId);
       localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
       localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
       localStorage.setItem('lastName', userResponse?.result?.userData?.lastName || '');
-        const tenantId = tenantData?.tenantId;
-        const tenantName = tenantData?.tenantName;
-        const uiConfig = tenantData?.params?.uiConfig;
-        const landingPage = tenantData?.params?.uiConfig?.landingPage;
 
-        localStorage.setItem('landingPage', landingPage);
-        localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
-        localStorage.setItem('tenantId', tenantId);
-        localStorage.setItem('userProgram', tenantName);
+      if (program.params?.templateId) {
+        localStorage.setItem('templtateId', program.params.templateId);
+      }
+      if (program.params?.channelId) {
+        localStorage.setItem('channelId', program.params.channelId);
+      }
+      if (program.params?.collectionFramework) {
+        localStorage.setItem('collectionFramework', program.params.collectionFramework);
+      }
 
-        // Check profile completion
-        await profileComplitionCheck();
+      localStorage.setItem('landingPage', landingPage || '');
+      localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+      localStorage.setItem('tenantId', tenantId);
+      localStorage.setItem('userProgram', tenantName);
 
-        // Handle academic year for YOUTHNET
-        if (tenantName === TenantName.YOUTHNET) {
-          const academicYearResponse = await getAcademicYear();
-          if (academicYearResponse?.[0]?.id) {
-            localStorage.setItem('academicYearId', academicYearResponse[0].id);
-          }
+      // Check profile completion
+      await profileComplitionCheck();
+
+      // Handle academic year for YOUTHNET
+      if (tenantName === TenantName.YOUTHNET) {
+        const academicYearResponse = await getAcademicYear();
+        if (academicYearResponse?.[0]?.id) {
+          localStorage.setItem('academicYearId', academicYearResponse[0].id);
         }
+      }
 
-        // Set channel and collection framework
-        const channelId = tenantData?.channelId;
-        localStorage.setItem('channelId', channelId);
+      // Set cookie
+      document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
 
-        const collectionFramework = tenantData?.collectionFramework;
-        localStorage.setItem('collectionFramework', collectionFramework);
+      // Log analytics event
+      logEvent({
+        action: 'access-program-after-enrollment',
+        category: 'Enrollment Profile Completion',
+        label: 'Profile Completed and Program Accessed',
+      });
 
-        // Set cookie
-        document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+      // Clean up enrolled program data
+      localStorage.removeItem('enrolledProgramData');
+      localStorage.removeItem('previousTenantId');
 
-        // Log analytics event
-        logEvent({
-          action: 'access-program-after-enrollment',
-          category: 'Enrollment Profile Completion',
-          label: 'Profile Completed and Program Accessed',
-        });
+      const finalLandingPage = landingPage || '/home';
+      setLandingPage(finalLandingPage);
 
-        // Clean up enrolled program data
-        localStorage.removeItem('enrolledProgramData');
-        localStorage.removeItem('previousTenantId');
+      const isRegisterationTestEnabled =
+        uiConfig?.RegisterationTest === true || uiConfig?.RegisterationTest === 'true';
+      console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
 
-        // Store landing page for later navigation
-    const finalLandingPage = landingPage || '/home';
-    console.log('Setting landing page to:', finalLandingPage);
-    setLandingPage(finalLandingPage);
-
-    // Show success modal instead of redirecting immediately
-    console.log('Opening signup success modal');
-
-    const isRegisterationTestEnabled =
-    uiConfig?.RegisterationTest === true || uiConfig?.RegisterationTest === 'true';
-console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
-if(isRegisterationTestEnabled){
-  let questionSetIdentifier: string | undefined;
-
-  try {
-    const preferredLanguage = localStorage.getItem('preferred_language');
-    const response = await ContentSearch({
-      query: '',
-      filters: {
-        status: ['Live'],
-        primaryCategory: ['Practice Question Set'],
-        assessmentType: 'Zatpat Test',
-        ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
-        program: ['Second Chance'],
-      },
-      sort_by: {
-        lastUpdatedOn: 'desc',
-      },
-      limit: 1,
-      offset: 0,
-    });
-    questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
-    if(questionSetIdentifier){
-      localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
-      localStorage.setItem('registerationTestGiven', "No");
-
-      setAssessmentRequiredModal(true);
-    }
-    else{
-      setAssessmentUnavailableModal(true);
-    }
- // questionSetIdentifier = 'do_2143742581853798401105';
-    console.log('questionSetIdentifier from API:', questionSetIdentifier);
-  } catch (error) {
-    console.error('ContentSearch failed, will use stored identifier:', error);
-  }
-
-
-}
-else{
-  setSignupSuccessModal(true);
-}
-  }
+      if (isRegisterationTestEnabled) {
+        try {
+          const preferredLanguage = localStorage.getItem('preferred_language');
+          const response = await ContentSearch({
+            query: '',
+            filters: {
+              status: ['Live'],
+              primaryCategory: ['Practice Question Set'],
+              assessmentType: 'Zatpat Test',
+              ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
+              program: ['Second Chance'],
+            },
+            sort_by: {
+              lastUpdatedOn: 'desc',
+            },
+            limit: 1,
+            offset: 0,
+          });
+          const questionSetIdentifier = response?.result?.QuestionSet?.[0]?.identifier;
+          console.log('questionSetIdentifier from API:', questionSetIdentifier);
+          if (questionSetIdentifier) {
+            localStorage.setItem('registerationTestQuestionSetIdentifier', questionSetIdentifier);
+            localStorage.setItem('registerationTestGiven', 'No');
+            setAssessmentRequiredModal(true);
+          } else {
+            setAssessmentUnavailableModal(true);
+          }
+        } catch (error) {
+          console.error('ContentSearch failed:', error);
+          setAssessmentUnavailableModal(true);
+        }
+      } else {
+        // No assessment required — enroll directly then show success modal
+        try {
+          const storedUserId = localStorage.getItem('userId');
+          const storedRoleId = localStorage.getItem('roleId');
+          const enrollTenantId = localStorage.getItem('tenantId');
+          const userTenantStatus = uiConfig?.isTenantPendingStatus;
+          if (storedUserId && storedRoleId && enrollTenantId) {
+            if (userTenantStatus) {
+              await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
+            } else {
+              await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
+            }
+            console.log('Enrolled into tenant:', enrollTenantId);
+          }
+        } catch (enrollError) {
+          console.error('Enrollment failed:', enrollError);
+        }
+        setSignupSuccessModal(true);
+      }
     } catch (error) {
       console.error('Failed to access program:', error);
       router.push('/programs');
@@ -240,14 +209,9 @@ else{
         else{
           console.log('Web path - navigating to:', landingPage || '/home');
           localStorage.removeItem('enrollTenantId');
-          // Close modal first, then navigate
-          setSignupSuccessModal(false);
-          // Use setTimeout to ensure modal closes before navigation
-          setTimeout(() => {
-            console.log('Executing router.push to:', landingPage || '/home');
-            localStorage.removeItem('temp_program_type');
-            router.push(landingPage || '/home');
-          }, 100);
+          localStorage.removeItem('temp_program_type');
+          // Use window.location.href to avoid remounting EditProfile before navigation completes
+          window.location.href = landingPage || '/home';
       }
     } catch (error) {
       console.error('Error in onSigin:', error);
@@ -292,7 +256,7 @@ else{
 
   return (
     <>
-      {!signupSuccessModal && (
+      {!signupSuccessModal && !assessmentRequiredModal && !assessmentUnavailableModal && (
         <EditProfile
           completeProfile={true}
           enrolledProgram={true}

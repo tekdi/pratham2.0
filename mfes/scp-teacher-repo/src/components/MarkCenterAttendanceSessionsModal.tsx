@@ -184,7 +184,7 @@ const MarkCenterAttendanceSessionsModal: React.FC<
                   {t('ATTENDANCE.ONLINE_SESSIONS', { count: onlineSessions.length })}
                 </Typography>
               </Box>
-              <Typography
+              {/* <Typography
                 variant="caption"
                 display="block"
                 sx={{
@@ -194,7 +194,7 @@ const MarkCenterAttendanceSessionsModal: React.FC<
                 }}
               >
                 {t('ATTENDANCE.ONLINE_ATTENDANCE_AUTO_MARKED_NOTE')}
-              </Typography>
+              </Typography> */}
               {onlineSessions.length === 0 ? (
                 <Typography
                   variant="caption"

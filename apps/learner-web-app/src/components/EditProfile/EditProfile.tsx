@@ -127,6 +127,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
+      let skipLoadingReset = false;
       try {
         setLoading(true);
         const responseForm: any = await fetchForm([
@@ -172,6 +173,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.poc_id;
         delete responseFormForEnroll?.schema?.properties?.org_id;
         responseFormForEnroll?.schema?.required?.pop('batch');
+        console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
         setResponseFormData(responseFormCopy);
@@ -246,6 +248,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             : responseForm?.schema;
           let alterUISchema = enrolledProgram ? responseFormForEnroll?.uiSchema : responseForm?.uiSchema;
 
+          // If enrolledProgram + completeProfile and there are no required fields left,
+          // the profile is already complete — skip the form and proceed directly.
+          if (enrolledProgram && completeProfile && (!alterSchema?.required || alterSchema.required.length === 0)) {
+            skipLoadingReset = true; // keep loader visible while handleAccessProgram runs
+            uponEnrollCompletion?.();
+            return;
+          }
+
           // Set mobile field states
           setMobileAddUiSchema(responseForm?.uiSchema?.mobile);
           setMobileSchema(responseFormCopy?.schema?.properties?.mobile);
@@ -288,10 +298,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           }
           delete alterSchema?.properties?.is_volunteer;
           if (alterSchema?.properties?.family_member_details) {
-            if (!alterSchema?.required?.includes('family_member_details')) {
-              alterSchema?.required?.push('family_member_details')
+            // if (!alterSchema?.required?.includes('family_member_details')) {
+            //   alterSchema?.required?.push('family_member_details')
 
-            }
+            // }
             // Add family member fields to schema if they exist in responseFormCopy
             // But DON'T add them as required - DynamicForm will handle that based on selection
             if (responseFormCopy?.schema?.properties?.father_name) {
@@ -377,7 +387,9 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
       } catch (error) {
         console.log('error', error);
       } finally {
-        setLoading(false);
+        if (!skipLoadingReset) {
+          setLoading(false);
+        }
       }
     };
     if (isVolunteerOnboard == false) {
@@ -532,6 +544,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           && !enrolledProgram
         ) {
           showToastMessage('Profile Updated succeessfully', 'success');
+        }
+
+        if (formData?.what_is_your_preferred_language) {
+          localStorage.setItem('preferred_language', formData.what_is_your_preferred_language);
         }
 
         if (enrolledProgram) {
