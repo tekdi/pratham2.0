@@ -3,7 +3,7 @@
 import React, { Suspense, useState } from 'react';
 import EditProfile from '@learner/components/EditProfile/EditProfile';
 import { useRouter } from 'next/navigation';
-import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
+import { getUserDetails, profileComplitionCheck, updateUser } from '@learner/utils/API/userService';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { TenantName } from '@learner/utils/app.constant';
 import { logEvent } from '@learner/utils/googleAnalytics';
@@ -148,6 +148,18 @@ const EnrollProfileCompletionInner = () => {
               await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
             }
             console.log('Enrolled into tenant:', enrollTenantId);
+            // Always update user with pending custom field after enrollment
+            try {
+              await updateUser(storedUserId, {
+                userData: {},
+                customFields: [{
+                  fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+                  value: 'pending',
+                }],
+              });
+            } catch (updateError) {
+              console.error('Failed to update pending custom field:', updateError);
+            }
           }
         } catch (enrollError) {
           console.error('Enrollment failed:', enrollError);
