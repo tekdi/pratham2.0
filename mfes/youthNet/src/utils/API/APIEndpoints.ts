@@ -8,7 +8,7 @@ const API_ENDPOINTS = {
   notificationSend: `${baseurl}/notification/send`,
   userReadWithField: (userId: string | string[]) =>
     `${baseurl}/user/v1/read/${userId}?fieldvalue=true`,
-  academicYearsList: `${baseurl}/user/v1/academicyears/list`,
+  academicYearsList: `${baseurl}/academicyears/list`,
   userList: `${baseurl}/user/list`,
   fieldOptionsRead: `${baseurl}/fields/options/read`,
   accountCreate: `${baseurl}/account/create`,
@@ -37,6 +37,10 @@ const API_ENDPOINTS = {
   contentCreate: `${baseurl}/tracking/content/create`,
   hierarchicalSearch: `${baseurl}/user/hierarchical-search`,
   cohortMemberBulkCreate: `${baseurl}/cohortmember/bulkCreate`,
+  cohortSearch: `${baseurl}/cohort/search`,
+  cohortUpdateStatus: `${baseurl}/cohort/updateStatus`,
+  rbacUsersRolesBulkUpdate: `${baseurl}/rbac/usersRoles/bulkUpdate`,
+
 };
 
 export default API_ENDPOINTS;

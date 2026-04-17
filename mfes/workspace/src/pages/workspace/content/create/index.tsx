@@ -25,6 +25,7 @@ import {
 } from '../../../../services/ContentService';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import PsychologyOutlinedIcon from '@mui/icons-material/PsychologyOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import VideoLibraryOutlinedIcon from '@mui/icons-material/VideoLibraryOutlined';
 import Image from 'next/image';
@@ -176,6 +177,12 @@ const CreatePage = () => {
         }); // Removed an extra comma
       },
     },
+    // {
+    //   title: 'Bulk Import Question Sets',
+    //   description: 'Import multiple question sets with questions from a CSV file',
+    //   icon: <UploadFileOutlinedIcon fontSize="large" />,
+    //   onClick: () => router.push('/workspace/content/bulk-import'),
+    // },
     ...(isSCP
       ? [
           {

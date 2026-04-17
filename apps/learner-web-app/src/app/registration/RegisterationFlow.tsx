@@ -236,6 +236,7 @@ const RegisterationFlow = () => {
           'district',
           'block',
           'village',
+          'what_is_your_preferred_language',
         //  'family_member_details',
           // 'center',
           // 'batch',
@@ -514,6 +515,24 @@ const RegisterationFlow = () => {
         console.log(responseUserData);
         if (responseUserData) {
           localStorage.removeItem('localPayload');
+          
+          // Persist preferred language before clearing form data
+          try {
+            const storedFormDataRaw = localStorage.getItem('formData');
+            if (storedFormDataRaw) {
+              const storedFormData = JSON.parse(storedFormDataRaw || '{}');
+              const preferred =
+                Array.isArray(storedFormData?.what_is_your_preferred_language)
+                  ? storedFormData.what_is_your_preferred_language[0]
+                  : storedFormData?.what_is_your_preferred_language;
+              if (preferred) {
+                localStorage.setItem('preferred_language', preferred);
+              }
+            }
+          } catch (err) {
+            void err;
+          }
+          
           localStorage.removeItem('formData');
 
           //sent username and password
@@ -758,6 +777,7 @@ const RegisterationFlow = () => {
   const callBackSwitchDialog = async (
     selectedTenantId: string,
     selectedTenantName: string,
+    tenantType: string,
     selectedRoleId: string,
     selectedRoleName: string
   ) => {

@@ -438,3 +438,72 @@ export const hierarchyContent = async (content_do_id: string) => {
     return null;
   }
 };
+
+// New function to fetch Zatpat test identifiers
+export const getZatpatTestIdentifiers = async () => {
+  const apiUrl = `${URL_CONFIG.API.COMPOSITE_SEARCH}`;
+  const preferredLanguage = localStorage.getItem('preferred_language');
+  const data = {
+    request: {
+      filters: {
+        status: ['Live'],
+        primaryCategory: ['Practice Question Set'],
+        assessmentType: 'Eligibility Test',
+        ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
+        program: ['Second Chance Program', 'Second Chance']
+      },
+      fields: ['name', 'englishName', 'appIcon', 'description', 'posterImage', 'mimeType', 'identifier', 'leafNodes', 'se_subjects'],
+      sort_by: { lastUpdatedOn: 'desc' }
+    }
+  };
+
+  try {
+    const response = await post(apiUrl, data);
+    return response?.data;
+  } catch (error) {
+    console.error('Error in getZatpatTestIdentifiers Service', error);
+    throw error;
+  }
+};
+
+// New function to get user assessment status for zatpat tests
+export const getUserAssessmentStatus = async (userIds: string[]) => {
+  const apiUrl: string = API_ENDPOINTS.assessmentSearchStatus;
+  const data = {
+    userId: userIds
+  };
+  
+  console.log('📡 getUserAssessmentStatus - API URL:', apiUrl);
+  console.log('📡 getUserAssessmentStatus - Request Data:', data);
+  
+  try {
+    const response = await post(apiUrl, data);
+    console.log('📡 getUserAssessmentStatus - Raw Response:', response);
+    return response?.data?.data;
+  } catch (error) {
+    console.error('❌ getUserAssessmentStatus Service Error:', error);
+    throw error;
+  }
+};
+
+export const getAssessmentAttemptDetails = async (userId: string, assessmentId: string): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.assessmentSearch;
+  const data = {
+    userId: userId,
+    contentId: assessmentId,
+    courseId: assessmentId,
+    unitId: assessmentId
+  };
+
+  console.log('📡 getAssessmentAttemptDetails - API URL:', apiUrl);
+  console.log('📡 getAssessmentAttemptDetails - Request Data:', data);
+
+  try {
+    const response = await post(apiUrl, data);
+    console.log('📡 getAssessmentAttemptDetails - Raw Response:', response);
+    return response?.data?.data;
+  } catch (error) {
+    console.error('❌ getAssessmentAttemptDetails Service Error:', error);
+    throw error;
+  }
+};

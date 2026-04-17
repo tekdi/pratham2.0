@@ -93,10 +93,33 @@ const App = ({
   }, []);
 
   let activeLink = null;
+  let previousPage = null;
+  let exitLink = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    previousPage = searchParams.get('previousPage');
+    exitLink = searchParams.get('exitLink');
   }
+
+  // Intercept SBPlayer iframe's Exit button which calls window.history.back()
+  // When exitLink param is present, redirect there instead of going back in history
+  useEffect(() => {
+    if (!exitLink) return;
+
+    // Push a dummy state so when SBPlayer calls history.back(), popstate fires
+    window.history.pushState({ playerPage: true }, '', window.location.href);
+
+    const handlePopState = () => {
+       window.location.href = exitLink as string;
+       };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [exitLink]);
+
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
@@ -186,6 +209,10 @@ const App = ({
     // } else {
     //   router.push(`${activeLink ? activeLink : '/content'}`);
     // }
+    if (previousPage) {
+      router.push(previousPage);
+      return;
+    }
     router.back();
   };
 

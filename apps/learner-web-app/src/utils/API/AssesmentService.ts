@@ -130,10 +130,10 @@ export interface AssessmentRecord {
 }
 
 interface IAssessmentStatusOptions {
-  userId: string[];
-  courseId: string[];
-  unitId: string[];
-  contentId: string[];
+  userId: string[] | string;
+  courseId: string[] | string;
+  unitId: string[] | string;
+  contentId: string[] | string;
 }
 
 interface ISearchAssessment {

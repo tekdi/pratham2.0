@@ -56,7 +56,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
       try {
         if (cohortId) {
           const page = 0;
-          const filters = { cohortId: cohortId };
+          const filters = { cohortId: cohortId , status: [Status.ACTIVE, Status.DROPOUT]};
           const response = await getMyCohortMemberListLearner({
             limit,
             page,

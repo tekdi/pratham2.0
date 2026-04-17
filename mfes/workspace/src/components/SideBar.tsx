@@ -1,5 +1,6 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import AppsOutlinedIcon from '@mui/icons-material/AppsOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
@@ -102,6 +103,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'content-library',
       icon: <ManageSearchIcon />,
      },
+    {
+      text: 'Bulk Import Question Sets',
+      key: 'bulk-import',
+      icon: <UploadFileOutlinedIcon />,
+    },
     ...(isSCP
       ? [
           {

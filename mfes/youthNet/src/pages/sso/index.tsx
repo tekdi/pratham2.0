@@ -88,9 +88,17 @@ const SSOContent = () => {
     return '';
   };
 
-  const getRouteByProgramAndRole = (tenantName?: string, roleName?: string) => {
+  const getRouteByProgramAndRole = (tenantName?: string, roleName?: string, tenantType?: string) => {
     const normalizedTenant = tenantName?.trim().toLowerCase();
     const normalizedRole = roleName?.trim().toLowerCase();
+    const normalizedTenantType = tenantType?.trim().toLowerCase();
+
+    if (
+      normalizedTenantType === 'volunteeronboarding' &&
+      normalizedRole?.includes('lead')
+    ) {
+      return '/individual-volunteer';
+    }
 
     if (
       normalizedTenant === TenantName.PRAGYANPATH.toLowerCase() &&
@@ -100,7 +108,8 @@ const SSOContent = () => {
     }
 
     if (
-      normalizedTenant === TenantName.YOUTHNET.toLowerCase() 
+      normalizedTenant === TenantName.YOUTHNET.toLowerCase() &&
+      (normalizedRole?.includes('mobilizer') || normalizedRole?.includes('lead'))
     ) {
       return '/';
     }
@@ -235,14 +244,18 @@ const SSOContent = () => {
         const tenantIdFromUrl = searchParams.get('tenantid');
         const finalTenantId = tenantIdFromResponse || tenantIdFromUrl;
 
-        // Check across ALL tenants: allow Lead roles (Pragyanpath/YouthNet)
+        // Check across ALL tenants: allow Lead roles (Pragyanpath/YouthNet/VolunteerOnboarding)
         // OR Instructor/Teacher roles in Second Chance Program
         const hasValidRole = userResponse?.tenantData?.some((tenant: any) =>
           tenant.roles.some((role: any) => {
             const rn = role.roleName.toLowerCase();
             const tn = tenant.tenantName?.toLowerCase();
+            const tt = tenant.tenantType?.toLowerCase();
             return (
               rn.includes('lead') ||
+              (tt === 'volunteeronboarding' && rn.includes('lead')) ||
+              (tn === TenantName.YOUTHNET.toLowerCase() &&
+                (rn.includes('mobilizer') || rn.includes('lead'))) ||
               (tn === TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
                 (rn.includes('instructor') || rn.includes('teacher')))
             );
@@ -284,10 +297,11 @@ const SSOContent = () => {
   const callBackSwitchDialog = async (
     tenantId: string,
     tenantName: string,
+    tenantType: string,
     roleId: string,
     roleName: string
   ) => {
-    console.log("callBackSwitchDialog", tenantId, tenantName, roleId, roleName);
+    console.log("callBackSwitchDialog", tenantId, tenantName, tenantType, roleId, roleName);
     setSwitchDialogOpen(false);
     setLoading(true);
 
@@ -297,13 +311,20 @@ const SSOContent = () => {
           ? localStorage.getItem('token')
           : '';
       const isLeadRole = roleName?.toLowerCase().includes('lead');
+      const isYouthNetMobilizerOrLead =
+        tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase() &&
+        (roleName?.toLowerCase().includes('mobilizer') ||
+          roleName?.toLowerCase().includes('lead'));
       const isSecondChanceProgramRole =
         tenantName?.trim().toLowerCase() ===
           TenantName.SECOND_CHANCE_PROGRAM.toLowerCase() &&
         (roleName?.toLowerCase().includes('instructor') ||
           roleName?.toLowerCase().includes('teacher'));
+      const isVolunteerOnboardingLead =
+        tenantType === 'VolunteerOnboarding' &&
+        roleName?.toLowerCase().includes('lead');
 
-      if (isLeadRole || isSecondChanceProgramRole) {
+      if (isLeadRole || isYouthNetMobilizerOrLead || isSecondChanceProgramRole || isVolunteerOnboardingLead) {
         const tenantData = userResponse?.tenantData?.find(
           (tenant: any) => tenant.tenantId === tenantId
         );
@@ -318,6 +339,7 @@ const SSOContent = () => {
 
         localStorage.setItem('roleId', roleId);
         localStorage.setItem('roleName', roleName);
+        localStorage.setItem('role', roleName);
         localStorage.setItem('tenantName', tenantName);
         localStorage.setItem('tenantId', tenantId);
 
@@ -328,7 +350,7 @@ const SSOContent = () => {
         localStorage.setItem('userProgram', tenantName);
         const isYouthnetTenant =
           tenantName?.trim().toLowerCase() === TenantName.YOUTHNET.toLowerCase();
-        if (isYouthnetTenant) {
+        if (tenantType !== 'elearning') {
           const activeAcademicYearId = await getActiveAcademicYearId();
           if (activeAcademicYearId) {
             localStorage.setItem('academicYearId', activeAcademicYearId);
@@ -389,7 +411,7 @@ const SSOContent = () => {
           label: 'Login Button Clicked',
         });
         setTimeout(() => {
-          const targetRoute = getRouteByProgramAndRole(tenantName, roleName);
+          const targetRoute = getRouteByProgramAndRole(tenantName, roleName, tenantType);
           if (isSecondChanceProgramTenant) {
             // Use window.location.href to escape the '/youthnet' basePath
             // so we land on http://host/teacher instead of http://host/youthnet/teacher
@@ -608,4 +630,3 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 export default SSOPage;
-

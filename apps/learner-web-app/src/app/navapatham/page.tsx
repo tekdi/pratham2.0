@@ -67,6 +67,7 @@ export default function LandingPage() {
       // Only set if not already Telugu to avoid unnecessary updates
       if (currentLang !== 'tel') {
         localStorage.setItem('lang', 'tel');
+        localStorage.setItem('preferredLanguage', 'tel');
         setLanguage('tel');
       }
     }

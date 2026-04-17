@@ -504,6 +504,7 @@ const RegisterUser = () => {
   const callBackSwitchDialog = async (
     selectedTenantId: string,
     selectedTenantName: string,
+    tenantType: string,
     selectedRoleId: string,
     selectedRoleName: string
   ) => {

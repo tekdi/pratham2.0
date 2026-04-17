@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress, Checkbox, FormControlLabel } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import { useTranslation } from 'next-i18next';
 import Header from '../components/Header';
 import RegistrationPieChart from '../components/UserRegistration/RegistrationPieChart';
@@ -14,6 +13,7 @@ import MoreOptionsBottomSheet from '../components/UserRegistration/MoreOptionsBo
 import LocationDropdowns from '../components/UserRegistration/LocationDropdowns';
 import { fetchUserList } from '../services/ManageUser';
 import { editEditUser } from '../services/ProfileService';
+import { getZatpatTestIdentifiers, getUserAssessmentStatus } from '../services/AssesmentService';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
@@ -21,8 +21,47 @@ import { LocationFilters } from '../components/UserRegistration/types';
 
 const UserRegistrationList = () => {
   const { t } = useTranslation();
-  const [tabValue, setTabValue] = useState('pending');
-  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Helper functions for filter retention
+  const getStoredFilters = () => {
+    try {
+      const stored = localStorage.getItem('userRegistrationFilters');
+      if (stored) {
+        const parsedFilters = JSON.parse(stored);
+        
+        // Check if filters are not too old (optional: expire after 24 hours)
+        const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const now = Date.now();
+        
+        if (parsedFilters.timestamp && (now - parsedFilters.timestamp) > maxAge) {
+          console.log('📅 Stored filters expired, clearing them');
+          localStorage.removeItem('userRegistrationFilters');
+          return null;
+        }
+        
+        console.log('🔄 Restored filters from localStorage:', parsedFilters);
+        return parsedFilters;
+      }
+      return null;
+    } catch (error) {
+      console.error('❌ Error parsing stored filters:', error);
+      return null;
+    }
+  };
+
+  const saveFiltersToStorage = (filters: any) => {
+    try {
+      localStorage.setItem('userRegistrationFilters', JSON.stringify(filters));
+      console.log('💾 Saved filters to localStorage:', filters);
+    } catch (error) {
+      console.error('❌ Error saving filters to storage:', error);
+    }
+  };
+
+  // Initialize state with stored values or defaults for filter retention
+  const storedFilters = getStoredFilters();
+  const [tabValue, setTabValue] = useState(storedFilters?.tabValue || 'pending');
+  const [searchQuery, setSearchQuery] = useState(storedFilters?.searchQuery || '');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [assignBatchModalOpen, setAssignBatchModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -31,9 +70,11 @@ const UserRegistrationList = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
+  const [currentPage, setCurrentPage] = useState(storedFilters?.currentPage || 1);
+  const [locationFilters, setLocationFilters] = useState<LocationFilters>(storedFilters?.locationFilters || {});
   const [chartTrigger, setChartTrigger] = useState(false);
+  const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
+  const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
   const hasLocationFilters =
@@ -121,7 +162,6 @@ const UserRegistrationList = () => {
       },
       phoneNumber: apiUser.mobile || '',
       email: apiUser.email || '',
-
       username: apiUser.username || '',
       birthDate,
       callLogs:
@@ -144,8 +184,134 @@ const UserRegistrationList = () => {
       modeType,
       userId: apiUser.userId,
       enrollmentId: apiUser.enrollmentId,
+      // Assessment data will be populated separately
+      assessmentStats: {},
+      totalAssessmentAttempts: 0,
+      hasAssessments: false,
     };
   };
+
+  // Fetch Zatpat test identifiers
+  const fetchZatpatTestIdentifiers = useCallback(async () => {
+    try {
+      console.log('🔍 Fetching zatpat test identifiers...');
+      const response = await getZatpatTestIdentifiers();
+      console.log('🔍 Zatpat API response:', response);
+      
+      if (response?.result?.QuestionSet) {
+        const identifiers = response.result.QuestionSet.map((item: any) => item.identifier);
+        console.log('🔍 Extracted zatpat identifiers:', identifiers);
+        setZatpatTestIdentifiers(identifiers);
+        return identifiers;
+      }
+      console.log('⚠️ No zatpat tests found in response');
+      return [];
+    } catch (error) {
+      console.error('❌ Error fetching zatpat test identifiers:', error);
+      return [];
+    }
+  }, []);
+
+  // Fetch user assessment status
+  const fetchUserAssessments = useCallback(async (userIds: string[], identifiers?: string[]) => {
+    if (!userIds.length) return {};
+    
+    setAssessmentLoading(true);
+    try {
+      console.log('🚀 Calling getUserAssessmentStatus API with userIds:', userIds);
+      const response = await getUserAssessmentStatus(userIds);
+      console.log('✅ getUserAssessmentStatus API Response:', response);
+      if (response && Array.isArray(response)) {
+        const assessmentMap: {[userId: string]: any} = {};
+        const currentIdentifiers = identifiers || zatpatTestIdentifiers;
+        
+        response.forEach((userAssessment: any) => {
+          if (userAssessment.userId && userAssessment.assessments) {
+            // Filter assessments to only include those matching zatpat test identifiers
+            console.log(`🔍 User ${userAssessment.userId} raw assessments:`, userAssessment.assessments?.length || 0);
+            console.log(`🔍 Current zatpat identifiers:`, currentIdentifiers);
+            console.log(`🔍 User assessments contentIds:`, userAssessment.assessments?.map((a: any) => a.contentId) || []);
+            
+            const filteredAssessments = userAssessment.assessments.filter((assessment: any) => {
+              const isZatpatTest = currentIdentifiers.includes(assessment.contentId);
+              console.log(`🔍 Assessment ${assessment.attemptId} - contentId: ${assessment.contentId} - isZatpatTest: ${isZatpatTest}`);
+              return isZatpatTest;
+            });
+            
+            console.log(`🔍 User ${userAssessment.userId} filtered assessments:`, filteredAssessments.length);
+            console.log(`🔍 Filtered assessment details:`, filteredAssessments.map((a: any) => ({ 
+              contentId: a.contentId, 
+              totalScore: a.totalScore, 
+              percentage: a.percentage,
+              attemptId: a.attemptId
+            })));
+              
+            // Group assessments by contentId and store individual attempts
+            const assessmentStats: {[contentId: string]: any} = {};
+            
+            filteredAssessments.forEach((assessment: any, index: number) => {
+              const contentId = assessment.contentId;
+              console.log(`📊 Processing assessment ${index + 1} - contentId: ${contentId}, attemptId: ${assessment.attemptId}`);
+              
+              if (!assessmentStats[contentId]) {
+                assessmentStats[contentId] = {
+                  testName: 'Zatpat Test',
+                  attempts: []
+                };
+                console.log(`🆕 Created new assessment group for contentId: ${contentId}`);
+              }
+              
+              // Add individual attempt data
+              const attemptData = {
+                attemptId: assessment.attemptId,
+                assessmentTrackingId: assessment.assessmentTrackingId,
+                totalScore: assessment.totalScore,
+                maxScore: assessment.totalMaxScore,
+                percentage: assessment.percentage || 0,
+                lastAttempted: assessment.lastAttemptedOn,
+                timeSpent: assessment.timeSpent,
+                attemptNumber: assessmentStats[contentId].attempts.length + 1
+              };
+              
+              assessmentStats[contentId].attempts.push(attemptData);
+              
+              console.log(`📈 ContentId ${contentId} - attempt #${attemptData.attemptNumber}: ${attemptData.totalScore}/${attemptData.maxScore} (${attemptData.percentage}%)`);
+            });
+            
+            console.log(`🎯 Final stats for user ${userAssessment.userId}:`, assessmentStats);
+            
+            assessmentMap[userAssessment.userId] = {
+              rawAssessments: filteredAssessments,
+              stats: assessmentStats
+            };
+          }
+        });
+        
+        return assessmentMap;
+      }
+      return {};
+    } catch (error) {
+      console.error('Error fetching user assessments:', error);
+      return {};
+    } finally {
+     setAssessmentLoading(false);
+    }
+  }, [zatpatTestIdentifiers]);
+
+  // Helper function to update users with assessment data
+  const updateUsersWithAssessmentData = useCallback((transformedUsers: any[], assessmentMap: {[userId: string]: any}) => {
+    if (assessmentMap && Object.keys(assessmentMap).length > 0) {
+      const updatedUsers = transformedUsers.map((user: any) => ({
+        ...user,
+        assessmentStats: assessmentMap[user.userId]?.stats || {},
+        totalAssessmentAttempts: assessmentMap[user.userId] ? 
+          Object.values(assessmentMap[user.userId].stats).reduce((sum: number, stat: any) => sum + stat.attempts, 0) : 0,
+        hasAssessments: Boolean(assessmentMap[user.userId] && Object.keys(assessmentMap[user.userId].stats).length > 0)
+      }));
+      setUsers(updatedUsers);
+      console.log('Updated users with assessment data:', updatedUsers);
+    }
+  }, []);
 
   // Fetch users from API
   const getSearchTerm = () => {
@@ -210,6 +376,39 @@ const UserRegistrationList = () => {
         const transformedUsers = response.getUserDetails.map(transformUserData);
         setUsers(transformedUsers);
         setTotalCount(response.totalCount || 0);
+        
+        // Fetch assessment data for the current page users
+        const currentUserIds = transformedUsers.map(user => user.userId);
+        if (currentUserIds.length > 0) {
+          console.log('Calling fetchUserAssessments with userIds:', currentUserIds);
+          console.log('Current zatpatTestIdentifiers:', zatpatTestIdentifiers);
+          
+          // If zatpat identifiers are not loaded yet, fetch them first
+          if (zatpatTestIdentifiers.length === 0) {
+            console.log('Zatpat identifiers not loaded, fetching them first...');
+            fetchZatpatTestIdentifiers().then(identifiers => {
+              if (identifiers && identifiers.length > 0) {
+                console.log('Got zatpat identifiers:', identifiers, 'now fetching assessments...');
+                fetchUserAssessments(currentUserIds, identifiers).then(assessmentMap => {
+                  updateUsersWithAssessmentData(transformedUsers, assessmentMap);
+                }).catch(error => {
+                  console.error('Error in fetchUserAssessments (with identifiers):', error);
+                });
+              } else {
+                console.log('No zatpat identifiers found, skipping assessment fetch');
+              }
+            }).catch(error => {
+              console.error('Error fetching zatpat identifiers:', error);
+            });
+          } else {
+            console.log('Using existing zatpat identifiers:', zatpatTestIdentifiers, 'fetching assessments...');
+            fetchUserAssessments(currentUserIds).then(assessmentMap => {
+              updateUsersWithAssessmentData(transformedUsers, assessmentMap);
+            }).catch(error => {
+              console.error('Error in fetchUserAssessments (existing identifiers):', error);
+            });
+          }
+        }
       } else {
         setUsers([]);
         setTotalCount(0);
@@ -222,6 +421,24 @@ const UserRegistrationList = () => {
       setLoading(false);
     }
   }, [limit]);
+
+  // Save filters to localStorage whenever they change
+  useEffect(() => {
+    const filtersToSave = {
+      tabValue,
+      searchQuery,
+      currentPage,
+      locationFilters,
+      timestamp: Date.now() // For potential expiration logic
+    };
+    saveFiltersToStorage(filtersToSave);
+  }, [tabValue, searchQuery, currentPage, locationFilters]);
+
+  // Initialize zatpat test identifiers on component mount
+  useEffect(() => {
+    fetchZatpatTestIdentifiers();
+  }, [fetchZatpatTestIdentifiers]);
+
 
   // Initial fetch once location filters are populated
   useEffect(() => {
@@ -297,6 +514,42 @@ const UserRegistrationList = () => {
     setCurrentPage(1);
     setSelectedUsers(new Set());
   };
+
+  // Clear stored filters function (can be called when needed)
+  const clearStoredFilters = () => {
+    try {
+      localStorage.removeItem('userRegistrationFilters');
+      console.log('🗑️ Cleared stored filters from localStorage');
+    } catch (error) {
+      console.error('❌ Error clearing stored filters:', error);
+    }
+  };
+
+  // Reset all filters to defaults and clear localStorage
+  const resetFiltersToDefault = () => {
+    clearStoredFilters();
+    setTabValue('pending');
+    setSearchQuery('');
+    setCurrentPage(1);
+    setLocationFilters({});
+    setSelectedUsers(new Set());
+    console.log('🔄 Reset all filters to defaults');
+  };
+
+  // Make reset function available globally for debugging (development only)
+  useEffect(() => {
+  if (typeof globalThis.window !== 'undefined') {
+    (globalThis.window as any).resetUserRegistrationFilters = resetFiltersToDefault;
+      console.log('🛠️ Reset filters function available as window.resetUserRegistrationFilters()');
+    }
+    
+    // Cleanup function
+    return () => {
+      if (typeof globalThis.window !== 'undefined') {
+      delete (globalThis.window as any).resetUserRegistrationFilters;
+      }
+    };
+  }, []);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -469,7 +722,10 @@ const UserRegistrationList = () => {
         {t('USER_REGISTRATION.LEARNER_REGISTRATIONS')}
       </Typography>
         <Box sx={{   mb: 2, borderRadius: '8px', mt:"20px" }}>
-          <LocationDropdowns onLocationChange={handleLocationChange} />
+          <LocationDropdowns 
+            onLocationChange={handleLocationChange}
+            initialFilters={locationFilters}
+          />
         </Box>
         
         <RegistrationPieChart locationFilters={locationFilters} triggerFetch={chartTrigger} />

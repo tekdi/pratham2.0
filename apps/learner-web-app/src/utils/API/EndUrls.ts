@@ -27,6 +27,8 @@ export const API_ENDPOINTS = {
   cohortSearch: `${baseurl}/cohort/search`,
   myCohortsRead: (userId: string) => `${baseurl}/user/read/${userId}`,
   enrollUserTenant: `${baseurl}/user-tenant`,
+  myCohorts: (userId: string | string[], children?: boolean, customField?: boolean) => `${baseurl}/cohort/mycohorts/${userId}?children=${children}&customField=${customField}`,
+
 };
 
 export const COURSE_L2_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/save-user-salesforce`;

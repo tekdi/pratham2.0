@@ -53,12 +53,14 @@ export const ContentSearch = async ({
   query,
   filters,
   fields,
+  sort_by,
   limit = 5,
   offset = 0,
 }: {
   query?: string;
   filters?: object;
   fields?: string[];
+  sort_by?: object;
   limit?: number;
   offset?: number;
 }) => {
@@ -92,6 +94,7 @@ export const ContentSearch = async ({
           'leafNodes',
           'se_subjects',
         ],
+        sort_by,
         query,
         limit,
         offset,
