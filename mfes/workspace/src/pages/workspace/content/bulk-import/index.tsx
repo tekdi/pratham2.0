@@ -796,7 +796,7 @@ const BulkImportPage: React.FC = () => {
                           size="small"
                           onClick={() =>
                             window.open(
-                              `${router.basePath}/editor?identifier=${r.identifier}`,
+                              `${router.basePath}/mfe_workspace/editor?identifier=${r.identifier}`,
                               '_blank'
                             )
                           }
@@ -855,7 +855,8 @@ const BulkImportPage: React.FC = () => {
   return (
     <>
       {showHeader && <WorkspaceHeader />}
-      <Layout selectedKey="bulk-import" onSelect={() => {}}>
+      <Layout selectedKey="bulk-import" onSelect={() => {console.log('hello')}}
+      >
         <WorkspaceText />
 
         <Box
