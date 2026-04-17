@@ -454,11 +454,13 @@
       "START_LEARNING": "Start learning",
       "START_ASSESSMENT": "Start Assessment",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "You have successfully signed up for",
+      "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.",
       "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham",
-      "ASSESSMENT_REQUIRED_MESSAGE": "Before you go forward, you need to complete the assessment.",
-      "ASSESSMENT_UNAVAILABLE_MESSAGE": "Before you proceed, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
-      "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "You have to complete the assessment before accessing your Program course.",
-      "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Before accessing this course, you need to complete the assessment. The assessment is currently unavailable. Please visit again later.",
+      "ASSESSMENT_REQUIRED_MESSAGE": "Answer a few simple questions and move ahead.",
+      "ASSESSMENT_UNAVAILABLE_MESSAGE": "The Saral test is currently unavailable in your selected language. We are working on it. Please try again later.",
+      "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.\n\nAnswer a few simple questions and move ahead.",
+      "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Your journey towards Class 10 begins here. The Saral test is currently unavailable in your selected language. We are working on it. Please try again later.",
+      "COME_BACK_LATER": "Please come back later",
       "BACK_TO_PROGRAMS": "Back to Programs"
     }
   },
@@ -989,8 +991,8 @@
     "MODAL_TITLE": "Assessment",
     "REATTEMPT_BUTTON": "Reattempt",
     "CONTINUE_BUTTON": "Continue",
-    "MAIN_MESSAGE": "Would you like to reattempt the assessment or continue into the app?",
-    "SUB_MESSAGE": "You can reattempt the registration assessment or skip it and continue to your dashboard."
+    "MAIN_MESSAGE": "Would you like to reattempt the saral test or continue into the app?",
+    "SUB_MESSAGE": "You can reattempt the registration saral test or skip it and continue to your dashboard."
   },
   "ASSESSMENTS": {
     "ASSESSMENTS": "Assessments",
