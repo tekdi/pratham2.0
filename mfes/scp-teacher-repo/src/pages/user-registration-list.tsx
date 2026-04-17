@@ -74,6 +74,7 @@ const UserRegistrationList = () => {
   const [locationFilters, setLocationFilters] = useState<LocationFilters>(storedFilters?.locationFilters || {});
   const [chartTrigger, setChartTrigger] = useState(false);
   const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
+  const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
   const hasLocationFilters =
@@ -293,7 +294,7 @@ const UserRegistrationList = () => {
       console.error('Error fetching user assessments:', error);
       return {};
     } finally {
-     // setAssessmentLoading(false);
+     setAssessmentLoading(false);
     }
   }, [zatpatTestIdentifiers]);
 

@@ -236,6 +236,7 @@ const RegisterationFlow = () => {
           'district',
           'block',
           'village',
+          'what_is_your_preferred_language',
         //  'family_member_details',
           // 'center',
           // 'batch',

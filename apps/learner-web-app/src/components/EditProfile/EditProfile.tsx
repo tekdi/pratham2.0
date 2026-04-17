@@ -546,7 +546,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           showToastMessage('Profile Updated succeessfully', 'success');
         }
 
-        if (formData?.what_is_your_preferred_language) {
+        if (formData?.what_is_your_preferred_language && localStorage.getItem('registerationTestGiven') !== "Yes") {
           localStorage.setItem('preferred_language', formData.what_is_your_preferred_language);
         }
 

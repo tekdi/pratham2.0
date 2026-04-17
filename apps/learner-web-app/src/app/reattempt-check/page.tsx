@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
 import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
+import { updateUser } from '@learner/utils/API/userService';
 import Loader from '@learner/components/Loader/Loader';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import { useTranslation } from '@shared-lib';
@@ -57,6 +58,20 @@ const enrollIntoTenant = async () => {
       await enrollUserTenant({ userId: storedUserId, tenantId, roleId: storedRoleId });
     }
     console.log('Enrolled into tenant:', tenantId);
+
+    // Update user with pending custom field after enrollment
+    try {
+      await updateUser(storedUserId, {
+        userData: {},
+        customFields: [{
+          fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+          value: 'pending',
+        }],
+      });
+      console.log('Pending custom field updated for user:', storedUserId);
+    } catch (updateError) {
+      console.error('Failed to update pending custom field:', updateError);
+    }
   } catch (error) {
     console.error('enrollIntoTenant failed:', error);
   }
