@@ -177,12 +177,12 @@ const CreatePage = () => {
         }); // Removed an extra comma
       },
     },
-    {
-      title: 'Bulk Import Question Sets',
-      description: 'Import multiple question sets with questions from a CSV file',
-      icon: <UploadFileOutlinedIcon fontSize="large" />,
-      onClick: () => router.push('/workspace/content/bulk-import'),
-    },
+    // {
+    //   title: 'Bulk Import Question Sets',
+    //   description: 'Import multiple question sets with questions from a CSV file',
+    //   icon: <UploadFileOutlinedIcon fontSize="large" />,
+    //   onClick: () => router.push('/workspace/content/bulk-import'),
+    // },
     ...(isSCP
       ? [
           {
