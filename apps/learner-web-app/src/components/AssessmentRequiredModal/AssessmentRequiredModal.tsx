@@ -91,7 +91,7 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
                 mb: 2,
               }}
             >
-              {`${t('LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR')} ${
+              {`${t('LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT')} ${
                 localStorage.getItem('isForNavaPatham') === 'true'
                   ? t('NAVAPATHAM.NAVAPATHAM')
                   : localStorage.getItem('userProgram')

@@ -195,7 +195,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         filters: {
           status: ['Live'],
           primaryCategory: ['Practice Question Set'],
-          assessmentType: 'Zatpat Test',
+          assessmentType: 'Eligibility Test',
           ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
           program: programFilter,
         },
