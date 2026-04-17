@@ -1183,6 +1183,7 @@
     "NOT_INTERESTED_TO_JOIN": "Not interested to join",
     "INTERESTED_MAY_JOIN_NEXT_YEAR": "Interested, may join next year",
     "SELECT_ALL": "Select All",
-    "DESELECT_ALL": "Deselect All"
+    "DESELECT_ALL": "Deselect All",
+    "ASSESSMENT_SCORES": "Assessment Scores"
   }
 }
