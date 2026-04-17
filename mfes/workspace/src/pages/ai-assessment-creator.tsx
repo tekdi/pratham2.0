@@ -235,6 +235,9 @@ const AIAssessmentCreator: React.FC = () => {
         // attributions,
       };
 
+      // Remove contentLanguage as it is not supported by Sunbird hierarchy update
+      delete metadata.contentLanguage;
+
       const updateResponse = await updateQuestionSet({
         identifier: response?.result?.identifier,
         ...metadata,
