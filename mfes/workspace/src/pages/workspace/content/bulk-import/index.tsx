@@ -796,7 +796,7 @@ const BulkImportPage: React.FC = () => {
                           size="small"
                           onClick={() =>
                             window.open(
-                              `${router.basePath}/mfe_workspace/editor?identifier=${r.identifier}`,
+                              `${router.basePath}/editor?identifier=${r.identifier}`,
                               '_blank'
                             )
                           }
