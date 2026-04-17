@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import {
   Alert,
@@ -215,6 +216,7 @@ const QuestionSetPreview: React.FC<{ qs: ParsedQuestionSet; idx: number }> = ({
 const BulkImportPage: React.FC = () => {
   const theme = useTheme();
   const tenantConfig = useTenantConfig();
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
@@ -714,7 +716,6 @@ const BulkImportPage: React.FC = () => {
   };
 
   const renderSummaryStep = () => {
-    const basePath = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES ?? '';
 
     return (
       <Box>
@@ -795,7 +796,7 @@ const BulkImportPage: React.FC = () => {
                           size="small"
                           onClick={() =>
                             window.open(
-                              `${basePath}editor?identifier=${r.identifier}`,
+                              `${router.basePath}/editor?identifier=${r.identifier}`,
                               '_blank'
                             )
                           }
@@ -837,7 +838,7 @@ const BulkImportPage: React.FC = () => {
           <Button
             variant="text"
             onClick={() =>
-              (window.location.href = `${basePath}workspace/content/submitted`)
+              router.push('/workspace/content/submitted')
             }
           >
             View Submitted Content
