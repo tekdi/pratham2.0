@@ -192,7 +192,7 @@ function AssessmentAttemptDetail() {
           sx={{ display: 'flex', flexDirection: 'column', margin: '0.8rem' }}
         >
           <Typography textAlign={'left'} fontSize={'22px'}>
-            Zatpat Test - Attempt Details
+          Eligibility Test - Attempt Details
           </Typography>
           <Typography
             color={theme.palette.warning['A200']}
