@@ -200,6 +200,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseForm?.schema?.properties?.ptm_id;
         delete responseForm?.schema?.properties?.poc_id;
         delete responseForm?.schema?.properties?.org_id;
+        delete responseFormForEnroll?.schema?.properties?.consent_file;
+
 
         responseForm?.schema?.required.pop('batch');
         let userId = localStorage.getItem('userId');
