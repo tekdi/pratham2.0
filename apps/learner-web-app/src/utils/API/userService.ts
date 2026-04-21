@@ -117,6 +117,8 @@ export const profileComplitionCheck = async (): Promise<any> => {
         delete responseForm?.schema.properties.mobile;
       }
       const result = getMissingFields(responseForm?.schema, userData);
+      delete result?.properties?.what_do_you_want_to_become;
+      delete result?.properties?.consent_file;
       console.log('result', result);
       delete result?.properties?.is_volunteer;
 
