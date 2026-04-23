@@ -1,4 +1,5 @@
 import ReactGA from "react-ga4";
+import { fetchContent } from "./API/contentService";
 
 declare global {
   interface Window {
@@ -11,41 +12,79 @@ export const initGA = (measurementId: string) => {
   ReactGA.initialize(measurementId);
 };
 
-export const logPageView = (url: string) => {
+export const logPageView = async (url: string) => {
   // Extract doid from current route if present
   const currentPath = window.location.pathname;
   const doidMatches = Array.from(currentPath.matchAll(/do_\d+/g));
   
-  const additionalParams: Record<string, string> = {};
+  const additionalParams: Record<string, string> = {
+    origin: window.location.pathname.includes('/pos') ? 'pos web' : 'learner plp web app',
+  };
+  let contentId: string | undefined;
+
+  let courseId: string | undefined;
+  let unitId: string | undefined;
+
   if (doidMatches.length === 3) {
     // If there are exactly 3 do_ IDs: first=content_id, second=course_id, third=unit_id
-    additionalParams.content_id =  doidMatches[2][0];
-    additionalParams.course_id = doidMatches[0][0];
-    additionalParams.unit_id = doidMatches[1][0]
-  } 
+    contentId = doidMatches[2][0];
+    courseId = doidMatches[0][0];
+    unitId = doidMatches[1][0];
+    additionalParams.content_id = contentId;
+    additionalParams.course_id = courseId;
+    additionalParams.unit_id = unitId;
+  }
   else if (doidMatches.length === 2) {
-    additionalParams.course_id = doidMatches[0][0];
-    additionalParams.unit_id = doidMatches[1][0];
+    courseId = doidMatches[0][0];
+    unitId = doidMatches[1][0];
+    additionalParams.course_id = courseId;
+    additionalParams.unit_id = unitId;
   }
   else if (doidMatches.length > 0) {
-    // If there are other numbers of do_ IDs, use the last one as content_id
-    additionalParams.content_id = doidMatches[doidMatches.length - 1][0];
+    contentId = doidMatches[doidMatches.length - 1][0];
+    additionalParams.content_id = contentId;
   }
+
+  // Fetch content, course, and unit details in parallel when IDs are available
+  await Promise.all([
+    contentId
+      ? fetchContent(contentId)
+          .then((data) => {
+            console.log('Fetched content details for GA page view:', data);
+            if (data?.name) additionalParams.content_name = data.name;
+            if (data?.mimeType) additionalParams.content_type = data.mimeType;
+            if (data?.contentLanguage) additionalParams.content_language = data.contentLanguage;
+          })
+          .catch((err) => console.error('Error fetching content details for GA page view:', err))
+      : Promise.resolve(),
+    courseId
+      ? fetchContent(courseId)
+          .then((data) => {
+            if (data?.name) additionalParams.course_name = data.name;
+          })
+          .catch((err) => console.error('Error fetching course details for GA page view:', err))
+      : Promise.resolve(),
+    // unitId
+    //   ? fetchContent(unitId)
+    //       .then((data) => {
+    //         if (data?.name) additionalParams.unit_name = data.name;
+    //       })
+    //       .catch((err) => console.error('Error fetching unit details for GA page view:', err))
+    //   : Promise.resolve(),
+  ]);
   
   const userProgram = localStorage.getItem('userProgram');
-  if(userProgram)
-  {
+  if (userProgram) {
     const pageViewData: Record<string, string> = { hitType: "pageview", page: url, program: userProgram, ...additionalParams };
     ReactGA.send(pageViewData);
     return;
-  }
-  else {
+  } else {
     const pageViewData: Record<string, string> = { hitType: "pageview", page: url, ...additionalParams };
     ReactGA.send(pageViewData);
   }
 };
 
-export const logEvent = ({
+export const logEvent = async ({
   action,
   category,
   label,
@@ -83,32 +122,64 @@ export const logEvent = ({
   const currentPath = window.location.pathname;
   const doidMatches = Array.from(currentPath.matchAll(/do_\d+/g));
   
+  let contentId: string | undefined;
+  let courseId: string | undefined;
+  let unitId: string | undefined;
+
   if (doidMatches.length === 3) {
     // If there are exactly 3 do_ IDs: first=content_id, second=course_id, third=unit_id
-    eventParams.content_id = doidMatches[2][0];
-    eventParams.course_id = doidMatches[0][0];
-    eventParams.unit_id =  doidMatches[1][0];
-  } 
+    contentId = doidMatches[2][0];
+    courseId = doidMatches[0][0];
+    unitId = doidMatches[1][0];
+    eventParams.content_id = contentId;
+    eventParams.course_id = courseId;
+    eventParams.unit_id = unitId;
+  }
   else if (doidMatches.length === 2) {
-    eventParams.course_id = doidMatches[0][0];
-    eventParams.unit_id = doidMatches[1][0];
+    courseId = doidMatches[0][0];
+    unitId = doidMatches[1][0];
+    eventParams.course_id = courseId;
+    eventParams.unit_id = unitId;
   }
   else if (doidMatches.length > 0) {
-    // If there are other numbers of do_ IDs, use the last one as content_id
-    eventParams.content_id = doidMatches[doidMatches.length - 1][0];
+    contentId = doidMatches[doidMatches.length - 1][0];
+    eventParams.content_id = contentId;
   }
- 
-  // // Use gtag directly to send event with custom parameters
-  // This ensures custom parameters like 'program' are sent to GA4
+
+  // Fetch content, course, and unit details in parallel when IDs are available
+  await Promise.all([
+    contentId
+      ? fetchContent(contentId)
+          .then((data) => {
+            if (data?.name) eventParams.content_name = data.name;
+            if (data?.mimeType) eventParams.content_type = data.mimeType;
+            if (data?.contentLanguage) eventParams.content_language = data.contentLanguage;
+          })
+          .catch((err) => console.error('Error fetching content details for GA event:', err))
+      : Promise.resolve(),
+    courseId
+      ? fetchContent(courseId)
+          .then((data) => {
+            if (data?.name) eventParams.course_name = data.name;
+          })
+          .catch((err) => console.error('Error fetching course details for GA event:', err))
+      : Promise.resolve(),
+    // unitId
+    //   ? fetchContent(unitId)
+    //       .then((data) => {
+    //         if (data?.name) eventParams.unit_name = data.name;
+    //       })
+    //       .catch((err) => console.error('Error fetching unit details for GA event:', err))
+    //   : Promise.resolve(),
+  ]);
+
+  console.log('[GA logEvent] eventParams:', eventParams);
+
+  // Use gtag directly to send event with custom parameters
   if (window.gtag && typeof window.gtag === 'function') {
     window.gtag('event', action, eventParams);
   } else {
-    // Fallback to ReactGA.event if gtag is not available
-    ReactGA.event({
-      action,
-      category,
-      label,
-      value,
-    });
+    // Fallback: use ReactGA send so eventParams (including origin) are included
+    ReactGA.send({ hitType: 'event', event_action: action, ...eventParams });
   }
 };
