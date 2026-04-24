@@ -698,7 +698,7 @@ console.log('######### updateUserResponse', updateUserResponse);
 
   // Group fields into sections
   const contactFields = ['mobile', 'phone_type_accessible', 'own_phone_check', 'parent_phone', 'guardian_name', 'guardian_relation'];
-  const personalFields = ['firstName', 'middleName', 'lastName', 'dob', 'gender', 'class', 'marital_status', 'state', 'district', 'block', 'village', 'mother_name', 'father_name', 'spouse_name', 'family_member_details'];
+  const personalFields = ['firstName', 'middleName', 'lastName', 'dob', 'gender', 'class', 'marital_status', 'state', 'district', 'block', 'village', 'mother_name', 'father_name', 'spouse_name', 'family_member_details', 'enrollmentId'];
 
   const getSectionFields = (sectionFieldNames: string[]) => {
     return displayFields.filter((field) => sectionFieldNames.includes(field.name));
@@ -732,6 +732,16 @@ console.log('######### updateUserResponse', updateUserResponse);
   const personalFieldsFiltered = personalSectionFields.filter(
     (field) => !['state', 'district', 'block', 'village', 'firstName', 'middleName', 'lastName'].includes(field.name)
   );
+
+  // enrollmentId is a core field not present in form schema, inject it manually if it exists
+  if (userData.enrollmentId && !personalFieldsFiltered.some((f) => f.name === 'enrollmentId') && localStorage.getItem('userProgram')==="Vocational Training") {
+    personalFieldsFiltered.push({
+      name: 'enrollmentId',
+      schema: { coreField: 1, title: 'Enrollment Id' },
+      value: String(userData.enrollmentId),
+      rawValue: userData.enrollmentId,
+    });
+  }
   {console.log('personalFieldsFiltered==========>', personalFieldsFiltered)
     console.log('getLocationFields==========>', getLocationFields())
     console.log('getNameFields==========>', getNameFields())
