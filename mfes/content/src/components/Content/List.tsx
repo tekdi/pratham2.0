@@ -317,23 +317,42 @@ export default function Content(props: Readonly<ContentProps>) {
       // }
       if(props.onTotalCountChange)
       {
-        //console.log("hellooo")
-        // filter.primaryCategory = [
-        //     'Learning Resource','Practice Question Set','Activity','Story'];
-        console.log("filter====>" , filter);
-        resultResponse = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-          primaryCategory: ['Course'],
-        });
+        const isCourseType = ['course', 'self'].includes(filter.type?.toLowerCase() || '');
+        if (isCourseType) {
+          resultResponse = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+            primaryCategory: ['Course'],
+          });
+          const resultResponse2 = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+            isPrimaryCategory: true,
+            primaryCategory: [
+              'Learning Resource','Practice Question Set','Activity','Story','Interactive'],
+          });
+          setTotalCount(resultResponse2?.result?.count);
+        } else {
+          resultResponse = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+            isPrimaryCategory: true,
+            primaryCategory: [
+              'Learning Resource','Practice Question Set','Activity','Story','Interactive'],
+          });
+          setTotalCount(resultResponse?.result?.count);
+        }
       }
-      else{    
+      else{
         const program = searchParams.get('program');
         const search = searchParams.get('q');
 
-        
         if(program || (search && (tab === '0' || tab === null)))
         {
           resultResponse = await ContentSearch({
@@ -344,35 +363,16 @@ export default function Content(props: Readonly<ContentProps>) {
             isPrimaryCategory: true,
             primaryCategory: [
               'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive']
-          });        }
+          });
+        }
         else{
-
-        resultResponse = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-        });
-      }
-      }
-      
-
-      if(props.onTotalCountChange) {
-         console.log("hellooo")
-        // filter.primaryCategory = [
-        //     'Learning Resource','Practice Question Set','Activity','Story'];
-        console.log("filter====>" , filter);
-       const resultResponse2 = await ContentSearch({
-          ...filter,
-          offset: adjustedOffset,
-          limit: adjustedLimit,
-          signal: controller.signal,
-          isPrimaryCategory: true,
-          primaryCategory: [
-            'Learning Resource','Practice Question Set','Activity','Story' ,'Interactive'],
-        });
-
-        setTotalCount(resultResponse2?.result?.count);
+          resultResponse = await ContentSearch({
+            ...filter,
+            offset: adjustedOffset,
+            limit: adjustedLimit,
+            signal: controller.signal,
+          });
+        }
       }
         if(props.setTotalResources && resultResponse?.result?.count)
         {
@@ -380,12 +380,11 @@ export default function Content(props: Readonly<ContentProps>) {
         }
      
       
-
+console.log('API response for content search:', resultResponse);
       const response = resultResponse?.result;
       if (props?._config?.getContentData) {
         props._config.getContentData(response);
       }
-
       content.push(...(response?.content || []));
       QuestionSet.push(...(response?.QuestionSet || []));
       count = response?.count || 0;
@@ -523,6 +522,7 @@ export default function Content(props: Readonly<ContentProps>) {
      setIsLoading(true);
       try {
         const response = await fetchAllContent(localFilters);
+        console.log('Content response:', response);
         if (!response || !isMounted) return;
         const newContentData = [
           ...(response.content ?? []),

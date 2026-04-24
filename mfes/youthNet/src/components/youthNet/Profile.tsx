@@ -3,6 +3,7 @@ import { Card, CardContent, Typography, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { Role } from '../../utils/app.constant';
+import { TENANT_DATA } from '../../utils/app.config';
 
 interface ProfileDetailsProps {
   fullName: string;
@@ -23,6 +24,7 @@ interface ProfileDetailsProps {
   firstName?: string | null;
   lastName?: string | null;
   workingVillages?: string | null;
+  enrollmentId?: string | null;
 }
 
 const Profile: React.FC<ProfileDetailsProps> = ({
@@ -44,6 +46,7 @@ const Profile: React.FC<ProfileDetailsProps> = ({
   firstName,
   lastName,
   workingVillages,
+  enrollmentId,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -56,7 +59,8 @@ const Profile: React.FC<ProfileDetailsProps> = ({
     }
   }, []);
 
-  const isPragyanpath = userProgram === 'Pragyanpath';
+  const isPragyanpath = userProgram === TENANT_DATA.PRAGYANPATH;
+  const isVocationalTraining = userProgram === TENANT_DATA.YOUTHNET;
 
   console.log('designation', designation);
   return (
@@ -335,6 +339,24 @@ const Profile: React.FC<ProfileDetailsProps> = ({
                 gutterBottom
               >
                 {workingVillages}
+              </Typography>
+            </Grid>
+          )}
+
+          {designation === Role.LEARNER && isVocationalTraining && (
+            <Grid item xs={6}>
+              <Typography
+                color={theme.palette.warning['500']}
+                sx={{ fontSize: '12px', fontWeight: 600, mt: 2 }}
+              >
+                {t('YOUTHNET_PROFILE.ENROLLMENT_ID', { defaultValue: 'Enrollment ID' })}
+              </Typography>
+              <Typography
+                color={theme.palette.warning['A200']}
+                sx={{ fontSize: '16px', fontWeight: 400 }}
+                gutterBottom
+              >
+                {enrollmentId || "-"}
               </Typography>
             </Grid>
           )}
