@@ -103,11 +103,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
       key: 'content-library',
       icon: <ManageSearchIcon />,
      },
-    {
-      text: 'Bulk Import Question Sets',
-      key: 'bulk-import',
-      icon: <UploadFileOutlinedIcon />,
-    },
+    // {
+    //   text: 'Bulk Import Question Sets',
+    //   key: 'bulk-import',
+    //   icon: <UploadFileOutlinedIcon />,
+    // },
     ...(isSCP
       ? [
           {
