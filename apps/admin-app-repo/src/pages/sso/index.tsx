@@ -546,7 +546,7 @@ const SSOContent = () => {
               }
             }
           };
-          getAcademicYearList();
+          await getAcademicYearList();
         }
       }
 
