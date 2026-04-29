@@ -67,7 +67,7 @@ const SubHeader = ({
             ],
           },
           fields: ['contentLanguage'],
-          limit: 200,
+          limit: 1000,
           offset: 0,
         });
 
