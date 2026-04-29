@@ -787,7 +787,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       router.push(
         `centers/${classId}/events/${getMonthName(
           timeTableDate
-        )?.toLowerCase()}?showAll=1`
+        )?.toLowerCase()}`
       );
       ReactGA.event('month-name-clicked', { selectedCohortID: classId });
     }
