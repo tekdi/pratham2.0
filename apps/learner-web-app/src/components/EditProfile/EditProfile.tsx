@@ -555,8 +555,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           const landingPage = localStorage.getItem('landingPage') || '';
 
           if (landingPage) {
-            router.push(landingPage);
-          } 
+            window.location.href = landingPage;
+          }
         }
 
         if (formData?.what_is_your_preferred_language && localStorage.getItem('registerationTestGiven') !== "Yes") {
