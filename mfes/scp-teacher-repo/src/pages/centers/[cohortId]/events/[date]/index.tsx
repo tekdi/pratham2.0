@@ -7,6 +7,7 @@ import { logEvent } from '@/utils/googleAnalytics';
 import {
   getAfterDate,
   getBeforeDate,
+  MONTHS,
   shortDateFormat,
   sortSessionsByTime,
   toPascalCase,
@@ -35,16 +36,26 @@ import { getCohortDetails } from '@/services/CohortServices';
 import useEventDates from '@/hooks/useEventDates';
 import { sessionType } from '@/utils/app.constant';
 
+const getDateFromMonthName = (monthName: string): Date => {
+  const monthIndex = MONTHS.findIndex(
+    (m) => m.toLowerCase() === monthName?.toLowerCase()
+  );
+  if (monthIndex === -1) return new Date();
+  return new Date(new Date().getFullYear(), monthIndex, 1);
+};
+
 const EventMonthView: React.FC<any> = () => {
   const theme = useTheme<any>();
   const { t } = useTranslation();
   const { isRTL } = useDirection();
   const router = useRouter();
-  const { cohortId }: any = router.query;
+  const { cohortId, date: dateParam }: any = router.query;
   const { showAll } = router.query;
 
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(() =>
+    dateParam ? getDateFromMonthName(dateParam) : new Date()
+  );
   const [percentageAttendance, setPercentageAttendance] =
     React.useState<any>(null);
   const [extraSessions, setExtraSessions] = React.useState<Session[]>();
@@ -66,13 +77,9 @@ const EventMonthView: React.FC<any> = () => {
     const getSessionsData = async () => {
       try {
         const date = shortDateFormat(selectedDate);
-        let cohortId;
+        const activeCohortId = cohortId || classId;
 
-        if (typeof window !== 'undefined' && window.localStorage) {
-          cohortId = localStorage.getItem('cohortId') || '';
-        }
-
-        if (cohortId !== '') {
+        if (activeCohortId) {
           const afterDate = getAfterDate(date);
           const beforeDate = getBeforeDate(date);
           const limit = 0;
@@ -88,7 +95,7 @@ const EventMonthView: React.FC<any> = () => {
           if (showAll === '1' && userId) {
             filters['createdBy'] = userId;
           } else {
-            filters['cohortId'] = cohortId;
+            filters['cohortId'] = activeCohortId;
           }
 
           const response = await getEventList({ limit, offset, filters });
@@ -106,16 +113,13 @@ const EventMonthView: React.FC<any> = () => {
             });
           }
 
-          if (extraSessionArray.length > 0) {
-            const { sessionList, index } =
-              sortSessionsByTime(extraSessionArray);
-            setExtraSessions(sessionList);
-          }
+          const { sessionList: sortedSessions } =
+            sortSessionsByTime(sessionArray);
+          setSessions(sortedSessions);
 
-          if (sessionArray.length > 0) {
-            const { sessionList, index } = sortSessionsByTime(sessionArray);
-            setSessions(sessionList);
-          }
+          const { sessionList: sortedExtra } =
+            sortSessionsByTime(extraSessionArray);
+          setExtraSessions(sortedExtra);
         }
         setEventUpdated(false);
         setEventDeleted(false);
@@ -126,7 +130,7 @@ const EventMonthView: React.FC<any> = () => {
     };
 
     getSessionsData();
-  }, [selectedDate, eventUpdated, eventDeleted]);
+  }, [selectedDate, eventUpdated, eventDeleted, cohortId]);
 
   const modifyAttendanceLimit = dashboardDaysLimit;
 
@@ -151,8 +155,20 @@ const EventMonthView: React.FC<any> = () => {
     );
   }
 
+  useEffect(() => {
+    if (router.isReady && dateParam) {
+      setSelectedDate(getDateFromMonthName(dateParam));
+    }
+  }, [router.isReady, dateParam]);
+
   const handleActiveStartDateChange = (date: Date) => {
     setSelectedDate(date);
+    const newMonthName = MONTHS[date.getMonth()].toLowerCase();
+    router.replace(
+      `/centers/${cohortId}/events/${newMonthName}${showAll ? `?showAll=${showAll}` : ''}`,
+      undefined,
+      { shallow: true }
+    );
   };
 
   useEffect(() => {
