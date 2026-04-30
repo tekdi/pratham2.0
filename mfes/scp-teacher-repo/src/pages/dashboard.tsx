@@ -985,7 +985,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     lastSevenDaysLimit,
     timeTableDate,
     eventUpdated,
-    eventDeleted
+    eventDeleted,
+    undefined,
+    classId
   );
   useEffect(() => {
     console.log(eventDates);
