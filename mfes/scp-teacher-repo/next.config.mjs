@@ -40,7 +40,6 @@ const nextConfig = {
 
   trailingSlash: false,
   i18n: nextI18nextConfig.i18n,
-  distDir: 'build',
   images: {
     unoptimized: true,
   },
@@ -106,7 +105,7 @@ const nextConfig = {
       },
     ];
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, webpack }) => {
     config.plugins.push(
       new NextFederationPlugin({
         name: 'admin',
@@ -115,6 +114,20 @@ const nextConfig = {
         exposes: {},
       })
     );
+
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+        resource.request = resource.request.replace(/^node:/, '');
+      })
+    );
+
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        module: false,
+      };
+    }
+
     return config;
   },
 };

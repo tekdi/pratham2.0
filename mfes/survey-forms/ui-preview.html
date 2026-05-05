@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Survey Forms — UI Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Poppins', sans-serif; background: #F5F5F5; color: #1E1B16; }
+
+  /* Nav tabs */
+  .nav { display: flex; gap: 0; background: #fff; border-bottom: 2px solid #eee; padding: 0 8px; position: sticky; top: 0; z-index: 100; overflow-x: auto; }
+  .nav-btn { padding: 10px 14px; cursor: pointer; font-size: 12px; font-weight: 500; color: #999; border-bottom: 3px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .nav-btn.active { color: #0D599E; border-bottom-color: #FDBE16; }
+
+  /* Screens */
+  .screen { display: none; max-width: 430px; margin: 0 auto; min-height: 100vh; background: #F5F5F5; }
+  .screen.active { display: block; }
+
+  /* Header */
+  .header { background: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eee; position: sticky; top: 46px; z-index: 10; }
+  .back-btn { width: 32px; height: 32px; border-radius: 50%; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; flex-shrink: 0; }
+  .header-text h1 { font-size: 15px; font-weight: 600; color: #1E1B16; }
+  .header-text p { font-size: 11px; color: #7C766F; margin-top: 1px; }
+
+  /* Context category tabs */
+  .context-tabs { display: flex; gap: 0; background: #fff; border-bottom: 1px solid #eee; padding: 0 12px; overflow-x: auto; }
+  .context-tab { padding: 10px 16px; cursor: pointer; font-size: 13px; font-weight: 500; color: #7C766F; border-bottom: 3px solid transparent; margin-bottom: -1px; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Poppins', sans-serif; white-space: nowrap; transition: all .2s; }
+  .context-tab.active { color: #0D599E; border-bottom-color: #FDBE16; font-weight: 600; }
+  .context-tab:hover { color: #0D599E; }
+
+  /* Summary bar */
+  .summary-bar { display: flex; gap: 8px; padding: 10px 14px 6px; background: #F5F5F5; }
+  .summary-chip { display: flex; align-items: center; gap: 4px; background: #fff; border: 1px solid #E0E0E0; border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 500; color: #555; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-pending { background: #E0E0E0; }
+  .dot-progress { background: #FF9800; }
+  .dot-done { background: #4CAF50; }
+
+  /* Survey list */
+  .list-wrap { padding: 8px 14px 24px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Survey card */
+  .survey-card { background: #fff; border-radius: 12px; border: 1px solid #E8E8E8; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.05); position: relative; overflow: hidden; }
+  .survey-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; }
+  .survey-card.status-pending::before { background: #E0E0E0; }
+  .survey-card.status-in-progress::before { background: #FF9800; }
+  .survey-card.status-completed::before { background: #4CAF50; }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px; }
+  .card-title { font-size: 14px; font-weight: 600; color: #1E1B16; line-height: 1.4; }
+
+  /* Status badge */
+  .status-badge { display: flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .status-badge.pending { background: #F5F5F5; color: #757575; border: 1px solid #E0E0E0; }
+  .status-badge.in-progress { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; }
+  .status-badge.completed { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; }
+
+  .card-desc { font-size: 12px; color: #7C766F; line-height: 1.5; margin-bottom: 10px; }
+  .card-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chip { font-size: 10px; padding: 3px 8px; border-radius: 20px; border: 1px solid #E0E0E0; color: #555; background: #fafafa; }
+
+  /* Progress mini bar inside card */
+  .card-progress { margin-bottom: 10px; }
+  .card-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #7C766F; margin-bottom: 3px; }
+  .card-progress-track { height: 5px; background: #EEE; border-radius: 3px; }
+  .card-progress-fill { height: 5px; border-radius: 3px; transition: width .4s; }
+  .fill-orange { background: #FF9800; }
+  .fill-green { background: #4CAF50; }
+
+  .card-footer { display: flex; justify-content: space-between; align-items: center; }
+  .card-date { font-size: 11px; color: #AAA; }
+  .btn-fill { background: #FDBE16; color: #1E1B16; border: none; border-radius: 50px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; }
+  .btn-fill:hover { background: #e6ab0e; }
+  .btn-resume { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; border-radius: 50px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; }
+  .btn-view { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; border-radius: 50px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; }
+
+  /* Pagination */
+  .pagination { display: flex; justify-content: center; gap: 4px; padding: 16px; }
+  .page-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: #fff; font-size: 13px; cursor: pointer; font-family: 'Poppins', sans-serif; color: #555; }
+  .page-btn.active { background: #FDBE16; font-weight: 600; color: #1E1B16; }
+
+  /* ===== SCREEN: Learner Status List ===== */
+  .learner-list-body { padding: 12px 14px 24px; }
+  .learner-summary-box { background: #fff; border-radius: 12px; border: 1px solid #E8E8E8; padding: 14px; margin-bottom: 14px; }
+  .learner-summary-box h3 { font-size: 13px; font-weight: 600; color: #1E1B16; margin-bottom: 10px; }
+  .progress-wrap { margin-bottom: 6px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: #7C766F; margin-bottom: 4px; }
+  .progress-track { height: 8px; background: #E0E0E0; border-radius: 4px; }
+  .progress-fill { height: 8px; border-radius: 4px; transition: width .4s; }
+  .fill-orange { background: #FF9800; }
+  .fill-green { background: #4CAF50; }
+  .stat-row { display: flex; gap: 8px; margin-top: 10px; }
+  .stat-box { flex: 1; background: #F5F5F5; border-radius: 8px; padding: 8px 10px; text-align: center; }
+  .stat-num { font-size: 20px; font-weight: 700; color: #1E1B16; }
+  .stat-label { font-size: 10px; color: #7C766F; margin-top: 1px; }
+
+  .section-heading { font-size: 12px; font-weight: 600; color: #7C766F; text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 8px; }
+
+  .learner-item { background: #fff; border-radius: 10px; border: 1px solid #E8E8E8; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .learner-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  .avatar-gray { background: #F0F0F0; color: #999; }
+  .avatar-orange { background: #FFF3E0; color: #E65100; }
+  .avatar-green { background: #E8F5E9; color: #2E7D32; }
+  .learner-info { flex: 1; }
+  .learner-name { font-size: 13px; font-weight: 600; color: #1E1B16; }
+  .learner-meta { font-size: 11px; color: #7C766F; margin-top: 1px; }
+  .learner-action { flex-shrink: 0; }
+  .btn-sm { font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: 'Poppins', sans-serif; border: none; }
+  .btn-sm-fill { background: #FDBE16; color: #1E1B16; }
+  .btn-sm-resume { background: #FFF3E0; color: #E65100; border: 1px solid #FFE0B2; background-color: transparent; }
+  .btn-sm-done { background: #E8F5E9; color: #2E7D32; border: 1px solid #C8E6C9; background-color: transparent; }
+  .learner-status-icon { font-size: 18px; }
+
+  /* Context picker */
+  .context-body { padding: 24px 16px; }
+  .context-info { background: #E3F2FD; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #1565C0; margin-bottom: 20px; line-height: 1.5; }
+  .form-field { margin-bottom: 16px; }
+  .field-label { font-size: 12px; font-weight: 500; color: #555; margin-bottom: 6px; }
+  .field-label span.req { color: #f44; }
+  .input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; font-family: 'Poppins', sans-serif; outline: none; color: #1E1B16; }
+  .input:focus { border-color: #FDBE16; }
+  .input::placeholder { color: #BBB; }
+  .btn-primary { width: 100%; background: #FDBE16; color: #1E1B16; border: none; border-radius: 50px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; margin-top: 8px; }
+  .btn-primary:hover { background: #e6ab0e; }
+
+  /* Survey renderer */
+  .form-body { padding: 12px 14px 100px; }
+  .section-card { background: #fff; border-radius: 12px; border: 1px solid #E8E8E8; padding: 16px; margin-bottom: 14px; }
+  .section-title { font-size: 14px; font-weight: 600; color: #1E1B16; margin-bottom: 3px; }
+  .section-desc { font-size: 12px; color: #7C766F; margin-bottom: 12px; }
+  .section-divider { height: 1px; background: #F0F0F0; margin-bottom: 14px; }
+  .field-wrap { margin-bottom: 18px; }
+  .field-wrap:last-child { margin-bottom: 0; }
+  .mui-label { font-size: 11px; color: #7C766F; margin-bottom: 5px; font-weight: 500; }
+  .mui-input { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: 'Poppins', sans-serif; color: #1E1B16; background: #fff; outline: none; }
+  .mui-input:focus { border-color: #FDBE16; }
+  .mui-input.prefilled { background: #FAFAFA; color: #555; }
+  .radio-group { display: flex; gap: 20px; }
+  .radio-opt { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; color: #1E1B16; }
+  .radio-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #999; display: flex; align-items: center; justify-content: center; }
+  .radio-dot.selected { border-color: #FDBE16; }
+  .radio-dot.selected::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #FDBE16; }
+  .textarea { width: 100%; padding: 9px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: 'Poppins', sans-serif; color: #1E1B16; resize: vertical; min-height: 72px; outline: none; }
+  .stars { display: flex; gap: 4px; }
+  .star { font-size: 28px; cursor: pointer; }
+  .star.filled { color: #FDBE16; }
+  .star.empty { color: #DDD; }
+  .field-help { font-size: 11px; color: #AAA; margin-top: 4px; }
+
+  /* Bottom action bar */
+  .action-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 430px; background: #fff; border-top: 1px solid #eee; padding: 12px 16px; display: flex; gap: 10px; z-index: 50; }
+  .btn-outline { flex: 1; background: #fff; border: 2px solid #FDBE16; border-radius: 50px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; color: #1E1B16; }
+  .btn-submit { flex: 1; background: #FDBE16; border: none; border-radius: 50px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; color: #1E1B16; }
+
+  /* Success screen */
+  .success-body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; }
+  .success-icon { width: 80px; height: 80px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .success-title { font-size: 20px; font-weight: 600; color: #1E1B16; margin-bottom: 8px; }
+  .success-sub { font-size: 13px; color: #7C766F; margin-bottom: 16px; line-height: 1.6; }
+  .next-action-box { background: #FFF8E1; border: 1px solid #FFECB3; border-radius: 10px; padding: 12px 14px; width: 100%; margin-bottom: 20px; text-align: left; }
+  .next-action-box p { font-size: 12px; color: #7C766F; margin-bottom: 6px; }
+  .next-action-box strong { font-size: 13px; color: #1E1B16; }
+
+  /* No data */
+  .no-data { display: flex; flex-direction: column; align-items: center; padding: 60px 24px; color: #ccc; }
+  .no-data span { font-size: 64px; margin-bottom: 12px; }
+  .no-data p { font-size: 14px; color: #aaa; }
+
+  .empty-tab { display: flex; flex-direction: column; align-items: center; padding: 48px 24px; }
+  .empty-tab .material-icons { font-size: 48px; color: #DDD; margin-bottom: 10px; }
+  .empty-tab p { font-size: 13px; color: #AAA; }
+</style>
+</head>
+<body>
+
+<!-- Tab Navigation -->
+<div class="nav">
+  <button class="nav-btn active" onclick="show('list')">1. Survey List</button>
+  <button class="nav-btn" onclick="show('learners')">2. Learner Status</button>
+  <button class="nav-btn" onclick="show('picker')">3. Context Picker</button>
+  <button class="nav-btn" onclick="show('form')">4. Fill Survey</button>
+  <button class="nav-btn" onclick="show('success')">5. Success</button>
+</div>
+
+<!-- ===================== SCREEN 1: Survey List with Status ===================== -->
+<div class="screen active" id="screen-list">
+  <div class="header">
+    <button class="back-btn">
+      <span class="material-icons" style="font-size:18px;color:#1E1B16">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Surveys</h1>
+      <p>Fill surveys assigned to you</p>
+    </div>
+  </div>
+
+  <!-- Context category tabs -->
+  <div class="context-tabs">
+    <button class="context-tab active" onclick="filterContext('all', event)">All</button>
+    <button class="context-tab" onclick="filterContext('self', event)">Self</button>
+    <button class="context-tab" onclick="filterContext('learner', event)">Learner</button>
+    <button class="context-tab" onclick="filterContext('center', event)">Center</button>
+  </div>
+
+  <!-- Quick summary chips -->
+  <div class="summary-bar">
+    <div class="summary-chip"><div class="dot dot-pending"></div> <span id="count-pending">0</span> Not Started</div>
+    <div class="summary-chip"><div class="dot dot-progress"></div> <span id="count-progress">0</span> In Progress</div>
+    <div class="summary-chip"><div class="dot dot-done"></div> <span id="count-done">0</span> Completed</div>
+  </div>
+
+  <div class="list-wrap" id="survey-list-container"></div>
+
+  <div class="pagination" id="pagination-wrap">
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">&rsaquo;</button>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 2: Learner-level Status ===================== -->
+<div class="screen" id="screen-learners">
+  <div class="header">
+    <button class="back-btn" onclick="show('list')">
+      <span class="material-icons" style="font-size:18px;color:#1E1B16">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Learner Performance &amp; Attendance</h1>
+      <p>Batch: Advance Batch — Apr 2026</p>
+    </div>
+  </div>
+
+  <div class="learner-list-body">
+    <!-- Summary box -->
+    <div class="learner-summary-box">
+      <h3>Completion Progress</h3>
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>Filled</span>
+          <span><strong>20 / 25</strong> learners</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill fill-orange" style="width:80%"></div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num" style="color:#4CAF50">20</div>
+          <div class="stat-label">Submitted</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:#FF9800">2</div>
+          <div class="stat-label">Draft</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:#9E9E9E">3</div>
+          <div class="stat-label">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending learners -->
+    <div class="section-heading">Pending (3)</div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-gray">RK</div>
+      <div class="learner-info">
+        <div class="learner-name">Ravi Kumar</div>
+        <div class="learner-meta">Learner ID: 3fa8...afa1 &nbsp;·&nbsp; Not started</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-fill" onclick="show('picker')">Fill</button>
+      </div>
+    </div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-gray">PS</div>
+      <div class="learner-info">
+        <div class="learner-name">Priya Singh</div>
+        <div class="learner-meta">Learner ID: 3fa8...afa2 &nbsp;·&nbsp; Not started</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-fill" onclick="show('picker')">Fill</button>
+      </div>
+    </div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-gray">AM</div>
+      <div class="learner-info">
+        <div class="learner-name">Anil Mehta</div>
+        <div class="learner-meta">Learner ID: 3fa8...afa3 &nbsp;·&nbsp; Not started</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-fill" onclick="show('picker')">Fill</button>
+      </div>
+    </div>
+
+    <!-- Draft / In Progress -->
+    <div class="section-heading">Draft / In Progress (2)</div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-orange">SG</div>
+      <div class="learner-info">
+        <div class="learner-name">Sunita Gupta</div>
+        <div class="learner-meta">Saved 2 hrs ago &nbsp;·&nbsp; 60% done</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-resume" onclick="show('form')">Resume</button>
+      </div>
+    </div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-orange">VR</div>
+      <div class="learner-info">
+        <div class="learner-name">Vijay Rao</div>
+        <div class="learner-meta">Saved yesterday &nbsp;·&nbsp; 40% done</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-resume" onclick="show('form')">Resume</button>
+      </div>
+    </div>
+
+    <!-- Completed -->
+    <div class="section-heading">Submitted (20)</div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-green">NK</div>
+      <div class="learner-info">
+        <div class="learner-name">Neha Kapoor</div>
+        <div class="learner-meta">Submitted 3 Apr 2026</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-done">View</button>
+      </div>
+    </div>
+
+    <div class="learner-item">
+      <div class="learner-avatar avatar-green">MJ</div>
+      <div class="learner-info">
+        <div class="learner-name">Mohan Joshi</div>
+        <div class="learner-meta">Submitted 3 Apr 2026</div>
+      </div>
+      <div class="learner-action">
+        <button class="btn-sm btn-sm-done">View</button>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:12px 0">
+      <button style="background:none;border:none;font-size:12px;color:#0D599E;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:500">
+        + Show 18 more submitted
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 3: Context Picker ===================== -->
+<div class="screen" id="screen-picker">
+  <div class="header">
+    <button class="back-btn" onclick="show('learners')">
+      <span class="material-icons" style="font-size:18px;color:#1E1B16">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Learner Performance &amp; Attendance</h1>
+      <p>Filling for: Ravi Kumar</p>
+    </div>
+  </div>
+
+  <div class="context-body">
+    <div class="context-info">
+      This survey requires a <strong>learner</strong> context. Please confirm the learner ID to proceed.
+    </div>
+
+    <div class="form-field">
+      <div class="field-label">Learner ID <span class="req">*</span></div>
+      <input class="input" type="text" placeholder="Enter learner UUID" value="3fa85f64-5717-4562-b3fc-2c963f66afa1" readonly style="background:#fafafa;color:#555"/>
+    </div>
+
+    <button class="btn-primary" onclick="show('form')">Proceed to Survey</button>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 4: Survey Renderer ===================== -->
+<div class="screen" id="screen-form">
+  <div class="header">
+    <button class="back-btn" onclick="show('picker')">
+      <span class="material-icons" style="font-size:18px;color:#1E1B16">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Learner Performance &amp; Attendance</h1>
+      <p>Filling for: Ravi Kumar</p>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div style="padding:12px 16px 4px;background:#F5F5F5">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#7C766F;margin-bottom:4px">
+      <span>Progress</span><span id="pct">60%</span>
+    </div>
+    <div style="height:6px;background:#E0E0E0;border-radius:3px">
+      <div style="height:6px;background:#FDBE16;border-radius:3px;width:60%;transition:width .4s" id="pbar"></div>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <div class="section-card">
+      <div class="section-title">Attendance</div>
+      <div class="section-desc">Attendance details for the learner</div>
+      <div class="section-divider"></div>
+
+      <div class="field-wrap">
+        <div class="mui-label">Attendance Percentage <span style="color:#f44">*</span></div>
+        <input class="mui-input prefilled" type="number" value="72" id="attendance_pct" oninput="updateProgress()"/>
+        <div class="field-help">Auto-fetched from attendance service</div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="mui-label">Is attendance satisfactory? <span style="color:#f44">*</span></div>
+        <div class="radio-group">
+          <label class="radio-opt">
+            <div class="radio-dot" id="rd-yes" onclick="selectRadio('yes')"></div> Yes
+          </label>
+          <label class="radio-opt">
+            <div class="radio-dot selected" id="rd-no" onclick="selectRadio('no')"></div> No
+          </label>
+        </div>
+      </div>
+
+      <div class="field-wrap" id="reason-field">
+        <div class="mui-label">Reason for low attendance <span style="color:#f44">*</span></div>
+        <textarea class="textarea" placeholder="Describe the reasons...">Health issues and family emergencies.</textarea>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">Performance</div>
+      <div class="section-desc">Overall performance evaluation</div>
+      <div class="section-divider"></div>
+
+      <div class="field-wrap">
+        <div class="mui-label">Overall Performance Rating <span style="color:#f44">*</span></div>
+        <div class="stars" id="stars">
+          <span class="star filled" onclick="rateStar(1)">&#9733;</span>
+          <span class="star filled" onclick="rateStar(2)">&#9733;</span>
+          <span class="star filled" onclick="rateStar(3)">&#9733;</span>
+          <span class="star empty" onclick="rateStar(4)">&#9733;</span>
+          <span class="star empty" onclick="rateStar(5)">&#9733;</span>
+        </div>
+      </div>
+
+      <div class="field-wrap">
+        <div class="mui-label">Performance Level <span style="color:#f44">*</span></div>
+        <select class="mui-input">
+          <option value="">Select...</option>
+          <option value="excellent">Excellent</option>
+          <option selected value="average">Average</option>
+          <option value="below_average">Below Average</option>
+          <option value="poor">Poor</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-outline">Save Draft</button>
+    <button class="btn-submit" onclick="show('success')">Submit</button>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 5: Success ===================== -->
+<div class="screen" id="screen-success">
+  <div class="header">
+    <button class="back-btn" onclick="show('learners')">
+      <span class="material-icons" style="font-size:18px;color:#1E1B16">arrow_back</span>
+    </button>
+    <div class="header-text">
+      <h1>Survey Submitted</h1>
+    </div>
+  </div>
+
+  <div class="success-body">
+    <div class="success-icon">
+      <span class="material-icons" style="font-size:48px;color:#2E7D32">check_circle</span>
+    </div>
+    <div class="success-title">Submitted!</div>
+    <div class="success-sub">Survey for <strong>Ravi Kumar</strong> has been submitted successfully.</div>
+
+    <!-- Show remaining count — drives FL back to fill more -->
+    <div class="next-action-box">
+      <p>Remaining for this survey</p>
+      <strong>2 learners still pending &nbsp;·&nbsp; 2 drafts to complete</strong>
+    </div>
+
+    <button class="btn-primary" style="max-width:280px" onclick="show('learners')">Continue Filling</button>
+    <button style="background:none;border:none;font-size:13px;color:#7C766F;margin-top:12px;cursor:pointer;font-family:'Poppins',sans-serif" onclick="show('list')">Back to Survey List</button>
+  </div>
+</div>
+
+<script>
+// surveyData now includes completion status derived from:
+// - submitted_count: how many contextId responses are SUBMITTED for this survey
+// - total: total learners in the batch (from cohort service)
+// status = submitted_count===0 ? 'pending' : submitted_count>=total ? 'completed' : 'in-progress'
+var surveyData = [
+  {
+    id: '1',
+    title: 'Learner Performance & Attendance Survey',
+    desc: 'Fill this survey to record learner attendance percentage and overall performance rating for each batch learner.',
+    type: 'assessment',
+    context: 'learner',
+    date: '31 Mar 2026',
+    status: 'in-progress',
+    submitted: 20,
+    total: 25,
+    target: 'learners'
+  },
+  {
+    id: '2',
+    title: 'Batch Feedback & Satisfaction Survey',
+    desc: 'Collect feedback about batch quality, infrastructure, and overall learning environment.',
+    type: 'feedback',
+    context: 'center',
+    date: '28 Mar 2026',
+    status: 'pending',
+    submitted: 0,
+    total: 1,
+    target: 'picker'
+  },
+  {
+    id: '3',
+    title: 'Monthly Self-Assessment',
+    desc: 'Monthly self-reflection survey to track professional growth and identify training needs.',
+    type: 'self-assessment',
+    context: 'self',
+    date: '25 Mar 2026',
+    status: 'completed',
+    submitted: 1,
+    total: 1,
+    target: 'form'
+  },
+  {
+    id: '4',
+    title: 'Weekly Self Check-in',
+    desc: 'Quick weekly check-in on your well-being and workload.',
+    type: 'wellness',
+    context: 'self',
+    date: '24 Mar 2026',
+    status: 'pending',
+    submitted: 0,
+    total: 1,
+    target: 'form'
+  },
+  {
+    id: '5',
+    title: 'Center Infrastructure Audit',
+    desc: 'Evaluate the infrastructure, equipment, and facilities at your center.',
+    type: 'audit',
+    context: 'center',
+    date: '22 Mar 2026',
+    status: 'completed',
+    submitted: 1,
+    total: 1,
+    target: 'picker'
+  },
+  {
+    id: '6',
+    title: 'Learner Skill Assessment',
+    desc: 'Assess individual learner skill levels across key competencies.',
+    type: 'assessment',
+    context: 'learner',
+    date: '20 Mar 2026',
+    status: 'in-progress',
+    submitted: 8,
+    total: 25,
+    target: 'learners'
+  }
+];
+
+var activeContextFilter = 'all';
+
+function statusConfig(s) {
+  if (s.status === 'completed') return { label: '✓ Completed', cls: 'completed', btnLabel: 'View', btnCls: 'btn-view' };
+  if (s.status === 'in-progress') return { label: '● In Progress', cls: 'in-progress', btnLabel: 'Resume', btnCls: 'btn-resume' };
+  return { label: '○ Not Started', cls: 'pending', btnLabel: 'Fill Survey', btnCls: 'btn-fill' };
+}
+
+function renderSurveyCards() {
+  var container = document.getElementById('survey-list-container');
+  var filtered = activeContextFilter === 'all'
+    ? surveyData
+    : surveyData.filter(function(s) { return s.context === activeContextFilter; });
+
+  // Update summary counts
+  var counts = { pending: 0, 'in-progress': 0, completed: 0 };
+  surveyData.forEach(function(s) { counts[s.status]++; });
+  document.getElementById('count-pending').textContent = counts['pending'];
+  document.getElementById('count-progress').textContent = counts['in-progress'];
+  document.getElementById('count-done').textContent = counts['completed'];
+
+  if (filtered.length === 0) {
+    container.innerHTML =
+      '<div class="empty-tab">' +
+        '<span class="material-icons">assignment</span>' +
+        '<p>No surveys found for this category</p>' +
+      '</div>';
+    return;
+  }
+
+  var contextLabels = { self: 'Self', learner: 'Learner', center: 'Center', teacher: 'Teacher', none: 'General' };
+
+  container.innerHTML = filtered.map(function(s) {
+    var cfg = statusConfig(s);
+    var ctxLabel = contextLabels[s.context] || s.context;
+
+    // Show mini progress bar only for learner-context surveys (multi-fill)
+    var progressHtml = '';
+    if (s.context === 'learner' && s.total > 1) {
+      var pct = Math.round((s.submitted / s.total) * 100);
+      var fillCls = s.status === 'completed' ? 'fill-green' : 'fill-orange';
+      progressHtml =
+        '<div class="card-progress">' +
+          '<div class="card-progress-label">' +
+            '<span>Filled</span>' +
+            '<span><strong>' + s.submitted + ' / ' + s.total + '</strong> learners</span>' +
+          '</div>' +
+          '<div class="card-progress-track">' +
+            '<div class="card-progress-fill ' + fillCls + '" style="width:' + pct + '%"></div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    return (
+      '<div class="survey-card status-' + s.status + '">' +
+        '<div class="card-top">' +
+          '<div class="card-title">' + s.title + '</div>' +
+          '<span class="status-badge ' + cfg.cls + '">' + cfg.label + '</span>' +
+        '</div>' +
+        '<div class="card-desc">' + s.desc + '</div>' +
+        '<div class="card-chips">' +
+          '<span class="chip">' + s.type + '</span>' +
+          '<span class="chip">Context: ' + ctxLabel + '</span>' +
+        '</div>' +
+        progressHtml +
+        '<div class="card-footer">' +
+          '<span class="card-date">Published: ' + s.date + '</span>' +
+          '<button class="' + cfg.btnCls + '" onclick="show(\'' + s.target + '\')">' + cfg.btnLabel + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function filterContext(ctx, evt) {
+  activeContextFilter = ctx;
+  document.querySelectorAll('.context-tab').forEach(function(tab) { tab.classList.remove('active'); });
+  evt.target.classList.add('active');
+  renderSurveyCards();
+}
+
+function show(screen) {
+  document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('screen-' + screen).classList.add('active');
+  var idx = { list: 0, learners: 1, picker: 2, form: 3, success: 4 }[screen];
+  if (idx !== undefined) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+}
+
+var radioVal = 'no';
+function selectRadio(val) {
+  radioVal = val;
+  document.getElementById('rd-yes').className = val === 'yes' ? 'radio-dot selected' : 'radio-dot';
+  document.getElementById('rd-no').className = val === 'no' ? 'radio-dot selected' : 'radio-dot';
+  document.getElementById('reason-field').style.display = val === 'no' ? '' : 'none';
+}
+
+var rating = 3;
+function rateStar(n) {
+  rating = n;
+  document.querySelectorAll('.star').forEach(function(s, i) {
+    s.className = 'star ' + (i < n ? 'filled' : 'empty');
+  });
+}
+
+renderSurveyCards();
+</script>
+</body>
+</html>

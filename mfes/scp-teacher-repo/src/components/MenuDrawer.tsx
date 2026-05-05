@@ -206,6 +206,25 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
+  const navigateToSurveyMfe = () => {
+    closeDrawer();
+    const surveyMfeBase =
+      process.env.NEXT_PUBLIC_SURVEY_MFE_URL || 'http://localhost:3001';
+    const params = new URLSearchParams();
+    const pick = (key: string) => {
+      const v = localStorage.getItem(key);
+      if (v) params.set(key, v);
+    };
+    pick('token');
+    pick('refreshToken');
+    pick('userId');
+    pick('tenantId');
+    pick('tenantName');
+    pick('academicYearId');
+    pick('preferredLanguage');
+    window.location.href = `${surveyMfeBase}/teacher-survey-list?${params.toString()}`;
+  };
+
   const navigateToYouthBoard = () => {
     closeDrawer();
     router.push('/youthboard');
@@ -632,6 +651,36 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={navigateToObservation}
             >
               {t('OBSERVATION.SURVEY_FORMS')}
+            </Button>
+          </Box>
+        )}
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
+          <Box sx={{ marginTop: '18px' }}>
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: 'transparent',
+                gap: '10px',
+                padding: '0px 18px !important',
+                color: theme.palette.warning.A200,
+                fontWeight: 500,
+                '&:hover': { background: 'transparent' },
+                marginTop: '15px',
+              }}
+              startIcon={
+                <Image
+                  src={surveyForm}
+                  alt="Survey-Icon"
+                  width={24}
+                  height={24}
+                />
+              }
+              onClick={navigateToSurveyMfe}
+            >
+              Survey-Shubham
             </Button>
           </Box>
         )}
