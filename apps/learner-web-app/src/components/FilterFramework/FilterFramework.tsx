@@ -75,6 +75,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   const [dependencyMap, setDependencyMap] = useState<DependencyMap>({});
   const [clearTrigger, setClearTrigger] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
   // Check if filter should be shown based on uiConfig
   const shouldShowFilter = React.useMemo(() => {
@@ -90,10 +91,6 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
       return true; // On error, default to showing
     }
   }, []);
-
-  const isSecondChanceProgram =
-    typeof window !== 'undefined' &&
-    localStorage.getItem('userProgram') === 'Second Chance Program';
 
   const ITEMS_TO_SHOW = 3; // Number of items to show initially
 
@@ -251,7 +248,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     // Initialize collapse state - all categories expanded by default
     const initialCollapseState: CollapseState = {};
     const initialShowMoreState: ShowMoreState = {};
-    parsedCategories.forEach((category) => {
+    parsedCategories.forEach((category, index) => {
       initialCollapseState[category.code] = true; // All categories expanded
       initialShowMoreState[category.code] = false;
     });
@@ -643,28 +640,8 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     );
   };
 
+  // Don't render if showFilter is false in uiConfig
   if (!shouldShowFilter) {
-    if (isSecondChanceProgram) {
-      return (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            width: '100%',
-            padding: { xs: 1, sm: 2 },
-            borderRadius: 2,
-          }}
-        >
-          <StaticFilterFields
-            onFiltersChange={handleStaticFiltersChange}
-            showHeader={false}
-            clearTrigger={clearTrigger}
-            filterTypes={['contentLanguage']}
-          />
-        </Box>
-      );
-    }
     return null;
   }
 
@@ -810,41 +787,6 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   }
 
   if (!frameworkData || categories.length === 0) {
-    if (isSecondChanceProgram) {
-      return (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            width: '100%',
-            padding: { xs: 1, sm: 2 },
-            borderRadius: 2,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid #E0E0E0',
-              pb: 2,
-              mb: 1,
-            }}
-          >
-            <Typography variant="h2" sx={{ fontWeight: 500 }}>
-              Filter By
-            </Typography>
-          </Box>
-          <StaticFilterFields
-            onFiltersChange={handleStaticFiltersChange}
-            showHeader={false}
-            clearTrigger={clearTrigger}
-            filterTypes={['contentLanguage']}
-          />
-        </Box>
-      );
-    }
     return (
       <Box
         sx={{
@@ -854,6 +796,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
           width: '100%',
         }}
       >
+        {/* Filter Header */}
         <Box
           sx={{
             display: 'flex',
@@ -863,10 +806,17 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             pb: 2,
           }}
         >
-          <Typography variant="h2" sx={{ fontWeight: 500 }}>
+          <Typography
+            variant="h2"
+            sx={{
+              fontWeight: 500,
+            }}
+          >
             Filter By
           </Typography>
         </Box>
+
+        {/* Empty State */}
         <Box sx={{ width: '100%' }}>
           <Typography variant="body2" color="text.secondary">
             No filters available
@@ -952,8 +902,3 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 };
 
 export default FilterFramework;
-
-
-
-
-
