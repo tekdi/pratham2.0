@@ -266,6 +266,8 @@ export default memo(function LearnerCourse({
             position: 'sticky',
             top: !title ? 0 : 100,
             alignSelf: 'flex-start',
+            maxHeight: !title ? '100vh' : 'calc(100vh - 100px)',
+            overflowY: 'auto',
           }}
         >
           <FilterComponent
