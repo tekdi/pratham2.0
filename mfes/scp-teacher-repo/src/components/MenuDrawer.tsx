@@ -680,7 +680,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }
               onClick={navigateToSurveyMfe}
             >
-              Survey-Shubham
+              Survey
             </Button>
           </Box>
         )}
