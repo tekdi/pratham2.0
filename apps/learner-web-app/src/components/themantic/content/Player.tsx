@@ -76,27 +76,49 @@ const App = ({
       // console.log('response=======>', { content: response });
       if (unitId) {
         const course = await hierarchyAPI(courseId as string);
-        const breadcrum = findCourseUnitPath({
+        const keyArray = [
+          'name',
+          'identifier',
+          'mimeType',
+          {
+            key: 'link',
+            suffix: activeLink
+              ? `?activeLink=${encodeURIComponent(activeLink)}`
+              : '',
+          },
+        ];
+
+        // Try finding the leaf content first
+        let breadcrum = findCourseUnitPath({
           contentBaseUrl: contentBaseUrl,
           node: course,
           targetId: identifier as string,
-          keyArray: [
-            'name',
-            'identifier',
-            'mimeType',
-            {
-              key: 'link',
-              suffix: activeLink
-                ? `?activeLink=${encodeURIComponent(activeLink)}`
-                : '',
-            },
-          ],
+          keyArray,
         });
-        setBreadCrumbs([
-          { label: 'Home', link: '/themantic' },
-          ...(breadcrum?.slice(0, -1) || []),
-        ]);
+
+        if (breadcrum) {
+          // Found leaf: slice off the last entry (current content) for breadcrumb display
+          setBreadCrumbs([
+            { label: 'Home', link: '/themantic' },
+            ...breadcrum.slice(0, -1),
+          ]);
+        } else {
+          // Leaf content not in hierarchy (published tree may omit leaf nodes).
+          // Fall back to finding the unit path instead.
+          const unitBreadcrum = findCourseUnitPath({
+            contentBaseUrl: contentBaseUrl,
+            node: course,
+            targetId: unitId as string,
+            keyArray,
+          });
+          // Show the full unit path (no slice) so Fractions still appears in breadcrumbs
+          setBreadCrumbs([
+            { label: 'Home', link: '/themantic' },
+            ...(unitBreadcrum || []),
+          ]);
+        }
       } else {
+        console.log("No unitId found");
         setBreadCrumbs([
           { label: 'Home', link: '/themantic' },
           { label: response?.name },
