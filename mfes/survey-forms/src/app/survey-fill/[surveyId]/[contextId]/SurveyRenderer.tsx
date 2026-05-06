@@ -543,7 +543,7 @@ const SurveyRenderer: React.FC = () => {
         >
           <Button
             variant="outlined"
-            onClick={handleSaveDraft}
+            onClick={() => handleSaveDraft()}
             disabled={form.saving || form.submitting}
             sx={{
               borderColor: '#FDBE16',

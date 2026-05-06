@@ -210,19 +210,30 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     closeDrawer();
     const surveyMfeBase =
       process.env.NEXT_PUBLIC_SURVEY_MFE_URL || 'http://localhost:3001';
-    const params = new URLSearchParams();
-    const pick = (key: string) => {
+
+    // Same-origin check: if the survey MFE is on the same origin (production
+    // behind Nginx), localStorage is already shared — no need to pass tokens
+    // in the URL at all.
+    const surveyOrigin = new URL(surveyMfeBase).origin;
+    const isSameOrigin = surveyOrigin === window.location.origin;
+
+    if (isSameOrigin) {
+      window.location.href = `${surveyMfeBase}/teacher-survey-list`;
+      return;
+    }
+
+    // Different origin (local dev: scp-teacher on :4102, survey-forms on :4108).
+    // Use sessionStorage broadcast so tokens never appear in the URL or history.
+    // survey-forms reads this key on mount and removes it immediately.
+    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
+    const payload: Record<string, string> = {};
+    KEYS.forEach((key) => {
       const v = localStorage.getItem(key);
-      if (v) params.set(key, v);
-    };
-    pick('token');
-    pick('refreshToken');
-    pick('userId');
-    pick('tenantId');
-    pick('tenantName');
-    pick('academicYearId');
-    pick('preferredLanguage');
-    window.location.href = `${surveyMfeBase}/teacher-survey-list?${params.toString()}`;
+      if (v) payload[key] = v;
+    });
+    // Use a short-lived localStorage key that the target tab reads once and deletes.
+    localStorage.setItem('__survey_mfe_auth_handoff__', JSON.stringify(payload));
+    window.location.href = `${surveyMfeBase}/teacher-survey-list`;
   };
 
   const navigateToYouthBoard = () => {

@@ -1,47 +1,30 @@
 'use client';
 
 /**
- * When survey-forms is opened via a redirect from scp-teacher, the parent app
- * appends auth data as query params so localStorage (which is per-origin) can
- * be seeded on this port.  Call this once at the entry page before any API
- * requests fire.
+ * Seeds localStorage from the auth handoff written by scp-teacher before
+ * navigating here (cross-origin dev only). The key is deleted immediately
+ * after reading so tokens are never left lingering.
  *
- * Params bootstrapped: token, refreshToken, userId, tenantId, tenantName,
- * academicYearId, preferredLanguage.
- *
- * After seeding the params are stripped from the URL so they don't linger in
- * browser history.
+ * In production both apps share the same origin behind Nginx, so localStorage
+ * is already shared and no handoff is needed.
  */
-const BOOTSTRAP_KEYS = [
-  'token',
-  'refreshToken',
-  'userId',
-  'tenantId',
-  'tenantName',
-  'academicYearId',
-  'preferredLanguage',
-] as const;
+const HANDOFF_KEY = '__survey_mfe_auth_handoff__';
 
 export function bootstrapAuthFromUrl(): void {
   if (typeof window === 'undefined') return;
 
-  const params = new URLSearchParams(window.location.search);
-  let seeded = false;
+  const raw = localStorage.getItem(HANDOFF_KEY);
+  if (!raw) return;
 
-  BOOTSTRAP_KEYS.forEach((key) => {
-    const value = params.get(key);
-    if (value) {
-      localStorage.setItem(key, value);
-      params.delete(key);
-      seeded = true;
-    }
-  });
+  // Remove immediately — treat it as a one-time-use token
+  localStorage.removeItem(HANDOFF_KEY);
 
-  if (seeded) {
-    const clean =
-      params.toString()
-        ? `${window.location.pathname}?${params.toString()}`
-        : window.location.pathname;
-    window.history.replaceState({}, '', clean);
+  try {
+    const payload: Record<string, string> = JSON.parse(raw);
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value) localStorage.setItem(key, value);
+    });
+  } catch {
+    // Malformed payload — ignore
   }
 }

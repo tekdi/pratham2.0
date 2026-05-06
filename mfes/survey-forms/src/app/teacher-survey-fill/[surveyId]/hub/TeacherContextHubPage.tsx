@@ -296,7 +296,7 @@ const TeacherContextHubPage: React.FC = () => {
                 if (!batchId) return;
                 setLearnersLoading(true);
                 fetchTeacherCohortLearners(batchId)
-                  .then((list) => setLearners(list))
+                  .then(({ learners: list, totalCount }) => { setLearners(list); setLearnersTotalCount(totalCount); })
                   .catch(() => setLearnersError('Failed to load learners.'))
                   .finally(() => setLearnersLoading(false));
               }}
