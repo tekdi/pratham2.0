@@ -15,7 +15,8 @@ const useEventDates = (
   timeTableDate,
   eventUpdated,
   eventDeleted,
-  eventCreated
+  eventCreated,
+  cohortId
 ) => {
   const [eventDates, setEventDates] = useState({});
 
@@ -60,6 +61,7 @@ const useEventDates = (
             },
             [idType]: idValue,
             status: ['live'],
+            ...(cohortId && cohortId !== 'all' ? { cohortId } : {}),
           };
 
           const response = await getEventList({
@@ -93,6 +95,7 @@ const useEventDates = (
     eventUpdated,
     eventDeleted,
     eventCreated,
+    cohortId,
   ]);
 
   return eventDates;
