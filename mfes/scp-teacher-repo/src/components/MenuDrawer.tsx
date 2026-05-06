@@ -206,6 +206,36 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
+  const navigateToSurveyMfe = () => {
+    closeDrawer();
+    const surveyMfeBase =
+      process.env.NEXT_PUBLIC_SURVEY_MFE_URL || 'http://localhost:3001';
+
+    // Same-origin check: if the survey MFE is on the same origin (production
+    // behind Nginx), localStorage is already shared — no need to pass tokens
+    // in the URL at all.
+    const surveyOrigin = new URL(surveyMfeBase).origin;
+    const isSameOrigin = surveyOrigin === window.location.origin;
+
+    if (isSameOrigin) {
+      window.location.href = `${surveyMfeBase}/teacher-survey-list`;
+      return;
+    }
+
+    // Different origin (local dev: scp-teacher on :4102, survey-forms on :4108).
+    // Use sessionStorage broadcast so tokens never appear in the URL or history.
+    // survey-forms reads this key on mount and removes it immediately.
+    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
+    const payload: Record<string, string> = {};
+    KEYS.forEach((key) => {
+      const v = localStorage.getItem(key);
+      if (v) payload[key] = v;
+    });
+    // Use a short-lived localStorage key that the target tab reads once and deletes.
+    localStorage.setItem('__survey_mfe_auth_handoff__', JSON.stringify(payload));
+    window.location.href = `${surveyMfeBase}/teacher-survey-list`;
+  };
+
   const navigateToYouthBoard = () => {
     closeDrawer();
     router.push('/youthboard');
@@ -632,6 +662,36 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={navigateToObservation}
             >
               {t('OBSERVATION.SURVEY_FORMS')}
+            </Button>
+          </Box>
+        )}
+        {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
+          <Box sx={{ marginTop: '18px' }}>
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: 'transparent',
+                gap: '10px',
+                padding: '0px 18px !important',
+                color: theme.palette.warning.A200,
+                fontWeight: 500,
+                '&:hover': { background: 'transparent' },
+                marginTop: '15px',
+              }}
+              startIcon={
+                <Image
+                  src={surveyForm}
+                  alt="Survey-Icon"
+                  width={24}
+                  height={24}
+                />
+              }
+              onClick={navigateToSurveyMfe}
+            >
+              Survey
             </Button>
           </Box>
         )}

@@ -184,6 +184,17 @@ nx dev taxonomy-manager --port=4114 --verbose
 basePath : `http://localhost:4114/taxonomy-manager/`
 Port : `4114`
 
+### survey-forms
+
+Next JS, run:
+
+```sh
+nx dev survey-forms --port=4115 --verbose
+```
+
+basePath : `http://localhost:4115/plp-surveys/`
+Port : `4115`
+
 ##
 
 ## NX Command
