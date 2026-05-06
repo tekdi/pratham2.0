@@ -43,6 +43,7 @@ export interface SearchBarProps {
   discoverContents?: boolean;
   isPrimaryCategory?: boolean;
   staticFilter?: any;
+  contentType?:string
 }
 
 const sortOptions = SortOptions;
@@ -59,6 +60,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
   discoverContents = false,
   isPrimaryCategory = true,
   staticFilter = [],
+  contentType=""
 }) => {
   const router = useRouter();
 
@@ -130,7 +132,13 @@ const SearchBox: React.FC<SearchBarProps> = ({
         ...additionalCategories,
 
       ];
-      setPrimaryCategory(PrimaryCategory || []);
+      if(contentType === 'content-library'){
+        setPrimaryCategory(['Learning Resource' , 'Story' , 'Interactive' , 'Activity']);
+      }
+      else{
+              setPrimaryCategory(PrimaryCategory || []);
+
+      }
       localStorage.setItem('PrimaryCategory', JSON.stringify(PrimaryCategory));
     };
     PrimaryCategoryData();
