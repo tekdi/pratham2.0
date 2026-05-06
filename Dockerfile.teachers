@@ -17,7 +17,7 @@ COPY . .
 
 # Build Specific Application
 # Build only specific applications
-RUN npx nx run-many --target=build --projects=teachers,authentication,scp-teacher-repo,youthNet,players
+RUN npx nx run-many --target=build --projects=teachers,authentication,scp-teacher-repo,youthNet,players,survey-forms
 
 # Install PM2 to manage multiple apps
 RUN npm install -g pm2@6.0.8
