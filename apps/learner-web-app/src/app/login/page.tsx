@@ -102,7 +102,7 @@ export const checkRegistrationTestStatus = async (
       filters: {
         status: ['Live'],
         primaryCategory: ['Practice Question Set'],
-        assessmentType: 'Zatpat Test',
+        assessmentType: 'Eligibility Test',
         program: programFilter,
       },
       sort_by: { lastUpdatedOn: 'desc' },
@@ -742,6 +742,7 @@ const LoginPage = () => {
         showFooter={true}
         primaryText={t('COMMON.OK')}
         primaryActionHandler={() => setAssessmentUnavailableModal(false)}
+        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">
           <Typography variant="body1">

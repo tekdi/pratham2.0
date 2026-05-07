@@ -274,9 +274,16 @@ export default memo(function LearnerCourse({
             filterState={filterState}
             handleFilterChange={handleFilterChange}
             onlyFields={_content?.onlyFields ?? []}
-            isOpenColapsed={_content?.isOpenColapsed ?? []}        
+            isOpenColapsed={_content?.isOpenColapsed ?? []}
             onlyLanguage={typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
-
+            _config={{
+              _filterBody: {
+                sx: {
+                  maxHeight: `calc(100vh - ${!title ? 130 : 230}px)`,
+                  overflowY: 'auto',
+                },
+              },
+            }}
           />
         </Box>
         <Box flex={127}>

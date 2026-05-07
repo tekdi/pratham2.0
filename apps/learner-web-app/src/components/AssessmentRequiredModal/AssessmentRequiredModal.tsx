@@ -91,11 +91,12 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
                 mb: 2,
               }}
             >
-              {`${t('LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR')} ${
-                localStorage.getItem('isForNavaPatham') === 'true'
-                  ? t('NAVAPATHAM.NAVAPATHAM')
-                  : localStorage.getItem('userProgram')
-              }.`}
+             {`${t('LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT')}`}
+<br />
+{localStorage.getItem('isForNavaPatham') === 'true'
+  ? t('NAVAPATHAM.NAVAPATHAM')
+  : localStorage.getItem('userProgram')
+}.
             </Typography>
           )}
 
@@ -112,10 +113,10 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
 
         <Divider />
 
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
-          <Button variant="outlined" onClick={onClose}>
+        <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', gap: 1 }}>
+          {/* <Button variant="outlined" onClick={onClose}>
             {t('COMMON.CLOSE')}
-          </Button>
+          </Button> */}
           <Button variant="contained" color="primary" onClick={onStartAssessment}>
             {t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
           </Button>

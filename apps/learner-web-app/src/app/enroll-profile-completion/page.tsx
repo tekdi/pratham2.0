@@ -111,7 +111,7 @@ const EnrollProfileCompletionInner = () => {
             filters: {
               status: ['Live'],
               primaryCategory: ['Practice Question Set'],
-              assessmentType: 'Zatpat Test',
+              assessmentType: 'Eligibility Test',
               ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
               program: ['Second Chance'],
             },
@@ -304,6 +304,7 @@ const EnrollProfileCompletionInner = () => {
         showFooter={true}
         primaryText={t('COMMON.OK')}
         primaryActionHandler={onAssessmentUnavailableOk}
+        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">
           <Typography variant="body1">
