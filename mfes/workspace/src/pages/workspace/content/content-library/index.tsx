@@ -374,7 +374,8 @@ const ContentsPage = () => {
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
                 onStateChange={handleStateChange}
-                isPrimaryCategory={false}
+                contentType='content-library'
+             //   isPrimaryCategory={false}
               />
               <Box m={3}>
                 <DynamicMultiFilter

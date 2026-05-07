@@ -7,6 +7,8 @@ import dynamic from 'next/dynamic';
 import { SearchButton } from './SearchButton';
 import { debounce } from 'lodash';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { useGlobalData } from '@learner/components/Provider/GlobalProvider';
+import FilterComponent from '@learner/components/Content/FilterComponent';
 
 const Content = dynamic(() => import('@Content'), {
   ssr: false,
@@ -15,7 +17,9 @@ const Content = dynamic(() => import('@Content'), {
 const SearchPage = () => {
   const [searchValue, setSearchValue] = React.useState('');
   const [submitText, setSubmitText] = React.useState('');
+  const [filterState, setFilterState] = React.useState<any>({});
   const searchParams = useSearchParams();
+  const { globalData: { filterFramework } } = useGlobalData();
   const storedConfig =
   typeof window !== 'undefined'
     ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
@@ -41,11 +45,16 @@ const SearchPage = () => {
     setSubmitText(value);
   }, []);
 
+  const handleFilterChange = useCallback((newFilterState: any) => {
+    setFilterState({ filters: newFilterState });
+  }, []);
+
   const contentApp = useMemo(
     () => (
       <Content
         filters={{
           query: submitText,
+          ...filterState,
         }}
         contentTabs={storedConfig.showContent}
 
@@ -65,7 +74,7 @@ const SearchPage = () => {
         }}
       />
     ),
-    [submitText]
+    [submitText, filterState]
   );
 
   return (
@@ -99,7 +108,20 @@ const SearchPage = () => {
           </Box>
         </Box>
       </Box>
-      <Box sx={{ p: 4 }}>{contentApp}</Box>
+      <Box sx={{ display: 'flex', gap: 3, p: 4, alignItems: 'flex-start' }}>
+        <Box sx={{ width: { xs: '100%', md: '260px' }, flexShrink: 0 }}>
+          <FilterComponent
+            filterState={filterState}
+            filterFramework={filterFramework}
+            handleFilterChange={handleFilterChange}
+            onlyLanguage={true}
+            isOpenColapsed={['contentLanguage']}
+          />
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {contentApp}
+        </Box>
+      </Box>
     </Layout>
   );
 };
