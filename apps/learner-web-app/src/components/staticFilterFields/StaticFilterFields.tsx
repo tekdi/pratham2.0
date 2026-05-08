@@ -33,8 +33,18 @@ interface StaticFilterField {
 }
 
 const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange, showHeader = false, clearTrigger = 0, filterTypes }) => {
+  const storageKey = `staticFilters_${(filterTypes ?? ['contentLanguage', 'skills', 'courseType']).join('_')}`;
+
   const [filterFields, setFilterFields] = useState<StaticFilterField[]>([]);
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({});
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [collapseState, setCollapseState] = useState<Record<string, boolean>>({});
   const [showMoreState, setShowMoreState] = useState<Record<string, boolean>>({});
 
@@ -74,12 +84,17 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
     }));
   };
 
+  // Persist selected filters to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(storageKey, JSON.stringify(selectedFilters));
+  }, [selectedFilters]);
+
   // Clear filters when clearTrigger changes
   useEffect(() => {
     if (clearTrigger > 0) {
       setSelectedFilters({});
-      // Don't call onFiltersChange here - let the parent handle it
-      // The parent (FilterFramework) will call onFiltersChange after setting clearTrigger
+      if (typeof window !== 'undefined') localStorage.removeItem(storageKey);
     }
   }, [clearTrigger]);
 
@@ -149,6 +164,11 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
         });
         setCollapseState(initialCollapseState);
         setShowMoreState(initialShowMoreState);
+
+        // Notify parent about any filter selections restored from localStorage
+        if (Object.values(selectedFilters).some((arr) => arr?.length > 0)) {
+          onFiltersChange?.(selectedFilters);
+        }
         }
       }
     };
