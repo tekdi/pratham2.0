@@ -61,7 +61,6 @@ const DynamicForm = forwardRef(({
   parentDataAddUiSchema = {},
   parentDataSchema = {},
   id,
-  newLearnerRegister=false,
   mobileNumber=""
 }: any, ref) => {
   console.log('schema=======>', schema);

@@ -1002,7 +1002,6 @@ const RegisterationFlow = () => {
                 prefilledFormData={{ ...formData, ...(mobileFromQuery ? { mobile: mobileFromQuery, parent_phone: mobileFromQuery } : {}) }}
                 hideSubmit={true}
                 type={'learner'}
-                newLearnerRegister={true}
                 mobileNumber={mobileFromQuery}
               />
             )}
