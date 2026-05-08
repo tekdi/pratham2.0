@@ -48,6 +48,8 @@ const InfoCard: React.FC<InfoCardProps> = ({
       setIsTrackingSyncPending(isPending);
     }
     checkTrackingSyncPending();
+    const interval = setInterval(checkTrackingSyncPending, 2000);
+    return () => clearInterval(interval);
   }, [item?.identifier]);
 
   // Call checkCourseScore function

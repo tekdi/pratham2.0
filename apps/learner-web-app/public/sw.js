@@ -9,7 +9,7 @@ const STORE_NAME = 'tracking-store';
 const RESERVED_PREFIX = '__';
 const LOCK_KEY = '__sync_in_progress__';
 const LOCK_STALE_MS = 120000;
-const STATUS_INTERVAL_MS = 10000; // 10 seconds
+const STATUS_INTERVAL_MS = 2000; // 2 seconds
 /** Failed POST attempts per queue item before dropping it from the store. */
 const MAX_FETCH_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 800;
