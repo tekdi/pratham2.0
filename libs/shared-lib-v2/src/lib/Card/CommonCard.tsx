@@ -112,12 +112,11 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   React.useEffect(() => {
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier);
-      
-      // console.log('#asaasdas isPending===>', isPending);
-      // console.log('#asaasdas item?.identifier===>', item?.identifier);
       setIsTrackingSyncPending(isPending);
     };
     checkTrackingSyncPending();
+    const interval = setInterval(checkTrackingSyncPending, 2000);
+    return () => clearInterval(interval);
   }, [item?.identifier]);
 
   React.useEffect(() => {
