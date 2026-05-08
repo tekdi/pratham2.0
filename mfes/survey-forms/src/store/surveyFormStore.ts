@@ -72,7 +72,7 @@ export const useSurveyStore = create<SurveyStore>((set) => ({
   list: {
     surveys: [],
     pagination: null,
-    loading: false,
+    loading: true,
     error: null,
   },
   form: { ...initialFormState },

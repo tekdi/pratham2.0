@@ -295,13 +295,13 @@ const SurveyResponseViewer: React.FC = () => {
               <Divider sx={{ my: 1.5 }} />
 
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
-                {visibleFields.map((field) => (
+                {visibleFields.map((field, idx) => (
                   <Box key={field.fieldId}>
                     <Typography
                       variant="body2"
-                      sx={{ color: '#7C766F', fontWeight: 500, mb: 0.5 }}
+                      sx={{ color: '#1E1B16', fontWeight: 700, mb: 0.5 }}
                     >
-                      {field.fieldLabel}
+                      {idx + 1}. {field.fieldLabel}
                     </Typography>
                     <ReadOnlyValue field={field} value={responseData[field.fieldName]} />
                   </Box>
