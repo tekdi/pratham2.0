@@ -222,17 +222,17 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       return;
     }
 
-    // Different origin (local dev: scp-teacher on :4102, survey-forms on :4108).
-    // Use sessionStorage broadcast so tokens never appear in the URL or history.
-    // survey-forms reads this key on mount and removes it immediately.
+    // Different origin (local dev: scp-teacher on :4102, survey-forms on :4115).
+    // localStorage is isolated per origin, but COOKIES are shared across ports
+    // on the same hostname — so we set short-lived cookies that the survey MFE
+    // reads on mount and promotes into its own localStorage.
     const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
-    const payload: Record<string, string> = {};
     KEYS.forEach((key) => {
       const v = localStorage.getItem(key);
-      if (v) payload[key] = v;
+      if (v) {
+        document.cookie = `survey_auth_${key}=${encodeURIComponent(v)}; path=/; SameSite=Lax; max-age=30`;
+      }
     });
-    // Use a short-lived localStorage key that the target tab reads once and deletes.
-    localStorage.setItem('__survey_mfe_auth_handoff__', JSON.stringify(payload));
     window.location.href = `${surveyMfeBase}/teacher-survey-list`;
   };
 

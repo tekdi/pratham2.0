@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { tenantId } from '../../../app.config';
 
-// basePath '/plp-surveys' is hardcoded in next.config.js. Browser axios calls
-// are origin-relative so we prefix it here — otherwise they hit the teachers
-// shell which has no /api handler.
 const instance = axios.create({
-  baseURL: typeof window !== 'undefined' ? '/plp-surveys' : undefined,
+  baseURL:
+    typeof window !== 'undefined'
+      ? process.env.NEXT_PUBLIC_SURVEY_URL || '/plp-surveys'
+      : undefined,
 });
 
 instance.interceptors.request.use(
