@@ -112,6 +112,8 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
 
   const [reassignModalOpen, setReassignModalOpen] =
     React.useState<boolean>(false);
+  const [isBottomDrawerLoading, setIsBottomDrawerLoading] = useState(false);
+  const [canShowReassignBatch, setCanShowReassignBatch] = useState(true);
 
   //reassign modal variables
   // const [reassignModalOpen, setReassignModalOpen] = useState(false);
@@ -153,7 +155,7 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
 
   const toggleDrawer =
     (anchor: Anchor, open: boolean) =>
-      (event: React.KeyboardEvent | React.MouseEvent) => {
+      async (event: React.KeyboardEvent | React.MouseEvent) => {
         setCohortLearnerDeleteId(cohortMembershipId);
         setReassignId(userId);
 
@@ -163,6 +165,24 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
             (event as React.KeyboardEvent).key === 'Shift')
         ) {
           return;
+        }
+
+        // When opening the bottom drawer, pre-check today's attendance for this user
+        if (open) {
+          try {
+            setIsBottomDrawerLoading(true);
+            setCanShowReassignBatch(true);
+            const attendanceStats = await fetchAttendanceStats(userId);
+            // if any record exists for today, hide reassign-batch
+            if (attendanceStats && attendanceStats.length > 0) {
+              setCanShowReassignBatch(false);
+            }
+          } catch (e) {
+            // In case of failure, default to allowing actions (no silent block)
+            setCanShowReassignBatch(true);
+          } finally {
+            setIsBottomDrawerLoading(false);
+          }
         }
 
         setState({ ...state, bottom: open });
@@ -252,6 +272,9 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   };
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
+    if (name === 'loading') {
+      return;
+    }
     if (name === 'mark-drop-out') {
       setShowModal(true);
     } else if (name === 'unmark-drop-out') {
@@ -574,10 +597,22 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
   };
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleMenuOpen = (event: any) => {
+  const handleMenuOpen = async (event: any) => {
     setAnchorEl(event.currentTarget);
     setCohortLearnerDeleteId(cohortMembershipId);
     setReassignId(userId);
+    try {
+      setIsBottomDrawerLoading(true);
+      setCanShowReassignBatch(true);
+      const attendanceStats = await fetchAttendanceStats(userId);
+      if (attendanceStats && attendanceStats.length > 0) {
+        setCanShowReassignBatch(false);
+      }
+    } catch (e) {
+      setCanShowReassignBatch(true);
+    } finally {
+      setIsBottomDrawerLoading(false);
+    }
   };
 
   const renderCustomContent = () => {
@@ -863,7 +898,25 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
         setAnchorEl={setAnchorEl}
         anchorEl={anchorEl}
         isMobile={isMobile}
-        optionList={
+        renderCustomContent={() =>
+          isBottomDrawerLoading ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 3,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : null
+        }
+        optionList={isBottomDrawerLoading ? [{
+          label: t('COMMON.LOADING'),
+          icon: (<CircularProgress size={20} />),
+          name: 'loading',
+        }] :
           block
             ? [
               // TODO: Integrate todo service
@@ -921,7 +974,7 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
             })
             : [
               // Only TL will see this option
-              ...(loggedInUserRole === Role.TEAM_LEADER
+              ...(loggedInUserRole === Role.TEAM_LEADER && canShowReassignBatch
                 ? [
                   {
                     label: t('COMMON.REASSIGN_BATCH'),
