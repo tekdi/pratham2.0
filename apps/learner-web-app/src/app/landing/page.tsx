@@ -1,27 +1,24 @@
 'use client';
 
-import { Box, Button, Card, CardContent, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Header from '@learner/components/Header/Header';
 import { getTenantInfo, getPrathamTenantId } from '@learner/utils/API/ProgramService';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LockIcon from '@mui/icons-material/Lock';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useTranslation } from '@shared-lib';
-import 'swiper/css';
-import 'swiper/css/autoplay';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import RoleCard, { ROLE_CARD_THEMES } from '@learner/components/RoleCard/RoleCard';
+import ProgramCard from '@learner/components/ProgramCard/ProgramCard';
 
 interface Program {
   ordering: number;
   name: string;
   tenantId: string;
   description?: string;
+  type?: string;
   params?: {
     uiConfig?: {
       showSignup?: boolean;
@@ -37,6 +34,9 @@ interface Program {
     [key: string]: any;
   })[];
 }
+
+const PROGRAM_CARD_COLORS = ['#2979FF', '#00C853', '#FF6D00', '#AA00FF', '#00B8D4'];
+const VOLUNTEER_CARD_COLORS = ['#FF9800', '#F44336', '#E91E63', '#9C27B0', '#FF5722'];
 
 export default function LandingPage() {
   const router = useRouter();
@@ -55,6 +55,7 @@ export default function LandingPage() {
             program?.params?.uiConfig?.showProgram === true 
            // program?.params?.uiConfig?.sso?.length > 0
         );
+        console.log('Fetched Programs:', programsData);
         setPrograms(visiblePrograms || []);
         const ssoProgramsData = programsData?.filter(
           (program: any) =>
@@ -74,26 +75,19 @@ export default function LandingPage() {
   }
   }, []);
 
-  const handleGetStarted = async () => {
-    try {
-      const tenantId = await getPrathamTenantId();
-      if (tenantId) {
-        router.push(`/registration?tenantId=Pratham`);
-      } else {
-        console.error('Failed to get tenant ID');
-        // Fallback: redirect without tenantId or show error
-        router.push('/registration');
-      }
-    } catch (error) {
-      console.error('Error fetching tenant ID:', error);
-      // Fallback: redirect without tenantId
-      router.push('/registration');
-    }
+  const learnerPrograms = programs.filter((p) => p.type !== 'VolunteerOnboarding');
+  const volunteerPrograms = programs.filter((p) => p.type === 'VolunteerOnboarding');
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-    const handleLogin = () => {
-      router.push('/login');
-    };
+  const handleScrollToLearner = () => scrollTo('learner-programs');
+  const handleScrollToVolunteer = () => scrollTo('volunteer-programs');
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
 
   const handlePragyanpath = () => {
     const program = ssoPrograms.find((p) =>
@@ -138,7 +132,7 @@ export default function LandingPage() {
 
   return (
     <>
-      <Header />
+      <Header isLogin={true}/>
       <Box
         sx={{
           display: 'flex',
@@ -212,7 +206,7 @@ export default function LandingPage() {
               >
                 {t('LANDING.YOUR_LEARNING_JOURNEY_BEGINS_HERE')}
               </Typography>
-              <Button
+              {/* <Button
                 variant="contained"
                 onClick={handleGetStarted}
                 sx={{
@@ -235,8 +229,9 @@ export default function LandingPage() {
                 }}
               >
                 {t('LANDING.GET_STARTED')}
-              </Button>
-              <Box
+              </Button> */}
+
+              {/* <Box
                 sx={{
                 //  mt: 2,
                   borderRadius: '8px',
@@ -282,10 +277,10 @@ export default function LandingPage() {
                 >
                   {t('LANDING.LOGIN')}
                 </Button>
-              </Box>
+              </Box> */}
               
               {/* For Pratham Employees Section */}
-              <Box
+              {/* <Box
                 sx={{
                   mt: { xs: 4, md: 6 },
                   backgroundColor: 'rgba(31, 27, 19, 0.5)',
@@ -337,13 +332,185 @@ export default function LandingPage() {
                 >
                   {t('LANDING.ACCESS_PRAGYANPATH')}
                 </Button>
-              </Box>
+              </Box> */}
             </Box>
           </Container>
         </Box>
 
-        {/* About Pratham Section */}
-        <Container maxWidth="xl" disableGutters sx={{ my: { xs: 3, md: 4 }, px: { xs: 2, md: 3 } }}>
+       
+
+        {/* About Pratham Learning Platform Section */}
+      
+
+        {/* Role Selection Cards Section */}
+        <Box sx={{ backgroundColor: '#FFFDF7', py: { xs: 3, md: 5 } }}>
+          <Container maxWidth="xl" disableGutters sx={{ px: { xs: 2, md: 3 } }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: { xs: '20px', md: '24px' },
+                lineHeight: '32px',
+                color: '#1F1B13',
+                textAlign: 'center',
+                mb: 3,
+              }}
+            >
+              {t('LANDING.HOW_WOULD_YOU_LIKE_TO_GET_STARTED')}
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <RoleCard
+                  icon={<MenuBookOutlinedIcon fontSize="inherit" />}
+                  title={t('LANDING.ARE_YOU_HERE_TO_LEARN')}
+                  description={t('LANDING.REGISTER_FOR_LEARNING')}
+                  theme={ROLE_CARD_THEMES.learn}
+                  onClick={handleScrollToLearner}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <RoleCard
+                  icon={<FavoriteBorderIcon fontSize="inherit" />}
+                  title={t('LANDING.ARE_YOU_HERE_TO_VOLUNTEER')}
+                  description={t('LANDING.MAKE_A_DIFFERENCE')}
+                  theme={ROLE_CARD_THEMES.volunteer}
+                  onClick={handleScrollToVolunteer}
+                />
+              </Grid>
+            </Grid>
+          </Container>
+        </Box>
+        {/* Our Programs for Learners Section */}
+        <Box id="learner-programs" sx={{ backgroundColor: '#fff', py: { xs: 3, md: 5 } }}>
+          <Container maxWidth="xl" disableGutters sx={{ px: { xs: 2, md: 3 } }}>
+            <Typography
+              variant="h4"
+              component="h2"
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: { xs: '22px', md: '28px' },
+                lineHeight: '36px',
+                textAlign: 'center',
+                mb: 1,
+                color: '#1F1B13',
+              }}
+            >
+              {t('LANDING.OUR_PROGRAMS_FOR_LEARNERS')}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontFamily: 'Poppins',
+                fontWeight: 400,
+                fontSize: '14px',
+                color: '#5C5952',
+                textAlign: 'center',
+                mb: 4,
+              }}
+            >
+              {t('LANDING.OUR_PROGRAMS_SUBTITLE')}
+            </Typography>
+
+            {loading ? (
+              <Box sx={{ py: 4, textAlign: 'center' }}>
+                <Typography>{t('LANDING.LOADING_PROGRAMS')}</Typography>
+              </Box>
+            ) : learnerPrograms.length === 0 ? (
+              <Box sx={{ py: 4, textAlign: 'center' }}>
+                <Typography>{t('LANDING.NO_PROGRAMS_AVAILABLE')}</Typography>
+              </Box>
+            ) : (
+              <Grid container spacing={3}>
+                {learnerPrograms.map((program, index) => {
+                  const imageItem = program.programImages?.[0];
+                  const image =
+                    typeof imageItem === 'string'
+                      ? imageItem
+                      : (imageItem as any)?.description || '/images/default.png';
+                  return (
+                    <Grid item xs={12} sm={6} md={4} key={program.tenantId || index}>
+                      <ProgramCard
+                        image={image}
+                        title={program.name}
+                        description={program.description}
+                        buttonColor={PROGRAM_CARD_COLORS[index % PROGRAM_CARD_COLORS.length]}
+                        onExplore={() => router.push(`/programs/${program.tenantId}`)}
+                      />
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            )}
+          </Container>
+        </Box>
+
+        {/* Our Programs for Volunteers Section */}
+        {(loading || volunteerPrograms.length > 0) && (
+          <Box id="volunteer-programs" sx={{ backgroundColor: '#F7FAF7', py: { xs: 3, md: 5 } }}>
+            <Container maxWidth="xl" disableGutters sx={{ px: { xs: 2, md: 3 } }}>
+              <Typography
+                variant="h4"
+                component="h2"
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 700,
+                  fontSize: { xs: '22px', md: '28px' },
+                  lineHeight: '36px',
+                  textAlign: 'center',
+                  mb: 1,
+                  color: '#1F1B13',
+                }}
+              >
+                {t('LANDING.OUR_PROGRAMS_FOR_VOLUNTEERS')}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontFamily: 'Poppins',
+                  fontWeight: 400,
+                  fontSize: '14px',
+                  color: '#5C5952',
+                  textAlign: 'center',
+                  mb: 4,
+                }}
+              >
+                {t('LANDING.OUR_PROGRAMS_VOLUNTEERS_SUBTITLE')}
+              </Typography>
+
+              {loading ? (
+                <Box sx={{ py: 4, textAlign: 'center' }}>
+                  <Typography>{t('LANDING.LOADING_PROGRAMS')}</Typography>
+                </Box>
+              ) : (
+                <Grid container spacing={3}>
+                  {volunteerPrograms.map((program, index) => {
+                    const imageItem = program.programImages?.[0];
+                    const image =
+                      typeof imageItem === 'string'
+                        ? imageItem
+                        : (imageItem as any)?.description || '/images/default.png';
+                    return (
+                      <Grid item xs={12} sm={6} md={4} key={program.tenantId || index}>
+                        <ProgramCard
+                          image={image}
+                          title={program.name}
+                          description={program.description}
+                          buttonColor={VOLUNTEER_CARD_COLORS[index % VOLUNTEER_CARD_COLORS.length]}
+                          onExplore={() => router.push(`/programs/${program.tenantId}`)}
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              )}
+            </Container>
+          </Box>
+        )}
+
+ {/* About Pratham Section */}
+         <Container maxWidth="xl" disableGutters sx={{ my: { xs: 3, md: 4 }, px: { xs: 2, md: 3 } }}>
           <Grid container spacing={4} alignItems="center">
           <Grid item xs={12} md={5}>
                   <Box
@@ -400,10 +567,9 @@ export default function LandingPage() {
               </Typography>
             </Grid>
           </Grid>
-        </Container>
+        </Container> 
 
-        {/* About Pratham Learning Platform Section */}
-        <Box
+         <Box
           sx={{
             backgroundColor: '#FFFDF7',
             py: { xs: 3, md: 4 },
@@ -440,236 +606,10 @@ export default function LandingPage() {
               </Typography>
           </Container>
         </Box>
-
-        {/* Our Programs Section */}
-        <Container maxWidth="xl" disableGutters sx={{ my: { xs: 3, md: 4 }, px: { xs: 2, md: 3 } }}>
-          <Typography
-            variant="h4"
-            component="h2"
-            sx={{
-              fontFamily: 'Poppins',
-              fontWeight: 600,
-              fontSize: '32px',
-              lineHeight: '100%',
-              letterSpacing: '0px',
-              textAlign: 'center',
-              mb: 3,
-              color: '#1F1B13',
-            }}
-          >
-            {t('LANDING.OUR_PROGRAMS')}
-          </Typography>
-
-          {loading ? (
-            <Box sx={{  py: 4 }}>
-              <Typography>{t('LANDING.LOADING_PROGRAMS')}</Typography>
-            </Box>
-          ) : programs.length === 0 ? (
-            <Box sx={{  py: 4 }}>
-              <Typography>{t('LANDING.NO_PROGRAMS_AVAILABLE')}</Typography>
-            </Box>
-          ) : (
-            <Grid container spacing={4}>
-              {programs?.map((program, index) => (
-                <Grid item xs={12} md={4} key={program.tenantId || index}>
-                  <Card
-                    sx={{
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      boxShadow: 3,
-                      transition: 'transform 0.3s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        position: 'relative',
-                        width: '100%',
-                        height: '250px',
-                        overflow: 'hidden',
-                      }}
-                    >
-                      {program.programImages && program.programImages.length > 0 ? (
-                        <>
-                          <Swiper
-                            modules={[Navigation, Pagination, Autoplay]}
-                            spaceBetween={0}
-                            slidesPerView={1}
-                            navigation={{
-                              nextEl: `.next-${program.tenantId || index}`,
-                              prevEl: `.prev-${program.tenantId || index}`,
-                            }}
-                            pagination={{
-                              clickable: true,
-                              el: `.pagination-${program.tenantId || index}`,
-                            }}
-                            loop={program.programImages.length > 1}
-                            autoplay={
-                              program.programImages.length > 1
-                                ? {
-                                    delay: 3000,
-                                    disableOnInteraction: false,
-                                  }
-                                : false
-                            }
-                            style={{ height: '100%' }}
-                          >
-                            {program.programImages.map((imageItem: any, slideIndex: number) => {
-                              const imageUrl: string =
-                                typeof imageItem === 'string'
-                                  ? imageItem
-                                  : imageItem?.description || '/images/default.png';
-                              const imageAlt: string =
-                                typeof imageItem === 'string'
-                                  ? program.name
-                                  : imageItem?.label || program.name;
-                              return (
-                                <SwiperSlide key={`slide-${program.tenantId}-${slideIndex}`}>
-                                  <img
-                                    src={imageUrl}
-                                    alt={imageAlt}
-                                    style={{
-                                      width: '100%',
-                                      height: '100%',
-                                      objectFit: 'cover',
-                                    }}
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).src = '/images/default.png';
-                                    }}
-                                  />
-                                </SwiperSlide>
-                              );
-                            })}
-                          </Swiper>
-                          {program.programImages.length > 1 && (
-                            <Box sx={{ position: 'absolute', bottom: 8, left: 0, right: 0, zIndex: 10 }}>
-                              <Box
-                                display="flex"
-                                justifyContent="center"
-                                alignItems="center"
-                                gap={1}
-                              >
-                                <Button
-                                  className={`prev-${program.tenantId || index}`}
-                                  sx={{
-                                    minWidth: '24px',
-                                    width: '24px',
-                                    height: '24px',
-                                    p: 0,
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                    boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3)',
-                                    color: '#1F1B13',
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(255, 255, 255, 1)',
-                                    },
-                                  }}
-                                >
-                                  <ChevronLeftIcon sx={{ fontSize: '20px' }} />
-                                </Button>
-                                <Box
-                                  className={`pagination-${program.tenantId || index}`}
-                                  sx={{
-                                    display: 'flex',
-                                    '& .swiper-pagination-bullet': {
-                                      width: '24px',
-                                      height: '4px',
-                                      borderRadius: '2px',
-                                      backgroundColor: 'rgba(255, 255, 255, 0.5)',
-                                      opacity: 1,
-                                      mx: 0.5,
-                                    },
-                                    '& .swiper-pagination-bullet-active': {
-                                      backgroundColor: '#FFC107',
-                                    },
-                                  }}
-                                />
-                                <Button
-                                  className={`next-${program.tenantId || index}`}
-                                  sx={{
-                                    minWidth: '24px',
-                                    width: '24px',
-                                    height: '24px',
-                                    p: 0,
-                                    borderRadius: '50%',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                    boxShadow: '0px 1px 2px 0px rgba(0,0,0,0.3)',
-                                    color: '#1F1B13',
-                                    '&:hover': {
-                                      backgroundColor: 'rgba(255, 255, 255, 1)',
-                                    },
-                                  }}
-                                >
-                                  <ChevronRightIcon sx={{ fontSize: '20px' }} />
-                                </Button>
-                              </Box>
-                            </Box>
-                          )}
-                        </>
-                      ) : (
-                        <img
-                          src="/images/default.png"
-                          alt={program.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                          }}
-                        />
-                      )}
-                    </Box>
-                    <CardContent sx={{ flexGrow: 1, p: 2 }}>
-                      <Box
-                        sx={{
-                          width: 'fit-content',
-                          height: '40px',
-                          opacity: 1,
-                          gap: '10px',
-                          paddingTop: '8px',
-                          paddingRight: '16px',
-                          paddingBottom: '8px',
-                          paddingLeft: '16px',
-                          background: '#FDBE16',
-                          mb: 2,
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <Typography
-                          variant="h6"
-                          component="h3"
-                          sx={{
-                            fontWeight: 700,
-                            color: '#1F1B13',
-                          }}
-                        >
-                          {program.name}
-                        </Typography>
-                      </Box>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: '#666',
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        {program.description || ''}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </Container>
+     
 
         {/* Bottom CTA Section */}
-        <Box
+        {/* <Box
           sx={{
             backgroundColor: '#FFFDF7',
             py: { xs: 3, md: 4 },
@@ -701,7 +641,7 @@ export default function LandingPage() {
               {t('LANDING.GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW')}
             </Button>
           </Container>
-        </Box>
+        </Box> */}
       </Box>
     </>
   );

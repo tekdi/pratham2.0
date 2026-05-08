@@ -64,9 +64,11 @@ interface Program {
 const EnrollProgramCarousel = ({
   userId,
   isExplorePrograms = false,
+  programType,
 }: {
   userId?: string | null;
   isExplorePrograms?: boolean;
+  programType?: string;
 } = {}) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -235,40 +237,44 @@ console.log('result=====>', result);
         );
         localStorage.setItem('programsDataLogin', JSON.stringify(programsData));
         localStorage.setItem('visibleProgramsLogin', JSON.stringify(visiblePrograms));
-        // console.log('visiblePrograms', visiblePrograms);
 
-        // If it's Explore Programs tab, exclude enrolled programs
+        const isVolunteer = programType === 'VolunteerOnboarding';
+        const typeFiltered = (list: any[]) =>
+          programType
+            ? list.filter((p: any) =>
+                isVolunteer
+                  ? p.type === 'VolunteerOnboarding'
+                  : p.type !== 'VolunteerOnboarding'
+              )
+            : list;
+
         if (isExplorePrograms) {
           if (userId) {
-            // Fetch user's enrolled programs to exclude them from explore programs
             const data = await getUserDetails(userId, true);
-            console.log('data=====>', data?.result?.userData?.tenantData);
             const tenantData = data?.result?.userData?.tenantData || [];
-            const enrolledTenantIds = tenantData.map(
-              (item: any) => item.tenantId
+            const enrolledTenantIds = tenantData.map((item: any) => item.tenantId);
+            const explorePrograms = typeFiltered(
+              visiblePrograms?.filter(
+                (program: any) => !enrolledTenantIds.includes(program.tenantId)
+              ) || []
             );
-            // Filter out programs that user is already enrolled in
-            const explorePrograms = visiblePrograms?.filter(
-              (program: any) => !enrolledTenantIds.includes(program.tenantId)
-            );
-            setPrograms(explorePrograms || []);
+            setPrograms(explorePrograms);
           } else {
-            // If no userId, show all visible programs
-            setPrograms(visiblePrograms || []);
+            setPrograms(typeFiltered(visiblePrograms || []));
           }
         } else if (userId) {
           // For My Programs tab, show only enrolled programs
           const data = await getUserDetails(userId, true);
-          console.log('data=====>', data?.result?.userData?.tenantData);
-          const tenantData = data?.result?.userData?.tenantData?.filter((item: any) => item?.roles?.some((role: any) => role?.roleName === 'Learner'));
+          const tenantData = data?.result?.userData?.tenantData?.filter((item: any) =>
+            item?.roles?.some((role: any) => role?.roleName === 'Learner')
+          );
           const filterIds = tenantData.map((item: any) => item.tenantId);
-          const filteredPrograms = programsData?.filter((program: any) =>
-            filterIds.includes(program.tenantId)
-          )
-          setPrograms(filteredPrograms || []);
+          const filteredPrograms = typeFiltered(
+            programsData?.filter((program: any) => filterIds.includes(program.tenantId)) || []
+          );
+          setPrograms(filteredPrograms);
         } else {
-          console.log('visiblePrograms=====>', visiblePrograms);
-          setPrograms(visiblePrograms || []);
+          setPrograms(typeFiltered(visiblePrograms || []));
         }
         const tenantIds = res?.result?.map((item: any) => item.tenantId);
         setTenantId(tenantIds);
@@ -280,7 +286,7 @@ console.log('result=====>', result);
     };
 
     fetchTenantInfo();
-  }, [userId, isExplorePrograms]);
+  }, [userId, isExplorePrograms, programType]);
 
   const handleProgramSwitch = async (program: Program) => {
     if (!userId) {

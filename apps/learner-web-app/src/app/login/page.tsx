@@ -1,13 +1,15 @@
 'use client';
 
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
 import Header from '@learner/components/Header/Header';
 import { getUserId, login } from '@learner/utils/API/LoginService';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
@@ -271,6 +273,8 @@ const WelcomeMessage = () => {
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const defaultUsername = searchParams.get('username') || '';
   const handleAddAccount = () => {
     router.push('/');
   };
@@ -283,6 +287,14 @@ const LoginPage = () => {
   const [isAndroidApp, setIsAndroidApp] = useState(true);
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+  const [notEnrolledModal, setNotEnrolledModal] = useState(false);
+  const [notEnrolledProgramName, setNotEnrolledProgramName] = useState('');
+  const [notEnrolledTenantId, setNotEnrolledTenantId] = useState('');
+  const [enrollConfirmModal, setEnrollConfirmModal] = useState(false);
+  const [enrollConfirmTargetName, setEnrollConfirmTargetName] = useState('');
+  const [enrollConfirmTargetId, setEnrollConfirmTargetId] = useState('');
+  const [enrolledProgramNames, setEnrolledProgramNames] = useState<string[]>([]);
+  const [enrollConfirmProgramData, setEnrollConfirmProgramData] = useState<any>(null);
 
   const handleSuccessfulLogin = useCallback(
     async (
@@ -342,6 +354,83 @@ const LoginPage = () => {
       setTenantName(selectedTenantName || '');
       setRoleId(selectedRoleId);
       setRoleName(selectedRoleName);
+
+      // --- Program tenant check (from /programs/:tenantId → /login?tenantId=... flow) ---
+      const urlQuery = new URLSearchParams(window.location.search);
+      const programTenantId = urlQuery.get('tenantId');
+
+      if (programTenantId) {
+        const enrolledTenant = userResponse?.tenantData?.find(
+          (tenant: any) =>
+            tenant?.tenantId === programTenantId &&
+            (tenant?.tenantStatus === 'active' || tenant?.tenantStatus === 'pending') &&
+            tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
+        );
+
+        if (enrolledTenant) {
+          // User is already enrolled — log them directly into this program
+          const uiConfig = enrolledTenant?.params?.uiConfig;
+          const landingPage = uiConfig?.landingPage;
+          const learnerRoleId = enrolledTenant?.roles?.find((r: any) => r.roleName === 'Learner')?.roleId || '';
+          localStorage.setItem('userId', userResponse?.userId);
+          localStorage.setItem('userIdName', userResponse?.username);
+          localStorage.setItem('firstName', userResponse?.firstName || '');
+          localStorage.setItem('tenantId', enrolledTenant.tenantId);
+          localStorage.setItem('userProgram', enrolledTenant.tenantName);
+          localStorage.setItem('roleId', learnerRoleId);
+          localStorage.setItem('templtateId', enrolledTenant?.templateId || '');
+          localStorage.setItem('landingPage', landingPage || '/home');
+          localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+          if (enrolledTenant?.channelId) localStorage.setItem('channelId', enrolledTenant.channelId);
+          if (enrolledTenant?.collectionFramework) localStorage.setItem('collectionFramework', enrolledTenant.collectionFramework);
+          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+          await profileComplitionCheck();
+          setLoading(false);
+          router.push(landingPage || '/home');
+          return;
+        } else {
+          // User is not enrolled — look up program name then show modal
+          let programName = '';
+          let allPrograms: any[] = [];
+          try {
+            const res = await getTenantInfo();
+            allPrograms = res?.result || [];
+            const found = allPrograms.find((p: any) => p.tenantId === programTenantId);
+            programName = found?.name || '';
+            if (found) setEnrollConfirmProgramData(found);
+          } catch { /* ignore */ }
+          localStorage.setItem('userId', userResponse?.userId);
+          localStorage.setItem('userIdName', userResponse?.username);
+          localStorage.setItem('firstName', userResponse?.firstName || '');
+          localStorage.setItem('roleId', selectedRoleId);
+          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+
+          const accountExists = urlQuery.get('AccountExists');
+          if (accountExists === 'true') {
+            // Came from AccountExistsCard — show enroll-confirmation modal
+            const userProgramNames: string[] = (userResponse?.tenantData || [])
+              .filter(
+                (t: any) =>
+                  (t?.tenantStatus === 'active' || t?.tenantStatus === 'pending') &&
+                  t?.roles?.some((r: any) => r?.roleName === 'Learner') &&
+                  t?.tenantName !== 'Pratham'
+              )
+              .map((t: any) => t.tenantName as string);
+            setEnrolledProgramNames(userProgramNames);
+            setEnrollConfirmTargetName(programName);
+            setEnrollConfirmTargetId(programTenantId);
+            setEnrollConfirmModal(true);
+          } else {
+            setNotEnrolledProgramName(programName);
+            setNotEnrolledTenantId(programTenantId);
+            setNotEnrolledModal(true);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+      // --- End program tenant check ---
+
       if(tenantDataDetails[0]?.tenantName === "Pragyanpath" && tenantDataDetails.length === 1){
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
@@ -684,6 +773,7 @@ const LoginPage = () => {
               onLogin={handleLogin}
               handleForgotPassword={handleForgotPassword}
               handleAddAccount={handleAddAccount}
+              defaultUsername={defaultUsername}
             />
 
             {/* App Download Section - Only visible on mobile */}
@@ -750,6 +840,138 @@ const LoginPage = () => {
           </Typography>
         </Box>
       </SimpleModal>
+
+      {/* Not enrolled in program modal */}
+      <SimpleModal
+        open={notEnrolledModal}
+        onClose={() => { setNotEnrolledModal(false); router.push('/programs'); }}
+        showFooter={true}
+        primaryText={t('LANDING.ENROL_NOW') || 'Enrol Now'}
+        primaryActionHandler={() => {
+          setNotEnrolledModal(false);
+          router.push(`/programs/${notEnrolledTenantId}`);
+        }}
+        // secondaryText={t('LEARNER_APP.PROGRAMS.MY_PROGRAMS') || 'My Programs'}
+        // secondaryActionHandler={() => { setNotEnrolledModal(false); router.push('/programs'); }}
+      >
+        <Box p="10px" display="flex" flexDirection="column" alignItems="center" gap={1}>
+          <Typography variant="body1" textAlign="center">
+            {t('LANDING.NOT_ENROLLED_IN_PROGRAM') || 'You are not registered in'}{' '}
+            <Box component="span" fontWeight={700}>
+              {notEnrolledProgramName || 'this program'}
+            </Box>
+            .
+          </Typography>
+          <Typography variant="body2" textAlign="center" color="text.secondary">
+            {t('LANDING.YOU_CAN_ENROLL') || 'You can enroll into this program.'}
+          </Typography>
+        </Box>
+      </SimpleModal>
+
+      {/* Enroll confirmation modal (AccountExists flow) */}
+      <Dialog
+        open={enrollConfirmModal}
+        onClose={() => setEnrollConfirmModal(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            backgroundColor: '#FFFDF7',
+            border: '1px solid #F5E199',
+          },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          {/* Close button */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1.5, pr: 1.5 }}>
+            <IconButton size="small" onClick={() => setEnrollConfirmModal(false)} sx={{ color: '#666' }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ px: 3, pb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Title + program list — only when user is already enrolled elsewhere */}
+            {enrolledProgramNames.length > 0 && (
+              <>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    color: '#1F1B13',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t('LANDING.ENROLLED_TO_BELOW_PROGRAMS') || 'We can see that you are enrolled to below programs:'}
+                </Typography>
+
+                <Box component="ul" sx={{ pl: 2.5, m: 0 }}>
+                  {enrolledProgramNames.map((name, idx) => (
+                    <Box component="li" key={idx}>
+                      <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#1F1B13' }}>
+                        {name}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </>
+            )}
+
+            {/* Confirmation question */}
+            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#1F1B13', lineHeight: 1.6 }}>
+              {t('LANDING.SURE_TO_ENROLL_INTO') || 'Are you sure you want to enroll into'}{' '}
+              <Box component="span" sx={{ fontWeight: 700 }}>
+                {enrollConfirmTargetName}
+              </Box>
+              ?
+            </Typography>
+
+            {/* Yes button */}
+            <Button
+              fullWidth
+              variant="contained"
+              disableElevation
+              onClick={() => {
+                setEnrollConfirmModal(false);
+                const currentTenantId = localStorage.getItem('tenantId');
+                localStorage.setItem('previousTenantId', currentTenantId || '');
+                localStorage.setItem('tenantId', enrollConfirmTargetId);
+                localStorage.setItem('userProgram', enrollConfirmTargetName);
+                localStorage.setItem('onboardTenantId', enrollConfirmTargetId);
+                if (enrollConfirmProgramData?.params?.uiConfig) {
+                  localStorage.setItem('uiConfig', JSON.stringify(enrollConfirmProgramData.params.uiConfig));
+                }
+                if (enrollConfirmProgramData?.params?.uiConfig?.landingPage) {
+                  localStorage.setItem('landingPage', enrollConfirmProgramData.params.uiConfig.landingPage);
+                }
+                localStorage.setItem('enrolledProgramData', JSON.stringify({
+                  tenantId: enrollConfirmTargetId,
+                  name: enrollConfirmTargetName,
+                  params: enrollConfirmProgramData?.params || {},
+                }));
+                if (enrollConfirmProgramData?.type) {
+                  localStorage.setItem('temp_program_type', enrollConfirmProgramData.type);
+                }
+                router.push('/enroll-profile-completion');
+              }}
+              sx={{
+                backgroundColor: '#FDBE16',
+                color: '#1F1B13',
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: '15px',
+                textTransform: 'none',
+                borderRadius: '8px',
+                py: 1.4,
+                '&:hover': { backgroundColor: '#f0b000' },
+              }}
+            >
+              {t('LANDING.YES') || 'Yes'}
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Suspense>
   );
 };

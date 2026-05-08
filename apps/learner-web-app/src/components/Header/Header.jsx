@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Box, Select, MenuItem, IconButton, Menu } from '@mui/material';
+import { Box, Button, Select, MenuItem, IconButton, Menu } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -11,7 +11,7 @@ import { useTranslation } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { languages } from '@shared-lib-v2/lib/context/Languages';
 
-const Header = ({ isShowLogout = false }) => {
+const Header = ({ isShowLogout = false, isLogin = false }) => {
   const { t, setLanguage, language } = useTranslation();
   // Initialize with language from context if available, otherwise fallback to localStorage or 'en'
   const [lang, setLang] = useState(() => {
@@ -113,6 +113,31 @@ const Header = ({ isShowLogout = false }) => {
 
       {/* Language Selector and Logout */}
       <Box display="flex" alignItems="center" gap={2}>
+          {/* Login Button */}
+        {isLogin && (
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => router.push('/login')}
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 600,
+              fontSize: '14px',
+              textTransform: 'none',
+              backgroundColor: '#FDBE16',
+              color: '#1F1B13',
+              borderRadius: '8px',
+              px: 2.5,
+              py: 0.8,
+              '&:hover': {
+                backgroundColor: '#f0b000',
+              },
+            }}
+          >
+            {t('LANDING.LOGIN') || 'Log in'}
+          </Button>
+        )}
+
         {/* Language Selector */}
         <Box display="flex" alignItems="center" gap={1}>
           <LanguageIcon fontSize="small" />
@@ -140,6 +165,7 @@ const Header = ({ isShowLogout = false }) => {
           </Select>
         </Box>
 
+      
         {/* Logout Dropdown Menu */}
         {isShowLogout && (
           <Menu
