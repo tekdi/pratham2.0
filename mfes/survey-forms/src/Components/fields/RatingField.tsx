@@ -5,7 +5,7 @@ import {
   FormControl,
   FormLabel,
   Rating,
-  FormHelperText,
+  
   Box,
   Typography,
 } from '@mui/material';
@@ -44,9 +44,6 @@ const RatingField: React.FC<RatingFieldProps> = ({
           </Typography>
         )}
       </Box>
-      {(error || field.helpText) && (
-        <FormHelperText>{error || field.helpText}</FormHelperText>
-      )}
     </FormControl>
   );
 };

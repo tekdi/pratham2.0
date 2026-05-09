@@ -5,7 +5,7 @@ import {
   FormControl,
   FormLabel,
   Slider,
-  FormHelperText,
+  
   Box,
   Typography,
 } from '@mui/material';
@@ -50,9 +50,6 @@ const ScaleField: React.FC<ScaleFieldProps> = ({
           </Typography>
         </Box>
       </Box>
-      {(error || field.helpText) && (
-        <FormHelperText>{error || field.helpText}</FormHelperText>
-      )}
     </FormControl>
   );
 };

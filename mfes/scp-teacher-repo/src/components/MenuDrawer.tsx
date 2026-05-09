@@ -627,6 +627,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
+        {/* Survey Forms menu item commented out
         {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-8">
             <Button
@@ -665,6 +666,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
+        */}
         {tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && (
           <Box sx={{ marginTop: '18px' }}>
             <Button

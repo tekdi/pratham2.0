@@ -12,7 +12,6 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Survey } from '../../types/survey';
 import { formatDate } from '../../utils/Helper/helper';
-import { CONTEXT_TYPE_LABELS } from '../../../app.config';
 
 interface SurveyCardProps {
   survey: Survey;
@@ -28,15 +27,18 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
         borderRadius: '12px',
         border: '1px solid #E0E0E0',
         boxShadow: 'none',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         '&:hover': {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         },
       }}
     >
-      <CardContent sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AssignmentIcon sx={{ color: '#0D599E', fontSize: 20 }} />
+      <CardContent sx={{ p: 2.5, display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, mr: 1 }}>
+            <AssignmentIcon sx={{ color: '#0D599E', fontSize: 22, flexShrink: 0 }} />
             <Typography
               variant="h2"
               className="two-line-text"
@@ -56,6 +58,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
               fontSize: '11px',
               height: '24px',
               textTransform: 'capitalize',
+              flexShrink: 0,
             }}
           />
         </Box>
@@ -64,7 +67,7 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
           <Typography
             variant="body2"
             className="two-line-text"
-            sx={{ color: '#7C766F', mb: 1.5, fontSize: '13px' }}
+            sx={{ color: '#7C766F', fontSize: '13px', mb: 1.5 }}
           >
             {survey.surveyDescription}
           </Typography>
@@ -73,34 +76,9 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
         <Box
           sx={{
             display: 'flex',
-            gap: 1,
-            flexWrap: 'wrap',
-            mb: 1.5,
-          }}
-        >
-          {survey.surveyType && (
-            <Chip
-              label={survey.surveyType}
-              size="small"
-              variant="outlined"
-              sx={{ fontSize: '11px', height: '22px', textTransform: 'capitalize' }}
-            />
-          )}
-          {survey.contextType && survey.contextType !== 'none' && (
-            <Chip
-              label={`Context: ${CONTEXT_TYPE_LABELS[survey.contextType] || survey.contextType}`}
-              size="small"
-              variant="outlined"
-              sx={{ fontSize: '11px', height: '22px', textTransform: 'capitalize' }}
-            />
-          )}
-        </Box>
-
-        <Box
-          sx={{
-            display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            mt: 'auto',
           }}
         >
           {survey.publishedAt && (
