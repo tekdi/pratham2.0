@@ -7,7 +7,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  FormHelperText,
+  
 } from '@mui/material';
 import { SurveyField } from '../../types/survey';
 
@@ -63,11 +63,6 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
           />
         ))}
       </FormGroup>
-      {(error || field.helpText) && (
-        <FormHelperText id={`${field.fieldName}-error`}>
-          {error || field.helpText}
-        </FormHelperText>
-      )}
     </FormControl>
   );
 };

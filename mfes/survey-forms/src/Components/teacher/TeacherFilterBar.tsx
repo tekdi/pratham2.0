@@ -5,6 +5,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Skeleton,
   TextField,
   Typography,
 } from '@mui/material';
@@ -18,6 +19,7 @@ interface Props {
   search: string;
   onSearchChange: (value: string) => void;
   showSearch?: boolean;
+  centersLoading?: boolean;
   centers?: Option[];
   centerId?: string;
   onCenterChange?: (centerId: string) => void;
@@ -31,6 +33,7 @@ const TeacherFilterBar: React.FC<Props> = ({
   search,
   onSearchChange,
   showSearch = false,
+  centersLoading = false,
   centers,
   centerId,
   onCenterChange,
@@ -53,41 +56,45 @@ const TeacherFilterBar: React.FC<Props> = ({
       )}
 
       {onCenterChange && (
-        <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel id="teacher-center-label">Center</InputLabel>
-          <Select
-            labelId="teacher-center-label"
-            label="Center"
-            value={centerId ?? ''}
-            onChange={(e) => onCenterChange(e.target.value as string)}
-            sx={{ borderRadius: '8px' }}
-          >
-            {(centers ?? []).map((c) => (
-              <MenuItem key={c.id} value={c.id}>
-                {c.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        centersLoading
+          ? <Skeleton variant="rounded" width={200} height={40} />
+          : <FormControl size="small" sx={{ minWidth: 200 }}>
+              <InputLabel id="teacher-center-label">Center</InputLabel>
+              <Select
+                labelId="teacher-center-label"
+                label="Center"
+                value={centerId ?? ''}
+                onChange={(e) => onCenterChange(e.target.value as string)}
+                sx={{ borderRadius: '8px' }}
+              >
+                {(centers ?? []).map((c) => (
+                  <MenuItem key={c.id} value={c.id}>
+                    {c.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
       )}
 
       {onBatchChange && (
-        <FormControl size="small" sx={{ minWidth: 200 }} disabled={!centerId}>
-          <InputLabel id="teacher-batch-label">Batch</InputLabel>
-          <Select
-            labelId="teacher-batch-label"
-            label="Batch"
-            value={batchId ?? ''}
-            onChange={(e) => onBatchChange(e.target.value as string)}
-            sx={{ borderRadius: '8px' }}
-          >
-            {(batches ?? []).map((b) => (
-              <MenuItem key={b.id} value={b.id}>
-                {b.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        centersLoading
+          ? <Skeleton variant="rounded" width={200} height={40} />
+          : <FormControl size="small" sx={{ minWidth: 200 }} disabled={!centerId}>
+              <InputLabel id="teacher-batch-label">Batch</InputLabel>
+              <Select
+                labelId="teacher-batch-label"
+                label="Batch"
+                value={batchId ?? ''}
+                onChange={(e) => onBatchChange(e.target.value as string)}
+                sx={{ borderRadius: '8px' }}
+              >
+                {(batches ?? []).map((b) => (
+                  <MenuItem key={b.id} value={b.id}>
+                    {b.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
       )}
 
       {totalLabel && (
