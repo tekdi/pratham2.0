@@ -12,6 +12,7 @@ import RatingField from './RatingField';
 import ScaleField from './ScaleField';
 import DateField from './DateField';
 import FileUploadField from './FileUploadField';
+import FieldWrapper from './FieldWrapper';
 
 interface FieldRendererProps {
   field: SurveyField;
@@ -32,47 +33,45 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
     ? { ...field, fieldLabel: `${questionNumber}. ${field.fieldLabel}` }
     : field;
 
-  switch (f.fieldType) {
-    case 'text':
-    case 'email':
-    case 'phone':
-      return <TextField field={f} value={value} error={error} onChange={onChange} />;
+  const renderField = () => {
+    switch (f.fieldType) {
+      case 'text':
+      case 'email':
+      case 'phone':
+        return <TextField field={f} value={value} error={error} onChange={onChange} />;
+      case 'textarea':
+        return <TextareaField field={f} value={value} error={error} onChange={onChange} />;
+      case 'number':
+        return <NumberField field={f} value={value} error={error} onChange={onChange} />;
+      case 'select':
+      case 'multi_select':
+        return <SelectField field={f} value={value} error={error} onChange={onChange} />;
+      case 'radio':
+        return <RadioField field={f} value={value} error={error} onChange={onChange} />;
+      case 'checkbox':
+        return <CheckboxField field={f} value={value} error={error} onChange={onChange} />;
+      case 'rating':
+        return <RatingField field={f} value={value} error={error} onChange={onChange} />;
+      case 'scale':
+        return <ScaleField field={f} value={value} error={error} onChange={onChange} />;
+      case 'date':
+      case 'time':
+      case 'datetime':
+        return <DateField field={f} value={value} error={error} onChange={onChange} />;
+      case 'image_upload':
+      case 'video_upload':
+      case 'file_upload':
+        return <FileUploadField field={f} value={value} error={error} onChange={onChange} />;
+      default:
+        return <TextField field={f} value={value} error={error} onChange={onChange} />;
+    }
+  };
 
-    case 'textarea':
-      return <TextareaField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'number':
-      return <NumberField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'select':
-    case 'multi_select':
-      return <SelectField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'radio':
-      return <RadioField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'checkbox':
-      return <CheckboxField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'rating':
-      return <RatingField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'scale':
-      return <ScaleField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'date':
-    case 'time':
-    case 'datetime':
-      return <DateField field={f} value={value} error={error} onChange={onChange} />;
-
-    case 'image_upload':
-    case 'video_upload':
-    case 'file_upload':
-      return <FileUploadField field={f} value={value} error={error} onChange={onChange} />;
-
-    default:
-      return <TextField field={f} value={value} error={error} onChange={onChange} />;
-  }
+  return (
+    <FieldWrapper field={f} error={error}>
+      {renderField()}
+    </FieldWrapper>
+  );
 };
 
 export default FieldRenderer;

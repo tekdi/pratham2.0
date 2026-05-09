@@ -17,7 +17,7 @@ export function validateField(
       value === '' ||
       (Array.isArray(value) && value.length === 0)
     ) {
-      return `${field.fieldLabel} is required`;
+      return 'This field is required';
     }
   }
 

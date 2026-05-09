@@ -4,7 +4,7 @@ import React from 'react';
 import {
   TextField as MuiTextField,
   FormControl,
-  FormHelperText,
+  
 } from '@mui/material';
 import { SurveyField } from '../../types/survey';
 
@@ -45,9 +45,6 @@ const DateField: React.FC<DateFieldProps> = ({
         inputProps={{ max: maxDate }}
         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '8px' } }}
       />
-      {(error || field.helpText) && (
-        <FormHelperText>{error || field.helpText}</FormHelperText>
-      )}
     </FormControl>
   );
 };

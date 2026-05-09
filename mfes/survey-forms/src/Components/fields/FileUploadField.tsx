@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import {
   FormControl,
   FormLabel,
-  FormHelperText,
+  
   Button,
   Box,
   Typography,
@@ -79,9 +79,6 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
         <Box sx={{ mt: 1 }}>
           <Chip label={String(value)} onDelete={() => onChange(field.fieldName, null)} size="small" />
         </Box>
-      )}
-      {(error || field.helpText) && (
-        <FormHelperText>{error || field.helpText}</FormHelperText>
       )}
     </FormControl>
   );
