@@ -45,5 +45,14 @@ module.exports = {
         NODE_ENV: 'production',
       },
     },
+    {
+      name: 'survey-forms',
+      script: 'node_modules/.bin/next',
+      args: 'start -p 4115',
+      cwd: 'mfes/survey-forms',
+      env: {
+        NODE_ENV: 'production',
+      },
+    },
   ],
 };
