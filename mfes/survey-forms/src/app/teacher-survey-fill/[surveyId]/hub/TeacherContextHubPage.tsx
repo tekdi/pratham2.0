@@ -34,35 +34,38 @@ import type { TeacherContextRow } from '../../../../types/teacherSurvey';
 function PageSkeleton() {
   return (
     <Box sx={{ p: 2 }}>
-      {/* Filter bar skeleton — matches Center (200px) + Batch (200px) dropdowns */}
+      {/* Filter bar skeleton — matches Search + Center + Batch */}
       <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap' }}>
+        <Skeleton variant="rounded" width={220} height={40} />
         <Skeleton variant="rounded" width={200} height={40} />
         <Skeleton variant="rounded" width={200} height={40} />
       </Box>
 
-      {/* Table skeleton — matches TeacherContextTable structure */}
-      <TableContainer component={Paper} sx={{ borderRadius: '12px', border: '1px solid #E0E0E0' }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow sx={{ backgroundColor: '#fafafa' }}>
-              <TableCell sx={{ fontWeight: 600 }}>Learner Name</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Survey Status</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Submission Date</TableCell>
-              <TableCell align="right" sx={{ fontWeight: 600 }}>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <TableRow key={i}>
-                <TableCell><Skeleton variant="text" width="60%" /></TableCell>
-                <TableCell><Skeleton variant="rounded" width={80} height={22} /></TableCell>
-                <TableCell><Skeleton variant="text" width={80} /></TableCell>
-                <TableCell align="right"><Skeleton variant="rounded" width={60} height={28} /></TableCell>
+      {/* Table skeleton — wrapped in same maxWidth as loaded table */}
+      <Box sx={{ maxWidth: '100%' }}>
+        <TableContainer component={Paper} sx={{ borderRadius: '12px', border: '1px solid #E0E0E0' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#fafafa' }}>
+                <TableCell sx={{ fontWeight: 600 }}>Learner Name</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Survey Status</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Submission Date</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 600 }}>Action</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton variant="text" width="60%" /></TableCell>
+                  <TableCell><Skeleton variant="rounded" width={80} height={22} /></TableCell>
+                  <TableCell><Skeleton variant="text" width={80} /></TableCell>
+                  <TableCell align="right"><Skeleton variant="rounded" width={60} height={28} /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 }
@@ -73,12 +76,17 @@ const TeacherContextHubPage: React.FC = () => {
   const searchParams = useSearchParams();
   const surveyId = params.surveyId as string;
 
+  // If URL already has centerId+batchId (e.g. reload), skip the full-page skeleton —
+  // the filter bar renders immediately from URL state and learners handle their own loading.
+  const hasUrlFilters = !!(searchParams.get('centerId') && searchParams.get('batchId'));
+
   const [survey, setSurvey] = useState<Survey | null>(null);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(!hasUrlFilters);
   const [pageError, setPageError] = useState<string | null>(null);
 
   const [centers, setCenters] = useState<TeacherContextRow[]>([]);
   const [batchesByCenterId, setBatchesByCenterId] = useState<Record<string, TeacherContextRow[]>>({});
+  const [centersLoaded, setCentersLoaded] = useState(false);
   const [centerId, setCenterId] = useState<string>(searchParams.get('centerId') ?? '');
   const [batchId, setBatchId] = useState<string>(searchParams.get('batchId') ?? '');
 
@@ -91,6 +99,7 @@ const TeacherContextHubPage: React.FC = () => {
 
   const [responseInfoById, setResponseInfoById] = useState<Record<string, ContextResponseInfo>>({});
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const batches = batchesByCenterId[centerId] ?? [];
 
@@ -108,7 +117,7 @@ const TeacherContextHubPage: React.FC = () => {
     }
 
     let cancelled = false;
-    setPageLoading(true);
+    if (!hasUrlFilters) setPageLoading(true);
     setPageError(null);
 
     const surveyFetch = fetchSurveyById(surveyId);
@@ -130,6 +139,7 @@ const TeacherContextHubPage: React.FC = () => {
           const { centers: c, batchesByCenterId: b } = centersResult;
           setCenters(c);
           setBatchesByCenterId(b);
+          setCentersLoaded(true);
           if (!searchParams.get('centerId') && c.length > 0) {
             const firstCenterId = c[0].id;
             setCenterId(firstCenterId);
@@ -158,10 +168,16 @@ const TeacherContextHubPage: React.FC = () => {
     router.replace(`?${p.toString()}`, { scroll: false } as Parameters<typeof router.replace>[1]);
   }, [centerId, batchId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset to page 1 when batch changes
+  // Debounce search input — 400ms delay before firing API
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Reset to page 1 when batch or search changes
   useEffect(() => {
     setLearnersPage(1);
-  }, [batchId]);
+  }, [batchId, debouncedSearch]);
 
   // Load learners when batchId or page changes
   useEffect(() => {
@@ -174,7 +190,7 @@ const TeacherContextHubPage: React.FC = () => {
     let cancelled = false;
     setLearnersLoading(true);
     setLearnersError(null);
-    fetchTeacherCohortLearners(batchId, { limit: PAGE_SIZE, offset: (learnersPage - 1) * PAGE_SIZE })
+    fetchTeacherCohortLearners(batchId, { limit: PAGE_SIZE, offset: (learnersPage - 1) * PAGE_SIZE, name: debouncedSearch || undefined })
       .then(({ learners: list, totalCount }) => {
         if (!cancelled) {
           setLearners(list);
@@ -186,7 +202,7 @@ const TeacherContextHubPage: React.FC = () => {
       })
       .finally(() => { if (!cancelled) setLearnersLoading(false); });
     return () => { cancelled = true; };
-  }, [batchId, learnersPage]);
+  }, [batchId, learnersPage, debouncedSearch]);
 
   // Fetch response status for loaded learners
   useEffect(() => {
@@ -199,31 +215,19 @@ const TeacherContextHubPage: React.FC = () => {
     return () => { cancelled = true; };
   }, [learners, survey]);
 
-  const filteredLearners = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return learners;
-    return learners.filter(
-      (r) =>
-        r.label.toLowerCase().includes(q) ||
-        (r.subtitle && r.subtitle.toLowerCase().includes(q))
-    );
-  }, [learners, search]);
-
   const handleSearchChange = (value: string) => {
     setSearch(value);
-    setLearnersPage(1);
   };
 
   // Derive a dynamic subtitle based on current selection state
   const pageSubtitle = useMemo(() => {
+    if (!centersLoaded) return '';
     if (!centerId) return 'Select a center to get started';
     const centerLabel = centers.find((c) => c.id === centerId)?.label ?? '';
     if (!batchId) return `${centerLabel} — select a batch`;
     const batchLabel = (batchesByCenterId[centerId] ?? []).find((b) => b.id === batchId)?.label ?? '';
-    if (learnersLoading) return `Loading learners for ${centerLabel} – ${batchLabel}…`;
-    if (learners.length > 0) return `${centerLabel} – ${batchLabel}`;
     return `${centerLabel} – ${batchLabel}`;
-  }, [centerId, batchId, centers, batchesByCenterId, learners.length, learnersLoading]);
+  }, [centersLoaded, centerId, batchId, centers, batchesByCenterId]);
 
   if (pageLoading) {
     return (
@@ -259,7 +263,8 @@ const TeacherContextHubPage: React.FC = () => {
         <TeacherFilterBar
           search={search}
           onSearchChange={handleSearchChange}
-          showSearch={learners.length > 0}
+          showSearch={!!batchId && centersLoaded}
+          centersLoading={!centersLoaded}
           centers={centers}
           centerId={centerId}
           onCenterChange={(id) => {
@@ -277,63 +282,65 @@ const TeacherContextHubPage: React.FC = () => {
           onBatchChange={setBatchId}
         />
 
-        {!centerId ? (
-          <TeacherEmptyState message="No centers found for your account." />
-        ) : !batchId ? (
-          <TeacherEmptyState message="No batches found for this center." />
-        ) : learnersLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress sx={{ color: '#FDBE16' }} />
-          </Box>
-        ) : learnersError ? (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Typography color="error">{learnersError}</Typography>
-            <Button
-              variant="outlined"
-              sx={{ mt: 2, borderColor: '#FDBE16', color: '#1E1B16' }}
-              onClick={() => {
-                setLearnersError(null);
-                if (!batchId) return;
-                setLearnersLoading(true);
-                fetchTeacherCohortLearners(batchId)
-                  .then(({ learners: list, totalCount }) => { setLearners(list); setLearnersTotalCount(totalCount); })
-                  .catch(() => setLearnersError('Failed to load learners.'))
-                  .finally(() => setLearnersLoading(false));
-              }}
-            >
-              Retry
-            </Button>
-          </Box>
-        ) : filteredLearners.length === 0 ? (
-          <TeacherEmptyState
-            message={
-              search.trim()
-                ? 'No learners match your search.'
-                : 'No learners found in the selected batch.'
-            }
-          />
-        ) : (
-          <>
-            <TeacherContextTable
-              rows={filteredLearners}
-              responseInfoById={responseInfoById}
-              onRowAction={(row) =>
-                responseInfoById[row.id]?.status === 'submitted'
-                  ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)
-                  : router.push(`/survey-fill/${surveyId}/${row.id}`)
+        <Box sx={{ maxWidth: '100%' }}>
+          {!centerId ? (
+            <TeacherEmptyState message="No centers found for your account." />
+          ) : !batchId ? (
+            <TeacherEmptyState message="No batches found for this center." />
+          ) : learnersLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <CircularProgress sx={{ color: '#FDBE16' }} />
+            </Box>
+          ) : learnersError ? (
+            <Box sx={{ textAlign: 'center', mt: 4 }}>
+              <Typography color="error">{learnersError}</Typography>
+              <Button
+                variant="outlined"
+                sx={{ mt: 2, borderColor: '#FDBE16', color: '#1E1B16' }}
+                onClick={() => {
+                  setLearnersError(null);
+                  if (!batchId) return;
+                  setLearnersLoading(true);
+                  fetchTeacherCohortLearners(batchId)
+                    .then(({ learners: list, totalCount }) => { setLearners(list); setLearnersTotalCount(totalCount); })
+                    .catch(() => setLearnersError('Failed to load learners.'))
+                    .finally(() => setLearnersLoading(false));
+                }}
+              >
+                Retry
+              </Button>
+            </Box>
+          ) : learners.length === 0 ? (
+            <TeacherEmptyState
+              message={
+                search.trim()
+                  ? 'No learners match your search.'
+                  : 'No learners found in the selected batch.'
               }
             />
-            {learnersTotalCount > PAGE_SIZE && (
-              <PaginationBar
-                page={learnersPage}
-                pageSize={PAGE_SIZE}
-                total={learnersTotalCount}
-                onPrev={() => setLearnersPage((p) => Math.max(1, p - 1))}
-                onNext={() => setLearnersPage((p) => p + 1)}
+          ) : (
+            <>
+              <TeacherContextTable
+                rows={learners}
+                responseInfoById={responseInfoById}
+                onRowAction={(row) =>
+                  responseInfoById[row.id]?.status === 'submitted'
+                    ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)
+                    : router.push(`/survey-fill/${surveyId}/${row.id}`)
+                }
               />
-            )}
-          </>
-        )}
+              {learnersTotalCount > PAGE_SIZE && (
+                <PaginationBar
+                  page={learnersPage}
+                  pageSize={PAGE_SIZE}
+                  total={learnersTotalCount}
+                  onPrev={() => setLearnersPage((p) => Math.max(1, p - 1))}
+                  onNext={() => setLearnersPage((p) => p + 1)}
+                />
+              )}
+            </>
+          )}
+        </Box>
       </Box>
     </Box>
   );

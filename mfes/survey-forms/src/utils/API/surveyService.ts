@@ -118,6 +118,7 @@ interface RawCohort {
   cohortStatus?: string;
   cohortMemberStatus?: string;
   status?: string;
+  parentId?: string;
   childData?: RawCohort[];
 }
 
@@ -145,14 +146,61 @@ const toRow = (c: RawCohort): TeacherContextRow => ({
 });
 
 /**
+ * For Instructor role: mycohorts returns batches at top level with no center wrapper.
+ * Each batch has a parentId pointing to its center. This function fetches each unique
+ * parent center via cohort/search and reconstructs the Center → [Batches] hierarchy.
+ */
+const fetchCentersForBatches = async (batches: RawCohort[]): Promise<RawCohort[]> => {
+  const activeBatches = batches.filter((b) => isActive(b) && b.cohortMemberStatus?.toLowerCase() === 'active');
+  const uniqueParentIds = Array.from(new Set(activeBatches.map((b) => b.parentId).filter(Boolean))) as string[];
+
+  if (uniqueParentIds.length === 0) return [];
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
+  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') || '' : '';
+  const academicYearId = typeof window !== 'undefined' ? localStorage.getItem('academicYearId') || '' : '';
+
+  const fetchCenter = async (parentId: string): Promise<RawCohort[]> => {
+    try {
+      const res = await fetch(API_ENDPOINTS.COHORT_SEARCH, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          tenantId,
+          academicyearid: academicYearId,
+        },
+        body: JSON.stringify({
+          limit: 200,
+          offset: 0,
+          filters: { status: ['active'], cohortId: parentId },
+        }),
+      });
+      const data = await res.json();
+      return (data?.result?.results?.cohortDetails ?? []).filter((c: RawCohort) => isActive(c));
+    } catch {
+      return [];
+    }
+  };
+
+  const centerArrays = await Promise.all(uniqueParentIds.map(fetchCenter));
+  const centerList = centerArrays.flat();
+
+  // Attach matching batches as childData under each center
+  return centerList.map((center) => ({
+    ...center,
+    childData: activeBatches.filter((b) => b.parentId === center.cohortId),
+  }));
+};
+
+/**
  * Fetches teacher's cohort hierarchy in a single call.
  *
- * The mycohorts response has two possible shapes:
- *  - COHORT hierarchy: top-level items are centers (type='COHORT'), childData = batches
- *  - BLOCK hierarchy:  top-level item is a block (type='BLOCK'), its childData = centers,
- *                      each center's childData = batches
- *
- * No separate batch API call is needed — batches come from childData.
+ * Handles three response shapes from mycohorts:
+ *  - BLOCK hierarchy (Lead/TL): top-level item is a block, childData = centers, each center childData = batches
+ *  - COHORT hierarchy (Lead/TL): top-level items are centers (type='COHORT'), childData = batches
+ *  - BATCH hierarchy (Instructor): top-level items are batches with parentId pointing to center;
+ *    requires a separate cohort/search call to reconstruct the Center → [Batches] hierarchy
  */
 export const fetchTeacherCentersWithBatches = async (
   userId: string
@@ -162,13 +210,18 @@ export const fetchTeacherCentersWithBatches = async (
 
   if (raw.length === 0) return { centers: [], batchesByCenterId: {} };
 
-  // Determine whether the top-level entry is a BLOCK or already a list of centers
+  const topType = raw[0].type?.toUpperCase();
+
   let centerList: RawCohort[];
-  if (raw[0].type?.toUpperCase() === 'BLOCK') {
-    // Block hierarchy: dig one level deeper to get centers
+
+  if (topType === 'BLOCK') {
+    // Lead/TL — BLOCK hierarchy: dig one level to get centers
     centerList = raw.flatMap((block) => (block.childData ?? []).filter(isActive));
+  } else if (topType === 'BATCH') {
+    // Instructor — batches at top level, fetch parent centers separately
+    centerList = await fetchCentersForBatches(raw);
   } else {
-    // COHORT hierarchy: top-level items are centers
+    // Lead/TL — COHORT hierarchy: top-level items are already centers
     centerList = raw.filter(isActive);
   }
 
@@ -206,13 +259,15 @@ export interface CohortLearnersResult {
 
 export const fetchTeacherCohortLearners = async (
   cohortId: string,
-  opts: { limit?: number; offset?: number } = {}
+  opts: { limit?: number; offset?: number; name?: string } = {}
 ): Promise<CohortLearnersResult> => {
-  const { limit = 10, offset = 0 } = opts;
+  const { limit = 10, offset = 0, name } = opts;
+  const filters: Record<string, unknown> = { cohortId, role: 'Learner', status: ['active'] };
+  if (name && name.trim()) filters['name'] = name.trim();
   const response = await post(API_ENDPOINTS.TEACHER_COHORT_MEMBER_LIST, {
     limit,
     offset,
-    filters: { cohortId, role: 'Learner', status: ['active'] },
+    filters,
   });
   const result = (response.data as { result?: { userDetails?: RawCohortMember[]; totalCount?: number } })?.result;
   const raw = result?.userDetails ?? [];

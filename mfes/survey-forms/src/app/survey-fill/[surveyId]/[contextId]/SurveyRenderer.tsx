@@ -281,7 +281,7 @@ const SurveyRenderer: React.FC = () => {
     const errors = validateForm(form.survey.sections, form.formValues);
     if (errors.length > 0) {
       setValidationErrors(errors);
-      toast.error('Please fix the errors before submitting', { containerId: 'survey-renderer-toast' });
+      toast.error('Please fill all required fields', { containerId: 'survey-renderer-toast' });
       const firstErrorField = document.querySelector(
         `[name="${errors[0].fieldName}"]`
       );
@@ -335,7 +335,7 @@ const SurveyRenderer: React.FC = () => {
 
         if (mapped.length > 0) {
           setValidationErrors(mapped);
-          toast.error(`Please fix ${mapped.length} field error(s) before submitting`, { containerId: 'survey-renderer-toast' });
+          toast.error(`Please fill all required fields`, { containerId: 'survey-renderer-toast' });
           const firstField = document.getElementById(mapped[0].fieldName)
             ?? document.querySelector(`[name="${mapped[0].fieldName}"]`);
           firstField?.scrollIntoView({ behavior: 'smooth', block: 'center' });

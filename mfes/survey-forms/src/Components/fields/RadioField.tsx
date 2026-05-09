@@ -7,7 +7,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
-  FormHelperText,
+  
 } from '@mui/material';
 import { SurveyField } from '../../types/survey';
 
@@ -54,11 +54,6 @@ const RadioField: React.FC<RadioFieldProps> = ({
           />
         ))}
       </RadioGroup>
-      {(error || field.helpText) && (
-        <FormHelperText id={`${field.fieldName}-error`}>
-          {error || field.helpText}
-        </FormHelperText>
-      )}
     </FormControl>
   );
 };

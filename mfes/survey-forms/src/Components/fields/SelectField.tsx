@@ -6,7 +6,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormHelperText,
+  
   Chip,
   Box,
   OutlinedInput,
@@ -65,9 +65,6 @@ const SelectField: React.FC<SelectFieldProps> = ({
           </MenuItem>
         ))}
       </Select>
-      {(error || field.helpText) && (
-        <FormHelperText>{error || field.helpText}</FormHelperText>
-      )}
     </FormControl>
   );
 };

@@ -15,4 +15,5 @@ export const API_ENDPOINTS = {
   TEACHER_MY_COHORTS: (userId: string) =>
     `${middlewareBaseUrl}/cohort/mycohorts/${userId}?customField=true&children=true`,
   TEACHER_COHORT_MEMBER_LIST: `${middlewareBaseUrl}/cohortmember/list`,
+  COHORT_SEARCH: `${middlewareBaseUrl}/cohort/search`,
 };
