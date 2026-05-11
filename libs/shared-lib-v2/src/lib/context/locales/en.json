@@ -438,6 +438,8 @@
     "PROGRAMS": {
       "EXPLORE_PROGRAMS": "Explore Programs",
       "MY_PROGRAMS": "My Programs",
+      "EXPLORE_VOLUNTEER_PROGRAMS": "Explore Volunteer Programs",
+      "MY_VOLUNTEER_PROGRAMS": "My Volunteer Programs",
       "LOADING": "Loading..."
     },
     "REGISTRATION_FLOW": {

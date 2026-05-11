@@ -146,7 +146,7 @@ export default function LandingPage() {
           sx={{
             position: 'relative',
             width: '100%',
-            minHeight: { xs: '400px', md: '500px' },
+            minHeight: { xs: '360px', md: '430px' },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -343,7 +343,7 @@ export default function LandingPage() {
       
 
         {/* Role Selection Cards Section */}
-        <Box sx={{ backgroundColor: '#FFFDF7', py: { xs: 3, md: 5 } }}>
+        <Box sx={{ backgroundColor: '#FFFDF7', py: { xs: 3, md: 3 } }}>
           <Container maxWidth="xl" disableGutters sx={{ px: { xs: 2, md: 3 } }}>
             <Typography
               variant="h5"

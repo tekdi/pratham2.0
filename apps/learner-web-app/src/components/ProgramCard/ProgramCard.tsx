@@ -92,13 +92,14 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
         )}
 
         <Button
-          variant="contained"
           onClick={onExplore}
+             variant="contained"
+                  color="primary"
           disableElevation
           sx={{
             mt: 1,
-            backgroundColor: buttonColor,
-            color: '#fff',
+           
+         //   color: '#fff',
             fontFamily: 'Poppins',
             fontWeight: 600,
             fontSize: '14px',
@@ -106,10 +107,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             textTransform: 'none',
             borderRadius: '8px',
             py: 1.2,
-            '&:hover': {
-              backgroundColor: buttonColor,
-              filter: 'brightness(0.9)',
-            },
+            // '&:hover': {
+            //   backgroundColor: buttonColor,
+            //   filter: 'brightness(0.9)',
+            // },
           }}
         >
           {buttonLabel}

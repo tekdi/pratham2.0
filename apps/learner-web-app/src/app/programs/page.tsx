@@ -284,7 +284,7 @@ function ProgramsContent() {
       >
         {/* <Header /> */}
 
-        <Box
+        {/* <Box
           sx={{
             background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
             boxShadow: '0px 4px 8px 3px #00000026, 0px 1px 3px 0px #0000004D',
@@ -333,7 +333,7 @@ function ProgramsContent() {
               </Typography>
             </Box>
           </Container>
-        </Box>
+        </Box> */}
 
         {/* Tabs Section */}
         <Box
