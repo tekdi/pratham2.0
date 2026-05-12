@@ -47,7 +47,7 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
         {t('NAVAPATHAM.ACCOUNT_ALREADY_EXISTS_MESSAGE')}
       </Typography>
 
-      <Typography
+      {/* <Typography
         mt={2}
         variant="body5"
         component="h2"
@@ -57,7 +57,7 @@ const AccountExistsCard: React.FC<AccountExistsCardProps> = ({
         lineHeight="28px"
       >
         {fullName}
-      </Typography>
+      </Typography> */}
 
       <Stack spacing={2} width="100%" maxWidth={400} mt="10px">
         {usernames.map((username, idx) => (
