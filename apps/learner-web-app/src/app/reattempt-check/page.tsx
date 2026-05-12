@@ -12,7 +12,7 @@ import { useTranslation } from '@shared-lib';
 
 type ReattemptState = 'loading' | true | false;
 
-const checkReattemptStatus = async (): Promise<boolean> => {
+const checkReattemptStatus = async (): Promise<boolean | null> => {
   const storedUserId = localStorage.getItem('userId');
   const questionSetIdentifier = localStorage.getItem(
     'registerationTestQuestionSetIdentifier'
@@ -34,6 +34,10 @@ const checkReattemptStatus = async (): Promise<boolean> => {
     contentId: questionSetIdentifier,
   });
 
+  if (result.length === 0) {
+    return null;
+  }
+console.log('Assessment status result:', result, 'Reattempt allowed:', registrationTestReattempt);
   return (
     Array.isArray(result) && result.length < registrationTestReattempt
   );
@@ -88,6 +92,10 @@ const ReattemptCheckPage = () => {
         localStorage.setItem('registerationTestGiven', 'Yes');
 
         const canReattempt = await checkReattemptStatus();
+        if (canReattempt === null) {
+          router.push('/programs');
+          return;
+        }
         if (canReattempt) {
           setReattempt(true);
         } else {
