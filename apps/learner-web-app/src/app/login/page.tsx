@@ -270,7 +270,7 @@ const WelcomeMessage = () => {
   );
 };
 
-const LoginPage = () => {
+const LoginPageContent = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -708,7 +708,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       <Box
         //height="100vh"
         // width="100vw"
@@ -972,8 +972,14 @@ const LoginPage = () => {
           </Box>
         </DialogContent>
       </Dialog>
-    </Suspense>
+    </>
   );
 };
+
+const LoginPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <LoginPageContent />
+  </Suspense>
+);
 
 export default LoginPage;
