@@ -10,5 +10,6 @@ services:
       - '4102:4102'
       - '4103:4103'
       - '4107:4107'
+      - '4115:4115'
     environment:
       - NODE_ENV=production
