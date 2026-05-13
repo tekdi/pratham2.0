@@ -288,17 +288,18 @@ export const fetchInProgressResponse = async (
   contextId: string,
   respondentId?: string | null
 ): Promise<SurveyResponse | null> => {
-  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
+  const resolvedContextId = contextId === 'self' ? '' : contextId;
+  const body: Record<string, unknown> = {
     page: 1,
-    limit: 100,
+    limit: 20,
     sortBy: 'updatedAt',
     sortOrder: 'DESC',
-  });
+  };
+  if (resolvedContextId) body.contextIds = [resolvedContextId];
+  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
 
   const rows =
     (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ?? [];
-
-  const resolvedContextId = contextId === 'self' ? '' : contextId;
 
   const candidates = rows.filter(
     (r) =>
@@ -321,18 +322,19 @@ export const fetchSubmittedResponse = async (
   contextId: string,
   respondentId?: string | null
 ): Promise<SurveyResponse | null> => {
-  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
+  const resolvedContextId = contextId === 'self' ? '' : contextId;
+  const body: Record<string, unknown> = {
     page: 1,
-    limit: 100,
+    limit: 20,
     sortBy: 'updatedAt',
     sortOrder: 'DESC',
-  });
+  };
+  if (resolvedContextId) body.contextIds = [resolvedContextId];
+  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
 
   const rows =
     (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ??
     [];
-
-  const resolvedContextId = contextId === 'self' ? '' : contextId;
 
   const candidates = rows.filter(
     (r) =>
@@ -364,9 +366,10 @@ export const fetchResponseStatusByContext = async (
 
   const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
     page: 1,
-    limit: 500,
+    limit: contextIds.length,
     sortBy: 'updatedAt',
     sortOrder: 'DESC',
+    contextIds,
   });
 
   const rows =
