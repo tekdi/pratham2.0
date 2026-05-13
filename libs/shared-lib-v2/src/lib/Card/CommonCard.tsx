@@ -112,6 +112,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   React.useEffect(() => {
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier);
+      if(isTrackingSyncPending===true && isPending===false){
+        window.location.reload();
+      }
       setIsTrackingSyncPending(isPending);
     };
     checkTrackingSyncPending();
