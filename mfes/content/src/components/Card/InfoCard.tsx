@@ -45,6 +45,9 @@ const InfoCard: React.FC<InfoCardProps> = ({
   useEffect(() => {
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier as string);
+      if(isTrackingSyncPending===true && isPending===false){
+        window.location.reload();
+      }
       setIsTrackingSyncPending(isPending);
     }
     checkTrackingSyncPending();
