@@ -107,7 +107,8 @@
       "completed": "ସମ୍ପୂର୍ଣ୍ଣ",
       "in_progress": "ଚାଲୁଛି",
       "enrolled_not_started": "ଭର୍ତ୍ତି, ଆରମ୍ଭ ହେଲାନାହିଁ",
-      "not_started": "ଆରମ୍ଭ ହେଲାନାହିଁ"
+      "not_started": "ଆରମ୍ଭ ହେଲାନାହିଁ",
+      "tracking_sync_pending": "ଟ୍ରେକିଂ ସିନ୍କ ପେନ୍ଡିଂ"
     },
     "BACK": "ପଛକୁ",
     "RETURN_TO_LOGIN": "ଲଗଇନକୁ ଫେରନ୍ତୁ",
