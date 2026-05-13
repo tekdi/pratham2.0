@@ -241,6 +241,7 @@ const CollectionEditor: React.FC = () => {
             section.fields?.forEach((field: any) => {
               if (field.code === 'program' &&  field.default.length === 0) {
                 field.range = selectedPrograms;
+                if(selectedPrograms.length == 1)
                 field.default = selectedPrograms;
               }
             });

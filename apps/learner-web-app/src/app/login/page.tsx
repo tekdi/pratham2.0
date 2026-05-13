@@ -96,6 +96,8 @@ export const checkRegistrationTestStatus = async (
       ? [targetProgramName]
       : [];
 
+  const preferredLanguage = localStorage.getItem('preferred_language');
+
   try {
     const response = await ContentSearch({
       query: '',
@@ -104,6 +106,7 @@ export const checkRegistrationTestStatus = async (
         primaryCategory: ['Practice Question Set'],
         assessmentType: 'Eligibility Test',
         program: programFilter,
+        ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
       },
       sort_by: { lastUpdatedOn: 'desc' },
       limit: 1,
@@ -400,6 +403,7 @@ const LoginPage = () => {
         // Fetch user details and store preferred language for every tenant
         try {
           const userDetails = await getUserDetails(userResponse?.userId, true);
+          console.log('userDetails========>', userDetails);
           if (userDetails?.result?.userData?.customFields) {
             userDetails.result.userData.customFields.forEach((field: any) => {
               const { label, selectedValues } = field;

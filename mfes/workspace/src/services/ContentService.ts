@@ -76,15 +76,16 @@ const getReqBodyWithStatus = (
   console.log('primaryCategory', primaryCategory);
   console.log('PrimaryCategoryValue', PrimaryCategoryValue);
   primaryCategory =
-    primaryCategory.length === 0 ? PrimaryCategoryValue : primaryCategory;
+    (primaryCategory.length === 0 && contentType !== 'content-library') ? PrimaryCategoryValue : primaryCategory;
   // Merge custom filters into filters object
   const extraFilters = filters ? { ...filters } : {};
   console.log('extraFilters', extraFilters);
 
   if (contentType === 'content-library') {
-    console.log('upForReviewReqBody', upForReviewReqBody);
+
+    console.log('PrimaryCategory.length', PrimaryCategory.length);
     const userRole = getLocalStoredUserRole();
-    primaryCategory = ['Learning Resource'];
+    primaryCategory = primaryCategory.length ===0 ? ['Learning Resource' , 'Story' , 'Interactive' , 'Activity'] : primaryCategory ;
     console.log('PrimaryCategory', PrimaryCategory);
 
     console.log('upForReviewReqBody', upForReviewReqBody);

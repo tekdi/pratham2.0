@@ -759,11 +759,12 @@ const PlayerBox = ({
             ...(isPortrait && isVideo ? { p:0, ml:-10, mr:-5 } : {}),
           }}
         >
-          <iframe
+         <iframe
             name={JSON.stringify({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,
             })}
+             
             src={`${
               process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
             }?identifier=${identifier}${
@@ -773,18 +774,26 @@ const PlayerBox = ({
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
             }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
+            // style={{
+            //   border: 'none',
+            //   objectFit: 'contain',
+            //   //aspectRatio: getAspectRatio(),
+            // }}
+             allowFullScreen
             style={{
-              border: 'none',
-              objectFit: 'contain',
-              aspectRatio: getAspectRatio(),
-            }}
-            allowFullScreen
-            width={isPortrait && isVideo ? "110%" : "100%"}
-            height={isPortrait && isVideo ? '300%' : '100%'}
+        // display: 'block',
+        // padding: 0,
+        border: 'none',
+                    //  objectFit: 'contain',
+
+        height: 'calc(100vh - 60px)',
+      }}
+      width="100%"
+      height="100%"
+          
             title="Embedded Localhost"
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-            frameBorder="0"
-            scrolling="no"
+          
             sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
           />
         </Box>

@@ -14,7 +14,6 @@ import {
   Button,
   Collapse,
   Paper,
-  useTheme
 } from '@mui/material';
 import StaticFilterFields from '../staticFilterFields/StaticFilterFields';
 
@@ -66,7 +65,15 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 }) => {
   const [frameworkData, setFrameworkData] = useState<any>(null);
   const [categories, setCategories] = useState<FilterCategory[]>([]);
-  const [selectedFilters, setSelectedFilters] = useState<FilterState>({});
+  const [selectedFilters, setSelectedFilters] = useState<FilterState>(() => {
+    if (typeof window === 'undefined' || !framework) return {};
+    try {
+      const saved = localStorage.getItem(`frameworkFilters_${framework}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [staticFilters, setStaticFilters] = useState<Record<string, string[]>>(
     {}
   );
@@ -75,7 +82,6 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   const [dependencyMap, setDependencyMap] = useState<DependencyMap>({});
   const [clearTrigger, setClearTrigger] = useState<number>(0);
   const [loading, setLoading] = useState(false);
-  const theme = useTheme();
 
   // Check if filter should be shown based on uiConfig
   const shouldShowFilter = React.useMemo(() => {
@@ -92,6 +98,10 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     }
   }, []);
 
+  const isSecondChanceProgram =
+    typeof window !== 'undefined' &&
+    localStorage.getItem('userProgram') === 'Second Chance Program';
+
   const ITEMS_TO_SHOW = 3; // Number of items to show initially
 
   // Calculate filter count (including static filters)
@@ -104,15 +114,13 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 
   // Clear all filters
   const clearAllFilters = () => {
-    // Clear framework filters
     setSelectedFilters({});
     setStaticFilters({});
-
-    // Clear static filters
     setClearTrigger((prev) => prev + 1);
-
-    // Notify parent with empty filters immediately
     onFiltersChange?.({});
+    if (typeof window !== 'undefined' && framework) {
+      localStorage.removeItem(`frameworkFilters_${framework}`);
+    }
   };
 
   // Transform filters for callback - convert keys and values to desired format
@@ -166,6 +174,12 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     );
     onFiltersChange?.(mergedFilters);
   };
+
+  // Persist framework category filters to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined' || !framework) return;
+    localStorage.setItem(`frameworkFilters_${framework}`, JSON.stringify(selectedFilters));
+  }, [selectedFilters, framework]);
 
   useEffect(() => {
     const fetchFrameworkData = async () => {
@@ -248,7 +262,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     // Initialize collapse state - all categories expanded by default
     const initialCollapseState: CollapseState = {};
     const initialShowMoreState: ShowMoreState = {};
-    parsedCategories.forEach((category, index) => {
+    parsedCategories.forEach((category) => {
       initialCollapseState[category.code] = true; // All categories expanded
       initialShowMoreState[category.code] = false;
     });
@@ -534,23 +548,6 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 0.5,
-                maxHeight: '200px',
-                overflowY: 'auto',
-                pr: 1,
-                '&::-webkit-scrollbar': {
-                  width: '6px',
-                },
-                '&::-webkit-scrollbar-track': {
-                  background: '#f1f1f1',
-                  borderRadius: '3px',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                  background: '#c1c1c1',
-                  borderRadius: '3px',
-                  '&:hover': {
-                    background: '#a8a8a8',
-                  },
-                },
               }}
             >
               {displayedOptions.map((term) => (
@@ -640,8 +637,56 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     );
   };
 
-  // Don't render if showFilter is false in uiConfig
   if (!shouldShowFilter) {
+    if (isSecondChanceProgram) {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            width: '100%',
+            padding: { xs: 1, sm: 2 },
+            borderRadius: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid #E0E0E0',
+              pb: 2,
+              mb: 1,
+            }}
+          >
+            <Typography variant="h2" sx={{ fontWeight: 500 }}>
+              Filter By {staticFilterCount > 0 && `(${staticFilterCount})`}
+            </Typography>
+            {staticFilterCount > 0 && (
+              <Button
+                variant="text"
+                sx={{
+                  color: '#1976d2',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  fontSize: '0.875rem',
+                }}
+                onClick={clearAllFilters}
+              >
+                Clear Filter
+              </Button>
+            )}
+          </Box>
+          <StaticFilterFields
+            onFiltersChange={handleStaticFiltersChange}
+            showHeader={false}
+            clearTrigger={clearTrigger}
+            filterTypes={['contentLanguage', 'retention']}
+          />
+        </Box>
+      );
+    }
     return null;
   }
 
@@ -787,6 +832,41 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   }
 
   if (!frameworkData || categories.length === 0) {
+    if (isSecondChanceProgram) {
+      return (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            width: '100%',
+            padding: { xs: 1, sm: 2 },
+            borderRadius: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottom: '1px solid #E0E0E0',
+              pb: 2,
+              mb: 1,
+            }}
+          >
+            <Typography variant="h2" sx={{ fontWeight: 500 }}>
+              Filter By
+            </Typography>
+          </Box>
+          <StaticFilterFields
+            onFiltersChange={handleStaticFiltersChange}
+            showHeader={false}
+            clearTrigger={clearTrigger}
+            filterTypes={['contentLanguage']}
+          />
+        </Box>
+      );
+    }
     return (
       <Box
         sx={{
@@ -796,7 +876,6 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
           width: '100%',
         }}
       >
-        {/* Filter Header */}
         <Box
           sx={{
             display: 'flex',
@@ -806,17 +885,10 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             pb: 2,
           }}
         >
-          <Typography
-            variant="h2"
-            sx={{
-              fontWeight: 500,
-            }}
-          >
+          <Typography variant="h2" sx={{ fontWeight: 500 }}>
             Filter By
           </Typography>
         </Box>
-
-        {/* Empty State */}
         <Box sx={{ width: '100%' }}>
           <Typography variant="body2" color="text.secondary">
             No filters available
@@ -902,3 +974,8 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
 };
 
 export default FilterFramework;
+
+
+
+
+

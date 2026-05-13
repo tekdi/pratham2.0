@@ -43,11 +43,11 @@ const ContentCardGrid = memo((props: ContentCardGridProps) => {
 
   // Map Hindi + English names to a common key
   const normalizeName = (item: any) => {
-    const name = item.name?.toLowerCase();
+    const name = item.englishName?.toLowerCase();
 
-    if (['energy', 'ऊर्जा'].includes(name)) return 'energy';
-    if (['environment', 'पर्यावरण'].includes(name)) return 'environment';
-    if (['health', 'स्वास्थ्य', 'आरोग्य'].includes(name)) return 'health';
+    if (['energy'].includes(name)) return 'energy';
+    if (['environment'].includes(name)) return 'environment';
+    if (['health'].includes(name)) return 'health';
 
     return null; // not in priority list
   };

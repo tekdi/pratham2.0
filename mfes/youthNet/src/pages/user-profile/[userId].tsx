@@ -62,6 +62,7 @@ const UserId = () => {
     userName?: string | null;
     joinedOn?: string | null;
     workingVillages?: string | null;
+    enrollmentId?: string | null;
   }>({
     userRole: null,
     userID: null,
@@ -79,6 +80,7 @@ const UserId = () => {
     userName: null,
     joinedOn: null,
     workingVillages: null,
+    enrollmentId: null,
   });
 
   // Get current user ID and userProgram from localStorage on mount
@@ -460,7 +462,6 @@ const UserId = () => {
               ? toPascalCase(role)
               : (
                   getRoleFromTenant() ||
-                  localStorage.getItem('roleName') ||
                   toPascalCase(userData?.tenantData?.[0]?.roles?.[0]?.roleName) ||
                   toPascalCase(role)
                 ),
@@ -470,6 +471,7 @@ const UserId = () => {
           state: getFieldValue('STATE'),
           village: getFieldValue('VILLAGE'),
           workingVillages: getWorkingVillages(),
+          enrollmentId: userData?.enrollmentId || null,
         });
       }
     };
@@ -617,6 +619,7 @@ const UserId = () => {
             firstName={user.firstName || ''}
             lastName={user.lastName || ''}
             workingVillages={user.workingVillages || null}
+            enrollmentId={user.enrollmentId || null}
           />
         </Box>
         <Button

@@ -15,6 +15,8 @@ export * from './lib/context/LanguageContext';
 export * from './utils/API/Interceptor';
 export * from './utils/API/RestClient';
 export * from './utils/DataClient';
+export * from './utils/customIdbStore';
+export * from './utils/trackingContentQueueLookup';
 export * from './lib/CertificateModal/CertificateModal';
 export * from './lib/CourseCompletionBanner/CourseCompletionBanner';
 export * from './utils/helper';

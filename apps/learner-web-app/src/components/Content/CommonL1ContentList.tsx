@@ -187,11 +187,12 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                               target="_blank"
                               rel="noopener noreferrer"
                               sx={{
-                                color: '#FDBE16',
+                                //color: '#FDBE16',
+                                color: 'blue',
                                 textDecoration: 'underline',
                                 fontWeight: 500,
                                 '&:hover': {
-                                  color: '#fdbe16',
+                               //   color: '#fdbe16',
                                   textDecoration: 'underline',
                                 },
                               }}

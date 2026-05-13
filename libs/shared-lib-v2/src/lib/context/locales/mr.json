@@ -107,7 +107,8 @@
       "completed": "पूर्ण झाले",
       "in_progress": "चालू",
       "enrolled_not_started": "नोंदणीकृत, सुरू झाले नाही",
-      "not_started": "सुरू झाले नाही"
+      "not_started": "सुरू झाले नाही",
+      "tracking_sync_pending": "ट्रैकिंग सिंक पेंडिंग"
     },
     "BACK": "मागे",
     "RETURN_TO_LOGIN": "परत_लॉगिन करा",

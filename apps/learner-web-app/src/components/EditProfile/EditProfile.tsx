@@ -172,6 +172,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.ptm_id;
         delete responseFormForEnroll?.schema?.properties?.poc_id;
         delete responseFormForEnroll?.schema?.properties?.org_id;
+        delete responseFormForEnroll?.schema?.properties?.what_do_you_want_to_become;
         responseFormForEnroll?.schema?.required?.pop('batch');
         console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
@@ -200,6 +201,9 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseForm?.schema?.properties?.ptm_id;
         delete responseForm?.schema?.properties?.poc_id;
         delete responseForm?.schema?.properties?.org_id;
+        delete responseForm?.schema?.properties?.consent_file;
+        delete responseForm?.schema?.properties?.what_do_you_want_to_become;
+
 
         responseForm?.schema?.required.pop('batch');
         let userId = localStorage.getItem('userId');
@@ -233,6 +237,10 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             responseForm?.schema,
             useInfo?.result?.userData
           );
+          delete updatedSchema?.properties?.consent_file;
+          delete updatedSchema?.properties?.what_do_you_want_to_become;
+
+
           const updatedSchemaForEnroll = getMissingFields(
             responseFormForEnroll?.schema,
             useInfo?.result?.userData
@@ -544,6 +552,11 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           && !enrolledProgram
         ) {
           showToastMessage('Profile Updated succeessfully', 'success');
+          const landingPage = localStorage.getItem('landingPage') || '';
+
+          if (landingPage) {
+            window.location.href = landingPage;
+          }
         }
 
         if (formData?.what_is_your_preferred_language && localStorage.getItem('registerationTestGiven') !== "Yes") {

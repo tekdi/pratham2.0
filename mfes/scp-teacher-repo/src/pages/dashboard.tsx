@@ -787,7 +787,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
       router.push(
         `centers/${classId}/events/${getMonthName(
           timeTableDate
-        )?.toLowerCase()}?showAll=1`
+        )?.toLowerCase()}`
       );
       ReactGA.event('month-name-clicked', { selectedCohortID: classId });
     }
@@ -985,7 +985,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     lastSevenDaysLimit,
     timeTableDate,
     eventUpdated,
-    eventDeleted
+    eventDeleted,
+    undefined,
+    classId
   );
   useEffect(() => {
     console.log(eventDates);

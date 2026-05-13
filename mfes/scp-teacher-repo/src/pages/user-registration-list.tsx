@@ -255,7 +255,7 @@ const UserRegistrationList = () => {
               
               if (!assessmentStats[contentId]) {
                 assessmentStats[contentId] = {
-                  testName: 'Zatpat Test',
+                  testName: 'Saral Test',
                   attempts: []
                 };
                 console.log(`🆕 Created new assessment group for contentId: ${contentId}`);
