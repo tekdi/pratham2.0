@@ -7,7 +7,7 @@ import {
   Button,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import CommonModal from '../common-modal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
@@ -41,13 +41,15 @@ const InfoCard: React.FC<InfoCardProps> = ({
   const [isLoadingScore, setIsLoadingScore] = useState(false);
 
   const [isTrackingSyncPending, setIsTrackingSyncPending] = useState(false);
+  const isTrackingSyncPendingRef = useRef(false);
 
   useEffect(() => {
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier as string);
-      if(isTrackingSyncPending===true && isPending===false){
+      if(isTrackingSyncPendingRef.current === true && isPending === false){
         window.location.reload();
       }
+      isTrackingSyncPendingRef.current = isPending;
       setIsTrackingSyncPending(isPending);
     }
     checkTrackingSyncPending();
