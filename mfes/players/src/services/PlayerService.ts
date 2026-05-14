@@ -233,7 +233,6 @@ export const updateCOurseAndIssueCertificate = async ({
       });
     } else if (courseStatus?.status === 'completed' && isGenerateCertificate) {
       const userResponse: any = await getUserId();
-      console.log('User response:', userResponse);
       const data = await fetchCertificateStatus({
         userId: userId,
         courseId: course?.identifier,
