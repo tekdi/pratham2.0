@@ -284,7 +284,7 @@ function ProgramsContent() {
       >
         {/* <Header /> */}
 
-        <Box
+        {/* <Box
           sx={{
             background: 'linear-gradient(180deg, #FFFDF7 0%, #F8EFDA 100%)',
             boxShadow: '0px 4px 8px 3px #00000026, 0px 1px 3px 0px #0000004D',
@@ -333,7 +333,7 @@ function ProgramsContent() {
               </Typography>
             </Box>
           </Container>
-        </Box>
+        </Box> */}
 
         {/* Tabs Section */}
         <Box
@@ -381,18 +381,85 @@ function ProgramsContent() {
         {/* Content Section */}
         <Box
           sx={{
-            marginBottom: isAndroidApp 
-              ? { xs: '20px', sm: '20px', md: '20px' } 
-              : { xs: '100px', sm: '90px', md: '80px' }, // More space on mobile for footer
+            marginBottom: isAndroidApp
+              ? { xs: '20px', sm: '20px', md: '20px' }
+              : { xs: '100px', sm: '90px', md: '80px' },
           }}
         >
           {currentTab === 0 && userId !== null && (
-            <EnrollProgramCarousel userId={userId} isExplorePrograms={true} />
+            <>
+              {/* Learner programs */}
+              <Box sx={{ backgroundColor: '#fff', py: { xs: 2, md: 3 } }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: { xs: '18px', md: '22px' },
+                    color: '#1F1B13',
+                    px: { xs: 2, md: 3 },
+                    mb: 1,
+                  }}
+                >
+                  {t('LANDING.OUR_PROGRAMS_FOR_LEARNERS')}
+                </Typography>
+                <EnrollProgramCarousel userId={userId} isExplorePrograms={true} programType="learner" />
+              </Box>
+
+              {/* Volunteer programs */}
+              <Box sx={{ backgroundColor: '#F7FAF7', py: { xs: 2, md: 3 } }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: { xs: '18px', md: '22px' },
+                    color: '#1F1B13',
+                    px: { xs: 2, md: 3 },
+                    mb: 1,
+                  }}
+                >
+                  {t('LANDING.OUR_PROGRAMS_FOR_VOLUNTEERS')}
+                </Typography>
+                <EnrollProgramCarousel userId={userId} isExplorePrograms={true} programType="VolunteerOnboarding" />
+              </Box>
+            </>
           )}
+
           {currentTab === 1 && userId !== null && (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              <EnrollProgramCarousel userId={userId} />
-            </Box>
+            <>
+              {/* Enrolled learner programs */}
+              <Box sx={{ backgroundColor: '#fff', py: { xs: 2, md: 3 } }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: { xs: '18px', md: '22px' },
+                    color: '#1F1B13',
+                    px: { xs: 2, md: 3 },
+                    mb: 1,
+                  }}
+                >
+                  {t('LANDING.OUR_PROGRAMS_FOR_LEARNERS')}
+                </Typography>
+                <EnrollProgramCarousel userId={userId} programType="learner" />
+              </Box>
+
+              {/* Enrolled volunteer programs */}
+              <Box sx={{ backgroundColor: '#F7FAF7', py: { xs: 2, md: 3 } }}>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: { xs: '18px', md: '22px' },
+                    color: '#1F1B13',
+                    px: { xs: 2, md: 3 },
+                    mb: 1,
+                  }}
+                >
+                  {t('LANDING.OUR_PROGRAMS_FOR_VOLUNTEERS')}
+                </Typography>
+                <EnrollProgramCarousel userId={userId} programType="VolunteerOnboarding" />
+              </Box>
+            </>
           )}
         </Box>
 
