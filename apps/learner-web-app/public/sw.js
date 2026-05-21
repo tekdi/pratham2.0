@@ -542,7 +542,7 @@ async function getUserId() {
     });
     const response = await res.json();
 
-    return response?.data?.result;
+    return response?.result;
   } catch (error) {
     console.error('Error in fetching user details', error);
     throw error;

@@ -124,10 +124,13 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
         break;
 
       case 'all-content':
-        mode =
-          content?.status === 'Draft' || content?.status === 'Live'
-            ? 'edit'
-            : getLocalStoredUserRole() === Role.SCTA ? 'read' : 'review';
+        if (content?.status === 'Draft' || content?.status === 'Live') {
+          mode = 'edit';
+        } else if (content?.status === 'Processing') {
+          mode = 'review';
+        } else {
+          mode = getLocalStoredUserRole() === Role.SCTA ? 'read' : 'review';
+        }
         break;
 
       default:
@@ -152,16 +155,23 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
             query: { identifier },
           });
     } else if (tableTitle === 'all-content' && mode === 'review') {
-      content.contentType === 'Course'
-        ? router.push({
-            pathname: `/course-hierarchy/${identifier}`,
-            query: {
-              identifier,
-              isReadOnly: true,
-              previousPage: 'allContents',
-            },
-          })
-        : router.push({
+      console.log('Opening all-content review for identifier:', identifier);
+      if (content?.status === 'Processing') {
+         const pathname =
+        
+           `/workspace/content/review`
+          router.push({ pathname, query: { identifier } });
+      }
+        content.contentType === 'Course'
+          ? router.push({
+              pathname: `/course-hierarchy/${identifier}`,
+              query: {
+                identifier,
+                isReadOnly: true,
+                previousPage: 'allContents',
+              },
+            })
+          : router.push({
             pathname: `/workspace/content/review`,
             query: { identifier, isReadOnly: true, isAllContents: true },
           });
