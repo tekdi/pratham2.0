@@ -13,6 +13,7 @@ import Header from '@learner/components/Header/Header';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { useTranslation } from '@shared-lib';
 import EnrolModal from '@learner/components/EnrolModal/EnrolModal';
+import DOMPurify from 'dompurify';
 
 interface Program {
   tenantId: string;
@@ -30,7 +31,8 @@ interface Program {
 }
 
 function getFirstImage(program: Program): string {
-  const item = program.programImages?.[0];
+  console.log('Program images:', program?.params?.uiConfig);
+  const item =  program?.params?.uiConfig?.landingImage|| program.programImages?.[0];
   if (!item) return '/images/default.png';
   return typeof item === 'string'
     ? item
@@ -293,17 +295,20 @@ export default function ProgramDetailPage() {
                 </Box>
 
                 <Typography
+                  component="div"
                   variant="body1"
                   sx={{
                     fontFamily: 'Poppins',
                     fontSize: { xs: '14px', md: '15px' },
                     lineHeight: 1.9,
-                    color: '#3D6B5E',
-                    whiteSpace: 'pre-line',
+                    //color: '#3D6B5E',
+                    '& ul': { paddingLeft: '20px', margin: '4px 0' },
+                    '& li': { marginBottom: '2px' },
                   }}
-                >
-                  {program.description || ''}
-                </Typography>
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize((t(program?.params?.uiConfig?.aboutText) || '').replace(/\n/g, '<br/>'))
+                  }}
+                />
               </Box>
 
               {/* Contact */}
