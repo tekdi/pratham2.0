@@ -18,6 +18,7 @@ interface FileUploadFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const FileUploadField: React.FC<FileUploadFieldProps> = ({
@@ -25,6 +26,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +65,7 @@ const FileUploadField: React.FC<FileUploadFieldProps> = ({
           type="file"
           accept={accept}
           onChange={handleFileChange}
+          disabled={disabled}
           hidden
         />
         <CloudUploadIcon sx={{ fontSize: 32, color: '#999', mb: 1 }} />

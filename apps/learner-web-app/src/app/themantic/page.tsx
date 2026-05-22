@@ -2,6 +2,11 @@ import React, { Suspense } from 'react';
 
 import List from '@learner/components/themantic/content/List';
 
+const title = 'Experimento India';
+export const metadata = {
+  title,
+};
+
 const Page = () => {
   return (
     <div className="thematic-page">

@@ -12,6 +12,7 @@ interface SurveySectionProps {
   errors: Record<string, string>;
   onChange: (fieldName: string, value: any) => void;
   fieldNumberMap?: Record<string, number>;
+  disabled?: boolean;
 }
 
 const SurveySection: React.FC<SurveySectionProps> = ({
@@ -20,6 +21,7 @@ const SurveySection: React.FC<SurveySectionProps> = ({
   errors,
   onChange,
   fieldNumberMap,
+  disabled,
 }) => {
   const sortedFields = [...section.fields].sort(
     (a, b) => a.displayOrder - b.displayOrder
@@ -56,6 +58,7 @@ const SurveySection: React.FC<SurveySectionProps> = ({
             error={errors[field.fieldName]}
             onChange={onChange}
             questionNumber={fieldNumberMap?.[field.fieldId]}
+            disabled={disabled}
           />
         ))}
       </Box>

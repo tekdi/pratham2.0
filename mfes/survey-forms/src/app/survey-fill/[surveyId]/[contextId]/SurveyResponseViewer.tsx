@@ -19,11 +19,16 @@ import type { Survey, SurveyField, SurveyResponse } from '../../../../types/surv
 // ── Render a single submitted value in a human-readable way ──────────────────
 
 const ReadOnlyValue: React.FC<{ field: SurveyField; value: any }> = ({ field, value }) => {
+  // Unwrap { selected, otherText } shape produced when an "Other" option exists
+  const isOtherShape = value !== null && typeof value === 'object' && !Array.isArray(value) && 'selected' in value;
+  const selected = isOtherShape ? value.selected : value;
+  const otherText: string = isOtherShape ? (value.otherText ?? '') : '';
+
   const isEmpty =
-    value === null ||
-    value === undefined ||
-    value === '' ||
-    (Array.isArray(value) && value.length === 0);
+    selected === null ||
+    selected === undefined ||
+    selected === '' ||
+    (Array.isArray(selected) && selected.length === 0);
 
   if (isEmpty) {
     return (
@@ -46,21 +51,35 @@ const ReadOnlyValue: React.FC<{ field: SurveyField; value: any }> = ({ field, va
   switch (field.fieldType) {
     case 'checkbox':
     case 'multi_select': {
-      const vals: any[] = Array.isArray(value) ? value : [value];
+      const vals: any[] = Array.isArray(selected) ? selected : [selected];
       return (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-          {vals.map((v, i) => (
-            <Chip key={i} label={resolveLabel(v)} size="small" sx={{ backgroundColor: '#FFF8E1' }} />
-          ))}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-start' }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {vals.map((v, i) => (
+              <Chip key={i} label={resolveLabel(v)} size="small" sx={{ backgroundColor: '#FFF8E1' }} />
+            ))}
+          </Box>
+          {otherText && (
+            <Typography variant="body2" sx={{ color: '#1E1B16', fontStyle: 'italic', ml: 0.5 }}>
+              {otherText}
+            </Typography>
+          )}
         </Box>
       );
     }
     case 'radio':
     case 'select':
       return (
-        <Typography variant="body1" sx={{ color: '#1E1B16' }}>
-          {resolveLabel(value)}
-        </Typography>
+        <Box>
+          <Typography variant="body1" sx={{ color: '#1E1B16' }}>
+            {resolveLabel(selected)}
+          </Typography>
+          {otherText && (
+            <Typography variant="body2" sx={{ color: '#1E1B16', fontStyle: 'italic', mt: 0.5 }}>
+              {otherText}
+            </Typography>
+          )}
+        </Box>
       );
     case 'rating': {
       const max = field.validations?.max ?? 5;

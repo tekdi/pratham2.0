@@ -6,46 +6,55 @@ export interface ValidationError {
   message: string;
 }
 
+function unwrapOtherValue(value: any): any {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value) && 'selected' in value) {
+    return value.selected;
+  }
+  return value;
+}
+
 export function validateField(
   field: SurveyField,
   value: any
 ): string | null {
+  const raw = unwrapOtherValue(value);
+
   if (field.isRequired) {
     if (
-      value === null ||
-      value === undefined ||
-      value === '' ||
-      (Array.isArray(value) && value.length === 0)
+      raw === null ||
+      raw === undefined ||
+      raw === '' ||
+      (Array.isArray(raw) && raw.length === 0)
     ) {
       return 'This field is required';
     }
   }
 
-  if (value === null || value === undefined || value === '') {
+  if (raw === null || raw === undefined || raw === '') {
     return null;
   }
 
   const { validations } = field;
 
-  if (validations.minLength !== undefined && String(value).length < validations.minLength) {
+  if (validations.minLength !== undefined && String(raw).length < validations.minLength) {
     return `${field.fieldLabel} must be at least ${validations.minLength} characters`;
   }
 
-  if (validations.maxLength !== undefined && String(value).length > validations.maxLength) {
+  if (validations.maxLength !== undefined && String(raw).length > validations.maxLength) {
     return `${field.fieldLabel} must be at most ${validations.maxLength} characters`;
   }
 
-  if (validations.min !== undefined && Number(value) < validations.min) {
+  if (validations.min !== undefined && Number(raw) < validations.min) {
     return `${field.fieldLabel} must be at least ${validations.min}`;
   }
 
-  if (validations.max !== undefined && Number(value) > validations.max) {
+  if (validations.max !== undefined && Number(raw) > validations.max) {
     return `${field.fieldLabel} must be at most ${validations.max}`;
   }
 
   if (validations.pattern) {
     const regex = new RegExp(validations.pattern);
-    if (!regex.test(String(value))) {
+    if (!regex.test(String(raw))) {
       return `${field.fieldLabel} format is invalid`;
     }
   }
