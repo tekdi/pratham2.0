@@ -12,6 +12,7 @@ import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import RoleCard, { ROLE_CARD_THEMES } from '@learner/components/RoleCard/RoleCard';
 import ProgramCard from '@learner/components/ProgramCard/ProgramCard';
+import LanguageSelectionPopup from '@learner/components/LanguageSelectionPopup/LanguageSelectionPopup';
 
 interface Program {
   ordering: number;
@@ -132,6 +133,7 @@ export default function LandingPage() {
 
   return (
     <>
+      <LanguageSelectionPopup />
       <Header isLogin={true}/>
       <Box
         sx={{

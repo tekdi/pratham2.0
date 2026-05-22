@@ -13,6 +13,7 @@ import Header from '@learner/components/Header/Header';
 import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { useTranslation } from '@shared-lib';
 import EnrolModal from '@learner/components/EnrolModal/EnrolModal';
+import LanguageSelectionPopup from '@learner/components/LanguageSelectionPopup/LanguageSelectionPopup';
 import DOMPurify from 'dompurify';
 
 interface Program {
@@ -132,6 +133,7 @@ export default function ProgramDetailPage() {
 
   return (
     <>
+      <LanguageSelectionPopup />
       <Header  />
 
       <Box sx={{ backgroundColor: '#fff', minHeight: '100vh' }}>

@@ -853,7 +853,26 @@ const LoginPageContent = () => {
         primaryText={t('LANDING.ENROL_NOW') || 'Enrol Now'}
         primaryActionHandler={() => {
           setNotEnrolledModal(false);
-          router.push(`/${encodeURIComponent(notEnrolledProgramName)}`);
+          const currentTenantId = localStorage.getItem('tenantId');
+          localStorage.setItem('previousTenantId', currentTenantId || '');
+          localStorage.setItem('tenantId', notEnrolledTenantId);
+          localStorage.setItem('userProgram', notEnrolledProgramName);
+          localStorage.setItem('onboardTenantId', notEnrolledTenantId);
+          if (enrollConfirmProgramData?.params?.uiConfig) {
+            localStorage.setItem('uiConfig', JSON.stringify(enrollConfirmProgramData.params.uiConfig));
+          }
+          if (enrollConfirmProgramData?.params?.uiConfig?.landingPage) {
+            localStorage.setItem('landingPage', enrollConfirmProgramData.params.uiConfig.landingPage);
+          }
+          localStorage.setItem('enrolledProgramData', JSON.stringify({
+            tenantId: notEnrolledTenantId,
+            name: notEnrolledProgramName,
+            params: enrollConfirmProgramData?.params || {},
+          }));
+          if (enrollConfirmProgramData?.type) {
+            localStorage.setItem('temp_program_type', enrollConfirmProgramData.type);
+          }
+          router.push('/enroll-profile-completion');
         }}
         // secondaryText={t('LEARNER_APP.PROGRAMS.MY_PROGRAMS') || 'My Programs'}
         // secondaryActionHandler={() => { setNotEnrolledModal(false); router.push('/programs'); }}

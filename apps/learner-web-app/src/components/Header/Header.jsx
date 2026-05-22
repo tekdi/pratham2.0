@@ -169,6 +169,7 @@ const Header = ({ isShowLogout = false, isLogin = false }) => {
             <MenuItem value="kan">ಕನ್ನಡ</MenuItem>
             <MenuItem value="tam">தமிழ்</MenuItem>
             <MenuItem value="guj">ગુજરાતી</MenuItem>
+            <MenuItem value="ur">اردو</MenuItem>
             {/* Add more languages as needed */}
           </Select>
         </Box>
