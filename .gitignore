@@ -61,3 +61,7 @@ mfes/workspace/public/content-plugins/
 mfes/workspace/public/generic-editor/
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+
+# but allow H5P dist
+!mfes/players/public/libs/content-player-v2/h5p-libs/**/dist/
+!mfes/players/public/libs/content-player-v2/h5p-libs/**/dist/**

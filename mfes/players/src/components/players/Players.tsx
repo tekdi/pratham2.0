@@ -20,6 +20,11 @@ const SunbirdV1Player = dynamic(() => import('../V1-Player/V1Player'), {
   ssr: false,
 });
 
+//new player v2
+const ContentPlayerV2 = dynamic(() => import('./ContentPlayerV2'), {
+  ssr: false,
+});
+
 interface PlayerProps {
   'player-config': any;
   courseId?: string;
@@ -59,6 +64,14 @@ const SunbirdPlayers = ({
     updatedPlayerConfig.context.userData = { firstName: playerFirstName, lastName: playerLastName };
   }
   switch (mimeType) {
+    case 'application/vnd.ekstep.h5p-archive':
+      return (
+        <ContentPlayerV2
+          playerConfig={updatedPlayerConfig}
+          relatedData={{ courseId, unitId, userId }}
+          configFunctionality={configFunctionality}
+        />
+      );
     case 'application/pdf':
       return (
         <SunbirdPdfPlayer
@@ -94,7 +107,7 @@ const SunbirdPlayers = ({
           configFunctionality={configFunctionality}
         />
       );
-    case 'application/vnd.ekstep.h5p-archive':
+    // case 'application/vnd.ekstep.h5p-archive':
     case 'application/vnd.ekstep.html-archive':
     case 'video/youtube':
     case 'video/x-youtube':

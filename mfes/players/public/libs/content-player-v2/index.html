@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>H5P Player</title>
+  <style>
+    body { margin: 0; background: #1a1a2e; }
+    #player { width: 100vw; height: 100vh; display: block; }
+  </style>
+</head>
+<body>
+  <content-player id="player"></content-player>
+
+  <!-- IIFE bundle — includes H5P renderer -->
+  <script src="content-player.iife.js"></script>
+
+  <script type="text/javascript">
+    function setData(playerConfig) {
+    const player = document.getElementById('player');
+
+    player.sunbirdPlayerConfig = playerConfig;
+
+    player.addEventListener('player:ready',    (e) => { console.log('[player:ready v2]', e.detail);    window.parent.postMessage({ type: 'player:ready',    detail: e.detail }, '*'); });
+    player.addEventListener('player:start',    (e) => { console.log('[player:start]', e.detail);        window.parent.postMessage({ type: 'player:start',    detail: e.detail }, '*'); });
+    player.addEventListener('player:complete', (e) => { console.log('[player:complete]', e.detail);     window.parent.postMessage({ type: 'player:complete', detail: e.detail }, '*'); });
+    player.addEventListener('player:error',    (e) => { console.error('[player:error]', e.detail);      window.parent.postMessage({ type: 'player:error',    detail: e.detail }, '*'); });
+    player.addEventListener('player:close',    (e) => { console.log('[player:close]', e.detail);        window.parent.postMessage({ type: 'player:close',    detail: e.detail }, '*'); });
+    }
+  </script>
+
+</body>
+</html>

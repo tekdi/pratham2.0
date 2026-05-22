@@ -1,0 +1,54 @@
+{
+  "name": "h5p-three-image",
+  "version": "1.0.0",
+  "description": "Create 360 image content",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env NODE_ENV='production' webpack",
+    "watch": "cross-env NODE_ENV='development' webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h5p/h5p-three-image.git"
+  },
+  "author": "Joubel AS <contact@joubel.com> (https://joubel.com)",
+  "license": "MIT",
+  "contributors": [
+    "Frode Petterson <frode.petterson@joubel.com> (https://github.com/icc)",
+    "Thomas Marstrander <thomas.marstrander@joubel.com> (https://github.com/thomasmars)"
+  ],
+  "bugs": {
+    "url": "https://github.com/h5p/h5p-three-image/issues"
+  },
+  "homepage": "https://github.com/h5p/h5p-three-image#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/preset-env": "^7.2.0",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "eslint": "^8.21.0",
+    "eslint-plugin-react": "^7.30.1",
+    "file-loader": "^6.2.0",
+    "mini-css-extract-plugin": "^2.6.1",
+    "sass": "^1.77.8",
+    "sass-loader": "^13.2.2",
+    "style-loader": "^3.3.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "core-js": "^3.24.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
+  },
+  "engines": {
+    "npm": ">=8.15.0",
+    "node": ">=16.17.0"
+  }
+}

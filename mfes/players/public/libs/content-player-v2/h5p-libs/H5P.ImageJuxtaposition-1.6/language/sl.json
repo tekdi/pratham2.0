@@ -1,0 +1,78 @@
+{
+  "semantics": [
+    {
+      "label": "Navodilo udeležencem",
+      "description": "Dodaten naslov ali opis reševanja zadane naloge, ki je prikazan nad slikama.",
+      "placeholder": "Dodaten naslov ali navodilo za udeležence."
+    },
+    {
+      "label": "Prva slika",
+      "fields": [
+        {
+          "label": "Prva slika",
+          "description": "Slika mora biti enake velikosti kot druga."
+        },
+        {
+          "label": "Naslov prve slike",
+          "description": "Besedilo je zapisano na prvi sliki."
+        }
+      ]
+    },
+    {
+      "label": "Druga slika",
+      "fields": [
+        {
+          "label": "Druga slika",
+          "description": "Slika mora biti enake velikosti kot prva."
+        },
+        {
+          "label": "Naslov druge slike",
+          "description": "Besedilo je zapisano na drugi sliki."
+        }
+      ]
+    },
+    {
+      "label": "Nastavitve interakcije",
+      "description": "Nastavitve omogočajo nadzor nad interakcijo aktivnosti za udeležence.",
+      "fields": [
+        {
+          "label": "Začetni položaj drsnika v %",
+          "description": "Odstotek pomeni začetni položaj drsnika oz. delež vidnosti prve slike (npr. 50 za polovico)."
+        },
+        {
+          "label": "Usmerjenost drsnika",
+          "description": "Pri ležeči usmerjenosti (slike) se drsnik pomika levo in desno, pri pokončni pa gor in dol.",
+          "options": [
+            {
+              "label": "Ležeče"
+            },
+            {
+              "label": "Pokončno"
+            }
+          ]
+        },
+        {
+          "label": "Barva drsnika"
+        }
+      ]
+    },
+    {
+      "label": "Dostopnost",
+      "fields": [
+        {
+          "label": "Besedilo o vidnosti slike",
+          "default": "Vidne je @percentage % slike",
+          "description": "@percentage je spremenljivka in jo bo nadomestila ustrezna vrednost."
+        },
+        {
+          "label": "Text for screen readers. Title for full screen button (enter)",
+          "default": "Enter full screen mode"
+        },
+        {
+          "label": "Text for screen readers. Title for full screen button (exit)",
+          "default": "Exit full screen mode"
+        }
+      ]
+    }
+  ]
+}

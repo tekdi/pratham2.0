@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>H5P Content</title>
+  <!-- JSZip: used for offline .h5p file extraction (loaded before inline script) -->
+  <script src="jszip.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #fff;
+    }
+    /* Clip wrapper — holds the scaled content without leaking layout overflow */
+    #h5p-clip {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    /* Container receives the CSS transform: scale() from JS */
+    #h5p-container {
+      width: 100%;
+      transform-origin: top left;
+    }
+    #loading-msg {
+      display: none;
+      padding: 24px;
+      color: #555;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+    }
+    #error-msg {
+      display: none;
+      padding: 24px;
+      color: #d93025;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div id="h5p-clip">
+    <div id="h5p-container">
+      <div id="loading-msg">Loading H5P content…</div>
+      <div id="error-msg"></div>
+    </div>
+  </div>
+
+  <script>
+    // ── Read query params ────────────────────────────────────────────────────
+    var params        = new URLSearchParams(window.location.search);
+    var h5pBase       = params.get('h5pBase') || '';
+    var h5pFileUrl    = params.get('h5pFile')  || '';   // URL to a .h5p ZIP file (offline mode)
+    var contentId     = params.get('contentId') || 'h5p-content';
+    // librariesPath: base URL for H5P library folders (JS/CSS).
+    // Defaults to 'h5p-libs' (relative to this file), which resolves correctly
+    // whether the player is served from the root or any sub-directory.
+    // Consumers may pass an absolute URL (e.g. a CDN) via the query param.
+    var librariesPath = params.get('librariesPath') || 'h5p-libs';
+
+    // ── Offline file store ───────────────────────────────────────────────────
+    // Populated when h5pFile param is present. Maps ZIP-relative paths → Uint8Array.
+    var offlineFiles  = null;
+    var OFFLINE_BASE  = window.location.origin + '/h5p-offline-content';
+
+    // ── Fetch interceptor: version-fallback + h5p.json dependency injection ─────
+    // Two concerns handled here:
+    //
+    // 1. VERSION FALLBACK: h5p-standalone builds library paths from the version
+    //    declared in content's h5p.json (e.g. H5P.InteractiveVideo-1.27).  Our
+    //    bundled h5p-libs may only have a newer minor version (e.g. 1.28).  On
+    //    a 404 we transparently retry with minor+1 … minor+5.
+    //
+    // 2. INTERACTION DEPENDENCY INJECTION: Sunbird/Knowlg-packaged H5P.InteractiveVideo
+    //    content often ships an h5p.json with only the main library in
+    //    preloadedDependencies (e.g. just "H5P.InteractiveVideo 1.27").
+    //    The interaction-type sub-libraries (H5P.Text, H5P.Image, …) are expected
+    //    to be pre-registered on a full H5P server but are absent from h5p.json.
+    //    h5p-standalone only loads what's listed, so constructors are missing at
+    //    runtime.  We intercept the h5p.json fetch and inject the standard set of
+    //    InteractiveVideo interaction libraries into preloadedDependencies so
+    //    h5p-standalone fetches and registers them before content initialises.
+    if (window.fetch) {
+      (function patchFetch(libBase) {
+        var _fetch = window.fetch.bind(window);
+        // Cache resolved aliases so every asset under an aliased lib is rewritten
+        var aliases = {}; // e.g. 'H5P.InteractiveVideo-1.27' => 'H5P.InteractiveVideo-1.28'
+
+        // ── Bundled library versions (keyed by MachineName-major) ──────────────
+        // Generated from actual h5p-libs folder names. Used to normalise versions
+        // declared in content h5p.json before h5p-standalone constructs script URLs.
+        // When content says "CoursePresentation 1.26" but we have 1.27, we rewrite
+        // the dependency to 1.27 so the <script> tags point to the right folder.
+        var BUNDLED_VERSIONS = {
+          'Drop-1': '0',
+          'FontAwesome-4': '5',
+          'H5P.Accordion-1': '0',
+          'H5P.AdvancedBlanks-1': '0',
+          'H5P.AdvancedText-1': '1',
+          'H5P.Agamotto-1': '7',
+          'H5P.ArithmeticQuiz-1': '1',
+          'H5P.Audio-1': '5',
+          'H5P.AudioRecorder-1': '0',
+          'H5P.Blanks-1': '14',
+          'H5P.BranchingScenario-1': '11',
+          'H5P.CKEditor-1': '0',
+          'H5P.Chart-1': '2',
+          'H5P.Collage-0': '3',
+          'H5P.Column-1': '21',
+          'H5P.Components-1': '0',
+          'H5P.CoursePresentation-1': '27',
+          'H5P.Dialogcards-1': '9',
+          'H5P.Dictation-1': '4',
+          'H5P.DocumentationTool-1': '8',
+          'H5P.DragNBar-1': '5',
+          'H5P.DragNDrop-1': '1',
+          'H5P.DragNResize-1': '2',
+          'H5P.DragQuestion-1': '14',
+          'H5P.DragText-1': '10',
+          'H5P.Essay-1': '6',
+          'H5P.FindTheWords-1': '4',
+          'H5P.Flashcards-1': '7',
+          'H5P.FontIcons-1': '0',
+          'H5P.FreeTextQuestion-1': '0',
+          'H5P.GuessTheAnswer-1': '5',
+          'H5P.IFrameEmbed-1': '0',
+          'H5P.Image-1': '1',
+          'H5P.ImageHotspots-1': '11',
+          'H5P.ImageJuxtaposition-1': '6',
+          'H5P.ImageSlider-1': '1',
+          'H5P.ImpressPresentation-1': '3',
+          'H5P.InteractiveBook-1': '14',
+          'H5P.InteractiveVideo-1': '28',
+          'H5P.JoubelUI-1': '3',
+          'H5P.KewArCode-1': '7',
+          'H5P.Link-1': '3',
+          'H5P.MarkTheWords-1': '11',
+          'H5P.MathDisplay-1': '0',
+          'H5P.MemoryGame-1': '3',
+          'H5P.MultiChoice-1': '16',
+          'H5P.OpenEndedQuestion-1': '0',
+          'H5P.PersonalityQuiz-1': '1',
+          'H5P.Question-1': '5',
+          'H5P.QuestionSet-1': '21',
+          'H5P.Questionnaire-1': '3',
+          'H5P.Shape-1': '0',
+          'H5P.SingleChoiceSet-1': '11',
+          'H5P.SpeakTheWords-1': '5',
+          'H5P.SpeakTheWordsSet-1': '3',
+          'H5P.Summary-1': '10',
+          'H5P.Table-1': '2',
+          'H5P.Text-1': '1',
+          'H5P.TextUtilities-1': '3',
+          'H5P.ThreeImage-0': '5',
+          'H5P.ThreeSixty-0': '3',
+          'H5P.Timeline-1': '1',
+          'H5P.Timer-0': '4',
+          'H5P.Transition-1': '0',
+          'H5P.TrueFalse-1': '8',
+          'H5P.Video-1': '6',
+          'Tether-1': '0',
+          'jQuery.ui-1': '10',
+        };
+
+        // ── Dependency injection map ────────────────────────────────────────────
+        // Sunbird/Knowlg-packaged H5P content often ships h5p.json with only the
+        // main library in preloadedDependencies. Container and quiz-type libraries
+        // embed other H5P content types dynamically; those sub-types must be listed
+        // so h5p-standalone loads them before the content tries to instantiate them.
+        //
+        // Keys are mainLibrary values; values are arrays of extra deps to inject.
+        // "leaf" content types (Chart, MemoryGame, etc.) usually package correctly
+        // and don't need injection — only add here if observed to break.
+
+        // Interaction types usable inside InteractiveVideo overlays
+        var IV_INTERACTION_LIBS = [
+          { machineName: 'H5P.Text',              majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.Image',             majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.AdvancedText',      majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.Link',              majorVersion: '1', minorVersion: '3'  },
+          { machineName: 'H5P.MultiChoice',       majorVersion: '1', minorVersion: '16' },
+          { machineName: 'H5P.TrueFalse',         majorVersion: '1', minorVersion: '8'  },
+          { machineName: 'H5P.Summary',           majorVersion: '1', minorVersion: '10' },
+          { machineName: 'H5P.SingleChoiceSet',   majorVersion: '1', minorVersion: '11' },
+          { machineName: 'H5P.Blanks',            majorVersion: '1', minorVersion: '14' },
+          { machineName: 'H5P.DragQuestion',      majorVersion: '1', minorVersion: '14' },
+          { machineName: 'H5P.DragText',          majorVersion: '1', minorVersion: '10' },
+          { machineName: 'H5P.MarkTheWords',      majorVersion: '1', minorVersion: '11' },
+          { machineName: 'H5P.FreeTextQuestion',  majorVersion: '1', minorVersion: '0'  },
+          { machineName: 'H5P.Table',             majorVersion: '1', minorVersion: '2'  },
+          { machineName: 'H5P.Shape',             majorVersion: '1', minorVersion: '0'  },
+        ];
+
+        // Question types usable inside QuestionSet / CoursePresentation / Column / InteractiveBook
+        var QUESTION_LIBS = [
+          { machineName: 'H5P.MultiChoice',       majorVersion: '1', minorVersion: '16' },
+          { machineName: 'H5P.TrueFalse',         majorVersion: '1', minorVersion: '8'  },
+          { machineName: 'H5P.Blanks',            majorVersion: '1', minorVersion: '14' },
+          { machineName: 'H5P.DragQuestion',      majorVersion: '1', minorVersion: '14' },
+          { machineName: 'H5P.DragText',          majorVersion: '1', minorVersion: '10' },
+          { machineName: 'H5P.MarkTheWords',      majorVersion: '1', minorVersion: '11' },
+          { machineName: 'H5P.Summary',           majorVersion: '1', minorVersion: '10' },
+          { machineName: 'H5P.SingleChoiceSet',   majorVersion: '1', minorVersion: '11' },
+          { machineName: 'H5P.Essay',             majorVersion: '1', minorVersion: '6'  },
+          { machineName: 'H5P.FreeTextQuestion',  majorVersion: '1', minorVersion: '0'  },
+        ];
+
+        // All embeddable content types for fully open containers
+        var CONTAINER_LIBS = IV_INTERACTION_LIBS.concat(QUESTION_LIBS).concat([
+          { machineName: 'H5P.Text',              majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.Image',             majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.AdvancedText',      majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.Audio',             majorVersion: '1', minorVersion: '5'  },
+          { machineName: 'H5P.Video',             majorVersion: '1', minorVersion: '6'  },
+          { machineName: 'H5P.Chart',             majorVersion: '1', minorVersion: '2'  },
+          { machineName: 'H5P.Flashcards',        majorVersion: '1', minorVersion: '7'  },
+          { machineName: 'H5P.GuessTheAnswer',    majorVersion: '1', minorVersion: '5'  },
+          { machineName: 'H5P.ImageHotspots',     majorVersion: '1', minorVersion: '11' },
+          { machineName: 'H5P.ImageSlider',       majorVersion: '1', minorVersion: '1'  },
+          { machineName: 'H5P.Accordion',         majorVersion: '1', minorVersion: '0'  },
+          { machineName: 'H5P.Dialogcards',       majorVersion: '1', minorVersion: '9'  },
+          { machineName: 'H5P.Table',             majorVersion: '1', minorVersion: '2'  },
+          { machineName: 'H5P.Shape',             majorVersion: '1', minorVersion: '0'  },
+          { machineName: 'H5P.InteractiveVideo',  majorVersion: '1', minorVersion: '28' },
+          { machineName: 'H5P.Timeline',          majorVersion: '1', minorVersion: '1'  },
+        ]);
+
+        // Per-mainLibrary dep injection table
+        var EXTRA_DEPS = {
+          'H5P.InteractiveVideo':  IV_INTERACTION_LIBS,
+          'H5P.QuestionSet':       QUESTION_LIBS,
+          'H5P.CoursePresentation':CONTAINER_LIBS,
+          'H5P.Column':            CONTAINER_LIBS,
+          'H5P.InteractiveBook':   CONTAINER_LIBS,
+          'H5P.BranchingScenario': CONTAINER_LIBS,
+          'H5P.DocumentationTool': [
+            { machineName: 'H5P.Text',   majorVersion: '1', minorVersion: '1' },
+            { machineName: 'H5P.Image',  majorVersion: '1', minorVersion: '1' },
+            { machineName: 'H5P.Audio',  majorVersion: '1', minorVersion: '5' },
+            { machineName: 'H5P.Video',  majorVersion: '1', minorVersion: '6' },
+          ],
+        };
+
+        // Normalise a single dep's minorVersion to the bundled minor for that
+        // machineName+major, if we have a bundled version at all.
+        function normaliseDep(dep) {
+          var key    = dep.machineName + '-' + dep.majorVersion;
+          var bundled = BUNDLED_VERSIONS[key];
+          if (bundled && bundled !== dep.minorVersion) {
+            console.log('[h5p-iframe] version normalised: ' +
+              dep.machineName + '-' + dep.majorVersion + '.' + dep.minorVersion +
+              ' → ' + dep.majorVersion + '.' + bundled);
+            dep.minorVersion = bundled;
+          }
+          return dep;
+        }
+
+        function injectIVDeps(data) {
+          var deps = data.preloadedDependencies || [];
+
+          // 1. Normalise versions of ALL existing deps to what we have bundled
+          deps = deps.map(normaliseDep);
+
+          // 2. Inject additional interaction/container sub-libraries for known types
+          var extra = EXTRA_DEPS[data.mainLibrary];
+          if (extra) {
+            var present = deps.map(function(d) { return d.machineName; });
+            var seen = {};
+            extra.forEach(function(lib) {
+              if (!seen[lib.machineName] && present.indexOf(lib.machineName) === -1) {
+                seen[lib.machineName] = true;
+                deps.push(normaliseDep({
+                  machineName:  lib.machineName,
+                  majorVersion: lib.majorVersion,
+                  minorVersion: lib.minorVersion,
+                }));
+                console.log('[h5p-iframe] injected dep:', lib.machineName);
+              }
+            });
+          }
+
+          data.preloadedDependencies = deps;
+          return data;
+        }
+
+        function rewrite(url) {
+          if (!libBase || typeof url !== 'string' || !url.includes(libBase + '/')) return url;
+          var rest = url.slice(url.indexOf(libBase + '/') + libBase.length + 1);
+          var slash = rest.indexOf('/');
+          if (slash === -1) return url;
+          var dir = rest.slice(0, slash);
+          return aliases[dir] ? url.replace('/' + dir + '/', '/' + aliases[dir] + '/') : url;
+        }
+
+        // Returns true when a response is a Vite SPA fallback (200 + text/html
+        // served for any path that doesn't exist as a real static file).
+        function isHtmlFallback(r) {
+          return r.ok && (r.headers.get('content-type') || '').indexOf('text/html') !== -1;
+        }
+
+        // ── Offline file server ────────────────────────────────────────────────
+        // Guesses the MIME type from file extension for synthetic fetch responses.
+        function guessMime(path) {
+          var ext = (path.split('.').pop() || '').toLowerCase();
+          var types = {
+            'json': 'application/json',  'js':   'application/javascript',
+            'css':  'text/css',           'html': 'text/html',
+            'jpg':  'image/jpeg',         'jpeg': 'image/jpeg',
+            'png':  'image/png',          'gif':  'image/gif',
+            'svg':  'image/svg+xml',      'webp': 'image/webp',
+            'mp4':  'video/mp4',          'webm': 'video/webm',
+            'mp3':  'audio/mpeg',         'ogg':  'audio/ogg',
+            'wav':  'audio/wav',          'vtt':  'text/vtt',
+          };
+          return types[ext] || 'application/octet-stream';
+        }
+
+        // Looks up a URL targeting OFFLINE_BASE in the offlineFiles map.
+        // The ZIP root maps like this:
+        //   h5p.json              → served at {OFFLINE_BASE}/h5p.json
+        //   content/content.json  → served at {OFFLINE_BASE}/content.json
+        //   content/images/x.jpg  → served at {OFFLINE_BASE}/images/x.jpg
+        //   content/audio/y.mp3   → served at {OFFLINE_BASE}/audio/y.mp3
+        // Returns a Response or null when path is not in the ZIP.
+        function serveOfflineFile(url) {
+          if (!offlineFiles) return null;
+          var prefix = OFFLINE_BASE + '/';
+          if (url.indexOf(prefix) === -1) return null;
+          var relPath = url.slice(url.indexOf(prefix) + prefix.length).split('?')[0];
+
+          // Try direct key first (catches h5p.json at ZIP root)
+          var data = offlineFiles[relPath];
+          // Then try under content/ prefix (h5p-standalone requests content.json, images/*, etc.)
+          if (data === undefined) data = offlineFiles['content/' + relPath];
+          if (data === undefined) return null;
+
+          var mime = guessMime(relPath);
+          var body = (data instanceof Uint8Array) ? data.buffer : data;
+          return new Response(body, { status: 200, headers: { 'Content-Type': mime } });
+        }
+
+        function tryFallback(origUrl, opts) {
+          var m = origUrl.match(/([\w.]+)-(\d+)\.(\d+)\//);
+          if (!m) return _fetch(origUrl, opts);
+          var name = m[1], major = +m[2], minor = +m[3];
+          var attempts = [];
+          for (var v = minor + 1; v <= minor + 5; v++) attempts.push(v);
+
+          function next(i) {
+            if (i >= attempts.length) return _fetch(origUrl, opts);
+            var newDir = name + '-' + major + '.' + attempts[i];
+            var newUrl = origUrl.replace(name + '-' + major + '.' + minor + '/', newDir + '/');
+            return _fetch(newUrl, opts).then(function(r) {
+              // Accept the response only when it is genuinely OK *and* not the
+              // Vite SPA HTML fallback that Vite returns with status 200 for any
+              // unresolved path during development.
+              if (r.ok && !isHtmlFallback(r)) {
+                aliases[name + '-' + major + '.' + minor] = newDir;
+                console.log('[h5p-iframe] version alias: ' + name + '-' + major + '.' + minor + ' → ' + newDir);
+                return r;
+              }
+              return next(i + 1);
+            });
+          }
+          return next(0);
+        }
+
+        window.fetch = function(resource, opts) {
+          if (typeof resource === 'string') resource = rewrite(resource);
+
+          // ── OFFLINE MODE: serve files directly from the in-memory ZIP ────────
+          if (offlineFiles && typeof resource === 'string' && resource.indexOf(OFFLINE_BASE + '/') !== -1) {
+            if (/\/h5p\.json(\?.*)?$/.test(resource)) {
+              // h5p.json: serve from ZIP but also apply dep injection
+              var offlineH5pJson = offlineFiles['h5p.json'];
+              if (offlineH5pJson) {
+                try {
+                  var text = (offlineH5pJson instanceof Uint8Array)
+                    ? new TextDecoder().decode(offlineH5pJson)
+                    : offlineH5pJson;
+                  var data = injectIVDeps(JSON.parse(text));
+                  return Promise.resolve(new Response(JSON.stringify(data), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' },
+                  }));
+                } catch (e) {
+                  console.warn('[h5p-iframe] offline h5p.json parse error:', e);
+                }
+              }
+            }
+            var offlineResp = serveOfflineFile(resource);
+            if (offlineResp) return Promise.resolve(offlineResp);
+            // Path not in ZIP → 404 (never fall through to network for content URLs)
+            return Promise.resolve(new Response('Offline: file not found in H5P archive', { status: 404 }));
+          }
+
+          // ── Intercept h5p.json (online) to inject missing interaction-type deps ─
+          // Also handles Sunbird/Knowlg S3 layout where h5p.json lives one level
+          // deeper at {h5pBase}/content/h5p.json instead of {h5pBase}/h5p.json.
+          // If the direct fetch fails or returns HTML, we retry with /content/ prefix.
+          if (typeof resource === 'string' && /\/h5p\.json(\?.*)?$/.test(resource)) {
+            return _fetch(resource, opts).then(function(r) {
+              // Sunbird S3 fallback: if h5p.json is not at the root, try /content/h5p.json
+              if (!r.ok || isHtmlFallback(r)) {
+                var sunbirdUrl = resource.replace(/\/h5p\.json(\?.*)?$/, '/content/h5p.json');
+                if (sunbirdUrl !== resource) {
+                  console.log('[h5p-iframe] h5p.json not at root, trying Sunbird path:', sunbirdUrl);
+                  return _fetch(sunbirdUrl, opts).then(function(r2) {
+                    if (!r2.ok || isHtmlFallback(r2)) return r; // give up, return original error
+                    return r2.clone().json().then(function(data) {
+                      data = injectIVDeps(data);
+                      return new Response(JSON.stringify(data), {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' },
+                      });
+                    }).catch(function() { return r2; });
+                  });
+                }
+                return r;
+              }
+              return r.clone().json().then(function(data) {
+                data = injectIVDeps(data);
+                return new Response(JSON.stringify(data), {
+                  status: r.status,
+                  headers: { 'Content-Type': 'application/json' },
+                });
+              }).catch(function() { return r; });
+            });
+          }
+
+          return _fetch(resource, opts).then(function(r) {
+            // Trigger fallback on real 404s OR on Vite SPA's fake-200 text/html
+            // responses for missing library JSON/JS/CSS files.
+            var needsFallback = typeof resource === 'string' && libBase && resource.includes(libBase + '/');
+            if (needsFallback && (!r.ok || isHtmlFallback(r)))
+              return tryFallback(resource, opts);
+            return r;
+          });
+        };
+      })(librariesPath);
+    }
+
+    // ── Offline mode: extract .h5p ZIP then play ─────────────────────────────
+    function extractAndPlay(fileUrl) {
+      document.getElementById('loading-msg').style.display = 'block';
+
+      // Use the pre-patch _fetch if available, else the raw fetch.
+      // We need _fetch here because window.fetch is already patched, but the
+      // offline interceptor is gated on offlineFiles being non-null (which it
+      // isn't yet), so window.fetch would fall through to _fetch anyway.
+      var rawFetch = (typeof _fetch === 'function') ? _fetch : fetch;
+      rawFetch(fileUrl)
+        .then(function(r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status + ' fetching H5P file');
+          return r.arrayBuffer();
+        })
+        .then(function(buf) {
+          if (typeof JSZip === 'undefined') throw new Error('JSZip not loaded — jszip.min.js missing');
+          return JSZip.loadAsync(buf);
+        })
+        .then(function(zip) {
+          offlineFiles = {};
+          var promises = [];
+          zip.forEach(function(relPath, file) {
+            if (!file.dir) {
+              promises.push(
+                file.async('uint8array').then(function(data) {
+                  offlineFiles[relPath] = data;
+                  console.log('[h5p-iframe] offline file:', relPath, data.byteLength + 'B');
+                })
+              );
+            }
+          });
+          return Promise.all(promises);
+        })
+        .then(function() {
+          console.log('[h5p-iframe] H5P archive extracted, files:', Object.keys(offlineFiles).length);
+          loadH5P(OFFLINE_BASE, contentId, librariesPath);
+        })
+        .catch(function(err) {
+          notifyError('Failed to extract H5P archive: ' + (err.message || err));
+        });
+    }
+
+    if (h5pFileUrl) {
+      extractAndPlay(h5pFileUrl);
+    } else if (!h5pBase) {
+      showError('H5P base URL not provided (missing h5pBase or h5pFile query param)');
+    } else {
+      document.getElementById('loading-msg').style.display = 'block';
+      loadH5P(h5pBase, contentId, librariesPath);
+    }
+
+    // ── Notify parent of errors ───────────────────────────────────────────────
+    function notifyError(msg) {
+      window.parent.postMessage({ context: 'h5p', action: 'error', message: msg }, '*');
+      showError(msg);
+    }
+
+    function showError(msg) {
+      document.getElementById('loading-msg').style.display = 'none';
+      var el = document.getElementById('error-msg');
+      el.style.display = 'block';
+      el.textContent = 'H5P Error: ' + msg;
+      console.error('[h5p-iframe]', msg);
+    }
+
+    // ── Fit-to-viewport scaling ────────────────────────────────────────────────
+    // h5p-standalone sets inline height on the nested iframe (embedType:"iframe")
+    // or lets content grow inside a div (embedType:"div") after all assets load.
+    // We apply CSS transform: scale() on #h5p-container so EVERYTHING inside
+    // shrinks uniformly to fit the visible viewport — no scroll at any level.
+    // DragQuestion positions are percentage-based so they remain accurate after
+    // uniform scaling.
+    //
+    // ResizeObserver fires reliably when h5p-standalone adds/resizes the element,
+    // avoiding race conditions with fixed setTimeout delays.
+
+    var h5pScaleRO = null;
+
+    function getCurrentNaturalH() {
+      // h5p-standalone injects an iframe (embedType:"iframe") or a .h5p-container
+      // div (embedType:"div") as a direct child of #h5p-container.
+      // Reading scrollHeight gives us the natural (pre-scale) content height.
+      var container = document.getElementById('h5p-container');
+      if (!container) return 0;
+      // Temporarily clear any transform so offsetHeight is the real layout size
+      var prev = container.style.transform;
+      container.style.transform = 'none';
+      var h = container.scrollHeight || container.offsetHeight;
+      container.style.transform = prev;
+      return h;
+    }
+
+    function applyFitScale() {
+      var container = document.getElementById('h5p-container');
+      if (!container) return;
+
+      // Clear transform first so we can read the natural dimensions
+      container.style.transform = '';
+
+      var naturalH = container.scrollHeight || container.offsetHeight;
+      var naturalW = container.scrollWidth  || container.offsetWidth || window.innerWidth;
+      if (!naturalH || naturalH < 10) return;
+
+      var viewW = window.innerWidth;
+      var viewH = window.innerHeight;
+      var scale = Math.min(viewW / naturalW, viewH / naturalH, 1);
+
+      if (scale < 0.995) {
+        container.style.transformOrigin = 'top left';
+        container.style.transform = 'scale(' + scale + ')';
+        // Shrink the clip wrapper to the visual (scaled) height so no dead space
+        document.getElementById('h5p-clip').style.height = Math.ceil(naturalH * scale) + 'px';
+      } else {
+        container.style.transform = '';
+        document.getElementById('h5p-clip').style.height = '';
+      }
+    }
+
+    // Start observing #h5p-container for size changes caused by h5p-standalone
+    function startFitObserver() {
+      var container = document.getElementById('h5p-container');
+      if (!container || h5pScaleRO) return;
+
+      h5pScaleRO = new ResizeObserver(function() {
+        applyFitScale();
+      });
+      h5pScaleRO.observe(container);
+
+      // Also observe any direct child added by h5p-standalone (the nested iframe
+      // for embedType:"iframe" or a wrapper div for embedType:"div")
+      var childObs = new MutationObserver(function() {
+        var child = container.querySelector('iframe') || container.querySelector('.h5p-iframe-wrapper') || container.querySelector('[class^="h5p"]');
+        if (child && h5pScaleRO) {
+          h5pScaleRO.observe(child);
+          childObs.disconnect();
+        }
+      });
+      childObs.observe(container, { childList: true, subtree: false });
+
+      applyFitScale();
+    }
+
+    window.addEventListener('resize', applyFitScale);
+
+    // ── Mute / unmute control from parent ────────────────────────────────────
+    // H5pRendererView sends { context: 'h5p-control', action: 'mute', muted: bool }
+    // We propagate to all audio/video in this document and the nested content iframe.
+    window.addEventListener('message', function(ev) {
+      if (!ev.data || ev.data.context !== 'h5p-control') return;
+      if (ev.data.action === 'mute') {
+        var muteVal = !!ev.data.muted;
+        // Mute all media in this outer document
+        document.querySelectorAll('audio, video').forEach(function(el) {
+          el.muted = muteVal;
+        });
+        // Forward into any nested content iframes (same-origin; about:blank inherits origin)
+        document.querySelectorAll('iframe').forEach(function(iframe) {
+          try {
+            if (iframe.contentDocument) {
+              iframe.contentDocument.querySelectorAll('audio, video').forEach(function(el) {
+                el.muted = muteVal;
+              });
+            }
+          } catch (e) { /* cross-origin guard */ }
+          // Also send postMessage in case the iframe loads a separate page
+          try { iframe.contentWindow.postMessage({ context: 'h5p-control', action: 'mute', muted: muteVal }, '*'); } catch (e) {}
+        });
+      }
+    });
+
+    // ── Wire H5P xAPI dispatcher to postMessage ───────────────────────────────
+    function wireXAPI() {
+      document.getElementById('loading-msg').style.display = 'none';
+
+      // Start fit-to-viewport after h5p-standalone finishes rendering
+      startFitObserver();
+
+      try {
+        if (window.H5P && window.H5P.externalDispatcher) {
+          window.H5P.externalDispatcher.on('xAPI', function (event) {
+            var stmt = null;
+            try {
+              stmt = (typeof event.getVerifiedStatementValue === 'function')
+                ? event.getVerifiedStatementValue([])
+                : (event.data && event.data.statement ? event.data.statement : event.statement);
+            } catch (e) {
+              stmt = event.statement || (event.data && event.data.statement);
+            }
+            if (stmt) {
+              window.parent.postMessage({ type: 'h5p-xapi', statement: stmt }, '*');
+            }
+          });
+        }
+        if (window.H5P) {
+          window.H5P.on('resize', function () {
+            applyFitScale();
+            window.parent.postMessage({ context: 'h5p', action: 'resize' }, '*');
+          });
+        }
+      } catch (e) {
+        console.warn('[h5p-iframe] xAPI wiring failed:', e);
+      }
+    }
+
+    // ── Load h5p-standalone ───────────────────────────────────────────────────
+    function loadH5P(baseUrl, cid, libPath) {
+      var localScript = document.createElement('script');
+      localScript.src = './h5p-standalone/main.bundle.js';
+
+      localScript.onload = function () {
+        initH5P(baseUrl, cid, false, libPath);
+      };
+
+      localScript.onerror = function () {
+        console.warn('[h5p-iframe] Local h5p-standalone not found, falling back to CDN');
+        loadFromCDN(baseUrl, cid, libPath);
+      };
+
+      document.head.appendChild(localScript);
+    }
+
+    function loadFromCDN(baseUrl, cid, libPath) {
+      var cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/main.bundle.js';
+      cdnScript.crossOrigin = 'anonymous';
+
+      cdnScript.onload = function () {
+        initH5P(baseUrl, cid, true, libPath);
+      };
+
+      cdnScript.onerror = function () {
+        notifyError('Failed to load H5P standalone runtime (local and CDN both failed)');
+      };
+
+      document.head.appendChild(cdnScript);
+    }
+
+    // ── Initialize h5p-standalone ─────────────────────────────────────────────
+    // h5p-standalone v3 exposes its constructor at window.H5PStandalone.H5P.
+    // embedType is intentionally omitted so h5p-standalone respects the content's
+    // own embedTypes from h5p.json ('div' or 'iframe').
+    // librariesPath (optional): separate base for H5P library folders. When provided,
+    // h5p-standalone fetches library JS/CSS from here instead of h5pJsonPath —
+    // enabling content from a remote URL while libraries are bundled locally in the player.
+    function initH5P(baseUrl, cid, fromCDN, libPath) {
+      fromCDN = fromCDN || false;
+
+      var H5PClass = window.H5PStandalone && window.H5PStandalone.H5P
+        ? window.H5PStandalone.H5P
+        : null;
+
+      if (!H5PClass) {
+        notifyError('H5P standalone class not found — window.H5PStandalone.H5P is undefined');
+        return;
+      }
+
+      var frameJs  = fromCDN
+        ? 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/frame.bundle.js'
+        : './h5p-standalone/frame.bundle.js';
+      var frameCss = fromCDN
+        ? 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/styles/h5p.css'
+        : './h5p-standalone/styles/h5p.css';
+
+      var container = document.getElementById('h5p-container');
+
+      var h5pOptions = {
+        h5pJsonPath: baseUrl,
+        frameJs:     frameJs,
+        frameCss:    frameCss,
+        id:          cid,
+        // embedType intentionally omitted — h5p-standalone uses content's embedTypes
+        // customCss is injected into the nested content iframe (created by frame.bundle.js
+        // for embedType:"iframe" content like DragQuestion).  It provides CSS variable
+        // fallbacks and fixes overflow clipping of drop-zone labels.
+        customCss:   './h5p-fix.css',
+      };
+
+      // When librariesPath is provided, use it as the base for H5P library folders.
+      // This lets content live on S3/CDN while compiled library JS/CSS is served locally.
+      if (libPath) {
+        h5pOptions.librariesPath = libPath;
+      }
+
+      try {
+        var instance = new H5PClass(container, h5pOptions);
+
+        if (instance && typeof instance.then === 'function') {
+          instance.then(function () {
+            wireXAPI();
+          }).catch(function (err) {
+            var msg = err && err.message ? err.message : String(err);
+            notifyError('H5P initialization failed: ' + msg);
+          });
+        } else {
+          setTimeout(wireXAPI, 500);
+        }
+      } catch (err) {
+        var msg = err && err.message ? err.message : String(err);
+        notifyError('H5P init error: ' + msg);
+      }
+    }
+  </script>
+</body>
+</html>

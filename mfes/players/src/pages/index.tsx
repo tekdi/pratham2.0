@@ -83,6 +83,12 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           config.context['contentId'] = identifier;
         }
 
+        //if h5p player
+        if(data.mimeType === MIME_TYPE.H5P_CONTENT && config.metadata)
+        {
+          config.metadata.streamingUrl=config.metadata.streamingUrl+"/content";
+          console.log("########h5p playerConfig",config);
+        }
         setPlayerConfig(config);
       } catch (error) {
         console.error('Error loading content:', error);

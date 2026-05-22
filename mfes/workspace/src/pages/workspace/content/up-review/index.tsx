@@ -186,7 +186,7 @@ const UpForReviewPage = () => {
         const sort_by = { lastUpdatedOn: order };
         const contentType = 'upReview';
         const response = await getContent(
-          ['Review', 'FlagReview'],
+          ['Review', 'FlagReview' , 'Processing'],
           query,
           LIMIT,
           offset,

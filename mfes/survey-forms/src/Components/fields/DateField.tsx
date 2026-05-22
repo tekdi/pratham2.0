@@ -13,6 +13,7 @@ interface DateFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const DateField: React.FC<DateFieldProps> = ({
@@ -20,6 +21,7 @@ const DateField: React.FC<DateFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   const inputType =
     field.fieldType === 'time'
@@ -40,6 +42,7 @@ const DateField: React.FC<DateFieldProps> = ({
         type={inputType}
         required={field.isRequired}
         error={!!error}
+        disabled={disabled}
         size="small"
         InputLabelProps={{ shrink: true }}
         inputProps={{ max: maxDate }}

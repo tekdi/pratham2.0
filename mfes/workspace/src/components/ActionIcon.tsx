@@ -3,8 +3,10 @@ import { Box, Typography, Tooltip, useTheme } from "@mui/material";
 import DeleteConfirmation from "./DeleteConfirmation";
 import UnpublishedIcon from '@mui/icons-material/Unpublished';
 import PublishIcon from '@mui/icons-material/Publish';
+import ReplayIcon from '@mui/icons-material/Replay';
 import { Role } from "@workspace/utils/app.constant";
 import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
+import router from 'next/router';
 
 interface ActionCellProps {
   rowData?: any;
@@ -14,6 +16,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
   rowData,
   //  onEdit,
 }) => {
+  console.log("rowData in ActionIcon====>", rowData);
   const theme = useTheme<any>();
   const [open, setOpen] = useState(false);
   const [actionType, setActionType] = useState<string>('delete');
@@ -103,6 +106,28 @@ const ActionIcon: React.FC<ActionCellProps> = ({
           </Box>
         </Tooltip>
       )} */}
+
+      {rowData?.status === 'Processing' && (
+        <Tooltip title="Republish">
+          <Box
+            onClick={() => {
+              const identifier = rowData?.identifier;
+              const pathname = `/workspace/content/review`;
+              router.push({ pathname, query: { identifier } });
+            }}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'pointer',
+              backgroundColor: '#F8EFE7',
+              p: '10px',
+            }}
+          >
+            <ReplayIcon sx={{ color: 'green' }} />
+          </Box>
+        </Tooltip>
+      )}
 
       <DeleteConfirmation
         open={open}

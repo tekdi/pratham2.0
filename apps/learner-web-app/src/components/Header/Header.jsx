@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Box, Select, MenuItem, IconButton, Menu } from '@mui/material';
+import { Box, Button, Select, MenuItem, IconButton, Menu } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -11,7 +11,7 @@ import { useTranslation } from '@shared-lib';
 import { useRouter } from 'next/navigation';
 import { languages } from '@shared-lib-v2/lib/context/Languages';
 
-const Header = ({ isShowLogout = false }) => {
+const Header = ({ isShowLogout = false, isLogin = false }) => {
   const { t, setLanguage, language } = useTranslation();
   // Initialize with language from context if available, otherwise fallback to localStorage or 'en'
   const [lang, setLang] = useState(() => {
@@ -108,11 +108,44 @@ const Header = ({ isShowLogout = false }) => {
         }}
         style={{ cursor: 'pointer' }}
       >
-        <Image src={appLogo} alt="Pratham Logo" width={200} height={40} />
+        <Image
+          src={appLogo}
+          alt="Pratham Logo"
+          width={200}
+          height={40}
+          style={{ width: 'clamp(100px, 40vw, 200px)', height: 'auto' }}
+        />
       </Box>
 
       {/* Language Selector and Logout */}
-      <Box display="flex" alignItems="center" gap={2}>
+      <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
+          {/* Login Button */}
+        {isLogin && (
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => router.push('/login')}
+            sx={{
+              fontFamily: 'Poppins',
+              fontWeight: 600,
+              fontSize: { xs: '12px', sm: '14px' },
+              textTransform: 'none',
+              backgroundColor: '#FDBE16',
+              color: '#1F1B13',
+              borderRadius: '8px',
+              px: { xs: 1.5, sm: 2.5 },
+              py: 0.8,
+              whiteSpace: 'nowrap',
+              minWidth: 'unset',
+              '&:hover': {
+                backgroundColor: '#f0b000',
+              },
+            }}
+          >
+            {t('LANDING.LOGIN') || 'Log in'}
+          </Button>
+        )}
+
         {/* Language Selector */}
         <Box display="flex" alignItems="center" gap={1}>
           <LanguageIcon fontSize="small" />
@@ -124,8 +157,8 @@ const Header = ({ isShowLogout = false }) => {
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
-              fontSize: '14px',
-              minWidth: '80px',
+              fontSize: { xs: '12px', sm: '14px' },
+              minWidth: { xs: '60px', sm: '80px' },
             }}
           >
             <MenuItem value="en">English</MenuItem>
@@ -136,10 +169,12 @@ const Header = ({ isShowLogout = false }) => {
             <MenuItem value="kan">ಕನ್ನಡ</MenuItem>
             <MenuItem value="tam">தமிழ்</MenuItem>
             <MenuItem value="guj">ગુજરાતી</MenuItem>
+            <MenuItem value="ur">اردو</MenuItem>
             {/* Add more languages as needed */}
           </Select>
         </Box>
 
+      
         {/* Logout Dropdown Menu */}
         {isShowLogout && (
           <Menu
