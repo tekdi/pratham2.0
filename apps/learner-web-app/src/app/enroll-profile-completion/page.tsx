@@ -230,6 +230,37 @@ const EnrollProfileCompletionInner = () => {
     }
   };
 
+  const handleAssessmentModalClose = async () => {
+    setAssessmentRequiredModal(false);
+    try {
+      const storedUserId = localStorage.getItem('userId');
+      const storedRoleId = localStorage.getItem('roleId');
+      const enrollTenantId = localStorage.getItem('tenantId');
+      const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+      const userTenantStatus = uiConfig?.isTenantPendingStatus;
+      if (storedUserId && storedRoleId && enrollTenantId) {
+        if (userTenantStatus) {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
+        } else {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
+        }
+        try {
+          await updateUser(storedUserId, {
+            userData: {},
+            customFields: [{ fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963', value: 'pending' }],
+          });
+        } catch (updateError) {
+          console.error('Failed to update pending custom field:', updateError);
+        }
+      }
+    } catch (enrollError) {
+      console.error('Enrollment failed on close:', enrollError);
+    }
+    localStorage.setItem('registerationTestGiven', 'Yes');
+    const finalLandingPage = localStorage.getItem('landingPage') || '/home';
+    window.location.href = finalLandingPage;
+  };
+
   const onAssessmentUnavailableOk = () => {
     setAssessmentUnavailableModal(false);
     setTimeout(() => {
@@ -290,12 +321,7 @@ const EnrollProfileCompletionInner = () => {
 
       <AssessmentRequiredModal
         open={assessmentRequiredModal}
-        onClose={() => {
-          setAssessmentRequiredModal(false);
-          setTimeout(() => {
-            window.location.href = '/programs';
-          }, 100);
-        }}
+        onClose={handleAssessmentModalClose}
         onStartAssessment={handleStartAssessment}
       />
       <SimpleModal
