@@ -1187,6 +1187,8 @@
     "INTERESTED_MAY_JOIN_NEXT_YEAR": "Interested, may join next year",
     "SELECT_ALL": "Select All",
     "DESELECT_ALL": "Deselect All",
-    "ASSESSMENT_SCORES": "Assessment Scores"
+    "ASSESSMENT_SCORES": "Assessment Scores",
+    "READ_MORE": "Read more",
+    "READ_LESS": "Read less"
   }
 }
