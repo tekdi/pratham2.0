@@ -264,7 +264,7 @@ const EnrollProfileCompletionInner = () => {
   const onAssessmentUnavailableOk = () => {
     setAssessmentUnavailableModal(false);
     setTimeout(() => {
-      window.location.href = '/programs';
+      window.location.href = '/scp-dashboard';
     }, 100);
   };
 
