@@ -116,6 +116,11 @@ const SearchPage = () => {
             handleFilterChange={handleFilterChange}
             onlyLanguage={true}
             isOpenColapsed={['contentLanguage']}
+            _config={{
+              _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
+              },
+            }}
           />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
