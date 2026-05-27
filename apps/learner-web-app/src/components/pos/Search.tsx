@@ -109,7 +109,7 @@ const SearchPage = () => {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', gap: 3, p: 4, alignItems: 'flex-start' }}>
-        <Box sx={{ width: { xs: '100%', md: '260px' }, flexShrink: 0 }}>
+        <Box sx={{ width: { xs: '100%', md: '260px' }, flexShrink: 0, position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           <FilterComponent
             filterState={filterState}
             filterFramework={filterFramework}
