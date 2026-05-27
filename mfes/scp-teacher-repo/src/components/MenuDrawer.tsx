@@ -180,8 +180,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const handleCopyRegistrationLink = async () => {
     try {
       // Get the registration link from environment variable or construct it
-      const registrationBase = process.env.NEXT_PUBLIC_PLP_REGISTERATION || '';
-      
+      const registrationBase: string =
+        (process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+          ? process.env.NEXT_PUBLIC_LEARNER_SBPLAYER.replace("/sbplayer", "")
+          : '') || '';
+
       if (registrationBase) {
         const enroll = localStorage.getItem('tenantName') || '';
         
@@ -1005,7 +1008,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         {/* Bottom Section - Fixed at bottom */}
         {(
           <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
-            { process.env.NEXT_PUBLIC_PLP_REGISTERATION &&(<Button
+            { process.env.NEXT_PUBLIC_LEARNER_SBPLAYER &&(<Button
               className="fs-14"
               sx={{
                 width: '100%',
