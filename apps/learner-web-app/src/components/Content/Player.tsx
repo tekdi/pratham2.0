@@ -209,7 +209,40 @@ const App = ({
     // } else {
     //   router.push(`${activeLink ? activeLink : '/content'}`);
     // }
-    if (previousPage) {
+   const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      console.log('isAndroid check:', isAndroid);
+      
+      if(isAndroid)
+        {
+         console.log('Android path - sending message to WebView');
+         // Send message to React Native WebView
+
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+
+              //        const program = JSON.parse(enrolledProgramData || '{}');
+
+
+            // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+          let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+          // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+          if (!refreshToken || refreshToken === '') {
+            refreshToken = localStorage.getItem('refreshToken');
+          }
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+
+                // Add any data you want to send
+              }
+            }));
+          }
+        }
+   else if (previousPage) {
       router.push(previousPage);
       return;
     }
@@ -315,7 +348,6 @@ const App = ({
     const downloadableTypes = [
       'video/mp4',
       'video/webm',
-      'video/x-youtube',
       'application/pdf',
       'application/epub',
       'application/vnd.ekstep.ecml-archive',

@@ -31,6 +31,7 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (localStorage.getItem('isAndroidApp') === 'yes') return;
     const dismissed = sessionStorage.getItem(PLP_LANGUAGE_POPUP_DISMISSED_KEY);
     if (!dismissed) {
       setOpen(true);
@@ -107,7 +108,7 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
               mb: 1.5,
             }}
           >
-          <LanguageIcon sx={{ color: '#1ba4fb', fontSize: 55 }} />
+          <LanguageIcon sx={{ color: '#FDBE16', fontSize: 55 }} />
           </Box>
           <Typography
             id="language-selection-title"

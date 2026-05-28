@@ -77,11 +77,12 @@ const UserRegistrationList = () => {
   const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
+  const requestCounterRef = useRef(0);
+
   const hasLocationFilters =
     Boolean(locationFilters.states?.length) &&
     Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length) &&
-    Boolean(locationFilters.villages?.length);
+    Boolean(locationFilters.blocks?.length);
 
   // Transform API response to match UserCard format
   const parseCallLogEntry = (
@@ -321,6 +322,7 @@ const UserRegistrationList = () => {
 
   const fetchUsers = useCallback(
     async (page = 1, tab: string, location: LocationFilters, searchTerm = '') => {
+    const requestId = ++requestCounterRef.current;
     setLoading(true);
     try {
       const tenantId = localStorage.getItem('tenantId');
@@ -373,6 +375,7 @@ const UserRegistrationList = () => {
       });
 
       if (response && response.getUserDetails) {
+        if (requestId !== requestCounterRef.current) return;
         const transformedUsers = response.getUserDetails.map(transformUserData);
         setUsers(transformedUsers);
         setTotalCount(response.totalCount || 0);
@@ -410,15 +413,19 @@ const UserRegistrationList = () => {
           }
         }
       } else {
+        if (requestId !== requestCounterRef.current) return;
         setUsers([]);
         setTotalCount(0);
       }
     } catch (error) {
+      if (requestId !== requestCounterRef.current) return;
       console.error('Error fetching users:', error);
       setUsers([]);
       setTotalCount(0);
     } finally {
-      setLoading(false);
+      if (requestId === requestCounterRef.current) {
+        setLoading(false);
+      }
     }
   }, [limit]);
 
@@ -722,9 +729,8 @@ const UserRegistrationList = () => {
         {t('USER_REGISTRATION.LEARNER_REGISTRATIONS')}
       </Typography>
         <Box sx={{   mb: 2, borderRadius: '8px', mt:"20px" }}>
-          <LocationDropdowns 
+          <LocationDropdowns
             onLocationChange={handleLocationChange}
-            initialFilters={locationFilters}
           />
         </Box>
         
