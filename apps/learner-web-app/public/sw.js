@@ -420,7 +420,7 @@ async function updateCOurseAndIssueCertificate({
         });
         if (responseCriteria === true) {
           try {
-            // if(userResponse?.firstName) {
+            if(userResponse?.firstName) {
               await issueCertificate({
                 userId: userId,
                 courseId: course?.identifier,
@@ -435,14 +435,14 @@ async function updateCOurseAndIssueCertificate({
                 lastName: userResponse?.lastName ?? '',
                 courseName: course?.name ?? '',
               });
-            // }
-            /*else {
+            }
+            else {
               await updateUserCourseStatus({
                 userId,
                 courseId: course?.identifier,
                 status: 'completed',
               });
-            }*/
+            }
           } catch (error) {
             await updateUserCourseStatus({
               userId,
