@@ -165,6 +165,36 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
         setCollapseState(initialCollapseState);
         setShowMoreState(initialShowMoreState);
 
+        // Auto-select the language chosen in the registration form ("What is your preferred language")
+        const isContentLangIncluded = !filterTypes || filterTypes.includes('contentLanguage');
+        if (isContentLangIncluded) {
+          const contentLangField = staticFields.find(f => f.code === 'contentLanguage');
+          if (contentLangField && contentLangField.range.length > 0) {
+            const preferredLanguage = typeof window !== 'undefined'
+              ? localStorage.getItem('preferred_language')
+              : null;
+            if (preferredLanguage) {
+              const matchingOption = contentLangField.range.find((option: string | StaticFilterOption) => {
+                const val = typeof option === 'string' ? option : (option.identifier || option.label || '');
+                const lbl = typeof option === 'string' ? option : (option.label || option.identifier || '');
+                return val.toLowerCase() === preferredLanguage.toLowerCase()
+                  || lbl.toLowerCase() === preferredLanguage.toLowerCase();
+              });
+              if (matchingOption) {
+                const optionValue = typeof matchingOption === 'string'
+                  ? matchingOption
+                  : (matchingOption.identifier || matchingOption.label || '');
+                setSelectedFilters(prev => {
+                  const newFilters = { ...prev, contentLanguage: [optionValue] };
+                  onFiltersChange?.(newFilters);
+                  return newFilters;
+                });
+                return;
+              }
+            }
+          }
+        }
+
         // Notify parent about any filter selections restored from localStorage
         if (Object.values(selectedFilters).some((arr) => arr?.length > 0)) {
           onFiltersChange?.(selectedFilters);
