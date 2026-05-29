@@ -615,8 +615,13 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
             }, 100);
           }
         }}
-        secondaryText={t('COMMON.CANCEL')}
-        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+        secondaryText={t('COMMON.CLOSE')}
+        secondaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          localStorage.setItem('registerationTestGiven', 'Yes');
+          const landingPage = localStorage.getItem('landingPage') || '/home';
+          globalThis.location.href = landingPage;
+        }}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
