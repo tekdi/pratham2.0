@@ -284,6 +284,9 @@ export default memo(function LearnerCourse({
                   overflowY: 'auto',
                 },
               },
+               _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
+              },
             }}
             onlyLanguage={typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
           />
