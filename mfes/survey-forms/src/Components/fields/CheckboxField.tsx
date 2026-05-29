@@ -85,11 +85,14 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({
       </FormGroup>
       {showOtherInput && (
         <TextField
-          size="small"
+          multiline
+          minRows={3}
           placeholder="Please specify"
           value={otherText}
           onChange={(e) => handleOtherText(e.target.value)}
           disabled={disabled}
+          error={!!error && !otherText.trim()}
+          helperText={!!error && !otherText.trim() ? 'Please specify the other option' : undefined}
           sx={{ mt: 1 }}
           fullWidth
         />
