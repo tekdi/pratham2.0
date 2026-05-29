@@ -58,7 +58,7 @@ export const MasterVillageSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     block: {
       type: 'array',
@@ -87,7 +87,7 @@ export const MasterVillageSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     fieldName: {
       type: 'string',
