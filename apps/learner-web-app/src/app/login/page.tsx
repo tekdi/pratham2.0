@@ -864,8 +864,13 @@ const LoginPageContent = () => {
             }, 100);
           }
         }}
-        secondaryText={t('COMMON.CANCEL')}
-        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+        secondaryText={t('COMMON.CLOSE')}
+        secondaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          localStorage.setItem('registerationTestGiven', 'Yes');
+          const landingPage = localStorage.getItem('landingPage') || '/home';
+          window.location.href = landingPage;
+        }}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
