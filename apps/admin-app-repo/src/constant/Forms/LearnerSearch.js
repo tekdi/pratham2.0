@@ -94,7 +94,7 @@ export const learnerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     // village: {
     //   type: 'array',
