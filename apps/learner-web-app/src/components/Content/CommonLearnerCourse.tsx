@@ -8,6 +8,7 @@ import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import FilterFrameworkWrapper from '../FilterFramework/FilterFrameworkWrapper';
+import { staticFilterContent } from '@shared-lib-v2/utils/AuthService';
 
 interface LearnerCourseProps {
   title?: string;
@@ -38,12 +39,57 @@ export default memo(function LearnerCourse({
   };
 
   useEffect(() => {
-    const savedFilters = localStorage.getItem('learnerCourseFilters');
-    if (savedFilters) {
-      setFilterState(JSON.parse(savedFilters));
-    } else {
-      setFilterState(_content?.filters ?? {});
-    }
+    const initFilters = async () => {
+      const savedFilters = localStorage.getItem('learnerCourseFilters');
+      if (savedFilters) {
+        setFilterState(JSON.parse(savedFilters));
+        return;
+      }
+
+      const baseFilters = _content?.filters ?? {};
+      const preferredLanguage = typeof window !== 'undefined'
+        ? localStorage.getItem('preferred_language')
+        : null;
+
+      if (!preferredLanguage) {
+        setFilterState(baseFilters);
+        return;
+      }
+
+      try {
+        const channelId = localStorage.getItem('channelId');
+        if (channelId) {
+          const result = await staticFilterContent({ instantFramework: channelId });
+          const searchProps = result?.objectCategoryDefinition?.forms?.search?.properties ?? [];
+          const contentLangField = searchProps.find((f: { code: string }) => f.code === 'contentLanguage');
+          const matchingOption = contentLangField?.range?.find((option: { identifier?: string; label?: string } | string) => {
+            const val = typeof option === 'string' ? option : (option.identifier || option.label || '');
+            const lbl = typeof option === 'string' ? option : (option.label || option.identifier || '');
+            return val.toLowerCase() === preferredLanguage.toLowerCase()
+              || lbl.toLowerCase() === preferredLanguage.toLowerCase();
+          });
+          if (matchingOption) {
+            const optionValue = typeof matchingOption === 'string'
+              ? matchingOption
+              : (matchingOption.identifier || matchingOption.label || '');
+            setFilterState({
+              ...baseFilters,
+              filters: { ...(baseFilters.filters ?? {}), contentLanguage: [optionValue] },
+            });
+            return;
+          }
+        }
+      } catch {
+        // fall through to raw value
+      }
+
+      setFilterState({
+        ...baseFilters,
+        filters: { ...(baseFilters.filters ?? {}), contentLanguage: [preferredLanguage] },
+      });
+    };
+
+    initFilters();
   }, [_content?.filters, _content?.searchParams]);
 
   // Add animation trigger when component mounts
