@@ -48,9 +48,11 @@ export function validateField(
     const otherOptionValue = options.find(
       (opt: any) => String(opt.label).toLowerCase() === 'other'
     )?.value;
-    const otherIsActuallyChosen = Array.isArray(selected)
-      ? selected.includes(otherOptionValue)
-      : selected === String(otherOptionValue);
+    const otherIsActuallyChosen = otherOptionValue !== undefined && (
+      Array.isArray(selected)
+        ? selected.some((val) => String(val) === String(otherOptionValue))
+        : String(selected) === String(otherOptionValue)
+    );
     if (otherIsActuallyChosen && !otherText.trim()) {
       return 'Please specify the other option';
     }
