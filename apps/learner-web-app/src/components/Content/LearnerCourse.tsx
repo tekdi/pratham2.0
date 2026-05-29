@@ -283,6 +283,9 @@ export default memo(function LearnerCourse({
                   overflowY: 'auto',
                 },
               },
+               _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
+              },
             }}
           />
         </Box>
