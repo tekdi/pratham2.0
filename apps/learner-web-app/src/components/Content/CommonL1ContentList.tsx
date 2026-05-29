@@ -26,6 +26,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
+import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
 
 interface CommonL1ContentListProps {
   notab?: boolean;
@@ -209,22 +210,24 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
           {!notab && (
             <Box
               sx={{
-                height: 24,
                 display: 'flex',
-                alignItems: 'center',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
                 py: '36px',
                 px: '34px',
                 bgcolor: '#fff',
+                gap: 2,
               }}
             >
               <Typography
                 variant="body1"
                 component="h2"
-                gutterBottom
                 sx={{
                   fontWeight: 500,
                   color: '#1F1B13',
                   textTransform: 'capitalize',
+                  mb: 0,
                 }}
               >
                 <span role="img" aria-label="wave">
@@ -232,6 +235,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 </span>
                 {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
               </Typography>
+              <AttemptAssessmentButton />
             </Box>
           )}
           {!notab && <InProgressContent />}
