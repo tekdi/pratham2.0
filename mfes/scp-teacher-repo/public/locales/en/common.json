@@ -1189,6 +1189,13 @@
     "DESELECT_ALL": "Deselect All",
     "ASSESSMENT_SCORES": "Assessment Scores",
     "READ_MORE": "Read more",
-    "READ_LESS": "Read less"
+    "READ_LESS": "Read less",
+    "MODE_OF_LEARNING": "Mode of Learning",
+    "ALL": "All",
+    "REMOTE_LEARNERS": "Remote Learners",
+    "REGULAR_LEARNERS": "Regular Learners",
+    "ASSESSMENT_ATTEMPTS_FILTER": "Number of Assessment Attempts Completed",
+    "ONE_ATTEMPT": "1 Attempt",
+    "TWO_ATTEMPTS": "2 Attempts"
   }
 }
