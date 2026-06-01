@@ -6,6 +6,7 @@ import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import OutlinedFlagOutlinedIcon from '@mui/icons-material/OutlinedFlagOutlined';
 import PreviewOutlinedIcon from '@mui/icons-material/PreviewOutlined';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import {
   Box,
   Drawer,
@@ -118,6 +119,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           },
         ]
       : []),
+    {
+      text: 'Bulk Import',
+      key: 'bulk-import',
+      icon: <UploadFileOutlinedIcon />,
+    },
   ];
 
   const handleNavigation = (key: string) => {
