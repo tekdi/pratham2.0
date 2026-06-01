@@ -81,12 +81,11 @@ const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
   const framework = useMemo(() => getCollectionFramework(), []);
   const meta = FRAMEWORK_META[framework] ?? FRAMEWORK_META['pos-framework'];
 
-  // Dynamically generated template from the API route — always up-to-date.
-  // router.basePath gives "/mfe_workspace" so the href resolves correctly.
+  // Template API lives in the host admin app (same domain, no basePath prefix).
   // The `t` timestamp param busts the browser's download cache on every visit.
   const fwLabel = framework === 'scp-framework' ? 'SCP' : 'POS';
   const templateFileName = `Bulk_Import_Template_${fwLabel}.xlsx`;
-  const templateUrl = `${router.basePath}/api/bulk-import/template?framework=${framework}&t=${Date.now()}`;
+  const templateUrl = `/api/bulk-import/template?framework=${framework}&t=${Date.now()}`;
 
   return (
     <Box>

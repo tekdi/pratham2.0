@@ -368,14 +368,9 @@ export const readQuestionSetFormDefinition = async (
 export const downloadGoogleDriveFile = async (
   driveUrl: string
 ): Promise<{ buffer: ArrayBuffer; fileName: string; mimeType: string }> => {
-  // Next.js basePath is /mfe_workspace — internal API calls must include it.
-  // __NEXT_DATA__.basePath is injected by Next.js at runtime.
-  const basePath =
-    (typeof window !== 'undefined' && (window as any).__NEXT_DATA__?.basePath) ||
-    '/mfe_workspace';
-
+  // API route lives in the host admin app (same domain, no basePath prefix needed)
   const response = await axios.post(
-    `${basePath}/api/bulk-import/download-drive-file`,
+    `/api/bulk-import/download-drive-file`,
     { driveUrl },
     { responseType: 'arraybuffer', timeout: 120_000 }
   );

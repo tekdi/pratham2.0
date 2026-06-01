@@ -36,7 +36,13 @@ const nextConfig = {
     esmExternals: false,
   },
   async rewrites() {
-    return [
+    // ── IMPORTANT: afterFiles ensures the admin app's own pages/api/** files
+    // (e.g. /api/bulk-import/template, /api/bulk-import/download-drive-file)
+    // are served from the local filesystem BEFORE the /api/:path* catch-all
+    // rewrite proxies them to the workspace MFE.
+    return {
+      beforeFiles: [],
+      afterFiles: [
       {
         source: '/action/asset/v1/upload/:identifier*',
         destination: '/api/fileUpload',
@@ -128,7 +134,9 @@ const nextConfig = {
         source: '/app/telemetry',
         destination: `${process.env.NEXT_PUBLIC_WORKSPACE_BASE_URL}/api/telemetry`,
       },
-    ];
+      ],
+      fallback: [],
+    };
   },
 };
 
