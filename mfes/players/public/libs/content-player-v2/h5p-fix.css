@@ -1,0 +1,169 @@
+/* ================================================================
+   h5p-fix.css — Injected into the H5P content iframe via
+   h5p-standalone's customCss option.
+
+   ROOT CAUSE SUMMARY
+   ──────────────────
+   1. CSS variables not in content iframe
+      h5p-standalone v3 injects h5p.css (which defines --h5p-theme-*)
+      into the outer document (h5p-iframe.html) but NOT into the nested
+      iframe created by frame.bundle.js for embedType:"iframe" content
+      like H5P.DragQuestion.  CSS custom properties do not cascade
+      across iframe boundaries.  We declare fallback values here.
+
+   2. Draggable elements have no background without .h5p-theme
+      H5P.Components.Draggable is styled by Components CSS rules that
+      all require a .h5p-theme ancestor:
+        .h5p-theme .h5p-draggable { background: hsl(from ...) }
+      H5P.DragQuestion never calls H5P.Components.applyTheme(), so
+      .h5p-theme is never added and the draggable is transparent.
+      Transparent draggables over a background image = text illegible.
+
+   3. Drop-zone labels are clipped
+      H5P.Components.Dropzone renders category labels absolutely at
+      bottom:100% (above the drop zone).  dragquestion.css sets
+      overflow:hidden on .h5p-inner, clipping those labels.
+
+   SPECIFICITY STRATEGY
+   ────────────────────
+   State-based rules in library CSS use specificity [0,3,0] or higher
+   (e.g. .h5p-dragquestion .h5p-dropped.h5p-correct).  We wrap our
+   structural container check in :where() (specificity 0) so our rules
+   are [0,1,0], safely below the correct/wrong state rules.  Library
+   CSS loads first; h5p-fix.css loads last (via customCss), so for the
+   equal-specificity background rule we rely on load order only where
+   the library does NOT set a value (background on draggables is not
+   set by dragquestion.css, only by the .h5p-theme conditional).
+================================================================ */
+
+/* ── 0. No-scroll inside content iframe ────────────────────────── */
+/* h5p-iframe.html applies CSS transform: scale() to the content
+   iframe so the H5P content fits the viewport without any scroll.
+   We also suppress scroll here as a secondary guard.               */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── 1. CSS variable fallbacks ──────────────────────────────────── */
+/* Applied to :root of the content iframe.  If h5p.css was already
+   injected these are simply equal-specificity declarations that don't
+   change anything.  If h5p.css was NOT injected they provide all the
+   values that library CSS depends on.                               */
+:root {
+  --h5p-theme-text-primary:   #101729;
+  --h5p-theme-text-secondary: #354054;
+  --h5p-theme-text-third:     #737373;
+  --h5p-theme-ui-base:        #ffffff;
+
+  --h5p-theme-alternative-base:    #f1f5fb;
+  --h5p-theme-alternative-light:   #f7f9fd;
+  --h5p-theme-alternative-dark:    #dbe5f5;
+  --h5p-theme-alternative-darker:  #c7d7ef;
+
+  --h5p-theme-main-cta-base:  #006fbf;
+  --h5p-theme-main-cta-light: #007cd6;
+  --h5p-theme-main-cta-dark:  #005fa3;
+
+  --h5p-theme-contrast-cta:         #ebf7ff;
+  --h5p-theme-contrast-cta-white:   #006fbf;
+  --h5p-theme-contrast-cta-light:   rgba(0, 111, 191, 0.10);
+
+  --h5p-theme-secondary-cta-base:   #e3e9f1;
+  --h5p-theme-secondary-cta-light:  #f5f7fa;
+  --h5p-theme-secondary-cta-dark:   #d3dce9;
+  --h5p-theme-secondary-contrast-cta:       #202122;
+  --h5p-theme-secondary-contrast-cta-hover: #ebf7ff;
+
+  --h5p-theme-stroke-1: #dcdffa;
+  --h5p-theme-stroke-2: #edeefb;
+  --h5p-theme-stroke-3: #e5e5e5;
+
+  --h5p-theme-border-radius-large:  0.5rem;
+  --h5p-theme-border-radius-medium: 0.375rem;
+  --h5p-theme-border-radius-small:  0.25rem;
+
+  --h5p-theme-font-size-xxl: 1.5em;
+  --h5p-theme-font-size-xl:  1.25em;
+  --h5p-theme-font-size-l:   1.125em;
+  --h5p-theme-font-size-m:   1em;
+  --h5p-theme-font-size-s:   0.85em;
+
+  --h5p-theme-spacing-xl:  2.4em;
+  --h5p-theme-spacing-l:   1.6em;
+  --h5p-theme-spacing-m:   1.2em;
+  --h5p-theme-spacing-s:   0.8em;
+  --h5p-theme-spacing-xs:  0.52em;
+  --h5p-theme-spacing-xxs: 0.4em;
+
+  --h5p-theme-feedback-correct-main:      #256d1d;
+  --h5p-theme-feedback-correct-secondary: #f3fcf0;
+  --h5p-theme-feedback-correct-third:     #cff1c2;
+
+  --h5p-theme-feedback-incorrect-main:      #a13236;
+  --h5p-theme-feedback-incorrect-secondary: #faf0f4;
+  --h5p-theme-feedback-incorrect-third:     #f6dce7;
+}
+
+/* ── 2. Draggable fallback background and text ──────────────────── */
+/* .h5p-theme .h5p-draggable sets background via hsl(from ...) in
+   Components CSS — but only when .h5p-theme is on an ancestor.
+   DragQuestion never calls applyTheme(), so the draggable is
+   transparent and text is illegible over the background image.
+
+   :where() gives the outer part zero specificity, so the whole rule
+   is [0,1,0].  Library correct/wrong-state rules are [0,3,0] and
+   will still override on answered draggables.                       */
+:where(.h5p-container:not(.h5p-theme)) .h5p-draggable {
+  background-color: #f1f5fb;
+  border: 2px solid #dbe5f5;
+  border-bottom-color: #c7d7ef;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 0 0 #c7d7ef;
+  color: #101729;
+}
+
+:where(.h5p-container:not(.h5p-theme)) .h5p-draggable:hover {
+  background-color: #dbe5f5;
+  border-color: #006fbf;
+}
+
+/* Ensure span/p text inside draggables always has legible colour.
+   Specificity [0,2,0] — below any state override at [0,3,0].      */
+:where(.h5p-container:not(.h5p-theme))
+  .h5p-draggable span:not(.h5p-hidden-read),
+:where(.h5p-container:not(.h5p-theme))
+  .h5p-draggable p:not(.h5p-hidden-read) {
+  color: #101729;
+  font-size: 1em;
+  line-height: 1.25;
+  display: inline-block;
+  padding: 0.3em 0.4em;
+}
+
+/* ── 3. Drop-zone label overflow fix ────────────────────────────── */
+/* .h5p-inner has overflow:hidden which clips the absolutely
+   positioned drop-zone labels (bottom:100%, above the zone).
+   overflow:visible lets them appear above the image area.
+   background-image is a CSS background so it does not overflow.   */
+.h5p-dragquestion .h5p-question-content > .h5p-inner {
+  overflow: visible !important;
+}
+
+/* ── 4. Drop-zone label explicit colours ────────────────────────── */
+/* Ensure legible text on drop-zone labels even if CSS variables
+   aren't defined in the content iframe context.                     */
+.h5p-dropzone.h5p-dropzone--area .h5p-dropzone_label {
+  color: #101729;
+  background-color: #dbe5f5;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+/* ── 5. Drop-zone area fallback background ──────────────────────── */
+:where(.h5p-container:not(.h5p-theme)) .h5p-dropzone.h5p-dropzone--area > .h5p-inner {
+  background-color: #dbe5f5;
+  border-radius: 0.375rem;
+}

@@ -33,12 +33,16 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
     { name: t('USER_REGISTRATION.MAY_JOIN_UPCOMING_YEAR'), value: counts.mayJoin, color: '#FFD700' },
   ];
 
-  // Only require states to be selected, other levels are optional
-  const hasLocationFilters = Boolean(locationFilters.states?.length);
+  const hasLocationFilters =
+    Boolean(locationFilters.states?.length) &&
+    Boolean(locationFilters.districts?.length) &&
+    Boolean(locationFilters.blocks?.length);
 
   const buildFilters = (overrides: Record<string, any> = {}) => {
+    const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
     const filters: Record<string, any> = {
       role: 'Learner',
+      ...(tenantId ? { tenantId } : {}),
       ...overrides,
     };
     if (locationFilters.states?.length) {
@@ -63,6 +67,7 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
 
   useEffect(() => {
     if (!hasLocationFilters) {
+      setCounts({ pending: 0, archived: 0, mayJoin: 0 });
       return;
     }
 

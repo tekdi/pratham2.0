@@ -31,6 +31,7 @@ export interface Survey {
   updatedAt: string;
   publishedAt: string | null;
   closedAt: string | null;
+  endDate: string | null;
   sections?: SurveySection[];
 }
 

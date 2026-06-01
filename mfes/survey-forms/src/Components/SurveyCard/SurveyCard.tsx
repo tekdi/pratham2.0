@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { Survey } from '../../types/survey';
-import { formatDate } from '../../utils/Helper/helper';
+import { formatDate, isExpired, formatDateTime } from '../../utils/Helper/helper';
 
 interface SurveyCardProps {
   survey: Survey;
@@ -20,6 +20,7 @@ interface SurveyCardProps {
 
 const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
   const isActionable = survey.status === 'published';
+  const expired = isExpired(survey.endDate);
 
   return (
     <Card
@@ -48,12 +49,19 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
             </Typography>
           </Box>
           <Chip
-            label={survey.status}
+            label={expired ? 'Expired' : survey.status}
             size="small"
             sx={{
-              backgroundColor:
-                survey.status === 'published' ? '#E8F5E9' : '#FFF3E0',
-              color: survey.status === 'published' ? '#2E7D32' : '#E65100',
+              backgroundColor: expired
+                ? '#FFEBEE'
+                : survey.status === 'published'
+                ? '#E8F5E9'
+                : '#FFF3E0',
+              color: expired
+                ? '#C62828'
+                : survey.status === 'published'
+                ? '#2E7D32'
+                : '#E65100',
               fontWeight: 500,
               fontSize: '11px',
               height: '24px',
@@ -81,27 +89,52 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
             mt: 'auto',
           }}
         >
-          {survey.publishedAt && (
-            <Typography variant="h6" sx={{ color: '#999' }}>
-              Published: {formatDate(survey.publishedAt)}
-            </Typography>
-          )}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
+            {survey.publishedAt && (
+              <Typography variant="h6" sx={{ color: '#999' }}>
+                Published: {formatDate(survey.publishedAt)}
+              </Typography>
+            )}
+            {expired && survey.endDate && (
+              <Typography variant="h6" sx={{ color: '#C62828', fontSize: '11px' }}>
+                Expired on: {formatDateTime(survey.endDate)}
+              </Typography>
+            )}
+          </Box>
           {isActionable && (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={() => onClick(survey)}
-              sx={{
-                backgroundColor: '#FDBE16',
-                color: '#1E1B16',
-                fontWeight: 600,
-                fontSize: '13px',
-                px: 2,
-                '&:hover': { backgroundColor: '#e6ab0e' },
-              }}
-            >
-              Fill Survey
-            </Button>
+            expired ? (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => onClick(survey)}
+                sx={{
+                  borderColor: '#BDBDBD',
+                  color: '#757575',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  px: 2,
+                  '&:hover': { borderColor: '#9E9E9E', backgroundColor: '#F5F5F5' },
+                }}
+              >
+                View Survey
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => onClick(survey)}
+                sx={{
+                  backgroundColor: '#FDBE16',
+                  color: '#1E1B16',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  px: 2,
+                  '&:hover': { backgroundColor: '#e6ab0e' },
+                }}
+              >
+                Fill Survey
+              </Button>
+            )
           )}
         </Box>
       </CardContent>

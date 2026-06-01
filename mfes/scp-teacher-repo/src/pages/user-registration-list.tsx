@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress, Checkbox, FormControlLabel } from '@mui/material';
+import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress, Checkbox, FormControlLabel, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'next-i18next';
 import Header from '../components/Header';
@@ -18,6 +18,11 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withRole from '../components/withRole';
 import { TENANT_DATA } from '../../app.config';
 import { LocationFilters } from '../components/UserRegistration/types';
+
+const ALL_FILTER_VALUE = 'all';
+
+const normalizeFilterValue = (value?: string) =>
+  !value || value === '' ? ALL_FILTER_VALUE : value;
 
 const UserRegistrationList = () => {
   const { t } = useTranslation();
@@ -72,16 +77,34 @@ const UserRegistrationList = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(storedFilters?.currentPage || 1);
   const [locationFilters, setLocationFilters] = useState<LocationFilters>(storedFilters?.locationFilters || {});
+  const [modeOfLearning, setModeOfLearning] = useState<string>(
+    normalizeFilterValue(storedFilters?.modeOfLearning)
+  );
+  const [assessmentAttemptsFilter, setAssessmentAttemptsFilter] = useState<string>(
+    normalizeFilterValue(storedFilters?.assessmentAttemptsFilter)
+  );
   const [chartTrigger, setChartTrigger] = useState(false);
   const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
   const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
+  const requestCounterRef = useRef(0);
+
   const hasLocationFilters =
     Boolean(locationFilters.states?.length) &&
     Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length) &&
-    Boolean(locationFilters.villages?.length);
+    Boolean(locationFilters.blocks?.length);
+
+  const getUserAssessmentAttemptCount = (user: any): number => {
+    if (!user.assessmentStats || Object.keys(user.assessmentStats).length === 0) {
+      return 0;
+    }
+    return Math.max(
+      ...Object.values(user.assessmentStats).map(
+        (stat: any) => stat.attempts?.length || 0
+      )
+    );
+  };
 
   // Transform API response to match UserCard format
   const parseCallLogEntry = (
@@ -320,7 +343,8 @@ const UserRegistrationList = () => {
   };
 
   const fetchUsers = useCallback(
-    async (page = 1, tab: string, location: LocationFilters, searchTerm = '') => {
+    async (page = 1, tab: string, location: LocationFilters, searchTerm = '', mode = '') => {
+    const requestId = ++requestCounterRef.current;
     setLoading(true);
     try {
       const tenantId = localStorage.getItem('tenantId');
@@ -365,6 +389,9 @@ const UserRegistrationList = () => {
       if (searchTerm) {
         filters.name = searchTerm;
       }
+      if (mode && mode !== ALL_FILTER_VALUE) {
+        filters.preferred_mode_of_learning = mode;
+      }
 
       const response = await fetchUserList({
         limit,
@@ -373,6 +400,7 @@ const UserRegistrationList = () => {
       });
 
       if (response && response.getUserDetails) {
+        if (requestId !== requestCounterRef.current) return;
         const transformedUsers = response.getUserDetails.map(transformUserData);
         setUsers(transformedUsers);
         setTotalCount(response.totalCount || 0);
@@ -410,15 +438,19 @@ const UserRegistrationList = () => {
           }
         }
       } else {
+        if (requestId !== requestCounterRef.current) return;
         setUsers([]);
         setTotalCount(0);
       }
     } catch (error) {
+      if (requestId !== requestCounterRef.current) return;
       console.error('Error fetching users:', error);
       setUsers([]);
       setTotalCount(0);
     } finally {
-      setLoading(false);
+      if (requestId === requestCounterRef.current) {
+        setLoading(false);
+      }
     }
   }, [limit]);
 
@@ -429,10 +461,12 @@ const UserRegistrationList = () => {
       searchQuery,
       currentPage,
       locationFilters,
+      modeOfLearning,
+      assessmentAttemptsFilter,
       timestamp: Date.now() // For potential expiration logic
     };
     saveFiltersToStorage(filtersToSave);
-  }, [tabValue, searchQuery, currentPage, locationFilters]);
+  }, [tabValue, searchQuery, currentPage, locationFilters, modeOfLearning, assessmentAttemptsFilter]);
 
   // Initialize zatpat test identifiers on component mount
   useEffect(() => {
@@ -445,12 +479,13 @@ const UserRegistrationList = () => {
     if (!hasLocationFilters || isMounted.current) {
       return;
     }
-    fetchUsers(1, tabValue, locationFilters, getSearchTerm());
+    fetchUsers(1, tabValue, locationFilters, getSearchTerm(), modeOfLearning);
     isMounted.current = true;
     prevTabRef.current = tabValue;
     prevLocationRef.current = JSON.stringify(locationFilters);
     prevPageRef.current = 1;
     prevSearchRef.current = searchQuery;
+    prevModeRef.current = modeOfLearning;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasLocationFilters, searchQuery]);
 
@@ -459,9 +494,10 @@ const UserRegistrationList = () => {
   const prevLocationRef = useRef<string>(JSON.stringify(locationFilters));
   const prevPageRef = useRef(currentPage);
   const prevSearchRef = useRef(searchQuery);
+  const prevModeRef = useRef(modeOfLearning);
   const isMounted = useRef(false);
 
-  // Fetch users when tab, location, or page changes (skip initial mount)
+  // Fetch users when tab, location, page, or mode changes (skip initial mount)
   useEffect(() => {
     const normalizedSearch = searchQuery.trim();
     const isSearchShort = normalizedSearch.length > 0 && normalizedSearch.length < 3;
@@ -476,6 +512,7 @@ const UserRegistrationList = () => {
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
       prevSearchRef.current = searchQuery;
+      prevModeRef.current = modeOfLearning;
       return;
     }
 
@@ -483,30 +520,32 @@ const UserRegistrationList = () => {
     const locationChanged = prevLocationRef.current !== JSON.stringify(locationFilters);
     const pageChanged = prevPageRef.current !== currentPage;
     const searchChanged = prevSearchRef.current !== searchQuery;
+    const modeChanged = prevModeRef.current !== modeOfLearning;
 
     // Skip fetch if only search changed and it is too short
-    if (searchChanged && isSearchShort && !tabChanged && !locationChanged && !pageChanged) {
+    if (searchChanged && isSearchShort && !tabChanged && !locationChanged && !pageChanged && !modeChanged) {
       prevSearchRef.current = searchQuery;
       return;
     }
 
-    const shouldFetch = tabChanged || locationChanged || searchChanged || pageChanged;
+    const shouldFetch = tabChanged || locationChanged || searchChanged || pageChanged || modeChanged;
     if (shouldFetch) {
-      if (tabChanged || locationChanged || searchChanged) {
+      if (tabChanged || locationChanged || searchChanged || modeChanged) {
         setCurrentPage(1);
         prevPageRef.current = 1;
-        fetchUsers(1, tabValue, locationFilters, getSearchTerm());
+        fetchUsers(1, tabValue, locationFilters, getSearchTerm(), modeOfLearning);
       } else if (pageChanged) {
-        fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm());
+        fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm(), modeOfLearning);
       }
 
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
       prevSearchRef.current = searchQuery;
+      prevModeRef.current = modeOfLearning;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, locationFilters, currentPage, hasLocationFilters, searchQuery]);
+  }, [tabValue, locationFilters, currentPage, hasLocationFilters, searchQuery, modeOfLearning]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     console.log('handleTabChange', newValue);
@@ -532,6 +571,8 @@ const UserRegistrationList = () => {
     setSearchQuery('');
     setCurrentPage(1);
     setLocationFilters({});
+    setModeOfLearning(ALL_FILTER_VALUE);
+    setAssessmentAttemptsFilter(ALL_FILTER_VALUE);
     setSelectedUsers(new Set());
     console.log('🔄 Reset all filters to defaults');
   };
@@ -554,6 +595,24 @@ const UserRegistrationList = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
   };
+
+  const handleModeOfLearningChange = (mode: string) => {
+    setModeOfLearning(mode);
+    setCurrentPage(1);
+    setSelectedUsers(new Set());
+  };
+
+  const handleAssessmentAttemptsFilterChange = (value: string) => {
+    setAssessmentAttemptsFilter(value);
+    setSelectedUsers(new Set());
+  };
+
+  const filteredUsers =
+    assessmentAttemptsFilter && assessmentAttemptsFilter !== ALL_FILTER_VALUE
+      ? users.filter(
+          (user) => getUserAssessmentAttemptCount(user) === Number(assessmentAttemptsFilter)
+        )
+      : users;
 
   const handleUserSelect = (userId: string, selected: boolean) => {
     setSelectedUsers((prev) => {
@@ -688,24 +747,13 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
-  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      // Select all users on current page
-      const allUserIds = users.map(user => user.userId);
-      setSelectedUsers(new Set(allUserIds));
-    } else {
-      // Deselect all
-      setSelectedUsers(new Set());
-    }
-  };
-
   const selectedLearnerNames = users
     .filter((user) => selectedUsers.has(user.userId))
     .map((user) => user.name);
 
   // Determine select all checkbox state
-  const allSelected = users.length > 0 && users.every(user => selectedUsers.has(user.userId));
-  const someSelected = users.some(user => selectedUsers.has(user.userId)) && !allSelected;
+  const allSelected = filteredUsers.length > 0 && filteredUsers.every(user => selectedUsers.has(user.userId));
+  const someSelected = filteredUsers.some(user => selectedUsers.has(user.userId)) && !allSelected;
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#FBF4E4', pb: selectedUsers.size > 0 ? '80px' : 0, overflowX: 'hidden' }}>
@@ -721,11 +769,8 @@ const UserRegistrationList = () => {
         <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
         {t('USER_REGISTRATION.LEARNER_REGISTRATIONS')}
       </Typography>
-        <Box sx={{   mb: 2, borderRadius: '8px', mt:"20px" }}>
-          <LocationDropdowns 
-            onLocationChange={handleLocationChange}
-            initialFilters={locationFilters}
-          />
+        <Box sx={{ mb: 2, borderRadius: '8px', mt: '20px' }}>
+          <LocationDropdowns onLocationChange={handleLocationChange} />
         </Box>
         
         <RegistrationPieChart locationFilters={locationFilters} triggerFetch={chartTrigger} />
@@ -736,7 +781,7 @@ const UserRegistrationList = () => {
         
         {/* Search and Filter Row */}
         <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
-            <Grid item xs={8} sm={9}>
+            <Grid item xs={12} md={6}>
                 <TextField
                     fullWidth
                     placeholder={t('USER_REGISTRATION.SEARCH_LEARNER')}
@@ -761,21 +806,54 @@ const UserRegistrationList = () => {
                     }}
                 />
             </Grid>
-            {/* <Grid item xs={4} sm={3}>
-                <Box sx={{ 
-                    bgcolor: '#fff', 
-                    borderRadius: '100px', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    px: 2,
-                    height: '40px',
-                    justifyContent: 'space-between',
-                    cursor: 'pointer'
-                }}>
-                     <Typography sx={{ fontSize: '14px', color: '#1E1B16', fontWeight: 500 }}>Filter by</Typography>
-                     <FilterListIcon sx={{ color: '#1E1B16', fontSize: 20 }} />
-                </Box>
-            </Grid> */}
+            <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                    <InputLabel
+                        id="mode-of-learning-label"
+                        sx={{ fontSize: '12px', color: '#7C766F' }}
+                    >
+                        {t('USER_REGISTRATION.MODE_OF_LEARNING')}
+                    </InputLabel>
+                    <Select
+                        labelId="mode-of-learning-label"
+                        label={t('USER_REGISTRATION.MODE_OF_LEARNING')}
+                        value={modeOfLearning}
+                        onChange={(e) => handleModeOfLearningChange(e.target.value as string)}
+                        sx={{
+                            borderRadius: '8px',
+                            '& .MuiSelect-select': { py: 1.5 },
+                        }}
+                    >
+                        <MenuItem value={ALL_FILTER_VALUE}>{t('USER_REGISTRATION.ALL')}</MenuItem>
+                        <MenuItem value="remote">{t('USER_REGISTRATION.REMOTE_LEARNERS')}</MenuItem>
+                        <MenuItem value="regular">{t('USER_REGISTRATION.REGULAR_LEARNERS')}</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth>
+                    <InputLabel
+                        id="assessment-attempts-filter-label"
+                        sx={{ fontSize: '12px', color: '#7C766F' }}
+                    >
+                        {t('USER_REGISTRATION.ASSESSMENT_ATTEMPTS_FILTER')}
+                    </InputLabel>
+                    <Select
+                        labelId="assessment-attempts-filter-label"
+                        label={t('USER_REGISTRATION.ASSESSMENT_ATTEMPTS_FILTER')}
+                        value={assessmentAttemptsFilter}
+                        onChange={(e) => handleAssessmentAttemptsFilterChange(e.target.value as string)}
+                        sx={{
+                            borderRadius: '8px',
+                            '& .MuiSelect-select': { py: 1.5 },
+                        }}
+                    >
+                        <MenuItem value={ALL_FILTER_VALUE}>{t('USER_REGISTRATION.ALL')}</MenuItem>
+                        <MenuItem value="1">{t('USER_REGISTRATION.ONE_ATTEMPT')}</MenuItem>
+                        <MenuItem value="2">{t('USER_REGISTRATION.TWO_ATTEMPTS')}</MenuItem>
+                    </Select>
+                </FormControl>
+            </Grid>
         </Grid>
         
         {/* Action Banner */}
@@ -788,14 +866,20 @@ const UserRegistrationList = () => {
         )}
 
         {/* Select All Checkbox */}
-        {users.length > 0 && (
+        {filteredUsers.length > 0 && (
             <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', bgcolor: '#fff', p: 1.5, borderRadius: '8px' }}>
                 <FormControlLabel
                     control={
                         <Checkbox
                             checked={allSelected}
                             indeterminate={someSelected}
-                            onChange={handleSelectAll}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedUsers(new Set(filteredUsers.map((user) => user.userId)));
+                              } else {
+                                setSelectedUsers(new Set());
+                              }
+                            }}
                             sx={{ 
                                 '&.Mui-checked': { color: '#1E1B16' },
                                 '&.MuiCheckbox-indeterminate': { color: '#1E1B16' }
@@ -819,7 +903,7 @@ const UserRegistrationList = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
                     <CircularProgress />
                 </Box>
-            ) : users.length === 0 ? (
+            ) : filteredUsers.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 4 }}>
                     <Typography sx={{ color: '#7C766F', fontSize: '16px' }}>
                         {t('USER_REGISTRATION.NO_LEARNERS_FOUND')}
@@ -827,7 +911,7 @@ const UserRegistrationList = () => {
                 </Box>
             ) : (
                 <>
-                    {users.map((user) => (
+                    {filteredUsers.map((user) => (
                         <UserCard 
                             key={user.userId} 
                             user={user}

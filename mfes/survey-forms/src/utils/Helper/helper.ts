@@ -46,3 +46,26 @@ export function parseSurveyCategoriesFromLocalStorage(): string[] {
   }
   return [trimmed];
 }
+
+/**
+ * Returns true if endDate is set and is in the past relative to now.
+ */
+export function isExpired(endDate: string | null | undefined): boolean {
+  if (!endDate) return false;
+  return new Date() > new Date(endDate);
+}
+
+/**
+ * Formats an ISO date string as "12 Jan 2026, 11:59 PM" (en-IN locale).
+ */
+export function formatDateTime(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+}

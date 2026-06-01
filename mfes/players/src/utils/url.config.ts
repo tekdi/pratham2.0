@@ -109,6 +109,7 @@ export const MIME_TYPE = {
     'application/vnd.ekstep.html-archive',
     'application/vnd.ekstep.ecml-archive',
   ],
+  H5P_CONTENT : 'application/vnd.ekstep.h5p-archive'
 };
 
 export const getTelemetryConfig = (): Context => {

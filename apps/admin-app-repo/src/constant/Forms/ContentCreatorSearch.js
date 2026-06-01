@@ -23,7 +23,7 @@ export const ContentCreatorSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     board: {
       "type": "array",

@@ -109,13 +109,18 @@ const SearchPage = () => {
         </Box>
       </Box>
       <Box sx={{ display: 'flex', gap: 3, p: 4, alignItems: 'flex-start' }}>
-        <Box sx={{ width: { xs: '100%', md: '260px' }, flexShrink: 0 }}>
+        <Box sx={{ width: { xs: '100%', md: '260px' }, flexShrink: 0, position: 'sticky', top: 0, alignSelf: 'flex-start' }}>
           <FilterComponent
             filterState={filterState}
             filterFramework={filterFramework}
             handleFilterChange={handleFilterChange}
             onlyLanguage={true}
             isOpenColapsed={['contentLanguage']}
+            _config={{
+              _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
+              },
+            }}
           />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>

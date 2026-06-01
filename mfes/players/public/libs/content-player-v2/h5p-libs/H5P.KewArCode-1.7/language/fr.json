@@ -1,0 +1,519 @@
+{
+  "semantics": [
+    {
+      "label": "Introductory text",
+      "description": "This text can optionally be presented along with your code."
+    },
+    {
+      "label": "Type de code",
+      "description": "Sélectionnez le type de code que vous souhaitez générer",
+      "options": [
+        {
+          "label": "Contact"
+        },
+        {
+          "label": "Événement"
+        },
+        {
+          "label": "Adresse e-mail"
+        },
+        {
+          "label": "H5P"
+        },
+        {
+          "label": "Emplacement"
+        },
+        {
+          "label": "Numéro de téléphone"
+        },
+        {
+          "label": "SMS"
+        },
+        {
+          "label": "Texte"
+        },
+        {
+          "label": "URL"
+        }
+      ]
+    },
+    {
+      "label": "Contact",
+      "fields": [
+        {
+          "label": "Name",
+          "placeholder": "John Smith"
+        },
+        {
+          "label": "Organization",
+          "placeholder": "H5P fan club"
+        },
+        {
+          "label": "Title",
+          "placeholder": "Master of None"
+        },
+        {
+          "label": "Phone number",
+          "description": "Phone number (please use the format +12 345 67890)",
+          "placeholder": "+12 345 67890"
+        },
+        {
+          "label": "Email address",
+          "description": "Email address to write message to",
+          "placeholder": "john@fictional-h5p-fan-club.org"
+        },
+        {
+          "label": "Address",
+          "fields": [
+            {
+              "label": "Adresse complète",
+              "description": "c/o information, etc.",
+              "placeholder": "c/o H5P Fan Club"
+            },
+            {
+              "label": "Street",
+              "description": "Street including number",
+              "placeholder": "1308 W. Dayton Street"
+            },
+            {
+              "label": "Locality",
+              "description": "City name, etc.",
+              "placeholder": "Madison"
+            },
+            {
+              "label": "Region",
+              "description": "Federal state, county, etc.",
+              "placeholder": "WI"
+            },
+            {
+              "label": "ZIP code",
+              "description": "ZIP code",
+              "placeholder": "53715"
+            },
+            {
+              "label": "Country",
+              "description": "Country",
+              "placeholder": "USA"
+            }
+          ]
+        },
+        {
+          "label": "Website",
+          "description": "Website to link to (must start with https:// or http://)",
+          "placeholder": "https://fictional-h5p-fan-club.org"
+        },
+        {
+          "label": "Note",
+          "description": "Note",
+          "placeholder": "John loves H5P."
+        }
+      ]
+    },
+    {
+      "label": "Événement",
+      "fields": [
+        {
+          "label": "Titre",
+          "description": "Title for the calendar event",
+          "placeholder": "Conférence H5P 2020"
+        },
+        {
+          "label": "Événement de toute une journée",
+          "description": "Check if event will be valid all day long"
+        },
+        {
+          "label": "Date de début",
+          "description": "Start date of the event (please use the format yyyy/mm/dd)",
+          "placeholder": "2020/05/18"
+        },
+        {
+          "label": "Heure de début",
+          "description": "Heure de début de l'événement (veuillez utiliser le format hh : mm)",
+          "placeholder": "09 : 00"
+        },
+        {
+          "label": "Date de fin",
+          "description": "Date de fin de l'événement (veuillez utiliser le format aaaa/mm/jj)",
+          "placeholder": "2020/05/20"
+        },
+        {
+          "label": "End time",
+          "description": "End time of the event (please use the format hh:mm)",
+          "placeholder": "16:00"
+        },
+        {
+          "label": "Fuseau horaire",
+          "description": "Sélectionner le fuseau horaire dans lequel l'événement doit avoir lieu",
+          "options": [
+            {
+              "label": "UTC-12:00"
+            },
+            {
+              "label": "UTC-11:00"
+            },
+            {
+              "label": "UTC-10:00"
+            },
+            {
+              "label": "UTC-9:30"
+            },
+            {
+              "label": "UTC-9:00"
+            },
+            {
+              "label": "UTC-8:00"
+            },
+            {
+              "label": "UTC-7:00"
+            },
+            {
+              "label": "UTC-6:00"
+            },
+            {
+              "label": "UTC-5:00"
+            },
+            {
+              "label": "UTC-4:00"
+            },
+            {
+              "label": "UTC-3:30"
+            },
+            {
+              "label": "UTC-3:00"
+            },
+            {
+              "label": "UTC-2:00"
+            },
+            {
+              "label": "UTC-1:00"
+            },
+            {
+              "label": "UTC"
+            },
+            {
+              "label": "UTC+1:00"
+            },
+            {
+              "label": "UTC+2:00"
+            },
+            {
+              "label": "UTC+3:00"
+            },
+            {
+              "label": "UTC+3:30"
+            },
+            {
+              "label": "UTC+4:00"
+            },
+            {
+              "label": "UTC+4:30"
+            },
+            {
+              "label": "UTC+5:00"
+            },
+            {
+              "label": "UTC+5:30"
+            },
+            {
+              "label": "UTC+5:45"
+            },
+            {
+              "label": "UTC+6:00"
+            },
+            {
+              "label": "UTC+6:30"
+            },
+            {
+              "label": "UTC+7:00"
+            },
+            {
+              "label": "UTC+8:00"
+            },
+            {
+              "label": "UTC+9:00"
+            },
+            {
+              "label": "UTC+9:30"
+            },
+            {
+              "label": "UTC+10:00"
+            },
+            {
+              "label": "UTC+10:30"
+            },
+            {
+              "label": "UTC+11:00"
+            },
+            {
+              "label": "UTC+12:00"
+            },
+            {
+              "label": "UTC+12:45"
+            },
+            {
+              "label": "UTC+13:00"
+            },
+            {
+              "label": "UTC+14:00"
+            }
+          ]
+        },
+        {
+          "label": "L'heure d'été",
+          "description": "Vérifier si l’emplacement où se déroule l'événement utilise l'heure d'été"
+        },
+        {
+          "label": "Location",
+          "description": "Name the location",
+          "placeholder": "Madison, USA"
+        },
+        {
+          "label": "Description",
+          "description": "Add a description for the event",
+          "placeholder": "3rd H5P conference"
+        }
+      ]
+    },
+    {
+      "label": "Email address",
+      "fields": [
+        {
+          "label": "Email address",
+          "description": "Email address to write message to",
+          "placeholder": "john@fictional-h5p-fan-club.org"
+        }
+      ]
+    },
+    {
+      "label": "Contenu H5P",
+      "fields": [
+        {
+          "label": "Content types",
+          "description": "Select the H5P content type that you want to display. If you select more than one, one will be picked randomly when scanning the code.",
+          "entity": "contenu H5P",
+          "field": {
+            "label": "Contenu H5P",
+            "description": "Contenu H5P à afficher"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Emplacement",
+      "fields": [
+        {
+          "label": "Latitude",
+          "description": "Latitude (veuillez utiliser le format 53.864462)",
+          "placeholder": "69.646007"
+        },
+        {
+          "label": "Longitude",
+          "description": "Longitude (please use the format 10.663792)",
+          "placeholder": "18.954036"
+        }
+      ]
+    },
+    {
+      "label": "Numéro de téléphone",
+      "fields": [
+        {
+          "label": "Numéro de téléphone",
+          "description": "Numéro de téléphone à appeler (veuillez utiliser le format +12 345 67890)",
+          "placeholder": "+12 345 67890"
+        }
+      ]
+    },
+    {
+      "label": "SMS",
+      "fields": [
+        {
+          "label": "Numéro de téléphone",
+          "description": "Numéro de téléphone à envoyer (veuillez utiliser le format +12 345 67890)",
+          "placeholder": "+12 345 67890"
+        },
+        {
+          "label": "Message",
+          "description": "Message to send",
+          "placeholder": "Please fetch milk and bread!"
+        }
+      ]
+    },
+    {
+      "label": "Text",
+      "fields": [
+        {
+          "label": "Text",
+          "description": "Text to encode",
+          "placeholder": "Please fetch\n* milk\n* bread"
+       }
+      ]
+    },
+    {
+      "label": "URL",
+      "fields": [
+        {
+          "label": "URL",
+          "description": "URL vers lequel établir un lien (doit commencer par https:// ou http://)",
+          "placeholder": "https://fictional-h5p-fan-club.org"
+        }
+      ]
+    },
+    {
+      "label": "Paramètres comportementaux",
+      "description": "These options will let you control how the task behaves.",
+      "fields": [
+        {
+          "label": "Couleur de code"
+        },
+        {
+          "label": "Background color"
+        },
+        {
+          "label": "Maximum size",
+          "description": "Maximum size for the code given in CSS notation (pixels by default if only a number is given)"
+        },
+        {
+          "label": "Horizontal alignment",
+          "description": "Set horizontal alignment if you set a maximum size",
+          "options": [
+            {
+              "label": "left"
+            },
+            {
+              "label": "center"
+            },
+            {
+              "label": "right"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "Interface utilisateur",
+      "fields": [
+        {
+          "label": "Adresse",
+          "default": "Adresse"
+        },
+        {
+          "label": "Contact",
+          "default": "Contact"
+        },
+        {
+          "label": "Country",
+          "default": "Country"
+        },
+        {
+          "label": "End date",
+          "default": "End date"
+        },
+        {
+          "label": "Start date",
+          "default": "Start date"
+        },
+        {
+          "label": "Description",
+          "default": "Description"
+        },
+        {
+          "label": "Email",
+          "default": "Email"
+        },
+        {
+          "label": "Event",
+          "default": "Event"
+        },
+        {
+          "label": "Extended address",
+          "default": "Extended address"
+        },
+        {
+          "label": "Latitude",
+          "default": "Latitude"
+        },
+        {
+          "label": "Locality",
+          "default": "Locality"
+        },
+        {
+          "label": "Location",
+          "default": "Location"
+        },
+        {
+          "label": "Longitude",
+          "default": "Longitude"
+        },
+        {
+          "label": "Message",
+          "default": "Message"
+        },
+        {
+          "label": "Name",
+          "default": "Name"
+        },
+        {
+          "label": "Note",
+          "default": "Note"
+        },
+        {
+          "label": "Organization",
+          "default": "Organization"
+        },
+        {
+          "label": "Phone",
+          "default": "Phone"
+        },
+        {
+          "label": "Region",
+          "default": "Region"
+        },
+        {
+          "label": "SMS",
+          "default": "SMS"
+        },
+        {
+          "label": "Street",
+          "default": "Street"
+        },
+        {
+          "label": "Text",
+          "default": "Text"
+        },
+        {
+          "label": "Title",
+          "default": "Title"
+        },
+        {
+          "label": "URL",
+          "default": "URL"
+        },
+        {
+          "label": "ZIP code",
+          "default": "ZIP code"
+        },
+        {
+          "label": "No content to display",
+          "default": "No content to display"
+        }
+      ]
+    },
+    {
+      "label": "Readspeaker",
+      "fields": [
+        {
+          "label": "QRCode. Afficher les informations (texte pour les synthèses vocales)",
+          "default": "QRCode. Afficher les informations."
+        },
+        {
+          "label": "Masquer les informations (texte pour les synthèses vocales)",
+          "default": "Cacher les informations."
+        },
+        {
+          "label": "Code contents (Text for Readspeakers)",
+          "default": ". Code contents"
+        }
+      ]
+    }
+  ]
+}

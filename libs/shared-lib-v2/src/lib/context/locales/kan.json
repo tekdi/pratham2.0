@@ -107,7 +107,8 @@
       "completed": "ಮುಗಿಯಿತು",
       "in_progress": "ಪ್ರಗತಿಯಲ್ಲಿ",
       "enrolled_not_started": "ਦਾਖಲ, ಶುರು ಆಗಿಲ್ಲ",
-      "not_started": "ಶುರು ಆಗಿಲ್ಲ"
+      "not_started": "ಶುರು ಆಗಿಲ್ಲ",
+      "tracking_sync_pending": "ಟ್ರೇಕಿಂಗ ಸಿನ್ಕ ಪೇನ್ಡಿಂಗ"
     },
     "BACK": "ಹಿಂದೆ",
     "RETURN_TO_LOGIN": "ಲಾಗಿನ್‌ಗೆ ಹಿಂತಿರುಗಿ",

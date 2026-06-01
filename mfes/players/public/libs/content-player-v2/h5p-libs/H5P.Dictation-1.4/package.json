@@ -1,0 +1,56 @@
+{
+  "name": "h5p-dictation",
+  "version": "1.4.0",
+  "description": "Let your students train their listening comprehension and spelling skills.",
+  "scripts": {
+    "test": "jest",
+    "lint": "stylelint './src/**/*.scss' && eslint './src/**/*.js' && eslint './test/**/*.js'",
+    "build": "webpack --mode=production",
+    "watch": "webpack --mode=development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/otacke/h5p-dictation.git"
+  },
+  "keywords": [],
+  "author": "Oliver Tacke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/otacke/h5p-dictation/issues"
+  },
+  "homepage": "https://github.com/otacke/h5p-dictation#readme",
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/__mocks__/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/src/stylesheets/",
+      "^@services(.*)$": "<rootDir>/src/scripts/services$1",
+      "^@scripts(.*)$": "<rootDir>/src/scripts$1"
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/src/stylesheets/"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.5",
+    "@jest/globals": "^30.4.1",
+    "babel-jest": "^30.4.1",
+    "babel-loader": "^10.1.1",
+    "css-loader": "^7.1.4",
+    "eslint-config-snordian-h5p": "github:otacke/eslint-config-snordian-h5p",
+    "eslint-plugin-jest": "^29.15.2",
+    "jest": "^30.4.2",
+    "mini-css-extract-plugin": "^2.10.2",
+    "regenerator-runtime": "^0.14.1",
+    "sass": "^1.99.0",
+    "sass-loader": "^16.0.8",
+    "stylelint": "^17.11.0",
+    "stylelint-config-recommended": "^18.0.0",
+    "stylelint-config-recommended-scss": "^17.0.1",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2"
+  },
+  "browserslist": "> 0.5%, last 2 versions, Firefox ESR, not dead",
+  "type": "module"
+}

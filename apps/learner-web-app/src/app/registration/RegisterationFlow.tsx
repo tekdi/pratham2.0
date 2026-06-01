@@ -11,14 +11,14 @@ import {
 } from '@mui/material';
 import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
-import { userCheck } from '@learner/utils/API/userService';
-import AccountExistsCard from '@learner/components/AccountExistsCard/AccountExistsCard';
+// import { userCheck } from '@learner/utils/API/userService';
+// import AccountExistsCard from '@learner/components/AccountExistsCard/AccountExistsCard';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
-import OtpVerificationComponent from '@learner/components/OtpVerificationComponent/OtpVerificationComponent';
-import { sendOTP, verifyOTP } from '@learner/utils/API/OtPService';
+// import OtpVerificationComponent from '@learner/components/OtpVerificationComponent/OtpVerificationComponent';
+// import { sendOTP, verifyOTP } from '@learner/utils/API/OtPService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
-import axios from 'axios';
-import MobileVerificationSuccess from '@learner/components/MobileVerificationSuccess/MobileVerificationSuccess';
+// import axios from 'axios';
+// import MobileVerificationSuccess from '@learner/components/MobileVerificationSuccess/MobileVerificationSuccess';
 import CreateAccountForm from '@learner/components/CreateAccountForm/CreateAccountForm';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
@@ -36,9 +36,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import { useTranslation } from '@shared-lib';
 import {
-  firstLetterInUpperCase,
+  // firstLetterInUpperCase,
   isUnderEighteen,
-  maskMobileNumber,
+  // maskMobileNumber,
 } from '@learner/utils/helper';
 import face from '../../../public/images/Group 3.png';
 
@@ -63,22 +63,23 @@ const RegisterationFlow = () => {
   console.log('language', language);
 
   // let formData: any = {};
-  const [usernames, setUsernames] = useState<any[]>([]);
+  // const [usernames, setUsernames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
   const enroll = searchParams.get('enroll');
+  const mobileFromQuery = searchParams.get('mobile') || '';
   const [fetchedTenantId, setFetchedTenantId] = useState<string | null>(null);
   const [fetchedEnroll, setFetchedEnroll] = useState<string | null>(null);
 
-  const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
+  // const [accountExistModal, setAccountExistModal] = useState<boolean>(false);
   const [usernamePasswordForm, setUsernamePasswordForm] =
     useState<boolean>(false);
 
-  const [otpmodal, setOtpModal] = useState(false);
-  const [otp, setOtp] = useState<string[]>(['', '', '', '']);
-  const [hash, setHash] = useState<string>('');
+  // const [otpmodal, setOtpModal] = useState(false);
+  // const [otp, setOtp] = useState<string[]>(['', '', '', '']);
+  // const [hash, setHash] = useState<string>('');
   const [below18PrivacyConsent, setBelow18PrivacyConsent] = useState<string>("");
    const [above18ParentGuardianConsent, setAbove18ParentGuardianConsent] = useState<string>("");
 
@@ -96,8 +97,8 @@ const RegisterationFlow = () => {
 
   const [payload, setPayload] = useState<any>(localPayload);
 
-  const [verificationSuccessModal, setVerificationSuccessModal] =
-    useState(false);
+  // const [verificationSuccessModal, setVerificationSuccessModal] =
+  //   useState(false);
   const [signupSuccessModal, setSignupSuccessModal] = useState(false);
 
   //formData.email = 'a@tekditechnologies.com';
@@ -152,6 +153,15 @@ const RegisterationFlow = () => {
       localStorage.setItem('enrollTenantId', fetchedEnroll as string);
     }
   }, [fetchedEnroll]);
+
+  useEffect(() => {
+    if (mobileFromQuery && typeof window !== 'undefined') {
+      const stored = JSON.parse(localStorage.getItem('formData') || '{}');
+      const updated = { ...stored, mobile: mobileFromQuery, parent_phone: mobileFromQuery };
+      localStorage.setItem('formData', JSON.stringify(updated));
+      setFormData((prev: any) => ({ ...prev, mobile: mobileFromQuery, parent_phone: mobileFromQuery }));
+    }
+  }, [mobileFromQuery]);
 
   // Fetch tenant ID by name when enroll parameter is present
   useEffect(() => {
@@ -411,19 +421,19 @@ const RegisterationFlow = () => {
     };
   }
 
-  useEffect(() => {
-    let timer: any;
-    if (verificationSuccessModal) {
-      timer = setTimeout(() => {
-        //   router.push(`/account-selection?newAccount=${'true'}`);
-        // params.set('newAccount', 'true');
+  // useEffect(() => {
+  //   let timer: any;
+  //   if (verificationSuccessModal) {
+  //     timer = setTimeout(() => {
+  //       //   router.push(`/account-selection?newAccount=${'true'}`);
+  //       // params.set('newAccount', 'true');
 
-        onCloseSuccessModal();
-      }, 3000);
-    }
+  //       onCloseSuccessModal();
+  //     }, 3000);
+  //   }
 
-    return () => clearTimeout(timer);
-  }, [verificationSuccessModal]);
+  //   return () => clearTimeout(timer);
+  // }, [verificationSuccessModal]);
   const handleCreateAccount = async () => {
     if (creatingAccount) return; // Prevent multiple clicks
 
@@ -576,140 +586,64 @@ const RegisterationFlow = () => {
   // formData.lastName = 'patil';
   console.log(payload);
 
-  const handleSendOtp = async (mob: string) => {
-    try {
-      const reason = 'signup';
-      const response = await sendOTP({ mobile: mob, reason });
+  // const handleSendOtp = async (mob: string) => {
+  //   try {
+  //     const reason = 'signup';
+  //     const response = await sendOTP({ mobile: mob, reason });
+  //     setHash(response?.result?.data?.hash);
+  //     setOtpModal(true);
+  //   } catch (error: any) {
+  //     console.error('Error sending OTP:', error);
+  //   }
+  // };
 
-      console.log('sendOTP', response);
-      setHash(response?.result?.data?.hash);
-      setOtpModal(true);
-    } catch (error: any) {
-      console.error('Error sending OTP:', error);
-    }
-  };
+  // const handleAccountValidation = async (formData: any) => {
+  //   try {
+  //     const isEmailCheck = Boolean(formData.email);
+  //     const payload = isEmailCheck
+  //       ? { email: formData.email }
+  //       : { mobile: isUnderEighteen(formData.dob) ? formData.parent_phone : formData.mobile };
+  //     const response = await userCheck(payload);
+  //     const users = response?.result || [];
+  //     if (users.length > 0 && isEmailCheck) {
+  //       showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.EMAIL_ALREADY_EXISTS'), 'error');
+  //     } else if (users.length > 0) {
+  //       setUsernames(users.map((user: any) => user.username));
+  //       setAccountExistModal(true);
+  //     } else {
+  //       setOtpModal(true);
+  //     }
+  //   } catch (error: any) {
+  //     if (error.response?.data?.params?.errmsg === 'User does not exist') {
+  //       handleSendOtp(isUnderEighteen(formData.dob) ? formData.parent_phone : formData.mobile);
+  //     }
+  //   }
+  // };
 
-  const handleAccountValidation = async (formData: any) => {
-    try {
-      const isEmailCheck = Boolean(formData.email);
-      const payload = isEmailCheck
-        ? { email: formData.email }
-        : {
-            //  firstName: formData.firstName,
-            mobile: isUnderEighteen(formData.dob)
-              ? formData.parent_phone
-              : formData.mobile,
-          };
+  // const handleLoginClick = () => { setAccountExistModal(false); window.location.href = '/login'; };
+  // const handleCloseModal = () => { setAccountExistModal(false); };
+  // const handleOTPModal = () => { setOtpModal(false); setOtp(['', '', '', '']); };
+  // const onCreateAnotherAccount = async () => { setAccountExistModal(false); await handleSendOtp(mobile); };
+  // const onVerify = async () => {
+  //   try {
+  //     const response = await verifyOTP({ mobile: mobile.toString(), reason: 'signup', otp: otp.join(''), hash });
+  //     if (response.result.success) { setVerificationSuccessModal(true); setOtpModal(false); }
+  //     else { showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error'); }
+  //   } catch { showToastMessage(t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'), 'error'); }
+  //   finally { setOtp(['', '', '', '']); }
+  // };
+  // const onResend = async () => {
+  //   try { const response = await sendOTP({ mobile, reason: 'signup' }); setHash(response?.result?.data?.hash); } catch {}
+  // };
 
-      const response = await userCheck(payload);
-      const users = response?.result || [];
-      if (users.length > 0 && isEmailCheck) {
-        showToastMessage(
-          t('LEARNER_APP.REGISTRATION_FLOW.EMAIL_ALREADY_EXISTS'),
-          'error'
-        );
-      } else if (users.length > 0) {
-        const usernameList = users.map((user: any) => user.username);
-
-        setUsernames(usernameList);
-        setAccountExistModal(true);
-      } else {
-        setOtpModal(true);
-      }
-    } catch (error: any) {
-      if (axios.isAxiosError(error) && error.response) {
-        console.log(error.response?.data?.params?.errmsg);
-      }
-      const errorMessage = error.response?.data?.params?.errmsg;
-      if (errorMessage == 'User does not exist') {
-        let reason = 'signup';
-        handleSendOtp(
-          isUnderEighteen(formData.dob)
-            ? formData.parent_phone
-            : formData.mobile
-        );
-      }
-      // errmsg: 'User does not exist'
-
-      console.error('Error in account validation:', error);
-      // Optionally handle fallback here
-    }
-  };
-
-  const handleLoginClick = (username?: string) => {
-    // Close the modal first
-    setAccountExistModal(false);
-
-    // Use hard navigation to ensure it works
-
-    window.location.href = `/login`;
-  };
-  const handleCloseModal = () => {
-    setAccountExistModal(false);
-  };
-  const handleOTPModal = () => {
-    setOtpModal(false);
-    setOtp(['', '', '', '']);
-  };
-  const onCreateAnotherAccount = async () => {
-    setAccountExistModal(false);
-    await handleSendOtp(mobile);
-  };
-  const onVerify = async () => {
-    try {
-      //let mobile = mobile.toString();
-      let reason = 'signup';
-      // let username = enterdUserName;
-      const response = await verifyOTP({
-        mobile: mobile.toString(),
-        reason,
-        otp: otp.join(''),
-        hash,
-        //  username,
-      });
-      console.log('verifyOtp', response);
-      const isValid = response.result.success;
-      localStorage.setItem('tokenForResetPassword', response.result.token); // temporary assume true
-
-      if (isValid) {
-        setVerificationSuccessModal(true);
-        setOtpModal(false);
-
-        // router.push('/reset-Password');
-      } else {
-        showToastMessage(
-          t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'),
-          'error'
-        );
-      }
-    } catch (error) {
-      showToastMessage(
-        t('LEARNER_APP.REGISTRATION_FLOW.PLEASE_ENTER_VALID_OTP'),
-        'error'
-      );
-    } finally {
-      setOtp(['', '', '', '']);
-    }
-  };
-  const onResend = async () => {
-    try {
-      let reason = 'signup';
-      const response = await sendOTP({ mobile: mobile, reason });
-      console.log('sendOTP', response);
-      setHash(response?.result?.data?.hash);
-    } catch (error) {}
-  };
-
-  const onCloseSuccessModal = () => {
-    //  const route = localStorage.getItem('redirectionRoute');
-    //   if (route) router.push(route);
-    console.log('onCloseSuccessModal', formData);
+  const onCloseSuccessModal = (currentFormData?: any) => {
+    const data = currentFormData || formData;
     setUsername(
-      (formData?.firstName || '') +
-        (formData?.lastName || '') +
-        Math.floor(10 + Math.random() * 90) // random 2-digit number
+      (data?.firstName || '') +
+        (data?.lastName || '') +
+        Math.floor(10 + Math.random() * 90)
     );
-    setVerificationSuccessModal(false);
+    // setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
   };
   const onCloseSignupSuccessModal = () => {
@@ -869,7 +803,7 @@ const RegisterationFlow = () => {
     localStorage.setItem('loginLocalPayload', JSON.stringify(payload));
 
     setFormData(formData);
-    handleAccountValidation(formData);
+    onCloseSuccessModal(formData);
     console.log(formData.parent_phone);
     console.log(payload);
     console.log(formData.dob);
@@ -1055,11 +989,20 @@ const RegisterationFlow = () => {
             {addSchema && addUiSchema && (
               <DynamicForm
                 schema={addSchema}
-                uiSchema={addUiSchema}
+                uiSchema={
+                  mobileFromQuery
+                    ? {
+                        ...(addUiSchema as any),
+                        mobile: { ...(addUiSchema as any)?.mobile, 'ui:disabled': true },
+                        parent_phone: { ...(addUiSchema as any)?.parent_phone, 'ui:disabled': true },
+                      }
+                    : addUiSchema
+                }
                 FormSubmitFunction={FormSubmitFunction}
-                prefilledFormData={formData}
+                prefilledFormData={{ ...formData, ...(mobileFromQuery ? { mobile: mobileFromQuery, parent_phone: mobileFromQuery } : {}) }}
                 hideSubmit={true}
                 type={'learner'}
+                mobileNumber={mobileFromQuery}
               />
             )}
             <Button
@@ -1088,55 +1031,8 @@ const RegisterationFlow = () => {
         </>
       )}
 
-      <SimpleModal
-        open={accountExistModal}
-        onClose={handleCloseModal}
-        showFooter
-        primaryText={t(
-          'LEARNER_APP.REGISTRATION_FLOW.YES_CREATE_ANOTHER_ACCOUNT'
-        )}
-        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.ACCOUNT_ALREADY_EXISTS')}
-        primaryActionHandler={onCreateAnotherAccount}
-        footerText={t(
-          'LEARNER_APP.REGISTRATION_FLOW.ARE_YOU_SURE_CREATE_ANOTHER_ACCOUNT'
-        )}
-      >
-        <AccountExistsCard
-          fullName={firstLetterInUpperCase(
-            formData.firstName + ' ' + formData?.lastName
-          )}
-          usernames={usernames}
-          onLoginClick={handleLoginClick}
-        />
-      </SimpleModal>
-
-      <SimpleModal
-        open={otpmodal && mobile ? true : false}
-        onClose={handleOTPModal}
-        showFooter
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.VERIFY_OTP')}
-        modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.VERIFY_YOUR_PHONE_NUMBER')}
-        primaryActionHandler={onVerify}
-      >
-        <OtpVerificationComponent
-          onResend={onResend}
-          otp={otp}
-          setOtp={setOtp}
-          maskedNumber={maskMobileNumber(mobile || '')}
-        />
-      </SimpleModal>
-
-      <SimpleModal
-        open={verificationSuccessModal}
-        onClose={onCloseSuccessModal}
-        showFooter={false}
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.OKAY')}
-        primaryActionHandler={onCloseSuccessModal}
-      >
-        <Box p="10px">
-          <MobileVerificationSuccess />
-        </Box>
-      </SimpleModal>
+      {/* Account Exists, OTP verification and Verification Success modals removed —
+          these checks now happen in EnrolModal before reaching registration */}
 
       <SimpleModal
         open={signupSuccessModal}

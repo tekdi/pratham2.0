@@ -60,7 +60,8 @@ const DynamicForm = forwardRef(({
   mobileSchema = {},
   parentDataAddUiSchema = {},
   parentDataSchema = {},
-  id
+  id,
+  mobileNumber=""
 }: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -409,6 +410,10 @@ const DynamicForm = forwardRef(({
             reorderedUiSchema = reorderUiSchemaFields(reorderedUiSchema, 'parent_phone', 'guardian_relation');
 
             oldFormUiSchema = reorderedUiSchema;
+
+            if (mobileNumber && formData?.parent_phone !== mobileNumber) {
+              setFormData((prev: any) => ({ ...prev, parent_phone: mobileNumber }));
+            }
           } else {
             delete formData?.parent_phone;
             delete formData?.guardian_relation;
@@ -1808,6 +1813,11 @@ const DynamicForm = forwardRef(({
       if (isUsernameDisabled && prevFormData.current?.username) {
         // Keep the existing username value when username field is disabled
         formData.username = prevFormData.current.username;
+      }
+
+      // Protect parent_phone when mobileNumber prop is provided and learner is under 18
+      if (mobileNumber && formData?.dob && calculateAgeFromDate(formData?.dob) < 18) {
+        formData.parent_phone = mobileNumber;
       }
 
       prevFormData.current = formData;

@@ -23,17 +23,19 @@ interface LoginComponentProps {
   }) => void;
   handleAddAccount?: () => void;
   handleForgotPassword?: () => void;
+  defaultUsername?: string;
 }
 
 const LoginComponent: React.FC<LoginComponentProps> = ({
   onLogin,
   handleAddAccount,
   handleForgotPassword,
+  defaultUsername = '',
 }) => {
   const { t } = useTranslation(); // Initialize translation function
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
+    username: defaultUsername,
     password: '',
     remember: false,
   });

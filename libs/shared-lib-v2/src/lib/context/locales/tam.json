@@ -107,7 +107,8 @@
       "completed": "முடிந்தது",
       "in_progress": "நடந்து கொண்டிருக்கிறது",
       "enrolled_not_started": "சேர்ந்தவர், தொடங்கவில்லை",
-      "not_started": "தொடங்கவில்லை"
+      "not_started": "தொடங்கவில்லை",
+      "tracking_sync_pending": "டிரேக்கிங் சிங்க பென்டிங்"
     },
     "BACK": "மீண்டும்",
     "RETURN_TO_LOGIN": "உள்நுழைவுக்குத் திரும்பு",

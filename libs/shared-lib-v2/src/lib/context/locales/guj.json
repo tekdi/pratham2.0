@@ -106,7 +106,8 @@
       "completed": "પૂર્ણ થયું",
       "in_progress": "પ્રગતિ પર",
       "enrolled_not_started": "નોંધણી, શરૂ થયું નથી",
-      "not_started": "શરૂ થયું નથી"
+      "not_started": "શરૂ થયું નથી",
+      "tracking_sync_pending": "ટ્રેકિંગ સિન્ક પેન્ડિંગ"
     },
     "BACK": "પાછળ",
     "RETURN_TO_LOGIN": "લોગિન પર પાછા ફરો",

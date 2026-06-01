@@ -29,6 +29,7 @@ import {
 } from '../../../../utils/API/surveyService';
 import type { ContextResponseInfo } from '../../../../utils/API/surveyService';
 import type { Survey } from '../../../../types/survey';
+import { isExpired } from '../../../../utils/Helper/helper';
 import type { TeacherContextRow } from '../../../../types/teacherSurvey';
 
 function PageSkeleton() {
@@ -323,6 +324,7 @@ const TeacherContextHubPage: React.FC = () => {
               <TeacherContextTable
                 rows={learners}
                 responseInfoById={responseInfoById}
+                expired={isExpired(survey?.endDate)}
                 onRowAction={(row) =>
                   responseInfoById[row.id]?.status === 'submitted'
                     ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)

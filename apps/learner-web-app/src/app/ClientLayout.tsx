@@ -5,6 +5,7 @@ import { FontSizeProvider } from '../context/FontSizeContext';
 import { UnderlineLinksProvider } from '../context/UnderlineLinksContext';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import { usePathname, useRouter } from 'next/navigation';
+import ServiceWorkerRegister from '@learner/components/ServiceWorkerRegister/ServiceWorkerRegister';
 
 export default function ClientLayout({
   children,
@@ -40,6 +41,7 @@ export default function ClientLayout({
         pathname?.startsWith('/player/') ||
         pathname === '/enroll-profile-completion' ||
         pathname === '/programs' ||
+        pathname === '/scp-dashboard' ||
         pathname === '/logout' ||
         pathname === '/login' ||
         pathname === '/sso' ||
@@ -68,6 +70,7 @@ export default function ClientLayout({
 
   return (
     <FontSizeProvider>
+      <ServiceWorkerRegister />
       <UnderlineLinksProvider>{children}</UnderlineLinksProvider>
     </FontSizeProvider>
   );
