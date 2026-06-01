@@ -62,6 +62,7 @@ mfes/workspace/public/generic-editor/
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 apps/learner-web-app/src/utils/helper.ts
+apps/learner-web-app/src/utils/Helper.ts
 
 # but allow H5P dist
 !mfes/players/public/libs/content-player-v2/h5p-libs/**/dist/
