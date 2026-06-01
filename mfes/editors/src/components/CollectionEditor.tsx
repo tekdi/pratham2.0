@@ -50,7 +50,27 @@ const CollectionEditor: React.FC = () => {
       );
       const data = await ContentDetail.json();
       const board = data?.result?.content?.board;
-      const subject = data?.result?.content?.subject;
+      const rawSubject = data?.result?.content?.subject;
+      let subject: string[];
+
+      const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+      if (rawSubject) {
+        const arr = Array.isArray(rawSubject) ? rawSubject : [rawSubject];
+        subject = arr.map(capitalize);
+      } else {
+        const hierarchyRes = await fetch(
+          `/action/content/v3/hierarchy/${notificationData?.contentId}?mode=edit`
+        );
+        const hierarchyData = await hierarchyRes.json();
+        const targetSubjectIds: string[] =
+          hierarchyData?.result?.content?.targetSubjectIds ?? [];
+        const PREFIX = 'scp-framework_subject_';
+        subject = targetSubjectIds.map((id: string) => {
+          const stripped = id.startsWith(PREFIX) ? id.slice(PREFIX.length) : id;
+          return capitalize(stripped);
+        });
+      }
       console.log('board=====>', board);
       console.log('subject=====>', subject);
       const response = await fetchCCTAList(board, subject);
