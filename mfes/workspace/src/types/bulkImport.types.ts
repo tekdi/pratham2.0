@@ -19,8 +19,15 @@ export interface ContentRow {
   subject?: string;
   medium?: string;
   gradeLevel?: string;
+  domain?: string;
+  subDomain?: string;
+  targetAgeGroup?: string;
+  primaryUser?: string;
   audience?: string;
   language?: string;
+  /** Plain string content language (from content form-read API range) */
+  contentLanguage?: string;
+  program?: string;
   keywords?: string;
   license?: string;
   copyright?: string;
@@ -46,8 +53,16 @@ export interface QuestionSetRow {
   subject?: string;
   medium?: string;
   gradeLevel?: string;
+  domain?: string;
+  subDomain?: string;
   audience?: string;
   language?: string;
+  // SCP-specific QS fields
+  board?: string;
+  courseType?: string;
+  program?: string;
+  assessmentType?: string;
+  evaluationType?: string;
   maxAttempts?: number;
   showFeedback?: boolean;
   showSolutions?: boolean;
