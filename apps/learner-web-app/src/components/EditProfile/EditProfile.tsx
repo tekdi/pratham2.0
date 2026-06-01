@@ -176,6 +176,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         responseFormForEnroll?.schema?.required?.pop('batch');
         console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
+        if (responseFormForEnroll?.schema?.properties && Array.isArray(responseFormForEnroll?.schema?.required)) {
+          const requiredFields = responseFormForEnroll.schema.required;
+          Object.keys(responseFormForEnroll.schema.properties).forEach((key) => {
+            if (!requiredFields.includes(key)) {
+              delete responseFormForEnroll.schema.properties[key];
+            }
+          });
+        }
+
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
         setResponseFormData(responseFormCopy);
         console.log('responseForm===>', responseFormCopy?.schema);
