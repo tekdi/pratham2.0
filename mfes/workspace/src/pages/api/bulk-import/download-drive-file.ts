@@ -27,10 +27,10 @@ const convertToDirectUrl = (driveUrl: string): string | null => {
 };
 
 const extractFileNameFromHeaders = (
-  headers: Record<string, string>,
+  headers: Record<string, any>,
   driveUrl: string
 ): string => {
-  const contentDisp = headers['content-disposition'] || '';
+  const contentDisp = String(headers['content-disposition'] || '');
   const match = contentDisp.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
   if (match) {
     return match[1].replace(/['"]/g, '').trim();
