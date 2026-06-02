@@ -127,6 +127,7 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
         <Grid
           container
           spacing={1.5}
+          justifyContent="center"
           id="language-selection-description"
         >
           {PLP_LANGUAGE_OPTIONS.map((option) => (

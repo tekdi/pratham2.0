@@ -698,7 +698,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }
               onClick={navigateToSurveyMfe}
             >
-              Survey
+              Surveys
             </Button>
           </Box>
         )}
