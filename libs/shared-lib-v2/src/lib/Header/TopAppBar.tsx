@@ -46,6 +46,7 @@ export interface AppBarProps {
   _brand?: object;
   isColorInverted?: boolean;
   _config?: any;
+  isVerticalSubmenu?: boolean;
 }
 
 export const withoutQueryString = () => {
@@ -163,6 +164,7 @@ export const DesktopBar = ({
   _brand,
   isColorInverted = false,
   _config,
+  isVerticalSubmenu = false,
 }: AppBarProps) => {
   const [menus, setMenus] = useState<
     { anchorEl: HTMLElement | null; items: any[] }[]
@@ -344,7 +346,11 @@ export const DesktopBar = ({
           }}
         >
           <Paper elevation={3} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-            <Box display="flex" flexDirection="row" flexWrap="wrap">
+            <Box
+              display="flex"
+              flexDirection={isVerticalSubmenu ? 'column' : 'row'}
+              flexWrap={isVerticalSubmenu ? 'nowrap' : 'wrap'}
+            >
               {menu.items.map((item, idx) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
@@ -376,8 +382,16 @@ export const DesktopBar = ({
                       }}
                       sx={{
                         justifyContent: 'space-between',
-                        whiteSpace: 'nowrap',
-                        py: 3,
+                        whiteSpace: isVerticalSubmenu ? 'normal' : 'nowrap',
+                        ...(isVerticalSubmenu
+                          ? {
+                              py: 2,
+                              px: 2,
+                              minHeight: 40,
+                            }
+                          : {
+                              py: 3,
+                            }),
                       }}
                     >
                       <Typography
