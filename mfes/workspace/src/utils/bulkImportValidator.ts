@@ -24,6 +24,7 @@ import {
   POS_CONTENT_COLUMNS,
   SCP_CONTENT_COLUMNS,
   LOOKUP,
+  ColumnDef,
 } from './frameworkConfig';
 import { extractDriveFileId } from '../services/BulkImportService';
 
@@ -83,6 +84,43 @@ const checkRequired = <T extends object>(
   });
 };
 
+// ─── Dropdown value validator ────────────────────────────────────
+// For every column that has a lookupKey, verify the entered value exists
+// in the allowed list. Skips blank values (required check handles those).
+
+const checkDropdownValues = <T extends object>(
+  rows: T[],
+  sheet: ValidationError['sheet'],
+  cols: ColumnDef[],
+  getTempId: (row: T) => string | undefined,
+  errors: ValidationError[]
+) => {
+  const dropdownCols = cols.filter((c) => c.lookupKey);
+
+  rows.forEach((row, idx) => {
+    const rowNum = idx + 2;
+    dropdownCols.forEach(({ apiField, header, lookupKey }) => {
+      const raw = (row as any)[apiField];
+      if (raw === undefined || raw === null || String(raw).trim() === '') return;
+
+      const allowed = LOOKUP[lookupKey!] as readonly string[];
+      if (!allowed) return;
+
+      const val = String(raw).trim();
+      if (!allowed.includes(val)) {
+        // Show at most 8 example values so the error message stays readable
+        const examples = (allowed as readonly string[]).slice(0, 8).join(', ');
+        const ellipsis = allowed.length > 8 ? ` … (${allowed.length} total)` : '';
+        errors.push(err(
+          sheet, rowNum, header,
+          `"${val}" is not a valid value for "${header}". Examples: ${examples}${ellipsis}`,
+          getTempId(row)
+        ));
+      }
+    });
+  });
+};
+
 // ─── Validate Content Sheet ────────────────────────────────────
 
 const validateContents = (
@@ -97,6 +135,7 @@ const validateContents = (
   }));
 
   checkRequired(contents, 'Content', requiredCols, (r) => r.tempId, errors);
+  checkDropdownValues(contents, 'Content', cols, (r) => r.tempId, errors);
 
   const seenIds = new Set<string>();
 
@@ -157,6 +196,7 @@ const validateQuestionSets = (
   }));
 
   checkRequired(questionSets, 'QuestionSets', requiredCols, (r) => r.tempId, errors);
+  checkDropdownValues(questionSets, 'QuestionSets', cols, (r) => r.tempId, errors);
 
   const seenIds = new Set<string>();
 
@@ -270,6 +310,7 @@ const validateCourses = (
   }));
 
   checkRequired(courses, 'Courses', requiredCols, (r) => r.tempId, errors);
+  checkDropdownValues(courses, 'Courses', cols, (r) => r.tempId, errors);
 
   const seenIds = new Set<string>();
 

@@ -205,13 +205,13 @@ const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
       </Typography>
       <List dense disablePadding>
         {INSTRUCTIONS.map((instr, i) => (
-          <ListItem key={i} disableGutters sx={{ py: 0.3 }}>
-            <ListItemIcon sx={{ minWidth: 28 }}>
-              <CheckCircleOutlineIcon sx={{ fontSize: 18, color: 'success.main' }} />
+          <ListItem key={i} disableGutters alignItems="flex-start" sx={{ py: 0.4 }}>
+            <ListItemIcon sx={{ minWidth: 26, mt: '7px' }}>
+              <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'success.main' }} />
             </ListItemIcon>
             <ListItemText
               primary={instr}
-              primaryTypographyProps={{ variant: 'body2' }}
+              primaryTypographyProps={{ variant: 'body2', lineHeight: 1.5 }}
             />
           </ListItem>
         ))}

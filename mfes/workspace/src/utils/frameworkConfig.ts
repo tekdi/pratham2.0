@@ -275,6 +275,123 @@ export const LOOKUP = {
   SCP_PROGRAMS: ['Second Chance', 'Open School'],
 } as const;
 
+// ─── POS Identifier Maps ──────────────────────────────────────
+// Maps display name (shown in Excel dropdown) → platform identifier
+// Required because POS course form-read uses targetDomainIds / targetSubDomainIds /
+// targetSubjectIds with output:"identifier" — same pattern as SCP.
+
+export const POS_DOMAIN_NAME_TO_ID: Record<string, string> = {
+  'Learning for School': 'pos-framework_domain_learningforschool',
+  'Learning for Work':   'pos-framework_domain_learningforwork',
+  'Learning for Life':   'pos-framework_domain_learningforlife',
+};
+
+export const POS_SUB_DOMAIN_NAME_TO_ID: Record<string, string> = {
+  'Academics':             'pos-framework_subdomain_academics',
+  'Career Exploration':    'pos-framework_subdomain_careerexploration',
+  'Creative Arts':         'pos-framework_subdomain_creativearts',
+  'Employee Training':     'pos-framework_subdomain_employeetraining',
+  'Environment Education': 'pos-framework_subdomain_environmenteducation',
+  'Growth & Learning':     'pos-framework_subdomain_growthplayfullearning',
+  'Health & Wellbeing':    'pos-framework_subdomain_healthwellbeing',
+  'Inclusive Education':   'pos-framework_subdomain_inclusiveeducation',
+  'Inclusive Learning':    'pos-framework_subdomain_inclusivelearning',
+  'Media Moments':         'pos-framework_subdomain_mediamoments',
+  'New Age Skills':        'pos-framework_subdomain_newageskills',
+  'Sports':                'pos-framework_subdomain_sports',
+};
+
+export const POS_SUBJECT_NAME_TO_ID: Record<string, string> = {
+  'Activity Videos':                    'pos-framework_subject_activityvideos',
+  'Agriculture Education':              'pos-framework_subject_agricultureeducation',
+  'Apparel':                            'pos-framework_subject_apparel',
+  'Art & Culture':                      'pos-framework_subject_artandculture',
+  'Assamese':                           'pos-framework_subject_assamese',
+  'Automotive':                         'pos-framework_subject_automotive',
+  'Awareness & Advocacy':               'pos-framework_subject_awarenessandadvocacy',
+  'Beauty':                             'pos-framework_subject_beauty',
+  'Bengali':                            'pos-framework_subject_bengali',
+  'Biodiversity & Conservation':        'pos-framework_subject_biodiversityandconservation',
+  'Career Awareness':                   'pos-framework_subject_careerawareness',
+  'Climate Education':                  'pos-framework_subject_climateeducation',
+  'Computational Thinking':             'pos-framework_subject_computationalthinking',
+  'Construction':                       'pos-framework_subject_construction',
+  'Crafts & Design':                    'pos-framework_subject_craftsanddesign',
+  'Daily-living & Independence':        'pos-framework_subject_dailylivingandindependence',
+  'Data Computing/Data Entry':          'pos-framework_subject_datacomputingdataentry',
+  'Data, Monitoring & Evaluation':      'pos-framework_subject_datamonitoringevaluation',
+  'Digital Games':                      'pos-framework_subject_digitalgames',
+  'Digital Skill Building':             'pos-framework_subject_digitalskillbuilding',
+  'Early Learning & School Readiness':  'pos-framework_subject_earlylearningandschoolreadiness',
+  'Electrical':                         'pos-framework_subject_electrical',
+  'English':                            'pos-framework_subject_english',
+  'Essential Awareness':                'pos-framework_subject_essentialawareness',
+  'Everyday Skills':                    'pos-framework_subject_everydayskills',
+  'Finance & Accounts':                 'pos-framework_subject_financeandaccounts',
+  'Games':                              'pos-framework_subject_games',
+  'General Health Awareness':           'pos-framework_subject_generalhealthawareness',
+  'General Skills':                     'pos-framework_subject_generalskills',
+  'General/Other':                      'pos-framework_subject_generalother',
+  'Good Contractor Program':            'pos-framework_subject_goodcontractorprogram',
+  'Gujarati':                           'pos-framework_subject_gujarati',
+  'HR':                                 'pos-framework_subject_hr',
+  'Healthcare':                         'pos-framework_subject_healthcare',
+  'Hindi':                              'pos-framework_subject_hindi',
+  'Holistic Development':               'pos-framework_subject_holisticdevelopment',
+  'Home Science':                       'pos-framework_subject_homescience',
+  'Hospitality & Tourism':              'pos-framework_subject_hospitalityandtourism',
+  'Indian Culture & History':           'pos-framework_subject_indiancultureandhistory',
+  'Individual Sports':                  'pos-framework_subject_individualsports',
+  'Innovative Strategies':              'pos-framework_subject_innovativestrategies',
+  'ITES':                               'pos-framework_subject_ites',
+  'Job Readiness':                      'pos-framework_subject_jobreadiness',
+  'Kannada':                            'pos-framework_subject_kannada',
+  'Khasi':                              'pos-framework_subject_khasi',
+  'Knowledge Videos':                   'pos-framework_subject_knowledgevideos',
+  'Leadership':                         'pos-framework_subject_leadership',
+  'Malayalam':                          'pos-framework_subject_malayalam',
+  'Marathi':                            'pos-framework_subject_marathi',
+  'Math':                               'pos-framework_subject_math',
+  'Media & Graphics':                   'pos-framework_subject_mediaandgraphics',
+  'Mental Health':                      'pos-framework_subject_mentalhealth',
+  'Natural Resources':                  'pos-framework_subject_naturalresources',
+  'Odia':                               'pos-framework_subject_odia',
+  'Operational Management':             'pos-framework_subject_operationalmanagement',
+  'Painting':                           'pos-framework_subject_painting',
+  'Partnerships & External Engagement': 'pos-framework_subject_partnershipsandexternalengagement',
+  'Performing Arts':                    'pos-framework_subject_performingarts',
+  'Physical Health':                    'pos-framework_subject_physicalhealth',
+  'Planning & Strategy':                'pos-framework_subject_planningstrategy',
+  'Podcasts':                           'pos-framework_subject_podcasts',
+  'Program & Pedagogy':                 'pos-framework_subject_programandpedagogy',
+  'Program Communication':              'pos-framework_subject_programcommunication',
+  'Punjabi':                            'pos-framework_subject_punjabi',
+  'Rabha (Rongdani)':                   'pos-framework_subject_rabha',
+  'Rhymes & Lullabies':                 'pos-framework_subject_rhymesandlullabies',
+  'Riddles':                            'pos-framework_subject_riddles',
+  'School Readiness':                   'pos-framework_subject_schoolreadiness',
+  'Science':                            'pos-framework_subject_science',
+  'Social Science':                     'pos-framework_subject_socialscience',
+  'Social Studies':                     'pos-framework_subject_socialstudies',
+  'Spoken English':                     'pos-framework_subject_spokenenglish',
+  'Stories':                            'pos-framework_subject_stories',
+  'Subject Specific Learning':          'pos-framework_subject_subjectspecificlearning',
+  'Sustainable Living':                 'pos-framework_subject_sustainableliving',
+  'Tamil':                              'pos-framework_subject_tamil',
+  'Team Games':                         'pos-framework_subject_teamgames',
+  'Technical Skills':                   'pos-framework_subject_technicalskills',
+  'Tech for Environment':               'pos-framework_subject_techforenvironment',
+  'Telugu':                             'pos-framework_subject_telugu',
+  'Therapy & Rehabilitation':           'pos-framework_subject_therapyandrehabilitation',
+  'Training & Capacity Building':       'pos-framework_subject_trainingandcapacitybuilding',
+  'TV Episodes':                        'pos-framework_subject_tvepisodes',
+  'Urdu':                               'pos-framework_subject_urdu',
+  'Visual Arts':                        'pos-framework_subject_visualarts',
+  'Waterworks Management & Sanitation': 'pos-framework_subject_waterworksmanagementandsanitation',
+  'Welding':                            'pos-framework_subject_welding',
+  'Yoga':                               'pos-framework_subject_yoga',
+};
+
 // ─── SCP Identifier Maps ──────────────────────────────────────
 // Maps display name (shown in Excel dropdown) → platform identifier
 // Required because SCP course form-read uses target*Ids fields with output:"identifier"
@@ -381,46 +498,58 @@ export const POS_CONTENT_COLUMNS: ColumnDef[] = [
   { header: 'Copyright',          apiField: 'copyright',       required: false },
   { header: 'Copyright Year',     apiField: 'copyrightYear',   required: false },
   { header: 'Author',             apiField: 'author',          required: false },
+  { header: 'Creator',            apiField: 'creator',         required: false, note: 'Name of the content creator (shown in Creator column on the platform)' },
   { header: 'Google Drive URL*',  apiField: 'driveUrl',        required: true,  note: 'Public share link: https://drive.google.com/file/d/FILE_ID/view' },
   { header: 'File Type*',         apiField: 'fileType',        required: true,  lookupKey: 'FILE_TYPES' },
 ];
 
+// POS QS form-read (obj-cat:practice-question-set_questionset_pos-channel) fields:
+// domain (required), subDomain (required), subject (required),
+// targetAgeGroup, primaryUser, contentLanguage, assessmentType, evaluationType, program.
+// NO medium, NO gradeLevel in POS QS.
+// POS QS form-read required fields (obj-cat:practice-question-set_questionset_pos-channel):
+// name ✓, description ✓ (required:true in form-read), domain ✓, subDomain ✓, subject ✓,
+// evaluationType ✓ (required:true in form-read with required validation message).
 export const POS_QS_COLUMNS: ColumnDef[] = [
   { header: 'Temp ID*',           apiField: 'tempId',          required: true,  note: 'Format: TEMP_QS_N e.g. TEMP_QS_1' },
   { header: 'Name*',              apiField: 'name',            required: true },
-  { header: 'Description',        apiField: 'description',     required: false },
+  { header: 'Description*',       apiField: 'description',     required: true },
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
+  { header: 'Domain*',            apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS' },
+  { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS' },
   { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS' },
-  { header: 'Domain',             apiField: 'domain',          required: false, lookupKey: 'POS_DOMAINS' },
-  { header: 'Sub Domain',         apiField: 'subDomain',       required: false, lookupKey: 'POS_SUB_DOMAINS' },
-  { header: 'Medium',             apiField: 'medium',          required: false, lookupKey: 'POS_MEDIUMS' },
-  { header: 'Grade Level',        apiField: 'gradeLevel',      required: false, lookupKey: 'POS_GRADE_LEVELS' },
-  { header: 'Language',           apiField: 'language',        required: false, lookupKey: 'LANGUAGES' },
+  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS' },
+  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS' },
+  { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES', note: 'Language the content is written in' },
   { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type',    apiField: 'evaluationType',  required: false, lookupKey: 'EVALUATION_TYPES', note: 'online, offline or ai' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES', note: 'online = Auto-Graded | offline = Facilitator-Graded | ai = AI-Assisted' },
   { header: 'Max Attempts',       apiField: 'maxAttempts',     required: false, note: 'Positive integer e.g. 3' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
 
+// POS Course form-read (obj-cat:course_collection_pos-channel) fields:
+// targetDomainIds, targetSubDomainIds, targetSubjectIds (all with output:"identifier"),
+// targetAgeGroup, primaryUser, contentLanguage, program.
+// NO medium, NO gradeLevel, NO plain subject/language for POS Course.
 export const POS_COURSE_COLUMNS: ColumnDef[] = [
-  { header: 'Temp ID*',           apiField: 'tempId',          required: true,  note: 'Format: TEMP_COURSE_N e.g. TEMP_COURSE_1' },
-  { header: 'Name*',              apiField: 'name',            required: true },
-  { header: 'Description',        apiField: 'description',     required: false },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS' },
-  { header: 'Domain',             apiField: 'domain',          required: false, lookupKey: 'POS_DOMAINS' },
-  { header: 'Sub Domain',         apiField: 'subDomain',       required: false, lookupKey: 'POS_SUB_DOMAINS' },
-  { header: 'Medium',             apiField: 'medium',          required: false, lookupKey: 'POS_MEDIUMS' },
-  { header: 'Grade Level',        apiField: 'gradeLevel',      required: false, lookupKey: 'POS_GRADE_LEVELS' },
-  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS' },
-  { header: 'Language',           apiField: 'language',        required: false, lookupKey: 'LANGUAGES' },
-  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS' },
-  { header: 'Keywords',           apiField: 'keywords',        required: false },
-  { header: 'License',            apiField: 'license',         required: false, lookupKey: 'LICENSES' },
-  { header: 'Copyright',          apiField: 'copyright',       required: false },
-  { header: 'Copyright Year',     apiField: 'copyrightYear',   required: false },
-  { header: 'Author',             apiField: 'author',          required: false },
+  { header: 'Temp ID*',           apiField: 'tempId',             required: true,  note: 'Format: TEMP_COURSE_N e.g. TEMP_COURSE_1' },
+  { header: 'Name*',              apiField: 'name',               required: true },
+  { header: 'Description',        apiField: 'description',        required: false },
+  { header: 'Domain*',            apiField: 'targetDomainIds',    required: true,  lookupKey: 'POS_DOMAINS',          note: 'Select from dropdown — sent as platform identifier' },
+  { header: 'Sub Domain*',        apiField: 'targetSubDomainIds', required: true,  lookupKey: 'POS_SUB_DOMAINS',      note: 'Select from dropdown — sent as platform identifier' },
+  { header: 'Subject*',           apiField: 'targetSubjectIds',   required: true,  lookupKey: 'POS_SUBJECTS',         note: 'Select from dropdown — sent as platform identifier' },
+  // targetAgeGroup has validations:[{type:"required"}] in POS course form-read
+  { header: 'Target Age Group*',  apiField: 'targetAgeGroup',     required: true,  lookupKey: 'POS_TARGET_AGE_GROUPS' },
+  { header: 'Primary User',       apiField: 'primaryUser',        required: false, lookupKey: 'POS_PRIMARY_USERS' },
+  { header: 'Content Language',   apiField: 'contentLanguage',    required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Language the content is written in' },
+  { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS' },
+  { header: 'Keywords',           apiField: 'keywords',           required: false },
+  { header: 'License',            apiField: 'license',            required: false, lookupKey: 'LICENSES' },
+  { header: 'Copyright',          apiField: 'copyright',          required: false },
+  { header: 'Copyright Year',     apiField: 'copyrightYear',      required: false },
+  { header: 'Author',             apiField: 'author',             required: false },
 ];
 
 // ─── SCP Framework Column Sets ────────────────────────────────
@@ -574,5 +703,11 @@ export const getLookupColumns = (fw: FrameworkId): LookupColumn[] => {
     ...shared,
     ...posContentLookups,
     { header: 'Primary Categories (QS)',  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
+    // POS QS and Course also need these (content lookups above cover the same keys,
+    // but keep explicit entries so the LookupData sheet headings are clear)
+    { header: 'Programs (QS/Course)',     lookupKey: 'POS_PROGRAMS' },
+    { header: 'Subjects (QS/Course)',     lookupKey: 'POS_SUBJECTS' },
+    { header: 'Domains (QS/Course)',      lookupKey: 'POS_DOMAINS' },
+    { header: 'Sub Domains (QS/Course)',  lookupKey: 'POS_SUB_DOMAINS' },
   ];
 };
