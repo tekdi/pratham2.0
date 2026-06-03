@@ -73,11 +73,17 @@ import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserServic
 import { sendCredentialService } from '@/services/NotificationService';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import useStore from '@/store/store';
+import {
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const Mobilizer = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(MobilizerSearchSchema);
   const [uiSchema, setUiSchema] = useState(MobilizerUISchema);
@@ -1128,41 +1134,43 @@ const Mobilizer = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="mobilizer"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
           />
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledState({});
-              setFormStep(0);
-              setSelectedUserId(null);
-              setUserDetails(null);
-              setSelectedCenterId(null);
-              setCohortResponse(null);
-              setCatchmentAreaData(null);
-              setSelectedStateId(null);
-              setSelectedDistrictId(null);
-              setSelectedBlockId(null);
-              setWorkingVillageAssignmentCenterId(null);
-              setWorkingVillageAssignmentLocation(null);
-              setMapModalOpen(true);
-            }}
-          >
-            {t('COMMON.MAP_NEW')}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledState({});
+                setFormStep(0);
+                setSelectedUserId(null);
+                setUserDetails(null);
+                setSelectedCenterId(null);
+                setCohortResponse(null);
+                setCatchmentAreaData(null);
+                setSelectedStateId(null);
+                setSelectedDistrictId(null);
+                setSelectedBlockId(null);
+                setWorkingVillageAssignmentCenterId(null);
+                setWorkingVillageAssignmentLocation(null);
+                setMapModalOpen(true);
+              }}
+            >
+              {t('COMMON.MAP_NEW')}
+            </Button>
+          )}
         </Box>
 
         {/* <SimpleModal
@@ -1212,7 +1220,7 @@ const Mobilizer = () => {
         {response != null ? (
           <>
             {response && response?.result?.getUserDetails ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}

@@ -64,9 +64,16 @@ import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
 import { getOverallStatus } from '@shared-lib-v2/utils/helper';
+import useStore from '@/store/store';
+import {
+  getVisibleTableActions,
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const Learner = () => {
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(learnerSearchSchema);
   const [uiSchema, setUiSchema] = useState(learnerSearchUISchema);
@@ -757,6 +764,8 @@ const Learner = () => {
     // },
   ];
 
+  const visibleActions = getVisibleTableActions(actions, isActiveYear);
+
   // Pagination handlers
   const handlePageChange = (newPage) => {
     // console.log('Page changed to:', newPage);
@@ -823,7 +832,7 @@ const Learner = () => {
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="learner"
             formRef={formRef}
@@ -910,12 +919,12 @@ const Learner = () => {
         {response != null ? (
           <Box mt={4}>
             {response && response?.result?.totalCount > 0 ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}
                   columns={columns}
-                  actions={actions}
+                  actions={visibleActions}
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   defaultPage={currentPage}

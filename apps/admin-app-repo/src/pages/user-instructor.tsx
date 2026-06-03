@@ -92,9 +92,16 @@ import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserServic
 import { updateUserTenantStatus } from '@/services/UserService';
 import { sendCredentialService } from '@/services/NotificationService';
 import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
+import useStore from '@/store/store';
+import {
+  getVisibleTableActions,
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(facilitatorSearchSchema);
   const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
@@ -773,6 +780,8 @@ const Facilitator = () => {
     },
   ];
 
+  const visibleActions = getVisibleTableActions(actions, isActiveYear);
+
   // Pagination handlers
   const handlePageChange = (newPage) => {
     // console.log('Page changed to:', newPage);
@@ -923,33 +932,35 @@ const Facilitator = () => {
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="facilitator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
           />
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledState({});
-              setFormStep(0);
-              setSelectedUserId(null);
-              setUserDetails(null);
-              setMapModalOpen(true);
-            }}
-          >
-            {t('COMMON.MAP_NEW')}{' '}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledState({});
+                setFormStep(0);
+                setSelectedUserId(null);
+                setUserDetails(null);
+                setMapModalOpen(true);
+              }}
+            >
+              {t('COMMON.MAP_NEW')}{' '}
+            </Button>
+          )}
         </Box>
 
         {/* <SimpleModal
@@ -1013,12 +1024,12 @@ const Facilitator = () => {
         {response != null ? (
           <>
             {response && response?.result?.getUserDetails ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}
                   columns={columns}
-                  actions={actions}
+                  actions={visibleActions}
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   defaultPage={currentPage}
