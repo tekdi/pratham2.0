@@ -38,6 +38,11 @@ import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import { updateCohort } from '@/services/MasterDataService';
+import useStore from '@/store/store';
+import {
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 interface BatchFlowProps {
   initialParentId?: string;
@@ -55,6 +60,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   centerType = null,
 }) => {
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(BatchSearchSchema);
   const [uiSchema, setUiSchema] = useState(BatchSearchUISchema);
@@ -465,44 +471,46 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              const addPrefill = initialParentId
-                ? { ...initialFormData, parentId: [initialParentId] }
-                : initialFormData;
-              const prefillWithBMGS: any = { ...addPrefill };
-              if (centerBoards?.length === 1)
-                prefillWithBMGS.board = [centerBoards[0]];
-              if (centerMediums?.length === 1)
-                prefillWithBMGS.medium = [centerMediums[0]];
-              if (centerGrades?.length === 1)
-                prefillWithBMGS.grade = [centerGrades[0]];
+        <Box mt={4} sx={pageActionBarSx}>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                const addPrefill = initialParentId
+                  ? { ...initialFormData, parentId: [initialParentId] }
+                  : initialFormData;
+                const prefillWithBMGS: any = { ...addPrefill };
+                if (centerBoards?.length === 1)
+                  prefillWithBMGS.board = [centerBoards[0]];
+                if (centerMediums?.length === 1)
+                  prefillWithBMGS.medium = [centerMediums[0]];
+                if (centerGrades?.length === 1)
+                  prefillWithBMGS.grade = [centerGrades[0]];
 
-              // Prefill batch_type for remote center
-              if (centerType === 'remote') {
-                prefillWithBMGS.batch_type = 'remote';
-              }
+                // Prefill batch_type for remote center
+                if (centerType === 'remote') {
+                  prefillWithBMGS.batch_type = 'remote';
+                }
 
-              buildSchemaAndUi(false);
+                buildSchemaAndUi(false);
 
-              setPrefilledAddFormData(prefillWithBMGS);
-              setIsEdit(false);
-              setEditableUserId('');
-              handleOpenModal();
-            }}
-          >
-            {t('COMMON.ADD_NEW')}{' '}
-          </Button>
+                setPrefilledAddFormData(prefillWithBMGS);
+                setIsEdit(false);
+                setEditableUserId('');
+                handleOpenModal();
+              }}
+            >
+              {t('COMMON.ADD_NEW')}{' '}
+            </Button>
+          )}
         </Box>
 
         <SimpleModal
@@ -554,7 +562,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
           <>
             {response &&
             response?.result?.results?.cohortDetails?.length > 0 ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.count}
                   data={response?.result?.results?.cohortDetails}

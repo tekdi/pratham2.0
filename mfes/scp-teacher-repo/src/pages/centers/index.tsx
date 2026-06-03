@@ -896,7 +896,7 @@ const CentersPage = () => {
                       ),
                     }}
                   />
-                  {isTeamLeader && (
+                  {isTeamLeader && isActiveYear && (
                     <Button
                       sx={{
                         mt: 1.2,
