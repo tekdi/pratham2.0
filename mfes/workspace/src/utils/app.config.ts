@@ -22,6 +22,7 @@ export const MIME_TYPE = {
     'video/x-youtube',
     'video/youtube',
   ],
+  MIME_H5P_TYPE:'application/vnd.ekstep.h5p-archive'
 };
 
 export const CLOUD_STORAGE_URL =
