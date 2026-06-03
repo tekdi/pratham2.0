@@ -1195,6 +1195,7 @@
     "REMOTE_LEARNERS": "Remote Learners",
     "REGULAR_LEARNERS": "Regular Learners",
     "ASSESSMENT_ATTEMPTS_FILTER": "Number of Assessment Attempts Completed",
+    "NO_ATTEMPT": "No Attempt",
     "ONE_ATTEMPT": "1 Attempt",
     "TWO_ATTEMPTS": "2 Attempts"
   }

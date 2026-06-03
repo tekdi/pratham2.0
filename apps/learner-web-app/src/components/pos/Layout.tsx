@@ -396,6 +396,8 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
             },
           },
         },
+        // Keep submenu items stacked vertically only on POS pages.
+        isVerticalSubmenu: true,
         navLinks: defaultNavLinks,
         _navLinkBox: { gap: '12px', cursor: 'pointer' },
         ...props?._topAppBar,
