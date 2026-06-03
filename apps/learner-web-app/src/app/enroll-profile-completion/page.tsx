@@ -150,6 +150,7 @@ const EnrollProfileCompletionInner = () => {
             console.log('Enrolled into tenant:', enrollTenantId);
             // Always update user with pending custom field after enrollment
             try {
+              if (userTenantStatus) {
               await updateUser(storedUserId, {
                 userData: {},
                 customFields: [{
@@ -157,6 +158,7 @@ const EnrollProfileCompletionInner = () => {
                   value: 'pending',
                 }],
               });
+            }
             } catch (updateError) {
               console.error('Failed to update pending custom field:', updateError);
             }

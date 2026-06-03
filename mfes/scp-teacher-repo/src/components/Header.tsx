@@ -418,6 +418,22 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       const admin = localStorage.getItem('userData');
       if (admin && admin !== 'undefined')
         setAdminInfo(JSON?.parse(admin) || {});
+
+      const storedList = localStorage.getItem('academicYearList');
+      const selectedAcademicYearId = localStorage.getItem('academicYearId');
+      if (storedList && selectedAcademicYearId) {
+        try {
+          const parsedList = JSON.parse(storedList);
+          const selectedYear = parsedList.find(
+            (item: AcademicYear) => item.id === selectedAcademicYearId
+          );
+          setIsActiveYearSelected(
+            selectedYear ? Boolean(selectedYear.isActive) : false
+          );
+        } catch (error) {
+          console.error('Error syncing academic year selection:', error);
+        }
+      }
       
       // Load tenantData for switch account functionality
       const storedTenantData = localStorage.getItem('tenantData');
@@ -442,7 +458,7 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
         }
       }
     }
-  }, []);
+  }, [setIsActiveYearSelected]);
   return (
     <>
       <Box

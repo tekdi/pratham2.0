@@ -185,7 +185,7 @@ const ImportSummary: React.FC<Props> = ({ session, onReset }) => {
                             size="small"
                             endIcon={<OpenInNewIcon sx={{ fontSize: 12 }} />}
                             sx={{ textTransform: 'none', fontSize: 11 }}
-                            href={`/workspace/content/allContents?identifier=${identifier}`}
+                            href="/mfe_workspace/workspace/content/allContents"
                             target="_blank"
                           >
                             View

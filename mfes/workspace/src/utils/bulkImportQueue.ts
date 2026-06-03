@@ -26,6 +26,9 @@ import {
   SCP_GRADE_NAME_TO_ID,
   SCP_SUBJECT_NAME_TO_ID,
   SCP_COURSE_TYPE_NAME_TO_ID,
+  POS_DOMAIN_NAME_TO_ID,
+  POS_SUB_DOMAIN_NAME_TO_ID,
+  POS_SUBJECT_NAME_TO_ID,
 } from './frameworkConfig';
 import {
   createContentNode,
@@ -95,16 +98,22 @@ export class BulkImportQueue {
           mimeType: FILE_MIME_MAP[content.fileType] || 'application/pdf',
           // pos-framework has no medium/gradeLevel taxonomy — do NOT send them for content
           // API expects arrays for these taxonomy fields
-          subject:    content.subject    ? [content.subject]    : undefined,
-          audience:   content.audience   ? [content.audience]   : undefined,
-          language:   content.language   ? [content.language]   : undefined,
-          // keywords → array; copyrightYear → number
+          subject:        content.subject        ? [content.subject]        : undefined,
+          domain:         content.domain         ? [content.domain]         : undefined,
+          subDomain:      content.subDomain      ? [content.subDomain]      : undefined,
+          targetAgeGroup: content.targetAgeGroup ? [content.targetAgeGroup] : undefined,
+          primaryUser:    content.primaryUser     ? [content.primaryUser]    : undefined,
+          audience:       content.audience        ? [content.audience]       : undefined,
+          language:       content.language        ? [content.language]       : undefined,
+          // program → array; keywords → array; copyrightYear → number
+          program:       content.program ? [content.program] : undefined,
           keywords:      content.keywords ? content.keywords.split(',').map((k: string) => k.trim()) : undefined,
           copyrightYear: content.copyrightYear ? Number(content.copyrightYear) : undefined,
           contentLanguage: content.contentLanguage,  // string, not array
           license:   content.license,
           copyright: content.copyright,
           author:    content.author,
+          creator:   content.creator,
           driveUrl:  content.driveUrl,
           fileType:  content.fileType,
           _contentTempId: content.tempId,
@@ -159,18 +168,24 @@ export class BulkImportQueue {
           primaryCategory: qs.primaryCategory,
           framework: qs.framework,
           mimeType: 'application/vnd.sunbird.questionset',
-          // API expects arrays for these taxonomy fields
-          subject:    qs.subject    ? [qs.subject]    : undefined,
-          medium:     qs.medium     ? [qs.medium]     : undefined,
-          gradeLevel: qs.gradeLevel ? [qs.gradeLevel] : undefined,
-          audience:   qs.audience   ? [qs.audience]   : undefined,
-          language:   qs.language   ? [qs.language]   : undefined,
+          // POS QS: domain (string), subDomain (array), subject (array),
+          // targetAgeGroup (array), primaryUser (array), contentLanguage (string)
+          // SCP QS: subject (array), board (string), courseType/program (arrays)
+          // Neither framework uses medium or gradeLevel for QS.
+          subject:         qs.subject    ? [qs.subject]    : undefined,
+          domain:          qs.domain     || undefined,
+          subDomain:       qs.subDomain  ? [qs.subDomain]  : undefined,
+          targetAgeGroup:  qs.targetAgeGroup  ? [qs.targetAgeGroup]  : undefined,
+          primaryUser:     qs.primaryUser     ? [qs.primaryUser]     : undefined,
+          contentLanguage: qs.contentLanguage || undefined,
+          audience:        qs.audience   ? [qs.audience]   : undefined,
           // SCP-specific fields: board → string, courseType/program → arrays
           board:          qs.board       || undefined,
           courseType:     qs.courseType  ? [qs.courseType]  : undefined,
           program:        qs.program     ? [qs.program]     : undefined,
           assessmentType: qs.assessmentType || undefined,
-          evaluationType: qs.evaluationType || 'online',
+          // evaluationType is required per form-read — validated before import runs
+          evaluationType: qs.evaluationType || undefined,
           maxAttempts:   qs.maxAttempts,
           showFeedback:  qs.showFeedback,
           showSolutions: qs.showSolutions,
@@ -279,8 +294,9 @@ export class BulkImportQueue {
           name: course.name,
           description: course.description,
           framework: course.framework,
-          // SCP courses: use target*Ids fields with platform identifiers
-          // POS courses: use plain subject/medium/gradeLevel arrays
+          // SCP courses: targetBoardIds / targetMediumIds / targetGradeLevelIds / targetSubjectIds / targetCourseTypeIds
+          // POS courses: targetDomainIds / targetSubDomainIds / targetSubjectIds / targetAgeGroup / primaryUser / contentLanguage
+          // Neither framework uses plain medium or gradeLevel for courses.
           ...(course.framework === 'scp-framework'
             ? {
                 // SCP form-read uses target*Ids with output:"identifier"
@@ -293,10 +309,22 @@ export class BulkImportQueue {
                 contentLanguage: course.contentLanguage || undefined,
               }
             : {
-                subject:    course.subject    ? [course.subject]    : undefined,
-                medium:     course.medium     ? [course.medium]     : undefined,
-                gradeLevel: course.gradeLevel ? [course.gradeLevel] : undefined,
-                language:   course.language   ? [course.language]   : undefined,
+                // POS course form-read uses targetDomainIds / targetSubDomainIds /
+                // targetSubjectIds with output:"identifier" — display name → identifier
+                targetDomainIds:    course.targetDomainIds
+                  ? [POS_DOMAIN_NAME_TO_ID[course.targetDomainIds]    || course.targetDomainIds]
+                  : undefined,
+                targetSubDomainIds: course.targetSubDomainIds
+                  ? [POS_SUB_DOMAIN_NAME_TO_ID[course.targetSubDomainIds] || course.targetSubDomainIds]
+                  : undefined,
+                targetSubjectIds:   course.targetSubjectIds
+                  ? [POS_SUBJECT_NAME_TO_ID[course.targetSubjectIds]  || course.targetSubjectIds]
+                  : undefined,
+                // targetAgeGroup, primaryUser: plain string arrays (no identifier mapping needed)
+                targetAgeGroup: course.targetAgeGroup ? [course.targetAgeGroup] : undefined,
+                primaryUser:    course.primaryUser    ? [course.primaryUser]    : undefined,
+                // contentLanguage: plain string
+                contentLanguage: course.contentLanguage || undefined,
               }
           ),
           audience:   course.audience   ? [course.audience]   : undefined,
@@ -534,21 +562,27 @@ export class BulkImportQueue {
     const { _contentTempId, driveUrl, fileType, ...metadata } = job.payload;
 
     const identifier = await createContentNode({
-      name: metadata.name,
-      description: metadata.description,
+      name:            metadata.name,
+      description:     metadata.description,
       primaryCategory: metadata.primaryCategory,
-      framework: metadata.framework,
-      mimeType: FILE_MIME_MAP[fileType] || 'application/pdf',
+      framework:       metadata.framework,
+      mimeType:        FILE_MIME_MAP[fileType] || 'application/pdf',
       // pos-framework has no medium/gradeLevel taxonomy — omitted for content
       subject:         metadata.subject,
+      domain:          metadata.domain,
+      subDomain:       metadata.subDomain,
+      targetAgeGroup:  metadata.targetAgeGroup,
+      primaryUser:     metadata.primaryUser,
       audience:        metadata.audience,
       language:        metadata.language,
+      program:         metadata.program,
       contentLanguage: metadata.contentLanguage,  // string, separate from language array
       keywords:        metadata.keywords,
       license:         metadata.license,
       copyright:       metadata.copyright,
       copyrightYear:   metadata.copyrightYear,
       author:          metadata.author,
+      creator:         metadata.creator,
     });
 
     this.resolvedIds.set(_contentTempId, identifier);
@@ -557,6 +591,25 @@ export class BulkImportQueue {
     this.rollbackRegistry.push({ type: 'content', identifier });
   }
 
+  // Maps a declared fileType → all MIME types that Google Drive may return for that format.
+  // ZIP and H5P are both ZIP archives at the OS level, so they share the same allowed MIMEs.
+  private static readonly ALLOWED_MIME_FOR_FILE_TYPE: Record<string, string[]> = {
+    pdf: ['application/pdf'],
+    mp4: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-m4v'],
+    zip: [
+      'application/zip',
+      'application/x-zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+    ],
+    h5p: [
+      'application/zip',
+      'application/x-zip',
+      'application/x-zip-compressed',
+      'application/octet-stream',
+    ],
+  };
+
   private async handleUploadContentFile(job: QueueJob): Promise<void> {
     const { _contentTempId, driveUrl, fileType } = job.payload;
     const contentId = this.resolvedIds.get(_contentTempId);
@@ -564,8 +617,24 @@ export class BulkImportQueue {
 
     const mimeType = FILE_MIME_MAP[fileType] || 'application/pdf';
 
-    // Download from Google Drive
-    const { buffer, fileName } = await downloadGoogleDriveFile(driveUrl);
+    // Download from Google Drive — returns the actual content-type from the server
+    const { buffer, fileName, mimeType: actualMimeType } = await downloadGoogleDriveFile(driveUrl);
+
+    // ── File type validation ─────────────────────────────────────
+    // Check that the actual MIME type of the downloaded file matches
+    // the fileType declared in the Excel sheet. This catches cases where
+    // a user declares "pdf" but the Drive link points to an MP4, etc.
+    const allowedMimes = BulkImportQueue.ALLOWED_MIME_FOR_FILE_TYPE[fileType?.toLowerCase()] ?? [];
+    const actualBase   = (actualMimeType || '').split(';')[0].trim().toLowerCase();
+
+    if (allowedMimes.length > 0 && actualBase && !allowedMimes.includes(actualBase)) {
+      throw new Error(
+        `File type mismatch for ${_contentTempId}: ` +
+        `declared "${fileType}" (expects ${allowedMimes[0]}) ` +
+        `but the Google Drive file is "${actualBase}". ` +
+        `Please update the File Type column in the Content sheet to match the actual file.`
+      );
+    }
 
     // Get pre-signed upload URL
     const { preSignedUrl } = await getContentUploadUrl(contentId, fileName);
@@ -736,18 +805,20 @@ export class BulkImportQueue {
       name:          metadata.name,
       description:   metadata.description,
       framework:     metadata.framework,
-      // SCP fields
+      // SCP course fields
       targetBoardIds:      metadata.targetBoardIds,
       targetMediumIds:     metadata.targetMediumIds,
       targetGradeLevelIds: metadata.targetGradeLevelIds,
-      targetSubjectIds:    metadata.targetSubjectIds,
       targetCourseTypeIds: metadata.targetCourseTypeIds,
-      contentLanguage:     metadata.contentLanguage,
-      // POS fields
-      subject:    metadata.subject,
-      medium:     metadata.medium,
-      gradeLevel: metadata.gradeLevel,
-      language:   metadata.language,
+      // POS course fields (targetDomainIds / targetSubDomainIds / targetSubjectIds)
+      // and shared target*Ids for POS Subject (also used in SCP)
+      targetDomainIds:    metadata.targetDomainIds,
+      targetSubDomainIds: metadata.targetSubDomainIds,
+      targetSubjectIds:   metadata.targetSubjectIds,
+      // POS + SCP shared plain-value fields
+      targetAgeGroup:  metadata.targetAgeGroup,
+      primaryUser:     metadata.primaryUser,
+      contentLanguage: metadata.contentLanguage,
       // Common fields
       audience:      metadata.audience,
       keywords:      metadata.keywords,

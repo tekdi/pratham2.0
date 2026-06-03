@@ -124,6 +124,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
     }
   }, []);
 
+  const [isModeOfLearningPresent, setIsModeOfLearningPresent] = useState<boolean | null>(false);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -291,6 +293,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+
+            //check if mode of learning is present in the schema
+            console.log('####debug responseForm?.schema?.properties?.preferred_mode_of_learning', responseForm?.schema?.properties?.preferred_mode_of_learning);
+            if (responseForm?.schema?.properties?.preferred_mode_of_learning) {
+              setIsModeOfLearningPresent(true);
+              console.log('####debug isModeOfLearningPresent', isModeOfLearningPresent);
+            }
+
 
           // Add helper text to all CustomTextFieldWidget fields if isForNavaPatham is true
           alterUISchema = addHelperTextToTextFieldWidgets(alterUISchema);
@@ -761,7 +772,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
                         parentDataSchema={parentDataSchema}
                         forEditedschema={responseFormData?.schema?.properties}
                         FormSubmitFunction={FormSubmitFunction}
-                        prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
+                        prefilledFormData={completeProfile && !enrolledProgram ? {}: enrolledProgram && isModeOfLearningPresent ? { preferred_mode_of_learning: 'remote' } : userFormData}
                         hideSubmit={true}
                         type="learner"
                         isCompleteProfile={completeProfile}

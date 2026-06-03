@@ -33,6 +33,8 @@ export interface ContentRow {
   copyright?: string;
   copyrightYear?: string;
   author?: string;
+  /** Name of the content creator (platform `creator` field, shown in Creator column) */
+  creator?: string;
   /** Public Google Drive share URL */
   driveUrl: string;
   /** pdf | zip | mp4 | h5p */
@@ -55,6 +57,10 @@ export interface QuestionSetRow {
   gradeLevel?: string;
   domain?: string;
   subDomain?: string;
+  // POS QS fields (from pos-channel form-read)
+  targetAgeGroup?: string;
+  primaryUser?: string;
+  contentLanguage?: string;
   audience?: string;
   language?: string;
   // SCP-specific QS fields
@@ -98,15 +104,22 @@ export interface CourseRow {
   name: string;
   description?: string;
   framework: FrameworkId;
-  // POS course fields
+  // POS course fields — form-read uses target*Ids with output:"identifier"
+  // (no medium or gradeLevel for POS courses; same target*Ids pattern as SCP)
+  targetDomainIds?: string;    // display name from Excel → resolved to identifier in queue
+  targetSubDomainIds?: string; // display name from Excel → resolved to identifier in queue
+  targetSubjectIds?: string;   // display name from Excel → resolved to identifier in queue
+  targetAgeGroup?: string;     // plain string e.g. "0-3 yrs"
+  primaryUser?: string;        // plain string e.g. "Educators"
+  // SCP course fields
+  board?: string;
+  courseType?: string;
+  contentLanguage?: string;    // used by both SCP and POS courses
+  // Legacy fields — kept for backwards compatibility only
   subject?: string;
   medium?: string;
   gradeLevel?: string;
   language?: string;
-  // SCP course fields (target*Ids use platform identifiers; contentLanguage is plain string)
-  board?: string;
-  courseType?: string;
-  contentLanguage?: string;
   // Common
   audience?: string;
   program?: string;
