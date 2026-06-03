@@ -150,6 +150,7 @@ const EnrollProfileCompletionInner = () => {
             console.log('Enrolled into tenant:', enrollTenantId);
             // Always update user with pending custom field after enrollment
             try {
+              if (userTenantStatus) {
               await updateUser(storedUserId, {
                 userData: {},
                 customFields: [{
@@ -157,6 +158,7 @@ const EnrollProfileCompletionInner = () => {
                   value: 'pending',
                 }],
               });
+            }
             } catch (updateError) {
               console.error('Failed to update pending custom field:', updateError);
             }
@@ -257,8 +259,45 @@ const EnrollProfileCompletionInner = () => {
       console.error('Enrollment failed on close:', enrollError);
     }
     localStorage.setItem('registerationTestGiven', 'Yes');
+     const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      console.log('isAndroid check:', isAndroid);
+                localStorage.setItem('registerationTestGiven', 'Yes');
+
+      if(isAndroid)
+        {
+         console.log('Android path - sending message to WebView');
+         // Send message to React Native WebView
+
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+
+              //        const program = JSON.parse(enrolledProgramData || '{}');
+
+
+            // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+          let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+          // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+          if (!refreshToken || refreshToken === '') {
+            refreshToken = localStorage.getItem('refreshToken');
+          }
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+
+                // Add any data you want to send
+              }
+            }));
+          }
+        // setSignupSuccessModal(false);
+        }
+        else{
     const finalLandingPage = localStorage.getItem('landingPage') || '/home';
     window.location.href = finalLandingPage;
+        }
   };
 
   const onAssessmentUnavailableOk = () => {
