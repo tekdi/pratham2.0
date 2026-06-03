@@ -57,6 +57,10 @@ export interface QuestionSetRow {
   gradeLevel?: string;
   domain?: string;
   subDomain?: string;
+  // POS QS fields (from pos-channel form-read)
+  targetAgeGroup?: string;
+  primaryUser?: string;
+  contentLanguage?: string;
   audience?: string;
   language?: string;
   // SCP-specific QS fields
