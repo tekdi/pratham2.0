@@ -129,13 +129,22 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         setModifiedAcademicYearList(modifiedList);
         const selectedAcademicYearId = localStorage.getItem('academicYearId');
         setSelectedSessionId(selectedAcademicYearId ?? '');
+
+        if (selectedAcademicYearId && parsedList.length > 0) {
+          const selectedYear = parsedList.find(
+            (item: AcademicYear) => item.id === selectedAcademicYearId
+          );
+          setIsActiveYearSelected(
+            selectedYear ? Boolean(selectedYear.isActive) : false
+          );
+        }
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
         setSelectedSessionId('');
       }
     }
-  }, [t]);
+  }, [t, setIsActiveYearSelected]);
 
   const handleChange = (event: SelectChangeEvent) => {
     const newLocale = event.target.value;

@@ -125,6 +125,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const queryClient = useQueryClient();
   const { isRTL } = useDirection();
   const isActiveYear = newStore.isActiveYearSelected;
+  const previousYearHiddenActions = ['reassign-block', 'delete-User'];
   const loggedInUserRole = localStorage.getItem('role');
   const tenantId = localStorage.getItem('tenantId') || '';
 
@@ -803,6 +804,9 @@ const ManageUser: React.FC<ManageUsersProps> = ({
       };
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
+    if (!isActiveYear && previousYearHiddenActions.includes(name)) {
+      return;
+    }
     if (name === 'delete-User') {
       const resolvedUserId = isFromFLProfile ? teacherUserId : store?.deleteId;
       setUserId(resolvedUserId);
@@ -1323,6 +1327,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
 
             <Box>
               {isFromFLProfile ? (
+                isActiveYear && (
                 <MoreVertIcon
                   onClick={(event) => {
                     isMobile
@@ -1336,6 +1341,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     cursor: 'pointer',
                   }}
                 />
+                )
               ) : (
                 <Box px={'18px'} mt={3}>
                   <Box
@@ -1415,6 +1421,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             right: '8px',
                                             zIndex: 1,
                                           }}>
+                                        {isActiveYear && (
                                         <MoreVertIcon
                                           onClick={(event) => {
                                             isMobile
@@ -1431,6 +1438,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             cursor: 'pointer',
                                           }}
                                         />
+                                        )}
                                       </Box>
                                       <Box
                                           display="flex"
@@ -1608,6 +1616,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                             zIndex: 1,
                                           }}
                                         >
+                                          {isActiveYear && (
                                           <MoreVertIcon
                                             onClick={(event) => {
                                               isMobile
@@ -1625,6 +1634,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                               cursor: 'pointer',
                                             }}
                                           />
+                                          )}
                                         </Box>
                                         <Box
                                           display="flex"
@@ -1848,7 +1858,12 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                     );
                   }
                   return true;
-                })}
+                })
+                .filter(
+                  (option) =>
+                    isActiveYear ||
+                    !previousYearHiddenActions.includes(option.name)
+                )}
               >
                 <Box
                   sx={{
