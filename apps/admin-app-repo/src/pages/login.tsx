@@ -406,6 +406,7 @@ const LoginPage = () => {
               );
               const activeSessionId = activeSession ? activeSession.id : '';
               localStorage.setItem('academicYearId', activeSessionId);
+              localStorage.setItem('session', activeSession?.session ?? '');
               if (activeSessionId) {
                 setIsActiveYearSelected(true);
                 // router.push("/centers");

@@ -138,6 +138,15 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             selectedYear ? Boolean(selectedYear.isActive) : false
           );
         }
+        // Backfill `session` for users who logged in before it was stored.
+        if (!localStorage.getItem('session') && selectedAcademicYearId) {
+          const selectedYear = parsedList?.find(
+            (item: { id: string }) => item.id === selectedAcademicYearId
+          );
+          if (selectedYear?.session) {
+            localStorage.setItem('session', selectedYear.session);
+          }
+        }
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
@@ -164,6 +173,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     const selectedYear = academicYearList?.find(
       (year) => year.id === event.target.value
     );
+    localStorage.setItem('session', selectedYear?.session ?? '');
     const isActive = selectedYear ? selectedYear.isActive : false;
     // localStorage.setItem('isActiveYearSelected', JSON.stringify(isActive));
     setIsActiveYearSelected(isActive);
@@ -240,7 +250,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     // localStorage is isolated per origin, but COOKIES are shared across ports
     // on the same hostname — so we set short-lived cookies that the survey MFE
     // reads on mount and promotes into its own localStorage.
-    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
+    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'session', 'preferredLanguage'] as const;
     KEYS.forEach((key) => {
       const v = localStorage.getItem(key);
       if (v) {
