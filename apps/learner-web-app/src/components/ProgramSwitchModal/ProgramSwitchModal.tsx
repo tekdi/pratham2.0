@@ -536,6 +536,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href="/home"
             onClick={handleHomeClick}
             startIcon={<HomeIcon />}
             sx={{
@@ -558,6 +560,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href="/programs"
             onClick={handleShowAllPrograms}
             sx={{
               borderColor: '#000',

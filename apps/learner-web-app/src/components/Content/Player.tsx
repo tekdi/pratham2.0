@@ -103,22 +103,36 @@ const App = ({
   }
 
   // Intercept SBPlayer iframe's Exit button which calls window.history.back()
-  // When exitLink param is present, redirect there instead of going back in history
+  // When exitLink/activeLink param is present, redirect there instead of going back in history
   useEffect(() => {
-    if (!exitLink) return;
+    const redirectUrl = exitLink || activeLink;
+    if (!redirectUrl) return;
 
-    // Push a dummy state so when SBPlayer calls history.back(), popstate fires
     window.history.pushState({ playerPage: true }, '', window.location.href);
 
     const handlePopState = () => {
-       window.location.href = exitLink as string;
-       };
+      window.location.href = redirectUrl as string;
+    };
 
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [exitLink]);
+  }, [exitLink, activeLink]);
+
+  // Fallback: sbplayer iframe posts player:close — redirect this tab using activeLink/exitLink.
+  useEffect(() => {
+    const handlePlayerClose = (event: MessageEvent) => {
+      if (event.data?.type !== 'player:close') return;
+      const redirectUrl = exitLink || activeLink;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    };
+
+    window.addEventListener('message', handlePlayerClose);
+    return () => window.removeEventListener('message', handlePlayerClose);
+  }, [exitLink, activeLink]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -242,6 +256,15 @@ const App = ({
       //       }));
       //     }
       //   }
+   // Prefer explicit exit/active links over history.back() so new-tab player sessions land on the right page.
+   if (exitLink) {
+      router.push(exitLink);
+      return;
+    }
+   if (activeLink) {
+      router.push(activeLink);
+      return;
+    }
    if (previousPage) {
       router.push(previousPage);
       return;
@@ -487,6 +510,9 @@ const App = ({
           courseId={courseId}
           unitId={unitId}
           mimeType={mimeType}
+          activeLink={activeLink}
+          exitLink={exitLink}
+          previousPage={previousPage}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
@@ -706,7 +732,10 @@ const PlayerBox = ({
   isShowMoreContent,
   mimeType,
   isPortrait,
-  isVideo
+  isVideo,
+  activeLink,
+  exitLink,
+  previousPage,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -805,7 +834,18 @@ const PlayerBox = ({
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
+            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}${
+              // Forward return URLs into sbplayer so Exit can redirect the player tab correctly.
+              exitLink
+                ? `&exitLink=${encodeURIComponent(exitLink)}`
+                : activeLink
+                ? `&activeLink=${encodeURIComponent(activeLink)}`
+                : ''
+            }${
+              previousPage
+                ? `&previousPage=${encodeURIComponent(previousPage)}`
+                : ''
+            }`}
             // style={{
             //   border: 'none',
             //   objectFit: 'contain',

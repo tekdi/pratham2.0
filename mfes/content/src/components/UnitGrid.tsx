@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Grid, Typography } from '@mui/material';
-import { ContentItem, useTranslation } from '@shared-lib';
+import { ContentItem, getUnitCardHref, useTranslation } from '@shared-lib';
 import UnitCard from './Card/UnitCard';
 import ContentCard from './Card/ContentCard';
 
@@ -21,9 +21,29 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
   _config,
   handleItemClick,
 }) => {
-  const { default_img, _grid, _parentGrid, _card, _containerGrid } =
-    _config || {};
+  const {
+    default_img,
+    _grid,
+    _parentGrid,
+    _card,
+    _containerGrid,
+    courseId,
+    effectiveUnitId,
+    contentBaseUrl,
+    activeLink,
+    enableCardHref,
+  } = _config || {};
   const { t } = useTranslation();
+
+  const buildUnitCardHref = (subItem: ContentItem) => {
+    if (enableCardHref === false) return undefined;
+    return getUnitCardHref(subItem, {
+      courseId,
+      effectiveUnitId,
+      contentBaseUrl: contentBaseUrl ?? '/content',
+      activeLink,
+    });
+  };
 
   return (
     <Grid
@@ -60,6 +80,7 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                   default_img={default_img}
                   _card={{
                     ..._card,
+                    href: buildUnitCardHref(subItem),
                     sx: { ...(_card?.sx ?? {}), height: '100%' },
                   }}
                   handleCardClick={(content: ContentItem) =>
@@ -73,6 +94,8 @@ export const UnitGrid: React.FC<CommonAccordionProps> = ({
                   default_img={default_img}
                   _card={{
                     ..._card,
+                    // Unit/lesson href — same paths as CourseUnitDetails.handleItemClick.
+                    href: buildUnitCardHref(subItem),
                     sx: { ...(_card?.sx ?? {}), height: '100%' },
                   }}
                   handleCardClick={(content: ContentItem) =>

@@ -355,13 +355,14 @@ export default function Details(props: DetailsProps) {
       props?._config.handleCardClick?.(subItem);
     } else {
       localStorage.setItem('unitId', subItem?.courseId);
-      const path =
-        subItem.mimeType === 'application/vnd.ekstep.content-collection'
-          ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${subItem?.identifier
-          }`
-          : `${props?._config?.contentBaseUrl ?? '/content'
-          }/${courseId}/${effectiveUnitId}/${subItem?.identifier}`;
-      router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
+      if (props?._config?.enableCardHref === false) {
+        const path =
+          subItem.mimeType === 'application/vnd.ekstep.content-collection'
+            ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${subItem?.identifier}`
+            : `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${effectiveUnitId}/${subItem?.identifier}`;
+        router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
+      }
+      // Otherwise navigation is handled by CommonCard anchor href (open in new tab).
     }
   };
 
@@ -470,7 +471,16 @@ export default function Details(props: DetailsProps) {
               typeof contentId === 'string' ? contentId : undefined
             }
             trackData={trackData}
-            _config={props?._config}
+            _config={{
+              ...props?._config,
+              courseId: courseId as string,
+              effectiveUnitId,
+              activeLink,
+              contentBaseUrl: props?._config?.contentBaseUrl ?? '/content',
+              enableCardHref: props?._config?.handleCardClick
+                ? false
+                : props?._config?.enableCardHref,
+            }}
           />
         )}
       </Box>

@@ -47,7 +47,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier as string);
       if(isTrackingSyncPendingRef.current === true && isPending === false){
-        window.location.reload();
+        // Reload only when this tab is visible — don't refresh a background course-list tab.
+        if (document.visibilityState === 'visible') {
+          window.location.reload();
+        }
       }
       isTrackingSyncPendingRef.current = isPending;
       setIsTrackingSyncPending(isPending);

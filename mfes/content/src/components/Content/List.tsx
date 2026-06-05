@@ -658,6 +658,8 @@ console.log('API response for content search:', resultResponse);
         
         if (propData?.handleCardClick) {
           propData.handleCardClick(content, e, rowNumber);
+        } else if (propData?._config?.enableCardHref !== false) {
+          // Navigation is handled by CommonCard anchor href (supports open in new tab).
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${content?.identifier
@@ -771,7 +773,13 @@ console.log('API response for content search:', resultResponse);
         value={tabValue}
         onChange={handleTabChange}
         contentData={contentData}
-        _config={propData?._config ?? {}}
+        _config={{
+          ...(propData?._config ?? {}),
+          // Disable anchor href when a custom click handler already controls navigation (e.g. POS).
+          enableCardHref: propData?.handleCardClick
+            ? false
+            : propData?._config?.enableCardHref,
+        }}
         trackData={trackData as any}
         type={localFilters?.type ?? ''}
         handleCardClick={handleCardClickLocal}

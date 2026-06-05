@@ -5,17 +5,24 @@ import {
   updateCOurseAndIssueCertificate,
 } from './PlayerService';
 import { customStoreSet } from '../utils/customIdbStore';
+import { getPlayerExitUrl } from '../components/utils/Helper';
 
 const lastAccessOn = new Date().toISOString();
 
+// Delegates to Helper.getPlayerExitUrl so Exit uses activeLink when opened in a new tab.
 export const handleExitEvent = () => {
-  const previousPage = sessionStorage.getItem('previousPage');
-  if (previousPage) {
-    window.location.href = previousPage;
-  } else {
-    window.history.go(-1);
+  const exitUrl = getPlayerExitUrl();
+  if (exitUrl) {
+    const targetWindow = window.top ?? window;
+    targetWindow.location.href = exitUrl;
+    return;
   }
+
+  const targetWindow = window.top ?? window;
+  targetWindow.history.go(-1);
 };
+
+export { getPlayerExitUrl } from '../components/utils/Helper';
 
 export const handlePlayerEvent = (event: any) => {
   console.log('Player Event', event.detail);

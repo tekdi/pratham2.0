@@ -40,13 +40,48 @@ export const debounce = <T extends (...args: any[]) => any>(
   };
 };
 
+// On Exit, redirect the top window to activeLink/exitLink instead of history.back() (fixes new-tab player flow).
 export const handleExitEvent = () => {
-  const previousPage = sessionStorage.getItem('previousPage');
-  if (previousPage) {
-    window.location.href = previousPage;
-  } else {
-    window.history.go(-1);
+  const exitUrl = getPlayerExitUrl();
+  if (exitUrl) {
+    const targetWindow = window.top ?? window;
+    targetWindow.location.href = exitUrl;
+    return;
   }
+
+  const targetWindow = window.top ?? window;
+  targetWindow.history.go(-1);
+};
+
+/** Read exitLink / activeLink / previousPage from iframe or parent URL for post-exit redirect. */
+export const getPlayerExitUrl = (): string | null => {
+  if (typeof window === 'undefined') return null;
+
+  const readParams = (search: string) => {
+    const params = new URLSearchParams(search);
+    return (
+      params.get('exitLink') ||
+      params.get('activeLink') ||
+      params.get('previousPage')
+    );
+  };
+
+  const fromCurrent = readParams(window.location.search);
+  if (fromCurrent) return fromCurrent;
+
+  const fromSession = sessionStorage.getItem('previousPage');
+  if (fromSession) return fromSession;
+
+  try {
+    if (window.parent && window.parent !== window) {
+      const fromParent = readParams(window.parent.location.search);
+      if (fromParent) return fromParent;
+    }
+  } catch {
+    // Cross-origin iframe — parent search is not readable; rely on iframe query params.
+  }
+
+  return null;
 };
 
 export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {

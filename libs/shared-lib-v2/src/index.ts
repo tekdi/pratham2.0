@@ -7,6 +7,7 @@ export * from './lib/Drawer/CommonDrawer';
 export * from './lib/Dialog/CommonDialog';
 export * from './lib/Tabs/CommonTabs';
 export * from './lib/Card/CommonCard';
+export * from './utils/contentCardHref';
 export * from './lib/Filter/FilterForm';
 export * from './lib/Progress/Progress';
 export * from './lib/Progress/CircularProgressWithLabel';
