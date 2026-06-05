@@ -25,6 +25,11 @@
     player.addEventListener('player:complete', (e) => { console.log('[player:complete]', e.detail);     window.parent.postMessage({ type: 'player:complete', detail: e.detail }, '*'); });
     player.addEventListener('player:error',    (e) => { console.error('[player:error]', e.detail);      window.parent.postMessage({ type: 'player:error',    detail: e.detail }, '*'); });
     player.addEventListener('player:close',    (e) => { console.log('[player:close]', e.detail);        window.parent.postMessage({ type: 'player:close',    detail: e.detail }, '*'); });
+        player.addEventListener('playerTelemetryEvent', function (e) {
+    const envelope = e.detail;   // full SunbirdTelemetryEvent object
+    console.log('[telemetry]', envelope.eid, envelope);
+    window.parent.postMessage({ type: 'telemetry',    detail: e.detail }, '*');
+  });
     }
   </script>
 
