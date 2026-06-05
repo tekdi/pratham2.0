@@ -77,6 +77,16 @@ const Header = ({
             selectedYear ? Boolean(selectedYear.isActive) : false
           );
         }
+        // Backfill `session` (clean label from raw list) for users who logged
+        // in before it was stored.
+        if (!localStorage.getItem('session') && selectedAcademicYearId) {
+          const selectedYear = parsedList?.find(
+            (item: { id: string }) => item.id === selectedAcademicYearId
+          );
+          if (selectedYear?.session) {
+            localStorage.setItem('session', selectedYear.session);
+          }
+        }
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
@@ -96,6 +106,14 @@ const Header = ({
     setSelectedSessionId(event.target.value);
     localStorage.setItem('academicYearId', event.target.value);
 
+    // Read the clean session label from the raw stored list (in-state list has
+    // the active year's session suffixed with "(Active)").
+    const rawList = JSON.parse(localStorage.getItem('academicYearList') || '[]');
+    const rawSelectedYear = rawList?.find(
+      (year: { id: string }) => year.id === event.target.value
+    );
+    localStorage.setItem('session', rawSelectedYear?.session ?? '');
+    // Check if the selected academic year is active
     const selectedYear = academicYearList?.find(
       (year) => year.id === event.target.value
     );
