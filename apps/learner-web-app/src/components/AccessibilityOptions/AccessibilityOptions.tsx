@@ -177,7 +177,7 @@ export default function AccessibilityOptions() {
           '&:hover': {
             bgcolor: isColorInverted ? '#2A2520' : '#ebe7d9',
           },
-          position: 'absolute',
+          position: 'fixed',
           right: 8,
           top: isMobile ? 100 : 150,
           zIndex: 1001,

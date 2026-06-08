@@ -7,6 +7,9 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+} from '@shared-lib-v2/utils/scaledFontSize';
 import { useRouter } from 'next/navigation';
 import EastIcon from '@mui/icons-material/East';
 
@@ -36,7 +39,7 @@ const BreadCrumb = ({
         separator={
           <EastIcon
             sx={{
-              fontSize: '25px',
+              fontSize: scaledFontSize(25),
               color: '#000000',
               fontWeight: 900,
               verticalAlign: 'middle',
@@ -53,36 +56,36 @@ const BreadCrumb = ({
             breadcrumb?.link &&
             (index !== breadCrumbs.length - 1 || isShowLastLink);
 
+          const label = breadcrumb?.name ?? breadcrumb?.label ?? '';
           return isClickable ? (
             <Typography
-              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              key={`${label} ${index}`}
               sx={{
                 color: '#212529',
                 fontWeight: index === breadCrumbs.length - 1 ? 600 : 400,
-                fontSize: '24px',
+                fontSize: scaledFontSize(24),
                 display: 'inline',
                 cursor: 'pointer',
                 fontFamily: '"Montserrat", sans-serif',
-
               }}
               component="span"
               onClick={() => handleClick(breadcrumb?.link)}
             >
-              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+              <SpeakableText text={label}>{label}</SpeakableText>
             </Typography>
           ) : (
             <Typography
-              key={`${breadcrumb?.name ?? breadcrumb?.label ?? ''} ${index}`}
+              key={`${label} ${index}`}
               sx={{
                 color: '#000000',
                 fontWeight: index === breadCrumbs.length - 1 ? 700 : 400,
-                fontSize: '24px',
+                fontSize: scaledFontSize(24),
                 display: 'inline',
                 fontFamily: '"Montserrat", sans-serif',
               }}
               component="span"
             >
-              {breadcrumb?.name ?? breadcrumb?.label ?? ''}
+              <SpeakableText text={label}>{label}</SpeakableText>
             </Typography>
           );
         })}
