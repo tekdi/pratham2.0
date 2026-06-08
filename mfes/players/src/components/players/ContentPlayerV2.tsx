@@ -86,7 +86,7 @@ const ContentPlayerV2 = ({
             if(detail.eid=='START' || detail.eid=='END')
             {
               console.log("response#######",detail)
-              await getTelemetryEvents(detail, contentType, {
+              await getTelemetryEvents(detail, contentType+"|15.00", {
                 courseId,
                 unitId,
                 userId,
