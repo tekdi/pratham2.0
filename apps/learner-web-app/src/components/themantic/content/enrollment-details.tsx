@@ -1,11 +1,11 @@
 'use client';
 import ContentEnroll from '@content-mfes/components/Content/ContentEnroll';
-import LayoutPage from '@content-mfes/components/LayoutPage';
+import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
 
 const ContentDetailsPage = () => {
   return (
-    <LayoutPage isShow={false}>
+    <Layout>
       <SubHeader showFilter={false} />
       <ContentEnroll
         isShowLayout={false}
@@ -16,7 +16,7 @@ const ContentDetailsPage = () => {
           _infoCard: { _cardMedia: { maxHeight: '280px' } },
         }}
       />
-    </LayoutPage>
+    </Layout>
   );
 };
 
