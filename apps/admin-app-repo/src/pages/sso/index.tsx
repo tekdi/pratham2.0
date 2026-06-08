@@ -36,6 +36,24 @@ interface SSOAuthParams {
   ssoProvider: string;
 }
 
+const NEWTON_SSO_BASE_URL =
+  process.env.NEXT_PUBLIC_NEWTON_SSO_URL ||
+  'https://prathamerp.org/Config/OAuthLogin/PRATHAM';
+
+const buildNewtonSsoRedirectUrl = (env = 'newton') => {
+  const currentBaseUrl =
+    globalThis.window !== undefined ? globalThis.window.location.origin : '';
+  const callbackUrl = `${currentBaseUrl}/sso?env=${env}`;
+  const hasQueryParams = NEWTON_SSO_BASE_URL.includes('?');
+  return `${NEWTON_SSO_BASE_URL}${hasQueryParams ? '&' : '?'}callbackurl=${callbackUrl}`;
+};
+
+const redirectToNewtonOAuth = (env = 'newton') => {
+  const ssoUrl = buildNewtonSsoRedirectUrl(env);
+  console.log('Redirecting to SSO URL:', ssoUrl);
+  window.location.href = ssoUrl;
+};
+
 // Pulse animation for loading dots
 const pulseAnimation = keyframes`
   0%, 80%, 100% { 
@@ -105,6 +123,12 @@ const SSOContent = () => {
     const userId = query.USER_ID as string;
     const tenantIdParam = query.tenantid as string;
 
+    // Newton SSO entry: send user to ERP OAuth login until callback tokens arrive
+    if (env === 'newton' && (!accessToken || !userId)) {
+      redirectToNewtonOAuth(env);
+      return;
+    }
+
     // Check if we have required parameters
     if (!env || !accessToken || !userId) {
       console.log('Waiting for search parameters to be loaded...');
@@ -156,18 +180,13 @@ const SSOContent = () => {
       } catch (error: any) {
         console.error('SSO authentication error:', error);
         showToastMessage(
-          error.message || 'Authentication failed',
-          'error'
+              error?.response?.data?.params?.errmsg || 'Authentication failed','error'
         );
-
-        // Reset authentication flags on error so user can retry
         setHasAuthenticated(false);
         authenticationRef.current = false;
-
-        // Redirect to login page after error
-        // setTimeout(() => {
-        //   router.push('/login');
-        // }, 2000);
+        setTimeout(() => {
+          redirectToNewtonOAuth(typeof env === 'string' ? env : 'newton');
+        }, 1000);
       } finally {
         setTimeout(() => {
           setProcessing(false);
