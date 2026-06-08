@@ -740,27 +740,45 @@ const DynamicForm = forwardRef(({
         });
       };
 
-      if (formSchema.properties?.own_phone_check) {
+      const hasPhoneTypeField =
+        formSchema.properties?.phone_type_accessible ||
+        forEditedschema?.phone_type_accessible;
+
+      if (hasPhoneTypeField) {
         if (formData.phone_type_accessible === 'nophone') {
           removeFields(['own_phone_check']);
         } else if (formData.phone_type_accessible) {
-          // 1. Add back to schema if missing
+          const ownPhoneCheckBase = forEditedschema?.own_phone_check || {
+            type: 'string',
+            title: 'DOES_THIS_PHONE_BELONG_TO_YOU',
+            coreField: 0,
+            fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
+            field_type: 'radio',
+            isRequired: true,
+            enum: ['yes', 'no'],
+            enumNames: ['YES', 'NO'],
+          };
+          const ownPhoneCheckSchema = {
+            ...ownPhoneCheckBase,
+            title: t(
+              ownPhoneCheckBase.title || 'DOES_THIS_PHONE_BELONG_TO_YOU'
+            ),
+          };
+          const ownPhoneCheckUiSchema = {
+            'ui:widget': 'CustomRadioWidget',
+            'ui:options': {
+              hideError: true,
+            },
+          };
+
+          // Add back to schema if missing
           setFormSchema((prevSchema) => {
-            if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
+            if (!prevSchema.properties?.own_phone_check) {
               return {
                 ...prevSchema,
                 properties: {
                   ...prevSchema.properties,
-                  own_phone_check: {
-                    type: 'string',
-                    title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
-                    coreField: 0,
-                    fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
-                    field_type: 'radio',
-                    isRequired: true,
-                    enum: ['yes', 'no'],
-                    enumNames: ['YES', 'NO'],
-                  },
+                  own_phone_check: ownPhoneCheckSchema,
                 },
                 required: prevSchema.required?.includes('own_phone_check')
                   ? prevSchema.required
@@ -770,18 +788,16 @@ const DynamicForm = forwardRef(({
             return prevSchema;
           });
 
-          // 2. Add back to uiSchema
+          // Add back to uiSchema
           setFormUiSchema((prevUiSchema) => ({
             ...prevUiSchema,
-            own_phone_check: {
-              'ui:widget': 'CustomRadioWidget',
-              'ui:options': {
-                hideError: true,
-              },
-            },
+            own_phone_check: ownPhoneCheckUiSchema,
+          }));
+          setFormUiSchemaOriginal((prevUiSchema) => ({
+            ...prevUiSchema,
+            own_phone_check: ownPhoneCheckUiSchema,
           }));
         }
-
       }
     }
   }, [formData]);
