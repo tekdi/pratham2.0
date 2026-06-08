@@ -50,6 +50,8 @@ const App = ({
   _config?: any;
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const router = useRouter();
   const params = useParams();
   const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
@@ -494,7 +496,7 @@ const App = ({
         {item?.content?.artifactUrl &&
           
           isDownloadableMimeType(item?.content?.mimeType || mimeType) &&
-          (!isPortrait || (isVideo && !isPortrait)) &&
+          (isMobileOrTablet || !isPortrait || (isVideo && !isPortrait)) &&
           isDownloadContentEnabled() && (
             <Box
               sx={{
