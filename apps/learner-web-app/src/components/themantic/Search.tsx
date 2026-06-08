@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { SearchButton } from './SearchButton';
 import { debounce } from 'lodash';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { scaledFontSize } from '@learner/utils/scaledFontSize';
 import SubHeader from './subHeader/SubHeader';
 import { CardComponent } from './content/List';
 import BreadCrumb from '@content-mfes/components/BreadCrumb';
@@ -101,7 +102,7 @@ const SearchPage = () => {
                 _noData: {
                   sx: {
                     textAlign: 'left',
-                    fontSize: '28px',
+                    fontSize: scaledFontSize(28),
                     fontWeight: 700,
                     display: 'flex',
                     justifyContent: 'start',

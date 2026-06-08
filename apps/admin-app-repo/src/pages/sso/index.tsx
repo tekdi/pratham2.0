@@ -493,6 +493,7 @@ const SSOContent = () => {
               );
               const activeSessionId = activeSession ? activeSession.id : '';
               localStorage.setItem('academicYearId', activeSessionId);
+              localStorage.setItem('session', activeSession?.session ?? '');
               if (activeSessionId) {
                 setIsActiveYearSelected(true);
                 if (

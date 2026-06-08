@@ -100,7 +100,7 @@
 
 // export default PaginatedTable;
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -113,6 +113,8 @@ import {
   IconButton,
   Box,
 } from '@mui/material';
+import useStore from '@/store/store';
+import { getVisibleTableActions } from '@/utils/filterTableActionsForAcademicYear';
 
 const PaginatedTable = ({
   count,
@@ -127,6 +129,11 @@ const PaginatedTable = ({
 }) => {
   const [page, setPage] = useState(defaultPage);
   const [rowsPerPage, setRowsPerPage] = useState(defaultRowsPerPage);
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
+  const visibleActions = useMemo(
+    () => getVisibleTableActions(actions, isActiveYear),
+    [actions, isActiveYear]
+  );
 
   useEffect(() => {
     setPage(defaultPage);
@@ -161,7 +168,7 @@ const PaginatedTable = ({
         >
           <TableHead>
             <TableRow>
-              {actions.length > 0 && <TableCell>Actions</TableCell>}
+              {visibleActions.length > 0 && <TableCell>Actions</TableCell>}
               {columns?.map((col) => (
                 <TableCell key={col.key || col.keys?.join('-')}>
                   {col.label}
@@ -173,7 +180,7 @@ const PaginatedTable = ({
             {data &&
               data?.map((row, index) => (
                 <TableRow key={index}>
-                  {actions.length > 0 && (
+                  {visibleActions.length > 0 && (
                     <TableCell>
                       <Box
                         sx={{
@@ -198,7 +205,7 @@ const PaginatedTable = ({
                             },
                         }}
                       >
-                        {actions
+                        {visibleActions
                           .filter((action) =>
                             typeof action.show === 'function'
                               ? action.show(row)

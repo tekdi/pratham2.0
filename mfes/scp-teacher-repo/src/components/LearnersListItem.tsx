@@ -109,6 +109,11 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
     (state) => state.setCohortLearnerDeleteId
   );
   const isActiveYear = userStore.isActiveYearSelected;
+  const previousYearHiddenActions = [
+    'reassign-batch',
+    'delete-User',
+    'reassign-centers',
+  ];
 
   const [reassignModalOpen, setReassignModalOpen] =
     React.useState<boolean>(false);
@@ -273,6 +278,9 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
 
   const listItemClick = async (event: React.MouseEvent, name: string) => {
     if (name === 'loading') {
+      return;
+    }
+    if (!isActiveYear && previousYearHiddenActions.includes(name)) {
       return;
     }
     if (name === 'mark-drop-out') {
@@ -972,6 +980,11 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                   option.name !== 'reassign-centers')
               );
             })
+            .filter(
+              (option) =>
+                isActiveYear ||
+                !previousYearHiddenActions.includes(option.name)
+            )
             : [
               // Only TL will see this option
               ...(loggedInUserRole === Role.TEAM_LEADER && canShowReassignBatch
@@ -1021,6 +1034,11 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                   option.name !== 'reassign-centers')
               );
             })
+            .filter(
+              (option) =>
+                isActiveYear ||
+                !previousYearHiddenActions.includes(option.name)
+            )
         }
         renderCustomContent={renderCustomContent}
       />

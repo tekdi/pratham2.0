@@ -46,6 +46,7 @@ export interface AppBarProps {
   _brand?: object;
   isColorInverted?: boolean;
   _config?: any;
+  isVerticalSubmenu?: boolean;
 }
 
 export const withoutQueryString = () => {
@@ -54,6 +55,24 @@ export const withoutQueryString = () => {
     return parsedUrl?.pathname + parsedUrl?.search;
   }
   return '';
+};
+
+const MULTI_COLUMN_SUBMENU_THRESHOLD = 10;
+const MAX_SUBMENU_ITEMS_PER_COLUMN = 7;
+
+/** Split submenu into columns (max 7 items each) when count exceeds threshold. */
+export const getVerticalSubmenuColumns = (
+  items: any[],
+  useVerticalLayout: boolean
+): any[][] => {
+  if (!useVerticalLayout || items.length <= MULTI_COLUMN_SUBMENU_THRESHOLD) {
+    return [items];
+  }
+  const columns: any[][] = [];
+  for (let i = 0; i < items.length; i += MAX_SUBMENU_ITEMS_PER_COLUMN) {
+    columns.push(items.slice(i, i + MAX_SUBMENU_ITEMS_PER_COLUMN));
+  }
+  return columns;
 };
 
 export const TopAppBar: React.FC<AppBarProps> = ({
@@ -143,13 +162,13 @@ const LanguageSelect = ({
       }}
     >
       <MuiMenuItem value="en">English</MuiMenuItem>
-      <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
+      {/* <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
       <MuiMenuItem value="mr">मराठी</MuiMenuItem>
       <MuiMenuItem value="odi">ଓଡ଼ିଆ</MuiMenuItem>
       <MuiMenuItem value="tel">తెలుగు</MuiMenuItem>
       <MuiMenuItem value="kan">ಕನ್ನಡ</MuiMenuItem>
       <MuiMenuItem value="tam">தமிழ்</MuiMenuItem>
-      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem>
+      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem> */}
     </Select>
   );
 };
@@ -163,6 +182,7 @@ export const DesktopBar = ({
   _brand,
   isColorInverted = false,
   _config,
+  isVerticalSubmenu = false,
 }: AppBarProps) => {
   const [menus, setMenus] = useState<
     { anchorEl: HTMLElement | null; items: any[] }[]
@@ -344,13 +364,20 @@ export const DesktopBar = ({
           }}
         >
           <Paper elevation={3} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-            <Box display="flex" flexDirection="row" flexWrap="wrap">
-              {menu.items.map((item, idx) => {
+            {(() => {
+              const columns = getVerticalSubmenuColumns(
+                menu.items,
+                isVerticalSubmenu
+              );
+              const useMultiColumn =
+                isVerticalSubmenu && columns.length > 1;
+
+              const renderSubmenuItem = (item: any, idx: number, colIdx: number) => {
                 const hasChild =
                   Array.isArray(item.child) && item.child.length > 0;
                 return (
                   <Box
-                    key={`${idx}-${item.label}`}
+                    key={`${colIdx}-${idx}-${item.label ?? item.title}`}
                     onMouseEnter={(e) => {
                       if (hasChild) {
                         openMenuAtLevel(level + 1, e.currentTarget, item.child);
@@ -376,8 +403,16 @@ export const DesktopBar = ({
                       }}
                       sx={{
                         justifyContent: 'space-between',
-                        whiteSpace: 'nowrap',
-                        py: 3,
+                        whiteSpace: isVerticalSubmenu ? 'normal' : 'nowrap',
+                        ...(isVerticalSubmenu
+                          ? {
+                              py: 2,
+                              px: 2,
+                              minHeight: 40,
+                            }
+                          : {
+                              py: 3,
+                            }),
                       }}
                     >
                       <Typography
@@ -402,8 +437,46 @@ export const DesktopBar = ({
                     </MenuItem>
                   </Box>
                 );
-              })}
-            </Box>
+              };
+
+              return (
+                <Box
+                  display="flex"
+                  flexDirection={
+                    useMultiColumn
+                      ? 'row'
+                      : isVerticalSubmenu
+                        ? 'column'
+                        : 'row'
+                  }
+                  flexWrap={isVerticalSubmenu && !useMultiColumn ? 'nowrap' : 'wrap'}
+                  gap={useMultiColumn ? 3 : 0}
+                  alignItems="flex-start"
+                  sx={useMultiColumn ? { px: 1, py: 0.5 } : undefined}
+                >
+                  {columns.map((columnItems, colIdx) => (
+                    <Box
+                      key={`submenu-col-${colIdx}`}
+                      display="flex"
+                      flexDirection="column"
+                      sx={
+                        useMultiColumn
+                          ? {
+                              minWidth: 200,
+                              maxWidth: 280,
+                              flex: '1 1 0',
+                            }
+                          : undefined
+                      }
+                    >
+                      {columnItems.map((item, idx) =>
+                        renderSubmenuItem(item, idx, colIdx)
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              );
+            })()}
           </Paper>
         </Popper>
       ))}

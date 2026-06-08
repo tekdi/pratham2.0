@@ -12,6 +12,8 @@ import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
 import { usePageViewCount } from '@learner/hooks/usePageViewCount';
 import { usePathname } from 'next/navigation';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { scaledFontSize } from '@learner/utils/scaledFontSize';
 
 // Dynamic import of Content component with SSR disabled
 const Content = dynamic(() => import('@Content'), {
@@ -174,12 +176,12 @@ const List: React.FC<ListProps> = ({
             >
               <Typography
                 sx={{
-                  fontSize: '20px',
+                  fontSize: scaledFontSize(20),
                   fontWeight: 600,
                   color: '#000',
                 }}
               >
-                New Arrivals
+                <SpeakableText>New Arrivals</SpeakableText>
               </Typography>
             </Box>
             <Box
@@ -243,20 +245,26 @@ const List: React.FC<ListProps> = ({
             </Box>
            
           </Box>
-        {pageViews != null && <Box sx={{ 
-          fontSize: '16px', 
-          color: '#363d47', 
-          fontWeight: 500, 
-          textAlign: 'center', 
-          mt: 4, 
-          p: 2, 
-          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-          borderRadius: '8px',
-          width: 'fit-content',
-          mx: 'auto'
-        }}>
-         Total views: {pageViews}
-        </Box>}
+        {pageViews != null && (
+          <Box
+            sx={{
+              fontSize: scaledFontSize(16),
+              color: '#363d47',
+              fontWeight: 500,
+              textAlign: 'center',
+              mt: 4,
+              p: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '8px',
+              width: 'fit-content',
+              mx: 'auto',
+            }}
+          >
+            <SpeakableText text={`Total views: ${pageViews}`}>
+              Total views: {pageViews}
+            </SpeakableText>
+          </Box>
+        )}
         </Box>
       </Box>
     </Layout>
@@ -324,6 +332,8 @@ export const CardComponent = ({
   const finalTextTransform = textTransform || _card?.textTransform;
   const finalTitleColor = titleColor || _card?.titleColor;
   const finalMaxTitleLines = maxTitleLines || _card?.maxTitleLines || 2;
+  const cardTitle = item.name || item.title || 'Untitled';
+  const scaledTitleFontSize = scaledFontSize(finalTitleFontSize || '16px');
   const onClick = (id: string) => {
     if (handleCardClick) {
       handleCardClick(id);
@@ -370,13 +380,13 @@ export const CardComponent = ({
         </Box>
 
         {/* Title */}
-        <Tooltip title={item.name || item.title || 'Untitled'} arrow>
+        <Tooltip title={cardTitle} arrow>
           <Typography
             variant="h6"
             sx={{
               fontWeight: finalFontWeight || 400,
               textAlign: 'center',
-              fontSize: finalTitleFontSize || '16px',
+              fontSize: scaledTitleFontSize,
               letterSpacing: '1px',
               mt: 0.3,
               mb: 0.3,
@@ -392,7 +402,7 @@ export const CardComponent = ({
               wordBreak: 'break-word',
             }}
           >
-            {item.name || item.title || 'Untitled'}
+            <SpeakableText text={cardTitle}>{cardTitle}</SpeakableText>
           </Typography>
         </Tooltip>
 
@@ -402,7 +412,7 @@ export const CardComponent = ({
             sx={{
               fontWeight: 500,
               textAlign: 'center',
-              // fontSize: '14px',
+              fontSize: scaledFontSize(14),
               letterSpacing: '0.5px',
               display: '-webkit-box',
               WebkitLineClamp: finalMaxTitleLines,
@@ -418,7 +428,11 @@ export const CardComponent = ({
               visibility: englishTitle ? 'visible' : 'hidden',
             }}
           >
-            {englishTitle || 'Placeholder'}
+            {englishTitle ? (
+              <SpeakableText text={englishTitle}>{englishTitle}</SpeakableText>
+            ) : (
+              'Placeholder'
+            )}
           </Typography>
         </Tooltip>
 
@@ -446,8 +460,14 @@ export const CardComponent = ({
                 pb: 2,
               }}
             >
-              <Box sx={{ fontSize: '18px', color: '#363d47', fontWeight: 500 }}>
-                Explore
+              <Box
+                sx={{
+                  fontSize: scaledFontSize(18),
+                  color: '#363d47',
+                  fontWeight: 500,
+                }}
+              >
+                <SpeakableText>Explore</SpeakableText>
               </Box>
               <Box>
                 <img height={'20px'} src={'/images/arrow.png'} alt="arrow" />

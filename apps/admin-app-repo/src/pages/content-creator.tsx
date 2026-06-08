@@ -35,10 +35,17 @@ import { transformLabel } from '@/utils/Helper';
 import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
+import useStore from '@/store/store';
+import {
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
+
 const ContentCreator = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentCreatorSearchSchema);
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
@@ -446,32 +453,34 @@ const ContentCreator = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="contentCreator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
           />
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledAddFormData({});
-              setIsEdit(false);
-              setEditableUserId('');
-              handleOpenModal();
-            }}
-          >
-            {t('COMMON.ADD_NEW')}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledAddFormData({});
+                setIsEdit(false);
+                setEditableUserId('');
+                handleOpenModal();
+              }}
+            >
+              {t('COMMON.ADD_NEW')}
+            </Button>
+          )}
         </Box>
 
         <SimpleModal
@@ -521,7 +530,7 @@ const ContentCreator = () => {
         {response != null ? (
           <>
             {response && response?.result?.getUserDetails ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}

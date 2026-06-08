@@ -66,9 +66,15 @@ import CenterLabel from '@/components/Centerlabel';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
 import { getOverallStatus } from '@shared-lib-v2/utils/helper';
+import useStore from '@/store/store';
+import {
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const Facilitator = () => {
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(facilitatorSearchSchema);
   const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
@@ -843,34 +849,36 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="facilitator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
           />
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledAddFormData(initialFormData);
-              setIsEdit(false);
-              setIsReassign(false);
-              setEditableUserId('');
-              handleOpenModal();
-              setButtonShow(true);
-            }}
-          >
-            {t('COMMON.ADD_NEW')}{' '}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledAddFormData(initialFormData);
+                setIsEdit(false);
+                setIsReassign(false);
+                setEditableUserId('');
+                handleOpenModal();
+                setButtonShow(true);
+              }}
+            >
+              {t('COMMON.ADD_NEW')}{' '}
+            </Button>
+          )}
         </Box>
 
         <SimpleModal
@@ -934,7 +942,7 @@ console.log('response?.result?.getUserDetails',response?.result?.getUserDetails)
         {response != null ? (
           <>
             {response && response?.result?.getUserDetails ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}

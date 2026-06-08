@@ -18,7 +18,7 @@ import Profile from './Profile';
 import { AcademicYear } from '@/utils/Interfaces';
 import useStore from '@/store/store';
 import { useQueryClient } from '@tanstack/react-query';
-import { Role, TenantName } from '@/utils/app.constant';
+import { Role } from '@/utils/app.constant';
 import MenuIcon from '@mui/icons-material/Menu';
 
 const Header = ({
@@ -68,13 +68,32 @@ const Header = ({
         setAcademicYearList(modifiedList);
         const selectedAcademicYearId = localStorage.getItem('academicYearId');
         setSelectedSessionId(selectedAcademicYearId ?? '');
+
+        if (selectedAcademicYearId && parsedList.length > 0) {
+          const selectedYear = parsedList.find(
+            (item: AcademicYear) => item.id === selectedAcademicYearId
+          );
+          setIsActiveYearSelected(
+            selectedYear ? Boolean(selectedYear.isActive) : false
+          );
+        }
+        // Backfill `session` (clean label from raw list) for users who logged
+        // in before it was stored.
+        if (!localStorage.getItem('session') && selectedAcademicYearId) {
+          const selectedYear = parsedList?.find(
+            (item: { id: string }) => item.id === selectedAcademicYearId
+          );
+          if (selectedYear?.session) {
+            localStorage.setItem('session', selectedYear.session);
+          }
+        }
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
         setSelectedSessionId('');
       }
     }
-  }, [setLanguage]);
+  }, [setLanguage, setIsActiveYearSelected, t]);
 
   useEffect(() => {
     const storedUserData = localStorage.getItem('adminInfo');
@@ -86,85 +105,23 @@ const Header = ({
   const handleSelectChange = (event: SelectChangeEvent) => {
     setSelectedSessionId(event.target.value);
     localStorage.setItem('academicYearId', event.target.value);
+
+    // Read the clean session label from the raw stored list (in-state list has
+    // the active year's session suffixed with "(Active)").
+    const rawList = JSON.parse(localStorage.getItem('academicYearList') || '[]');
+    const rawSelectedYear = rawList?.find(
+      (year: { id: string }) => year.id === event.target.value
+    );
+    localStorage.setItem('session', rawSelectedYear?.session ?? '');
     // Check if the selected academic year is active
     const selectedYear = academicYearList?.find(
       (year) => year.id === event.target.value
     );
-    const isActive = selectedYear ? selectedYear.isActive : false;
-    // localStorage.setItem('isActiveYearSelected', JSON.stringify(isActive));
+    const isActive = selectedYear ? Boolean(selectedYear.isActive) : false;
     setIsActiveYearSelected(isActive);
 
     queryClient.clear();
-    // window.location.reload();
-    const storedUserData = JSON.parse(
-      localStorage.getItem('adminInfo') || '{}'
-    );
-    // window.location.href = (storedUserData?.role === Role.SCTA || storedUserData?.role === Role.CCTA)?"/course-planner":"/centers";
-    const { locale } = router;
-    if (
-      storedUserData?.role === Role.SCTA ||
-      storedUserData?.role === Role.CCTA
-    ) {
-      if (
-        storedUserData?.tenantData[0]?.tenantName !=
-        TenantName.SECOND_CHANCE_PROGRAM
-      ) {
-        // router.push('/workspace');
-        router.push('/faqs');
-      } else {
-        if (locale)
-          router.push('/course-planner', undefined, { locale: locale });
-        else router.push('/course-planner');
-      }
-    } else {
-      if (locale) {
-        if (
-          storedUserData?.role === Role.CENTRAL_ADMIN &&
-          storedUserData?.tenantData[0]?.tenantName ==
-            TenantName.SECOND_CHANCE_PROGRAM
-        ) {
-          if (router.pathname === '/programs') window.location.reload();
-          else router.push('/programs', undefined, { locale: locale });
-        } else if (
-          (storedUserData?.role === Role.CENTRAL_ADMIN ||
-            storedUserData?.role === Role.ADMIN) &&
-          storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET
-        ) {
-          if (router.pathname === '/mentor') window.location.reload();
-          else router.push('/mentor', undefined, { locale: locale });
-        } else if (
-          storedUserData?.role === Role.ADMIN &&
-          storedUserData?.tenantData[0]?.tenantName ==
-            TenantName.SECOND_CHANCE_PROGRAM
-        ) {
-          if (router.pathname === '/centers') window.location.reload();
-          else router.push('/centers', undefined, { locale: locale });
-        }
-      } else {
-        if (
-          storedUserData?.role === Role.CENTRAL_ADMIN &&
-          storedUserData?.tenantData[0]?.tenantName ==
-            TenantName.SECOND_CHANCE_PROGRAM
-        ) {
-          if (router.pathname === '/programs') window.location.reload();
-          else router.push('/programs');
-        } else if (
-          storedUserData?.role === Role.ADMIN &&
-          storedUserData?.tenantData[0]?.tenantName ==
-            TenantName.SECOND_CHANCE_PROGRAM
-        ) {
-          if (router.pathname === '/centers') window.location.reload();
-          else router.push('/centers');
-        } else if (
-          (storedUserData?.role === Role.CENTRAL_ADMIN ||
-            storedUserData?.role === Role.ADMIN) &&
-          storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET
-        ) {
-          if (router.pathname === '/mentor') window.location.reload();
-          else router.push('/mentor', undefined, { locale: locale });
-        }
-      }
-    }
+    window.location.reload();
   };
 
   const handleChange = async (event: SelectChangeEvent) => {

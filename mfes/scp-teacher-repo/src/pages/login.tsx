@@ -193,6 +193,7 @@ const LoginPage = () => {
       );
       const activeSessionId = activeSession ? activeSession.id : '';
       localStorage.setItem('academicYearId', activeSessionId);
+      localStorage.setItem('session', activeSession?.session ?? '');
       setIsActiveYearSelected(true);
 
       return activeSessionId;

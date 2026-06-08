@@ -82,6 +82,7 @@ const SSOContent = () => {
     if (academicYearList.length) {
       localStorage.setItem('academicYearList', JSON.stringify(academicYearList));
       const activeSession = academicYearList.find((item: any) => item?.isActive);
+      localStorage.setItem('session', activeSession?.session ?? '');
       return activeSession?.id || '';
     }
 
