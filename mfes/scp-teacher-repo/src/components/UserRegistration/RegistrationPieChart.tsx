@@ -35,8 +35,7 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
 
   const hasLocationFilters =
     Boolean(locationFilters.states?.length) &&
-    Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length);
+    Boolean(locationFilters.districts?.length);
 
   const buildFilters = (overrides: Record<string, any> = {}) => {
     const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
