@@ -107,6 +107,7 @@ const CoursePlannerDetail = () => {
         courseType: tStore?.type,
         medium: tStore?.medium,
         entityId: cohortId,
+        academicYear: localStorage.getItem('session') || '',
       });
       let courseData = response?.result?.data?.[0];
       let courseId = courseData?._id;
@@ -122,6 +123,7 @@ const CoursePlannerDetail = () => {
           board: tStore?.board,
           courseType: tStore?.type,
           medium: tStore?.medium,
+          academicYear: localStorage.getItem('session') || '',
         });
         if (
           !Array.isArray(response?.result?.data) ||
@@ -199,6 +201,7 @@ const CoursePlannerDetail = () => {
         courseType: tStore?.type,
         medium: tStore?.medium,
         entityId: cohortId,
+        academicYear: localStorage.getItem('session') || '',
       });
       setLoading(false);
 
