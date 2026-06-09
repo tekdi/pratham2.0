@@ -91,6 +91,7 @@ export interface CoursePlannerMetaData {
   board: string;
   type: string;
   medium: string;
+  academicYear: string;
 }
 
 export interface GetTargetedSolutionsParams {
@@ -100,6 +101,7 @@ export interface GetTargetedSolutionsParams {
   class: string;
   board: string;
   courseType: string;
+  academicYear?: string;
 }
 
 export interface GetSolutionDetailsParams {

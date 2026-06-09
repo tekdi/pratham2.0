@@ -53,6 +53,7 @@ export const getTargetedSolutions = async ({
   class: className,
   board,
   courseType,
+  academicYear,
 }: GetTargetedSolutionsParams): Promise<any> => {
   const apiUrl: string = TARGET_SOLUTION_ENDPOINTS;
 
@@ -68,6 +69,7 @@ export const getTargetedSolutions = async ({
     class: className,
     board,
     courseType,
+    ...(academicYear && { academicYear }),
   };
 
   try {

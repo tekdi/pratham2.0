@@ -12,6 +12,7 @@ import {
 } from '@/services/coursePlanner';
 import coursePlannerStore from '@/store/coursePlannerStore';
 import taxonomyStore from '@/store/tanonomyStore';
+import useStore from '@/store/store';
 import { monthColors, Role } from '@/utils/app.constant';
 import { CoursePlannerMetaData } from '@/utils/Interfaces';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -60,6 +61,8 @@ const ImportCsv = () => {
   const router = useRouter();
   const store = coursePlannerStore();
   const tstore = taxonomyStore();
+  const userStore = useStore();
+  const isActiveYear = userStore.isActiveYearSelected;
   const { subject } = router.query;
   const { t } = useTranslation();
 
@@ -97,6 +100,7 @@ const ImportCsv = () => {
         board: tstore?.board,
         courseType: tstore?.taxonomyType,
         medium: tstore?.taxonomyMedium,
+        academicYear: localStorage.getItem('session') || '',
       });
 
       const courseData = response?.result?.data[0];
@@ -144,6 +148,7 @@ const ImportCsv = () => {
         board: tstore?.board,
         courseType: tstore?.taxonomyType,
         medium: tstore?.taxonomyMedium,
+        academicYear: localStorage.getItem('session') || '',
       });
       const courseData = updatedResponse?.result?.data[0];
       if (courseData?._id) {
@@ -319,6 +324,7 @@ const ImportCsv = () => {
         board: tstore?.board,
         type: tstore?.taxonomyType,
         medium: tstore?.taxonomyMedium,
+        academicYear: localStorage.getItem('session') || '',
       };
 
       Papa.parse(selectedFile, {
@@ -511,7 +517,7 @@ const ImportCsv = () => {
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {/* Delete Planner */}
-          {userProjectDetails?.length > 0 && (
+          {isActiveYear && userProjectDetails?.length > 0 && (
             <Box
               display="flex"
               alignItems="center"
@@ -558,7 +564,7 @@ const ImportCsv = () => {
               <Image src={deleteIcon} alt="" />
             </Box>
           )}
-          {userProjectDetails?.length == 0 && (
+          {isActiveYear && userProjectDetails?.length == 0 && (
             <>
               {/* Download CSV Template */}
               <Box
@@ -595,7 +601,7 @@ const ImportCsv = () => {
               </Button>
             </>
           )}
-          {userProjectDetails?.length > 0 && (
+          {isActiveYear && userProjectDetails?.length > 0 && (
             <Button
               variant="outlined"
               sx={{
@@ -765,48 +771,54 @@ const ImportCsv = () => {
                               )}
                             </Typography>
 
-                            <Button
-                              onClick={() => {
-                                setFormType('addSubTopic');
-                                setPrefilledObject(topic);
-                                setOpenAddTopicModal(true);
-                              }}
-                              sx={{
-                                p: 1,
-                                pl: 2.5,
-                                pr: 2.5,
-                                fontSize: 'small',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                              }}
-                              size="small"
-                              endIcon={<AddIcon fontSize="medium" />}
-                            >
-                              Add New Sub topic
-                            </Button>
-                            <IconButton
-                              onClick={() => {
-                                setFormType('editTopic');
-                                setPrefilledObject(topic);
-                                setOpenAddTopicModal(true);
-                              }}
-                              sx={{
-                                color: '#0D599E',
-                              }}
-                            >
-                              <EditOutlinedIcon />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => {
-                                handleDeleteContent(topic?.externalId, 'Topic');
-                              }}
-                              sx={{
-                                color: '#BA1A1A',
-                              }}
-                            >
-                              <DeleteOutlineOutlinedIcon />
-                            </IconButton>
+                            {isActiveYear && (
+                              <Button
+                                onClick={() => {
+                                  setFormType('addSubTopic');
+                                  setPrefilledObject(topic);
+                                  setOpenAddTopicModal(true);
+                                }}
+                                sx={{
+                                  p: 1,
+                                  pl: 2.5,
+                                  pr: 2.5,
+                                  fontSize: 'small',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                }}
+                                size="small"
+                                endIcon={<AddIcon fontSize="medium" />}
+                              >
+                                Add New Sub topic
+                              </Button>
+                            )}
+                            {isActiveYear && (
+                              <IconButton
+                                onClick={() => {
+                                  setFormType('editTopic');
+                                  setPrefilledObject(topic);
+                                  setOpenAddTopicModal(true);
+                                }}
+                                sx={{
+                                  color: '#0D599E',
+                                }}
+                              >
+                                <EditOutlinedIcon />
+                              </IconButton>
+                            )}
+                            {isActiveYear && (
+                              <IconButton
+                                onClick={() => {
+                                  handleDeleteContent(topic?.externalId, 'Topic');
+                                }}
+                                sx={{
+                                  color: '#BA1A1A',
+                                }}
+                              >
+                                <DeleteOutlineOutlinedIcon />
+                              </IconButton>
+                            )}
                           </Box>
                         </Box>
                       </AccordionSummary>
@@ -956,37 +968,39 @@ const ImportCsv = () => {
                                     )} */}
                                   </Box>
                                 </Box>
-                                <Box
-                                  sx={{
-                                    flex: 1,
-                                    display: 'flex',
-                                    justifyContent: 'flex-end',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                  }}
-                                >
+                                {isActiveYear && (
                                   <Box
                                     sx={{
-                                      padding: '2px',
-                                      background: '#FAEEEC',
-                                      borderRadius: '8px',
+                                      flex: 1,
+                                      display: 'flex',
+                                      justifyContent: 'flex-end',
+                                      alignItems: 'center',
+                                      gap: '6px',
                                     }}
                                   >
-                                    <IconButton
-                                      onClick={() => {
-                                        handleDeleteContent(
-                                          subTopic?.externalId,
-                                          'Sub Topic'
-                                        );
-                                      }}
+                                    <Box
                                       sx={{
-                                        color: '#BA1A1A',
+                                        padding: '2px',
+                                        background: '#FAEEEC',
+                                        borderRadius: '8px',
                                       }}
                                     >
-                                      <DeleteOutlineOutlinedIcon />
-                                    </IconButton>
+                                      <IconButton
+                                        onClick={() => {
+                                          handleDeleteContent(
+                                            subTopic?.externalId,
+                                            'Sub Topic'
+                                          );
+                                        }}
+                                        sx={{
+                                          color: '#BA1A1A',
+                                        }}
+                                      >
+                                        <DeleteOutlineOutlinedIcon />
+                                      </IconButton>
+                                    </Box>
                                   </Box>
-                                </Box>
+                                )}
                               </Box>
                             </Box>
                           </Box>
