@@ -310,7 +310,8 @@
       "LIFE": "Life",
       "PROGRAM": "Program",
       "ABOUT_US": "About Us",
-      "THEMATIC_REPOSITORY": "Thematic Repository"
+      "THEMATIC_REPOSITORY": "Thematic Repository",
+      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "Your response has been recorded",

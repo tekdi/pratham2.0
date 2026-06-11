@@ -17,6 +17,9 @@ export const Footer: React.FC = () => {
   const { t } = useTranslation('footer');
   const { isColorInverted } = useColorInversion();
 
+  const termsAndConditionsUrl =
+    'https://www.prathamopenschool.org/pos/terms-and-conditions';
+
   const usefulLinks = [
     {
       label: t('Pratham'),
@@ -42,6 +45,20 @@ export const Footer: React.FC = () => {
     //   label: t('Mohalla Learning Camp'),
     //   href: 'https://prathamopenschool.org/MohallaLearningCamp/Contents/mohallalc',
     // },
+
+    {
+      label: t('Pradigi'),
+      href: 'https://pradigi.org/',
+    },
+    {
+      label : t('Covid 19 Resources'),
+      href: 'https://www.prathamopenschool.org/Covid19Resources',
+    },
+    {
+      label : t('ASER'),
+      href: 'https://asercentre.org/'
+    }
+   
   ];
 
   return (
@@ -228,13 +245,28 @@ export const Footer: React.FC = () => {
           <Box>
             <Typography
               variant="body2"
+              component="div"
               sx={{ color: '#7C766F', fontWeight: 500 }}
             >
-              <SpeakableText>
+              <SpeakableText
+                text={`${t('All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |')} ${t('Terms and Conditions')}`}
+              >
                 {t(
-                  'All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School | Terms and Conditions'
+                  'All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |'
                 )}
-              </SpeakableText>
+              </SpeakableText>{' '}
+              <Link
+                href={termsAndConditionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'inherit',
+                  textDecoration: 'underline',
+                  fontWeight: 500,
+                }}
+              >
+                {t('Terms and Conditions')}
+              </Link>
             </Typography>
           </Box>
         </Grid>
