@@ -32,6 +32,26 @@ interface SSOAuthParams {
   ssoProvider: string;
 }
 
+const NEWTON_SSO_BASE_URL =
+  process.env.NEXT_PUBLIC_NEWTON_SSO_URL ||
+  'https://prathamerp.org/Config/OAuthLogin/PRATHAM';
+
+const YOUTHNET_BASE_PATH = '/youthnet';
+
+const buildNewtonSsoRedirectUrl = (env = 'newton') => {
+  const currentBaseUrl =
+    globalThis.window !== undefined ? globalThis.window.location.origin : '';
+  const callbackUrl = `${currentBaseUrl}${YOUTHNET_BASE_PATH}/sso?env=${env}`;
+  const hasQueryParams = NEWTON_SSO_BASE_URL.includes('?');
+  return `${NEWTON_SSO_BASE_URL}${hasQueryParams ? '&' : '?'}callbackurl=${callbackUrl}`;
+};
+
+const redirectToNewtonOAuth = (env = 'newton') => {
+  const ssoUrl = buildNewtonSsoRedirectUrl(env);
+  console.log('Redirecting to SSO URL:', ssoUrl);
+  window.location.href = ssoUrl;
+};
+
 // Pulse animation for loading dots
 const pulseAnimation = keyframes`
   0%, 80%, 100% { 
@@ -137,6 +157,13 @@ const SSOContent = () => {
      if(userId) {
      localStorage.setItem('managrUserId', userId);
      }
+
+    // Newton SSO entry: redirect to ERP OAuth login until callback tokens arrive
+    if (env === 'newton' && (!accessToken || !userId)) {
+      redirectToNewtonOAuth(env);
+      return;
+    }
+
     // Only proceed if we have search params and at least one of the required parameters
     if (!hasSearchParams || (!env && !accessToken && !userId)) {
       console.log('Waiting for search parameters to be loaded...');
@@ -197,16 +224,16 @@ const SSOContent = () => {
         }
       } catch (error: any) {
         console.error('SSO authentication error:', error);
-        showToastMessage(error.message || 'Authentication failed', 'error');
+        showToastMessage(error?.response?.data?.params?.errmsg || 'Authentication failed','error');
 
         // Reset authentication flags on error so user can retry
         setHasAuthenticated(false);
         authenticationRef.current = false;
 
-        // Redirect to home page after error
+        // Redirect to Newton OAuth login after error
         setTimeout(() => {
-          router.push('/');
-        }, 2000);
+          redirectToNewtonOAuth(env || 'newton');
+        }, 1000);
       } finally {
         setTimeout(() => {
           setProcessing(false);
