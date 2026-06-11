@@ -40,11 +40,18 @@ import ActiveArchivedLearner from '@/components/ActiveArchivedLearner';
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import ActiveArchivedBatch from '@/components/ActiveArchivedBatch';
 import BatchFlow from '@/components/BatchFlow/BatchFlow';
+import useStore from '@/store/store';
+import {
+  getVisibleTableActions,
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 //import { DynamicForm } from '@shared-lib';
 
 const Centers = () => {
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(CohortSearchSchema);
   const [uiSchema, setUiSchema] = useState(CohortSearchUISchema);
@@ -481,6 +488,7 @@ const Centers = () => {
     //       ?.selectedValues,
     // },
     {
+      readOnly: true,
       icon: (
         <Box
           sx={{
@@ -620,6 +628,8 @@ const Centers = () => {
     },
   ];
 
+  const visibleActions = getVisibleTableActions(actions, isActiveYear);
+
   // Pagination handlers
   const handlePageChange = (newPage: any) => {
     console.log('Page changed to:', newPage);
@@ -671,30 +681,32 @@ const Centers = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              // Restore original UI schema when creating new center
-              if (originalAddUiSchema) {
-                setAddUiSchema(originalAddUiSchema);
-              }
-              setPrefilledAddFormData(initialFormData);
-              setIsEdit(false);
-              setEditableUserId('');
-              handleOpenModal();
-            }}
-          >
-            {t('COMMON.ADD_NEW')}{' '}
-          </Button>
+        <Box mt={4} sx={pageActionBarSx}>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                // Restore original UI schema when creating new center
+                if (originalAddUiSchema) {
+                  setAddUiSchema(originalAddUiSchema);
+                }
+                setPrefilledAddFormData(initialFormData);
+                setIsEdit(false);
+                setEditableUserId('');
+                handleOpenModal();
+              }}
+            >
+              {t('COMMON.ADD_NEW')}{' '}
+            </Button>
+          )}
         </Box>
 
         <SimpleModal
@@ -743,12 +755,12 @@ const Centers = () => {
           <>
             {response &&
             response?.result?.results?.cohortDetails?.length > 0 ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.count}
                   data={response?.result?.results?.cohortDetails}
                   columns={columns}
-                  actions={actions}
+                  actions={visibleActions}
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   defaultPage={currentPage}

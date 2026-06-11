@@ -270,6 +270,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
       courseType: item?.metadata?.courseType,
       subject: item?.metadata?.subject,
       ...(isEntity && { entityId: cohortId }),
+      academicYear: localStorage.getItem('session') || '',
     });
     return response;
   };

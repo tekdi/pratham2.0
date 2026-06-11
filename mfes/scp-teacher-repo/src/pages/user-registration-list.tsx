@@ -849,6 +849,7 @@ const UserRegistrationList = () => {
                         }}
                     >
                         <MenuItem value={ALL_FILTER_VALUE}>{t('USER_REGISTRATION.ALL')}</MenuItem>
+                        <MenuItem value="0">{t('USER_REGISTRATION.NO_ATTEMPT')}</MenuItem>
                         <MenuItem value="1">{t('USER_REGISTRATION.ONE_ATTEMPT')}</MenuItem>
                         <MenuItem value="2">{t('USER_REGISTRATION.TWO_ATTEMPTS')}</MenuItem>
                     </Select>

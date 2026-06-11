@@ -17,6 +17,7 @@ export const getTargetedSolutions = async ({
   board,
   courseType,
   entityId,
+  academicYear,
 }: GetTargetedSolutionsParams): Promise<any> => {
   const apiUrl: string = `${process.env.NEXT_PUBLIC_COURSE_PLANNER_API_URL}/solutions/targetedSolutions?type=improvementProject&currentScopeOnly=true`;
   const headers = {
@@ -30,6 +31,7 @@ export const getTargetedSolutions = async ({
     board,
     courseType,
     ...(entityId && { entityId }),
+    ...(academicYear && { academicYear }),
   };
 
   try {

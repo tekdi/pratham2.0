@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Dialog,
@@ -28,17 +28,9 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
 }) => {
   const { setLanguage } = useTranslation();
   const [open, setOpen] = useState(false);
+  const hasMultipleLanguages = PLP_LANGUAGE_OPTIONS.length > 1;
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (localStorage.getItem('isAndroidApp') === 'yes') return;
-    const dismissed = sessionStorage.getItem(PLP_LANGUAGE_POPUP_DISMISSED_KEY);
-    if (!dismissed) {
-      setOpen(true);
-    }
-  }, []);
-
-  const persistLanguage = (code: string) => {
+  const persistLanguage = useCallback((code: string) => {
     setLanguage(code);
     localStorage.setItem('lang', code);
     localStorage.setItem('preferredLanguage', code);
@@ -51,13 +43,35 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
         })
       );
     }
-  };
+  }, [setLanguage]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    if (!hasMultipleLanguages) {
+      const code = PLP_LANGUAGE_OPTIONS[0]?.code;
+      if (code) {
+        persistLanguage(code);
+      }
+      return;
+    }
+
+    if (localStorage.getItem('isAndroidApp') === 'yes') return;
+    const dismissed = sessionStorage.getItem(PLP_LANGUAGE_POPUP_DISMISSED_KEY);
+    if (!dismissed) {
+      setOpen(true);
+    }
+  }, [hasMultipleLanguages, persistLanguage]);
 
   const handleLanguageSelect = (code: string) => {
     persistLanguage(code);
     sessionStorage.setItem(PLP_LANGUAGE_POPUP_DISMISSED_KEY, 'true');
     setOpen(false);
   };
+
+  if (!hasMultipleLanguages) {
+    return null;
+  }
 
   return (
     <Dialog
@@ -127,6 +141,7 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
         <Grid
           container
           spacing={1.5}
+          justifyContent="center"
           id="language-selection-description"
         >
           {PLP_LANGUAGE_OPTIONS.map((option) => (

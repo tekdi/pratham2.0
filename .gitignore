@@ -47,6 +47,8 @@ out
 # build/
 mfes/scp-teacher-repo/build/
 apps/admin-app-repo/build/
+apps/learner-web-app/src/utils/helper.ts
+apps/learner-web-app/src/utils/Helper.ts
 
 # ignore env
 .env
