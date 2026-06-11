@@ -21,52 +21,11 @@ import { LocationFilters } from '../components/UserRegistration/types';
 
 const ALL_FILTER_VALUE = 'all';
 
-const normalizeFilterValue = (value?: string) =>
-  !value || value === '' ? ALL_FILTER_VALUE : value;
-
 const UserRegistrationList = () => {
   const { t } = useTranslation();
   
-  // Helper functions for filter retention
-  const getStoredFilters = () => {
-    try {
-      const stored = localStorage.getItem('userRegistrationFilters');
-      if (stored) {
-        const parsedFilters = JSON.parse(stored);
-        
-        // Check if filters are not too old (optional: expire after 24 hours)
-        const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-        const now = Date.now();
-        
-        if (parsedFilters.timestamp && (now - parsedFilters.timestamp) > maxAge) {
-          console.log('📅 Stored filters expired, clearing them');
-          localStorage.removeItem('userRegistrationFilters');
-          return null;
-        }
-        
-        console.log('🔄 Restored filters from localStorage:', parsedFilters);
-        return parsedFilters;
-      }
-      return null;
-    } catch (error) {
-      console.error('❌ Error parsing stored filters:', error);
-      return null;
-    }
-  };
-
-  const saveFiltersToStorage = (filters: any) => {
-    try {
-      localStorage.setItem('userRegistrationFilters', JSON.stringify(filters));
-      console.log('💾 Saved filters to localStorage:', filters);
-    } catch (error) {
-      console.error('❌ Error saving filters to storage:', error);
-    }
-  };
-
-  // Initialize state with stored values or defaults for filter retention
-  const storedFilters = getStoredFilters();
-  const [tabValue, setTabValue] = useState(storedFilters?.tabValue || 'pending');
-  const [searchQuery, setSearchQuery] = useState(storedFilters?.searchQuery || '');
+  const [tabValue, setTabValue] = useState('pending');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [assignBatchModalOpen, setAssignBatchModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -75,25 +34,16 @@ const UserRegistrationList = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(storedFilters?.currentPage || 1);
-  const [locationFilters, setLocationFilters] = useState<LocationFilters>(storedFilters?.locationFilters || {});
-  const [modeOfLearning, setModeOfLearning] = useState<string>(
-    normalizeFilterValue(storedFilters?.modeOfLearning)
-  );
-  const [assessmentAttemptsFilter, setAssessmentAttemptsFilter] = useState<string>(
-    normalizeFilterValue(storedFilters?.assessmentAttemptsFilter)
-  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
+  const [modeOfLearning, setModeOfLearning] = useState<string>(ALL_FILTER_VALUE);
+  const [assessmentAttemptsFilter, setAssessmentAttemptsFilter] = useState<string>(ALL_FILTER_VALUE);
   const [chartTrigger, setChartTrigger] = useState(false);
   const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
   const [assessmentLoading, setAssessmentLoading] = useState(false);
   const limit = 50;
 
   const requestCounterRef = useRef(0);
-
-  const hasLocationFilters =
-    Boolean(locationFilters.states?.length) &&
-    Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length);
 
   const getUserAssessmentAttemptCount = (user: any): number => {
     if (!user.assessmentStats || Object.keys(user.assessmentStats).length === 0) {
@@ -387,7 +337,7 @@ const UserRegistrationList = () => {
         filters.village = location.villages;
       }
       if (searchTerm) {
-        filters.name = searchTerm;
+        filters.search = searchTerm;
       }
       if (mode && mode !== ALL_FILTER_VALUE) {
         filters.preferred_mode_of_learning = mode;
@@ -454,40 +404,11 @@ const UserRegistrationList = () => {
     }
   }, [limit]);
 
-  // Save filters to localStorage whenever they change
-  useEffect(() => {
-    const filtersToSave = {
-      tabValue,
-      searchQuery,
-      currentPage,
-      locationFilters,
-      modeOfLearning,
-      assessmentAttemptsFilter,
-      timestamp: Date.now() // For potential expiration logic
-    };
-    saveFiltersToStorage(filtersToSave);
-  }, [tabValue, searchQuery, currentPage, locationFilters, modeOfLearning, assessmentAttemptsFilter]);
-
   // Initialize zatpat test identifiers on component mount
   useEffect(() => {
     fetchZatpatTestIdentifiers();
   }, [fetchZatpatTestIdentifiers]);
 
-
-  // Initial fetch once location filters are populated
-  useEffect(() => {
-    if (!hasLocationFilters || isMounted.current) {
-      return;
-    }
-    fetchUsers(1, tabValue, locationFilters, getSearchTerm(), modeOfLearning);
-    isMounted.current = true;
-    prevTabRef.current = tabValue;
-    prevLocationRef.current = JSON.stringify(locationFilters);
-    prevPageRef.current = 1;
-    prevSearchRef.current = searchQuery;
-    prevModeRef.current = modeOfLearning;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasLocationFilters, searchQuery]);
 
   // Use ref to track previous values and prevent unnecessary calls
   const prevTabRef = useRef(tabValue);
@@ -497,22 +418,19 @@ const UserRegistrationList = () => {
   const prevModeRef = useRef(modeOfLearning);
   const isMounted = useRef(false);
 
-  // Fetch users when tab, location, page, or mode changes (skip initial mount)
+  // Fetch users when tab, location, page, or mode changes
   useEffect(() => {
     const normalizedSearch = searchQuery.trim();
     const isSearchShort = normalizedSearch.length > 0 && normalizedSearch.length < 3;
 
     if (!isMounted.current) {
-      // Skip initial fetch if location filters are not yet populated
-      if (!hasLocationFilters) {
-        return;
-      }
       isMounted.current = true;
       prevTabRef.current = tabValue;
       prevLocationRef.current = JSON.stringify(locationFilters);
       prevPageRef.current = currentPage;
       prevSearchRef.current = searchQuery;
       prevModeRef.current = modeOfLearning;
+      fetchUsers(currentPage, tabValue, locationFilters, getSearchTerm(), modeOfLearning);
       return;
     }
 
@@ -545,7 +463,7 @@ const UserRegistrationList = () => {
       prevModeRef.current = modeOfLearning;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, locationFilters, currentPage, hasLocationFilters, searchQuery, modeOfLearning]);
+  }, [tabValue, locationFilters, currentPage, searchQuery, modeOfLearning]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     console.log('handleTabChange', newValue);
@@ -554,19 +472,7 @@ const UserRegistrationList = () => {
     setSelectedUsers(new Set());
   };
 
-  // Clear stored filters function (can be called when needed)
-  const clearStoredFilters = () => {
-    try {
-      localStorage.removeItem('userRegistrationFilters');
-      console.log('🗑️ Cleared stored filters from localStorage');
-    } catch (error) {
-      console.error('❌ Error clearing stored filters:', error);
-    }
-  };
-
-  // Reset all filters to defaults and clear localStorage
   const resetFiltersToDefault = () => {
-    clearStoredFilters();
     setTabValue('pending');
     setSearchQuery('');
     setCurrentPage(1);
