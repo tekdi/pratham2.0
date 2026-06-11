@@ -36,6 +36,7 @@ import { CardComponent } from './List';
 import DownloadIcon from '@mui/icons-material/Download';
 import JotFormEmbedWithSubmit from '@learner/components/JotFormEmbed/JotFormEmbedWithSubmit';
 import { CONTENT_DOWNLOAD_JOTFORM_ID } from '../../../../app.config';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
@@ -309,6 +310,11 @@ const App = ({
     setPendingDownload(downloadData);
     setShowJotFormModal(true);
     // console.log('Modal should now open');
+    logEvent({
+      action: 'download_content',
+      category: 'Content',
+      label: item.content.name,
+    });
   };
 
   // const onBackClick = () => {
