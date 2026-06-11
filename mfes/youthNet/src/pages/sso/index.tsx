@@ -233,7 +233,7 @@ const SSOContent = () => {
         // Redirect to Newton OAuth login after error
         setTimeout(() => {
           redirectToNewtonOAuth(env || 'newton');
-        }, 1000);
+        }, 2500);
       } finally {
         setTimeout(() => {
           setProcessing(false);

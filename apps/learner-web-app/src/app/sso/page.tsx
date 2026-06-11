@@ -151,8 +151,8 @@ const SSOContent = () => {
         setHasAuthenticated(false);
         authenticationRef.current = false;
         setTimeout(() => {
-          router.push('/pragyanpath');
-        }, 1000);
+          window.location.href = '/pragyanpath';
+        }, 2500);
         return;
       }
     

@@ -9,6 +9,7 @@ import {
   keyframes,
 } from '@mui/material';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 import { post } from '@/services/RestClient';
 import { Role, TenantName } from '@/utils/app.constant';
 import { showToastMessage } from '@/components/Toastify';
@@ -186,7 +187,7 @@ const SSOContent = () => {
         authenticationRef.current = false;
         setTimeout(() => {
           redirectToNewtonOAuth(typeof env === 'string' ? env : 'newton');
-        }, 1000);
+        }, 2500);
       } finally {
         setTimeout(() => {
           setProcessing(false);
@@ -621,6 +622,19 @@ const SSOContent = () => {
               alignItems="center"
               gap={4}
             >
+              {/* Always-visible logo */}
+              <Fade in={true}>
+                <Box>
+                  <Image
+                    src="/logo.png"
+                    alt="Pratham"
+                    width={120}
+                    height={60}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </Box>
+              </Fade>
+
               {/* Loading State */}
               {processing && !success && (
                 <Fade in={processing}>
