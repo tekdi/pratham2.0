@@ -50,10 +50,10 @@ export const Footer: React.FC = () => {
       label: t('Pradigi'),
       href: 'https://pradigi.org/',
     },
-    {
-      label : t('Covid 19 Resources'),
-      href: 'https://www.prathamopenschool.org/Covid19Resources',
-    },
+    // {
+    //   label : t('Covid 19 Resources'),
+    //   href: 'https://www.prathamopenschool.org/Covid19Resources',
+    // },
     {
       label : t('ASER'),
       href: 'https://asercentre.org/'
