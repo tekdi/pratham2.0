@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
-import { Box } from '@mui/material';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import { fetchUserList } from '../../services/ManageUser';
 import { LocationFilters } from './types';
@@ -13,6 +13,7 @@ interface RegistrationPieChartProps {
 const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFilters, triggerFetch }) => {
   const { t } = useTranslation();
   const [counts, setCounts] = useState({ pending: 0, archived: 0, mayJoin: 0 });
+  const [loading, setLoading] = useState(true);
   
   const totalCount = counts.pending + counts.archived + counts.mayJoin;
   const isEmpty = totalCount === 0;
@@ -32,11 +33,6 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
     { name: t('USER_REGISTRATION.ARCHIVED_NOT_INTERESTED'), value: counts.archived, color: '#FF4500' },
     { name: t('USER_REGISTRATION.MAY_JOIN_UPCOMING_YEAR'), value: counts.mayJoin, color: '#FFD700' },
   ];
-
-  const hasLocationFilters =
-    Boolean(locationFilters.states?.length) &&
-    Boolean(locationFilters.districts?.length) &&
-    Boolean(locationFilters.blocks?.length);
 
   const buildFilters = (overrides: Record<string, any> = {}) => {
     const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
@@ -66,12 +62,8 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
   };
 
   useEffect(() => {
-    if (!hasLocationFilters) {
-      setCounts({ pending: 0, archived: 0, mayJoin: 0 });
-      return;
-    }
-
     const fetchCounts = async () => {
+      setLoading(true);
       try {
         const pendingFilters = buildFilters({ tenantStatus: ['pending'], interested_to_join: 'pending' });
         const archivedFilters = buildFilters({ tenantStatus: ['pending'], interested_to_join: 'no' });
@@ -86,29 +78,23 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
         setCounts({ pending, archived, mayJoin });
       } catch (error) {
         console.error('Error fetching pie counts', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCounts();
-  }, [hasLocationFilters, locationFilters.states, locationFilters.districts, locationFilters.blocks, locationFilters.villages, triggerFetch]);
-
-  const renderLegendText = (
-    value: string,
-    entry: { payload?: { value?: number } }
-  ) => {
-    return (
-      <span style={{ color: '#000', fontWeight: 400, fontSize: '12px' }}>
-        {value} ({entry.payload?.value ?? 0})
-      </span>
-    );
-  };
+  }, [locationFilters.states, locationFilters.districts, locationFilters.blocks, locationFilters.villages, triggerFetch]);
 
   return (
     <Box sx={{ width: '100%', bgcolor: '#FFF8F2', borderRadius: 2, p: 2, mb: 2, boxShadow: '0px 2px 4px rgba(0,0,0,0.1)' }}>
-      {/* <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-        Learner Registrations
-      </Typography> */}
-      <Box sx={{ height: 200, display: 'flex', flexDirection: 'row'}}>
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+        {t('USER_REGISTRATION.LEARNER_REGISTRATIONS')}
+      </Typography>
+      <Box sx={{ height: 200, display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: loading ? 'center' : 'flex-start' }}>
+        {loading ? (
+          <CircularProgress />
+        ) : (<>
         <ResponsiveContainer width="40%" height="100%">
             <PieChart>
             <Pie
@@ -127,27 +113,17 @@ const RegistrationPieChart: React.FC<RegistrationPieChartProps> = ({ locationFil
             </Pie>
             </PieChart>
         </ResponsiveContainer>
-        <Box sx={{ width: '60%' }}>
-            <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                    <Legend 
-                        layout="vertical" 
-                        verticalAlign="middle" 
-                        align="left"
-                        formatter={renderLegendText}
-                        iconType="circle"
-                        iconSize={10}
-                        wrapperStyle={{ fontSize: '12px' }}
-                    />
-                    {/* Hidden Pie just to render legend correctly without data duplication visual */}
-                    <Pie data={legendData} dataKey="value" cx={-1000} cy={-1000}>
-                        {legendData.map((entry: { color: string }, index: number) => (
-                            <Cell key={`cell-legend-${index}`} fill={entry.color} />
-                        ))}
-                    </Pie>
-                </PieChart>
-            </ResponsiveContainer>
+        <Box sx={{ width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1.5, pl: 2 }}>
+          {legendData.map((entry) => (
+            <Box key={entry.name} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: entry.color, flexShrink: 0 }} />
+              <Typography sx={{ fontSize: '12px', color: '#000', fontWeight: 400 }}>
+                {entry.name} ({entry.value})
+              </Typography>
+            </Box>
+          ))}
         </Box>
+        </>)}
       </Box>
     </Box>
   );

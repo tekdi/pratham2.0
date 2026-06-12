@@ -1147,7 +1147,7 @@
   },
   "USER_REGISTRATION": {
     "LEARNER_REGISTRATIONS": "Learner Registrations",
-    "SEARCH_LEARNER": "Search Learner..",
+    "SEARCH_LEARNER": "Search Learner by name or username...",
     "TO_TAKE_ACTION_SELECT_LEARNER": "To take action, select at least one learner",
     "NO_LEARNERS_FOUND": "No learners found",
     "NO_RECORDS_FOUND": "No records found",
