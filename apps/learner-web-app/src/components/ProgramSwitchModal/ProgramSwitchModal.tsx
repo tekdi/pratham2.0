@@ -143,29 +143,42 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
     try {
       if (tenantDataDetails?.tenantType !== 'elearning') {
         const academicYearList = await getAcademicYear();
+        const allAcademicYearIds = Array.isArray(academicYearList)
+          ? academicYearList
+              .map((year: { id?: string; isActive?: boolean }) => year?.id)
+              .filter(Boolean)
+          : [];
         const activeAcademicYear = Array.isArray(academicYearList)
           ? academicYearList.find(
               (year: { id?: string; isActive?: boolean }) => year?.isActive
             )
           : undefined;
 
+        let userHasActiveBatch = false;
+        for (const yearId of allAcademicYearIds) {
+          localStorage.setItem('academicYearId', yearId as string);
+          const cohortResponse = await getCohortList(storedUserId, true, true);
+          const hasBatch = Array.isArray(cohortResponse?.result)
+            ? cohortResponse.result.some(
+                (cohort: {
+                  type?: string;
+                  cohortStatus?: string;
+                  cohortMemberStatus?: string;
+                }) =>
+                  cohort?.type === 'BATCH' &&
+                  cohort?.cohortStatus === 'active' &&
+                  cohort?.cohortMemberStatus === 'active'
+              )
+            : false;
+          if (hasBatch) {
+            userHasActiveBatch = true;
+            break;
+          }
+        }
+
         if (activeAcademicYear?.id) {
           localStorage.setItem('academicYearId', activeAcademicYear.id);
         }
-
-        const cohortResponse = await getCohortList(storedUserId, true, true);
-        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
-          ? cohortResponse.result.some(
-              (cohort: {
-                type?: string;
-                cohortStatus?: string;
-                cohortMemberStatus?: string;
-              }) =>
-                cohort?.type === 'BATCH' &&
-                cohort?.cohortStatus === 'active' &&
-                cohort?.cohortMemberStatus === 'active'
-            )
-          : false;
 
         if (userHasActiveBatch) {
           return 'clear';
