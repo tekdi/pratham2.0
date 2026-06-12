@@ -100,6 +100,7 @@ export interface PlayerConfig {
   config?: Config;
   metadata?: Metadata;
   data?: any;
+  extra?:any;
 }
 
 export const MIME_TYPE = {

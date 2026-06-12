@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { getTelemetryEvents } from '../../services/TelemetryService';
+import { getTelemetryEvents, getTelemetryEventsResume } from '../../services/TelemetryService';
 import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
@@ -86,12 +86,24 @@ const ContentPlayerV2 = ({
             if(detail.eid=='START' || detail.eid=='END')
             {
               console.log("response#######",detail)
-              await getTelemetryEvents(detail, contentType+"|15.00", {
+              await getTelemetryEvents(detail, contentType, {
                 courseId,
                 unitId,
                 userId,
                 configFunctionality,
               });
+            }
+            if(detail.eid=='PROGRESS' && detail?.edata?.resumeData!='' && contentType!='epub')
+            {
+              await getTelemetryEventsResume(detail, contentType, {
+                  courseId,
+                  unitId,
+                  userId,
+                  configFunctionality,
+                },
+                detail.edata.resumeData,
+                mimeType
+              );
             }
           }
           break;
