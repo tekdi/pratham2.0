@@ -212,20 +212,21 @@ const getPosContentSample = (): (string | number)[][] => [[
   'Introduction to Mathematics',
   'Basic math concepts for Grade 5 students',
   'Learning Resource',
-  'Math',                   // POS_SUBJECTS (from pos-framework API)
-  'Learning for School',    // POS_DOMAINS: Learning for School | Learning for Work | Learning for Life
-  'Academics',              // POS_SUB_DOMAINS (from pos-framework API)
-  '8-11 yrs',               // POS_TARGET_AGE_GROUPS (from content form-read API)
-  'Learners/Children',      // POS_PRIMARY_USERS (from content form-read API)
-  'English',                // contentLanguage — single string (from content form-read API)
-  'Elementary',             // POS_PROGRAMS (from content form-read API)
-  'math, arithmetic',
-  'CC BY 4.0',
-  'Pratham',
-  '2024',
-  'Pratham Team',
-  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing',
-  'pdf',
+  'Math',                   // Subject
+  'Learning for School',    // Domain
+  'Academics',              // Sub Domain
+  '8-11 yrs',               // Target Age Group
+  'Learners/Children',      // Primary User
+  'English',                // Content Language
+  'Elementary',             // Program
+  'math, arithmetic',       // Keywords
+  'CC BY 4.0',              // License
+  'Pratham',                // Copyright
+  '2024',                   // Copyright Year
+  'Pratham Team',           // Author
+  'Pratham Team',           // Creator
+  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // Google Drive URL
+  'pdf',                    // File Type
 ]];
 
 // SCP content also uses POS columns (content always uses pos-framework for all users)
@@ -234,20 +235,21 @@ const getScpContentSample = (): (string | number)[][] => [[
   'Science Study Material',
   'Study material for Science',
   'Learning Resource',
-  'Science',                // POS_SUBJECTS (from pos-framework API)
-  'Learning for School',    // POS_DOMAINS: Learning for School | Learning for Work | Learning for Life
-  'Academics',              // POS_SUB_DOMAINS (from pos-framework API)
-  '14-18 yrs',              // POS_TARGET_AGE_GROUPS (from content form-read API)
-  'Learners/Children',      // POS_PRIMARY_USERS (from content form-read API)
-  'Hindi',                  // contentLanguage — single string (from content form-read API)
-  'Second Chance',          // POS_PROGRAMS (from content form-read API)
-  'science',
-  'CC BY 4.0',
-  'Pratham',
-  '2024',
-  'Pratham Team',
-  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing',
-  'pdf',
+  'Science',                // Subject
+  'Learning for School',    // Domain
+  'Academics',              // Sub Domain
+  '14-18 yrs',              // Target Age Group
+  'Learners/Children',      // Primary User
+  'Hindi',                  // Content Language
+  'Second Chance',          // Program
+  'science',                // Keywords
+  'CC BY 4.0',              // License
+  'Pratham',                // Copyright
+  '2024',                   // Copyright Year
+  'Pratham Team',           // Author
+  'Pratham Team',           // Creator
+  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // Google Drive URL
+  'pdf',                    // File Type
 ]];
 
 // ── QuestionSet samples ───────────────────────────────────────
@@ -256,35 +258,39 @@ const getScpContentSample = (): (string | number)[][] => [[
 //   MaxAttempts, ShowFeedback, ShowSolutions
 // AssessmentType allowed values: Pre Test | Post Test | Other | Unit Test | Mock Test | Eligibility Test
 
+// POS QS columns (16): TempID, Name, Desc*, PrimaryCategory*,
+//   Domain*, SubDomain*, Subject*,
+//   TargetAgeGroup, PrimaryUser, ContentLanguage, Program,
+//   AssessmentType, EvaluationType*, MaxAttempts, ShowFeedback, ShowSolutions
 const getPosQsSample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
-    'Mathematics Pre-Test — Grade 5',
-    'Baseline assessment for Grade 5 Mathematics',
-    'Practice Question Set',
-    'Math',
-    'Learning for School',  // POS_DOMAINS: Learning for School | Learning for Work | Learning for Life
-    'Academics',            // POS_SUB_DOMAINS (from pos-framework API)
-    'English',
-    'Grade 5',
-    'English',
-    'Elementary',
-    'Pre Test',            // allowed: Pre Test | Post Test | Other | Unit Test | Mock Test | Eligibility Test
-    'online',
-    3,
-    'true',
-    'false',
+    'Mathematics Pre-Test',
+    'Baseline assessment for Mathematics',     // Description* (required)
+    'Practice Question Set',                   // Primary Category*
+    'Learning for School',                     // Domain*
+    'Academics',                               // Sub Domain*
+    'Math',                                    // Subject*
+    '8-11 yrs',                                // Target Age Group
+    'Learners/Children',                       // Primary User
+    'English',                                 // Content Language
+    'Elementary',                              // Program
+    'Pre Test',                                // Assessment Type
+    'online',                                  // Evaluation Type*
+    3,                                         // Max Attempts
+    'true',                                    // Show Feedback
+    'false',                                   // Show Solutions
   ],
   [
     'TEMP_QS_2',
-    'Mathematics Post-Test — Grade 5',
-    'End-of-unit assessment for Grade 5 Mathematics',
+    'Mathematics Post-Test',
+    'End-of-unit assessment for Mathematics',  // Description*
     'Practice Question Set',
-    'Math',
     'Learning for School',
     'Academics',
-    'English',
-    'Grade 5',
+    'Math',
+    '8-11 yrs',
+    'Learners/Children',
     'English',
     'Elementary',
     'Post Test',
@@ -344,23 +350,26 @@ const getScpQsSample = (): (string | number)[][] => [
 //   Medium, GradeLevel, TargetAgeGroup, Language, Program,
 //   Keywords, License, Copyright, CopyrightYear, Author
 
+// POS Course columns (15): TempID, Name, Desc,
+//   Domain*(targetDomainIds), SubDomain*(targetSubDomainIds), Subject*(targetSubjectIds),
+//   TargetAgeGroup*, PrimaryUser, ContentLanguage, Program*,
+//   Keywords, License, Copyright, CopyrightYear, Author
 const getPosCoursesSample = (): (string | number)[][] => [[
   'TEMP_COURSE_1',
-  'Math Fundamentals — Grade 5',
-  'Introductory mathematics course for Grade 5',
-  'Math',                   // POS_SUBJECTS (from pos-framework API)
-  'Learning for School',    // POS_DOMAINS: Learning for School | Learning for Work | Learning for Life
-  'Academics',              // POS_SUB_DOMAINS (from pos-framework API)
-  'English',
-  'Grade 5',
-  '8-11 yrs',
-  'English',
-  'Elementary',
-  'math, grade 5',
-  'CC BY 4.0',
-  'Pratham',
-  '2024',
-  'Pratham Team',
+  'Math Fundamentals',
+  'Introductory mathematics course',
+  'Learning for School',    // Domain* (→ targetDomainIds identifier)
+  'Academics',              // Sub Domain* (→ targetSubDomainIds identifier)
+  'Math',                   // Subject* (→ targetSubjectIds identifier)
+  '8-11 yrs',               // Target Age Group*
+  'Learners/Children',      // Primary User
+  'English',                // Content Language
+  'Elementary',             // Program*
+  'math, grade 5',          // Keywords
+  'CC BY 4.0',              // License
+  'Pratham',                // Copyright
+  '2024',                   // Copyright Year
+  'Pratham Team',           // Author
 ]];
 
 // SCP Course columns: TempID, Name, Desc, Subject, Board, Medium,

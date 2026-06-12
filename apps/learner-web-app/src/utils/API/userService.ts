@@ -109,6 +109,8 @@ export const profileComplitionCheck = async (): Promise<any> => {
       ]);
       console.log('responseForm', responseForm?.schema);
       console.log('userData', userData);
+
+  
       if (!isUnderEighteen(userData?.dob)) {
         delete responseForm?.schema.properties.guardian_relation;
         delete responseForm?.schema.properties.guardian_name;
@@ -119,6 +121,14 @@ export const profileComplitionCheck = async (): Promise<any> => {
       const result = getMissingFields(responseForm?.schema, userData);
       delete result?.properties?.what_do_you_want_to_become;
       delete result?.properties?.consent_file;
+
+      if(!result?.properties?.phone_type_accessible )
+          {
+            delete result?.properties.own_phone_check;
+          //   delete responseForm?.uiSchema?.own_phone_check;
+          //    responseForm?.schema?.required.pop('own_phone_check');
+           } 
+
       console.log('result', result);
       delete result?.properties?.is_volunteer;
 

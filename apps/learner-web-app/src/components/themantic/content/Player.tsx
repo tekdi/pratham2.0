@@ -314,6 +314,11 @@ const App = ({
     setPendingDownload(downloadData);
     setShowJotFormModal(true);
     // console.log('Modal should now open');
+    logEvent({
+      action: 'download_content',
+      category: 'Content',
+      label: item.content.name,
+    });
   };
 
   // const onBackClick = () => {
