@@ -267,6 +267,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             : responseForm?.schema;
           let alterUISchema = enrolledProgram ? responseFormForEnroll?.uiSchema : responseForm?.uiSchema;
 
+          console.log('alterSchema', alterSchema);
+          console.log('alterUISchema', alterUISchema);
+          if(!alterSchema.properties.phone_type_accessible )
+          {
+            delete alterSchema.properties.own_phone_check;
+            delete alterUISchema.own_phone_check;
+             alterSchema.required.pop('own_phone_check');
+          }
           // If enrolledProgram + completeProfile and there are no required fields left,
           // the profile is already complete — skip the form and proceed directly.
           if (enrolledProgram && completeProfile && (!alterSchema?.required || alterSchema.required.length === 0)) {

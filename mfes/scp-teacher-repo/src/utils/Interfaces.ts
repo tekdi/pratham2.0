@@ -693,6 +693,7 @@ export interface GetTargetedSolutionsParams {
   board: any;
   courseType: string;
   entityId?: string;
+  academicYear?: string;
 }
 
 export interface GetUserProjectDetailsParams {
