@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import {
   fetchContent,
+  getContentStatus,
   getHierarchy,
   getQumlData,
 } from '../services/PlayerService';
@@ -86,6 +87,30 @@ const Players: React.FC<SunbirdPlayerProps> = ({
         {
           config.metadata.streamingUrl=config.metadata.streamingUrl+"/content";
           console.log("########h5p playerConfig",config);
+        }
+        //search content details
+        // console.log("###########contentStatus outer",userId,courseId,unitId,identifier);
+        if(courseId && unitId && identifier)
+        {
+          let temp_userId:any='';
+          if (typeof window !== "undefined") {
+            temp_userId = localStorage.getItem("userId");
+          }
+          let contentStatus = await getContentStatus({
+            courseId:courseId,
+            userId: temp_userId,
+            contentId:identifier,
+            unitId:unitId
+          });
+          // console.log("###########contentStatus",contentStatus);
+          if(contentStatus && contentStatus?.data?.length>0)
+          {
+            if(contentStatus.data[0]?.resumeData && contentStatus.data[0]?.resumeData!='' && contentStatus.data[0].resumeData!=null)
+            {
+              // console.log("###########contentStatus",contentStatus.data[0].resumeData);
+              config.extra={resumeData:contentStatus.data[0].resumeData.toString()};
+            }
+          }
         }
         setPlayerConfig(config);
       } catch (error) {
