@@ -21,11 +21,23 @@ import { LocationFilters } from '../components/UserRegistration/types';
 
 const ALL_FILTER_VALUE = 'all';
 
+const REGISTRATION_FILTERS_KEY = 'userRegistrationFilters';
+
+function readStoredFilters(): Record<string, any> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(REGISTRATION_FILTERS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
 const UserRegistrationList = () => {
   const { t } = useTranslation();
-  
-  const [tabValue, setTabValue] = useState('pending');
-  const [searchQuery, setSearchQuery] = useState('');
+
+  const [tabValue, setTabValue] = useState<string>(() => readStoredFilters().tabValue ?? 'pending');
+  const [searchQuery, setSearchQuery] = useState<string>(() => readStoredFilters().searchQuery ?? '');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
   const [assignBatchModalOpen, setAssignBatchModalOpen] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -34,10 +46,24 @@ const UserRegistrationList = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [locationFilters, setLocationFilters] = useState<LocationFilters>({});
-  const [modeOfLearning, setModeOfLearning] = useState<string>(ALL_FILTER_VALUE);
-  const [assessmentAttemptsFilter, setAssessmentAttemptsFilter] = useState<string>(ALL_FILTER_VALUE);
+  const [currentPage, setCurrentPage] = useState<number>(() => readStoredFilters().currentPage ?? 1);
+  const [locationFilters, setLocationFilters] = useState<LocationFilters>(() => {
+    if (typeof window === 'undefined') return {};
+    try {
+      const raw = localStorage.getItem('userRegistrationLocationFilters');
+      if (!raw) return {};
+      const stored = JSON.parse(raw);
+      return {
+        states:    stored.state    != null             ? [stored.state]    : undefined,
+        districts: stored.district != null             ? [stored.district] : undefined,
+        blocks:    stored.blocks?.length               ? stored.blocks     : undefined,
+      };
+    } catch {
+      return {};
+    }
+  });
+  const [modeOfLearning, setModeOfLearning] = useState<string>(() => readStoredFilters().modeOfLearning ?? ALL_FILTER_VALUE);
+  const [assessmentAttemptsFilter, setAssessmentAttemptsFilter] = useState<string>(() => readStoredFilters().assessmentAttemptsFilter ?? ALL_FILTER_VALUE);
   const [chartTrigger, setChartTrigger] = useState(false);
   const [zatpatTestIdentifiers, setZatpatTestIdentifiers] = useState<string[]>([]);
   const [assessmentLoading, setAssessmentLoading] = useState(false);
@@ -465,6 +491,19 @@ const UserRegistrationList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tabValue, locationFilters, currentPage, searchQuery, modeOfLearning]);
 
+  // Persist non-location filters to localStorage (no expiry — cleared only via Clear button)
+  useEffect(() => {
+    try {
+      localStorage.setItem(REGISTRATION_FILTERS_KEY, JSON.stringify({
+        tabValue,
+        searchQuery,
+        currentPage,
+        modeOfLearning,
+        assessmentAttemptsFilter,
+      }));
+    } catch {}
+  }, [tabValue, searchQuery, currentPage, modeOfLearning, assessmentAttemptsFilter]);
+
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     console.log('handleTabChange', newValue);
     setTabValue(newValue);
@@ -473,6 +512,7 @@ const UserRegistrationList = () => {
   };
 
   const resetFiltersToDefault = () => {
+    try { localStorage.removeItem(REGISTRATION_FILTERS_KEY); } catch {}
     setTabValue('pending');
     setSearchQuery('');
     setCurrentPage(1);
@@ -480,7 +520,6 @@ const UserRegistrationList = () => {
     setModeOfLearning(ALL_FILTER_VALUE);
     setAssessmentAttemptsFilter(ALL_FILTER_VALUE);
     setSelectedUsers(new Set());
-    console.log('🔄 Reset all filters to defaults');
   };
 
   // Make reset function available globally for debugging (development only)
@@ -646,6 +685,12 @@ const UserRegistrationList = () => {
     setLocationFilters(location);
     setCurrentPage(1);
     setSelectedUsers(new Set());
+    // When the Clear button empties all filters, batch-toggle chartTrigger in the
+    // same render so RegistrationPieChart gets an explicit reload signal alongside
+    // the cleared locationFilters — preventing it from missing the dep change.
+    if (!location.states && !location.districts && !location.blocks) {
+      setChartTrigger(prev => !prev);
+    }
   }, []);
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
