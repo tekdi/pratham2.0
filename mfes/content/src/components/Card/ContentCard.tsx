@@ -91,6 +91,7 @@ const ContentCard = ({
           type={type}
           default_img={default_img}
           _card={_card}
+          href={cardHref}
           handleCardClick={handleCardClick}
           trackData={trackData}
           englishTitle={item?.englishName}

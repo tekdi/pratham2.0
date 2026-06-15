@@ -15,6 +15,7 @@ import {
   CommonSearch,
   ContentItem,
   getData,
+  getContentCardHref,
 } from '@shared-lib';
 import { useRouter, useSearchParams } from 'next/navigation';
 import BackToTop from '@content-mfes/components/BackToTop';
@@ -695,7 +696,16 @@ export default function Content(props: Readonly<ContentProps>) {
         if (propData?.handleCardClick) {
           propData.handleCardClick(content, e, rowNumber);
         } else if (propData?._config?.enableCardHref !== false) {
-          // Navigation is handled by CommonCard anchor href (supports open in new tab).
+          const activeLink =
+            window.location.pathname + window.location.search;
+          const href = getContentCardHref(
+            content,
+            props?._config?.contentBaseUrl ?? '',
+            activeLink
+          );
+          if (href) {
+            router.push(href);
+          }
         } else if (SUPPORTED_MIME_TYPES.includes(content?.mimeType)) {
           router.push(
             `${props?._config?.contentBaseUrl ?? ''}/player/${content?.identifier
