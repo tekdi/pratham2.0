@@ -36,6 +36,7 @@ import BreadCrumb from '@content-mfes/components/BreadCrumb';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import JotFormEmbedWithSubmit from '@learner/components/JotFormEmbed/JotFormEmbedWithSubmit';
 import { CONTENT_DOWNLOAD_JOTFORM_ID } from '../../../app.config';
+import { logEvent } from '@learner/utils/googleAnalytics';
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
@@ -50,6 +51,8 @@ const App = ({
   _config?: any;
 }) => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const router = useRouter();
   const params = useParams();
   const { identifier, courseId, unitId } = params || {}; // string | string[] | undefined
@@ -426,6 +429,11 @@ const App = ({
     };
     setPendingDownload(downloadData);
     setShowJotFormModal(true);
+    logEvent({
+      action: 'download_content',
+      category: 'Content',
+      label: item.content.name,
+    });
   };
 
   return (
@@ -520,7 +528,7 @@ const App = ({
         {item?.content?.artifactUrl &&
           
           isDownloadableMimeType(item?.content?.mimeType || mimeType) &&
-          (!isPortrait || (isVideo && !isPortrait)) &&
+          (isMobileOrTablet || !isPortrait || (isVideo && !isPortrait)) &&
           isDownloadContentEnabled() && (
             <Box
               sx={{

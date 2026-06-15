@@ -740,48 +740,55 @@ const DynamicForm = forwardRef(({
         });
       };
 
-      if (formSchema.properties?.own_phone_check) {
-        if (formData.phone_type_accessible === 'nophone') {
+      if (formData.phone_type_accessible === 'nophone') {
+        if (formSchema.properties?.own_phone_check) {
           removeFields(['own_phone_check']);
-        } else if (formData.phone_type_accessible) {
-          // 1. Add back to schema if missing
-          setFormSchema((prevSchema) => {
-            if (!prevSchema.properties?.own_phone_check && !isCompleteProfile) {
-              return {
-                ...prevSchema,
-                properties: {
-                  ...prevSchema.properties,
-                  own_phone_check: {
-                    type: 'string',
-                    title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
-                    coreField: 0,
-                    fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
-                    field_type: 'radio',
-                    isRequired: true,
-                    enum: ['yes', 'no'],
-                    enumNames: ['YES', 'NO'],
-                  },
-                },
-                required: prevSchema.required?.includes('own_phone_check')
-                  ? prevSchema.required
-                  : [...(prevSchema.required || []), 'own_phone_check'],
-              };
-            }
-            return prevSchema;
-          });
-
-          // 2. Add back to uiSchema
-          setFormUiSchema((prevUiSchema) => ({
-            ...prevUiSchema,
-            own_phone_check: {
-              'ui:widget': 'CustomRadioWidget',
-              'ui:options': {
-                hideError: true,
-              },
-            },
-          }));
         }
+      } else if (formData.phone_type_accessible) {
+        // Add back to schema if missing
+        setFormSchema((prevSchema) => {
+          if (!prevSchema.properties?.own_phone_check) {
+            return {
+              ...prevSchema,
+              properties: {
+                ...prevSchema.properties,
+                own_phone_check: {
+                  type: 'string',
+                  title: t('DOES_THIS_PHONE_BELONG_TO_YOU'),
+                  coreField: 0,
+                  fieldId: 'd119d92f-fab7-4c7d-8370-8b40b5ed23dc',
+                  field_type: 'radio',
+                  isRequired: true,
+                  enum: ['yes', 'no'],
+                  enumNames: ['YES', 'NO'],
+                },
+              },
+              required: prevSchema.required?.includes('own_phone_check')
+                ? prevSchema.required
+                : [...(prevSchema.required || []), 'own_phone_check'],
+            };
+          }
+          return prevSchema;
+        });
 
+        const ownPhoneCheckUiEntry = {
+          'ui:widget': 'CustomRadioWidget',
+          'ui:options': {
+            hideError: true,
+          },
+        };
+
+        // Add back to uiSchema
+        setFormUiSchema((prevUiSchema) => ({
+          ...prevUiSchema,
+          own_phone_check: ownPhoneCheckUiEntry,
+        }));
+
+        // Add back to original uiSchema so it survives hide/show recalculations
+        setFormUiSchemaOriginal((prevUiSchema) => ({
+          ...prevUiSchema,
+          own_phone_check: ownPhoneCheckUiEntry,
+        }));
       }
     }
   }, [formData]);

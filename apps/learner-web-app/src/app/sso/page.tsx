@@ -146,18 +146,17 @@ const SSOContent = () => {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
       } catch (error: any) {
-        console.error('SSO authentication error:', error);
-        showToastMessage(error.message || 'Authentication failed', 'error');
-
-        // Reset authentication flags on error so user can retry
+        console.error('SSO authentication error:', error?.response?.data?.params?.errmsg);
+        showToastMessage(error?.response?.data?.params?.errmsg || 'Authentication failed', 'error');
         setHasAuthenticated(false);
         authenticationRef.current = false;
-
-        // Redirect to home page after error
         setTimeout(() => {
-          router.push('/');
-        }, 2000);
-      } finally {
+          window.location.href = '/pragyanpath';
+        }, 2500);
+        return;
+      }
+    
+    finally {
         setTimeout(() => {
           setProcessing(false);
         }, 800);

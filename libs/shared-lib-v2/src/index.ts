@@ -21,6 +21,7 @@ export * from './utils/trackingContentQueueLookup';
 export * from './lib/CertificateModal/CertificateModal';
 export * from './lib/CourseCompletionBanner/CourseCompletionBanner';
 export * from './utils/helper';
+export * from './utils/scaledFontSize';
 export * from './lib/Text/ExpandableText';
 export * from './lib/Grid/Grid';
 export { RoleId } from './utils/app.constant';

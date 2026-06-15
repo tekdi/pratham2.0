@@ -15,6 +15,11 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import HomeIcon from '@mui/icons-material/Home';
 import Layout from '../../../../components/themantic/layout/Layout';
 import SubHeader from '../../../../components/themantic/subHeader/SubHeader';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+  scaledFontSizeResponsive,
+} from '@learner/utils/scaledFontSize';
 
 // Reusable Breadcrumb Component
 const CustomBreadcrumbs = ({
@@ -38,11 +43,11 @@ const CustomBreadcrumbs = ({
             key={index}
             sx={{
               color: 'black',
-              fontSize: '18px',
+              fontSize: scaledFontSize(18),
               fontWeight: 'bold',
             }}
           >
-            {item.label}
+            <SpeakableText text={item.label}>{item.label}</SpeakableText>
           </Typography>
         ) : (
           <Link
@@ -52,14 +57,16 @@ const CustomBreadcrumbs = ({
               display: 'flex',
               alignItems: 'center',
               color: 'white',
-              fontSize: '18px',
+              fontSize: scaledFontSize(18),
               fontWeight: 500,
               cursor: 'pointer',
             }}
             onClick={item.onClick}
           >
-            {index === 0 && <HomeIcon sx={{ mr: 0.5, fontSize: '20px' }} />}
-            {item.label}
+            {index === 0 && (
+              <HomeIcon sx={{ mr: 0.5, fontSize: scaledFontSize(20) }} />
+            )}
+            <SpeakableText text={item.label}>{item.label}</SpeakableText>
           </Link>
         )
       )}
@@ -109,14 +116,14 @@ const EnergyCard = ({
             fontWeight: 'bold',
             textAlign: 'center',
             color: index === 2 ? 'white' : '#2C3E50',
-            fontSize: '18px',
+            fontSize: scaledFontSize(18),
             letterSpacing: '1px',
             lineHeight: 1.2,
             mt: 2,
             mb: 2,
           }}
         >
-          {card.title}
+          <SpeakableText text={card.title}>{card.title}</SpeakableText>
         </Typography>
 
         {/* Main Illustration Area with Characters */}
@@ -129,7 +136,9 @@ const EnergyCard = ({
             width: '100%',
           }}
         >
-          <Box>{card.subtitle}</Box>
+          <Box>
+            <SpeakableText>{card.subtitle}</SpeakableText>
+          </Box>
           <Box>
             <img height={'20px'} src={'/images/arrow.png'} alt="" />
           </Box>
@@ -179,14 +188,14 @@ const BasicsCard = ({
             fontWeight: 'bold',
             textAlign: 'center',
             color: '#2C3E50',
-            fontSize: '18px',
+            fontSize: scaledFontSize(18),
             letterSpacing: '1px',
             lineHeight: 1.2,
             mt: 2,
             mb: 2,
           }}
         >
-          {card.title}
+          <SpeakableText text={card.title}>{card.title}</SpeakableText>
         </Typography>
 
         {/* Explore Button */}
@@ -197,7 +206,9 @@ const BasicsCard = ({
             width: '100%',
           }}
         >
-          <Box>{card.subtitle}</Box>
+          <Box>
+            <SpeakableText>{card.subtitle}</SpeakableText>
+          </Box>
           <Box>
             <img height={'20px'} src={'/images/arrow.png'} alt="" />
           </Box>
@@ -437,31 +448,35 @@ const ThemanticCard = () => {
                 sx={{
                   fontWeight: 'bold',
                   color: '#2C3E50',
-                  fontSize: '20px',
+                  fontSize: scaledFontSize(20),
                   letterSpacing: '0.5px',
                   lineHeight: 1.2,
                   mb: 3,
                   textDecoration: 'underline',
                 }}
               >
-                Energy Our Invisible Companion
+                <SpeakableText>
+                  Energy Our Invisible Companion
+                </SpeakableText>
               </Typography>
 
               {/* Description */}
               <Typography
                 sx={{
                   color: '#2C3E50',
-                  fontSize: '14px',
+                  fontSize: scaledFontSize(14),
                   lineHeight: 1.6,
                   textAlign: 'justify',
                 }}
               >
-                This resource is designed to explain the concept of energy. It
-                explores what energy is, why it is called an invisible
-                companion, and why it is essential in our lives. To make
-                learning more engaging and effective, the resource includes
-                interactive questions that help in better understanding these
-                aspects.
+                <SpeakableText>
+                  This resource is designed to explain the concept of energy. It
+                  explores what energy is, why it is called an invisible
+                  companion, and why it is essential in our lives. To make
+                  learning more engaging and effective, the resource includes
+                  interactive questions that help in better understanding these
+                  aspects.
+                </SpeakableText>
               </Typography>
             </CardContent>
           </Card>
@@ -547,7 +562,7 @@ const ThemanticCard = () => {
                 </Box>
 
                 {/* Time display */}
-                <Typography sx={{ fontSize: '14px', mr: 2 }}>
+                <Typography sx={{ fontSize: scaledFontSize(14), mr: 2 }}>
                   0:00 / 3:31
                 </Typography>
 
