@@ -270,7 +270,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           console.log('alterSchema', alterSchema);
           console.log('alterUISchema', alterUISchema);
-          if(!alterSchema.properties.phone_type_accessible )
+          if(alterSchema.properties.own_phone_check && !alterSchema.properties.phone_type_accessible)
           {
             delete alterSchema.properties.own_phone_check;
             delete alterUISchema.own_phone_check;
