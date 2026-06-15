@@ -141,7 +141,6 @@ function ProgramsContent() {
 
             // Remove enrollTenantId from localStorage
             localStorage.removeItem('enrollTenantId');
-            
             // Redirect to landing page (keep loading state true during redirect)
             router.push(landingPage || '/home');
             return;
