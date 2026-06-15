@@ -175,6 +175,20 @@ export const CommonCard: React.FC<CommonCardProps> = ({
 
   const isLinkCard = Boolean(href);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (!onClick) return;
+    if (
+      isLinkCard &&
+      (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)
+    ) {
+      return;
+    }
+    if (isLinkCard) {
+      e.preventDefault();
+    }
+    onClick(e);
+  };
+
   return (
     <Card
       // Render as anchor when href is provided — enables open-in-new-tab without custom click handlers.
@@ -198,7 +212,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         },
         ..._card?.sx,
       }}
-      onClick={onClick}
+      onClick={onClick ? handleClick : undefined}
     >
       {/* Image and Progress Overlay */}
       <Box sx={{ position: 'relative', width: '100%' }}>

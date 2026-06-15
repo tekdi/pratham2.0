@@ -775,10 +775,11 @@ console.log('API response for content search:', resultResponse);
         contentData={contentData}
         _config={{
           ...(propData?._config ?? {}),
-          // Disable anchor href when a custom click handler already controls navigation (e.g. POS).
-          enableCardHref: propData?.handleCardClick
-            ? false
-            : propData?._config?.enableCardHref,
+          // Keep href enabled when explicitly requested (e.g. POS open-in-new-tab).
+          enableCardHref:
+            propData?._config?.enableCardHref !== undefined
+              ? propData._config.enableCardHref
+              : !propData?.handleCardClick,
         }}
         trackData={trackData as any}
         type={localFilters?.type ?? ''}

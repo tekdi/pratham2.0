@@ -8,6 +8,7 @@ import {
   CourseCompletionBanner,
   trackDataPorps,
   findCourseUnitPath,
+  getUnitCardHref,
 } from '@shared-lib';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { trackingData } from '@content-mfes/services/TrackingService';
@@ -355,14 +356,15 @@ export default function Details(props: DetailsProps) {
       props?._config.handleCardClick?.(subItem);
     } else {
       localStorage.setItem('unitId', subItem?.courseId);
-      if (props?._config?.enableCardHref === false) {
-        const path =
-          subItem.mimeType === 'application/vnd.ekstep.content-collection'
-            ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${subItem?.identifier}`
-            : `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${effectiveUnitId}/${subItem?.identifier}`;
-        router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
+      const path = getUnitCardHref(subItem, {
+        courseId: courseId as string,
+        effectiveUnitId,
+        contentBaseUrl: props?._config?.contentBaseUrl ?? '/content',
+        activeLink,
+      });
+      if (path) {
+        router.push(path);
       }
-      // Otherwise navigation is handled by CommonCard anchor href (open in new tab).
     }
   };
 
