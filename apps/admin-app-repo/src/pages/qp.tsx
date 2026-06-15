@@ -18,8 +18,6 @@ import {
 } from '@react-pdf/renderer';
 import moment from 'moment';
 
-// utils/encryption.ts
-import { useSearchParams } from 'next/navigation';
 
 const QuestionPaperPDF = ({ data }: any) => {
   Font.register({
@@ -603,19 +601,23 @@ const QuestionPaperPDF = ({ data }: any) => {
 };
 
 export default function QP() {
-  const searchParams = useSearchParams();
   const do_var = 'do_id';
   const [do_id, set_do_id] = useState<string | null>(null);
-  const do_id_from_url = searchParams.get(do_var);
-  useEffect(() => {
-    if (do_id_from_url) {
-      set_do_id(do_id_from_url);
-    }
-  }, [do_id_from_url]);
 
   //data fetch variable
   const [status, set_status] = useState<string>('');
   const [error, set_error] = useState<boolean>(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get(do_var);
+    console.log("do_id_from_url", value);
+    if (value) {
+      set_do_id(value);
+    } else {
+      set_error(true);
+    }
+  }, []);
   const [content_details, set_content_details] = useState<any>(null);
 
   //temp variable
