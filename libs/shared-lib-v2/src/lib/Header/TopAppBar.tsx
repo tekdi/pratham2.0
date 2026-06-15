@@ -212,10 +212,27 @@ export const DesktopBar = ({
     }, 300);
   };
 
-  const handleClickLeaf = (to: any) => {
+  const handleClickLeaf = (item: any, e?: React.MouseEvent) => {
     setMenus([]);
-    if (typeof to === 'function') to();
+    if (
+      item.href &&
+      e &&
+      (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)
+    ) {
+      return;
+    }
+    if (item.href && e) {
+      e.preventDefault();
+    }
+    if (typeof item.to === 'function') item.to(e);
+    else if (typeof item.to === 'string') window.location.href = item.to;
   };
+
+  const getNavHref = (link: NewDrawerItemProp) =>
+    link.href ?? (typeof link.to === 'string' ? link.to : undefined);
+
+  const isModifiedNavClick = (e: React.MouseEvent) =>
+    e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0;
 
   return (
     <Box
@@ -247,8 +264,8 @@ export const DesktopBar = ({
             // Removed onMouseEnter from here
             >
               <Button
-                component={typeof link.to === 'string' ? 'a' : 'button'}
-                href={typeof link.to === 'string' ? link.to : undefined}
+                component={getNavHref(link) ? 'a' : 'button'}
+                href={getNavHref(link)}
                 // @ts-ignore
                 variant={
                   link.isActive
@@ -258,12 +275,23 @@ export const DesktopBar = ({
                 sx={{
                   minWidth: 'unset',
                   mr: -0.5, // Slightly reduce margin to bring icon closer
+                  ...(getNavHref(link)
+                    ? { textDecoration: 'none', color: 'inherit' }
+                    : {}),
                 }}
                 startIcon={link?.icon && link.icon}
                 onClick={(e: any) => {
-                  typeof link.to !== 'string' && link.to !== undefined
-                    ? link.to(e)
-                    : openMenuAtLevel(0, e.currentTarget, link.child ?? []);
+                  if (getNavHref(link) && isModifiedNavClick(e)) {
+                    return;
+                  }
+                  if (getNavHref(link)) {
+                    e.preventDefault();
+                  }
+                  if (typeof link.to !== 'string' && link.to !== undefined) {
+                    link.to(e);
+                  } else if (link.to === undefined) {
+                    openMenuAtLevel(0, e.currentTarget, link.child ?? []);
+                  }
                 }}
                 onMouseEnter={(e: any) => {
                   if (link.child && link.child.length > 0) {
@@ -398,12 +426,17 @@ export const DesktopBar = ({
                     }}
                   >
                     <MenuItem
-                      onClick={() => {
-                        if (!hasChild) handleClickLeaf(item.to);
+                      component={!hasChild && item.href ? 'a' : 'li'}
+                      href={!hasChild ? item.href : undefined}
+                      onClick={(e) => {
+                        if (!hasChild) handleClickLeaf(item, e);
                       }}
                       sx={{
                         justifyContent: 'space-between',
                         whiteSpace: isVerticalSubmenu ? 'normal' : 'nowrap',
+                        ...(!hasChild && item.href
+                          ? { textDecoration: 'none', color: 'inherit' }
+                          : {}),
                         ...(isVerticalSubmenu
                           ? {
                               py: 2,
