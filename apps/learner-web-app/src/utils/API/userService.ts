@@ -122,12 +122,18 @@ export const profileComplitionCheck = async (): Promise<any> => {
       delete result?.properties?.what_do_you_want_to_become;
       delete result?.properties?.consent_file;
 
-      if(!result?.properties?.phone_type_accessible )
+      if(!result?.properties?.phone_type_accessible && result?.properties?.own_phone_check)
           {
             delete result?.properties.own_phone_check;
           //   delete responseForm?.uiSchema?.own_phone_check;
           //    responseForm?.schema?.required.pop('own_phone_check');
            } 
+           if(!result?.properties?.family_member_details)
+          {
+            delete result?.properties.father_name;
+            delete result?.properties.mother_name;
+            delete result?.properties.spouse_name;
+          }
 
       console.log('result', result);
       delete result?.properties?.is_volunteer;

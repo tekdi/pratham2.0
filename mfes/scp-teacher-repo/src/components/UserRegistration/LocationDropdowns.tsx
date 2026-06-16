@@ -1,7 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { Box, Select, MenuItem, InputLabel, Checkbox, ListItemText, Grid, FormControl } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Select, MenuItem, InputLabel, Checkbox, ListItemText, Grid, FormControl, Button } from '@mui/material';
 import { getFieldOptions } from '../../services/MasterDataService';
+
+const LOCATION_FILTERS_KEY = 'userRegistrationLocationFilters';
 
 interface LocationOption {
   value: number | string;
@@ -29,6 +31,25 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
   const [loadingStates, setLoadingStates] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingBlocks, setLoadingBlocks] = useState(false);
+
+  // Holds stored values to apply once each dropdown's options load
+  const pendingRestoreRef = useRef<{
+    state?: number | string;
+    district?: number | string;
+    blocks?: (number | string)[];
+  } | null>(null);
+  // Tracks whether each level has already been restored (prevents re-applying on subsequent loads)
+  const restoredRef = useRef({ state: false, district: false, blocks: false });
+  // Prevents the very first render (all selections empty) from wiping stored location
+  const isSaveInitialized = useRef(false);
+
+  // Read stored location from localStorage once on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LOCATION_FILTERS_KEY);
+      if (raw) pendingRestoreRef.current = JSON.parse(raw);
+    } catch {}
+  }, []);
 
   // Fetch states on mount
   useEffect(() => {
@@ -138,6 +159,61 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
       });
     }
   }, [selectedState, selectedDistrict, selectedBlocks, onLocationChange]);
+
+  // Restore state selection once states are loaded
+  useEffect(() => {
+    if (states.length > 0 && !restoredRef.current.state && pendingRestoreRef.current?.state != null) {
+      const match = states.find((s) => s.value === pendingRestoreRef.current!.state);
+      if (match) setSelectedState(match.value);
+      restoredRef.current.state = true;
+    }
+  }, [states]);
+
+  // Restore district selection once districts are loaded
+  useEffect(() => {
+    if (districts.length > 0 && !restoredRef.current.district && pendingRestoreRef.current?.district != null) {
+      const match = districts.find((d) => d.value === pendingRestoreRef.current!.district);
+      if (match) setSelectedDistrict(match.value);
+      restoredRef.current.district = true;
+    }
+  }, [districts]);
+
+  // Restore block selections once blocks are loaded
+  useEffect(() => {
+    if (blocks.length > 0 && !restoredRef.current.blocks && pendingRestoreRef.current?.blocks?.length) {
+      const matches = blocks
+        .filter((b) => pendingRestoreRef.current!.blocks!.includes(b.value))
+        .map((b) => b.value);
+      if (matches.length > 0) setSelectedBlocks(matches);
+      restoredRef.current.blocks = true;
+    }
+  }, [blocks]);
+
+  // Persist location selections to localStorage — skip the initial empty render so it
+  // doesn't wipe the previously stored values before restoration has a chance to run.
+  useEffect(() => {
+    if (!isSaveInitialized.current) {
+      isSaveInitialized.current = true;
+      return;
+    }
+    try {
+      localStorage.setItem(LOCATION_FILTERS_KEY, JSON.stringify({
+        state: selectedState !== '' ? selectedState : undefined,
+        district: selectedDistrict !== '' ? selectedDistrict : undefined,
+        blocks: selectedBlocks.length > 0 ? selectedBlocks : undefined,
+      }));
+    } catch {}
+  }, [selectedState, selectedDistrict, selectedBlocks]);
+
+  const handleClear = () => {
+    pendingRestoreRef.current = null;
+    restoredRef.current = { state: false, district: false, blocks: false };
+    try { localStorage.removeItem(LOCATION_FILTERS_KEY); } catch {}
+    setSelectedState('');
+    // district/block state clears automatically via their useEffects
+  };
+
+  const hasAnySelection = selectedState !== '' || selectedDistrict !== '' || selectedBlocks.length > 0;
 
   const renderBlockValue = (selected: (number | string)[]) => {
     if (selected.length === 0) return 'Select';
@@ -289,6 +365,32 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
             </Select>
           </FormControl>
         </Grid>
+
+        {/* Clear Button */}
+        {hasAnySelection && (
+          <Grid item xs={12} sm={6} md={3} sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button
+              variant="outlined"
+              onClick={handleClear}
+              sx={{
+                borderRadius: '8px',
+                borderColor: '#7C766F',
+                color: '#7C766F',
+                textTransform: 'none',
+                fontWeight: 500,
+                height: '48px',
+                px: 3,
+                '&:hover': {
+                  borderColor: '#1E1B16',
+                  color: '#1E1B16',
+                  bgcolor: 'transparent',
+                },
+              }}
+            >
+              Clear
+            </Button>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

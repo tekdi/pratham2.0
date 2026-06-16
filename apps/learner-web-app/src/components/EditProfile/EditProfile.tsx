@@ -186,6 +186,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             }
           });
         }
+        console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
         setResponseFormData(responseFormCopy);
@@ -269,13 +270,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           console.log('alterSchema', alterSchema);
           console.log('alterUISchema', alterUISchema);
-          if(!alterSchema.properties.phone_type_accessible )
+          if(alterSchema.properties.own_phone_check && !alterSchema.properties.phone_type_accessible)
           {
             delete alterSchema.properties.own_phone_check;
             delete alterUISchema.own_phone_check;
+            if(alterSchema.required.includes('own_phone_check')){
              alterSchema.required.pop('own_phone_check');
+            }
           }
-          // If enrolledProgram + completeProfile and there are no required fields left,
+       //   If enrolledProgram + completeProfile and there are no required fields left,
           // the profile is already complete — skip the form and proceed directly.
           if (enrolledProgram && completeProfile && (!alterSchema?.required || alterSchema.required.length === 0)) {
             skipLoadingReset = true; // keep loader visible while handleAccessProgram runs
