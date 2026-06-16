@@ -652,8 +652,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push('/centers');
               }}
-              // component="a"
-              // href={withBasePath('/centers?tab=1')}
+              component="a"
+              href={withBasePath('/centers')}
             >
               {accessGranted('showTeachingCenter', accessControl, userRole)
                 ? t('DASHBOARD.TEACHING_CENTERS')

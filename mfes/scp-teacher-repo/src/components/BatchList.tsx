@@ -62,7 +62,13 @@ const BatchList: React.FC<BatchListProps> = ({
               <Box
                 component="a"
                 href={withBasePath(`/centers/${batch.cohortId}`)}
-                onClick={() => handleBatchClick(batch)}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) {
+                    return;
+                  }
+                  e.preventDefault();
+                  handleBatchClick(batch);
+                }}
                 sx={{
                   cursor: 'pointer',
                   textDecoration: 'none',
