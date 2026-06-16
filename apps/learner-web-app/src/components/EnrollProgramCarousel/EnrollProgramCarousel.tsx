@@ -1082,13 +1082,13 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
         showFooter={true}
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
       >
         <Box p="10px">
