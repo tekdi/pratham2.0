@@ -201,55 +201,52 @@ const buildEntitySheet = (
 //   Medium, GradeLevel, TargetAgeGroup, PrimaryUser, ContentLanguage, Program,
 //   Keywords, License, Copyright, CopyrightYear, Author, DriveURL, FileType
 
-// NOTE: Medium and Grade Level columns REMOVED — pos-framework has no such taxonomy.
-// Sending them causes API error: "medium/gradeLevel range data is empty from the given framework."
-// Content columns: TempID, Name, Desc, PrimaryCategory, Subject, Domain, SubDomain,
-//   TargetAgeGroup, PrimaryUser, ContentLanguage, Program,
-//   Keywords, License, Copyright, CopyrightYear, Author, DriveURL, FileType
+// POS Content columns (17): TempID, Name, Desc, PrimaryCategory, AppIconDriveURL,
+//   Domain*(single), SubDomain*(multi|), Subject*(multi|), TargetAgeGroup(multi|),
+//   PrimaryUser(multi|), ContentLanguage*(single), Program*(multi|),
+//   Keywords, Author, Creator, File/ContentURL*, FileType*
 
 const getPosContentSample = (): (string | number)[][] => [[
   'TEMP_CONTENT_1',
   'Introduction to Mathematics',
-  'Basic math concepts for Grade 5 students',
+  'Introduction to Mathematics',  // English Name (optional)
+  'Basic math concepts for students',
   'Learning Resource',
-  'Math',                   // Subject
-  'Learning for School',    // Domain
-  'Academics',              // Sub Domain
+  'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing', // App Icon Drive URL
+  'Learning for School',    // Domain* (single)
+  'Academics',              // Sub Domain* (pipe-sep for multi: Academics|Sports)
+  'Math',                   // Subject* (pipe-sep for multi: Math|Science)
   '8-11 yrs',               // Target Age Group
   'Learners/Children',      // Primary User
-  'English',                // Content Language
-  'Elementary',             // Program
+  'English',                // Content Language* (single)
+  'Elementary',             // Program* (pipe-sep for multi)
   'math, arithmetic',       // Keywords
-  'CC BY 4.0',              // License
-  'Pratham',                // Copyright
-  '2024',                   // Copyright Year
   'Pratham Team',           // Author
   'Pratham Team',           // Creator
-  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // Google Drive URL
-  'pdf',                    // File Type
+  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // File/Content URL*
+  'pdf',                    // File Type*
 ]];
 
 // SCP content also uses POS columns (content always uses pos-framework for all users)
 const getScpContentSample = (): (string | number)[][] => [[
   'TEMP_CONTENT_1',
   'Science Study Material',
+  'Science Study Material',       // English Name (optional)
   'Study material for Science',
   'Learning Resource',
-  'Science',                // Subject
-  'Learning for School',    // Domain
-  'Academics',              // Sub Domain
+  'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing', // App Icon Drive URL
+  'Learning for School',    // Domain* (single)
+  'Academics',              // Sub Domain*
+  'Science',                // Subject*
   '14-18 yrs',              // Target Age Group
   'Learners/Children',      // Primary User
-  'Hindi',                  // Content Language
-  'Second Chance',          // Program
+  'Hindi',                  // Content Language* (single)
+  'Second Chance',          // Program*
   'science',                // Keywords
-  'CC BY 4.0',              // License
-  'Pratham',                // Copyright
-  '2024',                   // Copyright Year
   'Pratham Team',           // Author
   'Pratham Team',           // Creator
-  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // Google Drive URL
-  'pdf',                    // File Type
+  'https://drive.google.com/file/d/SAMPLE_FILE_ID/view?usp=sharing', // File/Content URL*
+  'pdf',                    // File Type*
 ]];
 
 // ── QuestionSet samples ───────────────────────────────────────
@@ -258,88 +255,89 @@ const getScpContentSample = (): (string | number)[][] => [[
 //   MaxAttempts, ShowFeedback, ShowSolutions
 // AssessmentType allowed values: Pre Test | Post Test | Other | Unit Test | Mock Test | Eligibility Test
 
-// POS QS columns (16): TempID, Name, Desc*, PrimaryCategory*,
-//   Domain*, SubDomain*, Subject*,
-//   TargetAgeGroup, PrimaryUser, ContentLanguage, Program,
-//   AssessmentType, EvaluationType*, MaxAttempts, ShowFeedback, ShowSolutions
+// POS QS columns (16): TempID, Name, Desc*, PrimaryCategory*, AppIconDriveURL,
+//   Program(multi|), Domain*(single), SubDomain*(multi|), Subject*(multi|),
+//   TargetAgeGroup(multi|), PrimaryUser(multi|), ContentLanguage(single),
+//   AssessmentType, EvaluationType*, ShowFeedback, ShowSolutions
 const getPosQsSample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Mathematics Pre-Test',
-    'Baseline assessment for Mathematics',     // Description* (required)
-    'Practice Question Set',                   // Primary Category*
-    'Learning for School',                     // Domain*
-    'Academics',                               // Sub Domain*
-    'Math',                                    // Subject*
-    '8-11 yrs',                                // Target Age Group
-    'Learners/Children',                       // Primary User
-    'English',                                 // Content Language
-    'Elementary',                              // Program
-    'Pre Test',                                // Assessment Type
-    'online',                                  // Evaluation Type*
-    3,                                         // Max Attempts
-    'true',                                    // Show Feedback
-    'false',                                   // Show Solutions
+    'Mathematics Pre-Test',         // English Name (optional)
+    'Baseline assessment for Mathematics',
+    'Practice Question Set',
+    'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing', // App Icon Drive URL
+    'Elementary',             // Program
+    'Learning for School',    // Domain* (single)
+    'Academics',              // Sub Domain*
+    'Math',                   // Subject*
+    '8-11 yrs',               // Target Age Group
+    'Learners/Children',      // Primary User
+    'English',                // Content Language
+    'Pre Test',               // Assessment Type
+    'online',                 // Evaluation Type*
+    'true',                   // Show Feedback
+    'false',                  // Show Solutions
   ],
   [
     'TEMP_QS_2',
     'Mathematics Post-Test',
-    'End-of-unit assessment for Mathematics',  // Description*
+    'Mathematics Post-Test',        // English Name (optional)
+    'End-of-unit assessment for Mathematics',
     'Practice Question Set',
+    'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing',
+    'Elementary',
     'Learning for School',
     'Academics',
     'Math',
     '8-11 yrs',
     'Learners/Children',
     'English',
-    'Elementary',
     'Post Test',
     'online',
-    2,
     'true',
     'true',
   ],
 ];
 
-// SCP QS columns: TempID, Name, Desc, PrimaryCategory, Subject, Board, Medium,
-//   GradeLevel, CourseType, Program, Language, AssessmentType, EvaluationType,
-//   MaxAttempts, ShowFeedback, ShowSolutions
-// AssessmentType allowed values: Pre Test | Post Test | Other | Unit Test | Mock Test | Eligibility Test
-
+// SCP QS columns (15): TempID, Name, Desc*, PrimaryCategory*,
+//   Program(multi|), Board*(single), Medium*(multi|), GradeLevel*(multi|),
+//   Subject*(multi|), CourseType*(multi|), ContentLanguage(single),
+//   AssessmentType, EvaluationType*, ShowFeedback, ShowSolutions
 const getScpQsSample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Science Pre-Test — Grade 10',
+    'Science Pre-Test — Grade 10',  // English Name (optional)
     'Baseline assessment for Grade 10 Science',
     'Practice Question Set',
-    'Science',
-    'Maharashtra State Education Board',
-    'Marathi',
-    'Grade 10',
-    'Main Course',
-    'Second Chance',
-    'Hindi',
-    'Pre Test',            // allowed: Pre Test | Post Test | Other | Unit Test | Mock Test | Eligibility Test
-    'online',
-    3,
-    'true',
-    'false',
+    'Second Chance',                       // Program
+    'Maharashtra State Education Board',   // Board* (single)
+    'Marathi',                             // Medium* (pipe-sep for multi)
+    'Grade 10',                            // Grade Level* (pipe-sep for multi)
+    'Science',                             // Subject* (pipe-sep for multi)
+    'Main Course',                         // Course Type* (pipe-sep for multi)
+    'Hindi',                               // Content Language
+    'Pre Test',                            // Assessment Type
+    'online',                              // Evaluation Type*
+    'true',                                // Show Feedback
+    'false',                               // Show Solutions
   ],
   [
     'TEMP_QS_2',
     'Science Unit Test — Grade 10',
+    'Science Unit Test — Grade 10', // English Name (optional)
     'Unit-level test for Grade 10 Science',
     'Practice Question Set',
-    'Science',
+    'Second Chance',
     'Maharashtra State Education Board',
     'Marathi',
     'Grade 10',
+    'Science',
     'Main Course',
-    'Second Chance',
     'Hindi',
     'Unit Test',
     'online',
-    2,
     'true',
     'true',
   ],
@@ -350,48 +348,47 @@ const getScpQsSample = (): (string | number)[][] => [
 //   Medium, GradeLevel, TargetAgeGroup, Language, Program,
 //   Keywords, License, Copyright, CopyrightYear, Author
 
-// POS Course columns (15): TempID, Name, Desc,
-//   Domain*(targetDomainIds), SubDomain*(targetSubDomainIds), Subject*(targetSubjectIds),
-//   TargetAgeGroup*, PrimaryUser, ContentLanguage, Program*,
-//   Keywords, License, Copyright, CopyrightYear, Author
+// POS Course columns (13): TempID, Name, Desc, AppIconDriveURL*,
+//   Keywords, Program*(multi|), Domain*(single→targetDomainIds),
+//   SubDomain*(multi|→targetSubDomainIds), Subject*(multi|→targetSubjectIds),
+//   TargetAgeGroup*(multi|), PrimaryUser(multi|), ContentLanguage(single), Author
 const getPosCoursesSample = (): (string | number)[][] => [[
   'TEMP_COURSE_1',
   'Math Fundamentals',
+  'Math Fundamentals',            // English Name (optional)
   'Introductory mathematics course',
-  'Learning for School',    // Domain* (→ targetDomainIds identifier)
-  'Academics',              // Sub Domain* (→ targetSubDomainIds identifier)
-  'Math',                   // Subject* (→ targetSubjectIds identifier)
-  '8-11 yrs',               // Target Age Group*
+  'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing', // App Icon Drive URL*
+  'math, grade 5',          // Keywords
+  'Elementary',             // Program*
+  'Learning for School',    // Domain* (single → targetDomainIds identifier)
+  'Academics',              // Sub Domain* (pipe-sep for multi → targetSubDomainIds)
+  'Math',                   // Subject* (pipe-sep for multi → targetSubjectIds)
+  '8-11 yrs',               // Target Age Group* (pipe-sep for multi)
   'Learners/Children',      // Primary User
   'English',                // Content Language
-  'Elementary',             // Program*
-  'math, grade 5',          // Keywords
-  'CC BY 4.0',              // License
-  'Pratham',                // Copyright
-  '2024',                   // Copyright Year
   'Pratham Team',           // Author
 ]];
 
-// SCP Course columns: TempID, Name, Desc, Subject, Board, Medium,
-//   GradeLevel, CourseType, Program, Language,
-//   Keywords, License, Copyright, CopyrightYear, Author
-
+// SCP Course columns (13): TempID, Name, Desc, AppIconDriveURL*,
+//   Keywords, Program*, Board*(single→targetBoardIds),
+//   Medium*(multi|→targetMediumIds), GradeLevel*(multi|→targetGradeLevelIds),
+//   Subject*(multi|→targetSubjectIds), CourseType*(multi|→targetCourseTypeIds),
+//   ContentLanguage(single), Author
 const getScpCoursesSample = (): (string | number)[][] => [[
   'TEMP_COURSE_1',
   'Grade 10 Science Course',
-  'Complete Science course',
-  'Science',                           // must match SCP_SUBJECTS exactly
-  'Maharashtra State Education Board',  // must match SCP_BOARDS exactly
-  'Marathi',                           // must match SCP_MEDIUMS exactly
-  'Grade 10',                          // only grade in SCP framework
-  'Main Course',                       // must match SCP_COURSE_TYPES exactly
-  'Second Chance',
-  'Hindi',
-  'science, scp',
-  'CC BY 4.0',
-  'Pratham',
-  '2024',
-  'Pratham Team',
+  'Grade 10 Science Course',      // English Name (optional)
+  'Complete Science course for Grade 10',
+  'https://drive.google.com/file/d/SAMPLE_ICON_ID/view?usp=sharing', // App Icon Drive URL*
+  'science, grade 10',      // Keywords
+  'Second Chance',          // Program*
+  'Maharashtra State Education Board', // Board* (single → targetBoardIds identifier)
+  'Marathi',                // Medium* (pipe-sep for multi → targetMediumIds)
+  'Grade 10',               // Grade Level* (pipe-sep for multi → targetGradeLevelIds)
+  'Science',                // Subject* (pipe-sep for multi → targetSubjectIds)
+  'Main Course',            // Course Type* (pipe-sep for multi → targetCourseTypeIds)
+  'Hindi',                  // Content Language
+  'Pratham Team',           // Author
 ]];
 
 // ── Questions sample ──────────────────────────────────────────
@@ -486,8 +483,15 @@ const getCourseMappingsSample = (): (string | number)[][] => [
   ['TEMP_COURSE_1', 'Unit 2: Assessment',    'TEMP_QS_2',      'questionset', 1],
 ];
 
+// ExistingContentMapping columns (6): TempID, ExistingIdentifier, EntityType,
+//   CourseTempID (optional), UnitName (optional), Sequence (optional)
+// Fill Course Temp ID + Unit Name + Sequence to add directly to a course unit.
+// Leave Course Temp ID blank if only using as a reference.
 const getExistingMappingsSample = (): (string | number)[][] => [
-  ['TEMP_EXISTING_1', 'do_abc1234567890', 'content'],
+  // Add existing content directly to a course unit (no CourseChildrenMapping needed)
+  ['TEMP_EXISTING_1', 'do_abc1234567890', 'content',     'TEMP_COURSE_1', 'Unit 1: Introduction', 3],
+  // Reference only — used in CourseChildrenMapping or as a QS reference
+  ['TEMP_EXISTING_2', 'do_xyz0987654321', 'questionset', '', '', ''],
 ];
 
 // ─── Instructions sheet ───────────────────────────────────────
