@@ -18,10 +18,11 @@ import {
 // ─── MIME TYPE MAP ────────────────────────────────────────────
 
 export const FILE_MIME_MAP: Record<string, string> = {
-  pdf: 'application/pdf',
-  zip: 'application/zip',
-  mp4: 'video/mp4',
-  h5p: 'application/vnd.ekstep.h5p-archive',
+  pdf:     'application/pdf',
+  zip:     'application/zip',
+  mp4:     'video/mp4',
+  h5p:     'application/vnd.ekstep.h5p-archive',
+  youtube: 'video/x-youtube',  // URL set directly as artifactUrl — no file download needed
 };
 
 export const QUESTIONSET_MIME = 'application/vnd.sunbird.questionset';
@@ -76,6 +77,28 @@ export const createContentNode = async (
   const identifier: string = response?.data?.result?.identifier;
   if (!identifier) throw new Error('Content creation failed: no identifier returned');
   return identifier;
+};
+
+/**
+ * Upload an app icon image for a content/QS/course node.
+ * Downloads the image from Google Drive, uploads it via the presigned URL
+ * mechanism, and returns the permanent S3 URL to use as appIcon.
+ */
+export const uploadAppIconFromDrive = async (
+  contentId: string,
+  driveUrl: string
+): Promise<string> => {
+  // 1. Download image from Drive
+  const { buffer, fileName, mimeType } = await downloadGoogleDriveFile(driveUrl);
+
+  // 2. Get presigned upload URL (reuse the same content upload URL endpoint)
+  const { preSignedUrl } = await getContentUploadUrl(contentId, fileName || 'icon.png');
+
+  // 3. Upload image to S3
+  await uploadFileToPresignedUrl(preSignedUrl, buffer, mimeType || 'image/png');
+
+  // 4. Return the permanent S3 URL (strip query params)
+  return preSignedUrl.split('?')[0];
 };
 
 /**

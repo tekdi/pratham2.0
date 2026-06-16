@@ -14,7 +14,8 @@ export type FrameworkId = 'pos-framework' | 'scp-framework';
 
 export const LOOKUP = {
   // ── Shared ──────────────────────────────────────────────────
-  FILE_TYPES: ['pdf', 'zip', 'mp4', 'h5p'],
+  // youtube uses mimeType video/x-youtube; URL goes in the File/Content URL column — no file download
+  FILE_TYPES: ['pdf', 'zip', 'mp4', 'h5p', 'youtube'],
   QUESTION_TYPES: ['MCQ', 'Arrange', 'Match', 'Subjective'],
   CHILD_TYPES: ['content', 'questionset'],
   FRAMEWORKS: ['pos-framework', 'scp-framework'],
@@ -464,91 +465,142 @@ export const SCP_COURSE_TYPE_NAME_TO_ID: Record<string, string> = {
   'Enablers':          'scp-framework_coursetype_enablers',
 };
 
+// ─── POS Domain → SubDomain → Subject association maps ────────
+// Used by the validator to enforce framework taxonomy relationships.
+// Data sourced from the POS framework read API (associations field).
+
+export const POS_DOMAIN_TO_SUBDOMAINS: Record<string, string[]> = {
+  'Learning for School': ['Academics', 'Growth & Learning', 'Media Moments', 'Inclusive Education'],
+  'Learning for Work':   ['Career Exploration', 'Employee Training', 'New Age Skills'],
+  'Learning for Life':   ['Creative Arts', 'Health & Wellbeing', 'Sports', 'Inclusive Learning', 'Environment Education'],
+};
+
+export const POS_SUBDOMAIN_TO_SUBJECTS: Record<string, string[]> = {
+  'Academics': [
+    'Tamil', 'Social Studies', 'Bengali', 'Odia', 'Indian Culture & History', 'English',
+    'Hindi', 'Gujarati', 'Telugu', 'General/Other', 'Yoga', 'Social Science', 'Malayalam',
+    'Urdu', 'Punjabi', 'Rabha (Rongdani)', 'Math', 'Home Science', 'Painting', 'Khasi',
+    'Data Computing/Data Entry', 'Science', 'Kannada', 'Marathi', 'Assamese',
+  ],
+  'Growth & Learning': [
+    'Games', 'School Readiness', 'Riddles', 'Rhymes & Lullabies', 'Holistic Development',
+    'Activity Videos', 'Knowledge Videos', 'Spoken English', 'Computational Thinking', 'Stories',
+  ],
+  'Media Moments': ['TV Episodes', 'Podcasts'],
+  'Inclusive Education': ['Innovative Strategies', 'Subject Specific Learning', 'Early Learning & School Readiness'],
+  'Career Exploration': [
+    'Everyday Skills', 'ITES', 'Beauty', 'Healthcare', 'Waterworks Management & Sanitation',
+    'Hospitality & Tourism', 'Media & Graphics', 'Agriculture Education', 'Good Contractor Program',
+    'Apparel', 'Welding', 'Electrical', 'Career Awareness', 'Construction', 'Automotive',
+  ],
+  'Employee Training': [
+    'General Skills', 'Program Communication', 'HR', 'Operational Management', 'Program & Pedagogy',
+    'Data, Monitoring & Evaluation', 'Technical Skills', 'Partnerships & External Engagement',
+    'Finance & Accounts', 'Leadership', 'Planning & Strategy',
+  ],
+  'New Age Skills': ['Essential Awareness', 'Digital Skill Building', 'Job Readiness'],
+  'Creative Arts': ['Crafts & Design', 'Visual Arts', 'Art & Culture', 'Performing Arts'],
+  'Health & Wellbeing': ['Physical Health', 'Mental Health', 'General Health Awareness'],
+  'Sports': ['Digital Games', 'Individual Sports', 'Team Games'],
+  'Inclusive Learning': [
+    'Therapy & Rehabilitation', 'Training & Capacity Building',
+    'Awareness & Advocacy', 'Daily-living & Independence',
+  ],
+  'Environment Education': [
+    'Climate Education', 'Natural Resources', 'Sustainable Living',
+    'Tech for Environment', 'Biodiversity & Conservation',
+  ],
+};
+
 // ─── Column Definitions ───────────────────────────────────────
-// Each entry: { header, apiField, lookupKey (for dropdown), required }
+// Each entry: { header, apiField, lookupKey (for dropdown), required, multiSelect }
 
 export interface ColumnDef {
   header: string;        // Excel column header text (shown to user)
   apiField: string;      // Field name sent to the platform API
   lookupKey?: keyof typeof LOOKUP;  // If set → this column gets a dropdown
   required: boolean;
+  multiSelect?: boolean; // true → user can enter pipe-separated values (A|B|C); sent as array to API
   note?: string;         // Hint text for the Instructions column
 }
 
 // ─── POS Framework Column Sets ────────────────────────────────
 
-// NOTE: Content always uses pos-framework for ALL users.
-// Medium and Grade Level are NOT in the pos-framework taxonomy and are NOT in the
-// content form-read API — sending them causes "range data is empty" API errors.
-// Domain and SubDomain are valid pos-framework fields for content.
+// Content form-read field order (index): appicon(1), name(2), description(3),
+// keywords(4), domain(5,multiselect,required), subDomain(6,multiselect,required),
+// subject(7,multiselect,required), targetAgeGroup(8,multiselect), primaryUser(9,multiselect),
+// contentLanguage(10,select,required), program(11,multiselect,required).
+// NOTE: license, copyright, copyrightYear are NOT in any content form-read — removed.
+// NOTE: domain schema type is "string" in QS; for content the form shows it as multiselect
+//       but the API accepts both string and array — we treat it as single-select for simplicity.
 export const POS_CONTENT_COLUMNS: ColumnDef[] = [
-  { header: 'Temp ID*',           apiField: 'tempId',          required: true,  note: 'Format: TEMP_CONTENT_N e.g. TEMP_CONTENT_1' },
-  { header: 'Name*',              apiField: 'name',            required: true,  note: 'Title of the content (max 250 chars)' },
-  { header: 'Description',        apiField: 'description',     required: false },
-  { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS' },
-  { header: 'Domain',             apiField: 'domain',          required: false, lookupKey: 'POS_DOMAINS' },
-  { header: 'Sub Domain',         apiField: 'subDomain',       required: false, lookupKey: 'POS_SUB_DOMAINS' },
-  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS' },
-  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS' },
-  { header: 'Content Language*',  apiField: 'contentLanguage', required: true,  lookupKey: 'CONTENT_LANGUAGES', note: 'Single language — language the content is written in' },
-  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS' },
-  { header: 'Keywords',           apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
-  { header: 'License',            apiField: 'license',         required: false, lookupKey: 'LICENSES' },
-  { header: 'Copyright',          apiField: 'copyright',       required: false },
-  { header: 'Copyright Year',     apiField: 'copyrightYear',   required: false },
-  { header: 'Author',             apiField: 'author',          required: false },
-  { header: 'Creator',            apiField: 'creator',         required: false, note: 'Name of the content creator (shown in Creator column on the platform)' },
-  { header: 'Google Drive URL*',  apiField: 'driveUrl',        required: true,  note: 'Public share link: https://drive.google.com/file/d/FILE_ID/view' },
-  { header: 'File Type*',         apiField: 'fileType',        required: true,  lookupKey: 'FILE_TYPES' },
+  { header: 'Temp ID*',             apiField: 'tempId',          required: true,  note: 'Format: TEMP_CONTENT_N e.g. TEMP_CONTENT_1' },
+  { header: 'Name*',                apiField: 'name',            required: true,  note: 'Title of the content (max 250 chars)' },
+  { header: 'English Name',         apiField: 'englishName',     required: false, note: 'Title of the content in English (englishName field)' },
+  { header: 'Description',          apiField: 'description',     required: false },
+  { header: 'Primary Category*',    apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
+  { header: 'App Icon Drive URL',   apiField: 'appIconUrl',      required: false, note: 'Google Drive public share link for the thumbnail image (PNG/JPEG)' },
+  { header: 'Domain*',              apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — select one domain' },
+  { header: 'Sub Domain*',          apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple e.g. Academics|Sports' },
+  { header: 'Subject*',             apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple e.g. Math|Science' },
+  { header: 'Target Age Group',     apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple e.g. 8-11 yrs|11-14 yrs' },
+  { header: 'Primary User',         apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Content Language*',    apiField: 'contentLanguage', required: true,  lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
+  { header: 'Program*',             apiField: 'program',         required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Keywords',             apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
+  { header: 'Author',               apiField: 'author',          required: false },
+  { header: 'Creator',              apiField: 'creator',         required: false, note: 'Name of the content creator' },
+  { header: 'File/Content URL*',    apiField: 'driveUrl',        required: true,  note: 'Google Drive link OR YouTube URL (for youtube file type)' },
+  { header: 'File Type*',           apiField: 'fileType',        required: true,  lookupKey: 'FILE_TYPES' },
 ];
 
-// POS QS form-read (obj-cat:practice-question-set_questionset_pos-channel) fields:
-// domain (required), subDomain (required), subject (required),
-// targetAgeGroup, primaryUser, contentLanguage, assessmentType, evaluationType, program.
-// NO medium, NO gradeLevel in POS QS.
-// POS QS form-read required fields (obj-cat:practice-question-set_questionset_pos-channel):
-// name ✓, description ✓ (required:true in form-read), domain ✓, subDomain ✓, subject ✓,
-// evaluationType ✓ (required:true in form-read with required validation message).
+// POS QS create form order: appIcon(required) → name(required) → description(required) →
+// program → domain(required,select,string) → subDomain(required,select,array) →
+// subject(required,nestedselect,array) → targetAgeGroup(nestedselect,array) →
+// primaryUser(nestedselect,array) → contentLanguage(select,string) →
+// assessmentType → evaluationType(required) → author
+// Note: maxAttempts is NOT in the QS create form — removed.
+// Note: domain schema type is "string" (single) per QS schema; subDomain/subject are arrays.
 export const POS_QS_COLUMNS: ColumnDef[] = [
   { header: 'Temp ID*',           apiField: 'tempId',          required: true,  note: 'Format: TEMP_QS_N e.g. TEMP_QS_1' },
   { header: 'Name*',              apiField: 'name',            required: true },
+  { header: 'English Name',       apiField: 'englishName',     required: false, note: 'Title in English (englishName field)' },
   { header: 'Description*',       apiField: 'description',     required: true },
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
-  { header: 'Domain*',            apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS' },
-  { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS' },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS' },
-  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS' },
-  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS' },
-  { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES', note: 'Language the content is written in' },
-  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS' },
+  { header: 'App Icon Drive URL', apiField: 'appIconUrl',      required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Domain*',            apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — select one domain' },
+  { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES', note: 'online = Auto-Graded | offline = Facilitator-Graded | ai = AI-Assisted' },
-  { header: 'Max Attempts',       apiField: 'maxAttempts',     required: false, note: 'Positive integer e.g. 3' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',     note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
 
-// POS Course form-read (obj-cat:course_collection_pos-channel) fields:
-// targetDomainIds, targetSubDomainIds, targetSubjectIds (all with output:"identifier"),
-// targetAgeGroup, primaryUser, contentLanguage, program.
-// NO medium, NO gradeLevel, NO plain subject/language for POS Course.
+// POS Course create form order: appIcon(required) → name(required) → description →
+// keywords → program(required,nestedselect,array) → targetDomainIds(required,select,identifier) →
+// targetSubDomainIds(required,nestedselect,identifier) → targetSubjectIds(required,nestedselect,identifier) →
+// targetAgeGroup(required,nestedselect,array) → primaryUser(nestedselect,array) →
+// contentLanguage(select,string) → author
+// Note: license, copyright, copyrightYear are NOT in the form-read — removed.
 export const POS_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Temp ID*',           apiField: 'tempId',             required: true,  note: 'Format: TEMP_COURSE_N e.g. TEMP_COURSE_1' },
   { header: 'Name*',              apiField: 'name',               required: true },
+  { header: 'English Name',       apiField: 'englishName',        required: false, note: 'Title in English (englishName field)' },
   { header: 'Description',        apiField: 'description',        required: false },
-  { header: 'Domain*',            apiField: 'targetDomainIds',    required: true,  lookupKey: 'POS_DOMAINS',          note: 'Select from dropdown — sent as platform identifier' },
-  { header: 'Sub Domain*',        apiField: 'targetSubDomainIds', required: true,  lookupKey: 'POS_SUB_DOMAINS',      note: 'Select from dropdown — sent as platform identifier' },
-  { header: 'Subject*',           apiField: 'targetSubjectIds',   required: true,  lookupKey: 'POS_SUBJECTS',         note: 'Select from dropdown — sent as platform identifier' },
-  // targetAgeGroup has validations:[{type:"required"}] in POS course form-read
-  { header: 'Target Age Group*',  apiField: 'targetAgeGroup',     required: true,  lookupKey: 'POS_TARGET_AGE_GROUPS' },
-  { header: 'Primary User',       apiField: 'primaryUser',        required: false, lookupKey: 'POS_PRIMARY_USERS' },
-  { header: 'Content Language',   apiField: 'contentLanguage',    required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Language the content is written in' },
-  { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS' },
-  { header: 'Keywords',           apiField: 'keywords',           required: false },
-  { header: 'License',            apiField: 'license',            required: false, lookupKey: 'LICENSES' },
-  { header: 'Copyright',          apiField: 'copyright',          required: false },
-  { header: 'Copyright Year',     apiField: 'copyrightYear',      required: false },
+  { header: 'App Icon Drive URL*',apiField: 'appIconUrl',         required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'Keywords',           apiField: 'keywords',           required: false, note: 'Comma-separated keywords' },
+  { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Domain*',            apiField: 'targetDomainIds',    required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — sent as platform identifier' },
+  { header: 'Sub Domain*',        apiField: 'targetSubDomainIds', required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Subject*',           apiField: 'targetSubjectIds',   required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Target Age Group*',  apiField: 'targetAgeGroup',     required: true,  lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Primary User',       apiField: 'primaryUser',        required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Content Language',   apiField: 'contentLanguage',    required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
   { header: 'Author',             apiField: 'author',             required: false },
 ];
 
@@ -560,42 +612,54 @@ export const POS_COURSE_COLUMNS: ColumnDef[] = [
 // courseType is NOT a valid content field — it only applies to QS/Courses.
 export const SCP_CONTENT_COLUMNS: ColumnDef[] = POS_CONTENT_COLUMNS;
 
+// SCP QS create form order: name(required) → description(required) →
+// program(nestedselect,range:["Second Chance"]) → board(required,select) →
+// medium(required,nestedselect,array) → gradeLevel(required,nestedselect,array) →
+// subject(required,nestedselect,array) → courseType(required,nestedselect,array) →
+// contentLanguage(select,string,"Assessment Language" label) →
+// assessmentType → evaluationType(required) → author
+// Note: maxAttempts is NOT in the QS create form — removed.
+// Note: SCP QS has NO appIcon in the create form (only in update form) — not added.
+// Note: "Language" field renamed to "Content Language", apiField changed to 'contentLanguage'.
 export const SCP_QS_COLUMNS: ColumnDef[] = [
   { header: 'Temp ID*',           apiField: 'tempId',          required: true,  note: 'Format: TEMP_QS_N e.g. TEMP_QS_1' },
   { header: 'Name*',              apiField: 'name',            required: true },
-  { header: 'Description',        apiField: 'description',     required: false },
+  { header: 'English Name',       apiField: 'englishName',     required: false, note: 'Title in English (englishName field)' },
+  { header: 'Description*',       apiField: 'description',     required: true },
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'SCP_PRIMARY_CATEGORIES_QS' },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS' },
-  { header: 'Board',              apiField: 'board',           required: false, lookupKey: 'SCP_BOARDS' },
-  { header: 'Medium',             apiField: 'medium',          required: false, lookupKey: 'SCP_MEDIUMS' },
-  { header: 'Grade Level',        apiField: 'gradeLevel',      required: false, lookupKey: 'SCP_GRADE_LEVELS' },
-  { header: 'Course Type',        apiField: 'courseType',      required: false, lookupKey: 'SCP_COURSE_TYPES' },
-  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'SCP_PROGRAMS' },
-  // Language is optional for SCP QS — platform does not enforce it as required
-  { header: 'Language',           apiField: 'language',        required: false, lookupKey: 'LANGUAGES' },
+  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'SCP_PROGRAMS',             multiSelect: true, note: 'Default: Second Chance' },
+  { header: 'Board*',             apiField: 'board',           required: true,  lookupKey: 'SCP_BOARDS',               note: 'Single value' },
+  { header: 'Medium*',            apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',              multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Grade Level*',       apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',             multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Course Type*',       apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',        note: 'Assessment language — single value' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type',    apiField: 'evaluationType',  required: false, lookupKey: 'EVALUATION_TYPES', note: 'online, offline or ai' },
-  { header: 'Max Attempts',       apiField: 'maxAttempts',     required: false, note: 'Positive integer e.g. 3' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',         note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
 
+// SCP Course create form order: appIcon(required) → name(required) → description →
+// keywords → program(required,nestedselect,range:["Second Chance"]) →
+// targetBoardIds(required,select,identifier) → targetMediumIds(required,nestedselect,identifier) →
+// targetGradeLevelIds(required,nestedselect,identifier) → targetSubjectIds(required,nestedselect,identifier) →
+// targetCourseTypeIds(required,nestedselect,identifier) → contentLanguage(select,string) → author
+// Note: license, copyright, copyrightYear are NOT in the form-read — removed.
 export const SCP_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Temp ID*',              apiField: 'tempId',          required: true,  note: 'Format: TEMP_COURSE_N e.g. TEMP_COURSE_1' },
   { header: 'Name*',                 apiField: 'name',            required: true },
+  { header: 'English Name',          apiField: 'englishName',     required: false, note: 'Title in English (englishName field)' },
   { header: 'Description',           apiField: 'description',     required: false },
-  { header: 'Subject*',              apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS' },
-  { header: 'Board',                 apiField: 'board',           required: false, lookupKey: 'SCP_BOARDS' },
-  { header: 'Medium',                apiField: 'medium',          required: false, lookupKey: 'SCP_MEDIUMS' },
-  { header: 'Grade Level',           apiField: 'gradeLevel',      required: false, lookupKey: 'SCP_GRADE_LEVELS' },
-  { header: 'Course Type',           apiField: 'courseType',      required: false, lookupKey: 'SCP_COURSE_TYPES' },
-  { header: 'Program',               apiField: 'program',         required: false, lookupKey: 'SCP_PROGRAMS' },
-  // SCP course form-read uses contentLanguage (plain string), not language (array)
-  { header: 'Content Language',      apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES' },
-  { header: 'Keywords',              apiField: 'keywords',        required: false },
-  { header: 'License',               apiField: 'license',         required: false, lookupKey: 'LICENSES' },
-  { header: 'Copyright',             apiField: 'copyright',       required: false },
-  { header: 'Copyright Year',        apiField: 'copyrightYear',   required: false },
+  { header: 'App Icon Drive URL*',   apiField: 'appIconUrl',      required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'Keywords',              apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
+  { header: 'Program*',              apiField: 'program',         required: true,  lookupKey: 'SCP_PROGRAMS',     note: 'Default: Second Chance' },
+  { header: 'Board*',                apiField: 'board',           required: true,  lookupKey: 'SCP_BOARDS',       note: 'Single value — sent as platform identifier' },
+  { header: 'Medium*',               apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',      multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Grade Level*',          apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS', multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Subject*',              apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',     multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Course Type*',          apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES', multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Content Language',      apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES', note: 'Single language' },
   { header: 'Author',                apiField: 'author',          required: false },
 ];
 
@@ -622,10 +686,17 @@ export const COURSE_MAPPING_COLUMNS: ColumnDef[] = [
   { header: 'Sequence*',       apiField: 'sequence',     required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
 ];
 
+// ExistingContentMapping: reference existing platform content by its do_xxx identifier.
+// Fill Course Temp ID + Unit Name + Sequence to add it directly to a course unit
+// (no CourseChildrenMapping row needed for existing content).
+// Leave Course Temp ID blank if only using as a reference for QS sections.
 export const EXISTING_MAPPING_COLUMNS: ColumnDef[] = [
-  { header: 'Temp ID*',             apiField: 'tempId',             required: true,  note: 'e.g. TEMP_EXISTING_1 — use this in CourseChildrenMapping' },
+  { header: 'Temp ID*',             apiField: 'tempId',             required: true,  note: 'e.g. TEMP_EXISTING_1 — used as a reference ID in this sheet' },
   { header: 'Existing Identifier*', apiField: 'existingIdentifier', required: true,  note: 'Real platform identifier e.g. do_abc123' },
   { header: 'Entity Type*',         apiField: 'entityType',         required: true,  lookupKey: 'CHILD_TYPES' },
+  { header: 'Course Temp ID',       apiField: 'courseTempId',       required: false, note: 'e.g. TEMP_COURSE_1 — which course to add this content to' },
+  { header: 'Unit Name',            apiField: 'unitName',           required: false, note: 'e.g. Unit 1: Introduction — which unit within the course' },
+  { header: 'Sequence',             apiField: 'sequence',           required: false, note: 'Order within the unit e.g. 1, 2, 3' },
 ];
 
 // ─── Framework selector ───────────────────────────────────────
@@ -661,41 +732,33 @@ export const getLookupColumns = (fw: FrameworkId): LookupColumn[] => {
     { header: 'File Types',         lookupKey: 'FILE_TYPES' },
     { header: 'Question Types',     lookupKey: 'QUESTION_TYPES' },
     { header: 'Child Types',        lookupKey: 'CHILD_TYPES' },
-    { header: 'Languages',          lookupKey: 'LANGUAGES' },
     { header: 'Content Languages',  lookupKey: 'CONTENT_LANGUAGES' },
-    { header: 'Licenses',           lookupKey: 'LICENSES' },
-    { header: 'Blooms Levels',      lookupKey: 'BLOOMS_LEVELS' },
-    { header: 'Difficulty Levels',  lookupKey: 'DIFFICULTY_LEVELS' },
     { header: 'Evaluation Types',   lookupKey: 'EVALUATION_TYPES' },
     { header: 'Assessment Types',   lookupKey: 'ASSESSMENT_TYPES' },
   ];
 
-  // Content sheet ALWAYS uses POS columns for all users (content uses pos-framework regardless).
-  // These POS lookup columns must be present in LookupData for BOTH SCP and POS templates
-  // so that Content sheet dropdowns resolve correctly.
+  // Content sheet always uses POS columns; these must be present in both templates.
   const posContentLookups: LookupColumn[] = [
     { header: 'Content Primary Categories', lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
-    { header: 'Content Subjects',           lookupKey: 'POS_SUBJECTS' },
-    { header: 'Content Domains',            lookupKey: 'POS_DOMAINS' },
-    { header: 'Content Sub Domains',        lookupKey: 'POS_SUB_DOMAINS' },
-    { header: 'Content Mediums',            lookupKey: 'POS_MEDIUMS' },
-    { header: 'Content Grade Levels',       lookupKey: 'POS_GRADE_LEVELS' },
+    { header: 'Domains',                    lookupKey: 'POS_DOMAINS' },
+    { header: 'Sub Domains',                lookupKey: 'POS_SUB_DOMAINS' },
+    { header: 'Subjects',                   lookupKey: 'POS_SUBJECTS' },
     { header: 'Target Age Groups',          lookupKey: 'POS_TARGET_AGE_GROUPS' },
     { header: 'Primary Users',              lookupKey: 'POS_PRIMARY_USERS' },
-    { header: 'Content Programs',           lookupKey: 'POS_PROGRAMS' },
+    { header: 'Programs',                   lookupKey: 'POS_PROGRAMS' },
   ];
 
   if (fw === 'scp-framework') {
     return [
       ...shared,
-      ...posContentLookups,                                              // always needed for Content sheet
+      ...posContentLookups,
       { header: 'Primary Categories (QS)',  lookupKey: 'SCP_PRIMARY_CATEGORIES_QS' },
-      { header: 'Subjects (QS/Course)',     lookupKey: 'SCP_SUBJECTS' },
       { header: 'Boards',                   lookupKey: 'SCP_BOARDS' },
-      { header: 'Mediums (QS/Course)',      lookupKey: 'SCP_MEDIUMS' },
-      { header: 'Grade Levels (QS/Course)', lookupKey: 'SCP_GRADE_LEVELS' },
+      { header: 'Mediums',                  lookupKey: 'SCP_MEDIUMS' },
+      { header: 'Grade Levels',             lookupKey: 'SCP_GRADE_LEVELS' },
+      { header: 'Subjects (SCP)',           lookupKey: 'SCP_SUBJECTS' },
       { header: 'Course Types',             lookupKey: 'SCP_COURSE_TYPES' },
-      { header: 'Programs (QS/Course)',     lookupKey: 'SCP_PROGRAMS' },
+      { header: 'Programs (SCP)',           lookupKey: 'SCP_PROGRAMS' },
     ];
   }
 
@@ -703,11 +766,5 @@ export const getLookupColumns = (fw: FrameworkId): LookupColumn[] => {
     ...shared,
     ...posContentLookups,
     { header: 'Primary Categories (QS)',  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
-    // POS QS and Course also need these (content lookups above cover the same keys,
-    // but keep explicit entries so the LookupData sheet headings are clear)
-    { header: 'Programs (QS/Course)',     lookupKey: 'POS_PROGRAMS' },
-    { header: 'Subjects (QS/Course)',     lookupKey: 'POS_SUBJECTS' },
-    { header: 'Domains (QS/Course)',      lookupKey: 'POS_DOMAINS' },
-    { header: 'Sub Domains (QS/Course)',  lookupKey: 'POS_SUB_DOMAINS' },
   ];
 };
