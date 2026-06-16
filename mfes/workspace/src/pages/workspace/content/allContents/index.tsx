@@ -437,7 +437,7 @@ const AllContentsPage = () => {
                   selectedFilters={selectedFilters}
                   onChange={setSelectedFilters}
                   onSelectedNamesChange={setSelectedNames}
-                  isProgramFilter={false}
+                 // isProgramFilter={false}
                 />
               </Box>
             </Box>

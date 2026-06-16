@@ -5,12 +5,13 @@ import { getUserDetailsInfo } from "./userServices";
 import { ContentStatus, Editor } from "../utils/app.constant";
 
 export const sendContentNotification = async (
-    status: ContentStatus.PUBLISHED | ContentStatus.REJECTED, 
-    editorType:  Editor.CONTENT | Editor.QUESTION_SET | Editor.COLLECTION, 
+    status: ContentStatus.PUBLISHED | ContentStatus.REJECTED,
+    editorType:  Editor.CONTENT | Editor.QUESTION_SET | Editor.COLLECTION,
     comment = "",
     identifier?:any,
     contentInfo?:any,
-    router?:any
+    router?:any,
+    returnPage?:any
   ) => {
     // const router = useRouter();
 
@@ -60,7 +61,7 @@ export const sendContentNotification = async (
         email: { receipients: [response?.userData?.email] },
       });
   
-      router.push({ pathname: "/workspace/content/up-review" });
+      router.push({ pathname: "/workspace/content/up-review", query: returnPage ? { page: returnPage } : {} });
     } catch (error) {
       console.error("Error sending email notifications:", error);
     }
