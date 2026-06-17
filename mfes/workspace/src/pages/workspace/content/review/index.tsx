@@ -40,7 +40,7 @@ const ReviewContentSubmissions = () => {
     useState(false);
   const router = useRouter();
   const { identifier } = router.query;
-  const { isDiscoverContent , isContentLibrary, isAllContents}  = router.query;
+  const { isDiscoverContent , isContentLibrary, isAllContents, returnPage}  = router.query;
   const { isReadOnly } = router.query;
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  const [showHeader, setShowHeader] = useState<boolean | null>(null);
@@ -104,20 +104,21 @@ const ReviewContentSubmissions = () => {
   }, [tenantConfig?.CHANNEL_ID, identifier]);
 
   const redirectToReviewPage = () => {
+    const pageQuery = returnPage ? { page: returnPage } : {};
     if (isDiscoverContent === "true") {
-      router.push({ pathname: `/workspace/content/discover-contents` });
+      router.push({ pathname: `/workspace/content/discover-contents`, query: pageQuery });
 
     }
     else if(isContentLibrary === "true") {
-      router.push({ pathname: `/workspace/content/content-library` });
+      router.push({ pathname: `/workspace/content/content-library`, query: pageQuery });
     }
     else if(isAllContents==="true")
     {
-      router.push({ pathname: `/workspace/content/allContents` });
+      router.push({ pathname: `/workspace/content/allContents`, query: pageQuery });
 
     }
     else if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
-      router.push({ pathname: `/workspace/content/up-review` });
+      router.push({ pathname: `/workspace/content/up-review`, query: pageQuery });
 
     }
     else
@@ -208,8 +209,8 @@ const ReviewContentSubmissions = () => {
  
   
   
-  const sendContentPublishNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.CONTENT,"", identifier, contentDetails, router);
-  const sendContentRejectNotification = (comment: any) => sendContentNotification(ContentStatus.REJECTED, Editor.CONTENT,comment, identifier, contentDetails , router);
+  const sendContentPublishNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.CONTENT, "", identifier, contentDetails, router, returnPage);
+  const sendContentRejectNotification = (comment: any) => sendContentNotification(ContentStatus.REJECTED, Editor.CONTENT, comment, identifier, contentDetails, router, returnPage);
   
 
   return (
