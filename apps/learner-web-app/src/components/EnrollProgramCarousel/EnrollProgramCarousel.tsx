@@ -156,6 +156,9 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
             userHasActiveBatch = true;
             break;
           }
+          else {
+            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+          }
         }
 
         if (activeAcademicYear?.id) {

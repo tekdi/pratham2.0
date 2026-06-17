@@ -97,6 +97,10 @@ const activeAcademicYear = Array.isArray(academicYearList)
           userHasActiveBatch = true;
           break;
         }
+        else
+        {
+          localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+        }
       }
 
       // Restore active academic year after iterating all IDs
