@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Layout from '../../../../components/Layout';
 import { Typography, Box, CircularProgress } from '@mui/material';
-import { getContent } from '@workspace/services/ContentService';
+import { getContent, getfilterList } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import { LIMIT } from '@workspace/utils/app.constant';
@@ -51,7 +51,7 @@ const PublishPage = () => {
   const [selectedKey, setSelectedKey] = useState('publish');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('publishSearchTerm') || '' : '');
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const { filterOptions, sort } = router.query;
 
@@ -72,6 +72,24 @@ const PublishPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
+  const [programFilter, setProgramFilter] = useState<string[]>([]);
+  const [programOptions, setProgramOptions] = useState<{ code: string; name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchProgramOptions = async () => {
+      const fields = await getfilterList();
+      const programField = fields?.find((f: any) => f.code === 'program');
+      if (programField?.range) {
+        const options = programField.range.map((r: any) => ({
+          code: String(r.key || r.value || r.name),
+          name: String(r.name || r.value || r.key),
+        }));
+        setProgramOptions(options);
+      }
+    };
+    fetchProgramOptions();
+  }, []);
+
   const [contentList, setContentList] = React.useState<any[]>([]);
   const [contentDeleted, setContentDeleted] = React.useState(false);
   const [loading, setLoading] = useState(false);
@@ -98,6 +116,11 @@ const PublishPage = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('publishSearchTerm', searchTerm);
+  }, [searchTerm]);
+
   useEffect(() => {
     const filteredArray = contentList.map((item: any) => ({
       image: item?.appIcon,
@@ -127,6 +150,27 @@ const PublishPage = () => {
 
   const handleSortChange = (sortBy: string) => {
     setSortBy(sortBy);
+  };
+
+  const handleProgramChange = (programs: string[]) => {
+    setProgramFilter(programs);
+    setPage(0);
+  };
+
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    programFilter.length > 0;
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setProgramFilter([]);
+    setPage(0);
+    localStorage.removeItem('publishSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
   };
 
   const openEditor = (content: any) => {
@@ -178,7 +222,10 @@ const PublishPage = () => {
           offset,
           primaryCategory,
           sort_by,
-          tenantConfig?.CHANNEL_ID
+          tenantConfig?.CHANNEL_ID,
+          undefined,
+          undefined,
+          programFilter.length > 0 ? { program: programFilter } : undefined
         );
         // Combine content and QuestionSet arrays
         const combinedList = [
@@ -209,6 +256,7 @@ const PublishPage = () => {
     fetchContentAPI,
     contentDeleted,
     page,
+    programFilter,
   ]);
 
   return (
@@ -235,10 +283,15 @@ const PublishPage = () => {
             </Box>
             <Box mb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
+                programOptions={programOptions}
+                programValue={programFilter}
+                onProgramChange={handleProgramChange}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
             </Box>
             {/* <Typography mb={2}>Here you see all your published content.</Typography> */}

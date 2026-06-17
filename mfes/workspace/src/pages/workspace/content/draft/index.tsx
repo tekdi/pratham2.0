@@ -68,7 +68,7 @@ const DraftPage = () => {
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('draftSearchTerm') || '' : '');
   const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
     {}
   );
@@ -119,6 +119,10 @@ const DraftPage = () => {
     return () => {
       clearTimeout(handler);
     };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('draftSearchTerm', searchTerm);
   }, [searchTerm]);
 
   useEffect(() => {
@@ -280,6 +284,25 @@ const DraftPage = () => {
     }
   }, [selectedFilters, selectedNames, router.asPath]);
 
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('draftFilters');
+    localStorage.removeItem('draftSelectedNames');
+    localStorage.removeItem('draftSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
+
   return (
     <>
       {showHeader && <WorkspaceHeader />}
@@ -308,10 +331,12 @@ const DraftPage = () => {
 
             <Box pb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter

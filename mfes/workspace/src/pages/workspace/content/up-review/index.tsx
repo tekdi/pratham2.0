@@ -92,7 +92,7 @@ const UpForReviewPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]); 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('upReviewSearchTerm') || '' : '');
   const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
     {}
   );
@@ -122,6 +122,11 @@ const UpForReviewPage = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('upReviewSearchTerm', searchTerm);
+  }, [searchTerm]);
+
   useEffect(() => {
     const sortedContentList = [...contentList].sort((a: any, b: any) => {
       return (
@@ -284,6 +289,25 @@ const UpForReviewPage = () => {
     }
   }, [selectedFilters, selectedNames, router.asPath]);
 
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('upReviewFilters');
+    localStorage.removeItem('upReviewSelectedNames');
+    localStorage.removeItem('upReviewSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
+
   return (
     <>
       {showHeader && <WorkspaceHeader />}
@@ -312,10 +336,12 @@ const UpForReviewPage = () => {
 
             <Box mb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter

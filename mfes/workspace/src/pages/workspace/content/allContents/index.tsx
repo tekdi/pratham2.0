@@ -92,7 +92,7 @@ const AllContentsPage = () => {
   const [selectedKey, setSelectedKey] = useState('allContents');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('allContentsSearchTerm') || '' : '');
   const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
     {}
   );
@@ -159,6 +159,10 @@ const AllContentsPage = () => {
     return () => {
       clearTimeout(handler);
     };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('allContentsSearchTerm', searchTerm);
   }, [searchTerm]);
 
   const handleSearch = (term: string) => {
@@ -396,6 +400,27 @@ const AllContentsPage = () => {
     }
   }, [selectedFilters, selectedNames, router.asPath]);
 
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    (statusBy !== '' && statusBy !== 'All') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setStatusBy('All');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('allContentsFilters');
+    localStorage.removeItem('allContentsSelectedNames');
+    localStorage.removeItem('allContentsSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
+
   return (
     <>
       {showHeader && <WorkspaceHeader />}
@@ -423,12 +448,14 @@ const AllContentsPage = () => {
 
             <Box mb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
                 onStatusChange={handleStatusChange}
                 allContents={true}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter
