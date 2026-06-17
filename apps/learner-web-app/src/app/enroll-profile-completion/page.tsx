@@ -131,11 +131,11 @@ const EnrollProfileCompletionInner = () => {
               : false;
             if (hasBatch) {
               userHasActiveBatch = true;
+                            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+
               break;
             }
-            else {
-              localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
-            }
+            
           }
 
           if (activeAcademicYear?.id) {

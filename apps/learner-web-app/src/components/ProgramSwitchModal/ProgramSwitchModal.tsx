@@ -172,11 +172,11 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
             : false;
           if (hasBatch) {
             userHasActiveBatch = true;
+               localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+
             break;
           }
-          else{
-            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
-          }
+         
         }
 
         if (activeAcademicYear?.id) {
