@@ -78,7 +78,7 @@ const Page = () => {
         const mimeTypeCategories = {
           videos: ["video/Webm", "video/mp4", "video/x-youtube"],
           games: ["application/vnd.ekstep.h5p-archive", "application/vnd.ekstep.html-archive", "application/vnd.ekstep.ecml-archive"],
-          audios: ["audio/mp3", "audio/wav", "video/mp3"],
+          audios: ["audio/mp3", "audio/wav", "video/mp3","audio/mpeg"],
           otherFormats: ["application/pdf", "application/epub", "application/vnd.sunbird.questionset"]
         };
 

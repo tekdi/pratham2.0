@@ -590,7 +590,7 @@ File: `mfes/players/src/components/players/Players.tsx`
 |-----------|-----------------|
 | `application/pdf` | `SunbirdPdfPlayer` |
 | `video/mp4`, `video/webm` | `SunbirdVideoPlayer` |
-| `audio/mp3`, `audio/wav` | `SunbirdVideoPlayer` |
+| `audio/mp3`, `audio/wav`, `audio/mpeg` | `SunbirdVideoPlayer` |
 | `application/epub` | `SunbirdEpubPlayer` |
 | `application/vnd.sunbird.question` | `SunbirdQuMLPlayer` |
 | `video/x-youtube` | `V1Player` |

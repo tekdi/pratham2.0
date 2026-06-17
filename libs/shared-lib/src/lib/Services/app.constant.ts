@@ -209,6 +209,7 @@ export enum ContentType {
   //new types
   AUDIO_MP3 = 'audio/mp3',
   AUDIO_WAV = 'audio/wav',
+  AUDIO_MPEG = 'audio/mpeg',
 }
 
 // Define the type for the content type mapping
@@ -272,6 +273,12 @@ export const ContentCardsTypes: FileType = {
     imgPath: mp4, 
     //@ts-ignore
     BgImgPath: bgmp4 },
+  [ContentType.AUDIO_MPEG]: { name: 'Audio', 
+    //@ts-ignore
+    imgPath: mp4, 
+    //@ts-ignore
+    BgImgPath: bgmp4 },
+
 };
 
 export enum contentStatus {
