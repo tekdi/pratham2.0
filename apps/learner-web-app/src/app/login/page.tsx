@@ -388,6 +388,23 @@ const LoginPageContent = () => {
           if (enrolledTenant?.collectionFramework) localStorage.setItem('collectionFramework', enrolledTenant.collectionFramework);
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
           await profileComplitionCheck();
+
+          const assessmentStatus = await checkRegistrationTestStatus(
+            uiConfig,
+            enrolledTenant.tenantName,
+            [enrolledTenant]
+          );
+          if (assessmentStatus === 'assessmentPending') {
+            localStorage.setItem('registerationTestGiven', 'No');
+            setLoading(false);
+            setAssessmentPendingModal(true);
+            return;
+          } else if (assessmentStatus === 'assessmentUnavailable') {
+            setLoading(false);
+            setAssessmentUnavailableModal(true);
+            return;
+          }
+
           setLoading(false);
            if(localStorage.getItem('isAndroidApp') == 'yes' && window.ReactNativeWebView)
             {
@@ -620,6 +637,7 @@ const LoginPageContent = () => {
           }
           // Redirect to landing page
           else if (assessmentStatus === 'assessmentUnavailable') {
+            setLoading(false);
             setAssessmentUnavailableModal(true);
             return;
           }
@@ -881,10 +899,16 @@ const LoginPageContent = () => {
 
       <SimpleModal
         open={assessmentUnavailableModal}
-        onClose={() => setAssessmentUnavailableModal(false)}
+        onClose={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         showFooter={true}
         primaryText={t('COMMON.OK')}
-        primaryActionHandler={() => setAssessmentUnavailableModal(false)}
+        primaryActionHandler={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">
