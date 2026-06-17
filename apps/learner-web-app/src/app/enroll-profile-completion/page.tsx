@@ -345,11 +345,43 @@ const EnrollProfileCompletionInner = () => {
         }
   };
 
-  const onAssessmentUnavailableOk = () => {
+  const onAssessmentUnavailableOk = async () => {
     setAssessmentUnavailableModal(false);
-    setTimeout(() => {
-      window.location.href = '/scp-dashboard';
-    }, 100);
+    localStorage.removeItem('enrollTenantId');
+
+    try {
+      const storedUserId = localStorage.getItem('userId');
+      const storedRoleId = localStorage.getItem('roleId');
+      const enrollTenantId = localStorage.getItem('tenantId');
+      const uiConfigRaw = localStorage.getItem('uiConfig');
+      const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
+      const userTenantStatus = uiConfig?.isTenantPendingStatus;
+
+      if (storedUserId && storedRoleId && enrollTenantId) {
+        if (userTenantStatus) {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
+        } else {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
+        }
+        if (userTenantStatus) {
+          try {
+            await updateUser(storedUserId, {
+              userData: {},
+              customFields: [{
+                fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+                value: 'pending',
+              }],
+            });
+          } catch (updateError) {
+            console.error('Failed to update pending custom field:', updateError);
+          }
+        }
+      }
+    } catch (enrollError) {
+      console.error('Enrollment failed on assessment unavailable:', enrollError);
+    }
+
+    window.location.href = '/scp-dashboard';
   };
 
   const handleStartAssessment = async () => {
