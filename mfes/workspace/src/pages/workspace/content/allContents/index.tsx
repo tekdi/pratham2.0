@@ -92,10 +92,12 @@ const AllContentsPage = () => {
   const [selectedKey, setSelectedKey] = useState('allContents');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('allContentsSearchTerm') || '' : '');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('allContentsSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   const { filterOptions, sort, status } = router.query;
 
   const [filter, setFilter] = useState<any[]>([]);
@@ -159,6 +161,10 @@ const AllContentsPage = () => {
     return () => {
       clearTimeout(handler);
     };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('allContentsSearchTerm', searchTerm);
   }, [searchTerm]);
 
   const handleSearch = (term: string) => {
@@ -346,7 +352,11 @@ const AllContentsPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('allContentsFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -370,31 +380,32 @@ const AllContentsPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for allContents
+  // Save filters for allContents
   useEffect(() => {
-    if (router.query && router.asPath.includes('allContents')) {
-      const savedFilters = localStorage.getItem('allContentsFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'allContentsSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
+    localStorage.setItem('allContentsFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('allContentsSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
-  // Save filters only for allContents
-  useEffect(() => {
-    if (router.asPath.includes('allContents')) {
-      localStorage.setItem(
-        'allContentsFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'allContentsSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    (statusBy !== '' && statusBy !== 'All') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setStatusBy('All');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('allContentsFilters');
+    localStorage.removeItem('allContentsSelectedNames');
+    localStorage.removeItem('allContentsSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
 
   return (
     <>
@@ -423,12 +434,14 @@ const AllContentsPage = () => {
 
             <Box mb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
                 onStatusChange={handleStatusChange}
                 allContents={true}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter

@@ -104,25 +104,33 @@ const ReviewContentSubmissions = () => {
   }, [tenantConfig?.CHANNEL_ID, identifier]);
 
   const redirectToReviewPage = () => {
+    const previousPage = sessionStorage.getItem('previousPage');
+    if (previousPage && previousPage.startsWith('/')) {
+      const validPaths = [
+        '/workspace/content/draft',
+        '/workspace/content/up-review',
+        '/workspace/content/publish',
+        '/workspace/content/allContents',
+        '/workspace/content/discover-contents',
+        '/workspace/content/submitted',
+      ];
+      if (validPaths.some(p => previousPage.includes(p))) {
+        router.push(previousPage);
+        return;
+      }
+    }
     const pageQuery = returnPage ? { page: returnPage } : {};
     if (isDiscoverContent === "true") {
       router.push({ pathname: `/workspace/content/discover-contents`, query: pageQuery });
-
-    }
-    else if(isContentLibrary === "true") {
+    } else if (isContentLibrary === "true") {
       router.push({ pathname: `/workspace/content/content-library`, query: pageQuery });
-    }
-    else if(isAllContents==="true")
-    {
+    } else if (isAllContents === "true") {
       router.push({ pathname: `/workspace/content/allContents`, query: pageQuery });
-
-    }
-    else if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
+    } else if (getLocalStoredUserRole() === Role.CCTA || getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
       router.push({ pathname: `/workspace/content/up-review`, query: pageQuery });
-
-    }
-    else
+    } else {
       router.push({ pathname: `/workspace/content/submitted` });
+    }
   };
 
   const closePublishPopup = () => {

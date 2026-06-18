@@ -60,6 +60,20 @@ export const sendContentNotification = async (
         email: { receipients: [response?.userData?.email] },
       });
   
+      const previousPage = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('previousPage') : null;
+      if (previousPage && previousPage.startsWith('/')) {
+        const validPaths = [
+          '/workspace/content/draft',
+          '/workspace/content/up-review',
+          '/workspace/content/publish',
+          '/workspace/content/allContents',
+          '/workspace/content/discover-contents',
+        ];
+        if (validPaths.some(p => previousPage.includes(p))) {
+          router.push(previousPage);
+          return;
+        }
+      }
       router.push({ pathname: "/workspace/content/up-review", query: returnPage ? { page: returnPage } : {} });
     } catch (error) {
       console.error("Error sending email notifications:", error);

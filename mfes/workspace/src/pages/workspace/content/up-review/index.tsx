@@ -92,10 +92,12 @@ const UpForReviewPage = () => {
   useEffect(() => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]); 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('upReviewSearchTerm') || '' : '');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('upReviewSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [contentList, setContentList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = useState(false);
@@ -122,6 +124,11 @@ const UpForReviewPage = () => {
       clearTimeout(handler);
     };
   }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('upReviewSearchTerm', searchTerm);
+  }, [searchTerm]);
+
   useEffect(() => {
     const sortedContentList = [...contentList].sort((a: any, b: any) => {
       return (
@@ -234,7 +241,11 @@ const UpForReviewPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('upReviewFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -258,31 +269,30 @@ const UpForReviewPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for up-review
+  // Save filters for up-review
   useEffect(() => {
-    if (router.query && router.asPath.includes('up-review')) {
-      const savedFilters = localStorage.getItem('upReviewFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'upReviewSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
+    localStorage.setItem('upReviewFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('upReviewSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
-  // Save filters only for up-review
-  useEffect(() => {
-    if (router.asPath.includes('up-review')) {
-      localStorage.setItem(
-        'upReviewFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'upReviewSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('upReviewFilters');
+    localStorage.removeItem('upReviewSelectedNames');
+    localStorage.removeItem('upReviewSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
 
   return (
     <>
@@ -312,10 +322,12 @@ const UpForReviewPage = () => {
 
             <Box mb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter

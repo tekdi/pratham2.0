@@ -91,6 +91,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
     const identifier = content?.identifier;
     let mode = content?.mode; // default mode from content, can be overwritten by tableTitle
 
+    // Store current path (without basePath) so editors/review can return to exact state including all filters
+    sessionStorage.setItem('previousPage', router.asPath);
+
     switch (tableTitle) {
       case 'draft':
         mode = !mode ? 'edit' : mode;
@@ -98,19 +101,16 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
 
         // Use draft-specific routing
         if (content?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
-          sessionStorage.setItem('previousPage', window.location.href);
           router.push({ pathname: `/editor`, query: { identifier } });
         } else if (
           content?.mimeType &&
           MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
         ) {
-          sessionStorage.setItem('previousPage', window.location.href);
           router.push({ pathname: `/upload-editor`, query: { identifier } });
         } else if (
           content?.mimeType &&
           MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)
         ) {
-          sessionStorage.setItem('previousPage', window.location.href);
           router.push({ pathname: `/collection`, query: { identifier } });
         }
         return; // Exit early since draft has specific routing logic
@@ -146,7 +146,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
 
     // Generic routing for cases other than 'draft'
     if (content?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
-      sessionStorage.setItem('previousPage', window.location.href);
       router.push({ pathname: `/editor`, query: { identifier } });
     } else if (tableTitle === 'submitted') {
       content.contentType === 'Course'
@@ -208,7 +207,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       if (tableTitle === 'upForReview') {
         router.push({ pathname: `/workspace/content/review`, query: { identifier, returnPage: currentPage } });
       } else {
-        sessionStorage.setItem('previousPage', window.location.href);
         if (tableTitle === 'all-content') {
           router.push({ pathname: `/upload-editor`, query: { identifier, isAllContents: true } });
         } else {
@@ -219,7 +217,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       content?.mimeType &&
       MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)
     ) {
-      sessionStorage.setItem('previousPage', window.location.href);
       router.push({ pathname: `/collection`, query: { identifier } });
     }
   };
