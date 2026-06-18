@@ -58,6 +58,9 @@ const ContentPlayerV2 = ({
         case 'audio/wav':
           contentType='wav';
           break;
+        case 'audio/mpeg':
+          contentType='mpeg';
+          break;
         default :
           contentType='content';
           break;
