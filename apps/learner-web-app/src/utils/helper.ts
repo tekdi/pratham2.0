@@ -126,12 +126,6 @@ result.number_of_children_in_your_group = getSingleTextValue('NUMBER_OF_CHILDREN
           'PARENT_GUARDIAN_PHONE_NO'
         ) || '';
     }
-
-    // #region agent log
-    const _trainingRaw = userData.customFields?.find((f: any) => f.label === 'HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING');
-    fetch('http://127.0.0.1:7667/ingest/dcd8bc2d-26a3-48b2-8671-6635c9925d89',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'bb8042'},body:JSON.stringify({sessionId:'bb8042',location:'helper.ts:mapUserData',message:'training_check mapped',data:{training_check:result.training_check,training_checkType:typeof result.training_check,isArray:Array.isArray(result.training_check),rawSelectedValues:_trainingRaw?.selectedValues},timestamp:Date.now(),hypothesisId:'H1-H2'})}).catch(()=>{});
-    // #endregion
-
     return result;
   } catch (error) {
     console.log(error);
