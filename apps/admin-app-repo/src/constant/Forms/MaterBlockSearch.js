@@ -58,7 +58,7 @@ export const MasterBlockSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     fieldName: {
       type: 'string',

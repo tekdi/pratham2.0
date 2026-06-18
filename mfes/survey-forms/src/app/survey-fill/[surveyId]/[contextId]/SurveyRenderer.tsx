@@ -22,6 +22,7 @@ import { validateForm, ValidationError } from '../../../../utils/validation';
 import { isSectionVisible, isFieldVisible } from '../../../../utils/conditionalLogic';
 import SurveySection from '../../../../Components/SurveySection/SurveySection';
 import BackHeader from '../../../../Components/BackHeader/BackHeader';
+import { isExpired } from '../../../../utils/Helper/helper';
 
 const AUTO_SAVE_INTERVAL = 30000;
 
@@ -299,7 +300,11 @@ const SurveyRenderer: React.FC = () => {
       section.fields.forEach((field) => {
         if (!isFieldVisible(field, form.formValues)) return;
         const val = form.formValues[field.fieldName];
-        if (val !== null && val !== undefined && val !== '' && !(Array.isArray(val) && val.length === 0)) {
+        const rawVal = (val !== null && typeof val === 'object' && !Array.isArray(val) && 'selected' in val)
+          ? val.selected
+          : val;
+        const isEmpty = rawVal === null || rawVal === undefined || rawVal === '' || (Array.isArray(rawVal) && rawVal.length === 0);
+        if (!isEmpty) {
           cleanData[field.fieldName] = val;
         }
       });
@@ -464,6 +469,7 @@ const SurveyRenderer: React.FC = () => {
 
   const survey = form.survey;
   if (!survey) return null;
+  const expired = isExpired(survey.endDate);
 
   const sortedSections = [...(survey.sections || [])].sort(
     (a, b) => a.displayOrder - b.displayOrder
@@ -519,6 +525,27 @@ const SurveyRenderer: React.FC = () => {
         />
       </Box>
 
+      {expired && (
+        <Box
+          sx={{
+            mx: 2,
+            mt: 2,
+            px: 2,
+            py: 1.5,
+            borderRadius: '8px',
+            backgroundColor: '#FFEBEE',
+            border: '1px solid #EF9A9A',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+          }}
+        >
+          <Typography variant="body2" sx={{ color: '#C62828', fontWeight: 500 }}>
+            This survey has expired and can no longer be filled.
+          </Typography>
+        </Box>
+      )}
+
       <Box sx={{ p: 2 }}>
         {visibleSections.map((section) => (
           <SurveySection
@@ -528,9 +555,11 @@ const SurveyRenderer: React.FC = () => {
             errors={form.errors}
             onChange={handleFieldChange}
             fieldNumberMap={fieldNumberMap}
+            disabled={expired}
           />
         ))}
 
+        {!expired && (
         <Box
           sx={{
             display: 'flex',
@@ -578,6 +607,7 @@ const SurveyRenderer: React.FC = () => {
             )}
           </Button>
         </Box>
+        )}
         {form.lastAutoSavedAt && (
           <Typography
             variant="caption"

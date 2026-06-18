@@ -56,11 +56,18 @@ import { enrollUserTenant } from '@shared-lib-v2/MapUser/MapService';
 import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserService';
 import { sendCredentialService } from '@/services/NotificationService';
 import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
+import useStore from '@/store/store';
+import {
+  getVisibleTableActions,
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const ContentCreator = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(ContentCreatorSearchSchema);
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
@@ -484,6 +491,8 @@ const ContentCreator = () => {
     },
   ];
 
+  const visibleActions = getVisibleTableActions(actions, isActiveYear);
+
   // Pagination handlers
   const handlePageChange = (newPage: any) => {
     console.log('Page changed to:', newPage);
@@ -552,33 +561,35 @@ const ContentCreator = () => {
             />
           )
         )}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }} mt={4}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="contentCreator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
           />
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledState({});
-              setFormStep(0);
-              setSelectedUserId(null);
-              setUserDetails(null);
-              setMapModalOpen(true);
-            }}
-          >
-            {t('COMMON.MAP_NEW')}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledState({});
+                setFormStep(0);
+                setSelectedUserId(null);
+                setUserDetails(null);
+                setMapModalOpen(true);
+              }}
+            >
+              {t('COMMON.MAP_NEW')}
+            </Button>
+          )}
         </Box>
 
         {/* <SimpleModal
@@ -628,12 +639,12 @@ const ContentCreator = () => {
         {response != null ? (
           <>
             {response && response?.result?.getUserDetails ? (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={pageTableSectionSx}>
                 <PaginatedTable
                   count={response?.result?.totalCount}
                   data={response?.result?.getUserDetails}
                   columns={columns}
-                  actions={actions}
+                  actions={visibleActions}
                   onPageChange={handlePageChange}
                   onRowsPerPageChange={handleRowsPerPageChange}
                   defaultPage={currentPage}

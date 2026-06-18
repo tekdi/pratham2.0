@@ -124,6 +124,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
     }
   }, []);
 
+  const [isModeOfLearningPresent, setIsModeOfLearningPresent] = useState<boolean | null>(false);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -174,6 +176,16 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.org_id;
         delete responseFormForEnroll?.schema?.properties?.what_do_you_want_to_become;
         responseFormForEnroll?.schema?.required?.pop('batch');
+        console.log('responseFormForEnroll', responseFormForEnroll?.schema);
+
+        if (responseFormForEnroll?.schema?.properties && Array.isArray(responseFormForEnroll?.schema?.required)) {
+          const requiredFields = responseFormForEnroll.schema.required;
+          Object.keys(responseFormForEnroll.schema.properties).forEach((key) => {
+            if (!requiredFields.includes(key)) {
+              delete responseFormForEnroll.schema.properties[key];
+            }
+          });
+        }
         console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
         const responseFormCopy = JSON.parse(JSON.stringify(responseForm));
@@ -256,7 +268,25 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
             : responseForm?.schema;
           let alterUISchema = enrolledProgram ? responseFormForEnroll?.uiSchema : responseForm?.uiSchema;
 
-          // If enrolledProgram + completeProfile and there are no required fields left,
+          console.log('alterSchema', alterSchema);
+          console.log('alterUISchema', alterUISchema);
+          if(alterSchema.properties.own_phone_check && !alterSchema.properties.phone_type_accessible)
+          {
+            delete alterSchema.properties.own_phone_check;
+            delete alterUISchema.own_phone_check;
+            if(alterSchema.required.includes('own_phone_check')){
+             alterSchema.required.pop('own_phone_check');
+            }
+          }
+          if(alterSchema.properties.own_phone_check && mappedData?.phone_type_accessible === 'nophone')
+          {
+            delete alterSchema.properties.own_phone_check;
+            delete alterUISchema.own_phone_check;
+            if(Array.isArray(alterSchema.required) && alterSchema.required.includes('own_phone_check')){
+              alterSchema.required = alterSchema.required.filter((f: string) => f !== 'own_phone_check');
+            }
+          }
+       //   If enrolledProgram + completeProfile and there are no required fields left,
           // the profile is already complete — skip the form and proceed directly.
           if (enrolledProgram && completeProfile && (!alterSchema?.required || alterSchema.required.length === 0)) {
             skipLoadingReset = true; // keep loader visible while handleAccessProgram runs
@@ -282,6 +312,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           //set 2 grid layout
           alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
+
+
+            //check if mode of learning is present in the schema
+            console.log('####debug responseForm?.schema?.properties?.preferred_mode_of_learning', responseForm?.schema?.properties?.preferred_mode_of_learning);
+            if (responseForm?.schema?.properties?.preferred_mode_of_learning) {
+              setIsModeOfLearningPresent(true);
+              console.log('####debug isModeOfLearningPresent', isModeOfLearningPresent);
+            }
+
 
           // Add helper text to all CustomTextFieldWidget fields if isForNavaPatham is true
           alterUISchema = addHelperTextToTextFieldWidgets(alterUISchema);
@@ -752,7 +791,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
                         parentDataSchema={parentDataSchema}
                         forEditedschema={responseFormData?.schema?.properties}
                         FormSubmitFunction={FormSubmitFunction}
-                        prefilledFormData={completeProfile && !enrolledProgram ? {} : userFormData}
+                        prefilledFormData={completeProfile && !enrolledProgram ? {}: enrolledProgram && isModeOfLearningPresent ? { preferred_mode_of_learning: 'remote' } : userFormData}
                         hideSubmit={true}
                         type="learner"
                         isCompleteProfile={completeProfile}

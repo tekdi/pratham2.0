@@ -8,6 +8,7 @@ import FilterComponent from './FilterComponent';
 import { gredientStyle } from '@learner/utils/style';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { TenantName } from '@learner/utils/app.constant';
+import { staticFilterContent } from '@shared-lib-v2/utils/AuthService';
 
 interface LearnerCourseProps {
   title?: string;
@@ -30,12 +31,58 @@ export default memo(function LearnerCourse({
   const contentListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const savedFilters = localStorage.getItem('learnerCourseFilters');
-    if (savedFilters) {
-      setFilterState(JSON.parse(savedFilters));
-    } else {
-      setFilterState(_content?.filters ?? {});
-    }
+    const initFilters = async () => {
+      const savedFilters = localStorage.getItem('learnerCourseFilters');
+      if (savedFilters) {
+        setFilterState(JSON.parse(savedFilters));
+        return;
+      }
+
+      const baseFilters = _content?.filters ?? {};
+      const preferredLanguage = typeof window !== 'undefined'
+        ? localStorage.getItem('preferred_language')
+        : null;
+
+      if (!preferredLanguage) {
+        setFilterState(baseFilters);
+        return;
+      }
+
+      // Resolve preferred_language (may be native script) to actual filter option value
+      try {
+        const channelId = localStorage.getItem('channelId');
+        if (channelId) {
+          const result = await staticFilterContent({ instantFramework: channelId });
+          const searchProps = result?.objectCategoryDefinition?.forms?.search?.properties ?? [];
+          const contentLangField = searchProps.find((f: { code: string }) => f.code === 'contentLanguage');
+          const matchingOption = contentLangField?.range?.find((option: { identifier?: string; label?: string } | string) => {
+            const val = typeof option === 'string' ? option : (option.identifier || option.label || '');
+            const lbl = typeof option === 'string' ? option : (option.label || option.identifier || '');
+            return val.toLowerCase() === preferredLanguage.toLowerCase()
+              || lbl.toLowerCase() === preferredLanguage.toLowerCase();
+          });
+          if (matchingOption) {
+            const optionValue = typeof matchingOption === 'string'
+              ? matchingOption
+              : (matchingOption.identifier || matchingOption.label || '');
+            setFilterState({
+              ...baseFilters,
+              filters: { ...(baseFilters.filters ?? {}), contentLanguage: [optionValue] },
+            });
+            return;
+          }
+        }
+      } catch {
+        // fall through to raw value
+      }
+
+      setFilterState({
+        ...baseFilters,
+        filters: { ...(baseFilters.filters ?? {}), contentLanguage: [preferredLanguage] },
+      });
+    };
+
+    initFilters();
   }, [_content?.filters, _content?.searchParams]);
 
   // Add animation trigger when component mounts
@@ -233,9 +280,12 @@ export default memo(function LearnerCourse({
                 sx: {
                   py: 2,
                   px: 2,
-                  height: 'calc(100vh - 130px)',
+                  height: 'calc(100vh - 200px)',
                   overflowY: 'auto',
                 },
+              },
+               _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
               },
             }}
             onlyLanguage={typeof window !== 'undefined' && window.localStorage && localStorage.getItem('userProgram') === TenantName.CAMP_TO_CLUB ? true : false}
@@ -282,6 +332,9 @@ export default memo(function LearnerCourse({
                   maxHeight: `calc(100vh - ${!title ? 130 : 230}px)`,
                   overflowY: 'auto',
                 },
+              },
+               _accordionDetails: {
+                sx: { maxHeight: '350px', overflow: 'auto' },
               },
             }}
           />

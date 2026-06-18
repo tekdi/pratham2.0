@@ -47,26 +47,16 @@ function evaluateLogic(
   logic: ConditionalLogic | null,
   formValues: Record<string, any>
 ): boolean {
-  if (!logic) return true;
-
-  // Handle legacy format: { show_if: string[], depends_on: string }
-  const legacyLogic = logic as any;
-  if (legacyLogic.depends_on !== undefined) {
-    const dependValue = formValues[legacyLogic.depends_on];
-    const allowedValues: string[] = legacyLogic.show_if ?? [];
-    const currentValues = Array.isArray(dependValue) ? dependValue : [dependValue];
-    return allowedValues.some((v) => currentValues.includes(v));
-  }
+  if (!logic || !logic.conditions) return true;
 
   const { action, conditions } = logic;
-  if (!conditions) return true;
 
   const allMatch = conditions.every((cond) => {
     const currentValue = formValues[cond.fieldName];
     return evaluateCondition(currentValue, cond.operator, cond.value);
   });
 
-  return action === 'show' ? allMatch : !allMatch;
+  return action === 'hide' ? !allMatch : allMatch;
 }
 
 export function isFieldVisible(

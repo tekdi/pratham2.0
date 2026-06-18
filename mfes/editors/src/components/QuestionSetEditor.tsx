@@ -171,6 +171,17 @@ const QuestionSetEditor: React.FC<{
     });
   };
 
+  const getReturnPage = () => {
+    try {
+      const previousPageUrl = sessionStorage.getItem('previousPage');
+      if (previousPageUrl) {
+        const url = new URL(previousPageUrl, window.location.origin);
+        return url.searchParams.get('page') || undefined;
+      }
+    } catch {}
+    return undefined;
+  };
+
   const sendCreatorNotification = () =>
     sendContentNotification(
       ContentStatus.PUBLISHED,
@@ -178,7 +189,8 @@ const QuestionSetEditor: React.FC<{
       "",
       identifier,
       undefined,
-      router
+      router,
+      getReturnPage()
     );
   const sendContentRejectNotification = () =>
     sendContentNotification(
@@ -187,7 +199,8 @@ const QuestionSetEditor: React.FC<{
       "",
       identifier,
       undefined,
-      router
+      router,
+      getReturnPage()
     );
 
   useEffect(() => {

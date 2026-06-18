@@ -46,6 +46,7 @@ export const logPageView = async (url: string) => {
   }
 
   // Fetch content, course, and unit details in parallel when IDs are available
+  
   await Promise.all([
     contentId
       ? fetchContent(contentId)
@@ -54,13 +55,16 @@ export const logPageView = async (url: string) => {
             if (data?.name) additionalParams.content_name = data.name;
             if (data?.mimeType) additionalParams.content_type = data.mimeType;
             if (data?.contentLanguage) additionalParams.content_language = data.contentLanguage;
+              if (data?.program) additionalParams.program = data.program;
           })
           .catch((err) => console.error('Error fetching content details for GA page view:', err))
       : Promise.resolve(),
     courseId
       ? fetchContent(courseId)
           .then((data) => {
+            console.log('Fetched course details for GA page view:', data);
             if (data?.name) additionalParams.course_name = data.name;
+            if (data?.program) additionalParams.program = data.program;
           })
           .catch((err) => console.error('Error fetching course details for GA page view:', err))
       : Promise.resolve(),
@@ -75,7 +79,7 @@ export const logPageView = async (url: string) => {
   
   const userProgram = localStorage.getItem('userProgram');
   if (userProgram) {
-    const pageViewData: Record<string, string> = { hitType: "pageview", page: url, program: userProgram, ...additionalParams };
+    const pageViewData: Record<string, string> = { hitType: "pageview", page: url, userProgram: userProgram, ...additionalParams };
     ReactGA.send(pageViewData);
     return;
   } else {
@@ -115,7 +119,7 @@ export const logEvent = async ({
   // Add program name if available (custom parameter)
   if (userProgram) {
     console.log('userProgram', userProgram);
-    eventParams.program = userProgram;
+    eventParams.userProgram = userProgram;
   }
   
   // Extract doid from current route if present
@@ -151,9 +155,11 @@ export const logEvent = async ({
     contentId
       ? fetchContent(contentId)
           .then((data) => {
+            console.log('Fetched content details for GA event:', data);
             if (data?.name) eventParams.content_name = data.name;
             if (data?.mimeType) eventParams.content_type = data.mimeType;
             if (data?.contentLanguage) eventParams.content_language = data.contentLanguage;
+            if (data?.program) eventParams.program = data.program;
           })
           .catch((err) => console.error('Error fetching content details for GA event:', err))
       : Promise.resolve(),

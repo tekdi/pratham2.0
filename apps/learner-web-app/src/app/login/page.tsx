@@ -1,13 +1,15 @@
 'use client';
 
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, Grid, IconButton, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import dynamic from 'next/dynamic';
 import WelcomeScreen from '@learner/components/WelcomeComponent/WelcomeScreen';
 import Header from '@learner/components/Header/Header';
 import { getUserId, login } from '@learner/utils/API/LoginService';
+import { getTenantInfo } from '@learner/utils/API/ProgramService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
@@ -53,31 +55,57 @@ export const checkRegistrationTestStatus = async (
   const storedUserId = localStorage.getItem('userId');
   if (!storedUserId) return 'clear';
 
+  // User just completed enrollment — skip assessment popup
+  if (localStorage.getItem('onboardTenantId')) {
+    return 'clear';
+  }
+
   try {
     
 
     if (tenantDataDetails?.[0]?.tenantType !== 'elearning') {
       const academicYearList = await getAcademicYear();
-    const activeAcademicYear = Array.isArray(academicYearList)
+    const allAcademicYearIds = Array.isArray(academicYearList)
+      ? academicYearList
+          .map((year: { id?: string; isActive?: boolean }) => year?.id)
+          .filter(Boolean)
+      : [];
+const activeAcademicYear = Array.isArray(academicYearList)
       ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
-      : undefined;
-
+      : undefined
     if (activeAcademicYear?.id) {
       localStorage.setItem('academicYearId', activeAcademicYear.id);
     }
-      const cohortResponse = await getCohortList(storedUserId, true, true);
-      const userHasActiveBatch = Array.isArray(cohortResponse?.result)
-        ? cohortResponse.result.some(
-            (cohort: {
-              type?: string;
-              cohortStatus?: string;
-              cohortMemberStatus?: string;
-            }) =>
-              cohort?.type === 'BATCH' &&
-              cohort?.cohortStatus === 'active' &&
-              cohort?.cohortMemberStatus === 'active'
-          )
-        : false;
+      let userHasActiveBatch = false;
+
+      for (const yearId of allAcademicYearIds) {
+        localStorage.setItem('academicYearId', yearId as string);
+        const cohortResponse = await getCohortList(storedUserId, true, true);
+        const hasBatch = Array.isArray(cohortResponse?.result)
+          ? cohortResponse.result.some(
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
+                cohort?.type === 'BATCH' &&
+                cohort?.cohortStatus === 'active' &&
+                cohort?.cohortMemberStatus === 'active'
+            )
+          : false;
+        if (hasBatch) {
+          userHasActiveBatch = true;
+                    localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+
+          break;
+        }
+        
+      }
+
+      // Restore active academic year after iterating all IDs
+      if (activeAcademicYear?.id) {
+        localStorage.setItem('academicYearId', activeAcademicYear.id);
+      }
 
       if (userHasActiveBatch) {
         return 'clear';
@@ -271,9 +299,11 @@ const WelcomeMessage = () => {
   );
 };
 
-const LoginPage = () => {
+const LoginPageContent = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const defaultUsername = searchParams.get('username') || '';
   const handleAddAccount = () => {
     router.push('/');
   };
@@ -286,6 +316,14 @@ const LoginPage = () => {
   const [isAndroidApp, setIsAndroidApp] = useState(true);
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+  const [notEnrolledModal, setNotEnrolledModal] = useState(false);
+  const [notEnrolledProgramName, setNotEnrolledProgramName] = useState('');
+  const [notEnrolledTenantId, setNotEnrolledTenantId] = useState('');
+  const [enrollConfirmModal, setEnrollConfirmModal] = useState(false);
+  const [enrollConfirmTargetName, setEnrollConfirmTargetName] = useState('');
+  const [enrollConfirmTargetId, setEnrollConfirmTargetId] = useState('');
+  const [enrolledProgramNames, setEnrolledProgramNames] = useState<string[]>([]);
+  const [enrollConfirmProgramData, setEnrollConfirmProgramData] = useState<any>(null);
 
   const handleSuccessfulLogin = useCallback(
     async (
@@ -345,6 +383,142 @@ const LoginPage = () => {
       setTenantName(selectedTenantName || '');
       setRoleId(selectedRoleId);
       setRoleName(selectedRoleName);
+
+      // --- Program tenant check (from /programs/:tenantId → /login?tenantId=... flow) ---
+      const urlQuery = new URLSearchParams(window.location.search);
+      const programTenantId = urlQuery.get('tenantId');
+
+      if (programTenantId) {
+        const enrolledTenant = userResponse?.tenantData?.find(
+          (tenant: any) =>
+            tenant?.tenantId === programTenantId &&
+            (tenant?.tenantStatus === 'active' || tenant?.tenantStatus === 'pending') &&
+            tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
+        );
+
+        if (enrolledTenant) {
+          // User is already enrolled — log them directly into this program
+          const uiConfig = enrolledTenant?.params?.uiConfig;
+          const landingPage = uiConfig?.landingPage;
+          const learnerRoleId = enrolledTenant?.roles?.find((r: any) => r.roleName === 'Learner')?.roleId || '';
+          localStorage.setItem('userId', userResponse?.userId);
+          localStorage.setItem('userIdName', userResponse?.username);
+          localStorage.setItem('firstName', userResponse?.firstName || '');
+          localStorage.setItem('tenantId', enrolledTenant.tenantId);
+          localStorage.setItem('userProgram', enrolledTenant.tenantName);
+          localStorage.setItem('roleId', learnerRoleId);
+          localStorage.setItem('templtateId', enrolledTenant?.templateId || '');
+          localStorage.setItem('landingPage', landingPage || '/home');
+          localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
+          if (enrolledTenant?.channelId) localStorage.setItem('channelId', enrolledTenant.channelId);
+          if (enrolledTenant?.collectionFramework) localStorage.setItem('collectionFramework', enrolledTenant.collectionFramework);
+          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+          await profileComplitionCheck();
+
+          const assessmentStatus = await checkRegistrationTestStatus(
+            uiConfig,
+            enrolledTenant.tenantName,
+            [enrolledTenant]
+          );
+          setLoading(false);
+          if (assessmentStatus === 'assessmentPending') {
+            localStorage.setItem('registerationTestGiven', 'No');
+            setAssessmentPendingModal(true);
+            return;
+          } else if (assessmentStatus === 'assessmentUnavailable') {
+            setAssessmentUnavailableModal(true);
+            return;
+          }
+
+           if(localStorage.getItem('isAndroidApp') == 'yes' && window.ReactNativeWebView)
+            {
+            //  let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            //  if (!refreshToken || refreshToken === '') {
+            //    refreshToken = localStorage.getItem('refreshToken');
+            //  }
+            //  window.ReactNativeWebView.postMessage(JSON.stringify({
+            //    type: 'LOGIN_INTO_SELECTED_PROGRAM_EVENT',
+            //    data: {
+            //      userId: userResponse?.userId,
+            //      selectedTenantId: enrolledTenant.tenantId,
+            //      token: localStorage.getItem('token'),
+            //      refreshToken: refreshToken,
+            //    }
+            //  }));
+            router.push(`/programs`);
+            }
+            else
+         router.push(landingPage || '/home');
+          return;
+        } else {
+          // User is not enrolled — look up program name then show modal
+          let programName = '';
+          let allPrograms: any[] = [];
+          try {
+            const res = await getTenantInfo();
+            allPrograms = res?.result || [];
+            const found = allPrograms.find((p: any) => p.tenantId === programTenantId);
+            programName = found?.name || '';
+            if (found) setEnrollConfirmProgramData(found);
+          } catch { /* ignore */ }
+          localStorage.setItem('userId', userResponse?.userId);
+          localStorage.setItem('userIdName', userResponse?.username);
+          localStorage.setItem('firstName', userResponse?.firstName || '');
+          localStorage.setItem('roleId', selectedRoleId);
+          localStorage.setItem('tenantId', selectedTenantId || '');
+          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+          try {
+            const userDetails = await getUserDetails(userResponse?.userId, true);
+            if (userDetails?.result?.userData?.customFields) {
+              userDetails.result.userData.customFields.forEach((field: any) => {
+                const { label, selectedValues } = field;
+                if (label === 'WHAT_IS_YOUR_PREFERRED_LANGUAGE') {
+                  let preferred = '';
+                  if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+                    const first = selectedValues[0] as unknown;
+                    preferred =
+                      typeof first === 'string'
+                        ? first
+                        : (first as { value?: string })?.value ?? String(first);
+                  } else if (typeof selectedValues === 'string') {
+                    preferred = selectedValues;
+                  }
+                  if (preferred) {
+                    localStorage.setItem('preferred_language', preferred);
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Failed to fetch user details for preferred language', error);
+          }
+
+          const accountExists = urlQuery.get('AccountExists');
+          if (accountExists === 'true') {
+            // Came from AccountExistsCard — show enroll-confirmation modal
+            const userProgramNames: string[] = (userResponse?.tenantData || [])
+              .filter(
+                (t: any) =>
+                  (t?.tenantStatus === 'active' || t?.tenantStatus === 'pending') &&
+                  t?.roles?.some((r: any) => r?.roleName === 'Learner') &&
+                  t?.tenantName !== 'Pratham'
+              )
+              .map((t: any) => t.tenantName as string);
+            setEnrolledProgramNames(userProgramNames);
+            setEnrollConfirmTargetName(programName);
+            setEnrollConfirmTargetId(programTenantId);
+            setEnrollConfirmModal(true);
+          } else {
+            setNotEnrolledProgramName(programName);
+            setNotEnrolledTenantId(programTenantId);
+            setNotEnrolledModal(true);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+      // --- End program tenant check ---
+
       if(tenantDataDetails[0]?.tenantName === "Pragyanpath" && tenantDataDetails.length === 1){
       setTimeout(async () => {
         const res = await getUserDetails(userResponse?.userId, true);
@@ -487,6 +661,7 @@ const LoginPage = () => {
           }
           // Redirect to landing page
           else if (assessmentStatus === 'assessmentUnavailable') {
+            setLoading(false);
             setAssessmentUnavailableModal(true);
             return;
           }
@@ -623,7 +798,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       <Box
         //height="100vh"
         // width="100vw"
@@ -688,6 +863,7 @@ const LoginPage = () => {
               onLogin={handleLogin}
               handleForgotPassword={handleForgotPassword}
               handleAddAccount={handleAddAccount}
+              defaultUsername={defaultUsername}
             />
 
             {/* App Download Section - Only visible on mobile */}
@@ -730,8 +906,13 @@ const LoginPage = () => {
             }, 100);
           }
         }}
-        secondaryText={t('COMMON.CANCEL')}
-        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+        secondaryText={t('COMMON.CLOSE')}
+        secondaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+          localStorage.setItem('registerationTestGiven', 'Yes');
+          const landingPage = localStorage.getItem('landingPage') || '/home';
+          window.location.href = landingPage;
+        }}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
@@ -742,10 +923,16 @@ const LoginPage = () => {
 
       <SimpleModal
         open={assessmentUnavailableModal}
-        onClose={() => setAssessmentUnavailableModal(false)}
+        onClose={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         showFooter={true}
         primaryText={t('COMMON.OK')}
-        primaryActionHandler={() => setAssessmentUnavailableModal(false)}
+        primaryActionHandler={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">
@@ -754,8 +941,165 @@ const LoginPage = () => {
           </Typography>
         </Box>
       </SimpleModal>
-    </Suspense>
+
+      {/* Not enrolled in program modal */}
+      <SimpleModal
+        open={notEnrolledModal}
+        onClose={() => { setNotEnrolledModal(false); router.push('/programs'); }}
+        showFooter={true}
+        primaryText={t('LANDING.ENROL_NOW') || 'Enrol Now'}
+        primaryActionHandler={() => {
+          setNotEnrolledModal(false);
+          const currentTenantId = localStorage.getItem('tenantId');
+          localStorage.setItem('previousTenantId', currentTenantId || '');
+          localStorage.setItem('tenantId', notEnrolledTenantId);
+          localStorage.setItem('userProgram', notEnrolledProgramName);
+          localStorage.setItem('onboardTenantId', notEnrolledTenantId);
+          if (enrollConfirmProgramData?.params?.uiConfig) {
+            localStorage.setItem('uiConfig', JSON.stringify(enrollConfirmProgramData.params.uiConfig));
+          }
+          if (enrollConfirmProgramData?.params?.uiConfig?.landingPage) {
+            localStorage.setItem('landingPage', enrollConfirmProgramData.params.uiConfig.landingPage);
+          }
+          localStorage.setItem('enrolledProgramData', JSON.stringify({
+            tenantId: notEnrolledTenantId,
+            name: notEnrolledProgramName,
+            params: enrollConfirmProgramData?.params || {},
+          }));
+          if (enrollConfirmProgramData?.type) {
+            localStorage.setItem('temp_program_type', enrollConfirmProgramData.type);
+          }
+          router.push('/enroll-profile-completion');
+        }}
+        // secondaryText={t('LEARNER_APP.PROGRAMS.MY_PROGRAMS') || 'My Programs'}
+        // secondaryActionHandler={() => { setNotEnrolledModal(false); router.push('/programs'); }}
+      >
+        <Box p="10px" display="flex" flexDirection="column" alignItems="center" gap={1}>
+          <Typography variant="body1" textAlign="center">
+            {t('LANDING.NOT_ENROLLED_IN_PROGRAM') || 'You are not registered in'}{' '}
+            <Box component="span" fontWeight={700}>
+              {notEnrolledProgramName || 'this program'}
+            </Box>
+            .
+          </Typography>
+          <Typography variant="body2" textAlign="center" color="text.secondary">
+            {t('LANDING.YOU_CAN_ENROLL') || 'You can enroll into this program.'}
+          </Typography>
+        </Box>
+      </SimpleModal>
+
+      {/* Enroll confirmation modal (AccountExists flow) */}
+      <Dialog
+        open={enrollConfirmModal}
+        onClose={() => setEnrollConfirmModal(false)}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '16px',
+            backgroundColor: '#FFFDF7',
+            border: '1px solid #F5E199',
+          },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          {/* Close button */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1.5, pr: 1.5 }}>
+            <IconButton size="small" onClick={() => setEnrollConfirmModal(false)} sx={{ color: '#666' }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Box>
+
+          <Box sx={{ px: 3, pb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Title + program list — only when user is already enrolled elsewhere */}
+            {enrolledProgramNames.length > 0 && (
+              <>
+                <Typography
+                  sx={{
+                    fontFamily: 'Poppins',
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    color: '#1F1B13',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {t('LANDING.ENROLLED_TO_BELOW_PROGRAMS') || 'We can see that you are enrolled to below programs:'}
+                </Typography>
+
+                <Box component="ul" sx={{ pl: 2.5, m: 0 }}>
+                  {enrolledProgramNames.map((name, idx) => (
+                    <Box component="li" key={idx}>
+                      <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#1F1B13' }}>
+                        {name}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </>
+            )}
+
+            {/* Confirmation question */}
+            <Typography sx={{ fontFamily: 'Poppins', fontSize: '14px', color: '#1F1B13', lineHeight: 1.6 }}>
+              {t('LANDING.SURE_TO_ENROLL_INTO') || 'Are you sure you want to enroll into'}{' '}
+              <Box component="span" sx={{ fontWeight: 700 }}>
+                {enrollConfirmTargetName}
+              </Box>
+              ?
+            </Typography>
+
+            {/* Yes button */}
+            <Button
+              fullWidth
+              variant="contained"
+              disableElevation
+              onClick={() => {
+                setEnrollConfirmModal(false);
+                const currentTenantId = localStorage.getItem('tenantId');
+                localStorage.setItem('previousTenantId', currentTenantId || '');
+                localStorage.setItem('tenantId', enrollConfirmTargetId);
+                localStorage.setItem('userProgram', enrollConfirmTargetName);
+                localStorage.setItem('onboardTenantId', enrollConfirmTargetId);
+                if (enrollConfirmProgramData?.params?.uiConfig) {
+                  localStorage.setItem('uiConfig', JSON.stringify(enrollConfirmProgramData.params.uiConfig));
+                }
+                if (enrollConfirmProgramData?.params?.uiConfig?.landingPage) {
+                  localStorage.setItem('landingPage', enrollConfirmProgramData.params.uiConfig.landingPage);
+                }
+                localStorage.setItem('enrolledProgramData', JSON.stringify({
+                  tenantId: enrollConfirmTargetId,
+                  name: enrollConfirmTargetName,
+                  params: enrollConfirmProgramData?.params || {},
+                }));
+                if (enrollConfirmProgramData?.type) {
+                  localStorage.setItem('temp_program_type', enrollConfirmProgramData.type);
+                }
+                router.push('/enroll-profile-completion');
+              }}
+              sx={{
+                backgroundColor: '#FDBE16',
+                color: '#1F1B13',
+                fontFamily: 'Poppins',
+                fontWeight: 700,
+                fontSize: '15px',
+                textTransform: 'none',
+                borderRadius: '8px',
+                py: 1.4,
+                '&:hover': { backgroundColor: '#f0b000' },
+              }}
+            >
+              {t('LANDING.YES') || 'Yes'}
+            </Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
+
+const LoginPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <LoginPageContent />
+  </Suspense>
+);
 
 export default LoginPage;

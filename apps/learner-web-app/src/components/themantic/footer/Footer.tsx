@@ -2,6 +2,11 @@
 
 import React, { useState } from 'react';
 import { Box, Typography, Link, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+  scaledFontSizeResponsive,
+} from '@learner/utils/scaledFontSize';
 
 const Footer = () => {
   const [openPrivacyModal, setOpenPrivacyModal] = useState(false);
@@ -51,13 +56,19 @@ const Footer = () => {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: { xs: '14px', sm: '15px', md: '16px' },
+                    fontSize: scaledFontSizeResponsive({
+                      xs: 14,
+                      sm: 15,
+                      md: 16,
+                    }),
                     fontWeight: 400,
                     color: '#000000',
                     lineHeight: 1.3,
                   }}
                 >
-                  Experimento India is a part of Project Jigyaasa.
+                  <SpeakableText>
+                    Experimento India is a part of Project Jigyaasa.
+                  </SpeakableText>
                 </Typography>
               </Box>
             </Box>
@@ -75,7 +86,7 @@ const Footer = () => {
             <Typography
               variant="body2"
               sx={{
-                fontSize: { xs: '13px', sm: '14px' },
+                fontSize: scaledFontSizeResponsive({ xs: 13, sm: 14 }),
                 fontWeight: 400,
                 color: '#000000',
                 textAlign: { xs: 'center', sm: 'left' },
@@ -83,7 +94,7 @@ const Footer = () => {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              Useful links:
+              <SpeakableText>Useful links:</SpeakableText>
             </Typography>
             <Box
               sx={{
@@ -126,13 +137,13 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     sx={{
-                      fontSize: { xs: '11px', sm: '12px' },
+                      fontSize: scaledFontSizeResponsive({ xs: 11, sm: 12 }),
                       fontWeight: 400,
                       color: '#000000',
                       lineHeight: { xs: 1.4, sm: 1.2 },
                     }}
                   >
-                    {link.text}
+                    <SpeakableText>{link.text}</SpeakableText>
                   </Link>
                   {index < arr.length - 1 && (
                     <Typography color="text.secondary">|</Typography>
@@ -151,15 +162,17 @@ const Footer = () => {
           >
             <Box
               sx={{
-                fontSize: { xs: '11px', sm: '12px' },
+                fontSize: scaledFontSizeResponsive({ xs: 11, sm: 12 }),
                 fontWeight: 400,
                 color: '#000000',
                 marginTop: '10px !important',
               }}
             >
-              All resources on the website are licensed under a CC-BY-NC-SA 4.0
-              or CC-BY-SA 4.0 International License. Please refer to individual
-              content to find more.
+              <SpeakableText>
+                All resources on the website are licensed under a CC-BY-NC-SA 4.0
+                or CC-BY-SA 4.0 International License. Please refer to individual
+                content to find more.
+              </SpeakableText>
             </Box>
             <Box>
               <Box
@@ -179,7 +192,7 @@ const Footer = () => {
               <Box
                 onClick={handleOpenPrivacyModal}
                 sx={{
-                  fontSize: { xs: '10px', sm: '10px', md: '10px' },
+                  fontSize: scaledFontSize(10),
                   fontWeight: 400,
                   marginTop: '5px',
                   color: '#000000',
@@ -190,7 +203,7 @@ const Footer = () => {
                   },
                 }}
               >
-                Privacy Guidelines
+                <SpeakableText>Privacy Guidelines</SpeakableText>
               </Box>
             </Box>
           </Box>
@@ -208,13 +221,15 @@ const Footer = () => {
         <Box width="100%">
           <Typography
             sx={{
-              fontSize: { xs: '12px', sm: '12px', md: '12px' },
+              fontSize: scaledFontSize(12),
               fontWeight: 400,
               color: '#000000',
               textAlign: 'center',
             }}
           >
-            © {new Date().getFullYear()} Pratham
+            <SpeakableText>
+              © {new Date().getFullYear()} Pratham
+            </SpeakableText>
           </Typography>
         </Box>
       </Box>
@@ -233,19 +248,19 @@ const Footer = () => {
       >
         <DialogTitle
           sx={{
-            fontSize: '20px',
+            fontSize: scaledFontSize(20),
             fontWeight: 'bold',
             textAlign: 'center',
             pb: 2,
           }}
         >
-          PRIVACY GUIDELINES
+          <SpeakableText>PRIVACY GUIDELINES</SpeakableText>
         </DialogTitle>
         <DialogContent dividers>
           <Typography
             component="div"
             sx={{
-              fontSize: '14px',
+              fontSize: scaledFontSize(14),
               lineHeight: 1.6,
               whiteSpace: 'pre-line',
               '& p': {

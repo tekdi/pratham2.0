@@ -30,10 +30,17 @@ export const mapUserData = (userData: any) => {
         .find((f: any) => f.label === label)
         ?.selectedValues.map((v: any) => v?.id?.toString() || v?.value?.toString()) || '';
 
-    const getSingleSelectedValue = (label: any) =>
-      userData.customFields
-        .find((f: any) => f.label === label)
-        ?.selectedValues[0]?.id?.toString() || '';
+    const getSingleSelectedValue = (label: any) => {
+      const selected = userData.customFields.find(
+        (f: any) => f.label === label
+      )?.selectedValues[0];
+      return (
+        selected?.id?.toString() ||
+        selected?.value?.toString() ||
+        (typeof selected === 'string' ? selected : '') ||
+        ''
+      );
+    };
 
     const getSingleTextValue = (label: any) =>
       userData.customFields.find((f: any) => f.label === label)
@@ -74,8 +81,9 @@ export const mapUserData = (userData: any) => {
         getSelectedValue(
           'WHAT_IS_YOUR_PRIMARY_WORK'
         ) || [],
-      training_check:
-        getSelectedValue('HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING') || [],
+      training_check: getSingleSelectedValue(
+        'HAVE_YOU_RECEIVE_ANY_PRIOR_TRAINING'
+      ),
       what_do_you_want_to_become: getSingleTextValue(
         'WHAT_DO_YOU_WANT_TO_BECOME'
       ),
@@ -118,7 +126,6 @@ result.number_of_children_in_your_group = getSingleTextValue('NUMBER_OF_CHILDREN
           'PARENT_GUARDIAN_PHONE_NO'
         ) || '';
     }
-
     return result;
   } catch (error) {
     console.log(error);

@@ -56,6 +56,11 @@ import AddIcon from '@mui/icons-material/Add';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import apartment from '../../public/images/apartment.svg';
 import { modifiedSchema } from 'mfes/youthNet/src/utils/Helper';
+import useStore from '@/store/store';
+import {
+  pageActionBarSx,
+  pageTableSectionSx,
+} from '@/utils/filterTableActionsForAcademicYear';
 
 const MentorLead = () => {
   console.log(
@@ -63,6 +68,7 @@ const MentorLead = () => {
     MentorLeadSearchSchema
   );
   const theme = useTheme<any>();
+  const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(MentorLeadSearchSchema);
   const [uiSchema, setUiSchema] = useState(MentorLeadSearchUISchema);
@@ -614,7 +620,7 @@ const MentorLead = () => {
             />
           )
         )}
-        <Box mt={4} sx={{ display: 'flex', justifyContent: 'end' }}>
+        <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
             searchStoreKey="mentorLeader"
             formRef={formRef}
@@ -622,25 +628,27 @@ const MentorLead = () => {
             setPrefilledFormData={setPrefilledFormData}
           />
 
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            color="primary"
-            sx={{
-              textTransform: 'none',
-              fontSize: '14px',
-              color: theme.palette.primary['100'],
-              width: '200px',
-            }}
-            onClick={() => {
-              setPrefilledAddFormData(initialFormData);
-              setIsEdit(false);
-              setEditableUserId('');
-              handleOpenModal();
-            }}
-          >
-            {t('COMMON.ADD_NEW')}{' '}
-          </Button>
+          {isActiveYear && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              color="primary"
+              sx={{
+                textTransform: 'none',
+                fontSize: '14px',
+                color: theme.palette.primary['100'],
+                width: '200px',
+              }}
+              onClick={() => {
+                setPrefilledAddFormData(initialFormData);
+                setIsEdit(false);
+                setEditableUserId('');
+                handleOpenModal();
+              }}
+            >
+              {t('COMMON.ADD_NEW')}{' '}
+            </Button>
+          )}
         </Box>
 
         <SimpleModal
@@ -691,7 +699,7 @@ const MentorLead = () => {
         </SimpleModal>
 
         {response && response?.result?.getUserDetails ? (
-          <Box sx={{ mt: 1 }}>
+          <Box sx={pageTableSectionSx}>
             <PaginatedTable
               count={response?.result?.totalCount}
               data={response?.result?.getUserDetails}

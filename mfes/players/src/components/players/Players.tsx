@@ -91,6 +91,7 @@ const SunbirdPlayers = ({
     // case 'video/webm':
     case 'audio/mp3':
     case 'audio/wav':
+    // case 'audio/mpeg':
       return (
         <SunbirdVideoPlayer
           playerConfig={updatedPlayerConfig}

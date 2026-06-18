@@ -1721,6 +1721,8 @@
         'video/x-youtube',
         'video/webm',
         'audio/mp3',
+        'audio/wav',
+        'audio/mpeg',
       ],
       whiteListUrl: [
         'self',
@@ -1765,7 +1767,7 @@
           type: 'plugin',
         },
         {
-          mimeType: ['video/mp4', 'video/webm', 'audio/mp3'],
+          mimeType: ['video/mp4', 'video/webm', 'audio/mp3', 'audio/wav', 'audio/mpeg'],
           id: 'org.ekstep.videorenderer',
           ver: 1.1,
           type: 'plugin',

@@ -13,6 +13,11 @@ import { SearchButton } from '../SearchButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { logEvent } from '@learner/utils/googleAnalytics';
 import { ContentSearch } from '@learner/utils/API/contentService';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+  scaledFontSizeResponsive,
+} from '@learner/utils/scaledFontSize';
 
 const STORAGE_KEY = 'selectedLanguage';
 type SearchLanguageItem = {
@@ -130,8 +135,14 @@ const SubHeader = ({
     <Box className='bs-container-fluid  bs-px-md-5 bs-px-sm-3' sx={{ background: '#fff' }}>
       {/* Main Title */}
       <Box
+        component="h1"
         sx={{
-          fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' },
+          fontSize: scaledFontSizeResponsive({
+            xs: 24,
+            sm: 28,
+            md: 32,
+            lg: 36,
+          }),
           fontWeight: 600,
           color: '#3891CE',
           fontFamily: '"Montserrat", sans-serif',
@@ -140,10 +151,12 @@ const SubHeader = ({
           py: { xs: [0, 1], sm: [0, 1] },
           wordWrap: 'break-word',
           lineHeight: 1.2,
-          pt: '5px'
+          pt: '5px',
         }}
       >
-        STEM Education for Innovation : Experimento India
+        <SpeakableText>
+          STEM Education for Innovation : Experimento India
+        </SpeakableText>
       </Box>
 
       {/* Main Container */}
@@ -189,7 +202,7 @@ const SubHeader = ({
                   boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                   '& .MuiSelect-select': {
                     padding: '4px 8px',
-                    fontSize: '14px',
+                    fontSize: scaledFontSize(14),
                     textAlign: 'center',
                   },
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -202,7 +215,7 @@ const SubHeader = ({
                     border: 'none',
                   },
                   '& .MuiSvgIcon-root': {
-                    fontSize: '16px',
+                    fontSize: scaledFontSize(16),
                     color: '#222',
                   },
                 }}
@@ -233,7 +246,7 @@ const SubHeader = ({
                 variant="h6"
                 sx={{
                   fontWeight: 600,
-                  fontSize: { xs: '16px', sm: '18px' },
+                  fontSize: scaledFontSizeResponsive({ xs: 16, sm: 18 }),
                   color: 'black',
                   mb: 0.5,
                   whiteSpace: 'nowrap',
@@ -243,7 +256,9 @@ const SubHeader = ({
                   fontFamily: '"Montserrat", sans-serif',
                 }}
               >
-                {resourceCount} Resources
+                <SpeakableText text={`${resourceCount} Resources`}>
+                  {resourceCount} Resources
+                </SpeakableText>
               </Typography>
 
             </Box>

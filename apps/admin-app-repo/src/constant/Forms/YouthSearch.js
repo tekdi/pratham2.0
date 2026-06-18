@@ -35,7 +35,7 @@ export const YouthSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     district: {
       type: 'array',
@@ -65,7 +65,7 @@ export const YouthSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     block: {
       type: 'array',
@@ -94,7 +94,7 @@ export const YouthSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     village: {
       type: 'array',
@@ -123,7 +123,7 @@ export const YouthSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 5,
     },
     name: {
       type: 'string',

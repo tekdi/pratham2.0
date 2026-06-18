@@ -57,6 +57,7 @@ interface FilterSectionProps {
   isOpenColapsed?: boolean | any[];
   t: (key: string) => string;
   _checkbox?: any;
+  _accordionDetails?: any;
   inputType?: Record<
     string,
     'checkbox' | 'dropdown' | 'dropdown-single' | 'dropdown-multi'
@@ -366,6 +367,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   isShowStaticFilterValue,
   isOpenColapsed,
   _checkbox,
+  _accordionDetails,
   inputType = {},
   _box,
   _selectOptionBox,
@@ -688,6 +690,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                 overflow: 'auto',
                 maxHeight: '150px',
                 transition: 'all 0.3s ease-in-out',
+                ...(_accordionDetails?.sx ?? {}),
               }}
             >
               <FormGroup>

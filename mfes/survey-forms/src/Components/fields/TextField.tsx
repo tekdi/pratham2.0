@@ -13,6 +13,7 @@ interface TextFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -20,6 +21,7 @@ const TextField: React.FC<TextFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   const inputType =
     field.fieldType === 'email'
@@ -38,6 +40,7 @@ const TextField: React.FC<TextFieldProps> = ({
         placeholder={field.placeholder || ''}
         required={field.isRequired}
         error={!!error}
+        disabled={disabled}
         size="small"
         inputProps={{
           maxLength: field.validations?.maxLength,

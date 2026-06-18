@@ -41,6 +41,7 @@ export default function ClientLayout({
         pathname?.startsWith('/player/') ||
         pathname === '/enroll-profile-completion' ||
         pathname === '/programs' ||
+        pathname === '/scp-dashboard' ||
         pathname === '/logout' ||
         pathname === '/login' ||
         pathname === '/sso' ||

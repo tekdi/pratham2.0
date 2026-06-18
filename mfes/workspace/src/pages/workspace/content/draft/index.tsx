@@ -68,10 +68,12 @@ const DraftPage = () => {
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('draftSearchTerm') || '' : '');
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('draftSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   // const filterOption: string[] = router.query.filterOptions
   //   ? JSON.parse(router.query.filterOptions as string)
   //   : [];
@@ -119,6 +121,10 @@ const DraftPage = () => {
     return () => {
       clearTimeout(handler);
     };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    localStorage.setItem('draftSearchTerm', searchTerm);
   }, [searchTerm]);
 
   useEffect(() => {
@@ -230,7 +236,11 @@ const DraftPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('draftFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -254,31 +264,30 @@ const DraftPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for draft
+  // Save filters for draft
   useEffect(() => {
-    if (router.query && router.asPath.includes('draft')) {
-      const savedFilters = localStorage.getItem('draftFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'draftSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
+    localStorage.setItem('draftFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('draftSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
-  // Save filters only for draft
-  useEffect(() => {
-    if (router.asPath.includes('draft')) {
-      localStorage.setItem(
-        'draftFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'draftSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+  const hasActiveFilters =
+    searchTerm !== '' ||
+    filter.length > 0 ||
+    (sortBy !== '' && sortBy !== 'Modified On') ||
+    Object.values(selectedFilters).some((arr) => arr.length > 0);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilter([]);
+    setSortBy('Modified On');
+    setSelectedFilters({});
+    setSelectedNames({});
+    setPage(0);
+    localStorage.removeItem('draftFilters');
+    localStorage.removeItem('draftSelectedNames');
+    localStorage.removeItem('draftSearchTerm');
+    router.push({ pathname: router.pathname }, undefined, { shallow: true });
+  };
 
   return (
     <>
@@ -308,10 +317,12 @@ const DraftPage = () => {
 
             <Box pb={3}>
               <SearchBox
+                value={searchTerm}
                 placeholder="Search by title..."
                 onSearch={handleSearch}
                 onFilterChange={handleFilterChange}
                 onSortChange={handleSortChange}
+                onClear={hasActiveFilters ? clearFilters : undefined}
               />
               <Box m={3}>
                 <DynamicMultiFilter
@@ -320,7 +331,7 @@ const DraftPage = () => {
                   selectedFilters={selectedFilters}
                   onChange={setSelectedFilters}
                   onSelectedNamesChange={setSelectedNames}
-                  isProgramFilter={false}
+                 // isProgramFilter={false}
                 />
               </Box>
             </Box>
