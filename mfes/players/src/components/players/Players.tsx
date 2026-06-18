@@ -72,6 +72,9 @@ const SunbirdPlayers = ({
     case 'video/x-youtube':
     case 'application/vnd.ekstep.html-archive':
     case 'application/epub':
+    case 'audio/mp3':
+    case 'audio/wav':
+    case 'audio/mpeg':
       return (
         <ContentPlayerV2
           playerConfig={updatedPlayerConfig}
@@ -89,16 +92,16 @@ const SunbirdPlayers = ({
     //   );
     // case 'video/mp4':
     // case 'video/webm':
-    case 'audio/mp3':
-    case 'audio/wav':
+    // case 'audio/mp3':
+    // case 'audio/wav':
     // case 'audio/mpeg':
-      return (
-        <SunbirdVideoPlayer
-          playerConfig={updatedPlayerConfig}
-          relatedData={{ courseId, unitId, userId }}
-          configFunctionality={configFunctionality}
-        />
-      );
+      // return (
+      //   <SunbirdVideoPlayer
+      //     playerConfig={updatedPlayerConfig}
+      //     relatedData={{ courseId, unitId, userId }}
+      //     configFunctionality={configFunctionality}
+      //   />
+      // );
     case 'application/vnd.sunbird.questionset':
       return (
         <SunbirdQuMLPlayer
@@ -119,14 +122,14 @@ const SunbirdPlayers = ({
     // case 'application/vnd.ekstep.html-archive':
     // case 'video/youtube':
     // case 'video/x-youtube':
-      //case 'application/vnd.ekstep.ecml-archive':
-      // return (
-      //   <SunbirdV1Player
-      //     playerConfig={updatedPlayerConfig}
-      //     relatedData={{ courseId, unitId, userId }}
-      //     configFunctionality={configFunctionality}
-      //   />
-      // );
+    case 'application/vnd.ekstep.ecml-archive':
+      return (
+        <SunbirdV1Player
+          playerConfig={updatedPlayerConfig}
+          relatedData={{ courseId, unitId, userId }}
+          configFunctionality={configFunctionality}
+        />
+      );
     default:
       return <div>Unsupported media type</div>;
   }
