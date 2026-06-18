@@ -53,7 +53,7 @@ const PublishPage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('publishSearchTerm') || '' : '');
   const [showHeader, setShowHeader] = useState<boolean | null>(null);
-  const { filterOptions, sort } = router.query;
+  const { filterOptions, sort, program: programQuery } = router.query;
 
   const [filter, setFilter] = useState<any[]>([]);
 
@@ -73,6 +73,19 @@ const PublishPage = () => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]);
   const [programFilter, setProgramFilter] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (typeof programQuery === 'string') {
+      try {
+        setProgramFilter(JSON.parse(programQuery));
+      } catch {
+        // ignore malformed query
+      }
+    } else if (programQuery === undefined) {
+      setProgramFilter([]);
+    }
+  }, [programQuery]);
+
   const [programOptions, setProgramOptions] = useState<{ code: string; name: string }[]>([]);
 
   useEffect(() => {
@@ -153,8 +166,15 @@ const PublishPage = () => {
   };
 
   const handleProgramChange = (programs: string[]) => {
-    setProgramFilter(programs);
     setPage(0);
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, program: JSON.stringify(programs) },
+      },
+      undefined,
+      { shallow: true }
+    );
   };
 
   const hasActiveFilters =
