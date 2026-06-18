@@ -93,9 +93,11 @@ const UpForReviewPage = () => {
     setSortBy(sort?.toString() || 'Modified On');
   }, [sort]); 
   const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('upReviewSearchTerm') || '' : '');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('upReviewSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   const [contentList, setContentList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [contentDeleted, setContentDeleted] = useState(false);
@@ -239,7 +241,11 @@ const UpForReviewPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('upReviewFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -263,31 +269,11 @@ const UpForReviewPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for up-review
+  // Save filters for up-review
   useEffect(() => {
-    if (router.query && router.asPath.includes('up-review')) {
-      const savedFilters = localStorage.getItem('upReviewFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'upReviewSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
-
-  // Save filters only for up-review
-  useEffect(() => {
-    if (router.asPath.includes('up-review')) {
-      localStorage.setItem(
-        'upReviewFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'upReviewSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+    localStorage.setItem('upReviewFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('upReviewSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
   const hasActiveFilters =
     searchTerm !== '' ||

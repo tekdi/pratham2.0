@@ -93,9 +93,11 @@ const AllContentsPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('allContentsSearchTerm') || '' : '');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('allContentsSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   const { filterOptions, sort, status } = router.query;
 
   const [filter, setFilter] = useState<any[]>([]);
@@ -350,7 +352,11 @@ const AllContentsPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('allContentsFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -374,31 +380,11 @@ const AllContentsPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for allContents
+  // Save filters for allContents
   useEffect(() => {
-    if (router.query && router.asPath.includes('allContents')) {
-      const savedFilters = localStorage.getItem('allContentsFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'allContentsSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
-
-  // Save filters only for allContents
-  useEffect(() => {
-    if (router.asPath.includes('allContents')) {
-      localStorage.setItem(
-        'allContentsFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'allContentsSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+    localStorage.setItem('allContentsFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('allContentsSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
   const hasActiveFilters =
     searchTerm !== '' ||

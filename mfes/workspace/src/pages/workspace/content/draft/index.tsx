@@ -69,9 +69,11 @@ const DraftPage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('draftSearchTerm') || '' : '');
-  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(
-    {}
-  );
+  const [selectedNames, setSelectedNames] = useState<Record<string, string[]>>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('draftSelectedNames');
+    return saved ? JSON.parse(saved) : {};
+  });
   // const filterOption: string[] = router.query.filterOptions
   //   ? JSON.parse(router.query.filterOptions as string)
   //   : [];
@@ -234,7 +236,11 @@ const DraftPage = () => {
   const [posFrameworkData, setPosFrameworkData] = useState<any>(null);
   const [selectedFilters, setSelectedFilters] = useState<{
     [key: string]: string[];
-  }>({});
+  }>(() => {
+    if (typeof window === 'undefined') return {};
+    const saved = localStorage.getItem('draftFilters');
+    return saved ? JSON.parse(saved) : {};
+  });
 
   // Mock fetch for readData and posFrameworkData (replace with real API calls)
   useEffect(() => {
@@ -258,31 +264,11 @@ const DraftPage = () => {
     fetchReadData();
   }, []);
 
-  // Restore filters only for draft
+  // Save filters for draft
   useEffect(() => {
-    if (router.query && router.asPath.includes('draft')) {
-      const savedFilters = localStorage.getItem('draftFilters');
-      const savedSelectedNames = localStorage.getItem(
-        'draftSelectedNames'
-      );
-      if (savedFilters) setSelectedFilters(JSON.parse(savedFilters));
-      if (savedSelectedNames) setSelectedNames(JSON.parse(savedSelectedNames));
-    }
-  }, [router.asPath]);
-
-  // Save filters only for draft
-  useEffect(() => {
-    if (router.asPath.includes('draft')) {
-      localStorage.setItem(
-        'draftFilters',
-        JSON.stringify(selectedFilters)
-      );
-      localStorage.setItem(
-        'draftSelectedNames',
-        JSON.stringify(selectedNames)
-      );
-    }
-  }, [selectedFilters, selectedNames, router.asPath]);
+    localStorage.setItem('draftFilters', JSON.stringify(selectedFilters));
+    localStorage.setItem('draftSelectedNames', JSON.stringify(selectedNames));
+  }, [selectedFilters, selectedNames]);
 
   const hasActiveFilters =
     searchTerm !== '' ||
