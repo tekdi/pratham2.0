@@ -25,6 +25,7 @@ export interface userListParam {
     tenantStatus?: string[];
     interested_to_join?: string;
     state?: (string | number)[];
+    preferred_mode_of_learning?: string;
   };
   fields?: any;
   sort?: object;

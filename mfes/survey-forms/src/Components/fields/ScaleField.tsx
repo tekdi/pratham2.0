@@ -16,6 +16,7 @@ interface ScaleFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const ScaleField: React.FC<ScaleFieldProps> = ({
@@ -23,6 +24,7 @@ const ScaleField: React.FC<ScaleFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   const min = field.validations?.min ?? 0;
   const max = field.validations?.max ?? 10;
@@ -38,6 +40,7 @@ const ScaleField: React.FC<ScaleFieldProps> = ({
           onChange={(_, newValue) => onChange(field.fieldName, newValue)}
           min={min}
           max={max}
+          disabled={disabled}
           valueLabelDisplay="auto"
           sx={{ color: '#FDBE16' }}
         />

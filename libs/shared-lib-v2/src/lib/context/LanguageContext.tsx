@@ -35,6 +35,9 @@ import tam from './locales/tam.json';
 // @ts-ignore
 
 import guj from './locales/guj.json';
+// @ts-ignore
+
+import ur from './locales/ur.json';
 
 // Define translations object
 const translations: Record<string, Record<string, string>> = {
@@ -54,6 +57,8 @@ const translations: Record<string, Record<string, string>> = {
   tam,
   // @ts-ignore
   guj,
+  // @ts-ignore
+  ur,
 };
 
 // Define RTL languages
@@ -99,6 +104,14 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       }
     }
   }, []);
+
+  // Apply document direction for RTL languages (e.g. Urdu)
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const dir = rtlLanguages.includes(language) ? 'rtl' : 'ltr';
+    document.documentElement.setAttribute('dir', dir);
+    document.documentElement.setAttribute('lang', language);
+  }, [language]);
 
   // Translate function
   const t = useMemo(() => {

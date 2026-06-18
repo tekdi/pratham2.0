@@ -3,6 +3,7 @@
 
 .thematic-page {
   font-family: 'Montserrat', Arial, sans-serif !important;
+  font-size: calc(100% * var(--font-size-scale, 1));
 }
 
 .thematic-page * {

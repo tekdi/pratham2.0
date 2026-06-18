@@ -16,6 +16,7 @@ interface RatingFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const RatingField: React.FC<RatingFieldProps> = ({
@@ -23,6 +24,7 @@ const RatingField: React.FC<RatingFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   const max = field.validations?.max || 5;
 
@@ -36,6 +38,7 @@ const RatingField: React.FC<RatingFieldProps> = ({
           value={value ?? 0}
           onChange={(_, newValue) => onChange(field.fieldName, newValue)}
           max={max}
+          disabled={disabled}
           size="large"
         />
         {value != null && (

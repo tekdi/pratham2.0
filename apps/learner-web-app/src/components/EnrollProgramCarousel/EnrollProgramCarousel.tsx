@@ -64,9 +64,11 @@ interface Program {
 const EnrollProgramCarousel = ({
   userId,
   isExplorePrograms = false,
+  programType,
 }: {
   userId?: string | null;
   isExplorePrograms?: boolean;
+  programType?: string;
 } = {}) => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -125,26 +127,42 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
 
       if (tenantDataDetails?.tenantType !== 'elearning') {
         const academicYearList = await getAcademicYear();
-      const activeAcademicYear = Array.isArray(academicYearList)
-        ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
-        : undefined;
+        const allAcademicYearIds = Array.isArray(academicYearList)
+          ? academicYearList
+              .map((year: { id?: string; isActive?: boolean }) => year?.id)
+              .filter(Boolean)
+          : [];
+        const activeAcademicYear = Array.isArray(academicYearList)
+          ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+          : undefined;
 
-      if (activeAcademicYear?.id) {
-        localStorage.setItem('academicYearId', activeAcademicYear.id);
-      }
-        const cohortResponse = await getCohortList(storedUserId, true, true);
-        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
-          ? cohortResponse.result.some(
-              (cohort: {
-                type?: string;
-                cohortStatus?: string;
-                cohortMemberStatus?: string;
-              }) =>
-                cohort?.type === 'BATCH' &&
-                cohort?.cohortStatus === 'active' &&
-                cohort?.cohortMemberStatus === 'active'
-            )
-          : false;
+        let userHasActiveBatch = false;
+        for (const yearId of allAcademicYearIds) {
+          localStorage.setItem('academicYearId', yearId as string);
+          const cohortResponse = await getCohortList(storedUserId, true, true);
+          const hasBatch = Array.isArray(cohortResponse?.result)
+            ? cohortResponse.result.some(
+                (cohort: {
+                  type?: string;
+                  cohortStatus?: string;
+                  cohortMemberStatus?: string;
+                }) =>
+                  cohort?.type === 'BATCH' &&
+                  cohort?.cohortStatus === 'active' &&
+                  cohort?.cohortMemberStatus === 'active'
+              )
+            : false;
+          if (hasBatch) {
+            userHasActiveBatch = true;
+            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+            break;
+          }
+         
+        }
+
+        if (activeAcademicYear?.id) {
+          localStorage.setItem('academicYearId', activeAcademicYear.id);
+        }
 
         if (userHasActiveBatch) {
           return 'clear';
@@ -235,40 +253,44 @@ console.log('result=====>', result);
         );
         localStorage.setItem('programsDataLogin', JSON.stringify(programsData));
         localStorage.setItem('visibleProgramsLogin', JSON.stringify(visiblePrograms));
-        // console.log('visiblePrograms', visiblePrograms);
 
-        // If it's Explore Programs tab, exclude enrolled programs
+        const isVolunteer = programType === 'VolunteerOnboarding';
+        const typeFiltered = (list: any[]) =>
+          programType
+            ? list.filter((p: any) =>
+                isVolunteer
+                  ? p.type === 'VolunteerOnboarding'
+                  : p.type !== 'VolunteerOnboarding'
+              )
+            : list;
+
         if (isExplorePrograms) {
           if (userId) {
-            // Fetch user's enrolled programs to exclude them from explore programs
             const data = await getUserDetails(userId, true);
-            console.log('data=====>', data?.result?.userData?.tenantData);
             const tenantData = data?.result?.userData?.tenantData || [];
-            const enrolledTenantIds = tenantData.map(
-              (item: any) => item.tenantId
+            const enrolledTenantIds = tenantData.map((item: any) => item.tenantId);
+            const explorePrograms = typeFiltered(
+              visiblePrograms?.filter(
+                (program: any) => !enrolledTenantIds.includes(program.tenantId)
+              ) || []
             );
-            // Filter out programs that user is already enrolled in
-            const explorePrograms = visiblePrograms?.filter(
-              (program: any) => !enrolledTenantIds.includes(program.tenantId)
-            );
-            setPrograms(explorePrograms || []);
+            setPrograms(explorePrograms);
           } else {
-            // If no userId, show all visible programs
-            setPrograms(visiblePrograms || []);
+            setPrograms(typeFiltered(visiblePrograms || []));
           }
         } else if (userId) {
           // For My Programs tab, show only enrolled programs
           const data = await getUserDetails(userId, true);
-          console.log('data=====>', data?.result?.userData?.tenantData);
-          const tenantData = data?.result?.userData?.tenantData?.filter((item: any) => item?.roles?.some((role: any) => role?.roleName === 'Learner'));
+          const tenantData = data?.result?.userData?.tenantData?.filter((item: any) =>
+            item?.roles?.some((role: any) => role?.roleName === 'Learner')
+          );
           const filterIds = tenantData.map((item: any) => item.tenantId);
-          const filteredPrograms = programsData?.filter((program: any) =>
-            filterIds.includes(program.tenantId)
-          )
-          setPrograms(filteredPrograms || []);
+          const filteredPrograms = typeFiltered(
+            programsData?.filter((program: any) => filterIds.includes(program.tenantId)) || []
+          );
+          setPrograms(filteredPrograms);
         } else {
-          console.log('visiblePrograms=====>', visiblePrograms);
-          setPrograms(visiblePrograms || []);
+          setPrograms(typeFiltered(visiblePrograms || []));
         }
         const tenantIds = res?.result?.map((item: any) => item.tenantId);
         setTenantId(tenantIds);
@@ -280,7 +302,7 @@ console.log('result=====>', result);
     };
 
     fetchTenantInfo();
-  }, [userId, isExplorePrograms]);
+  }, [userId, isExplorePrograms, programType]);
 
   const handleProgramSwitch = async (program: Program) => {
     if (!userId) {
@@ -1019,8 +1041,49 @@ console.log('result=====>', result);
             }, 100);
           }
         }}
-        secondaryText={t('COMMON.CANCEL')}
-        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+        secondaryText={t('COMMON.CLOSE')}
+        secondaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+           const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      console.log('isAndroid check:', isAndroid);
+                localStorage.setItem('registerationTestGiven', 'Yes');
+
+      if(isAndroid)
+        {
+         console.log('Android path - sending message to WebView');
+         // Send message to React Native WebView
+
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+
+              //        const program = JSON.parse(enrolledProgramData || '{}');
+
+
+            // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+          let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+          // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+          if (!refreshToken || refreshToken === '') {
+            refreshToken = localStorage.getItem('refreshToken');
+          }
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+
+                // Add any data you want to send
+              }
+            }));
+          }
+        // setSignupSuccessModal(false);
+        }
+        else
+        {
+          const landingPage = localStorage.getItem('landingPage') || '/home';
+          globalThis.location.href = landingPage;
+        }}}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
@@ -1035,13 +1098,13 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
         showFooter={true}
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
       >
         <Box p="10px">

@@ -2,7 +2,7 @@
 
 const HANDOFF_KEY = '__survey_mfe_auth_handoff__';
 const COOKIE_PREFIX = 'survey_auth_';
-const AUTH_KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
+const AUTH_KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'session', 'preferredLanguage'] as const;
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));

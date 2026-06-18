@@ -13,6 +13,7 @@ interface TextareaFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const TextareaField: React.FC<TextareaFieldProps> = ({
@@ -20,6 +21,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   return (
     <FormControl fullWidth error={!!error}>
@@ -32,6 +34,7 @@ const TextareaField: React.FC<TextareaFieldProps> = ({
         placeholder={field.placeholder || ''}
         required={field.isRequired}
         error={!!error}
+        disabled={disabled}
         size="small"
         inputProps={{
           maxLength: field.validations?.maxLength,

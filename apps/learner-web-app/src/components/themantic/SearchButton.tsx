@@ -5,7 +5,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import { scaledFontSize } from '@learner/utils/scaledFontSize';
 
 interface SearchButtonProps {
   searchValue?: string;
@@ -81,13 +81,13 @@ export const SearchButton: React.FC<SearchButtonProps> = ({
                   },
                 }}
               >
-                <ClearIcon sx={{ fontSize: '20px' }} />
+                <ClearIcon sx={{ fontSize: scaledFontSize(20) }} />
               </IconButton>
             ),
             ...(_input?.InputProps ?? {}),
             sx: {
               fontFamily: 'Poppins',
-              fontSize: '18px',
+              fontSize: scaledFontSize(18),
               pl: 1,
               bgcolor: 'transparent',
               '& .MuiInputAdornment-root': {

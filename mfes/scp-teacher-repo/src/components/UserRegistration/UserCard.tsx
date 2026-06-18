@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Box, Grid, Checkbox, Button, Chip, Typography } from '@mui/material';
@@ -23,6 +23,85 @@ interface CallLog {
   status: string;
   note?: string;
 }
+
+const CallLogNote: React.FC<{ text: string }> = ({ text }) => {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    setExpanded(false);
+  }, [text]);
+
+  useLayoutEffect(() => {
+    if (expanded) {
+      return;
+    }
+
+    const element = textRef.current;
+    if (!element) {
+      return;
+    }
+
+    const checkTruncation = () => {
+      setIsTruncated(element.scrollHeight > element.clientHeight + 1);
+    };
+
+    checkTruncation();
+    window.addEventListener('resize', checkTruncation);
+    return () => window.removeEventListener('resize', checkTruncation);
+  }, [text, expanded]);
+
+  if (!text) {
+    return null;
+  }
+
+  return (
+    <Box>
+      <Typography
+        ref={textRef}
+        component="span"
+        variant="body2"
+        sx={{
+          fontSize: '14px',
+          color: '#1E1B16',
+          display: expanded ? 'block' : '-webkit-box',
+          WebkitLineClamp: expanded ? 'unset' : 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: expanded ? 'visible' : 'hidden',
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+        marginBottom={0}
+      >
+        {text}
+      </Typography>
+      {isTruncated && (
+        <Button
+          onClick={() => setExpanded((prev) => !prev)}
+          sx={{
+            textTransform: 'none',
+            color: '#0D599E',
+            fontSize: '12px',
+            fontWeight: 500,
+            padding: 0,
+            minWidth: 'auto',
+            mt: 0.25,
+            '&:hover': {
+              backgroundColor: 'transparent',
+              textDecoration: 'underline',
+            },
+          }}
+        >
+          {expanded
+            ? t('USER_REGISTRATION.READ_LESS')
+            : t('USER_REGISTRATION.READ_MORE')}
+        </Button>
+      )}
+    </Box>
+  );
+};
 
 interface User {
   id: number;
@@ -357,10 +436,10 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                           <Box key={index} sx={{ mb: 1 }}>
                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                   <Box sx={{ flex: 1 }}>
-                                      <Typography variant="body2" sx={{ fontSize: '14px', color: '#1E1B16' }}>{log.note || log.status}</Typography>
+                                      <CallLogNote text={log.note || log.status || ''} />
                                       <Typography variant="caption" sx={{ color: '#7C766F' }}>{log.date}</Typography>
                                   </Box>
-                                  <EditOutlinedIcon 
+                                  {/* <EditOutlinedIcon 
                                       sx={{ 
                                           fontSize: 16, 
                                           color: '#0D599E', 
@@ -373,7 +452,7 @@ const UserCard: React.FC<UserCardProps> = ({ user, isSelected = false, onSelectC
                                         setEditingCallLogIndex(index);
                                         setCallLogModalOpen(true);
                                       }}
-                                  />
+                                  /> */}
                               </Box>
                           </Box>
                           ))

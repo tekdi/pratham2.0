@@ -13,6 +13,7 @@ interface NumberFieldProps {
   value: any;
   error?: string;
   onChange: (fieldName: string, value: any) => void;
+  disabled?: boolean;
 }
 
 const NumberField: React.FC<NumberFieldProps> = ({
@@ -20,6 +21,7 @@ const NumberField: React.FC<NumberFieldProps> = ({
   value,
   error,
   onChange,
+  disabled,
 }) => {
   return (
     <FormControl fullWidth error={!!error}>
@@ -34,6 +36,7 @@ const NumberField: React.FC<NumberFieldProps> = ({
         placeholder={field.placeholder || ''}
         required={field.isRequired}
         error={!!error}
+        disabled={disabled}
         size="small"
         inputProps={{
           min: field.validations?.min,

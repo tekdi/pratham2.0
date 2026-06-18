@@ -23,12 +23,14 @@ interface Props {
   rows: Row[];
   responseInfoById?: Record<string, ContextResponseInfo>;
   onRowAction: (row: Row) => void;
+  expired?: boolean;
 }
 
 const TeacherContextTable: React.FC<Props> = ({
   rows,
   responseInfoById,
   onRowAction,
+  expired,
 }) => {
   return (
     <TableContainer component={Paper} sx={{ borderRadius: '12px', border: '1px solid #E0E0E0', overflowX: 'auto' }}>
@@ -56,6 +58,7 @@ const TeacherContextTable: React.FC<Props> = ({
           {rows.map((row) => {
             const info = responseInfoById?.[row.id];
             const status = info?.status;
+            const isFillDisabled = !!(expired && (!status || status === 'none'));
             const submittedAt = info?.submittedAt
               ? new Date(info.submittedAt).toLocaleDateString()
               : '—';
@@ -92,12 +95,14 @@ const TeacherContextTable: React.FC<Props> = ({
                   <Button
                     size="small"
                     variant="contained"
-                    onClick={() => onRowAction(row)}
+                    onClick={isFillDisabled ? undefined : () => onRowAction(row)}
                     sx={{
-                      backgroundColor: '#FDBE16',
-                      color: '#1E1B16',
+                      backgroundColor: isFillDisabled ? '#E0E0E0' : '#FDBE16',
+                      color: isFillDisabled ? '#9E9E9E' : '#1E1B16',
                       fontWeight: 600,
-                      '&:hover': { backgroundColor: '#e6ab0e' },
+                      pointerEvents: isFillDisabled ? 'none' : 'auto',
+                      boxShadow: 'none',
+                      '&:hover': { backgroundColor: isFillDisabled ? '#E0E0E0' : '#e6ab0e', boxShadow: 'none' },
                     }}
                   >
                     {status === 'submitted' ? 'View' : status === 'draft' ? 'Continue' : 'Fill'}

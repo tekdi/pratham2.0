@@ -420,20 +420,29 @@ async function updateCOurseAndIssueCertificate({
         });
         if (responseCriteria === true) {
           try {
-            await issueCertificate({
-              userId: userId,
-              courseId: course?.identifier,
-              unitId: unitId,
-              issuanceDate: new Date().toISOString(),
-              expirationDate: new Date(
-                new Date().setFullYear(new Date().getFullYear() + 20)
-              ).toISOString(),
-              // credentialId: data?.result?.usercertificateId,
-              firstName: userResponse?.firstName ?? '',
-              middleName: userResponse?.middleName ?? '',
-              lastName: userResponse?.lastName ?? '',
-              courseName: course?.name ?? '',
-            });
+            if(userResponse?.firstName) {
+              await issueCertificate({
+                userId: userId,
+                courseId: course?.identifier,
+                unitId: unitId,
+                issuanceDate: new Date().toISOString(),
+                expirationDate: new Date(
+                  new Date().setFullYear(new Date().getFullYear() + 20)
+                ).toISOString(),
+                // credentialId: data?.result?.usercertificateId,
+                firstName: userResponse?.firstName ?? '',
+                middleName: userResponse?.middleName ?? '',
+                lastName: userResponse?.lastName ?? '',
+                courseName: course?.name ?? '',
+              });
+            }
+            else {
+              await updateUserCourseStatus({
+                userId,
+                courseId: course?.identifier,
+                status: 'completed',
+              });
+            }
           } catch (error) {
             await updateUserCourseStatus({
               userId,
@@ -542,7 +551,7 @@ async function getUserId() {
     });
     const response = await res.json();
 
-    return response?.data?.result;
+    return response?.result;
   } catch (error) {
     console.error('Error in fetching user details', error);
     throw error;
