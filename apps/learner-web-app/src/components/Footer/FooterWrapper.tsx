@@ -7,7 +7,7 @@ const POS_ORIGINS = [
   'https://qa-pos.prathamdigital.org',
   'https://dev-pos.prathamdigital.org',
   'https://www.prathamopenschool.org',
-  'https://pos.prathamdigital.org/',
+  'https://pos.prathamdigital.org',
 ];
 
 const isPOSDomain = (): boolean => {
