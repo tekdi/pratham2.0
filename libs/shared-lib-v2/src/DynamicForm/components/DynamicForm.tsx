@@ -2126,13 +2126,22 @@ const DynamicForm = forwardRef(({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Suppress enum errors for fields with no value selected (empty string / undefined)
+    updatedError = updatedError.filter((error) => {
+      if (error.name === 'enum') {
+        const fieldKey = error.property?.replace(/^\./, '');
+        const fieldValue = formData[fieldKey];
+        if (fieldValue === '' || fieldValue === null || fieldValue === undefined) {
+          return false;
+        }
+      }
+      return true;
+    });
     // Filter errors for UI display, but keep working_village errors for onSubmit handler
-    // Note: transformErrors affects UI display, but onSubmit receives original errors
     return updatedError.filter(
       (err) =>
         !err?.property?.startsWith?.('.catchment_area') &&
         !err?.property?.startsWith?.('.working_location')
-      // Don't filter working_village errors - we need them in onSubmit for toast
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     // return updatedError;
