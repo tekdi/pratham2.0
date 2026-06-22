@@ -910,9 +910,19 @@ const LoginPageContent = () => {
         secondaryActionHandler={() => {
           setAssessmentPendingModal(false);
           localStorage.setItem('registerationTestGiven', 'Yes');
-          const landingPage = localStorage.getItem('landingPage') || '/home';
+          if(localStorage.getItem('isAndroidApp') == 'yes')
+            {
+                          router.push(`/programs`);
+                                    window.location.href = `/programs`;
+
+
+            }
+            else{
+                const landingPage = localStorage.getItem('landingPage') || '/home';
           window.location.href = landingPage;
-        }}
+   
+            }
+              }}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
