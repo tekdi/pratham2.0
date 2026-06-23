@@ -86,6 +86,8 @@ const EnrollProgramCarousel = ({
   // States for registration assessment gate
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
+  const [pendingAssessmentAction, setPendingAssessmentAction] = useState<'access' | 'enroll'>('access');
+  const [pendingProgramTenantId, setPendingProgramTenantId] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
 
   /**
@@ -478,6 +480,8 @@ console.log('result=====>', result);
           tenantData
         );
         if (assessmentStatus === 'assessmentPending') {
+          setPendingAssessmentAction('access');
+          setPendingProgramTenantId(program.tenantId);
           setAssessmentPendingModal(true);
           return;
         }
@@ -564,7 +568,8 @@ console.log('result=====>', result);
       );
       if (assessmentStatus === 'assessmentPending') {
         localStorage.setItem('registerationTestGiven', "No");
-
+        setPendingAssessmentAction('enroll');
+        setPendingProgramTenantId(program.tenantId);
         setAssessmentPendingModal(true);
       }
       // Redirect to landing page
@@ -1066,18 +1071,15 @@ console.log('result=====>', result);
           }
           if (window.ReactNativeWebView) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              type: pendingAssessmentAction === 'access' ? 'ACCESS_PROGRAM_EVENT' : 'ENROLL_PROGRAM_EVENT',
               data: {
                 userId: localStorage.getItem('userId'),
-                tenantId: localStorage.getItem('tenantId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
                 token: localStorage.getItem('token'),
                 refreshToken: refreshToken,
-
-                // Add any data you want to send
               }
             }));
           }
-        // setSignupSuccessModal(false);
         }
         else
         {
