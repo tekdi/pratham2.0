@@ -12,7 +12,8 @@ export const MIME_TYPE = {
     "video/x-youtube",
     "video/youtube",
     'audio/mp3',
-    'audio/wav'
+    'audio/wav',
+    'audio/mpeg'
   ],
   QUESTIONSET_MIME_TYPE: "application/vnd.sunbird.questionset",
   COURSE_MIME_TYPE: "application/vnd.ekstep.content-collection",
@@ -22,7 +23,8 @@ export const MIME_TYPE = {
     "video/x-youtube",
     "video/youtube",
     'audio/mp3',
-    'audio/wav',]
+    'audio/wav',
+    'audio/mpeg']
 };
 
 export const CLOUD_STORAGE_URL = process.env.NEXT_PUBLIC_CLOUD_STORAGE_URL || "";

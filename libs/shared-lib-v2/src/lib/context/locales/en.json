@@ -465,7 +465,8 @@
       "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.\n\nAnswer a few simple questions and move ahead.",
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Your journey towards Class 10 begins here. The Saral test is currently unavailable in your selected language. We are working on it. Please try again later.",
       "COME_BACK_LATER": "Please come back later",
-      "BACK_TO_PROGRAMS": "Back to Programs"
+      "BACK_TO_PROGRAMS": "Back to Programs",
+      "BACK_TO_DASHBOARD": "Back to Dashboard"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",
