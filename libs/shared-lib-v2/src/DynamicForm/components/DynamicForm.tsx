@@ -778,17 +778,26 @@ const DynamicForm = forwardRef(({
           },
         };
 
+        const addOwnPhoneCheckToUiSchema = (prevUiSchema) => {
+          const updated = { ...prevUiSchema, own_phone_check: ownPhoneCheckUiEntry };
+          if (Array.isArray(updated['ui:order']) && !updated['ui:order'].includes('own_phone_check')) {
+            const newOrder = [...updated['ui:order']];
+            const phoneTypeIndex = newOrder.indexOf('phone_type_accessible');
+            if (phoneTypeIndex !== -1) {
+              newOrder.splice(phoneTypeIndex + 1, 0, 'own_phone_check');
+            } else {
+              newOrder.push('own_phone_check');
+            }
+            updated['ui:order'] = newOrder;
+          }
+          return updated;
+        };
+
         // Add back to uiSchema
-        setFormUiSchema((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: ownPhoneCheckUiEntry,
-        }));
+        setFormUiSchema(addOwnPhoneCheckToUiSchema);
 
         // Add back to original uiSchema so it survives hide/show recalculations
-        setFormUiSchemaOriginal((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: ownPhoneCheckUiEntry,
-        }));
+        setFormUiSchemaOriginal(addOwnPhoneCheckToUiSchema);
       }
     }
   }, [formData]);
@@ -2001,7 +2010,7 @@ const DynamicForm = forwardRef(({
 
     const transformedFormData = transformFormData(
       cleanedData,
-      schema,
+      formSchema,
       extraFields
     );
 
