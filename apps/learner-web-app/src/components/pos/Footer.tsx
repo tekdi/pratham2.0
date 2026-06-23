@@ -93,6 +93,13 @@ export const Footer: React.FC = () => {
           zIndex: 1100,
           backgroundColor: '#f3f3f3',
           boxShadow: isExpanded ? '0 -2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+          // iOS Safari caches touch hit-test areas for fixed elements and doesn't
+          // update them after internal layout changes (e.g. Collapse animation).
+          // Forcing a GPU compositing layer causes iOS to correctly re-map touch
+          // targets after the Collapse opens/closes, fixing the "Hide footer"
+          // button being untappable until a scroll occurs.
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
         }}
       >
         <Box
