@@ -140,6 +140,8 @@ export const Footer: React.FC = () => {
           zIndex: 1100,
           backgroundColor: '#f3f3f3',
           boxShadow: isExpanded ? '0 -2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
         }}
       >
         <Box
