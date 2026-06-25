@@ -61,7 +61,8 @@ const DynamicForm = forwardRef(({
   parentDataAddUiSchema = {},
   parentDataSchema = {},
   id,
-  mobileNumber=""
+  mobileNumber="",
+  valueSelectedChange=null,
 }: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -1831,6 +1832,11 @@ const DynamicForm = forwardRef(({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
+
+      //submit new form data
+      if(valueSelectedChange){
+        valueSelectedChange(formData)
+      }
 
       function getSkipKeys(skipHideObject, formData) {
         let skipKeys = [];

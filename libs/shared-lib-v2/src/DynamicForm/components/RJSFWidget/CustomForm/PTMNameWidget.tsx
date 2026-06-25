@@ -81,7 +81,8 @@ const PTMNameWidget = ({
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedBlock, setSelectedBlock] = useState<string>('');
-  const [ptmEmail, setPtmEmail] = useState<string>('');
+  const [ptmMobile, setPtmMobile] = useState<string>('');
+  const [autoSelectedByMobile, setAutoSelectedByMobile] = useState<boolean>(false);
   const [loadingStates, setLoadingStates] = useState({
     state: false,
     district: false,
@@ -100,11 +101,11 @@ const PTMNameWidget = ({
   const lastSearchQueryRef = useRef<string>('');
   const currentDataSearchQueryRef = useRef<string>('');
   const previousSearchQueryRef = useRef<string>('');
-  const previousFiltersRef = useRef<{ state: string; district: string; block: string; ptmEmail: string; search: string }>({
+  const previousFiltersRef = useRef<{ state: string; district: string; block: string; ptmMobile: string; search: string }>({
     state: '',
     district: '',
     block: '',
-    ptmEmail: '',
+    ptmMobile: '',
     search: '',
   });
   const previousLocalStorageValuesRef = useRef<{ state: string; district: string; block: string }>({
@@ -123,9 +124,89 @@ const PTMNameWidget = ({
     }
   }, []);
 
+  // Pre-fill state, district, block from onboarding localStorage values
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const parseLS = (key: string) => {
+        try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+      };
+      const stateVal   = parseLS('onboarding_state');
+      const districtVal = parseLS('onboarding_district');
+      const blockVal   = parseLS('onboarding_block');
+      if (stateVal?.id)   setSelectedState(String(stateVal.id));
+      if (districtVal?.id) setSelectedDistrict(String(districtVal.id));
+      if (blockVal?.id)   setSelectedBlock(String(blockVal.id));
+    }
+  }, []);
+
+  // Auto-search by mobile when 10 digits are entered
+  useEffect(() => {
+    if (ptmMobile.length !== 10 || !academicYearId) return;
+
+    const searchByMobile = async () => {
+      try {
+        setUsers([]);
+        setLoading(true);
+        const tenantId = localStorage.getItem('onboardTenantId') || '';
+        const token = localStorage.getItem('token') || '';
+        if (!tenantId || !token) return;
+
+        const requestBody: any = {
+          limit: 10,
+          offset: 0,
+          filters: {
+            role: 'Lead',
+            tenantStatus: ['active'],
+            mobile: ptmMobile.trim(),
+          },
+          sort: ['firstName', 'asc'],
+        };
+        if (selectedState)   requestBody.filters.state    = [selectedState];
+        if (selectedDistrict) requestBody.filters.district = [selectedDistrict];
+        if (selectedBlock)   requestBody.filters.block    = [selectedBlock];
+
+        const response = await axios.post(API_ENDPOINTS.userList, requestBody, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            tenantid: tenantId,
+            academicyearid: academicYearId,
+          },
+        });
+
+        const fetchedUsers = response.data?.result?.getUserDetails || [];
+        const userOptions: UserOption[] = fetchedUsers.map((user: any) => ({
+          label: formatUserName(user),
+          value: user.userId,
+          region: formatRegion(user),
+        }));
+
+        setUsers(userOptions);
+
+        if (userOptions.length === 1) {
+          setSelectedUser(userOptions[0]);
+          onChange(userOptions[0].value);
+          setAutoSelectedByMobile(true);
+          setOpen(false);
+        } else if (userOptions.length > 1) {
+          setAutoSelectedByMobile(false);
+          setOpen(true);
+        } else {
+          setAutoSelectedByMobile(false);
+        }
+      } catch (err) {
+        console.error('Mobile auto-search error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    searchByMobile();
+  }, [ptmMobile, academicYearId, selectedState, selectedDistrict, selectedBlock]);
+
   // Load state, district, block from localStorage when in organization register mode
   useEffect(() => {
-    if (isOrganizationRegister && typeof window !== 'undefined') {
+    /*if (isOrganizationRegister && typeof window !== 'undefined') {
       const tempState = localStorage.getItem('temp_State') ?? '';
       const tempDistrict = localStorage.getItem('temp_District') ?? '';
       const tempBlock = localStorage.getItem('temp_Block') ?? '';
@@ -155,71 +236,71 @@ const PTMNameWidget = ({
         // If key is removed, clear the block
         setSelectedBlock('');
       }
-    }
+    }*/
   }, [isOrganizationRegister, selectedState, selectedDistrict, selectedBlock]);
 
   // Watch for changes to localStorage values in organization register mode
   useEffect(() => {
     if (!isOrganizationRegister || typeof window === 'undefined') return;
 
-    const checkLocalStorageChanges = () => {
-      // Check if keys exist, if not, treat as empty string
-      const tempState = localStorage.getItem('temp_State') ?? '';
-      const tempDistrict = localStorage.getItem('temp_District') ?? '';
-      const tempBlock = localStorage.getItem('temp_Block') ?? '';
+    // const checkLocalStorageChanges = () => {
+    //   // Check if keys exist, if not, treat as empty string
+    //   const tempState = localStorage.getItem('temp_State') ?? '';
+    //   const tempDistrict = localStorage.getItem('temp_District') ?? '';
+    //   const tempBlock = localStorage.getItem('temp_Block') ?? '';
 
-      const prevValues = previousLocalStorageValuesRef.current;
+    //   const prevValues = previousLocalStorageValuesRef.current;
 
-      // Check if any value has changed (including removal - null becomes empty string)
-      const stateChanged = prevValues.state !== tempState;
-      const districtChanged = prevValues.district !== tempDistrict;
-      const blockChanged = prevValues.block !== tempBlock;
+    //   // Check if any value has changed (including removal - null becomes empty string)
+    //   const stateChanged = prevValues.state !== tempState;
+    //   const districtChanged = prevValues.district !== tempDistrict;
+    //   const blockChanged = prevValues.block !== tempBlock;
 
-      if (stateChanged || districtChanged || blockChanged) {
-        // Update the state values
-        if (stateChanged) {
-          setSelectedState(tempState);
-          // If state is removed, also clear district and block
-          if (!tempState) {
-            setSelectedDistrict('');
-            setSelectedBlock('');
-          }
-        }
-        if (districtChanged) {
-          setSelectedDistrict(tempDistrict);
-          // If district is removed, also clear block
-          if (!tempDistrict) {
-            setSelectedBlock('');
-          }
-        }
-        if (blockChanged) {
-          setSelectedBlock(tempBlock);
-        }
+    //   if (stateChanged || districtChanged || blockChanged) {
+    //     // Update the state values
+    //     if (stateChanged) {
+    //       setSelectedState(tempState);
+    //       // If state is removed, also clear district and block
+    //       if (!tempState) {
+    //         setSelectedDistrict('');
+    //         setSelectedBlock('');
+    //       }
+    //     }
+    //     if (districtChanged) {
+    //       setSelectedDistrict(tempDistrict);
+    //       // If district is removed, also clear block
+    //       if (!tempDistrict) {
+    //         setSelectedBlock('');
+    //       }
+    //     }
+    //     if (blockChanged) {
+    //       setSelectedBlock(tempBlock);
+    //     }
 
-        // Clear selected user and users list to allow reselection
-        setSelectedUser(null);
-        onChange(undefined);
-        setUsers([]);
-        setOffset(0);
-        setHasMore(true);
-        setTotalCount(0);
-        currentDataSearchQueryRef.current = '';
-        previousFiltersRef.current = {
-          state: tempState,
-          district: tempDistrict,
-          block: tempBlock,
-          ptmEmail: ptmEmail || '',
-          search: '',
-        };
+    //     // Clear selected user and users list to allow reselection
+    //     setSelectedUser(null);
+    //     onChange(undefined);
+    //     setUsers([]);
+    //     setOffset(0);
+    //     setHasMore(true);
+    //     setTotalCount(0);
+    //     currentDataSearchQueryRef.current = '';
+    //     previousFiltersRef.current = {
+    //       state: tempState,
+    //       district: tempDistrict,
+    //       block: tempBlock,
+    //       ptmMobile: ptmMobile || '',
+    //       search: '',
+    //     };
 
-        // Update the ref with new values
-        previousLocalStorageValuesRef.current = {
-          state: tempState,
-          district: tempDistrict,
-          block: tempBlock,
-        };
-      }
-    };
+    //     // Update the ref with new values
+    //     previousLocalStorageValuesRef.current = {
+    //       state: tempState,
+    //       district: tempDistrict,
+    //       block: tempBlock,
+    //     };
+    //   }
+    // };
 
     // Initial check - use nullish coalescing to handle key removal
     const tempState = localStorage.getItem('temp_State') ?? '';
@@ -239,7 +320,7 @@ const PTMNameWidget = ({
         e.key === 'temp_Block' ||
         e.key === null // null means storage was cleared
       ) {
-        checkLocalStorageChanges();
+        // checkLocalStorageChanges();
       }
     };
 
@@ -251,7 +332,7 @@ const PTMNameWidget = ({
         key === 'temp_District' ||
         key === 'temp_Block'
       ) {
-        checkLocalStorageChanges();
+        // checkLocalStorageChanges();
       }
     };
 
@@ -263,14 +344,14 @@ const PTMNameWidget = ({
 
     // Check for changes periodically (every 300ms) for same-tab changes
     // Note: storage event doesn't fire in the same tab, so we need polling
-    const intervalId = setInterval(checkLocalStorageChanges, 300);
+    // const intervalId = setInterval(checkLocalStorageChanges, 300);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('localStorageChange', handleCustomStorageChange as EventListener);
-      clearInterval(intervalId);
+      // clearInterval(intervalId);
     };
-  }, [isOrganizationRegister, onChange, ptmEmail]);
+  }, [isOrganizationRegister, onChange, ptmMobile]);
 
   // Fetch active academic year ID on mount
   useEffect(() => {
@@ -306,13 +387,13 @@ const PTMNameWidget = ({
         if (stateId && !selectedState) {
           const stateExists = states.some((state) => state.value === stateId);
           if (stateExists) {
-            setSelectedState(stateId);
+            // setSelectedState(stateId);
           }
         }
       } catch (error) {
         console.error('Error loading states:', error);
         if (stateId && !selectedState) {
-          setSelectedState(stateId);
+          // setSelectedState(stateId);
         }
       } finally {
         setLoadingStates((prev) => ({ ...prev, state: false }));
@@ -323,41 +404,41 @@ const PTMNameWidget = ({
 
   // Load district options when state changes
   useEffect(() => {
-    const loadDistrictOptions = async () => {
-      const stateToUse = selectedState || stateId;
-      if (!stateToUse) {
-        setDistrictOptions([]);
-        if (!isOrganizationRegister) {
-          setSelectedDistrict('');
-        }
-        return;
-      }
+    // const loadDistrictOptions = async () => {
+    //   const stateToUse = selectedState || stateId;
+    //   if (!stateToUse) {
+    //     setDistrictOptions([]);
+    //     if (!isOrganizationRegister) {
+    //       setSelectedDistrict('');
+    //     }
+    //     return;
+    //   }
 
-      setLoadingStates((prev) => ({ ...prev, district: true }));
-      try {
-        const controllingField = !isCentralAdmin && stateId ? [stateId] : [stateToUse];
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-          {
-            fieldName: 'district',
-            controllingfieldfk: controllingField,
-            sort: ['district_name', 'asc'],
-          }
-        );
-        const districts =
-          response?.data?.result?.values?.map((item) => ({
-            value: item.value,
-            label: item.label,
-          })) || [];
-        setDistrictOptions(districts);
-      } catch (error) {
-        console.error('Error loading districts:', error);
-        setDistrictOptions([]);
-      } finally {
-        setLoadingStates((prev) => ({ ...prev, district: false }));
-      }
-    };
-    loadDistrictOptions();
+    //   setLoadingStates((prev) => ({ ...prev, district: true }));
+    //   try {
+    //     const controllingField = !isCentralAdmin && stateId ? [stateId] : [stateToUse];
+    //     const response = await axios.post(
+    //       `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+    //       {
+    //         fieldName: 'district',
+    //         controllingfieldfk: controllingField,
+    //         sort: ['district_name', 'asc'],
+    //       }
+    //     );
+    //     const districts =
+    //       response?.data?.result?.values?.map((item) => ({
+    //         value: item.value,
+    //         label: item.label,
+    //       })) || [];
+    //     setDistrictOptions(districts);
+    //   } catch (error) {
+    //     console.error('Error loading districts:', error);
+    //     setDistrictOptions([]);
+    //   } finally {
+    //     setLoadingStates((prev) => ({ ...prev, district: false }));
+    //   }
+    // };
+    // loadDistrictOptions();
   }, [selectedState, stateId, isCentralAdmin]);
 
   // Load block options when district changes
@@ -366,7 +447,7 @@ const PTMNameWidget = ({
       if (!selectedDistrict) {
         setBlockOptions([]);
         if (!isOrganizationRegister) {
-          setSelectedBlock('');
+          // setSelectedBlock('');
         }
         return;
       }
@@ -496,8 +577,8 @@ const PTMNameWidget = ({
         if (selectedBlock) {
           requestBody.filters.block = [selectedBlock];
         }
-        if (ptmEmail && ptmEmail.trim()) {
-          requestBody.filters.email = ptmEmail.trim();
+        if (ptmMobile && ptmMobile.trim()) {
+          requestBody.filters.mobile = ptmMobile.trim();
         }
 
         // Add search filter if search term exists
@@ -557,7 +638,7 @@ const PTMNameWidget = ({
             state: selectedState || '',
             district: selectedDistrict || '',
             block: selectedBlock || '',
-            ptmEmail: ptmEmail || '',
+            ptmMobile: ptmMobile || '',
             search: searchTerm || '',
           };
         }
@@ -580,7 +661,7 @@ const PTMNameWidget = ({
         }
       }
     },
-    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmEmail, formatUserName, formatRegion, isOrganizationRegister]
+    [academicYearId, selectedState, selectedDistrict, selectedBlock, ptmMobile, formatUserName, formatRegion, isOrganizationRegister]
   );
 
   // Fetch users when filters or search change (only when dropdown is open)
@@ -592,7 +673,7 @@ const PTMNameWidget = ({
       state: selectedState || '',
       district: selectedDistrict || '',
       block: selectedBlock || '',
-      ptmEmail: ptmEmail || '',
+      ptmMobile: ptmMobile || '',
       search: searchQuery || '',
     };
 
@@ -600,7 +681,7 @@ const PTMNameWidget = ({
       previousFiltersRef.current.state !== currentFilters.state ||
       previousFiltersRef.current.district !== currentFilters.district ||
       previousFiltersRef.current.block !== currentFilters.block ||
-      previousFiltersRef.current.ptmEmail !== currentFilters.ptmEmail ||
+      previousFiltersRef.current.ptmMobile !== currentFilters.ptmMobile ||
       previousFiltersRef.current.search !== currentFilters.search;
 
     // Only reset pagination when filters/search actually change
@@ -628,7 +709,7 @@ const PTMNameWidget = ({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, ptmEmail, academicYearId, open, fetchUsers, users.length]);
+  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, ptmMobile, academicYearId, open, fetchUsers, users.length]);
 
   // Reset selected item and pagination immediately when user types in search box
   useEffect(() => {
@@ -667,7 +748,7 @@ const PTMNameWidget = ({
         previousFiltersRef.current.state === (selectedState || '') &&
         previousFiltersRef.current.district === (selectedDistrict || '') &&
         previousFiltersRef.current.block === (selectedBlock || '') &&
-        previousFiltersRef.current.ptmEmail === (ptmEmail || '') &&
+        previousFiltersRef.current.ptmMobile === (ptmMobile || '') &&
         previousFiltersRef.current.search === (searchQuery || '');
 
       // Only trigger pagination if:
@@ -687,7 +768,7 @@ const PTMNameWidget = ({
         fetchUsers(searchQuery, offset, true);
       }
     },
-    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchUsers, selectedState, selectedDistrict, selectedBlock, ptmEmail]
+    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchUsers, selectedState, selectedDistrict, selectedBlock, ptmMobile]
   );
 
   // Set selected user when value changes
@@ -715,7 +796,7 @@ const PTMNameWidget = ({
 
   // Handle dropdown toggle
   const handleToggle = () => {
-    if (disabled || readonly) return;
+    if (disabled || readonly || autoSelectedByMobile || ptmMobile.length !== 10) return;
     setOpen((prev) => !prev);
     if (!open) {
       // Focus search input when opening
@@ -733,9 +814,9 @@ const PTMNameWidget = ({
   // Handle state change
   const handleStateChange = (event: any) => {
     const newState = event.target.value;
-    setSelectedState(newState);
-    setSelectedDistrict('');
-    setSelectedBlock('');
+    // setSelectedState(newState);
+    // setSelectedDistrict('');
+    // setSelectedBlock('');
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -743,8 +824,8 @@ const PTMNameWidget = ({
   // Handle district change
   const handleDistrictChange = (event: any) => {
     const newDistrict = event.target.value;
-    setSelectedDistrict(newDistrict);
-    setSelectedBlock('');
+    // setSelectedDistrict(newDistrict);
+    // setSelectedBlock('');
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -752,15 +833,20 @@ const PTMNameWidget = ({
   // Handle block change
   const handleBlockChange = (event: any) => {
     const newBlock = event.target.value;
-    setSelectedBlock(newBlock);
+    // setSelectedBlock(newBlock);
     setSelectedUser(null);
     onChange(undefined);
   };
 
   // Handle PTM email change
-  const handlePtmEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPtmEmail(event.target.value);
+  const handlePtmMobileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const digits = event.target.value.replace(/\D/g, '').slice(0, 10);
+    setPtmMobile(digits);
+    setAutoSelectedByMobile(false);
     setSelectedUser(null);
+    setUsers([]);
+    setSearchQuery('');
+    setOpen(false);
     onChange(undefined);
   };
 
@@ -775,9 +861,9 @@ const PTMNameWidget = ({
     setTotalCount(0);
     currentDataSearchQueryRef.current = '';
 
-    setSelectedState('');
-    setSelectedDistrict('');
-    setSelectedBlock('');
+    // setSelectedState('');
+    // setSelectedDistrict('');
+    // setSelectedBlock('');
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -793,8 +879,8 @@ const PTMNameWidget = ({
     setTotalCount(0);
     currentDataSearchQueryRef.current = '';
 
-    setSelectedDistrict('');
-    setSelectedBlock('');
+    // setSelectedDistrict('');
+    // setSelectedBlock('');
     setSelectedUser(null);
     onChange(undefined);
   };
@@ -810,13 +896,13 @@ const PTMNameWidget = ({
     setTotalCount(0);
     currentDataSearchQueryRef.current = '';
 
-    setSelectedBlock('');
+    // setSelectedBlock('');
     setSelectedUser(null);
     onChange(undefined);
   };
 
   // Handle clear PTM email filter
-  const handleClearPtmEmail = () => {
+  const handleClearPtmMobile = () => {
     if (disabled || readonly) return;
 
     // Clear user list and reset pagination
@@ -826,14 +912,15 @@ const PTMNameWidget = ({
     setTotalCount(0);
     currentDataSearchQueryRef.current = '';
 
-    setPtmEmail('');
+    setPtmMobile('');
+    setAutoSelectedByMobile(false);
     setSelectedUser(null);
     onChange(undefined);
   };
 
   return (
     <Box>
-      <Typography
+      {/* <Typography
         variant="h1"
         sx={{
           fontWeight: 600,
@@ -842,8 +929,8 @@ const PTMNameWidget = ({
         }}
       >
         {t('FORM.PTM_SELECTION', { defaultValue: 'PTM Selection' })}
-      </Typography>
-      <Typography
+      </Typography> */}
+      {/* <Typography
         variant="body1"
         sx={{
           marginBottom: 2,
@@ -851,8 +938,8 @@ const PTMNameWidget = ({
         }}
       >
         {t('FORM.COMPLETE_YOUR_REGISTRATION', { defaultValue: 'Complete your registration.' })}
-      </Typography>
-      {!isOrganizationRegister && (
+      </Typography> */}
+      {/* {!isOrganizationRegister && (
         <Typography
           variant="body1"
           sx={{
@@ -862,12 +949,12 @@ const PTMNameWidget = ({
         >
           {t('FORM.FIND_YOUR_REGISTRED_ORGANISATION', { defaultValue: 'Select your PTM (Pratham Team Member) for the Summer Camp program.' })}
         </Typography>
-      )}
+      )} */}
       {/* State, District, Block Filters - 3 in one row */}
       {!isOrganizationRegister && (
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {/* State Dropdown */}
-          <Grid item xs={12} sm={12} md={4}>
+          {/* <Grid item xs={12} sm={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
               <FormControl fullWidth>
                 <InputLabel id={`${id}-state-label`}>
@@ -911,10 +998,10 @@ const PTMNameWidget = ({
                 </IconButton>
               )}
             </Box>
-          </Grid>
+          </Grid> */}
 
           {/* District Dropdown */}
-          <Grid item xs={12} sm={12} md={4}>
+          {/* <Grid item xs={12} sm={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
               <FormControl fullWidth>
                 <InputLabel id={`${id}-district-label`}>
@@ -958,10 +1045,10 @@ const PTMNameWidget = ({
                 </IconButton>
               )}
             </Box>
-          </Grid>
+          </Grid> */}
 
           {/* Block Dropdown */}
-          <Grid item xs={12} sm={12} md={4}>
+          {/* <Grid item xs={12} sm={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
               <FormControl fullWidth>
                 <InputLabel id={`${id}-block-label`}>
@@ -1005,13 +1092,13 @@ const PTMNameWidget = ({
                 </IconButton>
               )}
             </Box>
-          </Grid>
+          </Grid> */}
 
         </Grid>
       )}
 
       {/* Show message if location data is missing in organization register mode */}
-      {isOrganizationRegister && (() => {
+      {/* {isOrganizationRegister && (() => {
         const tempState = typeof window !== 'undefined' ? localStorage.getItem('temp_State') : '';
         const tempDistrict = typeof window !== 'undefined' ? localStorage.getItem('temp_District') : '';
         const tempBlock = typeof window !== 'undefined' ? localStorage.getItem('temp_Block') : '';
@@ -1036,40 +1123,72 @@ const PTMNameWidget = ({
           );
         }
         return null;
-      })()}
+      })()} */}
 
-      {/* PTM Email TextField - Full Width on Next Line */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <TextField
-              fullWidth
-              label={t('FORM.PTM_EMAIL', { defaultValue: 'PTM Email (Optional)' })}
-              value={ptmEmail}
-              onChange={handlePtmEmailChange}
-              disabled={disabled || readonly}
-              placeholder={t('FORM.PTM_EMAIL_PLACEHOLDER', { defaultValue: 'Enter PTM email for exact match' })}
-            />
-            {ptmEmail && !disabled && !readonly && (
-              <IconButton
-                size="small"
-                onClick={handleClearPtmEmail}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear PTM email"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
+      {/* PTM Mobile Number Field */}
+      <Box sx={{ mb: 2 }}>
+        <FormLabel
+          sx={{
+            display: 'block',
+            color: 'black',
+            mb: 1,
+            fontWeight: 600,
+            fontSize: '1rem',
+            '&.Mui-error': { color: 'black' },
+            '&.Mui-disabled': { color: 'black' },
+          }}
+        >
+          {t('FORM.PTM_PHONE_NUMBER', { defaultValue: `PTM's Phone Number` })}
+        </FormLabel>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'stretch',
+            border: '1px solid #e0e0e0',
+            borderRadius: 2,
+            overflow: 'hidden',
+            backgroundColor: '#ffffff',
+          }}
+        >
+          <Box
+            sx={{
+              px: 2,
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: '#f5f5f5',
+              borderRight: '1px solid #e0e0e0',
+              fontWeight: 600,
+              fontSize: '1rem',
+              color: '#424242',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            +91
           </Box>
-        </Grid>
-      </Grid>
+          <TextField
+            fullWidth
+            variant="standard"
+            value={ptmMobile}
+            onChange={handlePtmMobileChange}
+            disabled={disabled || readonly}
+            placeholder={t('FORM.PTM_MOBILE_PLACEHOLDER', { defaultValue: '10-digit number' })}
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 10 }}
+            InputProps={{
+              disableUnderline: true,
+              endAdornment: ptmMobile && !disabled && !readonly ? (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={handleClearPtmMobile} edge="end">
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
+            sx={{
+              '& .MuiInputBase-root': { px: 1.5, height: '48px' },
+            }}
+          />
+        </Box>
+      </Box>
 
       <FormControl
         fullWidth
@@ -1128,45 +1247,56 @@ const PTMNameWidget = ({
           onClick={handleToggle}
           sx={{
             position: 'relative',
-            cursor: disabled || readonly ? 'default' : 'pointer',
+            cursor: disabled || readonly || autoSelectedByMobile ? 'default' : 'pointer',
           }}
         >
-          <TextField
-            fullWidth
-            placeholder={t('FORM.SEARCH_AND_SELECT_PTM', { defaultValue: 'Search and select PTM' })}
-            value={selectedUser ? selectedUser.label : ''}
-            InputProps={{
-              readOnly: true,
-              endAdornment: (
-                <InputAdornment position="end">
-                  {open ? (
-                    <KeyboardArrowUpIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
-                  ) : (
-                    <KeyboardArrowDownIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
-                  )}
-                </InputAdornment>
-              ),
-              sx: {
-                backgroundColor: '#f5f5f5',
-                cursor: disabled || readonly ? 'default' : 'pointer',
-                borderRadius: '4px',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#e0e0e0',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: disabled || readonly ? '#e0e0e0' : '#bdbdbd',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#bdbdbd',
-                },
-              },
-            }}
+          <Box
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              minHeight: '56px',
+              px: 1.75,
+              border: '1px solid #e0e0e0',
+              borderRadius: '4px',
+              backgroundColor: autoSelectedByMobile ? '#e8f5e9' : '#f5f5f5',
+              '&:hover': {
+                borderColor: disabled || readonly || autoSelectedByMobile ? '#e0e0e0' : '#bdbdbd',
               },
             }}
-          />
+          >
+            {selectedUser ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, overflow: 'hidden' }}>
+                <Typography
+                  component="span"
+                  sx={{ fontWeight: 700, fontSize: '0.9375rem', color: '#212121', whiteSpace: 'nowrap' }}
+                >
+                  {selectedUser.label}
+                </Typography>
+                {ptmMobile && (
+                  <Typography
+                    component="span"
+                    sx={{ fontWeight: 400, fontSize: '0.9375rem', color: '#616161', whiteSpace: 'nowrap' }}
+                  >
+                    {` - ${'X'.repeat(6)}${ptmMobile.slice(-4)}`}
+                  </Typography>
+                )}
+              </Box>
+            ) : (
+              <Typography sx={{ fontSize: '0.9375rem', color: '#9e9e9e' }}>
+                {t('FORM.SEARCH_AND_SELECT_PTM', { defaultValue: 'Search and select PTM' })}
+              </Typography>
+            )}
+            {!autoSelectedByMobile && (
+              <InputAdornment position="end">
+                {open ? (
+                  <KeyboardArrowUpIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
+                ) : (
+                  <KeyboardArrowDownIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
+                )}
+              </InputAdornment>
+            )}
+          </Box>
         </Box>
 
         {/* Dropdown Popper */}
