@@ -43,8 +43,28 @@ import {
   updateCourseHierarchy,
   downloadGoogleDriveFile,
   convertDriveToDirectUrl,
+  readContent,
   FILE_MIME_MAP,
+  uploadAppIconFromDrive,
 } from '../services/BulkImportService';
+import { patch } from '../services/RestClient';
+
+// ─── Multi-select helper ──────────────────────────────────────
+// Splits pipe-separated values from Excel into an array.
+// Returns undefined if the value is blank.
+const toArray = (val: string | undefined): string[] | undefined => {
+  if (!val || String(val).trim() === '') return undefined;
+  return String(val).split('|').map((s) => s.trim()).filter(Boolean);
+};
+
+// Convert Excel 'true'/'false' strings (or actual booleans) → JavaScript boolean.
+// Used for QS create/hierarchy APIs which require boolean true/false.
+const toBool = (val: any, defaultVal = false): boolean => {
+  if (val === undefined || val === null || val === '') return defaultVal;
+  if (val === true  || String(val).toLowerCase() === 'true')  return true;
+  if (val === false || String(val).toLowerCase() === 'false') return false;
+  return defaultVal;
+};
 
 // ─── Config ───────────────────────────────────────────────────
 
@@ -92,30 +112,27 @@ export class BulkImportQueue {
         dependsOn: [],
         payload: {
           name: content.name,
+          englishName: content.englishName || undefined,
           description: content.description,
           primaryCategory: content.primaryCategory,
-          framework: 'pos-framework' as const, // content always pos-framework for all users
+          framework: 'pos-framework' as const,
           mimeType: FILE_MIME_MAP[content.fileType] || 'application/pdf',
-          // pos-framework has no medium/gradeLevel taxonomy — do NOT send them for content
-          // API expects arrays for these taxonomy fields
-          subject:        content.subject        ? [content.subject]        : undefined,
-          domain:         content.domain         ? [content.domain]         : undefined,
-          subDomain:      content.subDomain      ? [content.subDomain]      : undefined,
-          targetAgeGroup: content.targetAgeGroup ? [content.targetAgeGroup] : undefined,
-          primaryUser:    content.primaryUser     ? [content.primaryUser]    : undefined,
-          audience:       content.audience        ? [content.audience]       : undefined,
-          language:       content.language        ? [content.language]       : undefined,
-          // program → array; keywords → array; copyrightYear → number
-          program:       content.program ? [content.program] : undefined,
-          keywords:      content.keywords ? content.keywords.split(',').map((k: string) => k.trim()) : undefined,
-          copyrightYear: content.copyrightYear ? Number(content.copyrightYear) : undefined,
+          // Multi-select fields use pipe-separated values in Excel → split into arrays
+          subject:        toArray(content.subject),
+          domain:         content.domain ? [content.domain.trim()] : undefined,  // API expects array
+          subDomain:      toArray(content.subDomain),
+          targetAgeGroup: toArray(content.targetAgeGroup),
+          primaryUser:    toArray(content.primaryUser),
+          program:        toArray(content.program),
+          audience:       content.audience ? [content.audience] : undefined,
+          language:       content.language ? [content.language] : undefined,
+          keywords:       content.keywords ? content.keywords.split(',').map((k: string) => k.trim()) : undefined,
           contentLanguage: content.contentLanguage,  // string, not array
-          license:   content.license,
-          copyright: content.copyright,
           author:    content.author,
           creator:   content.creator,
           driveUrl:  content.driveUrl,
           fileType:  content.fileType,
+          appIconUrl: content.appIconUrl,
           _contentTempId: content.tempId,
         },
         status: 'queued',
@@ -123,13 +140,29 @@ export class BulkImportQueue {
         maxRetries: MAX_RETRIES,
       });
 
-      // Job 2: Upload file (depends on create)
+      // Job 2a (optional): Upload app icon (depends on create)
+      let iconJobId: string | undefined;
+      if (content.appIconUrl) {
+        iconJobId = `upload_icon_${content.tempId}`;
+        this.addJob({
+          id: iconJobId,
+          type: 'upload_app_icon',
+          tempId: content.tempId,
+          dependsOn: [createJobId],
+          payload: { appIconUrl: content.appIconUrl, _entityTempId: content.tempId, _entityType: 'content' },
+          status: 'queued',
+          retryCount: 0,
+          maxRetries: MAX_RETRIES,
+        });
+      }
+
+      // Job 2b: Upload file (depends on create + optional icon)
       const uploadJobId = `upload_content_${content.tempId}`;
       this.addJob({
         id: uploadJobId,
         type: 'upload_content_file',
         tempId: content.tempId,
-        dependsOn: [createJobId],
+        dependsOn: iconJobId ? [createJobId, iconJobId] : [createJobId],
         payload: {
           driveUrl: content.driveUrl,
           fileType: content.fileType,
@@ -164,39 +197,44 @@ export class BulkImportQueue {
         dependsOn: [],
         payload: {
           name: qs.name,
+          englishName: qs.englishName || undefined,
           description: qs.description,
           primaryCategory: qs.primaryCategory,
           framework: qs.framework,
           mimeType: 'application/vnd.sunbird.questionset',
-          // POS QS: domain (string), subDomain (array), subject (array),
-          // targetAgeGroup (array), primaryUser (array), contentLanguage (string)
-          // SCP QS: subject (array), board (string), courseType/program (arrays)
-          // Neither framework uses medium or gradeLevel for QS.
-          subject:         qs.subject    ? [qs.subject]    : undefined,
-          domain:          qs.domain     || undefined,
-          subDomain:       qs.subDomain  ? [qs.subDomain]  : undefined,
-          targetAgeGroup:  qs.targetAgeGroup  ? [qs.targetAgeGroup]  : undefined,
-          primaryUser:     qs.primaryUser     ? [qs.primaryUser]     : undefined,
+          // POS QS: domain=string (single), subDomain/subject/targetAgeGroup/primaryUser/program=array (pipe-sep)
+          // SCP QS: board=string (single), medium/gradeLevel/subject/courseType=array (pipe-sep)
+          domain:          qs.domain ? qs.domain.trim() : undefined,   // QS API expects string (not array)
+          subDomain:       toArray(qs.subDomain),
+          subject:         toArray(qs.subject),
+          targetAgeGroup:  toArray(qs.targetAgeGroup),
+          primaryUser:     toArray(qs.primaryUser),
+          program:         toArray(qs.program),
           contentLanguage: qs.contentLanguage || undefined,
-          audience:        qs.audience   ? [qs.audience]   : undefined,
-          // SCP-specific fields: board → string, courseType/program → arrays
-          board:          qs.board       || undefined,
-          courseType:     qs.courseType  ? [qs.courseType]  : undefined,
-          program:        qs.program     ? [qs.program]     : undefined,
+          audience:        qs.audience ? [qs.audience] : undefined,
+          // SCP-specific fields: board=string, medium/gradeLevel/courseType=arrays
+          board:      qs.board || undefined,
+          medium:     toArray(qs.medium),
+          gradeLevel: toArray(qs.gradeLevel),
+          courseType: toArray(qs.courseType),
           assessmentType: qs.assessmentType || undefined,
-          // evaluationType is required per form-read — validated before import runs
           evaluationType: qs.evaluationType || undefined,
-          maxAttempts:   qs.maxAttempts,
-          showFeedback:  qs.showFeedback,
-          showSolutions: qs.showSolutions,
+          // QS create API requires boolean true/false for these fields
+          showFeedback:  toBool(qs.showFeedback),
+          showSolutions: toBool(qs.showSolutions),
+          showTimer:     false,
+          showHints:     false,
           allowAnonymousAccess: 'Yes',
-          shuffle: false,   // keep section order fixed
+          shuffle: false,
+          // appIconUrl skipped for QS — QS uses a different API for icons (TBD)
           _qsTempId: qs.tempId,
         },
         status: 'queued',
         retryCount: 0,
         maxRetries: MAX_RETRIES,
       });
+
+      // NOTE: QS app icon upload skipped — QS uses a different API for icons (will be added later)
 
       // Questions for this QS
       const questionsForQs = data.questions.filter(
@@ -262,13 +300,29 @@ export class BulkImportQueue {
 
     // ── COURSE JOBS ──
     data.courses.forEach((course) => {
-      // Collect child dependencies
+      // Collect child mappings from CourseChildrenMapping sheet
       const childMappings = data.courseChildMappings.filter(
         (m) => m.courseTempId === course.tempId
       );
 
+      // Also fold in ExistingContentMapping rows that directly specify this course.
+      // This allows existing do_xxx content to be added to a course unit without
+      // requiring a separate CourseChildrenMapping row.
+      const existingChildMappings = data.existingMappings
+        .filter((e) => e.courseTempId === course.tempId && e.unitName)
+        .map((e) => ({
+          courseTempId: course.tempId,
+          unitName:     e.unitName!,
+          childRef:     e.existingIdentifier,  // use do_xxx directly
+          childType:    e.entityType as 'content' | 'questionset',
+          sequence:     e.sequence ?? 999,
+        }));
+
+      // Merge — CourseChildrenMapping rows first, then existing content mappings
+      const allChildMappings = [...childMappings, ...existingChildMappings];
+
       // The course depends on all its children being processed
-      const childDependencies = childMappings
+      const childDependencies = allChildMappings
         .map((m) => {
           const childRef = m.childRef;
           // If childRef is a tempId, find the last job for that entity
@@ -292,6 +346,7 @@ export class BulkImportQueue {
         dependsOn: childDependencies,
         payload: {
           name: course.name,
+          englishName: course.englishName || undefined,
           description: course.description,
           framework: course.framework,
           // SCP courses: targetBoardIds / targetMediumIds / targetGradeLevelIds / targetSubjectIds / targetCourseTypeIds
@@ -300,49 +355,54 @@ export class BulkImportQueue {
           ...(course.framework === 'scp-framework'
             ? {
                 // SCP form-read uses target*Ids with output:"identifier"
-                targetBoardIds:      course.board       ? [SCP_BOARD_NAME_TO_ID[course.board]       || course.board]       : undefined,
-                targetMediumIds:     course.medium      ? [SCP_MEDIUM_NAME_TO_ID[course.medium]      || course.medium]      : undefined,
-                targetGradeLevelIds: course.gradeLevel  ? [SCP_GRADE_NAME_TO_ID[course.gradeLevel]   || course.gradeLevel]  : undefined,
-                targetSubjectIds:    course.subject     ? [SCP_SUBJECT_NAME_TO_ID[course.subject]    || course.subject]     : undefined,
-                targetCourseTypeIds: course.courseType  ? [SCP_COURSE_TYPE_NAME_TO_ID[course.courseType] || course.courseType] : undefined,
-                // contentLanguage: plain string for SCP (form-read range of strings, not identifiers)
+                // board=single, medium/gradeLevel/subject/courseType=multi (pipe-separated)
+                targetBoardIds:      course.board ? [SCP_BOARD_NAME_TO_ID[course.board] || course.board] : undefined,
+                targetMediumIds:     toArray(course.medium)?.map(v => SCP_MEDIUM_NAME_TO_ID[v] || v),
+                targetGradeLevelIds: toArray(course.gradeLevel)?.map(v => SCP_GRADE_NAME_TO_ID[v] || v),
+                targetSubjectIds:    toArray(course.subject)?.map(v => SCP_SUBJECT_NAME_TO_ID[v] || v),
+                targetCourseTypeIds: toArray(course.courseType)?.map(v => SCP_COURSE_TYPE_NAME_TO_ID[v] || v),
                 contentLanguage: course.contentLanguage || undefined,
               }
             : {
-                // POS course form-read uses targetDomainIds / targetSubDomainIds /
-                // targetSubjectIds with output:"identifier" — display name → identifier
+                // POS course: domain=single identifier, subDomain/subject=multi identifiers
                 targetDomainIds:    course.targetDomainIds
-                  ? [POS_DOMAIN_NAME_TO_ID[course.targetDomainIds]    || course.targetDomainIds]
+                  ? [POS_DOMAIN_NAME_TO_ID[course.targetDomainIds] || course.targetDomainIds]
                   : undefined,
-                targetSubDomainIds: course.targetSubDomainIds
-                  ? [POS_SUB_DOMAIN_NAME_TO_ID[course.targetSubDomainIds] || course.targetSubDomainIds]
-                  : undefined,
-                targetSubjectIds:   course.targetSubjectIds
-                  ? [POS_SUBJECT_NAME_TO_ID[course.targetSubjectIds]  || course.targetSubjectIds]
-                  : undefined,
-                // targetAgeGroup, primaryUser: plain string arrays (no identifier mapping needed)
-                targetAgeGroup: course.targetAgeGroup ? [course.targetAgeGroup] : undefined,
-                primaryUser:    course.primaryUser    ? [course.primaryUser]    : undefined,
-                // contentLanguage: plain string
-                contentLanguage: course.contentLanguage || undefined,
+                targetSubDomainIds: toArray(course.targetSubDomainIds)?.map(v => POS_SUB_DOMAIN_NAME_TO_ID[v] || v),
+                targetSubjectIds:   toArray(course.targetSubjectIds)?.map(v => POS_SUBJECT_NAME_TO_ID[v] || v),
+                targetAgeGroup:     toArray(course.targetAgeGroup),
+                primaryUser:        toArray(course.primaryUser),
+                contentLanguage:    course.contentLanguage || undefined,
               }
           ),
-          audience:   course.audience   ? [course.audience]   : undefined,
-          // keywords → array; copyrightYear → number
-          keywords:      course.keywords ? course.keywords.split(',').map((k: string) => k.trim()) : undefined,
-          copyrightYear: course.copyrightYear ? Number(course.copyrightYear) : undefined,
-          license:   course.license,
-          copyright: course.copyright,
-          author:    course.author,
+          audience: course.audience ? [course.audience] : undefined,
+          program:  toArray(course.program),
+          keywords: course.keywords ? course.keywords.split(',').map((k: string) => k.trim()) : undefined,
+          author:   course.author,
+          appIconUrl: course.appIconUrl,
           _courseTempId: course.tempId,
-          _childMappings: childMappings,
+          _childMappings: allChildMappings,
         },
         status: 'queued',
         retryCount: 0,
         maxRetries: MAX_RETRIES,
       });
 
-      if (childMappings.length > 0) {
+      // Optional: Upload app icon for this course
+      if (course.appIconUrl) {
+        this.addJob({
+          id: `upload_icon_${course.tempId}`,
+          type: 'upload_app_icon',
+          tempId: course.tempId,
+          dependsOn: [createCourseJobId],
+          payload: { appIconUrl: course.appIconUrl, _entityTempId: course.tempId, _entityType: 'course' },
+          status: 'queued',
+          retryCount: 0,
+          maxRetries: MAX_RETRIES,
+        });
+      }
+
+      if (allChildMappings.length > 0) {
         const courseHierarchyJobId = `hierarchy_course_${course.tempId}`;
         this.addJob({
           id: courseHierarchyJobId,
@@ -352,7 +412,7 @@ export class BulkImportQueue {
           payload: {
             _courseTempId: course.tempId,
             _courseName: course.name,   // needed for hierarchy root name
-            _childMappings: childMappings,
+            _childMappings: allChildMappings,
           },
           status: 'queued',
           retryCount: 0,
@@ -533,6 +593,9 @@ export class BulkImportQueue {
       case 'upload_content_file':
         await this.handleUploadContentFile(job);
         break;
+      case 'upload_app_icon':
+        await this.handleUploadAppIcon(job);
+        break;
       case 'review_content':
         await this.handleReviewContent(job);
         break;
@@ -563,6 +626,7 @@ export class BulkImportQueue {
 
     const identifier = await createContentNode({
       name:            metadata.name,
+      englishName:     metadata.englishName || undefined,
       description:     metadata.description,
       primaryCategory: metadata.primaryCategory,
       framework:       metadata.framework,
@@ -576,11 +640,8 @@ export class BulkImportQueue {
       audience:        metadata.audience,
       language:        metadata.language,
       program:         metadata.program,
-      contentLanguage: metadata.contentLanguage,  // string, separate from language array
+      contentLanguage: metadata.contentLanguage,
       keywords:        metadata.keywords,
-      license:         metadata.license,
-      copyright:       metadata.copyright,
-      copyrightYear:   metadata.copyrightYear,
       author:          metadata.author,
       creator:         metadata.creator,
     });
@@ -593,9 +654,13 @@ export class BulkImportQueue {
 
   // Maps a declared fileType → all MIME types that Google Drive may return for that format.
   // ZIP and H5P are both ZIP archives at the OS level, so they share the same allowed MIMEs.
+  // Google Drive often returns 'application/octet-stream' for any file it cannot
+  // identify server-side (large PDFs, ZIPs, MP4s behind access checks, etc.).
+  // We accept it for every declared file type so that a valid Drive link never
+  // fails solely because of Drive's generic fallback content-type.
   private static readonly ALLOWED_MIME_FOR_FILE_TYPE: Record<string, string[]> = {
-    pdf: ['application/pdf'],
-    mp4: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-m4v'],
+    pdf: ['application/pdf', 'application/octet-stream'],
+    mp4: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-m4v', 'application/octet-stream'],
     zip: [
       'application/zip',
       'application/x-zip',
@@ -610,12 +675,45 @@ export class BulkImportQueue {
     ],
   };
 
+  // ── App Icon upload handler ────────────────────────────────────
+
+  private async handleUploadAppIcon(job: QueueJob): Promise<void> {
+    const { appIconUrl, _entityTempId } = job.payload;
+    const entityId = this.resolvedIds.get(_entityTempId);
+    if (!entityId) throw new Error(`Entity ID not resolved for ${_entityTempId}`);
+    if (!appIconUrl) return;
+
+    // Upload icon image from Drive → get permanent S3 URL
+    const iconUrl = await uploadAppIconFromDrive(entityId, appIconUrl);
+
+    // Fetch current versionKey (required for every PATCH on Sunbird)
+    const contentData = await readContent(entityId);
+    const versionKey: string | undefined = contentData?.versionKey;
+    if (!versionKey) throw new Error(`Could not retrieve versionKey for ${_entityTempId} when setting appIcon`);
+
+    // PATCH with the uploaded icon URL
+    await patch(`/action/content/v3/update/${entityId}`, {
+      request: { content: { appIcon: iconUrl, versionKey } },
+    });
+
+    job.resolvedIdentifier = entityId;
+  }
+
+  // ── Content file upload handler ────────────────────────────────
+
   private async handleUploadContentFile(job: QueueJob): Promise<void> {
     const { _contentTempId, driveUrl, fileType } = job.payload;
     const contentId = this.resolvedIds.get(_contentTempId);
     if (!contentId) throw new Error(`Content ID not resolved for ${_contentTempId}`);
 
     const mimeType = FILE_MIME_MAP[fileType] || 'application/pdf';
+
+    // ── YouTube: no file download — set artifactUrl directly ──────
+    if (fileType === 'youtube') {
+      await associateUploadedFile(contentId, driveUrl, mimeType);
+      job.resolvedIdentifier = contentId;
+      return;
+    }
 
     // Download from Google Drive — returns the actual content-type from the server
     const { buffer, fileName, mimeType: actualMimeType } = await downloadGoogleDriveFile(driveUrl);
@@ -662,28 +760,37 @@ export class BulkImportQueue {
     const { _qsTempId, ...metadata } = job.payload;
 
     const identifier = await createQuestionSetNode({
-      name: metadata.name,
-      description: metadata.description,
+      name:            metadata.name,
+      englishName:     metadata.englishName     || undefined,
+      description:     metadata.description,
       primaryCategory: metadata.primaryCategory,
-      framework: metadata.framework,
-      mimeType: 'application/vnd.sunbird.questionset',
-      subject:    metadata.subject,
-      medium:     metadata.medium,
-      gradeLevel: metadata.gradeLevel,
-      audience:   metadata.audience,
-      language:   metadata.language,
+      framework:       metadata.framework,
+      mimeType:        'application/vnd.sunbird.questionset',
+      // POS taxonomy fields (were missing — caused blank fields on platform)
+      domain:          metadata.domain,
+      subDomain:       metadata.subDomain,
+      subject:         metadata.subject,
+      targetAgeGroup:  metadata.targetAgeGroup,
+      primaryUser:     metadata.primaryUser,
+      contentLanguage: metadata.contentLanguage || undefined,
+      // Shared fields
+      program:         metadata.program,
+      audience:        metadata.audience,
+      language:        metadata.language,
       // SCP-specific taxonomy
-      board:          metadata.board,
-      courseType:     metadata.courseType,
-      program:        metadata.program,
-      assessmentType: metadata.assessmentType,
-      // Behaviour flags
+      board:           metadata.board,
+      medium:          metadata.medium,
+      gradeLevel:      metadata.gradeLevel,
+      courseType:      metadata.courseType,
+      assessmentType:  metadata.assessmentType,
+      // Behaviour flags — QS create API requires boolean true/false
       evaluationType:      metadata.evaluationType,
-      allowAnonymousAccess: metadata.allowAnonymousAccess,
-      shuffle:       metadata.shuffle,
-      maxAttempts:   metadata.maxAttempts,
-      showFeedback:  metadata.showFeedback,
-      showSolutions: metadata.showSolutions,
+      allowAnonymousAccess: 'Yes',
+      shuffle:       metadata.shuffle      ?? false,
+      showFeedback:  metadata.showFeedback  ?? false,
+      showSolutions: metadata.showSolutions ?? false,
+      showTimer:     metadata.showTimer     ?? false,
+      showHints:     metadata.showHints     ?? false,
     });
 
     this.resolvedIds.set(_qsTempId, identifier);
@@ -769,9 +876,12 @@ export class BulkImportQueue {
           primaryCategory: _qsPrimaryCategory || 'QuestionSet',
           visibility: 'Parent',
           allowAnonymousAccess: 'Yes',
-          shuffle: false,           // keep section question order fixed
-          showFeedback: false,
+          // QS hierarchy update also uses the questionset API — booleans required
+          shuffle:       false,
+          showFeedback:  false,
           showSolutions: false,
+          showTimer:     false,
+          showHints:     false,
         },
       };
     });
@@ -802,30 +912,27 @@ export class BulkImportQueue {
     const { _courseTempId, _childMappings, ...metadata } = job.payload;
 
     const identifier = await createCourseNode({
-      name:          metadata.name,
-      description:   metadata.description,
-      framework:     metadata.framework,
-      // SCP course fields
+      name:        metadata.name,
+      englishName: metadata.englishName || undefined,
+      description: metadata.description,
+      framework:   metadata.framework,
+      // SCP course: target*Ids (arrays of identifiers)
       targetBoardIds:      metadata.targetBoardIds,
       targetMediumIds:     metadata.targetMediumIds,
       targetGradeLevelIds: metadata.targetGradeLevelIds,
       targetCourseTypeIds: metadata.targetCourseTypeIds,
-      // POS course fields (targetDomainIds / targetSubDomainIds / targetSubjectIds)
-      // and shared target*Ids for POS Subject (also used in SCP)
+      // POS course: targetDomainIds/targetSubDomainIds/targetSubjectIds (arrays of identifiers)
       targetDomainIds:    metadata.targetDomainIds,
       targetSubDomainIds: metadata.targetSubDomainIds,
       targetSubjectIds:   metadata.targetSubjectIds,
-      // POS + SCP shared plain-value fields
+      // Shared plain-value arrays
       targetAgeGroup:  metadata.targetAgeGroup,
       primaryUser:     metadata.primaryUser,
+      program:         metadata.program,
       contentLanguage: metadata.contentLanguage,
-      // Common fields
-      audience:      metadata.audience,
-      keywords:      metadata.keywords,
-      license:       metadata.license,
-      copyright:     metadata.copyright,
-      author:        metadata.author,
-      copyrightYear: metadata.copyrightYear,
+      audience:        metadata.audience,
+      keywords:        metadata.keywords,
+      author:          metadata.author,
     });
 
     this.resolvedIds.set(_courseTempId, identifier);
@@ -996,6 +1103,20 @@ function buildQuestionBody(
 
   const meta = QUESTION_TYPE_META[type] ?? QUESTION_TYPE_META['Subjective'];
 
+  const score = maxScore ?? 1;
+
+  // Body varies by type — each type has its own wrapper and interaction placeholder
+  const buildBody = (): string => {
+    if (type === 'Match')
+      return `<div class='question-body' tabindex='-1'><div class='mtf-title' tabindex='0'><p>${text}</p></div><div data-match-interaction='response1' class='mtf-vertical'></div></div>`;
+    if (type === 'Arrange')
+      return `<div class='question-body' tabindex='-1'><div class='asq-title' tabindex='0'><p>${text}</p></div><div data-order-interaction='response1' class='asq-vertical'></div></div>`;
+    if (type === 'MCQ')
+      return `<div class='question-body' tabindex='-1'><div class='mcq-title' tabindex='0'><p>${text}</p></div><div data-choice-interaction='response1' class='mcq-horizontal'></div></div>`;
+    // Subjective
+    return `<div class='question-body' tabindex='-1'><p>${text}</p></div>`;
+  };
+
   const base: Record<string, any> = {
     name,
     mimeType:         'application/vnd.sunbird.question',
@@ -1010,55 +1131,92 @@ function buildQuestionBody(
     ...(taxonomy?.medium     && { medium:     taxonomy.medium }),
     ...(taxonomy?.gradeLevel && { gradeLevel: taxonomy.gradeLevel }),
     ...(taxonomy?.language   && { language:   taxonomy.language }),
-    // MTF has its own body format — overridden below for Match type
-    body:      type === 'Match'
-      ? `<div class='question-body' tabindex='-1'><div class='mtf-title' tabindex='0'><p>${text}</p></div><div data-match-interaction='response1' class='mtf-vertical'></div></div>`
-      : `<div class='question-body' tabindex='-1'><p>${text}</p></div>`,
+    body:      buildBody(),
     hints:     hint     ? [hint]     : undefined,
-    solutions: solution ? [solution] : undefined,
-    maxScore:  maxScore ?? 1,
+    solutions: solution ? { hint: solution } : {},
+    maxScore:  score,
   };
 
+  // ── MCQ ──────────────────────────────────────────────────────
   if (type === 'MCQ') {
-    const optionList = (options || '').split('|').map((o) => ({
-      label: o.trim(),
-      value: { body: `<p>${o.trim()}</p>` },
-    }));
+    const items = (options || '').split('|').map((o) => o.trim());
 
     // Find the 0-based index of the correct answer option
-    const correctIndex = optionList.findIndex(
-      (o) => o.label.toLowerCase() === (correctAnswer || '').toLowerCase()
+    const correctIndex = items.findIndex(
+      (o) => o.toLowerCase() === (correctAnswer || '').toLowerCase()
     );
+    const ci = correctIndex >= 0 ? correctIndex : 0;
 
     return {
       ...base,
       answer: correctAnswer,
       editorState: {
-        options: optionList,
-        question: text,
-        answer: correctAnswer,
+        question: `<p>${text}</p>`,
+        options:  items.map((o, i) => ({ value: { body: `<p>${o}</p>`, value: i } })),
       },
       interactions: {
         response1: {
-          type: 'choice',
-          options: optionList.map((o, i) => ({ label: o.label, value: i })),
+          type:       'choice',
+          options:    items.map((o, i) => ({ label: `<p>${o}</p>`, value: i })),
+          validation: { required: 'Yes' },
         },
-        validation: { required: 'Yes' },
       },
       responseDeclaration: {
         response1: {
-          cardinality: 'single',
-          type:        'integer',
-          correctResponse: { value: correctIndex >= 0 ? correctIndex : 0 },
-          mapping: [{ response: correctIndex >= 0 ? correctIndex : 0, outcomes: { score: maxScore ?? 1 } }],
+          cardinality:     'single',
+          type:            'integer',
+          correctResponse: { value: ci },
+          mapping:         [{ value: ci, score }],
         },
       },
       outcomeDeclaration: {
-        maxScore: { cardinality: 'single', type: 'integer', defaultValue: maxScore ?? 1 },
+        maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
       },
     };
   }
 
+  // ── Arrange Sequence ─────────────────────────────────────────
+  if (type === 'Arrange') {
+    // Options pipe-separated in CORRECT order: "1|3|2|4"
+    const items = (options || '').split('|').map((o) => o.trim());
+    const n = items.length;
+    const perScore = n > 0 ? parseFloat((score / n).toFixed(4)) : score;
+
+    // correctResponse is always [0, 1, 2 … n-1] — the user supplies items in the correct order
+    const correctSeq = items.map((_, i) => i);
+    const mapping    = items.map((_, i) => ({ value: i, score: perScore }));
+
+    const answerHtml = `<div class='answer-container'>${items.map((o) => `<div class='answer-body'><p>${o}</p></div>`).join('')}</div>`;
+
+    return {
+      ...base,
+      answer: answerHtml,
+      editorState: {
+        question: `<p>${text}</p>`,
+        options:  items.map((o, i) => ({ value: { body: `<p>${o}</p>`, value: i } })),
+      },
+      interactions: {
+        response1: {
+          type:       'order',
+          options:    items.map((o, i) => ({ label: `<p>${o}</p>`, value: i })),
+          validation: { required: 'Yes' },
+        },
+      },
+      responseDeclaration: {
+        response1: {
+          cardinality:     'ordered',
+          type:            'integer',
+          correctResponse: { value: correctSeq },
+          mapping,
+        },
+      },
+      outcomeDeclaration: {
+        maxScore: { cardinality: 'ordered', type: 'integer', defaultValue: score },
+      },
+    };
+  }
+
+  // ── Match The Following ───────────────────────────────────────
   if (type === 'Match') {
     // Parse "Dog:Bark|Cat:Meow|Cow:Moo" → left/right arrays with index-based values
     const pairs = (options || '').split('|').map((p) => {
@@ -1066,23 +1224,18 @@ function buildQuestionBody(
       return { left: left?.trim() ?? '', right: right?.trim() ?? '' };
     });
 
-    // Platform format: separate left/right arrays, each item has label (HTML) and value (index)
     const leftOptions  = pairs.map((p, i) => ({ label: `<p>${p.left}</p>`,  value: i }));
     const rightOptions = pairs.map((p, i) => ({ label: `<p>${p.right}</p>`, value: i }));
+    const editorLeft   = pairs.map((p, i) => ({ value: { body: `<p>${p.left}</p>`,  value: i } }));
+    const editorRight  = pairs.map((p, i) => ({ value: { body: `<p>${p.right}</p>`, value: i } }));
 
-    // editorState uses a nested value wrapper
-    const editorLeft  = pairs.map((p, i) => ({ value: { body: `<p>${p.left}</p>`,  value: i } }));
-    const editorRight = pairs.map((p, i) => ({ value: { body: `<p>${p.right}</p>`, value: i } }));
-
-    // responseDeclaration: each left maps to its matching right index
     const correctResponse = pairs.map((_, i) => ({ left: i, right: [i] }));
-    const perPairScore    = pairs.length > 0 ? parseFloat((1 / pairs.length).toFixed(4)) : 1;
+    const perPairScore    = pairs.length > 0 ? parseFloat((score / pairs.length).toFixed(4)) : score;
     const mapping         = pairs.map((_, i) => ({
       value: { left: i, right: i },
       score: perPairScore,
     }));
 
-    // answer HTML — match-container format used by platform renderer
     const answerLeft  = pairs.map((p) => `<div class='left-option'><p>${p.left}</p></div>`).join('');
     const answerRight = pairs.map((p) => `<div class='right-option'><p>${p.right}</p></div>`).join('');
     const answer = `<div class='match-container'><div class='left-options'>${answerLeft}</div><div class='right-options'>${answerRight}</div></div>`;
@@ -1096,8 +1249,8 @@ function buildQuestionBody(
       },
       interactions: {
         response1: {
-          type:    'match',
-          options: { left: leftOptions, right: rightOptions },
+          type:       'match',
+          options:    { left: leftOptions, right: rightOptions },
           validation: { required: 'Yes' },
         },
       },
@@ -1110,34 +1263,22 @@ function buildQuestionBody(
         },
       },
       outcomeDeclaration: {
-        maxScore: {
-          cardinality:  'multiple',
-          type:         'integer',
-          defaultValue: maxScore ?? 1,
-        },
+        maxScore: { cardinality: 'multiple', type: 'integer', defaultValue: score },
       },
     };
   }
 
-  if (type === 'Arrange') {
-    const items = (options || '').split('|').map((o) => o.trim());
-    return {
-      ...base,
-      editorState: { question: text, options: items },
-      interactions: {
-        response1: {
-          type:    'order',
-          options: items.map((label, i) => ({ label, value: i })),
-          validation: { required: 'Yes' },
-        },
-      },
-    };
-  }
-
-  // Subjective — no interactions, no responseDeclaration
+  // ── Subjective ────────────────────────────────────────────────
+  // answer is required by the platform — use provided answer or '-' as placeholder
+  const subjectiveAnswer = solution || correctAnswer || '-';
   return {
     ...base,
-    editorState: { question: text },
+    answer: subjectiveAnswer,
+    editorState: { question: `<p>${text}</p>` },
+    responseDeclaration: {},
+    outcomeDeclaration: {
+      maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
+    },
   };
 }
 

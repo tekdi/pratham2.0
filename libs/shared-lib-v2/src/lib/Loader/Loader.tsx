@@ -47,10 +47,9 @@ export const Loader: React.FC<LoaderProps> = memo(
           {..._childrenBox}
           sx={{
             width: '100%',
-            overflowY: 'auto',
             display: isLoading ? 'none' : 'block',
-            ...(isLoading || !isHideMaxHeight
-              ? { height: `calc(100vh - ${layoutHeight}px)` }
+            ...(!isHideMaxHeight
+              ? { minHeight: `calc(100vh - ${layoutHeight}px)` }
               : {}),
             ..._children,
           }}

@@ -12,6 +12,8 @@ export interface ContentRow {
   /** Internal temp ID e.g. TEMP_CONTENT_1 */
   tempId: string;
   name: string;
+  /** Title of the content in English (optional, from form-read englishName field) */
+  englishName?: string;
   description?: string;
   primaryCategory: string;
   /** pos-framework | scp-framework */
@@ -29,16 +31,15 @@ export interface ContentRow {
   contentLanguage?: string;
   program?: string;
   keywords?: string;
-  license?: string;
-  copyright?: string;
-  copyrightYear?: string;
+  /** Google Drive URL for the thumbnail/app icon image */
+  appIconUrl?: string;
   author?: string;
   /** Name of the content creator (platform `creator` field, shown in Creator column) */
   creator?: string;
-  /** Public Google Drive share URL */
+  /** Google Drive share URL or YouTube URL (for youtube file type) */
   driveUrl: string;
-  /** pdf | zip | mp4 | h5p */
-  fileType: 'pdf' | 'zip' | 'mp4' | 'h5p';
+  /** pdf | zip | mp4 | h5p | youtube */
+  fileType: 'pdf' | 'zip' | 'mp4' | 'h5p' | 'youtube';
   /** Resolved after creation */
   resolvedIdentifier?: string;
   status?: ImportItemStatus;
@@ -49,6 +50,8 @@ export interface ContentRow {
 export interface QuestionSetRow {
   tempId: string;
   name: string;
+  /** Title in English (optional, from form-read englishName field) */
+  englishName?: string;
   description?: string;
   primaryCategory: string;
   framework: FrameworkId;
@@ -57,6 +60,8 @@ export interface QuestionSetRow {
   gradeLevel?: string;
   domain?: string;
   subDomain?: string;
+  /** Google Drive URL for the thumbnail/app icon image */
+  appIconUrl?: string;
   // POS QS fields (from pos-channel form-read)
   targetAgeGroup?: string;
   primaryUser?: string;
@@ -102,8 +107,12 @@ export interface QuestionRow {
 export interface CourseRow {
   tempId: string;
   name: string;
+  /** Title in English (optional, from form-read englishName field) */
+  englishName?: string;
   description?: string;
   framework: FrameworkId;
+  /** Google Drive URL for the thumbnail/app icon image */
+  appIconUrl?: string;
   // POS course fields — form-read uses target*Ids with output:"identifier"
   // (no medium or gradeLevel for POS courses; same target*Ids pattern as SCP)
   targetDomainIds?: string;    // display name from Excel → resolved to identifier in queue
@@ -146,11 +155,18 @@ export interface CourseChildMappingRow {
 }
 
 export interface ExistingContentMappingRow {
-  /** e.g. EXISTING_CONTENT_1 */
+  /** e.g. TEMP_EXISTING_1 */
   tempId: string;
   /** Real platform identifier e.g. do_xxxx */
   existingIdentifier: string;
   entityType: 'content' | 'questionset';
+  /**
+   * Optional direct course mapping — if filled, the existing content is added
+   * to the specified course unit without needing a CourseChildrenMapping row.
+   */
+  courseTempId?: string;
+  unitName?: string;
+  sequence?: number;
 }
 
 // ─── Question Types ───────────────────────────────────────────
@@ -234,6 +250,7 @@ export interface ParsedImportData {
 export type JobType =
   | 'create_content'
   | 'upload_content_file'
+  | 'upload_app_icon'
   | 'review_content'
   | 'create_questionset'
   | 'create_question'

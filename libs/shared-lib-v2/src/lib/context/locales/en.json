@@ -310,7 +310,8 @@
       "LIFE": "Life",
       "PROGRAM": "Program",
       "ABOUT_US": "About Us",
-      "THEMATIC_REPOSITORY": "Thematic Repository"
+      "THEMATIC_REPOSITORY": "Thematic Repository",
+      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "Your response has been recorded",
@@ -467,6 +468,17 @@
       "COME_BACK_LATER": "Please come back later",
       "BACK_TO_PROGRAMS": "Back to Programs",
       "BACK_TO_DASHBOARD": "Back to Dashboard"
+    },
+    "FOOTER": {
+      "SHOW_FOOTER": "Show footer",
+      "HIDE_FOOTER": "Hide footer",
+      "APP_NAME": "Pratham myLearning",
+      "COPYRIGHT": "© {{year}} Pratham",
+      "USEFUL_LINKS": "Useful Links",
+      "DESCRIPTION": "Pratham addresses education-related gaps through innovative and cost-effective programs. We engage directly with children, schools, families, and communities, and also work in collaboration with government systems. In our direct programs, instructional and community-based activities are implemented by Pratham teams. Core elements such as technology, measurement and evaluation, and research underpin all our programs, ensuring effectiveness, scalability, and continuous improvement.",
+      "PRIVACY_GUIDELINES": "Privacy Guidelines",
+      "COOKIE_GUIDELINES": "Cookie Guidelines",
+      "PRAGYANPATH": "Pragyanpath (For Pratham Employees only)"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",

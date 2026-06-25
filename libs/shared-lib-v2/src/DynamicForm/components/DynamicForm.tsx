@@ -778,17 +778,26 @@ const DynamicForm = forwardRef(({
           },
         };
 
+        const addOwnPhoneCheckToUiSchema = (prevUiSchema) => {
+          const updated = { ...prevUiSchema, own_phone_check: ownPhoneCheckUiEntry };
+          if (Array.isArray(updated['ui:order']) && !updated['ui:order'].includes('own_phone_check')) {
+            const newOrder = [...updated['ui:order']];
+            const phoneTypeIndex = newOrder.indexOf('phone_type_accessible');
+            if (phoneTypeIndex !== -1) {
+              newOrder.splice(phoneTypeIndex + 1, 0, 'own_phone_check');
+            } else {
+              newOrder.push('own_phone_check');
+            }
+            updated['ui:order'] = newOrder;
+          }
+          return updated;
+        };
+
         // Add back to uiSchema
-        setFormUiSchema((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: ownPhoneCheckUiEntry,
-        }));
+        setFormUiSchema(addOwnPhoneCheckToUiSchema);
 
         // Add back to original uiSchema so it survives hide/show recalculations
-        setFormUiSchemaOriginal((prevUiSchema) => ({
-          ...prevUiSchema,
-          own_phone_check: ownPhoneCheckUiEntry,
-        }));
+        setFormUiSchemaOriginal(addOwnPhoneCheckToUiSchema);
       }
     }
   }, [formData]);
@@ -2001,7 +2010,7 @@ const DynamicForm = forwardRef(({
 
     const transformedFormData = transformFormData(
       cleanedData,
-      schema,
+      formSchema,
       extraFields
     );
 
@@ -2126,13 +2135,22 @@ const DynamicForm = forwardRef(({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Suppress enum errors for fields with no value selected (empty string / undefined)
+    updatedError = updatedError.filter((error) => {
+      if (error.name === 'enum') {
+        const fieldKey = error.property?.replace(/^\./, '');
+        const fieldValue = formData[fieldKey];
+        if (fieldValue === '' || fieldValue === null || fieldValue === undefined) {
+          return false;
+        }
+      }
+      return true;
+    });
     // Filter errors for UI display, but keep working_village errors for onSubmit handler
-    // Note: transformErrors affects UI display, but onSubmit receives original errors
     return updatedError.filter(
       (err) =>
         !err?.property?.startsWith?.('.catchment_area') &&
         !err?.property?.startsWith?.('.working_location')
-      // Don't filter working_village errors - we need them in onSubmit for toast
     );
     // console.log('########### issue debug updatedError 123 ', JSON.stringify(updatedError));
     // return updatedError;

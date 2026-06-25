@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
+  Button,
   Checkbox,
   FormControl,
   Grid,
@@ -38,7 +39,9 @@ export interface SearchBarProps {
   onSortChange?: (sortBy: string) => void;
   onStatusChange?: (status: string) => void;
   onStateChange?: (state: string) => void;
-
+  programOptions?: { code: string; name: string }[];
+  programValue?: string[];
+  onProgramChange?: (programs: string[]) => void;
   allContents?: boolean;
   discoverContents?: boolean;
   isPrimaryCategory?: boolean;
@@ -51,11 +54,15 @@ const sortOptions = SortOptions;
 const SearchBox: React.FC<SearchBarProps> = ({
   onSearch,
   value = '',
+  onClear,
   placeholder = 'Search...',
   onFilterChange,
   onSortChange,
   onStatusChange,
   onStateChange,
+  programOptions,
+  programValue = [],
+  onProgramChange,
   allContents = false,
   discoverContents = false,
   isPrimaryCategory = true,
@@ -67,6 +74,9 @@ const SearchBox: React.FC<SearchBarProps> = ({
   const theme = useTheme<any>();
   const tenantConfig = useTenantConfig();
   const [searchTerm, setSearchTerm] = useState(value);
+  useEffect(() => {
+    setSearchTerm(value);
+  }, [value]);
   // const sort: string =
   //   typeof router.query.sort === 'string' ? router.query.sort : 'Modified On';
 
@@ -103,6 +113,8 @@ const SearchBox: React.FC<SearchBarProps> = ({
       } catch (error) {
         console.error('Failed to parse filterOptions:', error);
       }
+    } else if (filterOption === undefined) {
+      setSelectedFilters(staticFilter && staticFilter.length > 0 ? staticFilter : []);
     }
   }, [filterOption]);
 
@@ -257,7 +269,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
   return (
     <Box sx={{ mx: 2 }}>
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={12} lg={6}>
+        <Grid item xs={12} md={12} lg={onClear ? 4 : 6}>
           <Box sx={{ mt: 2 }}>
             <Paper
               component="form"
@@ -301,7 +313,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
             item
             xs={12}
             md={12}
-            lg={allContents || discoverContents ? 2 : 3}
+            lg={allContents || discoverContents || (programOptions && programOptions.length > 0) ? 2 : 3}
             justifySelf={'end'}
           >
             <FormControl sx={{ width: '100%', mt: 2 }}>
@@ -380,7 +392,7 @@ const SearchBox: React.FC<SearchBarProps> = ({
           item
           xs={12}
           md={12}
-          lg={allContents || discoverContents ? 2 : 3}
+          lg={allContents || discoverContents || (programOptions && programOptions.length > 0) ? 2 : 3}
           justifySelf={'end'}
         >
           <FormControl sx={{ width: '100%', mt: 2 }}>
@@ -415,6 +427,76 @@ const SearchBox: React.FC<SearchBarProps> = ({
                 ))}
               </Select>
             </FormControl>
+          </Grid>
+        )}
+        {programOptions && programOptions.length > 0 && (
+          <Grid item xs={12} md={12} lg={2} justifySelf={'end'}>
+            <FormControl sx={{ width: '100%', mt: 2 }}>
+              <InputLabel sx={{ color: '#000000DB' }}>Filter By Program</InputLabel>
+              <Select
+                multiple
+                value={programValue}
+                onChange={(e) => {
+                  const val = e.target.value as string[];
+                  onProgramChange && onProgramChange(val);
+                }}
+                input={<OutlinedInput label="Filter By Program" />}
+                renderValue={(selected) =>
+                  (selected as string[])
+                    .map((code) => programOptions.find((o) => o.code === code)?.name || code)
+                    .join(', ')
+                }
+                MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+                sx={{
+                  '& .MuiSelect-select': {
+                    height: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
+                }}
+              >
+                {programOptions.map((option) => (
+                  <MenuItem key={option.code} value={option.code}
+                    sx={{
+                      color: '#000',
+                      '& .MuiCheckbox-root': {
+                        color: '#000',
+                        '&.Mui-checked, &.MuiCheckbox-indeterminate': { color: '#000' },
+                      },
+                      '& .MuiSvgIcon-root': { fontSize: '20px' },
+                    }}
+                  >
+                    <Checkbox
+                      checked={(programValue as string[]).indexOf(option.code) > -1}
+                      sx={{
+                        color: '#000',
+                        '&.Mui-checked, &.MuiCheckbox-indeterminate': { color: '#000' },
+                      }}
+                    />
+                    <ListItemText primary={option.name} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        )}
+        {onClear && (
+          <Grid item xs={12} md={12} lg={2} sx={{ display: 'flex', alignItems: 'flex-end' }}>
+            <Button
+              variant="text"
+              onClick={onClear}
+              sx={{
+                mt: 2,
+                color: '#BA1A1A',
+                fontWeight: 500,
+                textTransform: 'none',
+                fontSize: '14px',
+                whiteSpace: 'nowrap',
+                width: '100%',
+              }}
+            >
+              Clear Filters
+            </Button>
           </Grid>
         )}
         {/* {discoverContents && (

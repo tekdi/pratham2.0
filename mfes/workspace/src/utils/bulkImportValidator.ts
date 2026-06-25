@@ -25,6 +25,8 @@ import {
   SCP_CONTENT_COLUMNS,
   LOOKUP,
   ColumnDef,
+  POS_DOMAIN_TO_SUBDOMAINS,
+  POS_SUBDOMAIN_TO_SUBJECTS,
 } from './frameworkConfig';
 import { extractDriveFileId } from '../services/BulkImportService';
 
@@ -163,15 +165,53 @@ const validateContents = (
         `File type "${row.fileType}" is not valid. Allowed: ${VALID_FILE_TYPES.join(', ')}`, row.tempId));
     }
 
-    // Google Drive URL
+    // File/Content URL — Drive URL or YouTube URL
     if (row.driveUrl) {
-      if (!row.driveUrl.includes('drive.google.com') && !row.driveUrl.includes('docs.google.com')) {
-        errors.push(err('Content', rowNum, 'Google Drive URL*',
-          'URL must be a Google Drive share link (drive.google.com)', row.tempId));
-      } else if (!extractDriveFileId(row.driveUrl)) {
-        errors.push(err('Content', rowNum, 'Google Drive URL*',
-          'Could not extract file ID from Drive URL. Use format: https://drive.google.com/file/d/FILE_ID/view', row.tempId));
+      const isYoutube = row.fileType === 'youtube';
+      const isDrive = row.driveUrl.includes('drive.google.com') || row.driveUrl.includes('docs.google.com');
+      const isYoutubeUrl = row.driveUrl.includes('youtube.com') || row.driveUrl.includes('youtu.be');
+
+      if (isYoutube) {
+        if (!isYoutubeUrl) {
+          errors.push(err('Content', rowNum, 'File/Content URL*',
+            'File Type is "youtube" but the URL is not a YouTube link (youtube.com or youtu.be)', row.tempId));
+        }
+      } else {
+        if (!isDrive) {
+          errors.push(err('Content', rowNum, 'File/Content URL*',
+            'URL must be a Google Drive share link (drive.google.com) or YouTube URL for youtube file type', row.tempId));
+        } else if (!extractDriveFileId(row.driveUrl)) {
+          errors.push(err('Content', rowNum, 'File/Content URL*',
+            'Could not extract file ID from Drive URL. Use format: https://drive.google.com/file/d/FILE_ID/view', row.tempId));
+        }
       }
+    }
+
+    // Domain → Sub Domain → Subject association validation
+    if (row.domain && row.subDomain) {
+      const allowedSubDomains = POS_DOMAIN_TO_SUBDOMAINS[row.domain] ?? [];
+      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
+      const invalidSubs = selectedSubDomains.filter((sd) => allowedSubDomains.length > 0 && !allowedSubDomains.includes(sd));
+      if (invalidSubs.length > 0) {
+        errors.push(err('Content', rowNum, 'Sub Domain*',
+          `Sub Domain(s) "${invalidSubs.join(', ')}" do not belong to domain "${row.domain}". Allowed: ${allowedSubDomains.join(', ')}`,
+          row.tempId));
+      }
+    }
+    if (row.subDomain && row.subject) {
+      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
+      const selectedSubjects = row.subject.split('|').map((s) => s.trim());
+      selectedSubjects.forEach((subj) => {
+        const validForAny = selectedSubDomains.some((sd) => {
+          const allowed = POS_SUBDOMAIN_TO_SUBJECTS[sd] ?? [];
+          return allowed.length === 0 || allowed.includes(subj);
+        });
+        if (!validForAny) {
+          errors.push(err('Content', rowNum, 'Subject*',
+            `Subject "${subj}" does not belong to any of the selected Sub Domain(s). Check the domain/sub-domain associations.`,
+            row.tempId));
+        }
+      });
     }
 
     // Name length
@@ -216,9 +256,16 @@ const validateQuestionSets = (
       seenIds.add(row.tempId);
     }
 
-    if (row.maxAttempts !== undefined && (isNaN(Number(row.maxAttempts)) || Number(row.maxAttempts) < 1)) {
-      errors.push(err('QuestionSets', rowNum, 'Max Attempts',
-        'Max Attempts must be a positive integer', row.tempId));
+    // Domain → Sub Domain → Subject association validation (POS QS)
+    if (row.domain && row.subDomain) {
+      const allowedSubDomains = POS_DOMAIN_TO_SUBDOMAINS[row.domain] ?? [];
+      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
+      const invalidSubs = selectedSubDomains.filter((sd) => allowedSubDomains.length > 0 && !allowedSubDomains.includes(sd));
+      if (invalidSubs.length > 0) {
+        errors.push(err('QuestionSets', rowNum, 'Sub Domain*',
+          `Sub Domain(s) "${invalidSubs.join(', ')}" do not belong to domain "${row.domain}". Allowed: ${allowedSubDomains.join(', ')}`,
+          row.tempId));
+      }
     }
 
     if (row.assessmentType && !VALID_ASSESSMENT_TYPES.includes(row.assessmentType)) {
@@ -390,9 +437,11 @@ const validateCourseMappings = (
 
 const validateExistingMappings = (
   mappings: ExistingContentMappingRow[],
+  courses: CourseRow[],
   errors: ValidationError[]
 ) => {
   const seenIds = new Set<string>();
+  const courseTempIds = new Set(courses.map((c) => c.tempId));
 
   mappings.forEach((row, idx) => {
     const rowNum = idx + 2;
@@ -420,6 +469,22 @@ const validateExistingMappings = (
     if (row.entityType && !VALID_CHILD_TYPES.includes(row.entityType)) {
       errors.push(err('ExistingContentMapping', rowNum, 'Entity Type*',
         `Entity type "${row.entityType}" must be: ${VALID_CHILD_TYPES.join(' or ')}`));
+    }
+
+    // Validate direct course mapping fields (if Course Temp ID is provided)
+    if (row.courseTempId) {
+      if (!courseTempIds.has(row.courseTempId)) {
+        errors.push(err('ExistingContentMapping', rowNum, 'Course Temp ID',
+          `Course "${row.courseTempId}" not found in the Courses sheet`));
+      }
+      if (!row.unitName) {
+        errors.push(err('ExistingContentMapping', rowNum, 'Unit Name',
+          '"Unit Name" is required when "Course Temp ID" is filled'));
+      }
+      if (row.sequence !== undefined && (isNaN(Number(row.sequence)) || Number(row.sequence) < 1)) {
+        errors.push(err('ExistingContentMapping', rowNum, 'Sequence',
+          'Sequence must be a positive integer'));
+      }
     }
   });
 };
@@ -452,7 +517,7 @@ export const validateImportData = (data: ParsedImportData): ValidationResult => 
     data.existingMappings,
     errors
   );
-  validateExistingMappings(data.existingMappings, errors);
+  validateExistingMappings(data.existingMappings, data.courses, errors);
 
   const hardErrors = errors.filter((e) => e.severity === 'error');
   const warnings   = errors.filter((e) => e.severity === 'warning');

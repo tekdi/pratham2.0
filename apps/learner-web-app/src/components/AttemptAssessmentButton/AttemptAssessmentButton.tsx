@@ -42,6 +42,12 @@ const AttemptAssessmentButton: React.FC = () => {
       return;
     }
 
+    const cohortAssignedToAnyAcademicYearId = localStorage.getItem('cohortAssignedToAnyAcademicYearId');
+    if (cohortAssignedToAnyAcademicYearId) {
+      setShowButton(false);
+      return;
+    }
+
     const targetProgramName = userProgram;
     const programFilter =
       targetProgramName === TenantName.SECOND_CHANCE_PROGRAM
