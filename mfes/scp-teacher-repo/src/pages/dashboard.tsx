@@ -989,6 +989,17 @@ const Dashboard: React.FC<DashboardProps> = () => {
     undefined,
     classId
   );
+
+  const attendanceEventDates = useEventDates(
+    userId,
+    'userId',
+    dashboardDaysLimit,
+    selectedDate,
+    eventUpdated,
+    eventDeleted,
+    undefined,
+    classId
+  );
   useEffect(() => {
     console.log(eventDates);
   }, [eventDates]);
@@ -1148,6 +1159,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
                               disableDays={classId === 'all'}
                               classId={classId}
                               newWidth={'1840px'}
+                              eventData={attendanceEventDates}
+                              showEventIcon={false}
                             />
                           </Box>
                           <Box
