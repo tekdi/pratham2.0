@@ -637,14 +637,14 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         onClose={() => {
           setAssessmentUnavailableModal(false);
           onClose();
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
         showFooter={true}
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
           onClose();
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
       >
         <Box p="10px">

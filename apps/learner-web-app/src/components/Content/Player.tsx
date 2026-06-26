@@ -363,6 +363,8 @@ const App = ({
 
   // Get program value from subdomain or domain
   const getProgramValue = () => {
+    return 'prathamopenschool';
+    
     if (typeof window === 'undefined') {
       return '';
     }
