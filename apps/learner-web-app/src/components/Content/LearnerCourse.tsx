@@ -280,7 +280,7 @@ export default memo(function LearnerCourse({
                 sx: {
                   py: 2,
                   px: 2,
-                  height: 'calc(100vh - 130px)',
+                  height: 'calc(100vh - 200px)',
                   overflowY: 'auto',
                 },
               },

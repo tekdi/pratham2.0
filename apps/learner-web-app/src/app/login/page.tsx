@@ -55,31 +55,57 @@ export const checkRegistrationTestStatus = async (
   const storedUserId = localStorage.getItem('userId');
   if (!storedUserId) return 'clear';
 
+  // User just completed enrollment — skip assessment popup
+  if (localStorage.getItem('onboardTenantId')) {
+    return 'clear';
+  }
+
   try {
     
 
     if (tenantDataDetails?.[0]?.tenantType !== 'elearning') {
       const academicYearList = await getAcademicYear();
-    const activeAcademicYear = Array.isArray(academicYearList)
+    const allAcademicYearIds = Array.isArray(academicYearList)
+      ? academicYearList
+          .map((year: { id?: string; isActive?: boolean }) => year?.id)
+          .filter(Boolean)
+      : [];
+const activeAcademicYear = Array.isArray(academicYearList)
       ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
-      : undefined;
-
+      : undefined
     if (activeAcademicYear?.id) {
       localStorage.setItem('academicYearId', activeAcademicYear.id);
     }
-      const cohortResponse = await getCohortList(storedUserId, true, true);
-      const userHasActiveBatch = Array.isArray(cohortResponse?.result)
-        ? cohortResponse.result.some(
-            (cohort: {
-              type?: string;
-              cohortStatus?: string;
-              cohortMemberStatus?: string;
-            }) =>
-              cohort?.type === 'BATCH' &&
-              cohort?.cohortStatus === 'active' &&
-              cohort?.cohortMemberStatus === 'active'
-          )
-        : false;
+      let userHasActiveBatch = false;
+
+      for (const yearId of allAcademicYearIds) {
+        localStorage.setItem('academicYearId', yearId as string);
+        const cohortResponse = await getCohortList(storedUserId, true, true);
+        const hasBatch = Array.isArray(cohortResponse?.result)
+          ? cohortResponse.result.some(
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
+                cohort?.type === 'BATCH' &&
+                cohort?.cohortStatus === 'active' &&
+                cohort?.cohortMemberStatus === 'active'
+            )
+          : false;
+        if (hasBatch) {
+          userHasActiveBatch = true;
+                    localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+
+          break;
+        }
+        
+      }
+
+      // Restore active academic year after iterating all IDs
+      if (activeAcademicYear?.id) {
+        localStorage.setItem('academicYearId', activeAcademicYear.id);
+      }
 
       if (userHasActiveBatch) {
         return 'clear';
@@ -388,7 +414,22 @@ const LoginPageContent = () => {
           if (enrolledTenant?.collectionFramework) localStorage.setItem('collectionFramework', enrolledTenant.collectionFramework);
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
           await profileComplitionCheck();
+
+          const assessmentStatus = await checkRegistrationTestStatus(
+            uiConfig,
+            enrolledTenant.tenantName,
+            [enrolledTenant]
+          );
           setLoading(false);
+          if (assessmentStatus === 'assessmentPending') {
+            localStorage.setItem('registerationTestGiven', 'No');
+            setAssessmentPendingModal(true);
+            return;
+          } else if (assessmentStatus === 'assessmentUnavailable') {
+            setAssessmentUnavailableModal(true);
+            return;
+          }
+
            if(localStorage.getItem('isAndroidApp') == 'yes' && window.ReactNativeWebView)
             {
             //  let refreshToken = localStorage.getItem('refreshTokenForAndroid');
@@ -620,6 +661,7 @@ const LoginPageContent = () => {
           }
           // Redirect to landing page
           else if (assessmentStatus === 'assessmentUnavailable') {
+            setLoading(false);
             setAssessmentUnavailableModal(true);
             return;
           }
@@ -868,9 +910,19 @@ const LoginPageContent = () => {
         secondaryActionHandler={() => {
           setAssessmentPendingModal(false);
           localStorage.setItem('registerationTestGiven', 'Yes');
-          const landingPage = localStorage.getItem('landingPage') || '/home';
+          if(localStorage.getItem('isAndroidApp') == 'yes')
+            {
+                          router.push(`/programs`);
+                                    window.location.href = `/programs`;
+
+
+            }
+            else{
+                const landingPage = localStorage.getItem('landingPage') || '/home';
           window.location.href = landingPage;
-        }}
+   
+            }
+              }}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
@@ -881,10 +933,16 @@ const LoginPageContent = () => {
 
       <SimpleModal
         open={assessmentUnavailableModal}
-        onClose={() => setAssessmentUnavailableModal(false)}
+        onClose={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         showFooter={true}
         primaryText={t('COMMON.OK')}
-        primaryActionHandler={() => setAssessmentUnavailableModal(false)}
+        primaryActionHandler={() => {
+          setAssessmentUnavailableModal(false);
+          router.push('/scp-dashboard');
+        }}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">

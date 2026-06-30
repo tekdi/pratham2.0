@@ -13,6 +13,7 @@ import { Box, Typography } from '@mui/material';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
+import { getCohortList } from '@learner/utils/API/CohortService';
 import { useTranslation } from '@shared-lib';
 declare global {
   interface Window {
@@ -104,6 +105,51 @@ const EnrollProfileCompletionInner = () => {
       console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
 
       if (isRegisterationTestEnabled) {
+        // Check if user already has an active batch across all academic years
+        try {
+          const academicYearList = await getAcademicYear();
+          const allAcademicYearIds = Array.isArray(academicYearList)
+            ? academicYearList
+                .map((year: { id?: string; isActive?: boolean }) => year?.id)
+                .filter(Boolean)
+            : [];
+          const activeAcademicYear = Array.isArray(academicYearList)
+            ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+            : undefined;
+
+          let userHasActiveBatch = false;
+          for (const yearId of allAcademicYearIds) {
+            localStorage.setItem('academicYearId', yearId as string);
+            const cohortResponse = await getCohortList(storedUserId!, true, true);
+            const hasBatch = Array.isArray(cohortResponse?.result)
+              ? cohortResponse.result.some(
+                  (cohort: { type?: string; cohortStatus?: string; cohortMemberStatus?: string }) =>
+                    cohort?.type === 'BATCH' &&
+                    cohort?.cohortStatus === 'active' &&
+                    cohort?.cohortMemberStatus === 'active'
+                )
+              : false;
+            if (hasBatch) {
+              userHasActiveBatch = true;
+                            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+
+              break;
+            }
+            
+          }
+
+          if (activeAcademicYear?.id) {
+            localStorage.setItem('academicYearId', activeAcademicYear.id);
+          }
+
+          if (userHasActiveBatch) {
+            setSignupSuccessModal(true);
+            return;
+          }
+        } catch (error) {
+          console.error('Batch check failed in enroll-profile-completion:', error);
+        }
+
         try {
           const preferredLanguage = localStorage.getItem('preferred_language');
           const response = await ContentSearch({
@@ -224,6 +270,7 @@ const EnrollProfileCompletionInner = () => {
           console.log('Web path - navigating to:', landingPage || '/home');
           localStorage.removeItem('enrollTenantId');
           localStorage.removeItem('temp_program_type');
+          localStorage.removeItem('onboardTenantId');
           // Use window.location.href to avoid remounting EditProfile before navigation completes
           window.location.href = landingPage || '/home';
       }
@@ -295,16 +342,49 @@ const EnrollProfileCompletionInner = () => {
         // setSignupSuccessModal(false);
         }
         else{
+    localStorage.removeItem('onboardTenantId');
     const finalLandingPage = localStorage.getItem('landingPage') || '/home';
     window.location.href = finalLandingPage;
         }
   };
 
-  const onAssessmentUnavailableOk = () => {
+  const onAssessmentUnavailableOk = async () => {
     setAssessmentUnavailableModal(false);
-    setTimeout(() => {
-      window.location.href = '/scp-dashboard';
-    }, 100);
+    localStorage.removeItem('enrollTenantId');
+
+    try {
+      const storedUserId = localStorage.getItem('userId');
+      const storedRoleId = localStorage.getItem('roleId');
+      const enrollTenantId = localStorage.getItem('tenantId');
+      const uiConfigRaw = localStorage.getItem('uiConfig');
+      const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
+      const userTenantStatus = uiConfig?.isTenantPendingStatus;
+
+      if (storedUserId && storedRoleId && enrollTenantId) {
+        if (userTenantStatus) {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
+        } else {
+          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
+        }
+        if (userTenantStatus) {
+          try {
+            await updateUser(storedUserId, {
+              userData: {},
+              customFields: [{
+                fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+                value: 'pending',
+              }],
+            });
+          } catch (updateError) {
+            console.error('Failed to update pending custom field:', updateError);
+          }
+        }
+      }
+    } catch (enrollError) {
+      console.error('Enrollment failed on assessment unavailable:', enrollError);
+    }
+
+    window.location.href = '/scp-dashboard';
   };
 
   const handleStartAssessment = async () => {
