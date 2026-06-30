@@ -384,6 +384,33 @@ export const readQuestionSetFormDefinition = async (
 // ─── GOOGLE DRIVE DOWNLOAD PROXY ─────────────────────────────
 
 /**
+ * Pre-flight check: verify a Google Drive URL is publicly accessible
+ * WITHOUT downloading the file, and return the actual MIME type.
+ *
+ * Returns { mimeType } on success.
+ * Throws a user-readable error if the file is inaccessible so the caller
+ * can abort before creating any platform node.
+ *
+ * YouTube URLs skip this check entirely (caller's responsibility).
+ */
+export const checkDriveFileAccessible = async (
+  driveUrl: string
+): Promise<{ mimeType: string }> => {
+  const response = await axios.post(
+    `/api/bulk-import/check-drive-file`,
+    { driveUrl },
+    { timeout: 25_000, validateStatus: () => true }
+  );
+
+  if (response.data?.accessible === false || response.status >= 400) {
+    const msg = response.data?.error || 'Google Drive file is not accessible.';
+    throw new Error(`Drive file check failed: ${msg}`);
+  }
+
+  return { mimeType: response.data?.mimeType || 'application/octet-stream' };
+};
+
+/**
  * Download a Google Drive public file through our Next.js API proxy
  * to avoid CORS issues
  * Returns an ArrayBuffer
