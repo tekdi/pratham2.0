@@ -1050,7 +1050,7 @@ console.log('result=====>', result);
         open={assessmentPendingModal}
         onClose={() => setAssessmentPendingModal(false)}
         showFooter={true}
-        primaryText={t('ggg')}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
           if (pendingAssessmentIdentifier) {
