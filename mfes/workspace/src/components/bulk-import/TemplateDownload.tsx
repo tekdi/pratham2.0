@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import {
   Box, Typography, Button, Card, CardContent,
   List, ListItem, ListItemIcon, ListItemText, Divider, Chip, Alert,
+  Stack,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -84,8 +85,13 @@ const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
   // Template API lives in the host admin app (same domain, no basePath prefix).
   // The `t` timestamp param busts the browser's download cache on every visit.
   const fwLabel = framework === 'scp-framework' ? 'SCP' : 'POS';
-  const templateFileName = `Bulk_Import_Template_${fwLabel}.xlsx`;
-  const templateUrl = `/api/bulk-import/template?framework=${framework}&t=${Date.now()}`;
+  const ts = Date.now();
+  const templateUrl        = `/api/bulk-import/template?framework=${framework}&type=all&t=${ts}`;
+  const contentUrl         = `/api/bulk-import/template?framework=${framework}&type=content&t=${ts}`;
+  const questionSetUrl     = `/api/bulk-import/template?framework=${framework}&type=questionset&t=${ts}`;
+  const templateFileName        = `Bulk_Import_Template_${fwLabel}.xlsm`;
+  const contentFileName         = `Bulk_Import_Template_${fwLabel}_Content.xlsm`;
+  const questionSetFileName     = `Bulk_Import_Template_${fwLabel}_QuestionSet.xlsm`;
 
   return (
     <Box>
@@ -120,54 +126,101 @@ const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
         </Box>
       </Alert>
 
-      {/* Template Download Card */}
-      <Card
-        variant="outlined"
-        sx={{
-          mb: 3,
-          borderColor: 'primary.main',
-          borderWidth: 1.5,
-          borderRadius: 2,
-          background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF3E0 100%)',
-        }}
-      >
-        <CardContent>
-          <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
-            <Box>
-              <Typography fontWeight={600} variant="subtitle1">
-                {templateFileName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                8 sheets · Sample data included · All dropdown validations built-in
-              </Typography>
-              <Box display="flex" gap={0.8} mt={1} flexWrap="wrap">
-                <Chip label={framework} size="small" color={framework === 'scp-framework' ? 'info' : 'warning'} />
-                {['Content', 'QuestionSets', 'Courses', 'Dropdowns ✓'].map((s) => (
-                  <Chip key={s} label={s} size="small" variant="outlined" />
-                ))}
-              </Box>
+      {/* Template Download Cards */}
+      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
+        Download template — choose what you need
+      </Typography>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mb: 3 }}>
+
+        {/* Content only */}
+        <Card
+          variant="outlined"
+          sx={{ flex: 1, borderRadius: 2, borderColor: '#E0E0E0', background: '#FAFAFA' }}
+        >
+          <CardContent sx={{ pb: '12px !important' }}>
+            <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+              <ArticleOutlinedIcon color="primary" fontSize="small" />
+              <Typography fontWeight={600} variant="body2">Content only</Typography>
             </Box>
+            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              PDF, ZIP, MP4, H5P, YouTube · 1 sheet
+            </Typography>
             <Button
+              fullWidth
+              variant="outlined"
+              size="small"
+              startIcon={<DownloadIcon />}
+              href={contentUrl}
+              download={contentFileName}
+              sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+            >
+              Download
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* QuestionSet + Questions */}
+        <Card
+          variant="outlined"
+          sx={{ flex: 1, borderRadius: 2, borderColor: '#E0E0E0', background: '#FAFAFA' }}
+        >
+          <CardContent sx={{ pb: '12px !important' }}>
+            <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+              <QuizOutlinedIcon color="primary" fontSize="small" />
+              <Typography fontWeight={600} variant="body2">QuestionSet + Questions</Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              MCQ, Arrange, Match, Subjective · 2 sheets
+            </Typography>
+            <Button
+              fullWidth
+              variant="outlined"
+              size="small"
+              startIcon={<DownloadIcon />}
+              href={questionSetUrl}
+              download={questionSetFileName}
+              sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
+            >
+              Download
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Full template */}
+        <Card
+          variant="outlined"
+          sx={{
+            flex: 1, borderRadius: 2,
+            borderColor: 'primary.main', borderWidth: 1.5,
+            background: 'linear-gradient(135deg, #FFF8F0 0%, #FFF3E0 100%)',
+          }}
+        >
+          <CardContent sx={{ pb: '12px !important' }}>
+            <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+              <TableChartOutlinedIcon color="primary" fontSize="small" />
+              <Typography fontWeight={600} variant="body2">Full template</Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary" display="block" mb={1}>
+              Content + QuestionSets + Courses · 8 sheets
+            </Typography>
+            <Button
+              fullWidth
               variant="contained"
+              size="small"
               startIcon={<DownloadIcon />}
               href={templateUrl}
               download={templateFileName}
-              sx={{
-                px: 3, py: 1.2,
-                fontWeight: 600,
-                textTransform: 'none',
-                borderRadius: 2,
-              }}
+              sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 1.5 }}
             >
-              Download Template
+              Download
             </Button>
-          </Box>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </Stack>
 
       {/* Sheets overview */}
       <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
-        Template Sheets (8 total)
+        What each sheet contains
       </Typography>
       <Box
         display="grid"
