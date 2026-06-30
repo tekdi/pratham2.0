@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Alert, Box, Typography } from '@mui/material';
+import { Alert, Box, Grid, Typography } from '@mui/material';
 import Layout from '../../components/Layout';
 import UserProfileCard from '@learner/components/UserProfileCard/UserProfileCard';
 import CourseCertificateCard from '@learner/components/CourseCertificateCard/CourseCertificateCard';
@@ -81,110 +81,51 @@ const ProfilePage = () => {
   console.log('courseData', courseData);
   return (
     <Layout>
-      <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={2}>
-        {/* User Profile Card */}
-        <Box
-          sx={{
-            flexShrink: 0,
-            width: { xs: '100%', md: courseData.length === 0   ?'100%':'530px' },
-            mb: { xs: 2, md: 0 },
-          }}
-        >
-           {courseData.length === 0 ?
-          (<UserProfileCard maxWidth='100%' />):
-          (<UserProfileCard  />)
-           }
-        </Box>
+      <Grid container spacing={2}>
+        {/* User Profile Card — 4 cols always (12 only if right panel is hidden) */}
+        <Grid item xs={12} md={4}>
+          <UserProfileCard />
+        </Grid>
 
-        {/* Certificates Section */}
-      {/* {typeof window !== "undefined" && localStorage.getItem('userProgram') === "YouthNet" ? (
-  <Box flexGrow={1} p={2}>
-    <Typography color={'#78590C'}>{tenantName}</Typography>
-    
+        {/* Certificates Section — always visible at 8 cols */}
+        <Grid item xs={12} md={8}>
+          <Box p={1}>
+            <Typography color={'#78590C'}>{tenantName}</Typography>
+            <Typography color={'#78590C'}>
+              Completed Courses & Certificates
+            </Typography>
 
-    <Typography color={'#78590C'}>
-      Completed Courses & Certificates
-    </Typography>
+            {courseData.length === 0 && (
+              <Box display="flex" alignItems="center" p="20px">
+                <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
+                <Typography>Certification has not been completed yet.</Typography>
+              </Box>
+            )}
 
-    {courseData.length === 0 && (
-      <Box display="flex" alignItems="center" p="20px">
-        <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
-        <Typography>Certification has not been completed yet.</Typography>
-      </Box>
-    )}
-
-    <Box
-      mt="20px"
-      display="grid"
-      gridTemplateColumns={{
-        xs: '1fr',
-        sm: '1fr 1fr',
-        md: '1fr 1fr',
-        lg: '1fr 1fr 1fr',
-        xl: '1fr 1fr 1fr 1fr',
-      }}
-      gap={1}
-    >
-      {courseData.length !== 0 &&
-        courseData?.map((cert: any, index: any) => (
-          <CourseCertificateCard
-            key={index}
-            title={cert.program}
-            description={cert.description}
-            imageUrl={cert.posterImage}
-            completionDate={cert.completedOn}
-            onPreviewCertificate={() => handlePreview(cert.certificateId)}
-          />
-        ))}
-    </Box>
-  </Box>
-) : null} */}
- <Box flexGrow={1} p={1}>
-    <Typography color={'#78590C'}>{tenantName}</Typography>
-    
-
-    <Typography color={'#78590C'}>
-      Completed Courses & Certificates
-    </Typography>
-
-    {courseData.length === 0 && (
-      <Box display="flex" alignItems="center" p="20px">
-        <InfoIcon color="info" sx={{ color: '#FDBE16', mr: 1 }} />
-        <Typography>Certification has not been completed yet.</Typography>
-      </Box>
-    )}
-
-    <Box
-      mt="20px"
-      display="grid"
-      gridTemplateColumns={{
-        xs: '1fr 1fr',
-        sm: '1fr 1fr',
-        md: '1fr 1fr 1fr',
-        lg: '1fr 1fr 1fr 1fr',
-        xl: '1fr 1fr 1fr 1fr 1fr',
-      }}
-      p={'5px'}
-      gap={2}
-      sx={{
-        '& > *': {
-          margin: '0 !important',
-          padding: '0 !important'
-        }
-      }}
-    >
-      {courseData.length !== 0 &&
-        courseData?.map((cert: any, index: any) => (
-          <CourseCertificateCard
-            key={index}
-            certificateData={cert}
-            onPreviewCertificate={() => handlePreview(cert.certificateId)}
-          />
-        ))}
-    </Box>
-  </Box>
-
-      </Box>
+            <Box
+              mt="20px"
+              display="grid"
+              gridTemplateColumns={{
+                xs: '1fr 1fr',
+                sm: '1fr 1fr',
+                md: '1fr 1fr',
+                lg: '1fr 1fr 1fr',
+                xl: '1fr 1fr 1fr 1fr',
+              }}
+              gap={2}
+              sx={{ '& > *': { margin: '0 !important', padding: '0 !important' } }}
+            >
+              {courseData.map((cert: any, index: any) => (
+                <CourseCertificateCard
+                  key={index}
+                  certificateData={cert}
+                  onPreviewCertificate={() => handlePreview(cert.certificateId)}
+                />
+              ))}
+            </Box>
+          </Box>
+        </Grid>
+      </Grid>
       <CertificateModal
         certificateId={certificateId?.toString()}
         open={showCertificate}

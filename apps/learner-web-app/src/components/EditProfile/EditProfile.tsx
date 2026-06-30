@@ -278,6 +278,14 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
              alterSchema.required.pop('own_phone_check');
             }
           }
+          if(alterSchema.properties.own_phone_check && mappedData?.phone_type_accessible === 'nophone')
+          {
+            delete alterSchema.properties.own_phone_check;
+            delete alterUISchema.own_phone_check;
+            if(Array.isArray(alterSchema.required) && alterSchema.required.includes('own_phone_check')){
+              alterSchema.required = alterSchema.required.filter((f: string) => f !== 'own_phone_check');
+            }
+          }
        //   If enrolledProgram + completeProfile and there are no required fields left,
           // the profile is already complete — skip the form and proceed directly.
           if (enrolledProgram && completeProfile && (!alterSchema?.required || alterSchema.required.length === 0)) {

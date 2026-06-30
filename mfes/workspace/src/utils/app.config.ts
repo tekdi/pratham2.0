@@ -13,6 +13,7 @@ export const MIME_TYPE = {
     'video/youtube',
     'audio/mp3',
     'audio/wav',
+    'audio/mpeg',
   ],
   QUESTIONSET_MIME_TYPE: 'application/vnd.sunbird.questionset',
   COURSE_MIME_TYPE: 'application/vnd.ekstep.content-collection',

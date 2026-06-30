@@ -398,7 +398,7 @@ Tracks learner enrollment stages for board exams.
 |------|-----------|--------|
 | PDF Document | `application/pdf` | SunbirdPdfPlayer |
 | Video | `video/mp4`, `video/webm` | SunbirdVideoPlayer |
-| Audio | `audio/mp3`, `audio/wav` | SunbirdVideoPlayer |
+| Audio | `audio/mp3`, `audio/wav`, `audio/mpeg` | SunbirdVideoPlayer |
 | ePub Book | `application/epub` | SunbirdEpubPlayer |
 | YouTube Video | `video/x-youtube` | V1Player |
 | Interactive (ECML) | `application/vnd.ekstep.ecml-archive` | V1Player |
