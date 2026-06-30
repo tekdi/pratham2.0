@@ -79,7 +79,6 @@ export default function RootLayout({
                     <GoogleAnalyticsTracker />
 
             <MuiThemeProvider>{children}</MuiThemeProvider>
-            <FooterWrapper />
           </MuiThemeProviderWithLanguage>
           <ToastContainer />
         </ClientLayout>
