@@ -93,63 +93,15 @@ export const Footer: React.FC = () => {
           zIndex: 1100,
           backgroundColor: '#f3f3f3',
           boxShadow: isExpanded ? '0 -2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+          // iOS Safari caches touch hit-test areas for fixed elements and doesn't
+          // update them after internal layout changes (e.g. Collapse animation).
+          // Forcing a GPU compositing layer causes iOS to correctly re-map touch
+          // targets after the Collapse opens/closes, fixing the "Hide footer"
+          // button being untappable until a scroll occurs.
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: FOOTER_STRIP_HEIGHT,
-            px: { xs: 2, md: '56px' },
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            backgroundColor: '#f3f3f3',
-          }}
-        >
-          <Box
-            sx={{
-              flex: 1,
-              minWidth: 0,
-              pr: 2,
-              display: { xs: 'none', md: 'block' },
-            }}
-          >
-            {copyrightNotice}
-          </Box>
-        
-
-          <ButtonBase
-            onClick={toggleFooter}
-            aria-expanded={isExpanded}
-            aria-controls="pos-footer-content"
-            aria-label={isExpanded ? t('Hide footer') : t('Show footer')}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              flexShrink: 0,
-              ml: { xs: 'auto', md: 0 },
-              borderRadius: 1,
-              px: 1,
-              py: 0.5,
-              color: '#1F1B13',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {isExpanded ? t('Hide footer') : t('Show footer')}
-            </Typography>
-            {isExpanded ? (
-              <KeyboardArrowUp fontSize="small" />
-            ) : (
-              <KeyboardArrowDown fontSize="small" />
-            )}
-          </ButtonBase>
-        </Box>
-
         <Collapse in={isExpanded}>
           <Box
             id="pos-footer-content"
@@ -346,6 +298,60 @@ export const Footer: React.FC = () => {
             </Grid>
           </Box>
         </Collapse>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: FOOTER_STRIP_HEIGHT,
+            px: { xs: 2, md: '56px' },
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: '#f3f3f3',
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              pr: 2,
+              display: { xs: 'none', md: 'block' },
+            }}
+          >
+            {copyrightNotice}
+          </Box>
+
+          <ButtonBase
+            onClick={toggleFooter}
+            aria-expanded={isExpanded}
+            aria-controls="pos-footer-content"
+            aria-label={isExpanded ? t('Hide footer') : t('Show footer')}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexShrink: 0,
+              ml: { xs: 'auto', md: 0 },
+              borderRadius: 1,
+              px: 1,
+              py: 0.5,
+              color: '#1F1B13',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {isExpanded ? t('Hide footer') : t('Show footer')}
+            </Typography>
+            {isExpanded ? (
+              <KeyboardArrowUp fontSize="small" />
+            ) : (
+              <KeyboardArrowDown fontSize="small" />
+            )}
+          </ButtonBase>
+        </Box>
       </Box>
     </>
   );

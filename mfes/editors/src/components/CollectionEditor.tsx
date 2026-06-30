@@ -168,6 +168,17 @@ const CollectionEditor: React.FC = () => {
     },
   };
 
+  const getReturnPage = () => {
+    try {
+      const previousPageUrl = sessionStorage.getItem('previousPage');
+      if (previousPageUrl) {
+        const url = new URL(previousPageUrl, window.location.origin);
+        return url.searchParams.get('page') || undefined;
+      }
+    } catch {}
+    return undefined;
+  };
+
   const sendContentPublishNotification = () =>
     sendContentNotification(
       ContentStatus.PUBLISHED,
@@ -175,7 +186,8 @@ const CollectionEditor: React.FC = () => {
       '',
       identifier,
       undefined,
-      router
+      router,
+      getReturnPage()
     );
   const sendContentRejectNotification = () =>
     sendContentNotification(
@@ -184,7 +196,8 @@ const CollectionEditor: React.FC = () => {
       '',
       identifier,
       undefined,
-      router
+      router,
+      getReturnPage()
     );
 
   const editorRef = useRef<HTMLDivElement | null>(null);

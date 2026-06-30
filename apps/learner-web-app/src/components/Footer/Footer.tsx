@@ -38,6 +38,7 @@ interface SsoProgram {
 interface FooterLink {
   label: string;
   href?: string;
+  target?: string;
   onClick?: () => void;
 }
 
@@ -45,6 +46,7 @@ export const Footer: React.FC = () => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [ssoPrograms, setSsoPrograms] = useState<SsoProgram[]>([]);
+  const [pragyanpathUrl, setPragyanpathUrl] = useState<string | undefined>(undefined);
 
   const copyrightYear = new Date().getFullYear();
 
@@ -57,6 +59,22 @@ export const Footer: React.FC = () => {
           (program: SsoProgram) => program?.params?.uiConfig?.sso?.length
         );
         setSsoPrograms(ssoProgramsData);
+
+        const currentDomain =
+          typeof window !== 'undefined' ? window.location.origin : '';
+        const pragyanpathProgram = programsData.find((p: SsoProgram) =>
+          p.name.toLowerCase().includes('pragyanpath')
+        );
+        if (pragyanpathProgram?.params?.uiConfig?.sso?.length) {
+          const ssoOption = pragyanpathProgram.params.uiConfig.sso.find(
+            (opt: { url?: string; enable_domain?: string[] }) =>
+              opt?.enable_domain?.includes(currentDomain)
+          );
+          if (ssoOption?.url) {
+            const callbackUrl = `${currentDomain}/sso?env=newton&tenantid=${pragyanpathProgram.tenantId}`;
+            setPragyanpathUrl(`${ssoOption.url}?callbackurl=${callbackUrl}`);
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch SSO programs for footer:', error);
       }
@@ -72,17 +90,7 @@ export const Footer: React.FC = () => {
       p.name.toLowerCase().includes('pragyanpath')
     );
 
-    if (!program?.params?.uiConfig?.sso?.length) {
-      return;
-    }
-
-    const ssoOption = program.params.uiConfig.sso.find((option) => {
-      const currentDomain =
-        typeof window !== 'undefined' ? window.location.origin : '';
-      return option?.enable_domain?.includes(currentDomain);
-    });
-
-    if (!ssoOption?.url) {
+    if (!program?.params?.uiConfig) {
       return;
     }
 
@@ -97,13 +105,6 @@ export const Footer: React.FC = () => {
         JSON.stringify(program.params.uiConfig || {})
       );
     }
-
-    const currentBaseUrl =
-      typeof window !== 'undefined' ? window.location.origin : '';
-    const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${program.tenantId}`;
-    const ssoUrl = `${ssoOption.url}?callbackurl=${callbackUrl}`;
-
-    window.open(ssoUrl, '_blank');
   };
 
   const usefulLinks: FooterLink[] = [
@@ -117,6 +118,8 @@ export const Footer: React.FC = () => {
     },
     {
       label: t('LEARNER_APP.FOOTER.PRAGYANPATH'),
+      href: pragyanpathUrl,
+      target: '_blank',
       onClick: handlePragyanpath,
     },
   ];
@@ -137,56 +140,10 @@ export const Footer: React.FC = () => {
           zIndex: 1100,
           backgroundColor: '#f3f3f3',
           boxShadow: isExpanded ? '0 -2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            height: FOOTER_STRIP_HEIGHT,
-            px: { xs: 2, md: '56px' },
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            backgroundColor: '#f3f3f3',
-          }}
-        >
-          <ButtonBase
-            onClick={toggleFooter}
-            aria-expanded={isExpanded}
-            aria-controls="learner-footer-content"
-            aria-label={
-              isExpanded
-                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
-                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')
-            }
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              flexShrink: 0,
-              borderRadius: 1,
-              px: 1,
-              py: 0.5,
-              color: '#1F1B13',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {isExpanded
-                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
-                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')}
-            </Typography>
-            {isExpanded ? (
-              <KeyboardArrowUp fontSize="small" />
-            ) : (
-              <KeyboardArrowDown fontSize="small" />
-            )}
-          </ButtonBase>
-        </Box>
-
         <Collapse in={isExpanded}>
           <Box
             id="learner-footer-content"
@@ -252,13 +209,14 @@ export const Footer: React.FC = () => {
                   </Grid>
                   <Grid item>
                     <Grid container direction="column" spacing={1}>
-                      {usefulLinks.map(({ label, href, onClick }) => (
+                      {usefulLinks.map(({ label, href, target, onClick }) => (
                         <Grid item key={label}>
                           {href ? (
                             <Link
                               href={href}
-                              target="_blank"
+                              target={target ?? '_blank'}
                               rel="noopener noreferrer"
+                              onClick={onClick}
                               style={{
                                 textDecoration: 'none',
                                 color: 'inherit',
@@ -306,6 +264,54 @@ export const Footer: React.FC = () => {
             
           </Box>
         </Collapse>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            height: FOOTER_STRIP_HEIGHT,
+            px: { xs: 2, md: '56px' },
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: '#f3f3f3',
+          }}
+        >
+          <ButtonBase
+            onClick={toggleFooter}
+            aria-expanded={isExpanded}
+            aria-controls="learner-footer-content"
+            aria-label={
+              isExpanded
+                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
+                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')
+            }
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexShrink: 0,
+              borderRadius: 1,
+              px: 1,
+              py: 0.5,
+              color: '#1F1B13',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {isExpanded
+                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
+                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')}
+            </Typography>
+            {isExpanded ? (
+              <KeyboardArrowUp fontSize="small" />
+            ) : (
+              <KeyboardArrowDown fontSize="small" />
+            )}
+          </ButtonBase>
+        </Box>
       </Box>
     </>
   );
