@@ -108,7 +108,7 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
             <ListItemButton
               component={item.href ? 'a' : 'div'}
               href={item.href}
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
                 if (item.to || item.href) {
                   const anchorEvent =
                     e as unknown as React.MouseEvent<HTMLAnchorElement>;
