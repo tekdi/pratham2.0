@@ -65,58 +65,49 @@ export const checkRegistrationTestStatus = async (
 
     if (tenantDataDetails?.[0]?.tenantType !== 'elearning') {
       const academicYearList = await getAcademicYear();
-      const activeAcademicYear = Array.isArray(academicYearList)
-        ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
-        : undefined;
-      const previousYears = Array.isArray(academicYearList)
-        ? academicYearList.filter((year: { id?: string; isActive?: boolean }) => !year?.isActive && year?.id)
-        : [];
-
-      if (activeAcademicYear?.id) {
-        localStorage.setItem('academicYearId', activeAcademicYear.id);
-      }
-
+    const allAcademicYearIds = Array.isArray(academicYearList)
+      ? academicYearList
+          .map((year: { id?: string; isActive?: boolean }) => year?.id)
+          .filter(Boolean)
+      : [];
+const activeAcademicYear = Array.isArray(academicYearList)
+      ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+      : undefined
+    if (activeAcademicYear?.id) {
+      localStorage.setItem('academicYearId', activeAcademicYear.id);
+    }
       let userHasActiveBatch = false;
 
-      // Current year: cohortStatus must be 'active'
-      if (activeAcademicYear?.id) {
+      for (const yearId of allAcademicYearIds) {
+        localStorage.setItem('academicYearId', yearId as string);
         const cohortResponse = await getCohortList(storedUserId, true, true);
         const hasBatch = Array.isArray(cohortResponse?.result)
           ? cohortResponse.result.some(
-              (cohort: { type?: string; cohortStatus?: string; cohortMemberStatus?: string }) =>
+              (cohort: {
+                type?: string;
+                cohortStatus?: string;
+                cohortMemberStatus?: string;
+              }) =>
                 cohort?.type === 'BATCH' &&
                 cohort?.cohortStatus === 'active' &&
                 cohort?.cohortMemberStatus === 'active'
             )
           : false;
-        if (hasBatch) userHasActiveBatch = true;
-      }
+        if (hasBatch) {
+          userHasActiveBatch = true;
+                    localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
 
-      // Previous years: cohortStatus may be inactive (year is closed), check only cohortMemberStatus
-      if (!userHasActiveBatch) {
-        for (const prevYear of previousYears) {
-          localStorage.setItem('academicYearId', prevYear.id as string);
-          const cohortResponse = await getCohortList(storedUserId, true, true);
-          const hasBatch = Array.isArray(cohortResponse?.result)
-            ? cohortResponse.result.some(
-                (cohort: { type?: string; cohortMemberStatus?: string }) =>
-                  cohort?.type === 'BATCH' && cohort?.cohortMemberStatus === 'active'
-              )
-            : false;
-          if (hasBatch) {
-            userHasActiveBatch = true;
-            break;
-          }
+          break;
         }
+        
       }
 
-      // Restore active academic year
+      // Restore active academic year after iterating all IDs
       if (activeAcademicYear?.id) {
         localStorage.setItem('academicYearId', activeAcademicYear.id);
       }
 
       if (userHasActiveBatch) {
-        localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
         return 'clear';
       }
     }

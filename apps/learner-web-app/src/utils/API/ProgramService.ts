@@ -8,11 +8,9 @@ export const getTenantInfo = async (): Promise<any> => {
   try {
     const response = await axios.get(apiUrl);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const devOrigins = ['http://172.132.44.161:3003'];
     const matchingTenants =
       response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin) ||
-        devOrigins.includes(currentOrigin)
+        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
       ) || [];
     const programsData =
       matchingTenants.flatMap((t: any) => t?.children || []) || [];
@@ -43,11 +41,9 @@ export const getPrathamTenantId = async (): Promise<string | null> => {
   try {
     const response = await axios.get(apiUrl);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const devOrigins = ['http://172.132.44.161:3003'];
     const matchingTenants =
       response?.data?.result?.filter((tenant: any) =>
-        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin) ||
-        devOrigins.includes(currentOrigin)
+        tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin)
       ) || [];
     return matchingTenants[0]?.tenantId || null;
   } catch (error) {
