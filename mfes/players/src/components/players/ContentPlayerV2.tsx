@@ -92,6 +92,10 @@ const ContentPlayerV2 = ({
           break;
         case 'player:close':
           console.log('[player:close]', detail);
+          // Notify parent learner page so it can redirect via activeLink (sbplayer runs in iframe).
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'player:close' }, '*');
+          }
           handleExitEvent();
           break;
       }

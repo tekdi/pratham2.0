@@ -34,6 +34,7 @@ import { TenantName } from '../../utils/app.constant';
 interface SubMenuItem {
   title: string | React.ReactNode;
   to: () => void;
+  href?: string;
   isActive: boolean;
   code?: string;
 }
@@ -42,6 +43,7 @@ interface BaseDrawerItemProp {
   title: React.ReactNode;
   icon?: React.ReactNode;
   to?: ((event: React.MouseEvent<HTMLAnchorElement>) => void) | (() => void);
+  href?: string;
   variant?: 'contained' | 'text';
   isActive?: boolean;
   customStyle?: React.CSSProperties;
@@ -241,9 +243,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           (a?.name || '').localeCompare(b?.name || '')
         ) ?? [];
 
+    const encodeQueryValue = (value: string) => value?.replace(/&/g, '%26');
+
     const navLinks: NewDrawerItemProp[] = [
       {
         title: t('LEARNER_APP.POS.ABOUT_US'),
+        href: '/pos/about-us',
         to: () => {
           localStorage.removeItem('learnerCourseFilters');
           router.push('/pos/about-us');
@@ -252,60 +257,78 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       },
       {
         title: t('LEARNER_APP.POS.SCHOOL'),
+        href: '/pos/school',
         to: () => {
           localStorage.removeItem('learnerCourseFilters');
           router.push('/pos/school');
         },
         isActive: currentPage === '/pos/school',
-        child: schoolSubCategory.map((item: any) => ({
-          title: item?.name,
-          to: () => {
-            localStorage.removeItem('learnerCourseFilters');
-            const encodedName = item?.name?.replace(/&/g, '%26');
-            router.push(`/pos/school?se_subDomains=${encodedName}`);
-          },
-          isActive: currentPage === `/pos/school?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
-          code: item?.code,
-        })),
+        child: schoolSubCategory.map((item: any) => {
+          const encodedName = encodeQueryValue(item?.name);
+          return {
+            title: item?.name,
+            href: `/pos/school?se_subDomains=${encodedName}`,
+            to: () => {
+              localStorage.removeItem('learnerCourseFilters');
+              router.push(`/pos/school?se_subDomains=${encodedName}`);
+            },
+            isActive:
+              currentPage === `/pos/school?se_subDomains=${encodedName}`,
+            code: item?.code,
+          };
+        }),
       },
       {
         title: t('LEARNER_APP.POS.WORK'),
+        href: '/pos/work',
         to: () => {
           localStorage.removeItem('learnerCourseFilters');
           router.push('/pos/work');
         },
         isActive: currentPage === '/pos/work',
-        child: workSubCategory.map((item: any) => ({
-          title: item?.name,
-          to: () => {
-            localStorage.removeItem('learnerCourseFilters');
-            const encodedName = item?.name?.replace(/&/g, '%26');
-            router.push(`/pos/work?se_subDomains=${encodedName}`);
-          },
-          isActive: currentPage === `/pos/work?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
-          code: item?.code,
-        })),
+        child: workSubCategory.map((item: any) => {
+          const encodedName = encodeQueryValue(item?.name);
+          return {
+            title: item?.name,
+            href: `/pos/work?se_subDomains=${encodedName}`,
+            to: () => {
+              localStorage.removeItem('learnerCourseFilters');
+              router.push(`/pos/work?se_subDomains=${encodedName}`);
+            },
+            isActive: currentPage === `/pos/work?se_subDomains=${encodedName}`,
+            code: item?.code,
+          };
+        }),
       },
       {
         title: t('LEARNER_APP.POS.LIFE'),
+        href: '/pos/life',
         to: () => {
           localStorage.removeItem('learnerCourseFilters');
           router.push('/pos/life');
         },
         isActive: currentPage === '/pos/life',
-        child: lifeSubCategory.map((item: any) => ({
-          title: item?.name,
-          to: () => {
-            localStorage.removeItem('learnerCourseFilters');
-            const encodedName = item?.name?.replace(/&/g, '%26');
-            router.push(`/pos/life?se_subDomains=${encodedName}`);
-          },
-          isActive: currentPage === `/pos/life?se_subDomains=${item?.name?.replace(/&/g, '%26')}`,
-          code: item?.code,
-        })),
+        child: lifeSubCategory.map((item: any) => {
+          const encodedName = encodeQueryValue(item?.name);
+          return {
+            title: item?.name,
+            href: `/pos/life?se_subDomains=${encodedName}`,
+            to: () => {
+              localStorage.removeItem('learnerCourseFilters');
+              router.push(`/pos/life?se_subDomains=${encodedName}`);
+            },
+            isActive: currentPage === `/pos/life?se_subDomains=${encodedName}`,
+            code: item?.code,
+          };
+        }),
       },
       {
         title: t('LEARNER_APP.POS.PROGRAM'),
+        href: '/pos/program',
+        to: () => {
+          localStorage.removeItem('learnerCourseFilters');
+          router.push('/pos/program');
+        },
         isActive: currentPage === '/pos/program',
         child: [
           { code: 'Vocational Training', name: TenantName.YOUTHNET },
@@ -315,19 +338,23 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
           { name: 'Inclusive Education (ENABLE)', code: 'Inclusive Education (ENABLE)' },
           { name: 'Elementary', code: 'Elementary' },
           { name: 'Annual Status of Education Report', code: 'Annual Status of Education Report' },
-        ].map((item: any) => ({
-          title: item?.name,
-          to: () => {
-            localStorage.removeItem('learnerCourseFilters');
-            const encodedName = item?.name?.replace(/&/g, '%26');
-            router.push(`/pos/program?program=${encodedName}`);
-          },
-          isActive: currentPage === `/pos/program?program=${item?.name?.replace(/&/g, '%26')}`,
-          code: item?.code,
-        })),
+        ].map((item: any) => {
+          const encodedName = encodeQueryValue(item?.name);
+          return {
+            title: item?.name,
+            href: `/pos/program?program=${encodedName}`,
+            to: () => {
+              localStorage.removeItem('learnerCourseFilters');
+              router.push(`/pos/program?program=${encodedName}`);
+            },
+            isActive: currentPage === `/pos/program?program=${encodedName}`,
+            code: item?.code,
+          };
+        }),
       },
       {
         title: t('Experimento India'),
+        href: process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '',
         to: () => {
           localStorage.removeItem('learnerCourseFilters');
           const domain = process.env.NEXT_PUBLIC_THEMATIC_DOMAIN || '';

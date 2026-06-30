@@ -302,6 +302,7 @@ export const CardComponent = ({
   item,
   default_img,
   handleCardClick,
+  href,
   isExplore = true,
   titleFontSize,
   fontWeight,
@@ -315,6 +316,7 @@ export const CardComponent = ({
   item: any;
   default_img: any;
   handleCardClick: any;
+  href?: string;
   isExplore?: boolean;
   titleFontSize?: string;
   fontWeight?: number;
@@ -334,15 +336,26 @@ export const CardComponent = ({
   const finalMaxTitleLines = maxTitleLines || _card?.maxTitleLines || 2;
   const cardTitle = item.name || item.title || 'Untitled';
   const scaledTitleFontSize = scaledFontSize(finalTitleFontSize || '16px');
-  const onClick = (id: string) => {
-    if (handleCardClick) {
-      handleCardClick(id);
+  const cardHref = href ?? _card?.href;
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (
+      cardHref &&
+      (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)
+    ) {
+      return;
     }
+    if (cardHref) {
+      e.preventDefault();
+    }
+    handleCardClick?.(item, e);
   };
 
   return (
     <Box
-      onClick={() => onClick(item)}
+      component={cardHref ? 'a' : 'div'}
+      href={cardHref}
+      onClick={handleClick}
       sx={{
         backgroundColor: '#fff',
         position: 'relative',
@@ -352,6 +365,9 @@ export const CardComponent = ({
         border: '1px solid rgba(0, 0, 0, .125)',
         minHeight: finalMinHeight || '317px',
         borderRadius: '.25rem',
+        textDecoration: 'none',
+        color: 'inherit',
+        display: 'block',
         '&:hover': {
           transform: 'scale(1.07)',
         },

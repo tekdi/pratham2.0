@@ -111,6 +111,9 @@ const ContentCardCarousel = ({
               default_img={default_img}
               _card={{
                 ..._card,
+                // Same href config as ContentCardGrid for carousel cards.
+                contentBaseUrl: _config?.contentBaseUrl,
+                enableCardHref: _config?.enableCardHref,
                 sx: { ...(_card?.sx ?? {}), height: '100%' },
               }}
               handleCardClick={handleCardClick}

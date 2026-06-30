@@ -196,6 +196,8 @@ export default function App({
               searchParams,
               _config: {
                 userIdLocalstorageName: 'did',
+                contentBaseUrl: '/pos',
+                enableCardHref: true,
                 _card: {
                   isHideProgress: true,
                   isHideProgressStatus: true,

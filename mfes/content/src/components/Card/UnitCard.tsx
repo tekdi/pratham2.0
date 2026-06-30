@@ -54,6 +54,7 @@ const UnitCard = ({
         item={item}
         TrackData={trackData}
         type={type}
+        href={_card?.href}
         onClick={() => handleCardClick(item)}
         _card={{
           _contentParentText: { sx: { height: '156px' } },
