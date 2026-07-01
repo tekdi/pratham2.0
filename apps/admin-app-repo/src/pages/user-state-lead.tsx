@@ -228,6 +228,10 @@ const StateLead = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
+      delete formData.status;
+      if (formData.tenantStatus === 'all') {
+        delete formData.tenantStatus;
+      }
       const staticFilter = {
         role: RoleName.STATE_LEAD,
         // tenantId: storedUserData.tenantData[0].tenantId,
