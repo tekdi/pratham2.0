@@ -677,7 +677,7 @@
 
     function loadFromCDN(baseUrl, cid, libPath) {
       var cdnScript = document.createElement('script');
-      cdnScript.src = 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/main.bundle.js';
+      cdnScript.src = './h5p_android_offline/main.bundle.js';
       cdnScript.crossOrigin = 'anonymous';
 
       cdnScript.onload = function () {
@@ -711,10 +711,10 @@
       }
 
       var frameJs  = fromCDN
-        ? 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/frame.bundle.js'
+        ? './h5p_android_offline/frame.bundle.js'
         : './h5p-standalone/frame.bundle.js';
       var frameCss = fromCDN
-        ? 'https://cdn.jsdelivr.net/npm/h5p-standalone@3.8.2/dist/styles/h5p.css'
+        ? './h5p_android_offline/h5p.css'
         : './h5p-standalone/styles/h5p.css';
 
       var container = document.getElementById('h5p-container');
