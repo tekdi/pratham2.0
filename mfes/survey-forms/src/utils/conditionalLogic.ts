@@ -78,11 +78,14 @@ function evaluateShowIf(
   if (!logic || !logic.depends_on) return null;
 
   const dependsOn: string = logic.depends_on;
-  const showIf: string[] = Array.isArray(logic.show_if)
+  const rawShowIf = Array.isArray(logic.show_if)
     ? logic.show_if
-    : logic.show_if
+    : logic.show_if !== undefined && logic.show_if !== null
       ? [logic.show_if]
       : [];
+  const showIf = rawShowIf.map(String);
+
+  if (showIf.length === 0) return true;
 
   // Extract plain value from radio responses stored as { selected: 'value' }
   let currentValue = formValues[dependsOn];
@@ -95,7 +98,9 @@ function evaluateShowIf(
     currentValue = currentValue.selected;
   }
 
-  return showIf.length === 0 ? true : showIf.includes(String(currentValue));
+  if (currentValue === undefined || currentValue === null) return false;
+
+  return showIf.includes(String(currentValue));
 }
 
 export function isFieldVisible(
