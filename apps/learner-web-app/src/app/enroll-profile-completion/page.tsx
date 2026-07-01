@@ -342,7 +342,7 @@ const EnrollProfileCompletionInner = () => {
         // setSignupSuccessModal(false);
         }
         else{
-    localStorage.removeItem('onboardTenantId');
+    localStorage.removeItem('enrollTenantId');
     const finalLandingPage = localStorage.getItem('landingPage') || '/home';
     window.location.href = finalLandingPage;
         }
