@@ -498,8 +498,8 @@ const DynamicForm = forwardRef(({
         }
       } else {
         //initially hide all
-        let oldFormSchema = schemaa; // ✅ Use schemaa instead of formSchema
-        let oldFormUiSchema = uischema; // ✅ Use uischema instead of formUiSchema
+        let oldFormSchema = formSchema;
+        let oldFormUiSchema = formUiSchema;
         let requiredArray = oldFormSchema?.required;
 
         // remove from required
