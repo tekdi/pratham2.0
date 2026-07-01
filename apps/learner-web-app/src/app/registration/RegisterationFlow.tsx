@@ -312,6 +312,9 @@ const RegisterationFlow = () => {
           'parent_phone'
         );
 
+        //hide guardian details
+
+
         setAddSchema(alterSchema);
         setAddUiSchema(updatedUiSchema);
       } catch (error) {
@@ -994,7 +997,19 @@ const RegisterationFlow = () => {
                     ? {
                         ...(addUiSchema as any),
                         mobile: { ...(addUiSchema as any)?.mobile, 'ui:disabled': true },
-                        parent_phone: { ...(addUiSchema as any)?.parent_phone, 'ui:disabled': true },
+                        parent_phone: { ...(addUiSchema as any)?.parent_phone, 'ui:disabled': true, "ui:options": {
+                            hidden: true,
+                          },
+                        },
+                        //bug for guardian detail see fixed
+                        guardian_name: { ...(addUiSchema as any)?.guardian_name, "ui:options": {
+                            hidden: true,
+                          },
+                        },
+                        guardian_relation: { ...(addUiSchema as any)?.guardian_relation, "ui:options": {
+                            hidden: true,
+                          },
+                        }
                       }
                     : addUiSchema
                 }
