@@ -115,23 +115,19 @@ export const getDayMonthYearFormat = (dateString: string) => {
 };
 
 export const calculateAgeFromDate = (dobString: any) => {
-  if(dobString!="" && dobString!=undefined && dobString!=null )
-  {
-    const dob = new Date(dobString);
-    const today = new Date();
+  const dob = new Date(dobString);
+  const today = new Date();
 
-    let age = today.getFullYear() - dob.getFullYear();
+  let age = today.getFullYear() - dob.getFullYear();
 
-    const hasBirthdayPassedThisYear =
-      today.getMonth() > dob.getMonth() ||
-      (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+  const hasBirthdayPassedThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
 
-    if (!hasBirthdayPassedThisYear) {
-      age--;
-    }
-    return age;
+  if (!hasBirthdayPassedThisYear) {
+    age--;
   }
-  return null;
+  return age;
 };
 
 export const transformLabel = (label: string): string => {
