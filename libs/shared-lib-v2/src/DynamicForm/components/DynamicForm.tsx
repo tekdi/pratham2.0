@@ -331,7 +331,7 @@ const DynamicForm = forwardRef(({
 
         //if learner form then only apply
         if (oldFormSchema?.properties?.guardian_relation || isCompleteProfile) {
-          if (age && age < 18) {
+          if (age < 18) {
             //    delete formData?.mobile;
             // Merge only missing items from required2 into required1 guardian details
             requiredKeys.forEach((item) => {
@@ -498,8 +498,8 @@ const DynamicForm = forwardRef(({
         }
       } else {
         //initially hide all
-        let oldFormSchema = schemaa; // ✅ Use schemaa instead of formSchema
-        let oldFormUiSchema = uischema; // ✅ Use uischema instead of formUiSchema
+        let oldFormSchema = formSchema;
+        let oldFormUiSchema = formUiSchema;
         let requiredArray = oldFormSchema?.required;
 
         // remove from required
