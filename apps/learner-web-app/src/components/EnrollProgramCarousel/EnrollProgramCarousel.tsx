@@ -270,10 +270,17 @@ console.log('result=====>', result);
           if (userId) {
             const data = await getUserDetails(userId, true);
             const tenantData = data?.result?.userData?.tenantData || [];
-            const enrolledTenantIds = tenantData.map((item: any) => item.tenantId);
+            // FIX: Previously ALL enrolled programs (including archived/deleted ones) were
+            // excluded from Explore Programs, so a deleted user had no way to re-enroll.
+            // Now only ACTIVE (non-archived) enrollments are excluded. Programs where the
+            // user's tenantStatus is 'archived' (i.e. deleted by admin) will re-appear in
+            // Explore Programs so the user can re-enroll.
+            const activeEnrolledTenantIds = tenantData
+              .filter((item: any) => item.tenantStatus !== 'archived')
+              .map((item: any) => item.tenantId);
             const explorePrograms = typeFiltered(
               visiblePrograms?.filter(
-                (program: any) => !enrolledTenantIds.includes(program.tenantId)
+                (program: any) => !activeEnrolledTenantIds.includes(program.tenantId)
               ) || []
             );
             setPrograms(explorePrograms);
@@ -281,10 +288,14 @@ console.log('result=====>', result);
             setPrograms(typeFiltered(visiblePrograms || []));
           }
         } else if (userId) {
-          // For My Programs tab, show only enrolled programs
+          // FIX: Previously archived (admin-deleted) programs still appeared in My Programs
+          // because the filter only checked the Learner role, not the tenantStatus.
+          // Added: item?.tenantStatus !== 'archived' — programs deleted by admin must not
+          // appear in My Programs tab.
           const data = await getUserDetails(userId, true);
           const tenantData = data?.result?.userData?.tenantData?.filter((item: any) =>
-            item?.roles?.some((role: any) => role?.roleName === 'Learner')
+            item?.roles?.some((role: any) => role?.roleName === 'Learner') &&
+            item?.tenantStatus !== 'archived'
           );
           const filterIds = tenantData.map((item: any) => item.tenantId);
           const filteredPrograms = typeFiltered(

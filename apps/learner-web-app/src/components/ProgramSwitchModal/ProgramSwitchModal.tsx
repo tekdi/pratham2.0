@@ -106,9 +106,15 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
 
         setCurrentProgram(current || null);
 
-        // Get other enrolled programs (excluding current)
+        // FIX: When an admin deletes a user from a program, that program's tenantStatus
+        // is set to 'archived'. Archived programs must NOT appear in the program-switch
+        // dropdown — the user no longer has access to them.
+        // Added: tenant.tenantStatus !== 'archived'
         const otherPrograms = tenantData.filter(
-          (tenant: TenantData) => (tenant.tenantId !== currentTenantId &&tenant?.roles?.some((role: any) => role?.roleName === 'Learner'))
+          (tenant: TenantData) =>
+            tenant.tenantId !== currentTenantId &&
+            tenant.tenantStatus !== 'archived' &&
+            tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
         );
 
         setEnrolledPrograms(otherPrograms);

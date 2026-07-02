@@ -27,6 +27,14 @@ export const API_ENDPOINTS = {
   cohortSearch: `${baseurl}/cohort/search`,
   myCohortsRead: (userId: string) => `${baseurl}/user/read/${userId}`,
   enrollUserTenant: `${baseurl}/user-tenant`,
+  // FIX: Added for re-enrollment of admin-deleted users.
+  // POST /user-tenant (enrollUserTenant) creates a NEW mapping and fails when one already
+  // exists (e.g. user was previously deleted — tenantStatus = 'archived'). This PATCH
+  // endpoint updates the EXISTING mapping's status back to 'active' or 'pending' so the
+  // user can re-enroll without needing a new record. Same endpoint the admin app uses to
+  // set 'archived' on deletion (PATCH /user-tenant/status?userId=...&tenantId=...).
+  reactivateUserTenant: (userId: string, tenantId: string) =>
+    `${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
   myCohorts: (userId: string | string[], children?: boolean, customField?: boolean) => `${baseurl}/cohort/mycohorts/${userId}?children=${children}&customField=${customField}`,
 
 };

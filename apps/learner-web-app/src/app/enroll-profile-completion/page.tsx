@@ -12,7 +12,7 @@ import AssessmentRequiredModal from '@learner/components/AssessmentRequiredModal
 import { Box, Typography } from '@mui/material';
 import SignupSuccess from '@learner/components/SignupSuccess /SignupSuccess ';
 import { ContentSearch } from '@learner/utils/API/contentService';
-import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
+import { enrollUserTenant, reactivateUserTenant } from '@learner/utils/API/EnrollmentService';
 import { getCohortList } from '@learner/utils/API/CohortService';
 import { useTranslation } from '@shared-lib';
 declare global {
@@ -281,29 +281,44 @@ const EnrollProfileCompletionInner = () => {
 
   const handleAssessmentModalClose = async () => {
     setAssessmentRequiredModal(false);
-    try {
-      const storedUserId = localStorage.getItem('userId');
-      const storedRoleId = localStorage.getItem('roleId');
-      const enrollTenantId = localStorage.getItem('tenantId');
-      const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-      const userTenantStatus = uiConfig?.isTenantPendingStatus;
-      if (storedUserId && storedRoleId && enrollTenantId) {
+    // Declare outside try so they are accessible in the catch for the PATCH fallback
+    const storedUserId = localStorage.getItem('userId');
+    const storedRoleId = localStorage.getItem('roleId');
+    const enrollTenantId = localStorage.getItem('tenantId');
+    const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+    const userTenantStatus = uiConfig?.isTenantPendingStatus;
+    if (storedUserId && storedRoleId && enrollTenantId) {
+      // FIX: Two-step enrollment to handle re-enrollment of admin-deleted users.
+      //
+      // Step 1 — POST (standard path for first-time enrollees):
+      //   enrollUserTenant calls POST /user-tenant to create a new mapping.
+      //   For a user who was previously deleted (tenantStatus = 'archived'), a mapping
+      //   already exists, so POST throws an error.
+      //
+      // Step 2 — PATCH fallback (for previously-deleted users):
+      //   reactivateUserTenant calls PATCH /user-tenant/status to update the existing
+      //   archived mapping's status back to 'pending', completing the re-enrollment.
+      try {
         if (userTenantStatus) {
           await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
         } else {
           await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
         }
+      } catch {
         try {
-          await updateUser(storedUserId, {
-            userData: {},
-            customFields: [{ fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963', value: 'pending' }],
-          });
-        } catch (updateError) {
-          console.error('Failed to update pending custom field:', updateError);
+          await reactivateUserTenant(storedUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
+        } catch (patchErr) {
+          console.error('Re-activation also failed:', patchErr);
         }
       }
-    } catch (enrollError) {
-      console.error('Enrollment failed on close:', enrollError);
+      try {
+        await updateUser(storedUserId, {
+          userData: {},
+          customFields: [{ fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963', value: 'pending' }],
+        });
+      } catch (updateError) {
+        console.error('Failed to update pending custom field:', updateError);
+      }
     }
     localStorage.setItem('registerationTestGiven', 'Yes');
      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
@@ -352,37 +367,45 @@ const EnrollProfileCompletionInner = () => {
   const onAssessmentUnavailableOk = async () => {
     setAssessmentUnavailableModal(false);
     localStorage.removeItem('enrollTenantId');
+    localStorage.removeItem('onboardTenantId');
 
-    try {
-      const storedUserId = localStorage.getItem('userId');
-      const storedRoleId = localStorage.getItem('roleId');
-      const enrollTenantId = localStorage.getItem('tenantId');
-      const uiConfigRaw = localStorage.getItem('uiConfig');
-      const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
-      const userTenantStatus = uiConfig?.isTenantPendingStatus;
+    const storedUserId = localStorage.getItem('userId');
+    const storedRoleId = localStorage.getItem('roleId');
+    const enrollTenantId = localStorage.getItem('tenantId');
+    const uiConfigRaw = localStorage.getItem('uiConfig');
+    const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
+    const userTenantStatus = uiConfig?.isTenantPendingStatus;
 
-      if (storedUserId && storedRoleId && enrollTenantId) {
+    if (storedUserId && storedRoleId && enrollTenantId) {
+      // FIX: Same POST → PATCH fallback as handleAssessmentModalClose above.
+      // Enrolls the user via POST for first-time enrolments, or re-activates an
+      // existing archived mapping via PATCH for previously-deleted users.
+      try {
         if (userTenantStatus) {
           await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
         } else {
           await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
         }
-        if (userTenantStatus) {
-          try {
-            await updateUser(storedUserId, {
-              userData: {},
-              customFields: [{
-                fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
-                value: 'pending',
-              }],
-            });
-          } catch (updateError) {
-            console.error('Failed to update pending custom field:', updateError);
-          }
+      } catch {
+        try {
+          await reactivateUserTenant(storedUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
+        } catch (patchErr) {
+          console.error('Re-activation also failed:', patchErr);
         }
       }
-    } catch (enrollError) {
-      console.error('Enrollment failed on assessment unavailable:', enrollError);
+      if (userTenantStatus) {
+        try {
+          await updateUser(storedUserId, {
+            userData: {},
+            customFields: [{
+              fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+              value: 'pending',
+            }],
+          });
+        } catch (updateError) {
+          console.error('Failed to update pending custom field:', updateError);
+        }
+      }
     }
 
     window.location.href = '/scp-dashboard';

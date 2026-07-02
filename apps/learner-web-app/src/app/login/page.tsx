@@ -293,7 +293,7 @@ const WelcomeMessage = () => {
         sx={{ verticalAlign: 'middle' }}
         mb={2}
       >
-        {t('LEARNER_APP.LOGIN.welcome_subtitle')}
+        {t('LEARNER_APP.LOGIN.welcome_subtitle')} sss
       </Typography>
     </Box>
   );
@@ -698,16 +698,43 @@ const LoginPageContent = () => {
         }
       }
       } else {
-        showToastMessage('Username or password not correct', 'error');
-        const telemetryInteract = {
-          context: { env: 'sign-in', cdata: [] },
-          edata: {
-            id: 'login-failed',
-            type: 'CLICK',
-            pageid: 'sign-in',
-          },
-        };
-        telemetryFactory.interact(telemetryInteract);
+        // FIX: Previously if a user had no active/pending tenants (e.g. deleted from all
+        // programs by admin), the code fell straight to "Username or password not correct"
+        // which was misleading — the credentials are valid, the user just has no active program.
+        //
+        // New behaviour (TC1 / TC2):
+        //   Detect users whose ALL learner programs are archived (admin-deleted). Allow login
+        //   and redirect to /programs so they can re-enroll via the Explore Programs tab.
+        //
+        // IMPORTANT — Do NOT store the archived tenantId in localStorage.
+        //   If an archived tenantId is stored, the ClientLayout mid-session guard fires on
+        //   /programs, detects tenantStatus = 'archived', and immediately redirects back to
+        //   /login, creating an infinite redirect loop.
+        const hasArchivedLearnerTenants = userResponse?.tenantData?.some(
+          (tenant: any) =>
+            tenant?.tenantStatus === 'archived' &&
+            tenant?.tenantName !== 'Pratham' &&
+            tenant?.roles?.some((role: any) => role?.roleName === 'Learner')
+        );
+
+        if (hasArchivedLearnerTenants) {
+          localStorage.setItem('userId', userResponse?.userId);
+          localStorage.setItem('userIdName', userResponse?.username);
+          localStorage.setItem('firstName', userResponse?.firstName || '');
+          document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
+          router.push('/programs');
+        } else {
+          showToastMessage('Username or password not correct', 'error');
+          const telemetryInteract = {
+            context: { env: 'sign-in', cdata: [] },
+            edata: {
+              id: 'login-failed',
+              type: 'CLICK',
+              pageid: 'sign-in',
+            },
+          };
+          telemetryFactory.interact(telemetryInteract);
+        }
       }
       setLoading(false);
     },
@@ -719,6 +746,7 @@ const LoginPageContent = () => {
       try {
         const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
         setIsAndroidApp(isAndroid);
+
         // localStorage.clear();()
         preserveLocalStorage();
 
