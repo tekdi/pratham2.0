@@ -46,6 +46,7 @@ import {
   readContent,
   FILE_MIME_MAP,
   uploadAppIconFromDrive,
+  checkDriveFileAccessible,
 } from '../services/BulkImportService';
 import { patch } from '../services/RestClient';
 
@@ -623,6 +624,35 @@ export class BulkImportQueue {
 
   private async handleCreateContent(job: QueueJob): Promise<void> {
     const { _contentTempId, driveUrl, fileType, ...metadata } = job.payload;
+
+    // ── Pre-flight: verify Drive URL is accessible AND file type matches ──────
+    // YouTube URLs skip this check — the URL is set directly as artifactUrl.
+    // For all other file types:
+    //   1. Confirm the Drive link is reachable (not private/deleted)
+    //   2. Confirm the actual MIME type matches the declared fileType column
+    // Both checks run BEFORE createContentNode so no orphaned draft is created.
+    if (fileType !== 'youtube' && driveUrl) {
+      const { mimeType: actualMime } = await checkDriveFileAccessible(driveUrl);
+
+      // Validate actual MIME against declared fileType using the same allowlist
+      // used later in handleUploadContentFile (catches mismatch before node creation)
+      const allowedMimes = BulkImportQueue.ALLOWED_MIME_FOR_FILE_TYPE[fileType?.toLowerCase()] ?? [];
+      const actualBase   = (actualMime || '').split(';')[0].trim().toLowerCase();
+
+      if (
+        allowedMimes.length > 0 &&
+        actualBase &&
+        actualBase !== 'application/octet-stream' &&   // octet-stream is Drive's fallback — accept it
+        !allowedMimes.includes(actualBase)
+      ) {
+        throw new Error(
+          `File type mismatch: you declared "${fileType}" (expects ${allowedMimes[0]}) ` +
+          `but the Google Drive file is "${actualBase}". ` +
+          `Update the File Type column in the Content sheet to match the actual file, ` +
+          `or re-upload the correct file to Drive.`
+        );
+      }
+    }
 
     const identifier = await createContentNode({
       name:            metadata.name,
