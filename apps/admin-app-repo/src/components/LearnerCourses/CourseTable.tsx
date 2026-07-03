@@ -157,7 +157,7 @@ const CourseTable: React.FC = () => {
 
       const iframe = document.createElement('iframe');
       iframe.style.cssText =
-        'position:fixed;top:-10000px;left:0;width:1120px;height:790px;border:none;';
+        'position:fixed;top:-10000px;left:0;width:1300px;height:900px;border:none;';
       document.body.appendChild(iframe);
 
       try {
@@ -171,20 +171,32 @@ const CourseTable: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 600));
 
         const certDoc = iframe.contentDocument as Document;
-        const pageEl = certDoc.querySelector('.page') as HTMLElement;
+        const pageEl = certDoc.querySelector(
+          '.page, .certificate-container, .scale-container'
+        ) as HTMLElement;
         if (!pageEl) throw new Error('Certificate .page element not found');
 
         const dataUrl = await domtoimage.toJpeg(pageEl, {
           quality: 0.98,
-          width: 1120,
-          height: 790,
           scale: 2,
         });
 
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const pdfW = pdf.internal.pageSize.getWidth();
-        const pdfH = pdf.internal.pageSize.getHeight();
-        pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, pdfH);
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const naturalWidth = pageEl.scrollWidth || pageEl.offsetWidth;
+        const naturalHeight = pageEl.scrollHeight || pageEl.offsetHeight;
+        const aspect = naturalHeight / naturalWidth;
+
+        let imgW = pageW;
+        let imgH = imgW * aspect;
+        if (imgH > pageH) {
+          imgH = pageH;
+          imgW = imgH / aspect;
+        }
+        const xOffset = (pageW - imgW) / 2;
+        const yOffset = (pageH - imgH) / 2;
+        pdf.addImage(dataUrl, 'JPEG', xOffset, yOffset, imgW, imgH);
         pdf.save(`certificate_${rowData.certificateId}.pdf`);
 
         showToastMessage(
