@@ -17,6 +17,9 @@ export const LOOKUP = {
   // youtube uses mimeType video/x-youtube; URL goes in the File/Content URL column — no file download
   FILE_TYPES: ['pdf', 'zip', 'mp4', 'h5p', 'youtube'],
   QUESTION_TYPES: ['MCQ', 'Arrange', 'Match', 'Subjective'],
+  // Parent = question belongs to this QS only (not independently searchable)
+  // Public = question is publicly accessible / independently discoverable (API value: 'Default')
+  VISIBILITY_TYPES: ['Parent', 'Public'],
   CHILD_TYPES: ['content', 'questionset'],
   FRAMEWORKS: ['pos-framework', 'scp-framework'],
   LICENSES: ['CC BY 4.0', 'CC BY-SA 4.0', 'CC BY-NC 4.0', 'All Rights Reserved'],
@@ -666,16 +669,19 @@ export const SCP_COURSE_COLUMNS: ColumnDef[] = [
 // ─── Shared sheets (same for both frameworks) ─────────────────
 
 export const QUESTION_COLUMNS: ColumnDef[] = [
-  { header: 'QuestionSet Temp ID*', apiField: 'questionSetTempId', required: true,  note: 'Must match a Temp ID from QuestionSets sheet' },
-  { header: 'Section Name',         apiField: 'sectionName',       required: false, note: 'e.g. Section 1 — groups questions under a section' },
-  { header: 'Question Type*',       apiField: 'questionType',      required: true,  lookupKey: 'QUESTION_TYPES' },
-  { header: 'Question Text*',       apiField: 'questionText',      required: true },
-  { header: 'Options',              apiField: 'options',           required: false, note: 'MCQ/Arrange: pipe-separated (A|B|C|D). Match: Key:Value|Key:Value' },
-  { header: 'Correct Answer',       apiField: 'correctAnswer',     required: false, note: 'MCQ: exact option text. Arrange: correct order. Match: Key:Value pairs' },
-  { header: 'Max Score',            apiField: 'maxScore',          required: false, note: 'Positive number e.g. 1' },
+  { header: 'QuestionSet Temp ID*',  apiField: 'questionSetTempId',    required: true,  note: 'Must match a Temp ID from QuestionSets sheet' },
+  { header: 'Section Name',          apiField: 'sectionName',          required: false, note: 'e.g. Section 1 — groups questions under a section' },
+  { header: 'Section Description',   apiField: 'sectionDescription',   required: false, note: 'Optional description for this section (shown to students)' },
+  { header: 'Section Instructions',  apiField: 'sectionInstructions',  required: false, note: 'Optional instructions shown at the start of this section' },
+  { header: 'Question Type*',        apiField: 'questionType',         required: true,  lookupKey: 'QUESTION_TYPES' },
+  { header: 'Visibility',            apiField: 'visibility',           required: false, lookupKey: 'VISIBILITY_TYPES', note: 'Parent = belongs to this QS only; Public = publicly discoverable' },
+  { header: 'Question Text*',        apiField: 'questionText',         required: true },
+  { header: 'Options',               apiField: 'options',              required: false, note: 'MCQ/Arrange: pipe-separated (A|B|C|D). Match: Key:Value|Key:Value' },
+  { header: 'Correct Answer',        apiField: 'correctAnswer',        required: false, note: 'MCQ: exact option text. Arrange: correct order. Match: Key:Value pairs' },
+  { header: 'Max Score',             apiField: 'maxScore',             required: false, note: 'Positive number e.g. 1' },
   // Blooms Level and Difficulty removed — platform API rejects them as invalid props
-  { header: 'Hint',                 apiField: 'hint',              required: false },
-  { header: 'Solution',             apiField: 'solution',          required: false },
+  { header: 'Hint',                  apiField: 'hint',                 required: false },
+  { header: 'Solution',              apiField: 'solution',             required: false },
 ];
 
 export const COURSE_MAPPING_COLUMNS: ColumnDef[] = [
@@ -727,44 +733,79 @@ export interface LookupColumn {
   lookupKey: keyof typeof LOOKUP;
 }
 
-export const getLookupColumns = (fw: FrameworkId): LookupColumn[] => {
+/**
+ * Returns the set of lookup columns to include in the LookupData sheet.
+ *
+ * templateType controls which columns are relevant:
+ *   'all'         → full template (Content + QS + Courses)
+ *   'content'     → Content sheet only
+ *   'questionset' → QuestionSets + Questions only
+ */
+export const getLookupColumns = (
+  fw: FrameworkId,
+  templateType: 'all' | 'content' | 'questionset' = 'all'
+): LookupColumn[] => {
+  const includeContent     = templateType === 'all' || templateType === 'content';
+  const includeQS          = templateType === 'all' || templateType === 'questionset';
+  const includeCourseChild = templateType === 'all';
+
+  // ── Lookups only relevant to Content sheet ───────────────────
+  const contentOnly: LookupColumn[] = includeContent ? [
+    { header: 'File Types',                   lookupKey: 'FILE_TYPES' },
+    { header: 'Content Primary Categories',   lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
+  ] : [];
+
+  // ── Lookups only relevant to Questions sheet ─────────────────
+  const questionOnly: LookupColumn[] = includeQS ? [
+    { header: 'Question Types',   lookupKey: 'QUESTION_TYPES' },
+    { header: 'Visibility Types', lookupKey: 'VISIBILITY_TYPES' },
+    { header: 'Evaluation Types', lookupKey: 'EVALUATION_TYPES' },
+    { header: 'Assessment Types', lookupKey: 'ASSESSMENT_TYPES' },
+  ] : [];
+
+  // ── Lookup only relevant to CourseChildrenMapping ────────────
+  const courseChildOnly: LookupColumn[] = includeCourseChild ? [
+    { header: 'Child Types', lookupKey: 'CHILD_TYPES' },
+  ] : [];
+
+  // ── Always-included shared lookups ──────────────────────────
   const shared: LookupColumn[] = [
-    { header: 'File Types',         lookupKey: 'FILE_TYPES' },
-    { header: 'Question Types',     lookupKey: 'QUESTION_TYPES' },
-    { header: 'Child Types',        lookupKey: 'CHILD_TYPES' },
-    { header: 'Content Languages',  lookupKey: 'CONTENT_LANGUAGES' },
-    { header: 'Evaluation Types',   lookupKey: 'EVALUATION_TYPES' },
-    { header: 'Assessment Types',   lookupKey: 'ASSESSMENT_TYPES' },
+    { header: 'Content Languages', lookupKey: 'CONTENT_LANGUAGES' },
   ];
 
-  // Content sheet always uses POS columns; these must be present in both templates.
-  const posContentLookups: LookupColumn[] = [
-    { header: 'Content Primary Categories', lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
-    { header: 'Domains',                    lookupKey: 'POS_DOMAINS' },
-    { header: 'Sub Domains',                lookupKey: 'POS_SUB_DOMAINS' },
-    { header: 'Subjects',                   lookupKey: 'POS_SUBJECTS' },
-    { header: 'Target Age Groups',          lookupKey: 'POS_TARGET_AGE_GROUPS' },
-    { header: 'Primary Users',              lookupKey: 'POS_PRIMARY_USERS' },
-    { header: 'Programs',                   lookupKey: 'POS_PROGRAMS' },
+  // ── POS taxonomy lookups (used by both Content and QS sheets) ─
+  const posTaxonomy: LookupColumn[] = [
+    { header: 'Domains',          lookupKey: 'POS_DOMAINS' },
+    { header: 'Sub Domains',      lookupKey: 'POS_SUB_DOMAINS' },
+    { header: 'Subjects',         lookupKey: 'POS_SUBJECTS' },
+    { header: 'Target Age Groups',lookupKey: 'POS_TARGET_AGE_GROUPS' },
+    { header: 'Primary Users',    lookupKey: 'POS_PRIMARY_USERS' },
+    { header: 'Programs',         lookupKey: 'POS_PROGRAMS' },
   ];
 
   if (fw === 'scp-framework') {
     return [
+      ...contentOnly,
+      ...questionOnly,
+      ...courseChildOnly,
       ...shared,
-      ...posContentLookups,
-      { header: 'Primary Categories (QS)',  lookupKey: 'SCP_PRIMARY_CATEGORIES_QS' },
-      { header: 'Boards',                   lookupKey: 'SCP_BOARDS' },
-      { header: 'Mediums',                  lookupKey: 'SCP_MEDIUMS' },
-      { header: 'Grade Levels',             lookupKey: 'SCP_GRADE_LEVELS' },
-      { header: 'Subjects (SCP)',           lookupKey: 'SCP_SUBJECTS' },
-      { header: 'Course Types',             lookupKey: 'SCP_COURSE_TYPES' },
-      { header: 'Programs (SCP)',           lookupKey: 'SCP_PROGRAMS' },
+      ...posTaxonomy,
+      { header: 'Primary Categories (QS)', lookupKey: 'SCP_PRIMARY_CATEGORIES_QS' },
+      { header: 'Boards',                  lookupKey: 'SCP_BOARDS' },
+      { header: 'Mediums',                 lookupKey: 'SCP_MEDIUMS' },
+      { header: 'Grade Levels',            lookupKey: 'SCP_GRADE_LEVELS' },
+      { header: 'Subjects (SCP)',          lookupKey: 'SCP_SUBJECTS' },
+      { header: 'Course Types',            lookupKey: 'SCP_COURSE_TYPES' },
+      { header: 'Programs (SCP)',          lookupKey: 'SCP_PROGRAMS' },
     ];
   }
 
   return [
+    ...contentOnly,
+    ...questionOnly,
+    ...courseChildOnly,
     ...shared,
-    ...posContentLookups,
-    { header: 'Primary Categories (QS)',  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
+    ...posTaxonomy,
+    { header: 'Primary Categories (QS)', lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
   ];
 };
