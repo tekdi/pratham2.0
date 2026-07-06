@@ -34,8 +34,10 @@ import {
   createContentNode,
   getContentUploadUrl,
   uploadFileToPresignedUrl,
-  associateUploadedFile,
+  notifyContentUploaded,
+  associateYouTubeUrl,
   submitContentForReview,
+  publishContent,
   createQuestionSetNode,
   createQuestion,
   updateQuestionSetHierarchy,
@@ -116,6 +118,7 @@ export class BulkImportQueue {
           englishName: content.englishName || undefined,
           description: content.description,
           primaryCategory: content.primaryCategory,
+          resourceType: 'Learn',   // matches editor-created content; helps platform assign correct contentType
           framework: 'pos-framework' as const,
           mimeType: FILE_MIME_MAP[content.fileType] || 'application/pdf',
           // Multi-select fields use pipe-separated values in Excel → split into arrays
@@ -181,6 +184,23 @@ export class BulkImportQueue {
         type: 'review_content',
         tempId: content.tempId,
         dependsOn: [uploadJobId],
+        payload: { _contentTempId: content.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
+
+      // Job 4: Publish content (depends on review)
+      // Publishing triggers the platform processing pipeline:
+      //   • H5P / ZIP → creates streamingUrl
+      //   • Sets pkgVersion and transitions status to "Live"
+      // Without this step, H5P content has no streamingUrl and the player
+      // cannot render it, causing React hydration errors.
+      this.addJob({
+        id: `publish_content_${content.tempId}`,
+        type: 'publish_content',
+        tempId: content.tempId,
+        dependsOn: [reviewJobId],
         payload: { _contentTempId: content.tempId },
         status: 'queued',
         retryCount: 0,
@@ -262,6 +282,7 @@ export class BulkImportQueue {
               hint: q.hint,
               solution: q.solution,
               sectionName: q.sectionName || 'Section 1',
+              visibility: (q.visibility as 'Parent' | 'Public') || 'Parent',
               // Inherit taxonomy from parent QS so the question passes validation
               _qsSubject:    qs.subject,
               _qsMedium:     qs.medium,
@@ -328,7 +349,7 @@ export class BulkImportQueue {
           const childRef = m.childRef;
           // If childRef is a tempId, find the last job for that entity
           if (childRef.startsWith('TEMP_CONTENT_')) {
-            return `review_content_${childRef}`;
+            return `publish_content_${childRef}`;
           }
           if (childRef.startsWith('TEMP_QS_')) {
             const hasQuestions = data.questions.some((q) => q.questionSetTempId === childRef);
@@ -600,6 +621,9 @@ export class BulkImportQueue {
       case 'review_content':
         await this.handleReviewContent(job);
         break;
+      case 'publish_content':
+        await this.handlePublishContent(job);
+        break;
       case 'create_questionset':
         await this.handleCreateQuestionSet(job);
         break;
@@ -738,9 +762,9 @@ export class BulkImportQueue {
 
     const mimeType = FILE_MIME_MAP[fileType] || 'application/pdf';
 
-    // ── YouTube: no file download — set artifactUrl directly ──────
+    // ── YouTube: store URL directly, no file download or processing ─
     if (fileType === 'youtube') {
-      await associateUploadedFile(contentId, driveUrl, mimeType);
+      await associateYouTubeUrl(contentId, driveUrl, mimeType);
       job.resolvedIdentifier = contentId;
       return;
     }
@@ -764,15 +788,17 @@ export class BulkImportQueue {
       );
     }
 
-    // Get pre-signed upload URL
+    // Get pre-signed upload URL and upload file to S3
     const { preSignedUrl } = await getContentUploadUrl(contentId, fileName);
-
-    // Upload to S3
     await uploadFileToPresignedUrl(preSignedUrl, buffer, mimeType);
 
-    // Associate the file with the content node
-    const fileUrl = preSignedUrl.split('?')[0]; // Strip query params to get the base S3 URL
-    await associateUploadedFile(contentId, fileUrl, mimeType);
+    // ── Notify the platform via the upload endpoint ───────────────
+    // POST /action/content/v3/upload/{contentId} with fileUrl triggers the
+    // platform's processing pipeline. For H5P/ZIP this extracts the archive,
+    // creates content/h5p/{id}-latest/ on S3, and sets streamingUrl.
+    // Simply PATCHing artifactUrl bypasses all of this processing.
+    const s3FileUrl = preSignedUrl.split('?')[0]; // base S3 URL (public, no auth params needed)
+    await notifyContentUploaded(contentId, s3FileUrl);
 
     job.resolvedIdentifier = contentId;
   }
@@ -783,6 +809,17 @@ export class BulkImportQueue {
     if (!contentId) throw new Error(`Content ID not resolved for ${_contentTempId}`);
 
     await submitContentForReview(contentId);
+    job.resolvedIdentifier = contentId;
+  }
+
+  private async handlePublishContent(job: QueueJob): Promise<void> {
+    const { _contentTempId } = job.payload;
+    const contentId = this.resolvedIds.get(_contentTempId);
+    if (!contentId) throw new Error(`Content ID not resolved for ${_contentTempId}`);
+
+    // Publish triggers the platform processing pipeline:
+    // H5P/ZIP → streamingUrl is generated, pkgVersion is set, status → "Live"
+    await publishContent(contentId);
     job.resolvedIdentifier = contentId;
   }
 
@@ -833,6 +870,7 @@ export class BulkImportQueue {
     const {
       _qsTempId, _qIndex,
       questionType, questionText, options, correctAnswer, maxScore, hint, solution,
+      visibility,
       _qsSubject, _qsMedium, _qsGradeLevel, _qsLanguage, _qsFramework,
     } = job.payload;
     const qsId = this.resolvedIds.get(_qsTempId);
@@ -846,7 +884,11 @@ export class BulkImportQueue {
       framework:  _qsFramework  || 'pos-framework',
     };
 
-    const questionBody = buildQuestionBody(questionType, questionText, options, correctAnswer, maxScore, hint, solution, qsId, taxonomy);
+    const questionBody = buildQuestionBody(
+      questionType, questionText, options, correctAnswer,
+      maxScore, hint, solution, qsId, taxonomy,
+      (visibility as 'Parent' | 'Public') || 'Parent'
+    );
 
     const questionId = await createQuestion(questionBody);
 
@@ -862,7 +904,15 @@ export class BulkImportQueue {
 
     // ── 1. Group questions by section (preserve insertion order) ──
     // Each unique Section Name becomes one section node with a client-generated UUID.
-    const sectionMap = new Map<string, { name: string; sectionId: string; children: string[] }>();
+    // Also capture section-level description/instructions from the first question
+    // in each section (all questions in the same section should share these values).
+    const sectionMap = new Map<string, {
+      name: string;
+      sectionId: string;
+      description?: string;
+      instructions?: string;
+      children: string[];
+    }>();
 
     for (let i = 0; i < questionCount; i++) {
       const q = questions[i];
@@ -872,6 +922,8 @@ export class BulkImportQueue {
         sectionMap.set(sectionName, {
           name: sectionName,
           sectionId: uuidv4(),   // Sunbird requires a proper UUID for new section nodes
+          description:   q.sectionDescription  || undefined,
+          instructions:  q.sectionInstructions || undefined,
           children: [],
         });
       }
@@ -902,6 +954,8 @@ export class BulkImportQueue {
         objectType: 'QuestionSet',
         metadata: {
           name: sec.name,
+          ...(sec.description  && { description: sec.description }),
+          ...(sec.instructions && { instructions: sec.instructions }),
           mimeType: 'application/vnd.sunbird.questionset',
           primaryCategory: _qsPrimaryCategory || 'QuestionSet',
           visibility: 'Parent',
@@ -1126,7 +1180,8 @@ function buildQuestionBody(
     gradeLevel?: string[];
     language?: string[];
     framework?: string;
-  }
+  },
+  _visibility: 'Parent' | 'Public' = 'Parent'  // reserved for future use; API always receives 'Default' at creation
 ): Record<string, any> {
   // Platform requires `name` — derive from question text (max 120 chars)
   const name = text.replace(/<[^>]*>/g, '').trim().slice(0, 120) || 'Question';
@@ -1134,6 +1189,13 @@ function buildQuestionBody(
   const meta = QUESTION_TYPE_META[type] ?? QUESTION_TYPE_META['Subjective'];
 
   const score = maxScore ?? 1;
+
+  // Sunbird rejects visibility:'Parent' at question CREATE time.
+  // Questions must always be created with visibility:'Default'.
+  // When visibility='Parent' is desired, the QS hierarchy update (PATCH) automatically
+  // reassigns the question's visibility to 'Parent' once it's added to the QS.
+  // We keep the Excel value ('Parent'|'Public') only for future reference — creation always uses 'Default'.
+  const apiVisibility = 'Default';
 
   // Body varies by type — each type has its own wrapper and interaction placeholder
   const buildBody = (): string => {
@@ -1154,7 +1216,7 @@ function buildQuestionBody(
     qType:            meta.qType,
     ...(meta.interactionTypes?.length && { interactionTypes: meta.interactionTypes }),
     ...(meta.templateId               && { templateId:       meta.templateId }),
-    visibility:       'Default',
+    visibility: apiVisibility,  // always 'Default' at creation; hierarchy update handles 'Parent' assignment
     // Inherit taxonomy from parent QS for platform validation
     ...(taxonomy?.framework  && { framework:  taxonomy.framework }),
     ...(taxonomy?.subject    && { subject:    taxonomy.subject }),
