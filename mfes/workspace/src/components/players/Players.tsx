@@ -3,6 +3,7 @@ import SunbirdPdfPlayer from "@workspace/components/players/SunbirdPdfPlayer";
 import SunbirdVideoPlayer from "@workspace/components/players/SunbirdVideoPlayer";
 import SunbirdEpubPlayer from "@workspace/components/players/SunbirdEpubPlayer";
 import SunbirdQuMLPlayer from "@workspace/components/players/SunbirdQuMLPlayer";
+import ContentPlayerV2 from "@workspace/components/players/ContentPlayerV2";
 interface PlayerProps {
   playerConfig: any;
 }
@@ -17,12 +18,15 @@ const Players = ({ playerConfig }: PlayerProps) => {
     case "video/mp4":
     case 'audio/mp3':
     case 'audio/wav':
-    case 'audio/mpeg':
       return <SunbirdVideoPlayer playerConfig={playerConfig} />;
     case "application/vnd.sunbird.questionset":
       return <SunbirdQuMLPlayer playerConfig={playerConfig} />;
     case "application/epub":
       return <SunbirdEpubPlayer playerConfig={playerConfig} />;
+    case "application/vnd.ekstep.h5p-archive":
+    case 'audio/mpeg':
+    // case "application/pdf":
+      return <ContentPlayerV2 playerConfig={playerConfig} />;
     default:
       return <div>Unsupported media type</div>;
   }

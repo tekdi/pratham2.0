@@ -284,3 +284,130 @@ export const contentWithTelemetryData = async ({
   }
   // }
 };
+
+//resume
+export const getTelemetryEventsResume = async (
+  eventData: any,
+  contentType: string,
+  { courseId, unitId, userId, configFunctionality }: any = {},
+  resumeData:string,
+  contentMimeType:string,
+) => {
+  console.log('getTelemetryEvents hit', eventData, contentType, {
+    courseId,
+    unitId,
+    userId,
+  },resumeData);
+
+  if (!eventData || !eventData.object || !eventData.object.id) {
+    console.error('Invalid event data');
+    return;
+  }
+
+  const {
+    eid,
+    edata,
+    object: { id: identifier },
+  } = eventData;
+  const telemetryKey = `${contentType}_${identifier}_${eid}`;
+
+  const telemetryData = {
+    eid,
+    edata,
+    identifier,
+    contentType,
+  };
+
+  console.log(`${eid}Telemetry`, telemetryData);
+
+  localStorage.setItem(telemetryKey, JSON.stringify(telemetryData));
+
+  if (eid === 'PROGRESS') {
+    await contentWithTelemetryDataResume({
+      identifier,
+      detailsObject: [telemetryData],
+      courseId,
+      unitId,
+      userId,
+      configFunctionality,
+      contentType,
+      resumeData,
+      contentMimeType,
+    });
+  }
+};
+
+export const contentWithTelemetryDataResume = async ({
+  identifier,
+  detailsObject,
+  courseId,
+  unitId,
+  userId: propUserId,
+  configFunctionality,
+  contentType,
+  resumeData,
+  contentMimeType
+}: any) => {
+  if (configFunctionality.trackable === false) {
+    console.log('not trackable');
+    return false;
+  }
+  try {
+    const resolvedMimeType = contentMimeType || '';
+    if (!resolvedMimeType) {
+      console.error('Failed to fetch mimeType.');
+      return;
+    }
+
+    let userId = '';
+    if (propUserId) {
+      userId = propUserId;
+    } else if (typeof window !== 'undefined' && window.localStorage) {
+      userId = localStorage.getItem('userId') ?? '';
+    }
+
+    if (userId !== undefined || userId !== '') {
+      // Generate a random 4-digit number
+      await customStoreSet(`${userId}_${identifier}`, {
+        createdAt: new Date().toISOString(),
+        configFunctionality: configFunctionality,
+        extraObject: {
+          // course: course,
+          // unitId: unitId,
+        },
+        //below are api payload object
+        userId: userId,
+        contentId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
+        contentType: contentType || '',
+        contentMime: resolvedMimeType,
+        lastAccessOn: lastAccessOn,
+        detailsObject: detailsObject,
+      });
+      /*const reqBody: ContentCreate = {
+        userId: userId,
+        contentId: identifier,
+        courseId: courseId && unitId ? courseId : identifier,
+        unitId: courseId && unitId ? unitId : identifier,
+        contentType: ContentTypeReverseMap[resolvedMimeType] || '',
+        contentMime: resolvedMimeType,
+        lastAccessOn: lastAccessOn,
+        detailsObject: detailsObject,
+      };
+      // if (detailsObject.length > 0) {
+      const response = await createContentTracking(reqBody);
+      if (response && configFunctionality.isGenerateCertificate !== false) {
+        await updateCOurseAndIssueCertificate({
+          userId,
+          course,
+          unitId,
+          isGenerateCertificate: configFunctionality.isGenerateCertificate,
+        });
+      }*/
+    }
+  } catch (error) {
+    console.error('Error in contentWithTelemetryData:', error);
+  }
+  // }
+};
