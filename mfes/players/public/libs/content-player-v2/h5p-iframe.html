@@ -43,6 +43,13 @@
       white-space: pre-wrap;
       word-break: break-all;
     }
+    /* Hide H5P's built-in fullscreen button — the player wrapper provides its own */
+    .h5p-fullscreen-button,
+    .h5p-toggle-fullscreen,
+    a.h5p-fullscreen,
+    button.h5p-fullscreen,
+    .h5p-content-controls .h5p-fullscreen,
+    .h5p-frame .h5p-fullscreen-button { display: none !important; }
   </style>
 </head>
 <body>
