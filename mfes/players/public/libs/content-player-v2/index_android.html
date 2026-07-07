@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+   <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <title>H5P Player</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1a1a2e;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <content-player id="player"></content-player>
+
+  <!-- IIFE bundle — includes H5P renderer -->
+  <script src="content-player.iife.js"></script>
+
+  <script type="text/javascript">
+    function setData() {
+      let contentPlayerConfig=null;
+      if(localStorage.getItem("contentPlayerObject")){
+        let jsonObj=JSON.parse(localStorage.getItem("contentPlayerObject"));
+        // alert("jsonObj"+JSON.stringify(jsonObj));
+        contentPlayerConfig=jsonObj?.contentPlayerConfig;
+        // alert("in json object "+JSON.stringify(contentPlayerConfig));
+        // alert(localStorage.getItem("contentPlayerObject"));
+      }
+      if(contentPlayerConfig!=null)
+      {
+        //alert("valid playerConfig");
+        try {
+            const player = document.getElementById('player');
+            player.sunbirdPlayerConfig = contentPlayerConfig;
+            // player.sunbirdPlayerConfig={"context":{"host":"file:///data/user/0/com.pratham.learning/files/do_214576542059356160113","contentId":"do_214576542059356160113","uid":"7c7cbf27-f7d7-4bb3-a704-3f68e7b544ad","userData":{"firstName":"Newlearner Atmtest!","lastName":""}},"config":{"showEndPage":true,"plugins":[{"id":"org.sunbird.player.endpage","ver":1.1,"type":"plugin"}],"sideMenu":{"showShare":false,"showDownload":false,"showExit":true,"showPrint":false,"showReplay":true}},"metadata":{"copyright":"pos-channel","subject":["Social Science","Podcasts"],"channel":"pos-channel","downloadUrl":"https://knowlg-public.s3-ap-south-1.amazonaws.com/content/do_214576542059356160113/interactive-h5p-video-1_1779363117158_do_214576542059356160113_1.ecar","language":["English"],"mimeType":"application/vnd.ekstep.h5p-archive","objectType":"Content","primaryCategory":"Learning Resource","artifactUrl":"https://knowlg-public.s3-ap-south-1.amazonaws.com/content/do_214576542059356160113/artifact/1779363045412_do_214576542059356160113.zip","contentType":"Resource","identifier":"do_214576542059356160113","audience":["Student"],"visibility":"Default","mediaType":"content","osId":"org.ekstep.quiz.app","languageCode":["en"],"license":"CC BY 4.0","domain":["Learning for School","Learning for Work","Learning for Life"],"name":"Interactive h5p video 1","status":"Live","code":"478b297a-9dc9-41d6-89a0-a909ba3ea401","interceptionPoints":{},"streamingUrl":"file:///data/user/0/com.pratham.learning/files/do_214576542059356160113/assets/public/content/h5p/do_214576542059356160113-latest/content","createdOn":"2026-05-21T11:30:44.371+0000","lastUpdatedOn":"2026-05-21T11:31:57.836+0000","creator":"ShubhamUserthirtynine Tekdi","pkgVersion":1,"versionKey":"1779363097243","framework":"pos-framework","createdBy":"05be30aa-f509-4269-be33-7e3164ec7df5","resourceType":"Learn"},"data":""};
+
+            player.addEventListener('player:ready',    (e) => { console.log('[player:ready v2]', e.detail);    window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'player:ready',    detail: e.detail })); });
+            player.addEventListener('player:start',    (e) => { console.log('[player:start]', e.detail);        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'player:start',    detail: e.detail })); });
+            player.addEventListener('player:complete', (e) => { console.log('[player:complete]', e.detail);     window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'player:complete', detail: e.detail })); });
+            player.addEventListener('player:error',    (e) => { console.error('[player:error]', e.detail);      window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'player:error',    detail: e.detail })); });
+            player.addEventListener('player:close',    (e) => { console.log('[player:close]', e.detail);        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'player:close',    detail: e.detail })); });
+            player.addEventListener('playerTelemetryEvent', (e)=> {
+              const envelope = e.detail;   // full SunbirdTelemetryEvent object
+              console.log('[telemetry]', envelope.eid, envelope);
+              window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'telemetry',    detail: e.detail }));
+            });
+        } catch (e) {
+        }
+      }
+      else
+      {
+        alert("Invalid playerConfig");
+        // delay(1000).then(() => setData());
+        setTimeout(() => setData(), 1000);
+      }
+    }
+  </script>
+
+</body>
+</html>

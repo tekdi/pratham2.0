@@ -541,3 +541,22 @@ export const getUserId = async (): Promise<any> => {
     throw error;
   }
 };
+
+export const getContentStatus = async (reqBody: any) => {
+  const apiUrl = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/tracking/content/search`;
+  try {
+    const tenantId =
+      typeof window !== 'undefined' ? localStorage.getItem('tenantId') : null;
+
+    const response = await axios.post(apiUrl, reqBody, {
+      headers: {
+        ...(tenantId ? { tenantid: tenantId } : {}),
+      },
+    });
+    return response?.data;
+  } catch (error) {
+    console.log(error);
+    // throw error;
+    return null;
+  }
+};
