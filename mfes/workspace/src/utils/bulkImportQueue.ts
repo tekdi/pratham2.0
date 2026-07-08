@@ -29,6 +29,7 @@ import {
   POS_DOMAIN_NAME_TO_ID,
   POS_SUB_DOMAIN_NAME_TO_ID,
   POS_SUBJECT_NAME_TO_ID,
+  splitMultiValue,
 } from './frameworkConfig';
 import {
   createContentNode,
@@ -53,11 +54,11 @@ import {
 import { patch } from '../services/RestClient';
 
 // ─── Multi-select helper ──────────────────────────────────────
-// Splits pipe-separated values from Excel into an array.
+// Splits pipe- or comma-separated values from Excel into an array.
 // Returns undefined if the value is blank.
 const toArray = (val: string | undefined): string[] | undefined => {
-  if (!val || String(val).trim() === '') return undefined;
-  return String(val).split('|').map((s) => s.trim()).filter(Boolean);
+  const parts = splitMultiValue(val);
+  return parts.length > 0 ? parts : undefined;
 };
 
 // Convert Excel 'true'/'false' strings (or actual booleans) → JavaScript boolean.
