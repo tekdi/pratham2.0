@@ -5,24 +5,26 @@ import {
   updateCOurseAndIssueCertificate,
 } from './PlayerService';
 import { customStoreSet } from '../utils/customIdbStore';
-import { getPlayerExitUrl } from '../components/utils/Helper';
 
 const lastAccessOn = new Date().toISOString();
 
-// Delegates to Helper.getPlayerExitUrl so Exit uses activeLink when opened in a new tab.
 export const handleExitEvent = () => {
-  const exitUrl = getPlayerExitUrl();
-  if (exitUrl) {
-    const targetWindow = window.top ?? window;
-    targetWindow.location.href = exitUrl;
+  // New-tab scenario: exitLink is forwarded into the iframe src from the player page
+  const urlParams = new URLSearchParams(window.location.search);
+  const exitLinkFromUrl = urlParams.get('exitLink');
+  if (exitLinkFromUrl) {
+    const target = window.top || window;
+    target.location.href = exitLinkFromUrl;
     return;
   }
-
-  const targetWindow = window.top ?? window;
-  targetWindow.history.go(-1);
+  // Same-tab scenario: sessionStorage was set before router.push to the player
+  const previousPage = sessionStorage.getItem('previousPage');
+  if (previousPage) {
+    window.location.href = previousPage;
+  } else {
+    window.history.go(-1);
+  }
 };
-
-export { getPlayerExitUrl } from '../components/utils/Helper';
 
 export const handlePlayerEvent = (event: any) => {
   console.log('Player Event', event.detail);

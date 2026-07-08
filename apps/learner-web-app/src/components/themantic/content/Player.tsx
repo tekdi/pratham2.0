@@ -70,10 +70,28 @@ const App = ({
   } | null>(null);
 
   let activeLink = null;
+  let exitLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    exitLink = searchParams.get('exitLink');
+    returnUrl = searchParams.get('returnUrl');
   }
+
+  // Intercept browser back button when exitLink or returnUrl is present (new-tab scenario).
+  const effectiveExitLink = exitLink || returnUrl;
+  useEffect(() => {
+    if (!effectiveExitLink) return;
+    window.history.pushState({ playerPage: true }, '', window.location.href);
+    const handlePopState = () => {
+      window.location.href = effectiveExitLink as string;
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [effectiveExitLink]);
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
@@ -502,6 +520,7 @@ const App = ({
               courseId={courseId}
               unitId={unitId}
               {..._config?.player}
+              exitLink={returnUrl || exitLink}
             />
             {item?.content?.artifactUrl &&
               isDownloadableMimeType(item?.content?.mimeType) &&
@@ -639,6 +658,7 @@ const PlayerBox = ({
   unitId,
   userIdLocalstorageName,
   item,
+  exitLink,
 }: any) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -715,6 +735,8 @@ const PlayerBox = ({
       <iframe
   src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${identifier}${
     courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ""
+  }${
+    exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ""
   }${
     userIdLocalstorageName
       ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`

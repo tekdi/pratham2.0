@@ -146,6 +146,12 @@ export default function App({
   if (loading) return <Loader isLoading />;
 
   const handleBackClick = () => {
+    // In a new tab there is no browser history, so router.back() does nothing.
+    // Fall back to the base pathname (strips the subdomain/filter query params).
+    if (typeof window !== 'undefined' && window.history.length <= 1) {
+      router.push(window.location.pathname);
+      return;
+    }
     router.back();
   };
 

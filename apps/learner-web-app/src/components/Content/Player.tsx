@@ -98,44 +98,32 @@ const App = ({
   let activeLink = null;
   let previousPage = null;
   let exitLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
     previousPage = searchParams.get('previousPage');
     exitLink = searchParams.get('exitLink');
+    returnUrl = searchParams.get('returnUrl');
   }
 
-  // Intercept SBPlayer iframe's Exit button which calls window.history.back()
-  // When exitLink/activeLink param is present, redirect there instead of going back in history
+  // Intercept browser back button when exitLink or returnUrl is set.
+  // returnUrl covers new-tab scenario; exitLink covers same-tab scenario.
+  const effectiveExitLink = exitLink || returnUrl;
   useEffect(() => {
-    const redirectUrl = exitLink || activeLink;
-    if (!redirectUrl) return;
+    if (!effectiveExitLink) return;
 
     window.history.pushState({ playerPage: true }, '', window.location.href);
 
     const handlePopState = () => {
-      window.location.href = redirectUrl as string;
+      window.location.href = effectiveExitLink as string;
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [exitLink, activeLink]);
-
-  // Fallback: sbplayer iframe posts player:close — redirect this tab using activeLink/exitLink.
-  useEffect(() => {
-    const handlePlayerClose = (event: MessageEvent) => {
-      if (event.data?.type !== 'player:close') return;
-      const redirectUrl = exitLink || activeLink;
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      }
-    };
-
-    window.addEventListener('message', handlePlayerClose);
-    return () => window.removeEventListener('message', handlePlayerClose);
-  }, [exitLink, activeLink]);
+  }, [effectiveExitLink]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -259,16 +247,11 @@ const App = ({
       //       }));
       //     }
       //   }
-   // Prefer explicit exit/active links over history.back() so new-tab player sessions land on the right page.
-   if (exitLink) {
-      router.push(exitLink);
+   if (returnUrl) {
+      window.location.href = returnUrl;
       return;
     }
-   if (activeLink) {
-      router.push(activeLink);
-      return;
-    }
-   if (previousPage) {
+    if (previousPage) {
       router.push(previousPage);
       return;
     }
@@ -520,12 +503,10 @@ const App = ({
           courseId={courseId}
           unitId={unitId}
           mimeType={mimeType}
-          activeLink={activeLink}
-          exitLink={exitLink}
-          previousPage={previousPage}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
+          exitLink={returnUrl || exitLink}
         />
         {item?.content?.artifactUrl &&
           
@@ -743,9 +724,7 @@ const PlayerBox = ({
   mimeType,
   isPortrait,
   isVideo,
-  activeLink,
   exitLink,
-  previousPage,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -841,21 +820,12 @@ const PlayerBox = ({
             }?identifier=${identifier}${
               courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
             }${
+              exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ''
+            }${
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}${
-              // Forward return URLs into sbplayer so Exit can redirect the player tab correctly.
-              exitLink
-                ? `&exitLink=${encodeURIComponent(exitLink)}`
-                : activeLink
-                ? `&activeLink=${encodeURIComponent(activeLink)}`
-                : ''
-            }${
-              previousPage
-                ? `&previousPage=${encodeURIComponent(previousPage)}`
-                : ''
-            }`}
+            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
             // style={{
             //   border: 'none',
             //   objectFit: 'contain',

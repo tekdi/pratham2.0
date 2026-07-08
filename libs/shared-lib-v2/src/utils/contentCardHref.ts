@@ -16,25 +16,25 @@ export const CONTENT_CARD_PLAYER_MIME_TYPES = [
 export function getContentCardHref(
   item: { identifier?: string; mimeType?: string },
   contentBaseUrl = '',
-  activeLink?: string
+  returnUrl?: string | null
 ): string | undefined {
   if (!item?.identifier) return undefined;
 
   const base = contentBaseUrl ?? '';
-  const link =
-    activeLink ??
+  const backUrl =
+    returnUrl ??
     (typeof window !== 'undefined'
       ? window.location.pathname + window.location.search
-      : '');
-  const query = link
-    ? `?activeLink=${encodeURIComponent(link)}`
-    : '';
+      : null);
 
+  let path: string;
   if (CONTENT_CARD_PLAYER_MIME_TYPES.includes(item.mimeType as any)) {
-    return `${base}/player/${item.identifier}${query}`;
+    path = `${base}/player/${item.identifier}`;
+  } else {
+    path = `${base}/content-details/${item.identifier}`;
   }
 
-  return `${base}/content-details/${item.identifier}${query}`;
+  return backUrl ? `${path}?returnUrl=${encodeURIComponent(backUrl)}` : path;
 }
 
 const UNIT_COLLECTION_MIME = 'application/vnd.ekstep.content-collection';
@@ -46,7 +46,7 @@ export function getUnitCardHref(
     courseId,
     effectiveUnitId,
     contentBaseUrl = '/content',
-    activeLink,
+    activeLink: returnUrl,
   }: {
     courseId?: string;
     effectiveUnitId?: string;
@@ -58,14 +58,16 @@ export function getUnitCardHref(
   if (subItem.evaluationType === 'offline') return undefined;
 
   const base = contentBaseUrl ?? '/content';
-  const query = activeLink
-    ? `?activeLink=${encodeURIComponent(activeLink)}`
-    : '';
+  const backUrl =
+    returnUrl ??
+    (typeof window !== 'undefined'
+      ? window.location.pathname + window.location.search
+      : null);
 
   const path =
     subItem.mimeType === UNIT_COLLECTION_MIME
       ? `${base}/${courseId}/${subItem.identifier}`
       : `${base}/${courseId}/${effectiveUnitId}/${subItem.identifier}`;
 
-  return `${path}${query}`;
+  return backUrl ? `${path}?returnUrl=${encodeURIComponent(backUrl)}` : path;
 }
