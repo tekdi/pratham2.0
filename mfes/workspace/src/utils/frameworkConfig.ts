@@ -26,7 +26,9 @@ export const LOOKUP = {
   AUDIENCES: ['Student', 'Teacher', 'Parent', 'Administrator'],
   BLOOMS_LEVELS: ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'],
   DIFFICULTY_LEVELS: ['Easy', 'Medium', 'Hard'],
-  EVALUATION_TYPES: ['online', 'offline', 'ai'],
+  // Friendly labels shown in the Excel template; mapped to the raw API
+  // values online / offline / ai via EVALUATION_TYPE_LABEL_TO_VALUE.
+  EVALUATION_TYPES: ['Auto-Graded', 'Facilitator-Graded', 'AI-Assisted'],
   ASSESSMENT_TYPES: ['Pre Test', 'Post Test', 'Other', 'Unit Test', 'Mock Test', 'Eligibility Test'],
 
   // ── Languages ───────────────────────────────────────────────
@@ -279,6 +281,32 @@ export const LOOKUP = {
   SCP_PROGRAMS: ['Second Chance', 'Open School'],
 } as const;
 
+// ─── Evaluation type label ↔ API value mapping ────────────────
+// The Excel template shows friendly labels; the platform API expects
+// the raw values online / offline / ai.
+
+export const EVALUATION_TYPE_LABEL_TO_VALUE: Record<string, string> = {
+  'Auto-Graded': 'online',
+  'Facilitator-Graded': 'offline',
+  'AI-Assisted': 'ai',
+};
+
+const EVALUATION_TYPE_VALUE_TO_LABEL: Record<string, string> = {
+  online: 'Auto-Graded',
+  offline: 'Facilitator-Graded',
+  ai: 'AI-Assisted',
+};
+
+// Normalizes a parsed cell to the label form: raw API values from older
+// templates ("online") become labels ("Auto-Graded"); labels pass through.
+export const normalizeEvaluationType = (
+  val: string | undefined
+): string | undefined => {
+  if (!val || String(val).trim() === '') return undefined;
+  const str = String(val).trim();
+  return EVALUATION_TYPE_VALUE_TO_LABEL[str.toLowerCase()] ?? str;
+};
+
 // ─── Multi-select value splitter ──────────────────────────────
 // Multi-select cells accept pipe-separated (A|B) or comma-separated (A, B)
 // values. A few option values themselves contain a comma (e.g.
@@ -309,7 +337,7 @@ export const splitMultiValue = (val: string | undefined | null): string[] => {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
-    .map((s) => s.replace(/\u0000(\d+)\u0000/g, (_m, i) => COMMA_OPTION_VALUES[Number(i)]));
+    .map((s) => s.replace(/\u0000(\d+)\u0000/g, (m, i) => COMMA_OPTION_VALUES[Number(i)] ?? m));
 };
 
 // ─── POS Identifier Maps ──────────────────────────────────────
@@ -612,7 +640,7 @@ export const POS_QS_COLUMNS: ColumnDef[] = [
   { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',     note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',     note: 'Auto-Graded, Facilitator-Graded or AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
@@ -671,7 +699,7 @@ export const SCP_QS_COLUMNS: ColumnDef[] = [
   { header: 'Course Type*',       apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',        note: 'Assessment language — single value' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',         note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',         note: 'Auto-Graded, Facilitator-Graded or AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];

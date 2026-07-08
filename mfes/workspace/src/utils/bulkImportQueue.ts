@@ -30,6 +30,7 @@ import {
   POS_SUB_DOMAIN_NAME_TO_ID,
   POS_SUBJECT_NAME_TO_ID,
   splitMultiValue,
+  EVALUATION_TYPE_LABEL_TO_VALUE,
 } from './frameworkConfig';
 import {
   createContentNode,
@@ -240,7 +241,10 @@ export class BulkImportQueue {
           gradeLevel: toArray(qs.gradeLevel),
           courseType: toArray(qs.courseType),
           assessmentType: qs.assessmentType || undefined,
-          evaluationType: qs.evaluationType || undefined,
+          // Excel shows friendly labels — convert to API value (online/offline/ai)
+          evaluationType: qs.evaluationType
+            ? EVALUATION_TYPE_LABEL_TO_VALUE[qs.evaluationType] || qs.evaluationType
+            : undefined,
           // QS create API requires boolean true/false for these fields
           showFeedback:  toBool(qs.showFeedback),
           showSolutions: toBool(qs.showSolutions),
