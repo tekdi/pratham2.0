@@ -346,6 +346,45 @@ const validateQuestions = (
         `${row.questionType} questions should have a Correct Answer`, undefined, 'warning'));
     }
   });
+
+  // ── Section Description / Instructions — required per section ──
+  // The hierarchy update takes them from the first filled row of each
+  // section, so each (QS, section) group must have them on at least one row.
+  const sectionGroups = new Map<string, {
+    firstRowNum: number;
+    sectionName: string;
+    hasDescription: boolean;
+    hasInstructions: boolean;
+  }>();
+
+  questions.forEach((row, idx) => {
+    const rowNum = idx + 2;
+    const sectionName = (row.sectionName || 'Section 1').trim();
+    const key = `${row.questionSetTempId || ''}::${sectionName}`;
+
+    let group = sectionGroups.get(key);
+    if (!group) {
+      group = { firstRowNum: rowNum, sectionName, hasDescription: false, hasInstructions: false };
+      sectionGroups.set(key, group);
+    }
+    if (row.sectionDescription && String(row.sectionDescription).trim() !== '') {
+      group.hasDescription = true;
+    }
+    if (row.sectionInstructions && String(row.sectionInstructions).trim() !== '') {
+      group.hasInstructions = true;
+    }
+  });
+
+  sectionGroups.forEach((group) => {
+    if (!group.hasDescription) {
+      errors.push(err('Questions', group.firstRowNum, 'Section Description*',
+        `"Section Description*" is required for section "${group.sectionName}" — fill it on at least one row of the section`));
+    }
+    if (!group.hasInstructions) {
+      errors.push(err('Questions', group.firstRowNum, 'Section Instructions*',
+        `"Section Instructions*" is required for section "${group.sectionName}" — fill it on at least one row of the section`));
+    }
+  });
 };
 
 // ─── Validate Courses Sheet ───────────────────────────────────

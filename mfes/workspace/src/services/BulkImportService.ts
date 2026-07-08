@@ -6,7 +6,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import { get, post, patch } from './RestClient';
+import { get, post, patch, delApi } from './RestClient';
 import { getLocalStoredUserId } from './LocalStorageService';
 import {
   ContentCreatePayload,
@@ -309,7 +309,7 @@ export const createQuestion = async (
 export const updateQuestionSetHierarchy = async (
   questionSetId: string,
   payload: HierarchyUpdatePayload
-): Promise<void> => {
+): Promise<Record<string, string>> => {
   const userId = getLocalStoredUserId();
 
   const reqBody = {
@@ -322,10 +322,23 @@ export const updateQuestionSetHierarchy = async (
     },
   };
 
-  await patch('/action/questionset/v2/hierarchy/update', reqBody, {
+  const response = await patch('/action/questionset/v2/hierarchy/update', reqBody, {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   });
+
+  // Maps client-generated ids of isNew nodes (section UUIDs) to the real
+  // platform identifiers assigned during the update
+  return (response as any)?.data?.result?.identifiers ?? {};
+};
+
+/**
+ * Retire (soft-delete) a QuestionSet — used to clean up when the hierarchy
+ * update fails so no QuestionSet is left without its questions.
+ * DELETE /action/questionset/v2/retire/{identifier}
+ */
+export const retireQuestionSet = async (identifier: string): Promise<void> => {
+  await delApi(`/action/questionset/v2/retire/${identifier}`);
 };
 
 // ─── COURSE APIs ──────────────────────────────────────────────
