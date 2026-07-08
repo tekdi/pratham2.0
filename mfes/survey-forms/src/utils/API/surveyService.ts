@@ -362,53 +362,22 @@ export interface ContextResponseInfo {
   submittedAt: string | null;
 }
 
-export const fetchResponseStatusByContext = async (
+export interface CohortResponseRow {
+  contextId: string;
+  status: 'in_progress' | 'submitted' | 'reviewed';
+  submittedAt: string | null;
+}
+
+/**
+ * Every learner's current response status for a survey, scoped to one batch —
+ * one row per learner who has responded (their latest status if resubmitted).
+ * Learners with no row are "not started"; the caller derives that by diffing
+ * this against the batch's full roster (survey service has no roster visibility).
+ */
+export const fetchResponseListByCohort = async (
   surveyId: string,
-  contextIds: string[],
-  respondentId?: string | null
-): Promise<Record<string, ContextResponseInfo>> => {
-  if (contextIds.length === 0) return {};
-
-  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
-    page: 1,
-    limit: contextIds.length,
-    sortBy: 'updatedAt',
-    sortOrder: 'DESC',
-    contextIds,
-  });
-
-  const rows =
-    (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ??
-    [];
-
-  const scoped = respondentId
-    ? rows.filter((r) => r.respondentId === respondentId)
-    : rows;
-
-  const byContext = new Map<string, SurveyResponse>();
-  scoped.forEach((r) => {
-    if (!r.contextId || !contextIds.includes(r.contextId)) return;
-    const prev = byContext.get(r.contextId);
-    if (!prev) {
-      byContext.set(r.contextId, r);
-      return;
-    }
-    // Keep newest response if multiple exist.
-    if (new Date(r.updatedAt).getTime() > new Date(prev.updatedAt).getTime()) {
-      byContext.set(r.contextId, r);
-    }
-  });
-
-  const out: Record<string, ContextResponseInfo> = {};
-  contextIds.forEach((id) => {
-    const r = byContext.get(id);
-    if (!r) {
-      out[id] = { status: 'none', submittedAt: null };
-    } else if (r.status === 'submitted') {
-      out[id] = { status: 'submitted', submittedAt: r.submittedAt ?? null };
-    } else {
-      out[id] = { status: 'draft', submittedAt: null };
-    }
-  });
-  return out;
+  cohortId: string
+): Promise<CohortResponseRow[]> => {
+  const response = await get(API_ENDPOINTS.RESPONSE_LIST_BY_COHORT(surveyId, cohortId));
+  return (response.data as { result?: CohortResponseRow[] })?.result ?? [];
 };
