@@ -146,18 +146,17 @@ const SSOContent = () => {
           throw new Error(response?.data?.message || 'Authentication failed');
         }
       } catch (error: any) {
-        console.error('SSO authentication error:', error);
-        showToastMessage(error.message || 'Authentication failed', 'error');
-
-        // Reset authentication flags on error so user can retry
+        console.error('SSO authentication error:', error?.response?.data?.params?.errmsg);
+        showToastMessage(error?.response?.data?.params?.errmsg || 'Authentication failed', 'error');
         setHasAuthenticated(false);
         authenticationRef.current = false;
-
-        // Redirect to home page after error
         setTimeout(() => {
-          router.push('/');
-        }, 2000);
-      } finally {
+          window.location.href = '/pragyanpath';
+        }, 2500);
+        return;
+      }
+    
+    finally {
         setTimeout(() => {
           setProcessing(false);
         }, 800);
@@ -491,47 +490,61 @@ const SSOContent = () => {
                     alignItems="center"
                     gap={3}
                   >
-                    {/* Success checkmark */}
-                    <Box
-                      sx={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: '50%',
-                        backgroundColor: '#1A8825',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        animation: `${checkmarkAnimation} 0.6s ease-in-out`,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 24,
-                          height: 12,
-                          border: '3px solid white',
-                          borderTop: 'none',
-                          borderRight: 'none',
-                          transform: 'rotate(-45deg)',
-                          position: 'absolute',
-                          top: '18px',
-                          left: '18px',
-                        }}
-                      />
-                    </Box>
-
-                    {/* Success pulse effect */}
+                    {/* Success checkmark + pulse wrapper */}
                     <Box
                       sx={{
                         width: 80,
                         height: 80,
-                        borderRadius: '50%',
-                        border: '2px solid #1A8825',
-                        position: 'absolute',
-                        animation: `${pulseAnimation} 2s ease-in-out infinite`,
-                        opacity: 0.3,
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
-                    />
+                    >
+                      {/* Success pulse effect */}
+                      <Box
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: '50%',
+                          border: '2px solid #1A8825',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          animation: `${pulseAnimation} 2s ease-in-out infinite`,
+                          opacity: 0.3,
+                        }}
+                      />
+
+                      {/* Success checkmark */}
+                      <Box
+                        sx={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: '50%',
+                          backgroundColor: '#1A8825',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          position: 'relative',
+                          animation: `${checkmarkAnimation} 0.6s ease-in-out`,
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 24,
+                            height: 12,
+                            border: '3px solid white',
+                            borderTop: 'none',
+                            borderRight: 'none',
+                            transform: 'rotate(-45deg)',
+                            position: 'absolute',
+                            top: '18px',
+                            left: '18px',
+                          }}
+                        />
+                      </Box>
+                    </Box>
                   </Box>
                 </Fade>
               )}

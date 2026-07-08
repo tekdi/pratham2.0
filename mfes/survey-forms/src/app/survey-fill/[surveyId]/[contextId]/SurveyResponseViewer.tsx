@@ -48,38 +48,31 @@ const ReadOnlyValue: React.FC<{ field: SurveyField; value: any }> = ({ field, va
     return found ? found.label : String(val);
   };
 
+  const isOtherValue = (val: any) => resolveLabel(val).toLowerCase() === 'other';
+
   switch (field.fieldType) {
     case 'checkbox':
     case 'multi_select': {
       const vals: any[] = Array.isArray(selected) ? selected : [selected];
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, alignItems: 'flex-start' }}>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-            {vals.map((v, i) => (
-              <Chip key={i} label={resolveLabel(v)} size="small" sx={{ backgroundColor: '#FFF8E1' }} />
-            ))}
-          </Box>
-          {otherText && (
-            <Typography variant="body2" sx={{ color: '#1E1B16', fontStyle: 'italic', ml: 0.5 }}>
-              {otherText}
-            </Typography>
-          )}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'flex-start' }}>
+          {vals.map((v, i) => (
+            <Chip
+              key={i}
+              label={isOtherValue(v) && otherText ? `Other (${otherText})` : resolveLabel(v)}
+              size="small"
+              sx={{ backgroundColor: '#FFF8E1' }}
+            />
+          ))}
         </Box>
       );
     }
     case 'radio':
     case 'select':
       return (
-        <Box>
-          <Typography variant="body1" sx={{ color: '#1E1B16' }}>
-            {resolveLabel(selected)}
-          </Typography>
-          {otherText && (
-            <Typography variant="body2" sx={{ color: '#1E1B16', fontStyle: 'italic', mt: 0.5 }}>
-              {otherText}
-            </Typography>
-          )}
-        </Box>
+        <Typography variant="body1" sx={{ color: '#1E1B16' }}>
+          {isOtherValue(selected) && otherText ? `Other (${otherText})` : resolveLabel(selected)}
+        </Typography>
       );
     case 'rating': {
       const max = field.validations?.max ?? 5;

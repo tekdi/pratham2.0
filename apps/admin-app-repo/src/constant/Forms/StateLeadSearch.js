@@ -23,7 +23,7 @@ export const StateLeadSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     name: {
       type: 'string',
@@ -35,17 +35,17 @@ export const StateLeadSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    status: {
+    tenantStatus: {
       type: 'string',
       title: 'Status',
-      enum: ['active', 'archived'],
-      enumNames: ['Active', 'Archived'],
+      enum: ['all', 'active', 'archived'],
+      enumNames: ['All', 'Active', 'Archived'],
     },
   },
 };
 
 export const StateLeadUISchema = {
-  'ui:order': ['state', 'name', 'sortBy', 'status'],
+  'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
 
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',

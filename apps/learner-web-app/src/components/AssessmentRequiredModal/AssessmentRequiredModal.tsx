@@ -114,9 +114,9 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
         <Divider />
 
         <Box sx={{ p: 2, display: 'flex', justifyContent: 'center', gap: 1 }}>
-          {/* <Button variant="outlined" onClick={onClose}>
+          <Button variant="outlined" color="secondary" onClick={onClose}>
             {t('COMMON.CLOSE')}
-          </Button> */}
+          </Button>
           <Button variant="contained" color="primary" onClick={onStartAssessment}>
             {t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
           </Button>

@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import {
   fetchContent,
+  getContentStatus,
   getHierarchy,
   getQumlData,
 } from '../services/PlayerService';
@@ -82,13 +83,47 @@ const Players: React.FC<SunbirdPlayerProps> = ({
           //@ts-ignore
           config.context['contentId'] = identifier;
         }
-
-        //if h5p player
         if(data.mimeType === MIME_TYPE.H5P_CONTENT && config.metadata)
         {
           config.metadata.streamingUrl=config.metadata.streamingUrl+"/content";
           console.log("########h5p playerConfig",config);
         }
+        //check audio content
+        if (MIME_TYPE.AUDIO_MIME_TYPE.includes(data?.mimeType) && config?.metadata?.posterImage) {
+          config.extra={...(config?.extra? config.extra : {}),"audio": {
+            "icon": config?.metadata?.posterImage
+          }};
+        }
+        //search content details
+        // console.log("###########contentStatus outer",userId,courseId,unitId,identifier);
+        if(courseId && unitId && identifier)
+        {
+          let temp_userId:any='';
+          if (typeof window !== "undefined") {
+            temp_userId = localStorage.getItem("userId");
+          }
+          let contentStatus = await getContentStatus({
+            courseId:courseId,
+            userId: temp_userId,
+            contentId:identifier,
+            unitId:unitId
+          });    
+          if(contentStatus && contentStatus?.data?.length>0)
+          {
+            if(contentStatus.data[0]?.resumeData && contentStatus.data[0]?.resumeData!='' && contentStatus.data[0].resumeData!=null)
+            {
+              // console.log("###########contentStatus",contentStatus.data[0].resumeData);
+              config.extra={...(config?.extra? config.extra : {}), resumeData:contentStatus.data[0].resumeData.toString()};
+            }
+          }
+        }
+        //set theme
+        // console.log("###########contentStatus",contentStatus);
+        config.extra={...(config?.extra? config.extra : {}),"theme": {
+          "primary": "#DDA613", //FDBE16
+          "toolbar": "rgba(30,5,20,0.97)",
+          "background": "#1a0512"
+        }};
         setPlayerConfig(config);
       } catch (error) {
         console.error('Error loading content:', error);

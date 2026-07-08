@@ -406,6 +406,7 @@ const LoginPage = () => {
               );
               const activeSessionId = activeSession ? activeSession.id : '';
               localStorage.setItem('academicYearId', activeSessionId);
+              localStorage.setItem('session', activeSession?.session ?? '');
               if (activeSessionId) {
                 setIsActiveYearSelected(true);
                 // router.push("/centers");
@@ -574,8 +575,11 @@ const LoginPage = () => {
     if (userResponse) {
       const token = localStorage.getItem('token');
       localStorage.setItem('userId', userResponse?.userId);
-      console.log(userResponse?.tenantData);
-      localStorage.setItem('templtateId', tenantId);
+      const tenant = userResponse?.tenantData?.find(
+        (item:any) => item.tenantId === tenantId
+      );
+      let templateId=tenant?.templateId;
+      localStorage.setItem('templtateId', templateId);
       localStorage.setItem('tenantName', tenantName);
       localStorage.setItem('roleId', roleId);
       localStorage.setItem('roleName', roleName);

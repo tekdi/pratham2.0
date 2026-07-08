@@ -47,32 +47,71 @@ function evaluateLogic(
   logic: ConditionalLogic | null,
   formValues: Record<string, any>
 ): boolean {
-  if (!logic) return true;
-
-  // Handle legacy format: { show_if: string[], depends_on: string }
-  const legacyLogic = logic as any;
-  if (legacyLogic.depends_on !== undefined) {
-    const dependValue = formValues[legacyLogic.depends_on];
-    const allowedValues: string[] = legacyLogic.show_if ?? [];
-    const currentValues = Array.isArray(dependValue) ? dependValue : [dependValue];
-    return allowedValues.some((v) => currentValues.includes(v));
-  }
+  if (!logic || !logic.conditions) return true;
 
   const { action, conditions } = logic;
-  if (!conditions) return true;
 
   const allMatch = conditions.every((cond) => {
     const currentValue = formValues[cond.fieldName];
     return evaluateCondition(currentValue, cond.operator, cond.value);
   });
 
-  return action === 'show' ? allMatch : !allMatch;
+  return action === 'hide' ? !allMatch : allMatch;
+}
+
+/**
+ * Handles the legacy { show_if, depends_on } format.
+ *
+ * Examples:
+ *   { "depends_on": "Q1", "show_if": ["val1", "val2"] }
+ *   { "depends_on": "Q1", "show_if": "val1" }
+ *
+ * Returns:
+ *   - true  → field should be shown
+ *   - false → field should be hidden
+ *   - null  → not a legacy format, skip this check
+ */
+function evaluateShowIf(
+  logic: any,
+  formValues: Record<string, any>
+): boolean | null {
+  if (!logic || !logic.depends_on) return null;
+
+  const dependsOn: string = logic.depends_on;
+  const rawShowIf = Array.isArray(logic.show_if)
+    ? logic.show_if
+    : logic.show_if !== undefined && logic.show_if !== null
+      ? [logic.show_if]
+      : [];
+  const showIf = rawShowIf.map(String);
+
+  if (showIf.length === 0) return true;
+
+  // Extract plain value from radio responses stored as { selected: 'value' }
+  let currentValue = formValues[dependsOn];
+  if (
+    currentValue !== null &&
+    typeof currentValue === 'object' &&
+    !Array.isArray(currentValue) &&
+    'selected' in currentValue
+  ) {
+    currentValue = currentValue.selected;
+  }
+
+  if (currentValue === undefined || currentValue === null) return false;
+
+  return showIf.includes(String(currentValue));
 }
 
 export function isFieldVisible(
   field: SurveyField,
   formValues: Record<string, any>
 ): boolean {
+  // Handle legacy { show_if, depends_on } format first
+  const legacyResult = evaluateShowIf(field.conditionalLogic, formValues);
+  if (legacyResult !== null) return legacyResult;
+
+  // Fall through to the existing canonical-format evaluator
   return evaluateLogic(field.conditionalLogic, formValues);
 }
 
@@ -81,5 +120,11 @@ export function isSectionVisible(
   formValues: Record<string, any>
 ): boolean {
   if (!section.isVisible) return false;
+
+  // Handle legacy { show_if, depends_on } format first
+  const legacyResult = evaluateShowIf(section.conditionalLogic, formValues);
+  if (legacyResult !== null) return legacyResult;
+
+  // Fall through to the existing canonical-format evaluator
   return evaluateLogic(section.conditionalLogic, formValues);
 }

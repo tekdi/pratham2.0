@@ -289,6 +289,8 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 setMobileError('');
               }}
               placeholder="9999999999"
+              autoComplete="off"
+              inputProps={{ autoComplete: 'off' }}
               error={!!mobileError}
               helperText={mobileError}
               InputProps={{

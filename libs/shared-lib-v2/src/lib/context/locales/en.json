@@ -310,7 +310,8 @@
       "LIFE": "Life",
       "PROGRAM": "Program",
       "ABOUT_US": "About Us",
-      "THEMATIC_REPOSITORY": "Thematic Repository"
+      "THEMATIC_REPOSITORY": "Thematic Repository",
+      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "Your response has been recorded",
@@ -456,6 +457,7 @@
       "START_EXPLORING": "Start Exploring",
       "START_LEARNING": "Start learning",
       "START_ASSESSMENT": "Start Assessment",
+      "ATTEMPT_ASSESSMENT": "Attempt Assesment",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "You have successfully signed up for",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.",
       "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham",
@@ -464,7 +466,19 @@
       "ASSESSMENT_BEFORE_ACCESS_MESSAGE": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.\n\nAnswer a few simple questions and move ahead.",
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "Your journey towards Class 10 begins here. The Saral test is currently unavailable in your selected language. We are working on it. Please try again later.",
       "COME_BACK_LATER": "Please come back later",
-      "BACK_TO_PROGRAMS": "Back to Programs"
+      "BACK_TO_PROGRAMS": "Back to Programs",
+      "BACK_TO_DASHBOARD": "Back to Dashboard"
+    },
+    "FOOTER": {
+      "SHOW_FOOTER": "Show footer",
+      "HIDE_FOOTER": "Hide footer",
+      "APP_NAME": "Pratham myLearning",
+      "COPYRIGHT": "© {{year}} Pratham",
+      "USEFUL_LINKS": "Useful Links",
+      "DESCRIPTION": "Pratham addresses education-related gaps through innovative and cost-effective programs. We engage directly with children, schools, families, and communities, and also work in collaboration with government systems. In our direct programs, instructional and community-based activities are implemented by Pratham teams. Core elements such as technology, measurement and evaluation, and research underpin all our programs, ensuring effectiveness, scalability, and continuous improvement.",
+      "PRIVACY_GUIDELINES": "Privacy Guidelines",
+      "COOKIE_GUIDELINES": "Cookie Guidelines",
+      "PRAGYANPATH": "Pragyanpath (For Pratham Employees only)"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",

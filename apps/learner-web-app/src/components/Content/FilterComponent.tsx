@@ -77,6 +77,7 @@ if (typeof window !== 'undefined') {
         _config={{
           t: t,
           _filterBody: _config?._filterBody,
+          _accordionDetails: _config?._accordionDetails,
           _checkbox: {
             sx: checkboxStyle,
           },

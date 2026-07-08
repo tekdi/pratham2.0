@@ -35,7 +35,7 @@ export const MobilizerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     district: {
       type: 'array',
@@ -65,7 +65,7 @@ export const MobilizerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     block: {
       type: 'array',
@@ -94,7 +94,7 @@ export const MobilizerSearchSchema = {
       //for multiselect
       uniqueItems: true,
       isMultiSelect: true,
-      maxSelection: 1000,
+      maxSelection: 1,
     },
     center: {
       type: 'array',

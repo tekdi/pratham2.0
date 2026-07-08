@@ -438,7 +438,7 @@ export default function LandingPage() {
                         title={program.name}
                         description={program.description}
                         buttonColor={PROGRAM_CARD_COLORS[index % PROGRAM_CARD_COLORS.length]}
-                        onExplore={() => router.push(`/${encodeURIComponent(program.name)}`)}
+                        onExplore={() => router.push(`/${program.name.trim().replace(/\s+/g, '-')}`)}
                       />
                     </Grid>
                   );
@@ -500,7 +500,7 @@ export default function LandingPage() {
                           title={program.name}
                           description={program.description}
                           buttonColor={VOLUNTEER_CARD_COLORS[index % VOLUNTEER_CARD_COLORS.length]}
-                          onExplore={() => router.push(`/${encodeURIComponent(program.name)}`)}
+                          onExplore={() => router.push(`/${program.name.trim().replace(/\s+/g, '-')}`)}
                         />
                       </Grid>
                     );

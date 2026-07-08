@@ -129,13 +129,31 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         setModifiedAcademicYearList(modifiedList);
         const selectedAcademicYearId = localStorage.getItem('academicYearId');
         setSelectedSessionId(selectedAcademicYearId ?? '');
+
+        if (selectedAcademicYearId && parsedList.length > 0) {
+          const selectedYear = parsedList.find(
+            (item: AcademicYear) => item.id === selectedAcademicYearId
+          );
+          setIsActiveYearSelected(
+            selectedYear ? Boolean(selectedYear.isActive) : false
+          );
+        }
+        // Backfill `session` for users who logged in before it was stored.
+        if (!localStorage.getItem('session') && selectedAcademicYearId) {
+          const selectedYear = parsedList?.find(
+            (item: { id: string }) => item.id === selectedAcademicYearId
+          );
+          if (selectedYear?.session) {
+            localStorage.setItem('session', selectedYear.session);
+          }
+        }
       } catch (error) {
         console.error('Error parsing stored academic year list:', error);
         setAcademicYearList([]);
         setSelectedSessionId('');
       }
     }
-  }, [t]);
+  }, [t, setIsActiveYearSelected]);
 
   const handleChange = (event: SelectChangeEvent) => {
     const newLocale = event.target.value;
@@ -155,6 +173,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     const selectedYear = academicYearList?.find(
       (year) => year.id === event.target.value
     );
+    localStorage.setItem('session', selectedYear?.session ?? '');
     const isActive = selectedYear ? selectedYear.isActive : false;
     // localStorage.setItem('isActiveYearSelected', JSON.stringify(isActive));
     setIsActiveYearSelected(isActive);
@@ -180,14 +199,19 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const handleCopyRegistrationLink = async () => {
     try {
       // Get the registration link from environment variable or construct it
-      const registrationBase = process.env.NEXT_PUBLIC_PLP_REGISTERATION || '';
-      
+      const registrationBase: string =
+        (process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
+          ? process.env.NEXT_PUBLIC_LEARNER_SBPLAYER.replace("/sbplayer", "")
+          : '') || '';
+
       if (registrationBase) {
         const enroll = localStorage.getItem('tenantName') || '';
         
         // Construct the proper registration link
-        // Format: https://domain/registration?tenantId=Pratham&enroll=Second%20Chance%20Program
-        const registrationLink = `${registrationBase}&enroll=${encodeURIComponent(enroll)}`;
+        // Format: https://domain/Second-Chance-Program
+        const baseUrl = registrationBase.replace(/\/$/, '');
+        const programSlug = enroll.trim().replace(/\s+/g, '-');
+        const registrationLink = `${baseUrl}/${encodeURIComponent(programSlug)}`;
 
         // Copy to clipboard
         await navigator.clipboard.writeText(registrationLink);
@@ -226,7 +250,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     // localStorage is isolated per origin, but COOKIES are shared across ports
     // on the same hostname — so we set short-lived cookies that the survey MFE
     // reads on mount and promotes into its own localStorage.
-    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'preferredLanguage'] as const;
+    const KEYS = ['token', 'refreshToken', 'userId', 'tenantId', 'tenantName', 'academicYearId', 'session', 'preferredLanguage'] as const;
     KEYS.forEach((key) => {
       const v = localStorage.getItem(key);
       if (v) {
@@ -693,7 +717,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }
               onClick={navigateToSurveyMfe}
             >
-              Survey
+              Surveys
             </Button>
           </Box>
         )}
@@ -1003,7 +1027,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         {/* Bottom Section - Fixed at bottom */}
         {(
           <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
-            { process.env.NEXT_PUBLIC_PLP_REGISTERATION &&(<Button
+            { process.env.NEXT_PUBLIC_LEARNER_SBPLAYER &&(<Button
               className="fs-14"
               sx={{
                 width: '100%',

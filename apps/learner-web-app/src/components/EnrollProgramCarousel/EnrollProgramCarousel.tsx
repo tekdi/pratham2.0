@@ -86,6 +86,8 @@ const EnrollProgramCarousel = ({
   // States for registration assessment gate
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
+  const [pendingAssessmentAction, setPendingAssessmentAction] = useState<'access' | 'enroll'>('access');
+  const [pendingProgramTenantId, setPendingProgramTenantId] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
 
   /**
@@ -127,26 +129,42 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
 
       if (tenantDataDetails?.tenantType !== 'elearning') {
         const academicYearList = await getAcademicYear();
-      const activeAcademicYear = Array.isArray(academicYearList)
-        ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
-        : undefined;
+        const allAcademicYearIds = Array.isArray(academicYearList)
+          ? academicYearList
+              .map((year: { id?: string; isActive?: boolean }) => year?.id)
+              .filter(Boolean)
+          : [];
+        const activeAcademicYear = Array.isArray(academicYearList)
+          ? academicYearList.find((year: { id?: string; isActive?: boolean }) => year?.isActive)
+          : undefined;
 
-      if (activeAcademicYear?.id) {
-        localStorage.setItem('academicYearId', activeAcademicYear.id);
-      }
-        const cohortResponse = await getCohortList(storedUserId, true, true);
-        const userHasActiveBatch = Array.isArray(cohortResponse?.result)
-          ? cohortResponse.result.some(
-              (cohort: {
-                type?: string;
-                cohortStatus?: string;
-                cohortMemberStatus?: string;
-              }) =>
-                cohort?.type === 'BATCH' &&
-                cohort?.cohortStatus === 'active' &&
-                cohort?.cohortMemberStatus === 'active'
-            )
-          : false;
+        let userHasActiveBatch = false;
+        for (const yearId of allAcademicYearIds) {
+          localStorage.setItem('academicYearId', yearId as string);
+          const cohortResponse = await getCohortList(storedUserId, true, true);
+          const hasBatch = Array.isArray(cohortResponse?.result)
+            ? cohortResponse.result.some(
+                (cohort: {
+                  type?: string;
+                  cohortStatus?: string;
+                  cohortMemberStatus?: string;
+                }) =>
+                  cohort?.type === 'BATCH' &&
+                  cohort?.cohortStatus === 'active' &&
+                  cohort?.cohortMemberStatus === 'active'
+              )
+            : false;
+          if (hasBatch) {
+            userHasActiveBatch = true;
+            localStorage.setItem('cohortAssignedToAnyAcademicYearId', 'yes');
+            break;
+          }
+         
+        }
+
+        if (activeAcademicYear?.id) {
+          localStorage.setItem('academicYearId', activeAcademicYear.id);
+        }
 
         if (userHasActiveBatch) {
           return 'clear';
@@ -462,6 +480,8 @@ console.log('result=====>', result);
           tenantData
         );
         if (assessmentStatus === 'assessmentPending') {
+          setPendingAssessmentAction('access');
+          setPendingProgramTenantId(program.tenantId);
           setAssessmentPendingModal(true);
           return;
         }
@@ -548,7 +568,8 @@ console.log('result=====>', result);
       );
       if (assessmentStatus === 'assessmentPending') {
         localStorage.setItem('registerationTestGiven', "No");
-
+        setPendingAssessmentAction('enroll');
+        setPendingProgramTenantId(program.tenantId);
         setAssessmentPendingModal(true);
       }
       // Redirect to landing page
@@ -1025,8 +1046,46 @@ console.log('result=====>', result);
             }, 100);
           }
         }}
-        secondaryText={t('COMMON.CANCEL')}
-        secondaryActionHandler={() => setAssessmentPendingModal(false)}
+        secondaryText={t('COMMON.CLOSE')}
+        secondaryActionHandler={() => {
+          setAssessmentPendingModal(false);
+           const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+      console.log('isAndroid check:', isAndroid);
+                localStorage.setItem('registerationTestGiven', 'Yes');
+
+      if(isAndroid)
+        {
+         console.log('Android path - sending message to WebView');
+         // Send message to React Native WebView
+
+              //  const enrolledProgramData = localStorage.getItem('enrolledProgramData');
+
+              //        const program = JSON.parse(enrolledProgramData || '{}');
+
+
+            // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
+          let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+          // Fallback to refreshToken if refreshTokenForAndroid is null or empty
+          if (!refreshToken || refreshToken === '') {
+            refreshToken = localStorage.getItem('refreshToken');
+          }
+          if (window.ReactNativeWebView) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: pendingAssessmentAction === 'access' ? 'ACCESS_PROGRAM_EVENT' : 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+          }
+        }
+        else
+        {
+          const landingPage = localStorage.getItem('landingPage') || '/home';
+          globalThis.location.href = landingPage;
+        }}}
       >
         <Box p="10px">
           <Typography variant="body1" textAlign="center">
@@ -1041,13 +1100,13 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
         showFooter={true}
-        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_PROGRAMS')}
+        primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/programs');
+          router.push('/scp-dashboard');
         }}
       >
         <Box p="10px">

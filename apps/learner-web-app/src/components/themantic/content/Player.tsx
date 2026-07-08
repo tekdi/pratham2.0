@@ -36,6 +36,11 @@ import { CardComponent } from './List';
 import DownloadIcon from '@mui/icons-material/Download';
 import JotFormEmbedWithSubmit from '@learner/components/JotFormEmbed/JotFormEmbedWithSubmit';
 import { CONTENT_DOWNLOAD_JOTFORM_ID } from '../../../../app.config';
+import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+  scaledFontSizeResponsive,
+} from '@learner/utils/scaledFontSize';
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
@@ -251,7 +256,6 @@ const App = ({
     const downloadableTypes = [
       'video/mp4',
       'video/webm',
-      'video/x-youtube',
       'application/pdf',
       'application/epub',
       'application/vnd.ekstep.ecml-archive',
@@ -310,6 +314,11 @@ const App = ({
     setPendingDownload(downloadData);
     setShowJotFormModal(true);
     // console.log('Modal should now open');
+    logEvent({
+      action: 'download_content',
+      category: 'Content',
+      label: item.content.name,
+    });
   };
 
   // const onBackClick = () => {
@@ -423,7 +432,11 @@ const App = ({
                       fontWeight: '600',
                       textAlign: 'center',
                       color: '#000',
-                      fontSize: { xs: '18px', sm: '20px', md: '23px' },
+                      fontSize: scaledFontSizeResponsive({
+                        xs: 18,
+                        sm: 20,
+                        md: 23,
+                      }),
                       letterSpacing: '1px',
                       lineHeight: 1.2,
                       mt: { xs: 1, sm: 1.5, md: 2 },
@@ -433,7 +446,17 @@ const App = ({
                       textDecoration: 'underline',
                     }}
                   >
-                    {item?.content?.name || item?.content?.title || 'Untitled'}
+                    <SpeakableText
+                      text={
+                        item?.content?.name ||
+                        item?.content?.title ||
+                        'Untitled'
+                      }
+                    >
+                      {item?.content?.name ||
+                        item?.content?.title ||
+                        'Untitled'}
+                    </SpeakableText>
                   </Typography>
 
                   <Divider
@@ -448,14 +471,24 @@ const App = ({
 
                   <Typography
                     sx={{
-                      fontSize: { xs: '14px', sm: '15px', md: '16px' },
+                      fontSize: scaledFontSizeResponsive({
+                        xs: 14,
+                        sm: 15,
+                        md: 16,
+                      }),
                       color: '#363d47',
                       fontWeight: '400',
                       px: { xs: 1, sm: 1.5, md: 2 },
                       fontFamily: '"Montserrat", sans-serif',
                     }}
                   >
-                    {item?.content?.description || 'No description'}
+                    <SpeakableText
+                      text={
+                        item?.content?.description || 'No description'
+                      }
+                    >
+                      {item?.content?.description || 'No description'}
+                    </SpeakableText>
                   </Typography>
                 </Box>
               </Box>
@@ -489,7 +522,7 @@ const App = ({
                       backgroundColor: '#000',
                       color: '#fff',
                       padding: '12px 24px',
-                      fontSize: '16px',
+                      fontSize: scaledFontSize(16),
                       fontWeight: 600,
                       textTransform: 'none',
                       '&:hover': {

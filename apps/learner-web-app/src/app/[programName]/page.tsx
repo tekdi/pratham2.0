@@ -44,7 +44,7 @@ export default function ProgramDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { t } = useTranslation();
-  const programName = decodeURIComponent(params?.programName as string);
+  const programName = decodeURIComponent(params?.programName as string).replace(/-/g, ' ');
 
   const [program, setProgram] = useState<Program | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,11 +74,52 @@ export default function ProgramDetailPage() {
     fetchProgram();
   }, [programName]);
 
+  const isPragyanpath = programName.toLowerCase() === 'pragyanpath';
+
+  const handlePragyanpathSSO = () => {
+    if (!program) return;
+    if (program?.params?.uiConfig?.sso?.length > 0) {
+      const ssoOption = program?.params?.uiConfig?.sso?.find((option: any) => {
+        const currentDomain =
+          typeof window !== 'undefined' ? window.location.origin : '';
+        return option?.enable_domain?.includes(currentDomain);
+      });
+
+      if (ssoOption) {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.setItem('landingPage', program?.params?.uiConfig?.landingPage);
+          localStorage.setItem('userProgram', program?.name);
+          const uiConfig = program?.params?.uiConfig || {};
+          localStorage.setItem('uiConfig', JSON.stringify(uiConfig));
+        }
+        const currentBaseUrl =
+          typeof window !== 'undefined' ? window.location.origin : '';
+        const callbackUrl = `${currentBaseUrl}/sso?env=newton&tenantid=${program?.tenantId}`;
+        const ssoUrl = `${ssoOption?.url}?callbackurl=${callbackUrl}`;
+        window.location.href = ssoUrl;
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isPragyanpath && program) {
+      handlePragyanpathSSO();
+    }
+  }, [isPragyanpath, program]);
+
   const handleEnrolNow = () => {
+    if (isPragyanpath) {
+      handlePragyanpathSSO();
+      return;
+    }
     setEnrolModalOpen(true);
   };
 
   const handleLogin = () => {
+    if (isPragyanpath) {
+      handlePragyanpathSSO();
+      return;
+    }
     router.push(`/login?tenantId=${program?.tenantId}`);
   };
 

@@ -50,7 +50,11 @@ instance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.data.responseCode === 401 && !originalRequest._retry) {
+    // SSO authenticate is a public endpoint that validates the SSO provider's token, not our JWT.
+    // Replaying the same SSO URL params returns responseCode 401 — skip JWT refresh/logout for this endpoint.
+    const isSSOEndpoint = originalRequest?.url?.includes('/user/sso/authenticate');
+
+    if (error.response.data.responseCode === 401 && !originalRequest._retry && !isSSOEndpoint) {
       if (error?.response?.request?.responseURL.includes('/auth/refresh')) {
         window.location.href = '/logout';
       } else {

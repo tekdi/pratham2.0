@@ -13,6 +13,13 @@ function unwrapOtherValue(value: any): any {
   return value;
 }
 
+function hasOtherSelected(value: any): boolean {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value) && 'selected' in value) {
+    return true;
+  }
+  return false;
+}
+
 export function validateField(
   field: SurveyField,
   value: any
@@ -27,6 +34,27 @@ export function validateField(
       (Array.isArray(raw) && raw.length === 0)
     ) {
       return 'This field is required';
+    }
+  }
+
+  // When "Other" option is actually selected, its text input is always mandatory
+  if (hasOtherSelected(value)) {
+    const otherText: string = value.otherText ?? '';
+    const selected = raw;
+    const options: any[] =
+      field.options ??
+      (field.dataSource?.type === 'static' ? field.dataSource?.options : null) ??
+      [];
+    const otherOptionValue = options.find(
+      (opt: any) => String(opt.label).toLowerCase() === 'other'
+    )?.value;
+    const otherIsActuallyChosen = otherOptionValue !== undefined && (
+      Array.isArray(selected)
+        ? selected.some((val) => String(val) === String(otherOptionValue))
+        : String(selected) === String(otherOptionValue)
+    );
+    if (otherIsActuallyChosen && !otherText.trim()) {
+      return 'Please specify the other option';
     }
   }
 

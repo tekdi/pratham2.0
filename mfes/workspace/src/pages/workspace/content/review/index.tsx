@@ -40,7 +40,7 @@ const ReviewContentSubmissions = () => {
     useState(false);
   const router = useRouter();
   const { identifier } = router.query;
-  const { isDiscoverContent , isContentLibrary, isAllContents}  = router.query;
+  const { isDiscoverContent , isContentLibrary, isAllContents, returnPage}  = router.query;
   const { isReadOnly } = router.query;
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
  const [showHeader, setShowHeader] = useState<boolean | null>(null);
@@ -73,7 +73,7 @@ const ReviewContentSubmissions = () => {
           // playerConfig.metadata = quMLMetadata;
           // playerConfig.metadata = epubMetadata;
           console.log("data ==>", data);
-          if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType)) {
+          if (MIME_TYPE.INTERACTIVE_MIME_TYPE.includes(data?.mimeType) && MIME_TYPE.MIME_H5P_TYPE!=data?.mimeType) {
             V1PlayerConfig.metadata = data;
             V1PlayerConfig.context.contentId = data.identifier;
             V1PlayerConfig.context.channel = tenantConfig?.CHANNEL_ID;
@@ -104,24 +104,33 @@ const ReviewContentSubmissions = () => {
   }, [tenantConfig?.CHANNEL_ID, identifier]);
 
   const redirectToReviewPage = () => {
+    const previousPage = sessionStorage.getItem('previousPage');
+    if (previousPage && previousPage.startsWith('/')) {
+      const validPaths = [
+        '/workspace/content/draft',
+        '/workspace/content/up-review',
+        '/workspace/content/publish',
+        '/workspace/content/allContents',
+        '/workspace/content/discover-contents',
+        '/workspace/content/submitted',
+      ];
+      if (validPaths.some(p => previousPage.includes(p))) {
+        router.push(previousPage);
+        return;
+      }
+    }
+    const pageQuery = returnPage ? { page: returnPage } : {};
     if (isDiscoverContent === "true") {
-      router.push({ pathname: `/workspace/content/discover-contents` });
-
-    }
-    else if(isContentLibrary === "true") {
-      router.push({ pathname: `/workspace/content/content-library` });
-    }
-    else if(isAllContents==="true")
-    {
-      router.push({ pathname: `/workspace/content/allContents` });
-
-    }
-    else if (getLocalStoredUserRole() === Role.CCTA ||  getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
-      router.push({ pathname: `/workspace/content/up-review` });
-
-    }
-    else
+      router.push({ pathname: `/workspace/content/discover-contents`, query: pageQuery });
+    } else if (isContentLibrary === "true") {
+      router.push({ pathname: `/workspace/content/content-library`, query: pageQuery });
+    } else if (isAllContents === "true") {
+      router.push({ pathname: `/workspace/content/allContents`, query: pageQuery });
+    } else if (getLocalStoredUserRole() === Role.CCTA || getLocalStoredUserRole() === Role.CENTRAL_ADMIN) {
+      router.push({ pathname: `/workspace/content/up-review`, query: pageQuery });
+    } else {
       router.push({ pathname: `/workspace/content/submitted` });
+    }
   };
 
   const closePublishPopup = () => {
@@ -208,8 +217,8 @@ const ReviewContentSubmissions = () => {
  
   
   
-  const sendContentPublishNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.CONTENT,"", identifier, contentDetails, router);
-  const sendContentRejectNotification = (comment: any) => sendContentNotification(ContentStatus.REJECTED, Editor.CONTENT,comment, identifier, contentDetails , router);
+  const sendContentPublishNotification = () => sendContentNotification(ContentStatus.PUBLISHED, Editor.CONTENT, "", identifier, contentDetails, router, returnPage);
+  const sendContentRejectNotification = (comment: any) => sendContentNotification(ContentStatus.REJECTED, Editor.CONTENT, comment, identifier, contentDetails, router, returnPage);
   
 
   return (

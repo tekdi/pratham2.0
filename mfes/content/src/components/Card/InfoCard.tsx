@@ -13,6 +13,10 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { ExpandableText, useTranslation } from '@shared-lib';
 import BreadCrumb from '../BreadCrumb';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
+import {
+  scaledFontSize,
+  scaledFontSizeResponsive,
+} from '@shared-lib-v2/utils/scaledFontSize';
 import LoginIcon from '@mui/icons-material/Login';
 import { checkCourseScore } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import HoverableText from '../HoverableText';
@@ -176,8 +180,16 @@ const InfoCard: React.FC<InfoCardProps> = ({
               text={item?.description}
               maxLines={2}
               _text={{
-                fontSize: { xs: '14px', sm: '16px', md: '18px' },
-                lineHeight: { xs: '20px', sm: '22px', md: '26px' },
+                fontSize: scaledFontSizeResponsive({
+                  xs: 14,
+                  sm: 16,
+                  md: 18,
+                }),
+                lineHeight: scaledFontSizeResponsive({
+                  xs: 20,
+                  sm: 22,
+                  md: 26,
+                }),
               }}
             />
             <Box>
@@ -373,8 +385,8 @@ const OfflineStatusBarLocal = () => {
           pl: '6px',
           pr: '6px',
           py: '6px',
-          fontSize: '14px',
-          lineHeight: '20px',
+          fontSize: scaledFontSize(14),
+          lineHeight: scaledFontSize(20),
           fontWeight: '500',
           color: '#50EE42',
           display: 'flex',

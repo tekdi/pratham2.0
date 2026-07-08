@@ -3,13 +3,14 @@
 import React from 'react';
 import {
   FormControl,
-  InputLabel,
+  FormLabel,
   Select,
   MenuItem,
   Chip,
   Box,
   OutlinedInput,
   TextField,
+  FormHelperText,
 } from '@mui/material';
 import { SurveyField } from '../../types/survey';
 
@@ -61,14 +62,19 @@ const SelectField: React.FC<SelectFieldProps> = ({
   };
 
   return (
-    <FormControl fullWidth error={!!error} size="small">
-      <InputLabel required={field.isRequired}>{field.fieldLabel}</InputLabel>
+    <FormControl error={!!error} component="fieldset" sx={{ alignSelf: 'flex-start', minWidth: 120 }}>
+      <FormLabel required={field.isRequired} sx={{ mb: 0.5, fontSize: '14px' }}>
+        {field.fieldLabel}
+      </FormLabel>
       <Select
         multiple={isMulti}
         value={selectedValue}
         onChange={(e) => handleChange(e.target.value)}
         disabled={disabled}
-        input={<OutlinedInput label={field.fieldLabel} />}
+        size="small"
+        input={<OutlinedInput />}
+        displayEmpty
+        fullWidth
         sx={{ borderRadius: '8px' }}
         renderValue={(sel) => {
           if (isMulti && Array.isArray(sel)) {
@@ -97,15 +103,18 @@ const SelectField: React.FC<SelectFieldProps> = ({
           </MenuItem>
         ))}
       </Select>
+      {error && <FormHelperText>{error}</FormHelperText>}
       {showOtherInput && (
         <TextField
-          size="small"
+          multiline
+          minRows={3}
           placeholder="Please specify"
           value={otherText}
           onChange={(e) => handleOtherText(e.target.value)}
           disabled={disabled}
+          error={!!error && !otherText.trim()}
+          helperText={!!error && !otherText.trim() ? 'Please specify the other option' : undefined}
           sx={{ mt: 1 }}
-          fullWidth
         />
       )}
     </FormControl>

@@ -91,6 +91,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
     const identifier = content?.identifier;
     let mode = content?.mode; // default mode from content, can be overwritten by tableTitle
 
+    // Store current path (without basePath) so editors/review can return to exact state including all filters
+    sessionStorage.setItem('previousPage', router.asPath);
+
     switch (tableTitle) {
       case 'draft':
         mode = !mode ? 'edit' : mode;
@@ -103,7 +106,6 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           content?.mimeType &&
           MIME_TYPE.GENERIC_MIME_TYPE.includes(content?.mimeType)
         ) {
-          sessionStorage.setItem('previousPage', window.location.href);
           router.push({ pathname: `/upload-editor`, query: { identifier } });
         } else if (
           content?.mimeType &&
@@ -140,6 +142,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
 
     // Save mode in localStorage
     localStorage.setItem('contentMode', mode);
+    const currentPage = router.query.page;
 
     // Generic routing for cases other than 'draft'
     if (content?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
@@ -158,9 +161,9 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
       console.log('Opening all-content review for identifier:', identifier);
       if (content?.status === 'Processing') {
          const pathname =
-        
+
            `/workspace/content/review`
-          router.push({ pathname, query: { identifier } });
+          router.push({ pathname, query: { identifier, returnPage: currentPage } });
       }
         content.contentType === 'Course'
           ? router.push({
@@ -173,7 +176,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
             })
           : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isReadOnly: true, isAllContents: true },
+            query: { identifier, isReadOnly: true, isAllContents: true, returnPage: currentPage },
           });
     } else if (tableTitle === 'discover-contents') {
       content.contentType === 'Course'
@@ -183,7 +186,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isDiscoverContent: true },
+            query: { identifier, isDiscoverContent: true, returnPage: currentPage },
           });
     } else if (tableTitle === 'content-library') {
       content.contentType === 'Course'
@@ -193,7 +196,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
           })
         : router.push({
             pathname: `/workspace/content/review`,
-            query: { identifier, isContentLibrary: true },
+            query: { identifier, isContentLibrary: true, returnPage: currentPage },
           });
     } else if (
       content?.mimeType &&
@@ -201,13 +204,15 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
     ) {
       localStorage.setItem('contentCreatedBy', content?.createdBy);
       console.log(content);
-      const pathname =
-        tableTitle === 'upForReview'
-          ? `/workspace/content/review`
-          : `/upload-editor`;
-      if (tableTitle === 'all-content') {
-        router.push({ pathname, query: { identifier, isAllContents: true } });
-      } else router.push({ pathname, query: { identifier } });
+      if (tableTitle === 'upForReview') {
+        router.push({ pathname: `/workspace/content/review`, query: { identifier, returnPage: currentPage } });
+      } else {
+        if (tableTitle === 'all-content') {
+          router.push({ pathname: `/upload-editor`, query: { identifier, isAllContents: true } });
+        } else {
+          router.push({ pathname: `/upload-editor`, query: { identifier } });
+        }
+      }
     } else if (
       content?.mimeType &&
       MIME_TYPE.COLLECTION_MIME_TYPE.includes(content?.mimeType)

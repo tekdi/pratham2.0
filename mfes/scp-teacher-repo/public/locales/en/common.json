@@ -647,6 +647,7 @@
     "SOCIAL_SCIENCE": "Social Science",
     "LIFE_SKILLS": "Life Skills",
     "PREFERRED_LANGUAGE": "Preferred Language",
+    "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "What Is Your Preferred Language?",
     "FIRST_NAME": "First Name",
     "MIDDLE_NAME_OR_FATHER_NAME": "Middle Name or Father Name",
     "LAST_NAME": "Last Name",
@@ -1147,7 +1148,7 @@
   },
   "USER_REGISTRATION": {
     "LEARNER_REGISTRATIONS": "Learner Registrations",
-    "SEARCH_LEARNER": "Search Learner..",
+    "SEARCH_LEARNER": "Search Learner by name or username...",
     "TO_TAKE_ACTION_SELECT_LEARNER": "To take action, select at least one learner",
     "NO_LEARNERS_FOUND": "No learners found",
     "NO_RECORDS_FOUND": "No records found",
@@ -1187,6 +1188,16 @@
     "INTERESTED_MAY_JOIN_NEXT_YEAR": "Interested, may join next year",
     "SELECT_ALL": "Select All",
     "DESELECT_ALL": "Deselect All",
-    "ASSESSMENT_SCORES": "Assessment Scores"
+    "ASSESSMENT_SCORES": "Assessment Scores",
+    "READ_MORE": "Read more",
+    "READ_LESS": "Read less",
+    "MODE_OF_LEARNING": "Mode of Learning",
+    "ALL": "All",
+    "REMOTE_LEARNERS": "Remote Learners",
+    "REGULAR_LEARNERS": "Regular Learners",
+    "ASSESSMENT_ATTEMPTS_FILTER": "Number of Assessment Attempts Completed",
+    "NO_ATTEMPT": "No Attempt",
+    "ONE_ATTEMPT": "1 Attempt",
+    "TWO_ATTEMPTS": "2 Attempts"
   }
 }
