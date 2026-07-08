@@ -323,6 +323,7 @@ const TeacherContextHubPage: React.FC = () => {
             setSearch('');
             setStatusFilter('all');
             setAllLearners([]);
+            setAllLearnersLoading(true);
             const firstBatch = (batchesByCenterId[id] ?? [])[0];
             setBatchId(firstBatch?.id ?? '');
           }}
@@ -332,6 +333,8 @@ const TeacherContextHubPage: React.FC = () => {
             setBatchId(id);
             setSearch('');
             setStatusFilter('all');
+            setAllLearners([]);
+            setAllLearnersLoading(true);
           }}
           showStatusFilter={!!batchId && centersLoaded}
           statusFilter={statusFilter}

@@ -236,6 +236,7 @@ const SurveyRenderer: React.FC = () => {
     }
   }, [
     form.response?.responseId,
+    form.survey,
     surveyId,
     contextId,
     cohortId,
