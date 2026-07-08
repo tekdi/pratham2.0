@@ -41,8 +41,8 @@ import {
   submitContentForReview,
   publishContent,
   createQuestionSetNode,
-  createQuestion,
   updateQuestionSetHierarchy,
+  retireQuestionSet,
   createCourseNode,
   updateCourseHierarchy,
   downloadGoogleDriveFile,
@@ -214,54 +214,15 @@ export class BulkImportQueue {
     data.questionSets.forEach((qs) => {
       const createQsJobId = `create_qs_${qs.tempId}`;
 
-      // Questions are created FIRST (they are standalone until the hierarchy
-      // update attaches them). The QS create job depends on all its question
-      // jobs, so if any question fails the QS is never created — no orphan
-      // QuestionSet is left on the platform.
       const questionsForQs = data.questions.filter(
         (q) => q.questionSetTempId === qs.tempId
       );
-      const createQuestionJobIds: string[] = [];
-
-      questionsForQs.forEach((q, qIdx) => {
-        const qJobId = `create_question_${qs.tempId}_${qIdx}`;
-        this.addJob({
-          id: qJobId,
-          type: 'create_question',
-          tempId: qs.tempId,
-          dependsOn: [],
-          payload: {
-            questionType: q.questionType,
-            questionText: q.questionText,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            maxScore: q.maxScore,
-            // bloomsLevel and difficultyLevel removed — invalid props per platform API
-            hint: q.hint,
-            solution: q.solution,
-            sectionName: q.sectionName || 'Section 1',
-            visibility: (q.visibility as 'Parent' | 'Public') || 'Parent',
-            // Inherit taxonomy from parent QS so the question passes validation
-            _qsSubject:    qs.subject,
-            _qsMedium:     qs.medium,
-            _qsGradeLevel: qs.gradeLevel,
-            _qsLanguage:   qs.language,
-            _qsFramework:  qs.framework,
-            _qsTempId: qs.tempId,
-            _qIndex: qIdx,
-          },
-          status: 'queued',
-          retryCount: 0,
-          maxRetries: MAX_RETRIES,
-        });
-        createQuestionJobIds.push(qJobId);
-      });
 
       this.addJob({
         id: createQsJobId,
         type: 'create_questionset',
         tempId: qs.tempId,
-        dependsOn: createQuestionJobIds,
+        dependsOn: [],
         payload: {
           name: qs.name,
           englishName: qs.englishName || undefined,
@@ -307,8 +268,10 @@ export class BulkImportQueue {
       // NOTE: QS app icon upload skipped — QS uses a different API for icons (will be added later)
 
       if (questionsForQs.length > 0) {
-        // Hierarchy update after the QS is created (which itself requires
-        // all questions to have been created successfully)
+        // Sections AND questions are created inside this single atomic
+        // hierarchy update (editor-style). If any question is invalid the
+        // whole update fails, nothing is attached, and the queue retires
+        // the QS — so no incomplete QuestionSet is left on the platform.
         const hierarchyJobId = `hierarchy_qs_${qs.tempId}`;
         this.addJob({
           id: hierarchyJobId,
@@ -321,6 +284,12 @@ export class BulkImportQueue {
             _qsPrimaryCategory: qs.primaryCategory,
             questionCount: questionsForQs.length,
             questions: questionsForQs,
+            // Inherit taxonomy from parent QS so questions pass validation
+            _qsSubject:    qs.subject,
+            _qsMedium:     qs.medium,
+            _qsGradeLevel: qs.gradeLevel,
+            _qsLanguage:   qs.language,
+            _qsFramework:  qs.framework,
           },
           status: 'queued',
           retryCount: 0,
@@ -584,9 +553,27 @@ export class BulkImportQueue {
       job.error = err?.message || 'Unknown error';
       job.completedAt = Date.now();
       console.error(`Job ${job.id} failed:`, err);
+
+      // The hierarchy update creates sections + questions atomically. If it
+      // failed for good, retire the (empty) QuestionSet so the import never
+      // leaves a QS without its questions on the platform.
+      if (job.type === 'update_questionset_hierarchy') {
+        await this.retireQuestionSetOnFailure(job);
+      }
     }
 
     this.emitProgress();
+  }
+
+  private async retireQuestionSetOnFailure(job: QueueJob): Promise<void> {
+    const qsId = this.resolvedIds.get(job.payload._qsTempId);
+    if (!qsId) return;
+    try {
+      await retireQuestionSet(qsId);
+      job.error = `${job.error} — the QuestionSet was removed so it is not left without its questions`;
+    } catch (cleanupErr) {
+      console.error(`Failed to retire QuestionSet ${qsId} after hierarchy failure:`, cleanupErr);
+    }
   }
 
   private async runJobWithRetry(job: QueueJob): Promise<void> {
@@ -635,9 +622,6 @@ export class BulkImportQueue {
         break;
       case 'create_questionset':
         await this.handleCreateQuestionSet(job);
-        break;
-      case 'create_question':
-        await this.handleCreateQuestion(job);
         break;
       case 'update_questionset_hierarchy':
         await this.handleUpdateQsHierarchy(job);
@@ -875,18 +859,16 @@ export class BulkImportQueue {
     this.rollbackRegistry.push({ type: 'questionset', identifier });
   }
 
-  private async handleCreateQuestion(job: QueueJob): Promise<void> {
+  private async handleUpdateQsHierarchy(job: QueueJob): Promise<void> {
     const {
-      _qsTempId, _qIndex,
-      questionType, questionText, options, correctAnswer, maxScore, hint, solution,
-      visibility,
+      _qsTempId, _qsName, _qsPrimaryCategory, questionCount, questions,
       _qsSubject, _qsMedium, _qsGradeLevel, _qsLanguage, _qsFramework,
     } = job.payload;
-    // Questions are created BEFORE their QuestionSet (standalone, visibility
-    // 'Default') — the hierarchy update attaches them once the QS exists.
+    const qsId = this.resolvedIds.get(_qsTempId);
+    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
 
-    // Multi-select cells hold comma/pipe-separated values — split into arrays
-    // so each term is validated individually by the platform
+    // Taxonomy inherited from the parent QS so questions pass platform
+    // validation. Multi-select cells hold comma/pipe-separated values.
     const taxonomy = {
       subject:    toArray(_qsSubject),
       medium:     toArray(_qsMedium),
@@ -895,28 +877,12 @@ export class BulkImportQueue {
       framework:  _qsFramework  || 'pos-framework',
     };
 
-    const questionBody = buildQuestionBody(
-      questionType, questionText, options, correctAnswer,
-      maxScore, hint, solution, taxonomy,
-      (visibility as 'Parent' | 'Public') || 'Parent'
-    );
-
-    const questionId = await createQuestion(questionBody);
-
-    // Store in a special namespaced key: {qsTempId}_{qIndex} → questionId
-    this.resolvedIds.set(`${_qsTempId}_q${_qIndex}`, questionId);
-    job.resolvedIdentifier = questionId;
-  }
-
-  private async handleUpdateQsHierarchy(job: QueueJob): Promise<void> {
-    const { _qsTempId, _qsName, _qsPrimaryCategory, questionCount, questions } = job.payload;
-    const qsId = this.resolvedIds.get(_qsTempId);
-    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
-
     // ── 1. Group questions by section (preserve insertion order) ──
     // Each unique Section Name becomes one section node with a client-generated UUID.
-    // Also capture section-level description/instructions from the first question
-    // in each section (all questions in the same section should share these values).
+    // Questions are CREATED here as isNew hierarchy nodes (like the platform
+    // editor does): the question create API rejects visibility 'Parent', and
+    // visibility cannot be changed afterwards (restricted prop on update, and
+    // nodesModified cannot reach questions nested under sections).
     const sectionMap = new Map<string, {
       name: string;
       sectionId: string;
@@ -924,6 +890,9 @@ export class BulkImportQueue {
       instructions?: string;
       children: string[];
     }>();
+
+    /** client UUID → question node for nodesModified */
+    const questionNodes: Record<string, any> = {};
 
     for (let i = 0; i < questionCount; i++) {
       const q = questions[i];
@@ -933,16 +902,42 @@ export class BulkImportQueue {
         sectionMap.set(sectionName, {
           name: sectionName,
           sectionId: uuidv4(),   // Sunbird requires a proper UUID for new section nodes
-          description:   q.sectionDescription  || undefined,
-          instructions:  q.sectionInstructions || undefined,
           children: [],
         });
       }
 
-      const questionId = this.resolvedIds.get(`${_qsTempId}_q${i}`);
-      if (questionId) {
-        sectionMap.get(sectionName)!.children.push(questionId);
+      const section = sectionMap.get(sectionName)!;
+
+      // Take description/instructions from the first row of the section that
+      // has them filled (users typically fill only the section's first row)
+      if (!section.description && q.sectionDescription?.trim()) {
+        section.description = q.sectionDescription.trim();
       }
+      if (!section.instructions && q.sectionInstructions?.trim()) {
+        section.instructions = q.sectionInstructions.trim();
+      }
+
+      // Excel 'Public' → API 'Default' (independently discoverable);
+      // 'Parent' (the default) → belongs to this QS only
+      const visibility =
+        String(q.visibility || 'Parent').trim().toLowerCase() === 'public'
+          ? 'Default'
+          : 'Parent';
+
+      const questionUuid = uuidv4();
+      questionNodes[questionUuid] = {
+        isNew: true,
+        root: false,
+        objectType: 'Question',
+        metadata: {
+          ...buildQuestionBody(
+            q.questionType, q.questionText, q.options, q.correctAnswer,
+            q.maxScore, q.hint, q.solution, taxonomy, visibility
+          ),
+          code: questionUuid,
+        },
+      };
+      section.children.push(questionUuid);
     }
 
     const sections = Array.from(sectionMap.values());
@@ -981,8 +976,12 @@ export class BulkImportQueue {
       };
     });
 
+    // Question nodes (isNew) — created by the hierarchy service with the
+    // correct visibility in a single atomic request
+    Object.assign(nodesModified, questionNodes);
+
     // ── 3. hierarchy ──────────────────────────────────────────────
-    // QS root → [section UUIDs] → [question do_ identifiers]
+    // QS root → [section UUIDs] → [question UUIDs]
     const hierarchy: Record<string, any> = {
       [qsId]: {
         name: _qsName,
@@ -994,7 +993,7 @@ export class BulkImportQueue {
     sections.forEach((sec) => {
       hierarchy[sec.sectionId] = {
         name: sec.name,
-        children: sec.children,   // already resolved do_ question identifiers
+        children: sec.children,   // client UUIDs of the isNew question nodes
         root: false,
       };
     });
@@ -1191,7 +1190,7 @@ function buildQuestionBody(
     language?: string[];
     framework?: string;
   },
-  _visibility: 'Parent' | 'Public' = 'Parent'  // reserved for future use; API always receives 'Default' at creation
+  visibility: 'Parent' | 'Default' = 'Parent'
 ): Record<string, any> {
   // Platform requires `name` — derive from question text (max 120 chars)
   const name = text.replace(/<[^>]*>/g, '').trim().slice(0, 120) || 'Question';
@@ -1200,12 +1199,10 @@ function buildQuestionBody(
 
   const score = maxScore ?? 1;
 
-  // Sunbird rejects visibility:'Parent' at question CREATE time.
-  // Questions must always be created with visibility:'Default'.
-  // When visibility='Parent' is desired, the QS hierarchy update (PATCH) automatically
-  // reassigns the question's visibility to 'Parent' once it's added to the QS.
-  // We keep the Excel value ('Parent'|'Public') only for future reference — creation always uses 'Default'.
-  const apiVisibility = 'Default';
+  // Questions are created as isNew nodes inside the QS hierarchy update,
+  // where visibility 'Parent' is accepted. (The standalone question create
+  // API rejects 'Parent', and visibility is a restricted prop on update —
+  // so creating within the hierarchy is the only way to honour it.)
 
   // Body varies by type — each type has its own wrapper and interaction placeholder
   const buildBody = (): string => {
@@ -1226,7 +1223,7 @@ function buildQuestionBody(
     qType:            meta.qType,
     ...(meta.interactionTypes?.length && { interactionTypes: meta.interactionTypes }),
     ...(meta.templateId               && { templateId:       meta.templateId }),
-    visibility: apiVisibility,  // always 'Default' at creation; hierarchy update handles 'Parent' assignment
+    visibility,  // 'Parent' = belongs to this QS only; 'Default' = independently discoverable ("Public")
     // Inherit taxonomy from parent QS for platform validation
     ...(taxonomy?.framework  && { framework:  taxonomy.framework }),
     ...(taxonomy?.subject    && { subject:    taxonomy.subject }),
@@ -1235,7 +1232,11 @@ function buildQuestionBody(
     ...(taxonomy?.language   && { language:   taxonomy.language }),
     body:      buildBody(),
     hints:     hint     ? [hint]     : undefined,
-    solutions: solution ? { hint: solution } : {},
+    // QuML 1.0 stores solutions as an array of {id, type, value} — an object
+    // (or empty {}) breaks graph node creation with a generic SERVER_ERROR
+    solutions: solution
+      ? [{ id: uuidv4(), type: 'html', value: `<p>${solution}</p>` }]
+      : undefined,
     maxScore:  score,
   };
 
@@ -1271,9 +1272,9 @@ function buildQuestionBody(
           mapping:         [{ value: ci, score }],
         },
       },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
-      },
+      // NOTE: outcomeDeclaration is rejected as an invalid prop by the
+      // question create API on this platform version — maxScore (in base)
+      // carries the score instead.
     };
   }
 
@@ -1311,9 +1312,6 @@ function buildQuestionBody(
           correctResponse: { value: correctSeq },
           mapping,
         },
-      },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'ordered', type: 'integer', defaultValue: score },
       },
     };
   }
@@ -1364,9 +1362,6 @@ function buildQuestionBody(
           mapping,
         },
       },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'multiple', type: 'integer', defaultValue: score },
-      },
     };
   }
 
@@ -1378,9 +1373,6 @@ function buildQuestionBody(
     answer: subjectiveAnswer,
     editorState: { question: `<p>${text}</p>` },
     responseDeclaration: {},
-    outcomeDeclaration: {
-      maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
-    },
   };
 }
 

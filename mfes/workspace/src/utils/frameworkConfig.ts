@@ -586,6 +586,7 @@ export interface ColumnDef {
   required: boolean;
   multiSelect?: boolean; // true → user can enter comma- (A, B) or pipe-separated (A|B) values; sent as array to API
   note?: string;         // Hint text for the Instructions column
+  aliases?: string[];    // Legacy header spellings still accepted by the parser
 }
 
 // ─── POS Framework Column Sets ────────────────────────────────
@@ -732,8 +733,8 @@ export const SCP_COURSE_COLUMNS: ColumnDef[] = [
 export const QUESTION_COLUMNS: ColumnDef[] = [
   { header: 'QuestionSet Temp ID*',  apiField: 'questionSetTempId',    required: true,  note: 'Must match a Temp ID from QuestionSets sheet' },
   { header: 'Section Name',          apiField: 'sectionName',          required: false, note: 'e.g. Section 1 — groups questions under a section' },
-  { header: 'Section Description',   apiField: 'sectionDescription',   required: false, note: 'Optional description for this section (shown to students)' },
-  { header: 'Section Instructions',  apiField: 'sectionInstructions',  required: false, note: 'Optional instructions shown at the start of this section' },
+  { header: 'Section Description*',  apiField: 'sectionDescription',   required: true,  aliases: ['Section Description'],  note: 'Required — describes this section (fill on at least one row of each section)' },
+  { header: 'Section Instructions*', apiField: 'sectionInstructions',  required: true,  aliases: ['Section Instructions'], note: 'Required — shown at the start of this section (fill on at least one row of each section)' },
   { header: 'Question Type*',        apiField: 'questionType',         required: true,  lookupKey: 'QUESTION_TYPES' },
   { header: 'Visibility',            apiField: 'visibility',           required: false, lookupKey: 'VISIBILITY_TYPES', note: 'Parent = belongs to this QS only; Public = publicly discoverable' },
   { header: 'Question Text*',        apiField: 'questionText',         required: true },
@@ -783,8 +784,16 @@ export const getFrameworkColumns = (fw: FrameworkId) => ({
 
 export const buildHeaderToApiFieldMap = (
   cols: ColumnDef[]
-): Record<string, string> =>
-  Object.fromEntries(cols.map((c) => [c.header, c.apiField]));
+): Record<string, string> => {
+  const map: Record<string, string> = {};
+  cols.forEach((c) => {
+    map[c.header] = c.apiField;
+    c.aliases?.forEach((alias) => {
+      map[alias] = c.apiField;
+    });
+  });
+  return map;
+};
 
 // ─── Lookup sheet column definitions ─────────────────────────
 // Each entry: column header in LookupData sheet → LOOKUP key → column letter
