@@ -296,7 +296,7 @@ const getPosQsSample = (): (string | number)[][] => [
     'Learners/Children',      // Primary User
     'English',                // Content Language
     'Pre Test',               // Assessment Type
-    'online',                 // Evaluation Type*
+    'Auto-Graded',                 // Evaluation Type*
     'true',                   // Show Feedback
     'false',                  // Show Solutions
   ],
@@ -315,7 +315,7 @@ const getPosQsSample = (): (string | number)[][] => [
     'Learners/Children',
     'English',
     'Post Test',
-    'online',
+    'Auto-Graded',
     'true',
     'true',
   ],
@@ -340,7 +340,7 @@ const getScpQsSample = (): (string | number)[][] => [
     'Main Course',                         // Course Type* (pipe-sep for multi)
     'Hindi',                               // Content Language
     'Pre Test',                            // Assessment Type
-    'online',                              // Evaluation Type*
+    'Auto-Graded',                              // Evaluation Type*
     'true',                                // Show Feedback
     'false',                               // Show Solutions
   ],
@@ -358,7 +358,7 @@ const getScpQsSample = (): (string | number)[][] => [
     'Main Course',
     'Hindi',
     'Unit Test',
-    'online',
+    'Auto-Graded',
     'true',
     'true',
   ],

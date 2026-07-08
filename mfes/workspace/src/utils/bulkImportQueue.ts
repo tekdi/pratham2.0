@@ -29,6 +29,8 @@ import {
   POS_DOMAIN_NAME_TO_ID,
   POS_SUB_DOMAIN_NAME_TO_ID,
   POS_SUBJECT_NAME_TO_ID,
+  splitMultiValue,
+  EVALUATION_TYPE_LABEL_TO_VALUE,
 } from './frameworkConfig';
 import {
   createContentNode,
@@ -53,11 +55,11 @@ import {
 import { patch } from '../services/RestClient';
 
 // ─── Multi-select helper ──────────────────────────────────────
-// Splits pipe-separated values from Excel into an array.
+// Splits pipe- or comma-separated values from Excel into an array.
 // Returns undefined if the value is blank.
 const toArray = (val: string | undefined): string[] | undefined => {
-  if (!val || String(val).trim() === '') return undefined;
-  return String(val).split('|').map((s) => s.trim()).filter(Boolean);
+  const parts = splitMultiValue(val);
+  return parts.length > 0 ? parts : undefined;
 };
 
 // Convert Excel 'true'/'false' strings (or actual booleans) → JavaScript boolean.
@@ -211,11 +213,55 @@ export class BulkImportQueue {
     // ── QUESTION SET JOBS ──
     data.questionSets.forEach((qs) => {
       const createQsJobId = `create_qs_${qs.tempId}`;
+
+      // Questions are created FIRST (they are standalone until the hierarchy
+      // update attaches them). The QS create job depends on all its question
+      // jobs, so if any question fails the QS is never created — no orphan
+      // QuestionSet is left on the platform.
+      const questionsForQs = data.questions.filter(
+        (q) => q.questionSetTempId === qs.tempId
+      );
+      const createQuestionJobIds: string[] = [];
+
+      questionsForQs.forEach((q, qIdx) => {
+        const qJobId = `create_question_${qs.tempId}_${qIdx}`;
+        this.addJob({
+          id: qJobId,
+          type: 'create_question',
+          tempId: qs.tempId,
+          dependsOn: [],
+          payload: {
+            questionType: q.questionType,
+            questionText: q.questionText,
+            options: q.options,
+            correctAnswer: q.correctAnswer,
+            maxScore: q.maxScore,
+            // bloomsLevel and difficultyLevel removed — invalid props per platform API
+            hint: q.hint,
+            solution: q.solution,
+            sectionName: q.sectionName || 'Section 1',
+            visibility: (q.visibility as 'Parent' | 'Public') || 'Parent',
+            // Inherit taxonomy from parent QS so the question passes validation
+            _qsSubject:    qs.subject,
+            _qsMedium:     qs.medium,
+            _qsGradeLevel: qs.gradeLevel,
+            _qsLanguage:   qs.language,
+            _qsFramework:  qs.framework,
+            _qsTempId: qs.tempId,
+            _qIndex: qIdx,
+          },
+          status: 'queued',
+          retryCount: 0,
+          maxRetries: MAX_RETRIES,
+        });
+        createQuestionJobIds.push(qJobId);
+      });
+
       this.addJob({
         id: createQsJobId,
         type: 'create_questionset',
         tempId: qs.tempId,
-        dependsOn: [],
+        dependsOn: createQuestionJobIds,
         payload: {
           name: qs.name,
           englishName: qs.englishName || undefined,
@@ -239,7 +285,10 @@ export class BulkImportQueue {
           gradeLevel: toArray(qs.gradeLevel),
           courseType: toArray(qs.courseType),
           assessmentType: qs.assessmentType || undefined,
-          evaluationType: qs.evaluationType || undefined,
+          // Excel shows friendly labels — convert to API value (online/offline/ai)
+          evaluationType: qs.evaluationType
+            ? EVALUATION_TYPE_LABEL_TO_VALUE[qs.evaluationType] || qs.evaluationType
+            : undefined,
           // QS create API requires boolean true/false for these fields
           showFeedback:  toBool(qs.showFeedback),
           showSolutions: toBool(qs.showSolutions),
@@ -257,55 +306,15 @@ export class BulkImportQueue {
 
       // NOTE: QS app icon upload skipped — QS uses a different API for icons (will be added later)
 
-      // Questions for this QS
-      const questionsForQs = data.questions.filter(
-        (q) => q.questionSetTempId === qs.tempId
-      );
-
       if (questionsForQs.length > 0) {
-        const createQuestionJobIds: string[] = [];
-
-        questionsForQs.forEach((q, qIdx) => {
-          const qJobId = `create_question_${qs.tempId}_${qIdx}`;
-          this.addJob({
-            id: qJobId,
-            type: 'create_question',
-            tempId: qs.tempId,
-            dependsOn: [createQsJobId],
-            payload: {
-              questionType: q.questionType,
-              questionText: q.questionText,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
-              maxScore: q.maxScore,
-              // bloomsLevel and difficultyLevel removed — invalid props per platform API
-              hint: q.hint,
-              solution: q.solution,
-              sectionName: q.sectionName || 'Section 1',
-              visibility: (q.visibility as 'Parent' | 'Public') || 'Parent',
-              // Inherit taxonomy from parent QS so the question passes validation
-              _qsSubject:    qs.subject,
-              _qsMedium:     qs.medium,
-              _qsGradeLevel: qs.gradeLevel,
-              _qsLanguage:   qs.language,
-              _qsFramework:  qs.framework,
-              _qsTempId: qs.tempId,
-              _qIndex: qIdx,
-            },
-            status: 'queued',
-            retryCount: 0,
-            maxRetries: MAX_RETRIES,
-          });
-          createQuestionJobIds.push(qJobId);
-        });
-
-        // Hierarchy update after all questions created
+        // Hierarchy update after the QS is created (which itself requires
+        // all questions to have been created successfully)
         const hierarchyJobId = `hierarchy_qs_${qs.tempId}`;
         this.addJob({
           id: hierarchyJobId,
           type: 'update_questionset_hierarchy',
           tempId: qs.tempId,
-          dependsOn: createQuestionJobIds,
+          dependsOn: [createQsJobId],
           payload: {
             _qsTempId: qs.tempId,
             _qsName: qs.name,                    // needed for hierarchy root name
@@ -873,20 +882,22 @@ export class BulkImportQueue {
       visibility,
       _qsSubject, _qsMedium, _qsGradeLevel, _qsLanguage, _qsFramework,
     } = job.payload;
-    const qsId = this.resolvedIds.get(_qsTempId);
-    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
+    // Questions are created BEFORE their QuestionSet (standalone, visibility
+    // 'Default') — the hierarchy update attaches them once the QS exists.
 
+    // Multi-select cells hold comma/pipe-separated values — split into arrays
+    // so each term is validated individually by the platform
     const taxonomy = {
-      subject:    _qsSubject    ? [_qsSubject]    : undefined,
-      medium:     _qsMedium     ? [_qsMedium]     : undefined,
-      gradeLevel: _qsGradeLevel ? [_qsGradeLevel] : undefined,
-      language:   _qsLanguage   ? [_qsLanguage]   : undefined,
+      subject:    toArray(_qsSubject),
+      medium:     toArray(_qsMedium),
+      gradeLevel: toArray(_qsGradeLevel),
+      language:   toArray(_qsLanguage),
       framework:  _qsFramework  || 'pos-framework',
     };
 
     const questionBody = buildQuestionBody(
       questionType, questionText, options, correctAnswer,
-      maxScore, hint, solution, qsId, taxonomy,
+      maxScore, hint, solution, taxonomy,
       (visibility as 'Parent' | 'Public') || 'Parent'
     );
 
@@ -1173,7 +1184,6 @@ function buildQuestionBody(
   maxScore: number | undefined,
   hint: string | undefined,
   solution: string | undefined,
-  qsId: string,
   taxonomy?: {
     subject?: string[];
     medium?: string[];

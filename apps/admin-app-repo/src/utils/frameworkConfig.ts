@@ -26,7 +26,9 @@ export const LOOKUP = {
   AUDIENCES: ['Student', 'Teacher', 'Parent', 'Administrator'],
   BLOOMS_LEVELS: ['Remember', 'Understand', 'Apply', 'Analyze', 'Evaluate', 'Create'],
   DIFFICULTY_LEVELS: ['Easy', 'Medium', 'Hard'],
-  EVALUATION_TYPES: ['online', 'offline', 'ai'],
+  // Friendly labels shown in the Excel template; mapped to the raw API
+  // values online / offline / ai via EVALUATION_TYPE_LABEL_TO_VALUE.
+  EVALUATION_TYPES: ['Auto-Graded', 'Facilitator-Graded', 'AI-Assisted'],
   ASSESSMENT_TYPES: ['Pre Test', 'Post Test', 'Other', 'Unit Test', 'Mock Test', 'Eligibility Test'],
 
   // ── Languages ───────────────────────────────────────────────
@@ -279,6 +281,65 @@ export const LOOKUP = {
   SCP_PROGRAMS: ['Second Chance', 'Open School'],
 } as const;
 
+// ─── Evaluation type label ↔ API value mapping ────────────────
+// The Excel template shows friendly labels; the platform API expects
+// the raw values online / offline / ai.
+
+export const EVALUATION_TYPE_LABEL_TO_VALUE: Record<string, string> = {
+  'Auto-Graded': 'online',
+  'Facilitator-Graded': 'offline',
+  'AI-Assisted': 'ai',
+};
+
+const EVALUATION_TYPE_VALUE_TO_LABEL: Record<string, string> = {
+  online: 'Auto-Graded',
+  offline: 'Facilitator-Graded',
+  ai: 'AI-Assisted',
+};
+
+// Normalizes a parsed cell to the label form: raw API values from older
+// templates ("online") become labels ("Auto-Graded"); labels pass through.
+export const normalizeEvaluationType = (
+  val: string | undefined
+): string | undefined => {
+  if (!val || String(val).trim() === '') return undefined;
+  const str = String(val).trim();
+  return EVALUATION_TYPE_VALUE_TO_LABEL[str.toLowerCase()] ?? str;
+};
+
+// ─── Multi-select value splitter ──────────────────────────────
+// Multi-select cells accept pipe-separated (A|B) or comma-separated (A, B)
+// values. A few option values themselves contain a comma (e.g.
+// "Data, Monitoring & Evaluation"), so those are shielded with a placeholder
+// before comma-splitting and restored afterwards.
+
+const COMMA_OPTION_VALUES: string[] = (
+  Object.values(LOOKUP) as readonly (readonly string[])[]
+)
+  .flat()
+  .filter((v) => v.includes(','));
+
+export const splitMultiValue = (val: string | undefined | null): string[] => {
+  if (val === undefined || val === null) return [];
+  const str = String(val).trim();
+  if (!str) return [];
+
+  if (str.includes('|')) {
+    return str.split('|').map((s) => s.trim()).filter(Boolean);
+  }
+
+  let shielded = str;
+  COMMA_OPTION_VALUES.forEach((option, i) => {
+    shielded = shielded.split(option).join(`\u0000${i}\u0000`);
+  });
+
+  return shielded
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => s.replace(/\u0000(\d+)\u0000/g, (m, i) => COMMA_OPTION_VALUES[Number(i)] ?? m));
+};
+
 // ─── POS Identifier Maps ──────────────────────────────────────
 // Maps display name (shown in Excel dropdown) → platform identifier
 // Required because POS course form-read uses targetDomainIds / targetSubDomainIds /
@@ -523,7 +584,7 @@ export interface ColumnDef {
   apiField: string;      // Field name sent to the platform API
   lookupKey?: keyof typeof LOOKUP;  // If set → this column gets a dropdown
   required: boolean;
-  multiSelect?: boolean; // true → user can enter pipe-separated values (A|B|C); sent as array to API
+  multiSelect?: boolean; // true → user can enter comma- (A, B) or pipe-separated (A|B) values; sent as array to API
   note?: string;         // Hint text for the Instructions column
 }
 
@@ -544,12 +605,12 @@ export const POS_CONTENT_COLUMNS: ColumnDef[] = [
   { header: 'Primary Category*',    apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_CONTENT' },
   { header: 'App Icon Drive URL',   apiField: 'appIconUrl',      required: false, note: 'Google Drive public share link for the thumbnail image (PNG/JPEG)' },
   { header: 'Domain*',              apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — select one domain' },
-  { header: 'Sub Domain*',          apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple e.g. Academics|Sports' },
-  { header: 'Subject*',             apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple e.g. Math|Science' },
-  { header: 'Target Age Group',     apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple e.g. 8-11 yrs|11-14 yrs' },
-  { header: 'Primary User',         apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Sub Domain*',          apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Comma or pipe-separated for multiple e.g. Academics, Sports' },
+  { header: 'Subject*',             apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Comma or pipe-separated for multiple e.g. Math, Science' },
+  { header: 'Target Age Group',     apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Comma or pipe-separated for multiple e.g. 8-11 yrs, 11-14 yrs' },
+  { header: 'Primary User',         apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language*',    apiField: 'contentLanguage', required: true,  lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
-  { header: 'Program*',             apiField: 'program',         required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Program*',             apiField: 'program',         required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Keywords',             apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
   { header: 'Author',               apiField: 'author',          required: false },
   { header: 'Creator',              apiField: 'creator',         required: false, note: 'Name of the content creator' },
@@ -571,15 +632,15 @@ export const POS_QS_COLUMNS: ColumnDef[] = [
   { header: 'Description*',       apiField: 'description',     required: true },
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
   { header: 'App Icon Drive URL', apiField: 'appIconUrl',      required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
-  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Domain*',            apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — select one domain' },
-  { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Target Age Group',   apiField: 'targetAgeGroup',  required: false, lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Primary User',       apiField: 'primaryUser',     required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',     note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',     note: 'Auto-Graded, Facilitator-Graded or AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
@@ -597,12 +658,12 @@ export const POS_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Description',        apiField: 'description',        required: false },
   { header: 'App Icon Drive URL*',apiField: 'appIconUrl',         required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
   { header: 'Keywords',           apiField: 'keywords',           required: false, note: 'Comma-separated keywords' },
-  { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Domain*',            apiField: 'targetDomainIds',    required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — sent as platform identifier' },
-  { header: 'Sub Domain*',        apiField: 'targetSubDomainIds', required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
-  { header: 'Subject*',           apiField: 'targetSubjectIds',   required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
-  { header: 'Target Age Group*',  apiField: 'targetAgeGroup',     required: true,  lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Primary User',       apiField: 'primaryUser',        required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Sub Domain*',        apiField: 'targetSubDomainIds', required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
+  { header: 'Subject*',           apiField: 'targetSubjectIds',   required: true,  lookupKey: 'POS_SUBJECTS',         multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
+  { header: 'Target Age Group*',  apiField: 'targetAgeGroup',     required: true,  lookupKey: 'POS_TARGET_AGE_GROUPS',multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Primary User',       apiField: 'primaryUser',        required: false, lookupKey: 'POS_PRIMARY_USERS',    multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language',   apiField: 'contentLanguage',    required: false, lookupKey: 'CONTENT_LANGUAGES',    note: 'Single language' },
   { header: 'Author',             apiField: 'author',             required: false },
 ];
@@ -632,13 +693,13 @@ export const SCP_QS_COLUMNS: ColumnDef[] = [
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'SCP_PRIMARY_CATEGORIES_QS' },
   { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'SCP_PROGRAMS',             multiSelect: true, note: 'Default: Second Chance' },
   { header: 'Board*',             apiField: 'board',           required: true,  lookupKey: 'SCP_BOARDS',               note: 'Single value' },
-  { header: 'Medium*',            apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',              multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Grade Level*',       apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS',         multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',             multiSelect: true, note: 'Pipe-separated for multiple' },
-  { header: 'Course Type*',       apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES',         multiSelect: true, note: 'Pipe-separated for multiple' },
+  { header: 'Medium*',            apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',              multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Grade Level*',       apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Subject*',           apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',             multiSelect: true, note: 'Comma or pipe-separated for multiple' },
+  { header: 'Course Type*',       apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Content Language',   apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES',        note: 'Assessment language — single value' },
   { header: 'Assessment Type',    apiField: 'assessmentType',  required: false, lookupKey: 'ASSESSMENT_TYPES' },
-  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',         note: 'online=Auto-Graded | offline=Facilitator-Graded | ai=AI-Assisted' },
+  { header: 'Evaluation Type*',   apiField: 'evaluationType',  required: true,  lookupKey: 'EVALUATION_TYPES',         note: 'Auto-Graded, Facilitator-Graded or AI-Assisted' },
   { header: 'Show Feedback',      apiField: 'showFeedback',    required: false, note: 'true or false' },
   { header: 'Show Solutions',     apiField: 'showSolutions',   required: false, note: 'true or false' },
 ];
@@ -658,10 +719,10 @@ export const SCP_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Keywords',              apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
   { header: 'Program*',              apiField: 'program',         required: true,  lookupKey: 'SCP_PROGRAMS',     note: 'Default: Second Chance' },
   { header: 'Board*',                apiField: 'board',           required: true,  lookupKey: 'SCP_BOARDS',       note: 'Single value — sent as platform identifier' },
-  { header: 'Medium*',               apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',      multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
-  { header: 'Grade Level*',          apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS', multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
-  { header: 'Subject*',              apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',     multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
-  { header: 'Course Type*',          apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES', multiSelect: true, note: 'Pipe-separated for multiple — sent as identifiers' },
+  { header: 'Medium*',               apiField: 'medium',          required: true,  lookupKey: 'SCP_MEDIUMS',      multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
+  { header: 'Grade Level*',          apiField: 'gradeLevel',      required: true,  lookupKey: 'SCP_GRADE_LEVELS', multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
+  { header: 'Subject*',              apiField: 'subject',         required: true,  lookupKey: 'SCP_SUBJECTS',     multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
+  { header: 'Course Type*',          apiField: 'courseType',      required: true,  lookupKey: 'SCP_COURSE_TYPES', multiSelect: true, note: 'Comma or pipe-separated for multiple — sent as identifiers' },
   { header: 'Content Language',      apiField: 'contentLanguage', required: false, lookupKey: 'CONTENT_LANGUAGES', note: 'Single language' },
   { header: 'Author',                apiField: 'author',          required: false },
 ];
