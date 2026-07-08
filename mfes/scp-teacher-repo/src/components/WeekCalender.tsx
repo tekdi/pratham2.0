@@ -19,6 +19,7 @@ const Calendar: React.FC<any> = ({
   showFromToday,
   newWidth,
   eventData,
+  showEventIcon = true,
           
   // If required uncomment below code for distinguishing zoom attendance marked from manual marking
   // isZoomAttendance = true    
@@ -102,7 +103,7 @@ const Calendar: React.FC<any> = ({
     let showCircularProgress = false;
     const eventScheduled = eventData?.[format(day, 'yyyy-MM-dd')];
 
-    if (data !== null) {
+    if (data != null) {
       const dayData = data?.[format(day, 'yyyy-MM-dd')] || {};
       const presentPercentage = parseFloat(dayData.present_percentage) || 0;
       percentage = presentPercentage;
@@ -111,7 +112,17 @@ const Calendar: React.FC<any> = ({
       const dayDataValuesExist = Object.values(dayData).some(
         (value) => value !== null && value !== undefined && value !== ''
       );
-      showCircularProgress = dayDataValuesExist;
+
+      if (!dayDataValuesExist && eventScheduled) {
+        showCircularProgress = true;
+        pathColor = theme.palette.warning['400'];
+        percentage = 100;
+      } else {
+        showCircularProgress = dayDataValuesExist;
+        if (dayDataValuesExist && presentPercentage === 0) {
+          percentage = 100;
+        }
+      }
     }
 
     return (
@@ -166,7 +177,7 @@ const Calendar: React.FC<any> = ({
             alignItems={'center'}
             justifyContent={'center'}
           >
-            {eventScheduled && (
+            {showEventIcon && eventScheduled && (
               <div className="calender-icon">
                 <CalendarMonthRoundedIcon
                   style={{
