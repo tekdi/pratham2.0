@@ -830,7 +830,7 @@ console.log('######### updateUserResponse', updateUserResponse);
           {username}
           {/* • Joined on June 16, 2024 */}
         </Typography>
-        {/* {isPragyanpathLearner && (
+        {isPragyanpathLearner && (
           <Box>
             {!isVolunteerProgramLead ? (
               <Button
@@ -948,7 +948,7 @@ console.log('######### updateUserResponse', updateUserResponse);
               </Box>
             )}
           </Box>
-        )} */}
+        )}
 
       </Box>
 
