@@ -37,7 +37,7 @@ export const fetchSurveyList = async (
   limit = 20,
   sortBy = 'createdAt',
   sortOrder: 'ASC' | 'DESC' = 'DESC',
-  listFilters?: { contextType?: string }
+  listFilters?: { contextType?: string; skipAcademicYear?: boolean }
 ) => {
   const filters: { status: string; contextType?: string; academicYear?: string } = {
     status: 'published',
@@ -45,10 +45,12 @@ export const fetchSurveyList = async (
   if (listFilters?.contextType) {
     filters.contextType = listFilters.contextType;
   }
-  const session =
-    typeof window !== 'undefined' ? localStorage.getItem('session') : null;
-  if (session) {
-    filters.academicYear = session;
+  if (!listFilters?.skipAcademicYear) {
+    const session =
+      typeof window !== 'undefined' ? localStorage.getItem('session') : null;
+    if (session) {
+      filters.academicYear = session;
+    }
   }
   const response = await post<{
     page: number;
