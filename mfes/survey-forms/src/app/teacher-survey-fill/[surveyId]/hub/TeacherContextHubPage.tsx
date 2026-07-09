@@ -18,19 +18,30 @@ import {
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import BackHeader from '../../../../Components/BackHeader/BackHeader';
 import TeacherFilterBar from '../../../../Components/teacher/TeacherFilterBar';
+import type { StatusFilterValue } from '../../../../Components/teacher/TeacherFilterBar';
 import TeacherContextTable from '../../../../Components/teacher/TeacherContextTable';
 import TeacherEmptyState from '../../../../Components/teacher/TeacherEmptyState';
+import SurveyStatusSummary from '../../../../Components/teacher/SurveyStatusSummary';
 import PaginationBar from '../../../../Components/PaginationBar/PaginationBar';
 import {
   fetchSurveyById,
-  fetchResponseStatusByContext,
   fetchTeacherCentersWithBatches,
   fetchTeacherCohortLearners,
+  fetchResponseListByCohort,
 } from '../../../../utils/API/surveyService';
 import type { ContextResponseInfo } from '../../../../utils/API/surveyService';
 import type { Survey } from '../../../../types/survey';
 import { isExpired } from '../../../../utils/Helper/helper';
 import type { TeacherContextRow } from '../../../../types/teacherSurvey';
+
+// A batch tops out around 300 learners — cheap to fetch in one call and filter/paginate client-side.
+const MAX_BATCH_ROSTER = 300;
+const PAGE_SIZE = 10;
+
+interface LearnerWithStatus extends TeacherContextRow {
+  status: ContextResponseInfo['status'];
+  submittedAt: string | null;
+}
 
 function PageSkeleton() {
   return (
@@ -91,16 +102,16 @@ const TeacherContextHubPage: React.FC = () => {
   const [centerId, setCenterId] = useState<string>(searchParams.get('centerId') ?? '');
   const [batchId, setBatchId] = useState<string>(searchParams.get('batchId') ?? '');
 
-  const PAGE_SIZE = 10;
-  const [learners, setLearners] = useState<TeacherContextRow[]>([]);
-  const [learnersTotalCount, setLearnersTotalCount] = useState(0);
-  const [learnersPage, setLearnersPage] = useState(1);
-  const [learnersLoading, setLearnersLoading] = useState(false);
-  const [learnersError, setLearnersError] = useState<string | null>(null);
+  // Full batch roster merged with each learner's response status — single source of
+  // truth for both the summary counts and the (client-side filtered/paginated) table.
+  const [allLearners, setAllLearners] = useState<LearnerWithStatus[]>([]);
+  const [allLearnersLoading, setAllLearnersLoading] = useState(false);
+  const [allLearnersError, setAllLearnersError] = useState<string | null>(null);
 
-  const [responseInfoById, setResponseInfoById] = useState<Record<string, ContextResponseInfo>>({});
+  const [learnersPage, setLearnersPage] = useState(1);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('all');
 
   const batches = batchesByCenterId[centerId] ?? [];
 
@@ -175,46 +186,81 @@ const TeacherContextHubPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset to page 1 when batch or search changes
+  // Reset to page 1 when batch, search, or status filter changes
   useEffect(() => {
     setLearnersPage(1);
-  }, [batchId, debouncedSearch]);
+  }, [batchId, debouncedSearch, statusFilter]);
 
-  // Load learners when batchId or page changes
-  useEffect(() => {
-    if (!batchId) {
-      setLearners([]);
-      setLearnersTotalCount(0);
-      setResponseInfoById({});
+  const loadBatchData = React.useCallback(() => {
+    if (!survey || !batchId) {
+      setAllLearners([]);
       return;
     }
     let cancelled = false;
-    setLearnersLoading(true);
-    setLearnersError(null);
-    fetchTeacherCohortLearners(batchId, { limit: PAGE_SIZE, offset: (learnersPage - 1) * PAGE_SIZE, name: debouncedSearch || undefined })
-      .then(({ learners: list, totalCount }) => {
-        if (!cancelled) {
-          setLearners(list);
-          setLearnersTotalCount(totalCount);
-        }
+    setAllLearnersLoading(true);
+    setAllLearnersError(null);
+    Promise.all([
+      fetchTeacherCohortLearners(batchId, { limit: MAX_BATCH_ROSTER, offset: 0 }),
+      fetchResponseListByCohort(survey.surveyId, batchId),
+    ])
+      .then(([roster, responses]) => {
+        if (cancelled) return;
+        const byContextId = new Map(responses.map((r) => [r.contextId, r]));
+        const merged: LearnerWithStatus[] = roster.learners.map((l) => {
+          const r = byContextId.get(l.id);
+          if (!r) return { ...l, status: 'none', submittedAt: null };
+          const status = r.status === 'submitted' || r.status === 'reviewed' ? 'submitted' : 'draft';
+          return { ...l, status, submittedAt: r.submittedAt };
+        });
+        setAllLearners(merged);
       })
       .catch(() => {
-        if (!cancelled) { setLearnersError('Failed to load learners.'); setLearners([]); }
+        if (!cancelled) { setAllLearnersError('Failed to load learners.'); setAllLearners([]); }
       })
-      .finally(() => { if (!cancelled) setLearnersLoading(false); });
+      .finally(() => {
+        if (!cancelled) setAllLearnersLoading(false);
+      });
     return () => { cancelled = true; };
-  }, [batchId, learnersPage, debouncedSearch]);
+  }, [survey, batchId]);
 
-  // Fetch response status for loaded learners
-  useEffect(() => {
-    if (!survey || learners.length === 0) { setResponseInfoById({}); return; }
-    const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
-    let cancelled = false;
-    fetchResponseStatusByContext(survey.surveyId, learners.map((r) => r.id), userId)
-      .then((map) => { if (!cancelled) setResponseInfoById(map); })
-      .catch(() => { if (!cancelled) setResponseInfoById({}); });
-    return () => { cancelled = true; };
-  }, [learners, survey]);
+  useEffect(() => loadBatchData(), [loadBatchData]);
+
+  const statusCounts = useMemo(() => {
+    if (!batchId) return null;
+    let completed = 0;
+    let inProgress = 0;
+    let notStarted = 0;
+    allLearners.forEach((l) => {
+      if (l.status === 'submitted') completed++;
+      else if (l.status === 'draft') inProgress++;
+      else notStarted++;
+    });
+    return { completed, inProgress, notStarted };
+  }, [allLearners, batchId]);
+
+  const filteredLearners = useMemo(() => {
+    const q = debouncedSearch.trim().toLowerCase();
+    return allLearners.filter((l) => {
+      if (q && !l.label.toLowerCase().includes(q)) return false;
+      if (statusFilter === 'completed' && l.status !== 'submitted') return false;
+      if (statusFilter === 'inProgress' && l.status !== 'draft') return false;
+      if (statusFilter === 'notStarted' && l.status !== 'none') return false;
+      return true;
+    });
+  }, [allLearners, debouncedSearch, statusFilter]);
+
+  const pagedLearners = useMemo(
+    () => filteredLearners.slice((learnersPage - 1) * PAGE_SIZE, learnersPage * PAGE_SIZE),
+    [filteredLearners, learnersPage]
+  );
+
+  const responseInfoById = useMemo(() => {
+    const map: Record<string, ContextResponseInfo> = {};
+    allLearners.forEach((l) => {
+      map[l.id] = { status: l.status, submittedAt: l.submittedAt };
+    });
+    return map;
+  }, [allLearners]);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -261,6 +307,10 @@ const TeacherContextHubPage: React.FC = () => {
       />
 
       <Box sx={{ p: 2 }}>
+        {!!batchId && (
+          <SurveyStatusSummary counts={statusCounts} loading={allLearnersLoading} />
+        )}
+
         <TeacherFilterBar
           search={search}
           onSearchChange={handleSearchChange}
@@ -271,16 +321,24 @@ const TeacherContextHubPage: React.FC = () => {
           onCenterChange={(id) => {
             setCenterId(id);
             setSearch('');
-            setLearners([]);
-            setLearnersTotalCount(0);
-            setLearnersPage(1);
-            setResponseInfoById({});
+            setStatusFilter('all');
+            setAllLearners([]);
+            setAllLearnersLoading(true);
             const firstBatch = (batchesByCenterId[id] ?? [])[0];
             setBatchId(firstBatch?.id ?? '');
           }}
           batches={batches}
           batchId={batchId}
-          onBatchChange={setBatchId}
+          onBatchChange={(id) => {
+            setBatchId(id);
+            setSearch('');
+            setStatusFilter('all');
+            setAllLearners([]);
+            setAllLearnersLoading(true);
+          }}
+          showStatusFilter={!!batchId && centersLoaded}
+          statusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
         />
 
         <Box sx={{ maxWidth: '100%' }}>
@@ -288,54 +346,46 @@ const TeacherContextHubPage: React.FC = () => {
             <TeacherEmptyState message="No centers found for your account." />
           ) : !batchId ? (
             <TeacherEmptyState message="No batches found for this center." />
-          ) : learnersLoading ? (
+          ) : allLearnersLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <CircularProgress sx={{ color: '#FDBE16' }} />
             </Box>
-          ) : learnersError ? (
+          ) : allLearnersError ? (
             <Box sx={{ textAlign: 'center', mt: 4 }}>
-              <Typography color="error">{learnersError}</Typography>
+              <Typography color="error">{allLearnersError}</Typography>
               <Button
                 variant="outlined"
                 sx={{ mt: 2, borderColor: '#FDBE16', color: '#1E1B16' }}
-                onClick={() => {
-                  setLearnersError(null);
-                  if (!batchId) return;
-                  setLearnersLoading(true);
-                  fetchTeacherCohortLearners(batchId)
-                    .then(({ learners: list, totalCount }) => { setLearners(list); setLearnersTotalCount(totalCount); })
-                    .catch(() => setLearnersError('Failed to load learners.'))
-                    .finally(() => setLearnersLoading(false));
-                }}
+                onClick={loadBatchData}
               >
                 Retry
               </Button>
             </Box>
-          ) : learners.length === 0 ? (
+          ) : filteredLearners.length === 0 ? (
             <TeacherEmptyState
               message={
-                search.trim()
-                  ? 'No learners match your search.'
+                search.trim() || statusFilter !== 'all'
+                  ? 'No learners match your filters.'
                   : 'No learners found in the selected batch.'
               }
             />
           ) : (
             <>
               <TeacherContextTable
-                rows={learners}
+                rows={pagedLearners}
                 responseInfoById={responseInfoById}
                 expired={isExpired(survey?.endDate)}
                 onRowAction={(row) =>
                   responseInfoById[row.id]?.status === 'submitted'
                     ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)
-                    : router.push(`/survey-fill/${surveyId}/${row.id}`)
+                    : router.push(`/survey-fill/${surveyId}/${row.id}?cohortId=${batchId}`)
                 }
               />
-              {learnersTotalCount > PAGE_SIZE && (
+              {filteredLearners.length > PAGE_SIZE && (
                 <PaginationBar
                   page={learnersPage}
                   pageSize={PAGE_SIZE}
-                  total={learnersTotalCount}
+                  total={filteredLearners.length}
                   onPrev={() => setLearnersPage((p) => Math.max(1, p - 1))}
                   onNext={() => setLearnersPage((p) => p + 1)}
                 />
