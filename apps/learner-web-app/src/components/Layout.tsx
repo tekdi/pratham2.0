@@ -11,6 +11,7 @@ import {
   AccountCircleOutlined,
   Home,
   AssignmentOutlined,
+  AssignmentTurnedInOutlined,
   Logout,
   KeyboardArrowDown,
 } from '@mui/icons-material';
@@ -82,7 +83,7 @@ const getDynamicNavConfig = ({
     
     // Skip Survey item if isVolunteer is not true in localStorage
     if (key.toLowerCase() === 'survey') {
-      const isVolunteer = typeof window !== 'undefined' 
+      const isVolunteer = typeof window !== 'undefined'
         ? localStorage.getItem('isVolunteer') === 'true'
         : false;
       if (!isVolunteer) {
@@ -90,7 +91,7 @@ const getDynamicNavConfig = ({
         return;
       }
     }
-    
+
     // Get appropriate icon based on key
     const getIcon = () => {
       const keyLower = key.toLowerCase();
@@ -99,6 +100,8 @@ const getDynamicNavConfig = ({
         return <img src="/images/book_5.svg" alt="Knowledge Bank" style={{ width: 28, height: 28 }} />;
       } else if (keyLower === 'home') {
         return <Home sx={{ width: 28, height: 28 }} />;
+      } else if (keyLower === 'plp_surveys') {
+        return <AssignmentTurnedInOutlined sx={{ width: 28, height: 28 }} />;
       } else if (keyLower.includes('course')) {
         return <AssignmentOutlined sx={{ width: 28, height: 28 }} />;
       } else if (keyLower === 'profile') {

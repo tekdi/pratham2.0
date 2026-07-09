@@ -461,7 +461,7 @@ const SurveyRenderer: React.FC = () => {
           </Typography>
           <Button
             variant="contained"
-            onClick={() => { toast.dismiss({ containerId: 'survey-renderer-toast' }); router.push('/teacher-survey-list'); }}
+            onClick={() => { toast.dismiss({ containerId: 'survey-renderer-toast' }); router.back(); }}
             sx={{
               mt: 2,
               backgroundColor: '#FDBE16',

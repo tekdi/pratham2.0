@@ -37,7 +37,7 @@ export const fetchSurveyList = async (
   limit = 20,
   sortBy = 'createdAt',
   sortOrder: 'ASC' | 'DESC' = 'DESC',
-  listFilters?: { contextType?: string }
+  listFilters?: { contextType?: string; skipAcademicYear?: boolean }
 ) => {
   const filters: { status: string; contextType?: string; academicYear?: string } = {
     status: 'published',
@@ -45,10 +45,12 @@ export const fetchSurveyList = async (
   if (listFilters?.contextType) {
     filters.contextType = listFilters.contextType;
   }
-  const session =
-    typeof window !== 'undefined' ? localStorage.getItem('session') : null;
-  if (session) {
-    filters.academicYear = session;
+  if (!listFilters?.skipAcademicYear) {
+    const session =
+      typeof window !== 'undefined' ? localStorage.getItem('session') : null;
+    if (session) {
+      filters.academicYear = session;
+    }
   }
   const response = await post<{
     page: number;
@@ -380,4 +382,45 @@ export const fetchResponseListByCohort = async (
 ): Promise<CohortResponseRow[]> => {
   const response = await get(API_ENDPOINTS.RESPONSE_LIST_BY_COHORT(surveyId, cohortId));
   return (response.data as { result?: CohortResponseRow[] })?.result ?? [];
+};
+
+/**
+ * Single-request alternative to calling fetchSubmittedResponse + fetchInProgressResponse
+ * separately. Fetches the response list once for a given contextId/respondentId and
+ * returns the learner's status — 'submitted', 'in_progress', or 'none'.
+ * Use this in list views to avoid 2× the API calls per survey.
+ */
+export const fetchSurveyResponseStatus = async (
+  surveyId: string,
+  contextId: string,
+  respondentId?: string | null
+): Promise<'none' | 'in_progress' | 'submitted'> => {
+  const resolvedContextId = contextId === 'self' ? '' : contextId;
+  const body: Record<string, unknown> = {
+    page: 1,
+    limit: 20,
+    sortBy: 'updatedAt',
+    sortOrder: 'DESC',
+  };
+  if (resolvedContextId) body.contextIds = [resolvedContextId];
+
+  try {
+    const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
+    const rows: SurveyResponse[] =
+      (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ?? [];
+
+    const matches = rows.filter(
+      (r) =>
+        (resolvedContextId === ''
+          ? !r.contextId || r.contextId === ''
+          : r.contextId === resolvedContextId) &&
+        (!respondentId || r.respondentId === respondentId)
+    );
+
+    if (matches.some((r) => r.status === 'submitted')) return 'submitted';
+    if (matches.some((r) => r.status === 'in_progress')) return 'in_progress';
+    return 'none';
+  } catch {
+    return 'none';
+  }
 };
