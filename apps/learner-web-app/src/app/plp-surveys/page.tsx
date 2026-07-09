@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import dynamic from 'next/dynamic';
 import Layout from '@learner/components/Layout';
@@ -18,14 +18,17 @@ const SurveyListPage = dynamic(
 );
 
 const PlpSurveysPage: React.FC = () => {
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     localStorage.setItem('surveyCategory', '["learner"]');
+    setIsReady(true);
   }, []);
 
   return (
     <Layout>
       <Box display="flex" flexDirection="column">
-        <SurveyListPage skipAcademicYear />
+        {isReady && <SurveyListPage skipAcademicYear />}
       </Box>
     </Layout>
   );

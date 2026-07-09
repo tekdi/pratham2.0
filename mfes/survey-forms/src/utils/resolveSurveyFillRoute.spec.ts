@@ -2,20 +2,8 @@ import { resolvePostSurveyListRoute } from './resolveSurveyFillRoute';
 import type { Survey } from '../types/survey';
 import type { SurveyFormsEntryConfig } from '../types/surveyEntryConfig';
 
-const mockStorage: Record<string, string> = {};
-
 beforeEach(() => {
-  Object.keys(mockStorage).forEach((k) => delete mockStorage[k]);
-  Object.defineProperty(window, 'localStorage', {
-    value: {
-      getItem: (key: string) => mockStorage[key] ?? null,
-      setItem: (key: string, val: string) => { mockStorage[key] = val; },
-      removeItem: (key: string) => { delete mockStorage[key]; },
-      clear: () => { Object.keys(mockStorage).forEach((k) => delete mockStorage[k]); },
-    },
-    writable: true,
-    configurable: true,
-  });
+  localStorage.clear();
 });
 
 const makeSurvey = (contextType: string): Survey =>
@@ -49,7 +37,7 @@ describe('resolvePostSurveyListRoute', () => {
   });
 
   it('routes learner contextType to /{userId} when userId is in localStorage', () => {
-    mockStorage['userId'] = 'user-abc';
+    localStorage.setItem('userId', 'user-abc');
     expect(resolvePostSurveyListRoute(makeSurvey('learner'), null)).toBe(
       '/survey-fill/survey-123/user-abc'
     );
@@ -62,7 +50,7 @@ describe('resolvePostSurveyListRoute', () => {
   });
 
   it('falls back to ContextPicker for non-learner contextual types with no hub config', () => {
-    mockStorage['userId'] = 'user-abc';
+    localStorage.setItem('userId', 'user-abc');
     expect(resolvePostSurveyListRoute(makeSurvey('center'), null)).toBe(
       '/survey-fill/survey-123'
     );

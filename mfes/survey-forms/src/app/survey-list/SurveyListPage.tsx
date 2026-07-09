@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useSurveyStore } from '../../store/surveyFormStore';
-import { fetchSurveyList, fetchSubmittedResponse, fetchInProgressResponse } from '../../utils/API/surveyService';
+import { fetchSurveyList, fetchSurveyResponseStatus } from '../../utils/API/surveyService';
 import { Survey } from '../../types/survey';
 import SurveyCard from '../../Components/SurveyCard/SurveyCard';
 import NoDataFound from '../../Components/NoDataFound/NoDataFound';
@@ -59,17 +59,13 @@ const SurveyListPage: React.FC<SurveyListPageProps> = ({ skipAcademicYear = fals
           if (skipAcademicYear) {
             const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
             if (userId && result.result.data.length > 0) {
-              const statuses: Record<string, 'none' | 'in_progress' | 'submitted'> = {};
-              await Promise.all(
+              const entries = await Promise.all(
                 result.result.data.map(async (survey: Survey) => {
-                  const [submitted, inProgress] = await Promise.all([
-                    fetchSubmittedResponse(survey.surveyId, userId, userId).catch(() => null),
-                    fetchInProgressResponse(survey.surveyId, userId, userId).catch(() => null),
-                  ]);
-                  statuses[survey.surveyId] = submitted ? 'submitted' : inProgress ? 'in_progress' : 'none';
+                  const status = await fetchSurveyResponseStatus(survey.surveyId, userId, userId);
+                  return [survey.surveyId, status] as const;
                 })
               );
-              setResponseStatuses(statuses);
+              setResponseStatuses(Object.fromEntries(entries));
             }
           }
         } else {
