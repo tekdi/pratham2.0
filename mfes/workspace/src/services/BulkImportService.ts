@@ -6,7 +6,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import { get, post, patch } from './RestClient';
+import { get, post, patch, delApi } from './RestClient';
 import { getLocalStoredUserId } from './LocalStorageService';
 import {
   ContentCreatePayload,
@@ -138,16 +138,39 @@ export const uploadFileToPresignedUrl = async (
 };
 
 /**
- * Associate the uploaded file with the content node
- * POST /action/content/v3/upload/{contentId}  (multipart or JSON)
+ * Notify the platform that a file has been uploaded to S3 and trigger processing.
+ * POST /action/content/v3/upload/{contentId}  (multipart/form-data with fileUrl field)
+ *
+ * This is the CORRECT way to hand off an already-uploaded S3 file to the platform.
+ * The platform content service will:
+ *   1. Download the file from the provided S3 URL
+ *   2. Run mimeType-specific processing:
+ *      - H5P  → extract archive, upload to content/h5p/{id}-latest/, set streamingUrl
+ *      - ZIP  → extract and package for streaming
+ *      - PDF/MP4 → copy to artifact/ path
+ *   3. Set artifactUrl to the processed location and pkgVersion
+ *
+ * Do NOT use this for YouTube — use associateYouTubeUrl() instead.
  */
-export const associateUploadedFile = async (
+export const notifyContentUploaded = async (
   contentId: string,
   fileUrl: string,
+): Promise<void> => {
+  // Browser FormData — axios automatically sets Content-Type: multipart/form-data with boundary
+  const formData = new FormData();
+  formData.append('fileUrl', fileUrl);
+  await post(`/action/content/v3/upload/${contentId}`, formData);
+};
+
+/**
+ * For YouTube content: store the video URL as artifactUrl via PATCH.
+ * YouTube does not go through the file-upload pipeline.
+ */
+export const associateYouTubeUrl = async (
+  contentId: string,
+  youtubeUrl: string,
   mimeType: string
 ): Promise<void> => {
-  // Sunbird requires the current versionKey in every update call.
-  // Fetch it first via content read, then include it in the PATCH.
   const contentData = await readContent(contentId);
   const versionKey: string | undefined = contentData?.versionKey;
   if (!versionKey) throw new Error(`Could not retrieve versionKey for content ${contentId}`);
@@ -156,11 +179,26 @@ export const associateUploadedFile = async (
     request: {
       content: {
         versionKey,
-        artifactUrl: fileUrl,
+        artifactUrl: youtubeUrl,
         mimeType,
       },
     },
   });
+};
+
+/**
+ * @deprecated Use notifyContentUploaded() for files or associateYouTubeUrl() for YouTube.
+ * Kept for backward-compat — routes to the correct implementation based on URL.
+ */
+export const associateUploadedFile = async (
+  contentId: string,
+  fileUrl: string,
+  mimeType: string
+): Promise<void> => {
+  if (mimeType === 'video/x-youtube') {
+    return associateYouTubeUrl(contentId, fileUrl, mimeType);
+  }
+  return notifyContentUploaded(contentId, fileUrl);
 };
 
 /**
@@ -172,6 +210,27 @@ export const submitContentForReview = async (contentId: string): Promise<void> =
     request: {
       content: {
         lastUpdatedBy: getLocalStoredUserId(),
+      },
+    },
+  });
+};
+
+/**
+ * Publish content
+ * POST /action/content/v3/publish/{contentId}
+ *
+ * This is the step that triggers the platform's processing pipeline:
+ *   - H5P / ZIP → creates streamingUrl
+ *   - Sets pkgVersion
+ *   - Transitions status to "Live"
+ *
+ * Bulk import runs as an admin operation so we publish immediately after review.
+ */
+export const publishContent = async (contentId: string): Promise<void> => {
+  await post(`/action/content/v3/publish/${contentId}`, {
+    request: {
+      content: {
+        lastPublishedBy: getLocalStoredUserId(),
       },
     },
   });
@@ -250,7 +309,7 @@ export const createQuestion = async (
 export const updateQuestionSetHierarchy = async (
   questionSetId: string,
   payload: HierarchyUpdatePayload
-): Promise<void> => {
+): Promise<Record<string, string>> => {
   const userId = getLocalStoredUserId();
 
   const reqBody = {
@@ -263,10 +322,23 @@ export const updateQuestionSetHierarchy = async (
     },
   };
 
-  await patch('/action/questionset/v2/hierarchy/update', reqBody, {
+  const response = await patch('/action/questionset/v2/hierarchy/update', reqBody, {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   });
+
+  // Maps client-generated ids of isNew nodes (section UUIDs) to the real
+  // platform identifiers assigned during the update
+  return (response as any)?.data?.result?.identifiers ?? {};
+};
+
+/**
+ * Retire (soft-delete) a QuestionSet — used to clean up when the hierarchy
+ * update fails so no QuestionSet is left without its questions.
+ * DELETE /action/questionset/v2/retire/{identifier}
+ */
+export const retireQuestionSet = async (identifier: string): Promise<void> => {
+  await delApi(`/action/questionset/v2/retire/${identifier}`);
 };
 
 // ─── COURSE APIs ──────────────────────────────────────────────

@@ -125,8 +125,7 @@ const EnrollProfileCompletionInner = () => {
               ? cohortResponse.result.some(
                   (cohort: { type?: string; cohortStatus?: string; cohortMemberStatus?: string }) =>
                     cohort?.type === 'BATCH' &&
-                    cohort?.cohortStatus === 'active' &&
-                    cohort?.cohortMemberStatus === 'active'
+                    cohort?.cohortStatus === 'active'
                 )
               : false;
             if (hasBatch) {
@@ -343,6 +342,7 @@ const EnrollProfileCompletionInner = () => {
         }
         else{
     localStorage.removeItem('onboardTenantId');
+    localStorage.removeItem('enrollTenantId');
     const finalLandingPage = localStorage.getItem('landingPage') || '/home';
     window.location.href = finalLandingPage;
         }

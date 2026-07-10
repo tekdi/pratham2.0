@@ -89,9 +89,9 @@ const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
   const templateUrl        = `/api/bulk-import/template?framework=${framework}&type=all&t=${ts}`;
   const contentUrl         = `/api/bulk-import/template?framework=${framework}&type=content&t=${ts}`;
   const questionSetUrl     = `/api/bulk-import/template?framework=${framework}&type=questionset&t=${ts}`;
-  const templateFileName        = `Bulk_Import_Template_${fwLabel}.xlsm`;
-  const contentFileName         = `Bulk_Import_Template_${fwLabel}_Content.xlsm`;
-  const questionSetFileName     = `Bulk_Import_Template_${fwLabel}_QuestionSet.xlsm`;
+  const templateFileName        = `Bulk_Import_Template_${fwLabel}.xlsx`;
+  const contentFileName         = `Bulk_Import_Template_${fwLabel}_Content.xlsx`;
+  const questionSetFileName     = `Bulk_Import_Template_${fwLabel}_QuestionSet.xlsx`;
 
   return (
     <Box>
