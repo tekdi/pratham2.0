@@ -11,6 +11,10 @@ export const API_ENDPOINTS = {
     `/api/v1/responses/update/${responseId}`,
   RESPONSE_SUBMIT: (responseId: string) =>
     `/api/v1/responses/submit/${responseId}`,
+  RESPONSE_STATS: (surveyId: string, cohortId: string) =>
+    `/api/v1/responses/stats/${surveyId}?cohortId=${cohortId}`,
+  RESPONSE_LIST_BY_COHORT: (surveyId: string, cohortId: string) =>
+    `/api/v1/responses/list-by-cohort/${surveyId}?cohortId=${cohortId}`,
   FIELD_OPTIONS_READ: `${middlewareBaseUrl}/fields/options/read`,
   TEACHER_MY_COHORTS: (userId: string) =>
     `${middlewareBaseUrl}/cohort/mycohorts/${userId}?customField=true&children=true`,
