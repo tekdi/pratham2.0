@@ -221,7 +221,12 @@ console.log("sortedContentData", sortedContentData)
               item={item}
               type={props.type}
               default_img={default_img}
-              _card={_card}
+              _card={{
+                ..._card,
+                // Pass list config so ContentCard can build correct per-item hrefs.
+                contentBaseUrl: props._config?.contentBaseUrl,
+                enableCardHref: props._config?.enableCardHref,
+              }}
               handleCardClick={(e?: any) =>
                 props.handleCardClick(item, e, calculateRowNumber(index))
               }

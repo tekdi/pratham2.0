@@ -98,30 +98,32 @@ const App = ({
   let activeLink = null;
   let previousPage = null;
   let exitLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
     previousPage = searchParams.get('previousPage');
     exitLink = searchParams.get('exitLink');
+    returnUrl = searchParams.get('returnUrl');
   }
 
-  // Intercept SBPlayer iframe's Exit button which calls window.history.back()
-  // When exitLink param is present, redirect there instead of going back in history
+  // Intercept browser back button when exitLink or returnUrl is set.
+  // returnUrl covers new-tab scenario; exitLink covers same-tab scenario.
+  const effectiveExitLink = exitLink || returnUrl;
   useEffect(() => {
-    if (!exitLink) return;
+    if (!effectiveExitLink) return;
 
-    // Push a dummy state so when SBPlayer calls history.back(), popstate fires
     window.history.pushState({ playerPage: true }, '', window.location.href);
 
     const handlePopState = () => {
-       window.location.href = exitLink as string;
-       };
+      window.location.href = effectiveExitLink as string;
+    };
 
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [exitLink]);
+  }, [effectiveExitLink]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -245,7 +247,11 @@ const App = ({
       //       }));
       //     }
       //   }
-   if (previousPage) {
+   if (returnUrl) {
+      window.location.href = returnUrl;
+      return;
+    }
+    if (previousPage) {
       router.push(previousPage);
       return;
     }
@@ -500,6 +506,7 @@ const App = ({
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
+          exitLink={returnUrl || exitLink}
         />
         {item?.content?.artifactUrl &&
           
@@ -716,7 +723,8 @@ const PlayerBox = ({
   isShowMoreContent,
   mimeType,
   isPortrait,
-  isVideo
+  isVideo,
+  exitLink,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -811,6 +819,8 @@ const PlayerBox = ({
               process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
             }?identifier=${identifier}${
               courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+            }${
+              exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ''
             }${
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`

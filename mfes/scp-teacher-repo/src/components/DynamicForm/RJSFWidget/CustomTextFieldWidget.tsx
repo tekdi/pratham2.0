@@ -47,6 +47,12 @@ const CustomTextFieldWidget = ({
       error={displayErrors.length > 0}
       helperText={displayErrors.length > 0 ? displayErrors[0] : ''}
       variant="outlined"
+      autoComplete="new-password"
+      inputProps={{
+        autoComplete: 'new-password',
+        autoCorrect: 'off',
+        spellCheck: false,
+      }}
     //   margin="normal"
     />
   );
