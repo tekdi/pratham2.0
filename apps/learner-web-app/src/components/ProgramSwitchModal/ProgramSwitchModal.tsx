@@ -166,8 +166,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
                   cohortMemberStatus?: string;
                 }) =>
                   cohort?.type === 'BATCH' &&
-                  cohort?.cohortStatus === 'active' &&
-                  cohort?.cohortMemberStatus === 'active'
+                  cohort?.cohortStatus === 'active'
               )
             : false;
           if (hasBatch) {

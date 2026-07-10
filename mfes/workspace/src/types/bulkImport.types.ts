@@ -89,6 +89,10 @@ export interface QuestionRow {
   questionSetTempId: string;
   /** e.g. Section 1 */
   sectionName?: string;
+  /** Optional description for the section this question belongs to */
+  sectionDescription?: string;
+  /** Optional instructions shown to the student at the start of this section */
+  sectionInstructions?: string;
   /** MCQ | Arrange | Match | Subjective */
   questionType: QuestionType;
   questionText: string;
@@ -100,6 +104,8 @@ export interface QuestionRow {
   difficulty?: string;
   hint?: string;
   solution?: string;
+  /** Parent = belongs to this QS only; Public = independently searchable (maps to API 'Default') */
+  visibility?: 'Parent' | 'Public';
   status?: ImportItemStatus;
   error?: string;
 }
@@ -252,6 +258,7 @@ export type JobType =
   | 'upload_content_file'
   | 'upload_app_icon'
   | 'review_content'
+  | 'publish_content'
   | 'create_questionset'
   | 'create_question'
   | 'update_questionset_hierarchy'
