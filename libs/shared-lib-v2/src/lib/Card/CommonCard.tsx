@@ -54,6 +54,8 @@ interface CommonCardProps {
   item: ContentItem;
   type: string;
   onClick?: (e: any) => void;
+  /** When set, card renders as <a> so users can open the course in a new tab. */
+  href?: string;
   _card?: any;
   courseType?: string;
 }
@@ -100,6 +102,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
   item,
   type,
   onClick,
+  href,
   _card,
   courseType,
 }) => {
@@ -114,7 +117,10 @@ export const CommonCard: React.FC<CommonCardProps> = ({
     const checkTrackingSyncPending = async () => {
       const isPending = await hasQueuedTrackingForContentId(item?.identifier);
       if(isTrackingSyncPendingRef.current === true && isPending === false){
-        window.location.reload();
+        // Reload only this tab after tracking sync — avoid refreshing background tabs opened via new-tab links.
+        if (document.visibilityState === 'visible') {
+          window.location.reload();
+        }
       }
       isTrackingSyncPendingRef.current = isPending;
       setIsTrackingSyncPending(isPending);
@@ -167,16 +173,37 @@ export const CommonCard: React.FC<CommonCardProps> = ({
     init();
   }, [TrackData, item, type, _card?.isHideProgress, t]);
 
+  const isLinkCard = Boolean(href);
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!onClick) return;
+    if (
+      isLinkCard &&
+      (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0)
+    ) {
+      return;
+    }
+    if (isLinkCard) {
+      e.preventDefault();
+    }
+    onClick(e);
+  };
+
   return (
     <Card
+      // Render as anchor when href is provided — enables open-in-new-tab without custom click handlers.
+      component={isLinkCard ? 'a' : 'div'}
+      href={isLinkCard ? href : undefined}
       sx={{
         display: 'flex',
         flexDirection: orientation === 'horizontal' ? 'column' : 'row',
         height: minheight || '100%',
-        cursor: onClick ? 'pointer' : 'default',
+        cursor: onClick || isLinkCard ? 'pointer' : 'default',
         boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.2)',
         overflow: 'hidden',
         borderRadius: '20px',
+        textDecoration: 'none',
+        color: 'inherit',
         '&:hover': {
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.2)',
         },
@@ -185,7 +212,7 @@ export const CommonCard: React.FC<CommonCardProps> = ({
         },
         ..._card?.sx,
       }}
-      onClick={onClick}
+      onClick={onClick ? handleClick : undefined}
     >
       {/* Image and Progress Overlay */}
       <Box sx={{ position: 'relative', width: '100%' }}>

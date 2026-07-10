@@ -16,9 +16,11 @@ import { formatDate, isExpired, formatDateTime } from '../../utils/Helper/helper
 interface SurveyCardProps {
   survey: Survey;
   onClick: (survey: Survey) => void;
+  responseStatus?: 'none' | 'in_progress' | 'submitted';
+  onViewResponse?: (survey: Survey) => void;
 }
 
-const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
+const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick, responseStatus, onViewResponse }) => {
   const isActionable = survey.status === 'published';
   const expired = isExpired(survey.endDate);
 
@@ -102,7 +104,23 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
             )}
           </Box>
           {isActionable && (
-            expired ? (
+            responseStatus === 'submitted' ? (
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => onViewResponse ? onViewResponse(survey) : onClick(survey)}
+                sx={{
+                  borderColor: '#4CAF50',
+                  color: '#2E7D32',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  px: 2,
+                  '&:hover': { borderColor: '#388E3C', backgroundColor: '#E8F5E9' },
+                }}
+              >
+                View Response
+              </Button>
+            ) : expired ? (
               <Button
                 variant="outlined"
                 size="small"
@@ -117,6 +135,22 @@ const SurveyCard: React.FC<SurveyCardProps> = ({ survey, onClick }) => {
                 }}
               >
                 View Survey
+              </Button>
+            ) : responseStatus === 'in_progress' ? (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => onClick(survey)}
+                sx={{
+                  backgroundColor: '#FF9800',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  px: 2,
+                  '&:hover': { backgroundColor: '#F57C00' },
+                }}
+              >
+                Continue
               </Button>
             ) : (
               <Button

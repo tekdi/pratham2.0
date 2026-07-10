@@ -275,6 +275,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     router.push('/observation');
   };
 
+  const withBasePath = (path: string) => `${router.basePath}${path}`;
+
   const isDashboard = [
     '/dashboard',
     '/',
@@ -462,6 +464,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={navigateToDashboard}
+              component="a"
+              href={withBasePath('/dashboard')}
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
@@ -496,6 +500,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={navigateToYouthBoard}
+              component="a"
+              href={withBasePath('/youthboard')}
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
@@ -529,6 +535,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/youthboard/villages`);
               }}
+              component="a"
+              href={withBasePath('/youthboard/villages')}
             >
               {YOUTHNET_USER_ROLE.MENTOR_LEAD === TENANT_DATA.LEADER
                 ? t('DASHBOARD.USERS_&_VILLAGES')
@@ -642,8 +650,10 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 />
               }
               onClick={() => {
-                router.push(`/centers`); // Check route
+                router.push('/centers');
               }}
+              component="a"
+              href={withBasePath('/centers')}
             >
               {accessGranted('showTeachingCenter', accessControl, userRole)
                 ? t('DASHBOARD.TEACHING_CENTERS')
@@ -757,6 +767,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/curriculum-planner`);
               }}
+              component="a"
+              href={withBasePath('/curriculum-planner')}
             >
               {t('COURSE_PLANNER.COURSE_PLANNER')}
             </Button>
@@ -800,6 +812,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/assessments`);
                 }}
+                component="a"
+                href={withBasePath('/assessments')}
               >
                 {t('ASSESSMENTS.ASSESSMENTS')}
               </Button>
@@ -839,6 +853,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/ai-assessments`);
                 }}
+                component="a"
+                href={withBasePath('/ai-assessments')}  
               >
                 {t('ASSESSMENTS.AI_ASSESSMENT')}
               </Button>
@@ -879,6 +895,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/manual-assessments`);
                 }}
+                component="a"
+                href={withBasePath('/manual-assessments')}
               >
                 {t('ASSESSMENTS.MANUAL_ASSESSMENT')}
               </Button>
@@ -915,6 +933,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/board-enrollment`);
               }}
+              component="a"
+              href={withBasePath('/board-enrollment')}
             >
               {t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
             </Button>
@@ -947,6 +967,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 closeDrawer();
                 router.push('/user-registration-list');
               }}
+              component="a"
+              href={withBasePath('/user-registration-list')}
             >
               Learner Registrations
             </Button>
@@ -976,6 +998,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             onClick={() => {
               router.push(`/faqs`);
             }}
+            component="a"
+            href={withBasePath('/faqs')}
           >
             {t('COMMON.FAQS')}
           </Button>
@@ -1017,6 +1041,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/support-request`);
               }}
+              component="a"
+              href={withBasePath('/support-request')}
             >
               {t('COMMON.SUPPORT_REQUEST')}
             </Button>
@@ -1047,11 +1073,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <LinkIcon sx={{ fontSize: '18px !important', color:  '#FDBE16' }} />
               }
               onClick={handleCopyRegistrationLink}
+              component="a"
+              href={withBasePath('/registration-link')}
             >
-{ t('COMMON.COPY_REGISTRATION_LINK')}
+        { t('COMMON.COPY_REGISTRATION_LINK')}
             </Button>)}
             {        isActiveYear && tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM && 
-(<Button
+            (<Button
               className="fs-14"
               sx={{
                 width: '100%',

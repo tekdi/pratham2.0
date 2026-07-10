@@ -166,8 +166,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
                   cohortMemberStatus?: string;
                 }) =>
                   cohort?.type === 'BATCH' &&
-                  cohort?.cohortStatus === 'active' &&
-                  cohort?.cohortMemberStatus === 'active'
+                  cohort?.cohortStatus === 'active'
               )
             : false;
           if (hasBatch) {
@@ -552,6 +551,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href="/home"
             onClick={handleHomeClick}
             startIcon={<HomeIcon />}
             sx={{
@@ -574,6 +575,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href="/programs"
             onClick={handleShowAllPrograms}
             sx={{
               borderColor: '#000',
