@@ -68,6 +68,14 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+  const [homeHref, setHomeHref] = useState('/home');
+
+  useEffect(() => {
+    const landingPage = localStorage.getItem('landingPage');
+    if (landingPage) {
+      setHomeHref(landingPage);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -364,23 +372,17 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
     }
   };
 
-  const handleShowAllPrograms = () => {
+  const handleShowAllPrograms = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     localStorage.removeItem('learnerCourseFilters');
     onClose();
     router.push('/programs');
   };
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     onClose();
-    const landingPage =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('landingPage')
-        : null;
-    if (landingPage) {
-      router.push(landingPage);
-    } else {
-      router.push('/home');
-    }
+    router.push(homeHref);
   };
 
   const formatDate = (dateString?: string) => {
@@ -552,7 +554,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
             variant="outlined"
             fullWidth
             component="a"
-            href="/home"
+            href={homeHref}
             onClick={handleHomeClick}
             startIcon={<HomeIcon />}
             sx={{
