@@ -502,11 +502,10 @@ const App = ({
           courseId={courseId}
           unitId={unitId}
           mimeType={mimeType}
-          exitLink={exitLink || activeLink}
+          exitLink={exitLink || returnUrl || activeLink}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
-          exitLink={returnUrl || exitLink}
         />
         {item?.content?.artifactUrl &&
           
@@ -825,7 +824,7 @@ const PlayerBox = ({
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}${exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ''}`}
+            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
             // style={{
             //   border: 'none',
             //   objectFit: 'contain',
