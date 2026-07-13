@@ -731,6 +731,16 @@ const PlayerBox = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
 
+  // The sbplayer iframe is hosted on a different origin (NEXT_PUBLIC_LEARNER_SBPLAYER).
+  // When its Exit button runs `window.top.location.href = exitLink`, a relative
+  // exitLink would resolve against the iframe's origin, switching the domain.
+  // Resolve exitLink to an absolute URL on the current (parent) origin so the
+  // player navigates back to the correct domain.
+  const absoluteExitLink =
+    exitLink && typeof window !== 'undefined'
+      ? new URL(exitLink, window.location.origin).href
+      : exitLink;
+
   // Determine aspectRatio based on mimeType and mobile mode
   const getAspectRatio = () => {
     if (mimeType === 'application/vnd.sunbird.questionset' && isMobile) {
@@ -819,7 +829,9 @@ const PlayerBox = ({
             }?identifier=${identifier}${
               courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
             }${
-              exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ''
+              absoluteExitLink
+                ? `&exitLink=${encodeURIComponent(absoluteExitLink)}`
+                : ''
             }${
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
