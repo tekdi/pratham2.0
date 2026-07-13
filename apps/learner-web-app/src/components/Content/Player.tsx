@@ -107,9 +107,8 @@ const App = ({
     returnUrl = searchParams.get('returnUrl');
   }
 
-  // Intercept browser back button when exitLink or returnUrl is set.
-  // returnUrl covers new-tab scenario; exitLink covers same-tab scenario.
-  const effectiveExitLink = exitLink || returnUrl;
+  // Intercept browser ← button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
+  const effectiveExitLink = exitLink || returnUrl || activeLink;
   useEffect(() => {
     if (!effectiveExitLink) return;
 
@@ -503,6 +502,7 @@ const App = ({
           courseId={courseId}
           unitId={unitId}
           mimeType={mimeType}
+          exitLink={exitLink || activeLink}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
@@ -825,7 +825,7 @@ const PlayerBox = ({
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
                 : ''
-            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}`}
+            }${typeof window !== 'undefined' ? `&firstName=${localStorage.getItem('firstName')}&lastName=${localStorage.getItem('lastName')}` : ''}${exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ''}`}
             // style={{
             //   border: 'none',
             //   objectFit: 'contain',
