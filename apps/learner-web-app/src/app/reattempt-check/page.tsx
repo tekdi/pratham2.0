@@ -4,8 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
-import { enrollUserTenant } from '@learner/utils/API/EnrollmentService';
-import { updateUser } from '@learner/utils/API/userService';
 import Loader from '@learner/components/Loader/Loader';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import { useTranslation } from '@shared-lib';
@@ -43,44 +41,6 @@ console.log('Assessment status result:', result, 'Reattempt allowed:', registrat
   );
 };
 
-const enrollIntoTenant = async () => {
-  try {
-    const storedUserId = localStorage.getItem('userId');
-    const storedRoleId = localStorage.getItem('roleId');
-    const tenantId = localStorage.getItem('tenantId');
-    const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-    const userTenantStatus = uiConfig?.isTenantPendingStatus;
-
-    if (!storedUserId || !storedRoleId || !tenantId) {
-      console.error('enrollIntoTenant: missing required fields');
-      return;
-    }
-
-    if (userTenantStatus) {
-      await enrollUserTenant({ userId: storedUserId, tenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-    } else {
-      await enrollUserTenant({ userId: storedUserId, tenantId, roleId: storedRoleId });
-    }
-    console.log('Enrolled into tenant:', tenantId);
-
-    // Update user with pending custom field after enrollment
-    try {
-      await updateUser(storedUserId, {
-        userData: {},
-        customFields: [{
-          fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
-          value: 'pending',
-        }],
-      });
-      console.log('Pending custom field updated for user:', storedUserId);
-    } catch (updateError) {
-      console.error('Failed to update pending custom field:', updateError);
-    }
-  } catch (error) {
-    console.error('enrollIntoTenant failed:', error);
-  }
-};
-
 const ReattemptCheckPage = () => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -103,8 +63,7 @@ const ReattemptCheckPage = () => {
           const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
           const landingPage = localStorage.getItem('landingPage') || '/home';
 
-          // Enroll user into the tenant now that assessment is complete
-          await enrollIntoTenant();
+          // Enrollment already happened on Finish Enroll (enroll-profile-completion).
 
           if (isAndroid) {
             let refreshToken = localStorage.getItem('refreshTokenForAndroid');
@@ -139,9 +98,8 @@ const ReattemptCheckPage = () => {
   }, [router]);
 
   const handleContinue = async () => {
-        await enrollIntoTenant();
-
-    // Enroll user into the tenant when they choose to continue without reattempting
+    // Enrollment already happened on Finish Enroll (enroll-profile-completion);
+    // continuing without reattempting only needs the redirect / Android handoff.
        const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       console.log('isAndroid check:', isAndroid);
       

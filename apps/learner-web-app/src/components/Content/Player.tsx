@@ -503,6 +503,7 @@ const App = ({
           unitId={unitId}
           mimeType={mimeType}
           exitLink={exitLink || returnUrl || activeLink}
+          previousPage={previousPage}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
@@ -724,6 +725,7 @@ const PlayerBox = ({
   isPortrait,
   isVideo,
   exitLink,
+  previousPage,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -740,6 +742,15 @@ const PlayerBox = ({
     exitLink && typeof window !== 'undefined'
       ? new URL(exitLink, window.location.origin).href
       : exitLink;
+
+  // previousPage is where the learner should return when they abandon the flow
+  // (e.g. exiting an assessment before completing). Resolve to an absolute URL on
+  // the parent origin — same reason as absoluteExitLink above — so the player can
+  // navigate back to the correct domain from inside the cross-origin iframe.
+  const absolutePreviousPage =
+    previousPage && typeof window !== 'undefined'
+      ? new URL(previousPage, window.location.origin).href
+      : previousPage;
 
   // Determine aspectRatio based on mimeType and mobile mode
   const getAspectRatio = () => {
@@ -831,6 +842,10 @@ const PlayerBox = ({
             }${
               absoluteExitLink
                 ? `&exitLink=${encodeURIComponent(absoluteExitLink)}`
+                : ''
+            }${
+              absolutePreviousPage
+                ? `&previousPage=${encodeURIComponent(absolutePreviousPage)}`
                 : ''
             }${
               userIdLocalstorageName

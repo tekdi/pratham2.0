@@ -98,6 +98,10 @@ export const getTelemetryEvents = async (
   }
 
   if (eid === 'END' || (contentType === 'quml' && eid === 'SUMMARY')) {
+    // [QuML-DIAG] TEMPORARY — remove after analysis. Confirms that the
+    // completion-tracking branch fires (which marks the course/unit complete),
+    // and on which event, so we can verify it also fires on an aborted exit.
+    console.log('[QuML-DIAG] completion branch fired', { contentType, eid, identifier });
     try {
       const detailsObject: any[] = [];
 

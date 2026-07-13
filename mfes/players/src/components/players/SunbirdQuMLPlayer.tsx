@@ -118,9 +118,44 @@ const SunbirdQuMLPlayer = ({
   }, [playerConfig]);
 
   React.useEffect(() => {
+    // The QuML player posts a `maxScore` message when the assessment is submitted.
+    // Use it to tell a completed exit (→ exitLink, e.g. /reattempt-check) apart
+    // from an abandoned exit (→ previousPage, e.g. /scp-dashboard).
+    let isAssessmentCompleted = false;
     const handleMessage = (event: any) => {
       const data = JSON.parse(event?.data);
+
+      // [QuML-DIAG] TEMPORARY instrumentation — remove after analysis.
+      // Logs every message the embedded sunbird-quml-player posts, so we can
+      // compare the exact sequence for a genuine COMPLETION vs an ABORT (Exit
+      // mid-assessment). We want to find a reliable "actually finished" signal
+      // (e.g. progress === 100 / all questions answered) rather than relying on
+      // "a maxScore or SUMMARY message arrived", which may fire in both cases.
+      try {
+        const tele = data?.data ?? {};
+        const edata = tele?.edata ?? {};
+        const progressFromSummary = Array.isArray(edata?.summary)
+          ? edata.summary.find((s: any) => s?.progress != null)?.progress
+          : undefined;
+        const progressFromExtra = Array.isArray(edata?.extra)
+          ? edata.extra.find((e: any) => e?.id === 'progress')?.value
+          : undefined;
+        console.log('[QuML-DIAG] message', {
+          hasMaxScore: data?.maxScore !== undefined,
+          maxScore: data?.maxScore,
+          eid: tele?.eid,
+          edataType: edata?.type,
+          mid: tele?.mid,
+          progressFromSummary,
+          progressFromExtra,
+          payload: data,
+        });
+      } catch (diagErr) {
+        console.log('[QuML-DIAG] could not inspect message', diagErr, event?.data);
+      }
+
       if (data?.maxScore !== undefined) {
+        isAssessmentCompleted = true;
         createAssessmentTracking({
           ...data,
           courseId,
@@ -128,8 +163,19 @@ const SunbirdQuMLPlayer = ({
           userId,
         });
       } else if (data?.data?.edata?.type === 'EXIT') {
-        handleExitEvent();
+        handleExitEvent({ preferPreviousPage: !isAssessmentCompleted });
       } else if (data?.data?.mid) {
+        // An aborted assessment is never submitted, so `maxScore` /
+        // createAssessmentTracking never fires. Its END/SUMMARY telemetry must NOT
+        // mark the course content complete. Only forward completion telemetry once
+        // the assessment has actually been submitted (isAssessmentCompleted). START
+        // and other events still flow through (they record in-progress).
+        const telemetryEid = data?.data?.eid;
+        const isCompletionTelemetry =
+          telemetryEid === 'END' || telemetryEid === 'SUMMARY';
+        if (isCompletionTelemetry && !isAssessmentCompleted) {
+          return;
+        }
         handleTelemetryEventQuml(data, {
           courseId,
           unitId,

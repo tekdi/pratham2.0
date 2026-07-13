@@ -86,7 +86,13 @@ const AttemptAssessmentButton: React.FC = () => {
         contentId: identifier,
       });
 
-      if (Array.isArray(result) && result.length === 0) {
+      // Show the button while attempts remain, using the same allowance the
+      // reattempt popup uses (uiConfig.registrationTestReattempt) so the two agree.
+      const registrationTestReattempt = Number(
+        uiConfig?.registrationTestReattempt ?? 0
+      );
+
+      if (Array.isArray(result) && result.length < registrationTestReattempt) {
         localStorage.setItem('registerationTestQuestionSetIdentifier', identifier);
         setQuestionSetIdentifier(identifier);
         setIsContentAvailable(true);
