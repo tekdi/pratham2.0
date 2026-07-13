@@ -41,15 +41,18 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 export const handleExitEvent = () => {
-  // New-tab scenario: exitLink is forwarded into the iframe src from the player page
-  const urlParams = new URLSearchParams(window.location.search);
-  const exitLinkFromUrl = urlParams.get('exitLink');
-  if (exitLinkFromUrl) {
-    const target = window.top || window;
-    target.location.href = exitLinkFromUrl;
-    return;
+  // Prefer exitLink/activeLink from the iframe URL — set by the parent player page.
+  // This avoids using sessionStorage['previousPage'] which may point to a different domain.
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const exitUrl = params.get('exitLink') || params.get('activeLink');
+    if (exitUrl) {
+      const target = window.top ?? window;
+      target.location.href = exitUrl;
+      return;
+    }
   }
-  // Same-tab scenario: sessionStorage was set before router.push to the player
+
   const previousPage = sessionStorage.getItem('previousPage');
   if (previousPage) {
     window.location.href = previousPage;
