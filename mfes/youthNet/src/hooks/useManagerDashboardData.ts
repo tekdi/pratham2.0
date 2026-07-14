@@ -42,8 +42,12 @@ const INITIAL_STATE: ManagerDashboardData = {
 };
 
 let cache: ManagerDashboardData | null = null;
+let cachedManagerUserId: string | null = null;
 let inFlight: Promise<void> | null = null;
 const listeners = new Set<() => void>();
+
+const getCurrentManagerUserId = (): string | null =>
+  typeof window !== 'undefined' ? localStorage.getItem('managrUserId') : null;
 
 const publish = (patch: Partial<ManagerDashboardData>) => {
   cache = { ...(cache ?? INITIAL_STATE), ...patch };
@@ -56,7 +60,8 @@ const loadManagerDashboardData = (): Promise<void> => {
   inFlight = (async () => {
     let fetchedUsers: ManagerTeamUser[] = [];
     try {
-      const managerUserId = typeof window !== 'undefined' ? localStorage.getItem('managrUserId') : null;
+      const managerUserId = getCurrentManagerUserId();
+      cachedManagerUserId = managerUserId;
       if (managerUserId) {
         const response = await fetchUserList({ filters: { emp_manager: managerUserId, role: 'Learner' } });
         fetchedUsers = response?.getUserDetails || [];
@@ -108,8 +113,15 @@ export const useManagerDashboardData = (options?: { fetchIfMissing?: boolean }):
   useEffect(() => {
     const listener = () => setTick((tick) => tick + 1);
     listeners.add(listener);
-    if (fetchIfMissing && !cache && !inFlight) {
-      loadManagerDashboardData();
+    if (fetchIfMissing) {
+      if (cache && cachedManagerUserId !== getCurrentManagerUserId()) {
+        cache = null;
+        cachedManagerUserId = null;
+        inFlight = null;
+      }
+      if (!cache && !inFlight) {
+        loadManagerDashboardData();
+      }
     }
     return () => {
       listeners.delete(listener);

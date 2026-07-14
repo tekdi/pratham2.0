@@ -126,7 +126,7 @@ const getLiveCourseLearningSummary = async (
     COURSE_STATUS_API_URL,
     { ...request, type: 'dashboard' }
   );
-  const body: CourseStatusApiResponse = response.data;
+  const body: CourseStatusApiResponse = response?.data;
 
   const result: CourseLearningSummaryResult = {};
   (body?.data ?? []).forEach((courseEntry) => {

@@ -108,7 +108,7 @@ const CoursesFilterBar: React.FC<CoursesFilterBarProps> = ({ courses, filters, o
             borderRadius: '7px',
             cursor: isFiltered ? 'pointer' : 'default',
             color: isFiltered ? theme.palette.text.secondary : theme.palette.text.disabled,
-            bgColor: isFiltered ? theme.palette.warning['800'] : theme.palette.warning['700'],
+            bgcolor: isFiltered ? theme.palette.warning['800'] : theme.palette.warning['700'],
             border: `1px solid ${theme.palette.divider}`,
             '&:hover': isFiltered ? { color: theme.palette.text.primary } : undefined,
           }}

@@ -89,7 +89,7 @@ export const CommonPagination: React.FC<CommonPaginationProps> = ({
     alignItems: 'center',
     justifyContent: 'center',
     userSelect: 'none' as const,
-    '&:hover': { borderColor : theme.palette.dashboardStatus.inProgress },
+    '&:hover': { borderColor : theme.palette.dashboardStatus?.inProgress },
     '&:disabled': { opacity: 0.5, cursor: 'default', backgroundColor: 'white', borderColor: theme.palette.divider },
   };
 
@@ -137,7 +137,7 @@ export const CommonPagination: React.FC<CommonPaginationProps> = ({
                 backgroundColor: theme.palette.primary.main,
                 borderColor: theme.palette.primary.main,
                 color: 'white',
-                '&:hover': { borderColor : theme.palette.dashboardStatus.inProgress },
+                '&:hover': { borderColor : theme.palette.dashboardStatus?.inProgress },
               }),
             }}
           >

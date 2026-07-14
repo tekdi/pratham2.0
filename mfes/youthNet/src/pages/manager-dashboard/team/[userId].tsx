@@ -66,7 +66,7 @@ const EmployeeDetailPage = () => {
     });
   }, [router, fromTab]);
 
-  const isLoading = usersLoading || coursesLoading || summaryLoading;
+  const isLoading = !router.isReady || usersLoading || coursesLoading || summaryLoading;
   const dataUnavailable = hasLoaded && (usersError || coursesError || summaryError);
 
   let body: React.ReactNode;
