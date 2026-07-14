@@ -1,26 +1,25 @@
-import React, { useCallback, useMemo } from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useRouter } from 'next/router';
+import { Box, Button, Container, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
+import React, { useCallback, useMemo } from 'react';
+import Header from '../../../components/Header';
 import {
   EmployeeCourseBreakdown,
   EmployeeProfileCard,
   EmployeeSummaryCards,
 } from '../../../components/ManagerDashboard';
-import Header from '../../../components/Header';
 import NoDataFound from '../../../components/common/NoDataFound';
 import { useManagerDashboardData } from '../../../hooks/useManagerDashboardData';
 import { ManagerDashboardTabKey } from '../../../utils/Interface';
-import { isManagerDashboardTabKey } from '../../../utils/managerDashboardHelpers';
 import {
   buildUserById,
   getEmployeeCourseProgress,
   getEmployeeProgressSummary,
   getUserDisplayName,
-  groupEmployeeCoursesByType,
+  groupEmployeeCoursesByType, isManagerDashboardTabKey
 } from '../../../utils/managerDashboardHelpers';
 
 const EmployeeDetailPage = () => {
