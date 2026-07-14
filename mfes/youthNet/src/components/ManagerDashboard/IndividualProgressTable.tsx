@@ -110,15 +110,6 @@ const IndividualProgressTable: React.FC<IndividualProgressTableProps> = ({
                           {row.userName}
                         </Typography>
                       </Tooltip>
-                      {row.metadata && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                        >
-                          {row.metadata}
-                        </Typography>
-                      )}
                     </Box>
                   </Stack>
                 </TableCell>
