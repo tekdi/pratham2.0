@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 interface NoDataFoundProps {
   title?: string;
@@ -15,9 +15,8 @@ const NoDataFound: React.FC<NoDataFoundProps> = ({
   return (
     <Box
       sx={{
-        m: '1.125rem',
         width: '100%',
-        bgcolor: bgColor ?? 'inherit',
+        bgcolor: bgColor,
       }}
     >
       <Typography
