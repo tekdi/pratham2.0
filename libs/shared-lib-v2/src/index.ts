@@ -23,4 +23,5 @@ export * from './utils/helper';
 export * from './utils/scaledFontSize';
 export * from './lib/Text/ExpandableText';
 export * from './lib/Grid/Grid';
+export * from './lib/Pagination/CommonPagination';
 export { RoleId } from './utils/app.constant';

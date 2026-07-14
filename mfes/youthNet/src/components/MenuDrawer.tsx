@@ -1,21 +1,22 @@
 'use client';
 
-import useStore from '../store/store';
-import { accessGranted } from '../utils/Helper';
-import { AcademicYear } from '../utils/Interfaces';
+import BusinessIcon from '@mui/icons-material/Business';
 import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import GroupsIcon from '@mui/icons-material/Groups';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import LinkIcon from '@mui/icons-material/Link';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import BusinessIcon from '@mui/icons-material/Business';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import {
   Button,
   FormControl,
   IconButton,
-  MenuItem,
-  Typography,
+  MenuItem
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -27,20 +28,19 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
-import { accessControl, TENANT_DATA, TENANT_TYPE } from '../utils/app.config';
 import config from '../../config.json';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import board from '../assets/images/Board.svg';
 import support from '../assets/images/Support.svg';
-import checkBook from '../assets/images/checkbook.svg';
 import assessment from '../assets/images/assessment.svg';
+import checkBook from '../assets/images/checkbook.svg';
 import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
-import GroupsIcon from '@mui/icons-material/Groups';
-import { YOUTHNET_USER_ROLE } from './youthNet/tempConfigs';
+import useStore from '../store/store';
+import { accessGranted } from '../utils/Helper';
+import { AcademicYear } from '../utils/Interfaces';
+import { accessControl, DEFAULT_MANAGER_DASHBOARD_TAB, MANAGER_DASHBOARD_NAV_ITEMS, TENANT_DATA, TENANT_TYPE } from '../utils/app.config';
 import { Role } from '../utils/app.constant';
-import EditNoteIcon from '@mui/icons-material/EditNote';
-import LinkIcon from '@mui/icons-material/Link';
 import { showToastMessage } from './Toastify';
 
 interface DrawerProps {
@@ -91,7 +91,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         setTenantName(TENANT_DATA.YOUTHNET);
       } else if (storedTenantName === TENANT_DATA.PRAGYANPATH) {
         setTenantName(TENANT_DATA.PRAGYANPATH);
-      } 
+      }
       else if (storedTenantName === TENANT_DATA.SUMMER_CAMP) {
         setTenantName(TENANT_DATA.SUMMER_CAMP);
       }
@@ -205,7 +205,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           : '') || '';
       if (registrationBase) {
         const enroll = localStorage.getItem('tenantName') || '';
-        
+
         // Construct the proper registration link
         // Format: https://domain/Second-Chance-Program
         const baseUrl = registrationBase.replace(/\/$/, '');
@@ -214,7 +214,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
         // Copy to clipboard
         await navigator.clipboard.writeText(registrationLink);
-        
+
         // Show success toast message
         showToastMessage(
           'Registration link copied!\nShare this link with learners for program registration.',
@@ -294,8 +294,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
       }}
     >
       <Box
-        sx={{ 
-          padding: '16px 16px 12px 16px', 
+        sx={{
+          padding: '16px 16px 12px 16px',
           width: '350px',
           height: '100vh',
           display: 'flex',
@@ -617,42 +617,59 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Box>
           </Box>
         )}
-        
-        {/* PRAGYANPATH - Only shows manager-dashboard */}
+
+        {/* PRAGYANPATH - Manager Dashboard navigation (kept in sync with the header tabs) */}
         {tenantName === TENANT_DATA.PRAGYANPATH && (
           <Box>
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isManagerDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isManagerDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isManagerDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isManagerDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isManagerDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
-              }
-              onClick={() => {
-                router.push('/manager-dashboard');
-              }}
-            >
-              Manager Dashboard
-            </Button>
-          
+            {MANAGER_DASHBOARD_NAV_ITEMS.map((item) => {
+              const activeTab =
+                (router.query.tab as string) || DEFAULT_MANAGER_DASHBOARD_TAB;
+              const isActive = isManagerDashboard && activeTab === item.key;
+              const NavIcon =
+                item.key === 'team'
+                  ? GroupsOutlinedIcon
+                  : item.key === 'courses'
+                  ? MenuBookOutlinedIcon
+                  : DashboardOutlinedIcon;
+              return (
+                <Button
+                  key={item.key}
+                  className="fs-14"
+                  sx={{
+                    gap: '10px',
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    background: isActive
+                      ? theme.palette.primary.main
+                      : 'transparent',
+                    padding: isActive
+                      ? '16px 18px !important'
+                      : '0px 18px !important',
+                    marginTop: '25px',
+                    color: isActive ? '#2E1500' : theme.palette.warning.A200,
+                    fontWeight: isActive ? '600' : 500,
+                    '&:hover': {
+                      background: isActive
+                        ? theme.palette.primary.main
+                        : 'transparent',
+                    },
+                  }}
+                  startIcon={
+                    <NavIcon sx={{ fontSize: '24px !important' }} />
+                  }
+                  onClick={() => {
+                    closeDrawer();
+                    router.push({
+                      pathname: '/manager-dashboard',
+                      query: item.key === DEFAULT_MANAGER_DASHBOARD_TAB ? {} : { tab: item.key },
+                    });
+                  }}
+                >
+                  {t(item.menuLabelKey)}
+                </Button>
+              );
+            })}
           </Box>
         )}
         {(tenantName === TENANT_DATA.SUMMER_CAMP || tenantType === TENANT_TYPE.VOLUNTEER_ONBOARDING) && (
@@ -686,7 +703,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 router.push('/individual-volunteer');
               }}
             >
-              Individual Volunteer 
+              Individual Volunteer
             </Button>
 
 
@@ -720,7 +737,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 router.push('/organisation');
               }}
             >
-              Organisation 
+              Organisation
             </Button>
 
             <Button
@@ -796,7 +813,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Button>
           </Box>
         )}
-        
+
         {!tenantName && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-8">
             <Button
@@ -1031,7 +1048,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           </Box>
         )}
         </Box>
-        
+
         {/* Bottom Section - Fixed at bottom */}
         <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
           {process.env.NEXT_PUBLIC_LEARNER_SBPLAYER && typeof window !== 'undefined' && localStorage.getItem('tenantName') !== TENANT_DATA.PRAGYANPATH && (
