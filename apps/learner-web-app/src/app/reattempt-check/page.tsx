@@ -149,7 +149,7 @@ const ReattemptCheckPage = () => {
     );
     if (questionSetIdentifier) {
       const rettempt="/reattempt-check"
-      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent(rettempt)}`;
+      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent(rettempt)}`;
     } else {
       const landingPage = localStorage.getItem('landingPage') || '/home';
       router.replace(landingPage);

@@ -632,7 +632,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           onClose();
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}
