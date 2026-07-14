@@ -414,6 +414,40 @@ const LoginPageContent = () => {
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
           await profileComplitionCheck();
 
+          // Fetch user details and store preferred language BEFORE the registration
+          // test check — the main-login path does this. Without it, ContentSearch in
+          // checkRegistrationTestStatus runs without the contentLanguage filter and
+          // resolves a different question set than the one the learner attempted, so
+          // getAssessmentStatus returns [] and the Saral popup wrongly re-appears.
+          try {
+            const userDetails = await getUserDetails(userResponse?.userId, true);
+            if (userDetails?.result?.userData?.customFields) {
+              userDetails.result.userData.customFields.forEach((field: any) => {
+                const { label, selectedValues } = field;
+                if (label === 'WHAT_IS_YOUR_PREFERRED_LANGUAGE') {
+                  let preferred = '';
+                  if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+                    const first = selectedValues[0] as unknown;
+                    preferred =
+                      typeof first === 'string'
+                        ? first
+                        : (first as { value?: string })?.value ?? String(first);
+                  } else if (typeof selectedValues === 'string') {
+                    preferred = selectedValues;
+                  }
+                  if (preferred) {
+                    localStorage.setItem('preferred_language', preferred);
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            console.error(
+              'Failed to fetch user details for preferred language',
+              error
+            );
+          }
+
           const assessmentStatus = await checkRegistrationTestStatus(
             uiConfig,
             enrolledTenant.tenantName,

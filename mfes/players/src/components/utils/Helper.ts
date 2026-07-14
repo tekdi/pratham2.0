@@ -40,11 +40,22 @@ export const debounce = <T extends (...args: any[]) => any>(
   };
 };
 
-export const handleExitEvent = () => {
+export const handleExitEvent = (options?: { preferPreviousPage?: boolean }) => {
   // Prefer exitLink/activeLink from the iframe URL — set by the parent player page.
   // This avoids using sessionStorage['previousPage'] which may point to a different domain.
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
+    // Abandoned flow (e.g. exiting an assessment before completing): return to
+    // previousPage (where the learner launched from) instead of the
+    // post-completion gate (exitLink, e.g. /reattempt-check).
+    if (options?.preferPreviousPage) {
+      const previousUrl = params.get('previousPage');
+      if (previousUrl) {
+        const target = window.top ?? window;
+        target.location.href = previousUrl;
+        return;
+      }
+    }
     const exitUrl = params.get('exitLink') || params.get('activeLink');
     if (exitUrl) {
       const target = window.top ?? window;
