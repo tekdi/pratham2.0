@@ -313,7 +313,7 @@ const CollectionEditor: React.FC = () => {
 
         script.id = 'collection-editor-js';
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.7/sunbird-collection-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.10/sunbird-collection-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
@@ -328,7 +328,7 @@ const CollectionEditor: React.FC = () => {
         link.id = 'collection-editor-css';
         link.rel = 'stylesheet';
         link.href =
-          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.7/styles.css';
+          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.10/styles.css';
         document.head.appendChild(link);
       }
 
