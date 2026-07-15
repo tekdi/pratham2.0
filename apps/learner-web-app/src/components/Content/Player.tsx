@@ -766,6 +766,38 @@ const PlayerBox = ({
     }
   }, []);
 
+  // Android bridge relay: the player runs in a cross-origin iframe and cannot reach
+  // the native bridge (`window.ReactNativeWebView`) or read `isAndroidApp`. On an
+  // Android exit it posts `player:exit-native` up to this (top) window, and we hand
+  // control back to the native view via ENROLL_PROGRAM_EVENT. On web this listener
+  // never fires (the player navigates normally), so web behaviour is unchanged.
+  useEffect(() => {
+    const handlePlayerExitNative = (event: MessageEvent) => {
+      if (event?.data?.type !== 'player:exit-native') return;
+      if (typeof window === 'undefined') return;
+      if (localStorage.getItem('isAndroidApp') !== 'yes') return;
+      const nativeBridge = (window as any).ReactNativeWebView;
+      if (!nativeBridge) return;
+      let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+      if (!refreshToken || refreshToken === '') {
+        refreshToken = localStorage.getItem('refreshToken');
+      }
+      nativeBridge.postMessage(
+        JSON.stringify({
+          type: 'ENROLL_PROGRAM_EVENT',
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken: refreshToken,
+          },
+        })
+      );
+    };
+    window.addEventListener('message', handlePlayerExitNative);
+    return () => window.removeEventListener('message', handlePlayerExitNative);
+  }, []);
+
   const handlePlay = () => {
     if (checkAuth() || userIdLocalstorageName) {
       setPlay(true);
@@ -846,6 +878,11 @@ const PlayerBox = ({
             }${
               absolutePreviousPage
                 ? `&previousPage=${encodeURIComponent(absolutePreviousPage)}`
+                : ''
+            }${
+              typeof window !== 'undefined' &&
+              localStorage.getItem('isAndroidApp') === 'yes'
+                ? `&isAndroidApp=yes`
                 : ''
             }${
               userIdLocalstorageName
