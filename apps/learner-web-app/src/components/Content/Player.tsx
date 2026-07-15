@@ -251,6 +251,27 @@ const App = ({
       return;
     }
     if (previousPage) {
+      // Android app (Saral/registration flow uses previousPage): hand control back
+      // to the native view instead of loading the web dashboard in the WebView.
+      // Gated on isAndroidApp, so web keeps the existing router.push(previousPage).
+      if (isAndroid && (window as any).ReactNativeWebView) {
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
+        }
+        (window as any).ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: 'ENROLL_PROGRAM_EVENT',
+            data: {
+              userId: localStorage.getItem('userId'),
+              tenantId: localStorage.getItem('tenantId'),
+              token: localStorage.getItem('token'),
+              refreshToken: refreshToken,
+            },
+          })
+        );
+        return;
+      }
       router.push(previousPage);
       return;
     }

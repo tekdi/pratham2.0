@@ -930,6 +930,11 @@ const LoginPageContent = () => {
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it. The Saral popup still re-appears based
+          // on remaining attempts (getAssessmentStatus), not this flag.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           const pendingAssessmentIdentifier = localStorage.getItem(
             'registerationTestQuestionSetIdentifier'
           );
@@ -945,15 +950,29 @@ const LoginPageContent = () => {
           localStorage.setItem('registerationTestGiven', 'Yes');
           if(localStorage.getItem('isAndroidApp') == 'yes')
             {
-                          router.push(`/programs`);
-                                    window.location.href = `/programs`;
-
-
+              // Android: hand back to the native dashboard instead of loading the
+              // web /programs page in the WebView.
+              if ((window as any).ReactNativeWebView) {
+                let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+                if (!refreshToken || refreshToken === '') {
+                  refreshToken = localStorage.getItem('refreshToken');
+                }
+                (window as any).ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'ENROLL_PROGRAM_EVENT',
+                    data: {
+                      userId: localStorage.getItem('userId'),
+                      tenantId: localStorage.getItem('tenantId'),
+                      token: localStorage.getItem('token'),
+                      refreshToken: refreshToken,
+                    },
+                  })
+                );
+              }
             }
             else{
                 const landingPage = localStorage.getItem('landingPage') || '/home';
           window.location.href = landingPage;
-   
             }
               }}
       >
