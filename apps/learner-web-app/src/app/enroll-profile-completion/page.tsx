@@ -388,9 +388,13 @@ const EnrollProfileCompletionInner = () => {
 
     // Use window.location.href for guaranteed navigation (router.push can silently fail in modals)
      if(questionSetIdentifier){
+      // Mark the registration test as addressed (parity with Close) so the
+      // ClientLayout route guard doesn't lock the user out of programs if they
+      // start the test and then abort it.
+      localStorage.setItem('registerationTestGiven', 'Yes');
       window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
 
-   
+
    }
   };
 
