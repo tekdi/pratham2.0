@@ -8,7 +8,7 @@ export const getTenantInfo = async (): Promise<any> => {
   try {
     const response = await axios.get(apiUrl);
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    const devOrigins = ['http://192.168.1.40:3003'];
+    const devOrigins = ['http://172.132.44.161:3003'];
     const matchingTenants =
       response?.data?.result?.filter((tenant: any) =>
         tenant?.params?.uiConfig?.enable_domain?.includes(currentOrigin) ||
