@@ -77,6 +77,13 @@ const MAX_CONCURRENCY = 3;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 2_000;
 
+// File uploads stream large payloads (Drive download → presigned upload →
+// platform processing). Running several at once overloads the gateway and
+// produces 502s on big files, so they are limited to one at a time.
+// Lightweight metadata jobs still run at MAX_CONCURRENCY.
+const HEAVY_JOB_TYPES: ReadonlySet<string> = new Set(['upload_content_file']);
+const MAX_HEAVY_CONCURRENCY = 1;
+
 // ─── Event System ─────────────────────────────────────────────
 
 type ProgressListener = (progress: ImportProgress) => void;
@@ -498,10 +505,24 @@ export class BulkImportQueue {
 
         this.emitProgress();
 
-        // Launch up to MAX_CONCURRENCY jobs
-        const toRun = readyJobs
-          .filter((j) => j.status === 'queued')
-          .slice(0, MAX_CONCURRENCY - this.activeCount);
+        // Launch up to MAX_CONCURRENCY jobs, with heavy (file upload) jobs
+        // additionally capped at MAX_HEAVY_CONCURRENCY to avoid gateway 502s
+        let heavyActive = jobsArray.filter(
+          (j) =>
+            HEAVY_JOB_TYPES.has(j.type) &&
+            (j.status === 'processing' || j.status === 'retrying')
+        ).length;
+
+        const toRun: QueueJob[] = [];
+        for (const j of readyJobs) {
+          if (j.status !== 'queued') continue;
+          if (toRun.length >= MAX_CONCURRENCY - this.activeCount) break;
+          if (HEAVY_JOB_TYPES.has(j.type)) {
+            if (heavyActive >= MAX_HEAVY_CONCURRENCY) continue;
+            heavyActive++;
+          }
+          toRun.push(j);
+        }
 
         if (toRun.length === 0 && this.activeCount === 0) {
           // Nothing running and nothing ready — check for stall
@@ -708,6 +729,7 @@ export class BulkImportQueue {
   private static readonly ALLOWED_MIME_FOR_FILE_TYPE: Record<string, string[]> = {
     pdf: ['application/pdf', 'application/octet-stream'],
     mp4: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-m4v', 'application/octet-stream'],
+    mp3: ['audio/mp3', 'audio/mpeg', 'audio/mpeg3', 'audio/x-mpeg-3', 'application/octet-stream'],
     zip: [
       'application/zip',
       'application/x-zip',

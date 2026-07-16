@@ -38,8 +38,8 @@ export interface ContentRow {
   creator?: string;
   /** Google Drive share URL or YouTube URL (for youtube file type) */
   driveUrl: string;
-  /** pdf | zip | mp4 | h5p | youtube */
-  fileType: 'pdf' | 'zip' | 'mp4' | 'h5p' | 'youtube';
+  /** pdf | zip | mp4 | mp3 | h5p | youtube */
+  fileType: 'pdf' | 'zip' | 'mp4' | 'mp3' | 'h5p' | 'youtube';
   /** Resolved after creation */
   resolvedIdentifier?: string;
   status?: ImportItemStatus;
