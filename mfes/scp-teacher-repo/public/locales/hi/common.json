@@ -186,7 +186,6 @@
     "NOT_ABLE_UPDATE_FACILITATOR": "फैसिलिटेटर  को अपडेट नहीं कर पा रहे हैं",
     "HI": "नमस्ते, {{name}}",
     "FAQS": "अक्सर पूछे जाने वाले प्रश्न (FAQ's)",
-    "NEXT": "अगला",
     "PLEASE_SELECT_AT_LEAST_ONE_BATCH": "कृपया कम से कम एक बैच का चयन करें",
     "PLEASE_SEARCH_AND_SELECT_USER": "कृपया उपयोगकर्ता खोजें और चुनें",
     "PLEASE_SELECT_CENTER": "कृपया एक केंद्र चुनें",
@@ -194,7 +193,19 @@
     "REASSIGN_LEARNER_TO_BATCH": "शिक्षार्थी को बैच में पुनः असाइन करें",
     "LOADING_ELLIPSIS": "लोड हो रहा है...",
     "SELECT_BATCH_WIDGET_TITLE": "बैच चुनें",
-    "PLEASE_SELECT_BATCH": "कृपया एक बैच चुनें"
+    "PLEASE_SELECT_BATCH": "कृपया एक बैच चुनें",
+    "NEXT": "अगला",
+    "RESET_ATTENDANCE": "क्या आप उपस्थिति रीसेट करना चाहते हैं?",
+    "RESET_ATTENDANCE_CONFIRM_MESSAGE": "उपस्थिति रीसेट करने से आज की सारी दर्ज उपस्थिति (ऑफलाइन और ऑनलाइन दोनों) हट जाएगी। यह कार्रवाई वापस नहीं ली जा सकती।",
+    "RESET_ATTENDANCE_BUTTON": "उपस्थिति रीसेट करें",
+    "MAP_NEW": "नया जोड़ें / नया मैप करें",
+    "RESIGNED_FROM_COMPANY": "कंपनी से इस्तीफा दे दिया",
+    "MOVED_TO_DIFFERENT_ROLE": "दूसरी भूमिका/पद पर स्थानांतरित हो गए",
+    "DELETE_FROM_BATCH_WARNING": "क्या आप यूज़र को ऊपर दिए गए सेंटर के बैचों से हटाना चाहते हैं?",
+    "COPY_REGISTRATION_LINK": "रजिस्ट्रेशन लिंक कॉपी करें",
+    "REGISTRATION_LINK_COPIED": "रजिस्ट्रेशन लिंक कॉपी हो गया! इस लिंक को लर्नर्स के साथ साझा करें ताकि वे प्रोग्राम में रजिस्टर कर सकें।",
+    "TRY_AGAIN": "फिर से कोशिश करें",
+    "DOWNLOAD": "डाउनलोड करना"
   },
   "LOGIN_PAGE": {
     "USERNAME": "उपयोगकर्ता नाम",
@@ -312,7 +323,15 @@
     "MANUAL_ATTENDANCE_NOTE": "नोट :मैन्युअली मार्क की गई उपस्थिति बाद में ऑटो-अपडेट को बदल देगी।",
     "NO_BATCHES_ASSIGNED": "कोई बैच असाइन नहीं किया गया",
     "ABSENT_STUDENTS": "अनुपस्थित छात्र: {{count}}",
-    "N/A": "लागू नहीं"
+    "N/A": "लागू नहीं",
+    "ATTENDANCE_RESET_SUCCESSFULLY": "उपस्थिति सफलतापूर्वक रीसेट हो गई",
+    "IN_PERSON_SESSIONS": "ऑफलाइन सत्र ({{count}})",
+    "ONLINE_SESSIONS": "ऑनलाइन सत्र ({{count}})",
+    "ONLINE_ATTENDANCE_AUTO_MARKED_NOTE": "ऑनलाइन उपस्थिति अपने आप दर्ज हो जाती है, जब कोई व्यक्ति सत्र का कम से कम 50% समय पूरा करता है।",
+    "SUBMIT_ATTENDANCE": "उपस्थिति लगाएं",
+    "NO_SESSIONS_FOR_DAY": "इस दिन के लिए कोई सत्र तय नहीं है",
+    "NO_IN_PERSON_SESSIONS": "कोई ऑफलाइन सत्र तय नहीं है",
+    "NO_ONLINE_SESSIONS": "कोई ऑनलाइन सत्र तय नहीं है"
   },
   "PROFILE": {
     "EDIT_PROFILE": "प्रोफ़ाइल एडिट करें",
@@ -538,7 +557,8 @@
     "DELETE_THIS_SESSION": "इस सत्र को हटाएं",
     "LEARNER_PREREQUISITES": "पूर्व आवश्यकताएँ",
     "LEARNER_POSTREQUISITES": "बाद की आवश्यकताएँ",
-    "DURING_COURSE": "सीखना"
+    "DURING_COURSE": "सीखना",
+    "REMOVE_TOPIC_SUBTOPIC_CONFIRMATION": "क्या आप वाकई( सच में ) इस विषय और उप-विषय को हटाना चाहते हैं?"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "केंद्र का अनुरोध सफल रहा",
@@ -646,7 +666,7 @@
     "EDUCATIONAL_INSTITUTE": "शैक्षणिक संस्था",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "बेरोजगार या घरेलू काम",
     "SELF_PLACED": "स्वयं-नियोजित",
-    "TRANSGENDER": "ट्रांसजेंडर",
+    "TRANSGENDER": "अन्य",
     "HINDI": "हिंदी",
     "MARATHI": "मराठी",
     "URDU": "उर्दू",
@@ -688,7 +708,13 @@
     "GRADE_9": "कक्षा 9",
     "GRADE_10": "कक्षा 10",
     "GRADE_11": "कक्षा 11",
-    "GRADE_12": "कक्षा 12"
+    "GRADE_12": "कक्षा 12",
+    "BELONG_TO": "से जुड़ा है",
+    "BELONG_TO_MULTIPLE_CENTERS": "नीचे दिए गए सेंटर से जुड़ा है",
+    "WAS_BELONG_TO": "पहले जुड़ा हुआ था",
+    "DO_YOU_WANT_TO_DELETE": "क्या आप इस यूज़र को हटाना चाहते हैं?",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "क्या आप यूज़र को सभी सेंटर से हटाना चाहते हैं?",
+    "CONSENT_FILE": "सहमति फाइल"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट।",
@@ -855,7 +881,8 @@
     "STATE_DISTRICT_BLOCK_VILLAGE": "गाँव ब्लॉक जिला राज्य",
     "USERNAME": "उपयोगकर्ता नाम",
     "SUBJECTS_I_TEACH": "मैं जो विषय पढ़ाता हूँ",
-    "MY_MAIN_SUBJECTS": "मेरे मुख्य विषय"
+    "MY_MAIN_SUBJECTS": "मेरे मुख्य विषय",
+    "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "आपका पसंदीदा शिक्षण मोड क्या है?"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "मेंटर्स",
@@ -1046,9 +1073,22 @@
     "YOU_CANT_DELETE_BATCH_HAS_ACTIVE_LEARNERS": "आप बैच को नहीं हटा सकते क्योंकि इसमें {{activeMembers}} सक्रिय लर्नर्स हैं",
     "NO_BATCH_FOUND": "कोई बैच नहीं मिला"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "नया मेंटर",
+    "FIRST_SELECT_REQUIRED_FIELDS": "सबसे पहले आवश्यक फ़ील्ड चुनें",
+    "MENTOR_CREATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक बनाया गया है!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "मेंटर बना दिया गया है, क्रेडेंशियल जल्द ही भेज दिए जाएंगे।",
+    "MENTOR_UPDATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक अपडेट हो गया है!",
+    "EDIT_MENTOR": "मेंटर संपादित करें",
+    "NOT_ABLE_UPDATE_MENTOR": "मेंटर को अपडेट करने में असमर्थ",
+    "NOT_ABLE_CREATE_MENTOR": "मेंटर बनाने में असमर्थ",
+    "UPDATE_MENTOR": "मेंटर को अपडेट करें",
+    "RE_ASSIGN_MENTOR": "मेंटर को पुनः नियुक्त करें"
+  },
   "AI": {
     "ASSESSMENT_DETAILS": "मूल्यांकन विवरण",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "नमूना प्रश्न और उत्तर पत्र",
+    "DOWNLOAD_QUESTION_PAPER": "प्रश्न पत्र डाउनलोड करें",
     "SEARCH_LEARNER": "शिक्षार्थी खोजें..",
     "TOTAL_LEARNERS": "{{count}} में से {{total}} शिक्षार्थी",
     "SORT_AND_FILTER_LEARNERS": "शिक्षार्थियों को क्रमबद्ध और फ़िल्टर करें",
@@ -1101,11 +1141,56 @@
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• यदि उत्तर शीट में कई पृष्ठ हैं, तो प्रत्येक पृष्ठ का अलग से फोटो लें और अपलोड करें",
     "READ_LESS": "कम पढ़ें",
     "READ_MORE": "अधिक पढ़ें",
-    "DOWNLOAD_QUESTION_PAPER": "प्रश्न पत्र डाउनलोड करें"
+    "EXPLANATION": "व्याख्या:",
+    "SEE_LESS": "कम देखें",
+    "SEE_MORE": "और देखें",
+    "MARKS_LABEL": "अंक :",
+    "APPROVE_MARKS_NOTIFY_LEARNER": "अंक अप्रूव करें और लर्नर को सूचना दें",
+    "NO_ASSESSMENT_DATA": "मूल्यांकन से जुड़ा कोई डेटा उपलब्ध नहीं है",
+    "CHECK_IF_COMPLETED": "कृपया जांच लें कि टेस्ट पूरा हुआ है या नहीं, फिर दोबारा कोशिश करें।",
+    "DATE_LABEL": "तारीख",
+    "STUDENT_NAME": "छात्र का नाम",
+    "TOTAL_SCORE": "कुल अंक",
+    "PERCENTAGE": "प्रतिशत",
+    "STUDENT_ANSWER": "छात्र का उत्तर",
+    "AI_EXPLANATION_LABEL": "AI द्वारा व्याख्या (रिस्पांस)",
+    "NO_RESPONSE_AVAILABLE": "कोई उत्तर उपलब्ध नहीं है",
+    "FILL_IN_THE_BLANKS": "रिक्त स्थान भरें",
+    "MULTIPLE_CHOICE_QUESTIONS": "बहुविकल्पीय प्रश्न",
+    "SHORT_ANSWER_QUESTIONS": "छोटे उत्तर वाले प्रश्न ( लघु उत्तरीय प्रश्न )",
+    "LONG_ANSWER_QUESTIONS": "लंबे उत्तर वाले प्रश्न ( दीर्घ उत्तरीय प्रश्न )",
+    "UNKNOWN_SECTION": "अपरिचित खंड",
+    "GENERATED_ON": "{{date}} को तैयार किया गया",
+    "PAGE_LABEL": "पेज {{pageNumber}} / {{totalPages}}",
+    "TAKE_PHOTO": "फोटो लें",
+    "LOADING_CAMERA": "कैमरा लोड हो रहा है...",
+    "UPLOADING": "अपलोड हो रहा है...",
+    "MAX_IMAGES": "अधिकतम {{count}} तस्वीरें",
+    "TAKE_A_PHOTO": "फोटो लें",
+    "UPLOAD_A_PHOTO": "फोटो अपलोड करें",
+    "SUBMITTING": "सबमिट हो रहा है...",
+    "UPLOADING_FILES": "फाइलें अपलोड हो रही हैं...",
+    "SAVE_AND_UPLOAD": "सेव करें और अपलोड करें",
+    "UPLOAD_LIMIT_EXCEEDED": "आप अधिकतम {{count}} तस्वीरें ही अपलोड कर सकते हैं",
+    "INVALID_FILE_TYPE": "कृपया सही इमेज फाइल (jpg, jpeg) चुनें",
+    "FILE_SIZE_EXCEEDED": "फाइल 5MB से बड़ी है। कृपया छोटी फाइल चुनें।",
+    "IMAGES_UPLOADED_SUCCESS": "तस्वीरें सफलतापूर्वक अपलोड हो गईं!",
+    "UPLOAD_GALLERY_FAILED": "गैलरी से तस्वीरें अपलोड नहीं हो सकीं। कृपया फिर से कोशिश करें।",
+    "PHOTO_CAPTURED_SUCCESS": "फोटो खींचकर सफलतापूर्वक अपलोड कर दी गई है!",
+    "CAMERA_UPLOAD_FAILED": "कैमरे से फोटो अपलोड नहीं हो सकी। कृपया फिर से कोशिश करें।",
+    "MISSING_REQUIRED_PARAMS": "जरूरी जानकारी पूरी नहीं है। कृपया फिर से कोशिश करें।",
+    "UPLOAD_ONE_IMAGE_FIRST": "सबमिट करने से पहले कम से कम एक फोटो अपलोड करें।",
+    "ANSWER_SHEET_SUBMITTED": "उत्तर-पुस्तिका सफलतापूर्वक जमा ( सबमिट) हो गई!",
+    "SUBMIT_ANSWER_SHEET_FAILED": "उत्तर-पुस्तिका जमा  ( सबमिट) नहीं हो सकी। कृपया फिर से कोशिश करें।",
+    "PAPER_LABEL": "पेपर:",
+    "MAX_MARKS": "अधिकतम अंक:",
+    "SECTION_LABEL": "सेक्शन:",
+    "SECTION_MAX": "सेक्शन के अधिकतम अंक:",
+    "AWARDED": "दिए गए अंक:",
+    "OVERALL_AWARDED": "कुल दिए गए अंक:",
+    "MANUAL_ASSESSMENT_REPORT": "मैनुअल मूल्यांकन रिपोर्ट"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "सभी का चयन करें",
-    "DESELECT_ALL": "सभी का चयन रद्द करें",
     "LEARNER_REGISTRATIONS": "शिक्षार्थी पंजीकरण",
     "SEARCH_LEARNER": "शिक्षार्थी खोजें...",
     "TO_TAKE_ACTION_SELECT_LEARNER": "कार्रवाई करने के लिए, कम से कम एक शिक्षार्थी का चयन करें।",
@@ -1144,18 +1229,11 @@
     "MOVED_TO_BATCH": "और बैच में चले गए",
     "OKAY": "ठीक है",
     "NOT_INTERESTED_TO_JOIN": "शामिल होने में रुचि नहीं है",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "इच्छुक हूं, अगले साल शामिल हो सकता हूं।"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "इच्छुक हूं, अगले साल शामिल हो सकता हूं।",
+    "SELECT_ALL": "सभी का चयन करें",
+    "DESELECT_ALL": "सभी का चयन रद्द करें",
+    "ASSESSMENT_SCORES": "मूल्यांकन के अंक"
   },
-  "MENTORS": {
-    "NEW_MENTOR": "नया मेंटर",
-    "FIRST_SELECT_REQUIRED_FIELDS": "सबसे पहले आवश्यक फ़ील्ड चुनें",
-    "MENTOR_CREATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक बनाया गया है!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "मेंटर बना दिया गया है, क्रेडेंशियल जल्द ही भेज दिए जाएंगे।",
-    "MENTOR_UPDATED_SUCCESSFULLY": "मेंटर सफलतापूर्वक अपडेट हो गया है!",
-    "EDIT_MENTOR": "मेंटर संपादित करें",
-    "NOT_ABLE_UPDATE_MENTOR": "मेंटर को अपडेट करने में असमर्थ",
-    "NOT_ABLE_CREATE_MENTOR": "मेंटर बनाने में असमर्थ",
-    "UPDATE_MENTOR": "मेंटर को अपडेट करें",
-    "RE_ASSIGN_MENTOR": "मेंटर को पुनः नियुक्त करें"
-  }
+  "Select_Language_For_Learning": "आप जिस भाषा में सीखना चाहते हैं, उसे चुनें",
+  "Learning_Language_Info": "आपकी चुनी गई भाषा में कंटेंट, कोर्स और टेस्ट दिखाए जाएंगे। आप इस भाषा को कभी भी प्रोफ़ाइल सेक्शन से बदल सकते हैं"
 }
