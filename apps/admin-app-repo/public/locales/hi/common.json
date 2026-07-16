@@ -153,9 +153,10 @@
     "NO_CONTENT_CREATOR_FOUND": "कोई सामग्री निर्माता (SCTA) नहीं मिला",
     "NO_CONTENT_REVIEWER_FOUND": "कोई सामग्री समीक्षक (CCTA) नहीं मिला",
     "LOADING": "लोड हो रहा है",
-    "USER_DELETE_SUCCSSFULLY": "उपयोगकर्ता सफलतापूर्वक हटाया गया",
     "SURE_REASSIGN_CENTER": "क्या आप सुनिश्चित हैं कि आप इस उपयोगकर्ता को केंद्र पुनः आवंटित करना चाहते हैं?",
     "SORT": "छाँटें",
+    "USER_DELETE_SUCCSSFULLY": "उपयोगकर्ता सफलतापूर्वक हटाया गया",
+    "ARE_YOU_SURE_DELETE_STATE": "इस राज्य में {{district}} सक्रिय जिले हैं, इसलिए इसे हटाया नहीं जा सकता।",
     "ADD": "जोडा",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "अपना अनुरोध सबमिट करें और हम आपकी किसी भी समस्या या चिंता में आपकी सहायता करेंगे।",
     "WE_ARE_HERE_TO_HELP": "हम आपकी मदद के लिए यहाँ हैं",
@@ -168,7 +169,19 @@
     "MOVED_TO_DIFFERENT_ROLE": "एक अलग भूमिका में स्थानांतरित",
     "NO_MOBILIZER_FOUND": "कोई मार्गदर्शक नहीं मिला",
     "MAP": "मानचित्र",
-    "NEXT": "अगला"
+    "NEXT": "अगला",
+    "REDIRECTING": "आगे ले जाया जा रहा है...",
+    "SELECT_LANGUAGE": "भाषा चुनें",
+    "GOOGLE_DOC_VIEWER": "गूगल डॉक व्यूअर",
+    "SELECT_BATCHES_FOR": "{{name}} के लिए बैच चुनें",
+    "GO_BACK_WITHOUT_SAVING": "क्या आप बिना सेव किए वापस जाना चाहते हैं?",
+    "NO_CANCEL": "नहीं, रद्द करें",
+    "YES_GO_BACK": "हाँ, वापस जाएं",
+    "DO_ID_NOT_FOUND": "DO आईडी नहीं मिली",
+    "USER_BATCHES": "{{name}} नीचे दिए गए बैचों से जुड़ा है",
+    "DELETE_FROM_BATCH_WARNING": "क्या आप यूज़र को ऊपर दिए गए सेंटर के बैचों से हटाना चाहते हैं?",
+    "SAVING": "सेव किया जा रहा है...",
+    "MAP_NEW": "नया जोड़ें / नया मैप करें"
   },
   "LOGIN_PAGE": {
     "USERNAME": "उपयोगकर्ता नाम",
@@ -206,7 +219,9 @@
     "WE_SEND_AN_EMAIL": "हमने आपके पासवर्ड को रीसेट करने के लिए एक लिंक के साथ {{maskEmail}} पर एक ईमेल भेजा है",
     "CURRENT_PASSWORD_NOT": "वर्तमान पासवर्ड मेल नहीं खा रहा है।",
     "NO_USERNAME": "उपयोगकर्ता नाम नहीं मिला।",
-    "PASSWORD_SAME_AS_OLD": "पासवर्ड पुराना जैसा ही है।"
+    "PASSWORD_SAME_AS_OLD": "पासवर्ड पुराना जैसा ही है।",
+    "YOU_DONT_HAVE_APPROPRIATE_PRIVILEGES_TO_ACCESS": "आपको इस ऐप का उपयोग करने की अनुमति नहीं है",
+    "SET_PASSWORD": "पासवर्ड सेट करें"
   },
   "SIDEBAR": {
     "HI": "नमस्ते",
@@ -360,7 +375,10 @@
     "CSV_TEMPLATE": "सीएसवी टेम्पलेट",
     "NEW_TOPIC": "नया विषय",
     "DOWNLOAD_CSV": "अपलोड की गई CSV फ़ाइल डाउनलोड करें",
-    "DURING_COURSE": "सीखना"
+    "DURING_COURSE": "सीखना",
+    "OPTION_1": "विकल्प 1",
+    "OPTION_2": "विकल्प 2",
+    "OPTION_3": "विकल्प 3"
   },
   "MASTER": {
     "STATE": "राज्य",
@@ -516,7 +534,7 @@
     "EDUCATIONAL_INSTITUTE": "शैक्षिक संस्थान",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "बेरोजगार या घरेलू कार्य",
     "SELF_PLACED": "स्वयं नियुक्त",
-    "TRANSGENDER": "ट्रांसजेंडर",
+    "TRANSGENDER": "अन्य",
     "HINDI": "हिंदी",
     "MARATHI": "मराठी",
     "URDU": "उर्दू",
@@ -530,6 +548,8 @@
     "MEDIUM": "माध्यम",
     "GRADE": "ग्रेड",
     "CONTACT": "संपर्क",
+    "USERNAME": "उपयोगकर्ता नाम",
+    "DESCRIPTION": "विवरण",
     "BATCH": "बैच",
     "PREFERRED_LANGUAGE": "पसंदीदा भाषा",
     "FIRST_NAME": "पहला नाम",
@@ -543,7 +563,10 @@
     "CONFIRM_TO_ACTIVATE": "क्या आप वाकई इस उपयोगकर्ता को दोबारा सक्रिय करना चाहते हैं?",
     "WORKING_LOCATION": "कार्यस्थल",
     "CATCHMENT_AREA": "जलग्रह - क्षेत्र",
-    "TYPE_OF_BATCH": "बैच का प्रकार"
+    "TYPE_OF_BATCH": "बैच का प्रकार",
+    "BELONG_TO_MULTIPLE_CENTERS": "नीचे दिए गए सेंटर से जुड़ा है",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "क्या आप यूज़र को सभी सेंटर से हटाना चाहते हैं?",
+    "DO_YOU_WANT_TO_DELETE_FROM_LOCATION": "क्या आप यूज़र को इस स्थान से हटाना चाहते हैं?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अवैध इनपुट",
@@ -636,6 +659,12 @@
     "CONTINUE_PROGRAM": "क्या आप बदलाव जारी रखना चाहते हैं या त्यागना चाहते हैं?",
     "DRAFTS": "मसौदे",
     "DISCARD_CHANGES": "बदलाव त्यागें",
+    "PROGRAMS": "कार्यक्रमों",
+    "CREATE_PROGRAM": "प्रोग्राम बनाएं",
+    "EDIT_PROGRAM": "प्रोग्राम में बदलाव करें",
+    "DELETE_PROGRAM": "हटाएं",
+    "SEARCH_PROGRAM": "प्रोग्राम खोजें...",
+    "NO_PROGRAMS_FOUND": "कोई प्रोग्राम नहीं मिला",
     "EDIT": "संपादन करना"
   },
   "NOTIFICATION": {
@@ -654,7 +683,9 @@
     "UPDATE_TEMPLATE": "टेम्पलेट अपडेट करें",
     "DELETE_TEMPLATE_ALERT": "क्या आप निश्चित हैं कि आप इस टेम्पलेट को हटाना चाहते हैं?",
     "TEMPLATE_DELETED_SUCCESS": "टेम्पलेट {{templateId}} सफलतापूर्वक हटाया गया",
-    "Add_TEMPLATE": "नया टेम्पलेट जोड़ें"
+    "Add_TEMPLATE": "नया टेम्पलेट जोड़ें",
+    "ERROR_DELETING_TEMPLATE": "टेम्पलेट हटाने में त्रुटि हुई",
+    "ERROR_LOADING_DATA": "डेटा लोड करने में त्रुटि हुई"
   },
   "CERTIFICATES": {
     "SEARCHBAR_PLACEHOLDER": "खोजें...",
@@ -674,7 +705,9 @@
     "ISSUE_CERTIFICATE_CONFIRMATION": "सर्टिफिकेट जारी करने की पुष्टि",
     "COURSE_CERTIFICATE": "कोर्स सर्टिफिकेट",
     "DOWNLOAD": "सर्टिफिकेट डाउनलोड करें",
-    "DOWNLOAD_CERTIFICATE_SUCCESSFULLY": "सर्टिफिकेट सफलतापूर्वक डाउनलोड करें"
+    "DOWNLOAD_CERTIFICATE_SUCCESSFULLY": "सर्टिफिकेट सफलतापूर्वक डाउनलोड करें",
+    "RENDER_CERTIFICATE_FAILED": "सर्टिफिकेट दिखाने में समस्या हुई",
+    "ISSUED_CERTIFICATE_FAILED": "सर्टिफिकेट जारी नहीं हो सका"
   },
   "MENTOR": {
     "NEW_MENTOR": "नया मेंटर",
@@ -857,6 +890,10 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "कार्यस्थल आवश्यक है। कृपया सभी ब्लॉकों के लिए गांवों का चयन करें। {{blocks}} और {{count}} और ब्लॉकों में गांव अनुपस्थित हैं।",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "कार्यस्थल आवश्यक है। कृपया सभी ब्लॉकों के लिए गांवों का चयन करें। निम्नलिखित ब्लॉकों में गांव अनुपलब्ध हैं: {{ब्लॉक}}।",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "कार्यस्थल का उल्लेख आवश्यक है। कृपया सभी ब्लॉकों में से कम से कम एक गाँव का चयन करें।",
-    "MOBILIZER_NAME": "मेंटर का नाम"
-  }
+    "MOBILIZER_NAME": "मेंटर का नाम",
+    "EDIT_MOBILIZER": "मोबिलाइज़र में बदलाव करें"
+  },
+  "WELCOME_TO_YOUR_DASHBOARD": "आपके डैशबोर्ड में आपका स्वागत है",
+  "Select_Language_For_Learning": "आप जिस भाषा में सीखना चाहते हैं, उसे चुनें",
+  "Learning_Language_Info": "आपकी चुनी गई भाषा में कंटेंट, कोर्स और टेस्ट दिखाए जाएंगे। आप इस भाषा को कभी भी प्रोफ़ाइल सेक्शन से बदल सकते हैं"
 }

@@ -2,7 +2,7 @@
   "COMMON": {
     "LANGUAGE": "भाषा",
     "ADD_NEW": "नवीन जोडा",
-    "PAGE_SIZE": "पृष्ठ आकार",
+    "PAGE_SIZE": "पेज  आकार",
     "DELETE_USER": "वापरकर्त्याला कायमस्वरूपी हटवा",
     "DELETE_USER_WITH_REASON": "वापरकर्त्याला हटवा",
     "USER_DELETED_PERMANENTLY": "वापरकर्ता यशस्वीरित्या हटविला गेला!",
@@ -153,9 +153,10 @@
     "NO_CONTENT_CREATOR_FOUND": "कोणताही कन्टेन्ट क्रिएटर (SCTA) सापडला नाही",
     "NO_CONTENT_REVIEWER_FOUND": "कोणताही कन्टेन्ट रिव्ह्युअर (CCTA) सापडला नाही",
     "LOADING": "लोड करत आहे",
-    "USER_DELETE_SUCCSSFULLY": "वापरकर्ता यशस्वीपणे हटवला",
     "SURE_REASSIGN_CENTER": "तुम्ही खात्री आहात की तुम्हाला या वापरकर्त्यास केंद्र पुन्हा नियुक्त करायचे आहे?",
     "SORT": "क्रमवारी लावा",
+    "USER_DELETE_SUCCSSFULLY": "वापरकर्ता यशस्वीपणे हटवला",
+    "ARE_YOU_SURE_DELETE_STATE": "या राज्यात {{district}} सक्रिय जिल्हे आहेत, त्यामुळे त्यांना हटवता येणार नाही.",
     "ADD": "जोड़ें",
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "तुमची विनंती सबमिट करा आणि कोणत्याही समस्या किंवा चिंता असल्यास आम्हाला तुमची मदत करू द्या.",
     "WE_ARE_HERE_TO_HELP": "आम्ही मदतीसाठी येथे आहोत",
@@ -168,7 +169,19 @@
     "MOVED_TO_DIFFERENT_ROLE": "वेगळ्या भूमिकेत हलवले",
     "NO_MOBILIZER_FOUND": "कोणताही मार्गदर्शक सापडला नाही.",
     "MAP": "नकाशा",
-    "NEXT": "पुढे"
+    "NEXT": "पुढे",
+    "REDIRECTING": "पुन्हा निर्देशित केले जात आहे...",
+    "SELECT_LANGUAGE": "भाषा निवडा",
+    "GOOGLE_DOC_VIEWER": "गूगल दस्तऐवज दर्शक",
+    "SELECT_BATCHES_FOR": "{{name}} साठी बॅचेस निवडा",
+    "GO_BACK_WITHOUT_SAVING": "जतन न करता तुम्हाला मागे जायचे आहे याची खात्री आहे का?",
+    "NO_CANCEL": "नाही, रद्द करा",
+    "YES_GO_BACK": "हो, मागे जा",
+    "DO_ID_NOT_FOUND": "Do ID सापडली नाही",
+    "USER_BATCHES": "{{name}} खालील बॅचेसशी संबंधित आहे",
+    "DELETE_FROM_BATCH_WARNING": "तुम्हाला वर नमूद केलेल्या केंद्रांच्या बॅचमधून वापरकर्त्याला हटवायचे आहे का?",
+    "SAVING": "जतन केले जात आहे",
+    "MAP_NEW": "नवीन नकाशित करा"
   },
   "LOGIN_PAGE": {
     "USERNAME": "वापरकर्ता नाव",
@@ -206,7 +219,9 @@
     "WE_SEND_AN_EMAIL": "आम्ही तुमचा पासवर्ड रीसेट करण्यासाठी लिंकसह {{maskEmail}} वर ईमेल पाठवला आहे",
     "CURRENT_PASSWORD_NOT": "वर्तमान पासवर्ड जुळत नाही।",
     "NO_USERNAME": "वापरकर्तानाव सापडले नाही।",
-    "PASSWORD_SAME_AS_OLD": "पासवर्ड जुन्या पासवर्ड सारखाच आहे"
+    "PASSWORD_SAME_AS_OLD": "पासवर्ड जुन्या पासवर्ड सारखाच आहे",
+    "YOU_DONT_HAVE_APPROPRIATE_PRIVILEGES_TO_ACCESS": "आपल्याकडे या अॅपमध्ये प्रवेश करण्यासाठी योग्य अधिकार नाहीत.",
+    "SET_PASSWORD": "पासवर्ड सेट करा"
   },
   "SIDEBAR": {
     "HI": "नमस्कार",
@@ -360,7 +375,10 @@
     "CSV_TEMPLATE": "CSV टेम्पलेट",
     "NEW_TOPIC": "नवीन विषय",
     "DOWNLOAD_CSV": "अपलोड केलेले CSV डाउनलोड करा",
-    "DURING_COURSE": "शिका"
+    "DURING_COURSE": "शिका",
+    "OPTION_1": "पर्याय 1",
+    "OPTION_2": "पर्याय 2",
+    "OPTION_3": "पर्याय 3"
   },
   "MASTER": {
     "STATE": "राज्य",
@@ -516,7 +534,7 @@
     "EDUCATIONAL_INSTITUTE": "शैक्षणिक संस्था",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "बेरोजगार किंवा घरगुती काम",
     "SELF_PLACED": "स्वतःने नोकरी लावलेली",
-    "TRANSGENDER": "ट्रांसजेंडर",
+    "TRANSGENDER": "इतर",
     "HINDI": "हिंदी",
     "MARATHI": "मराठी",
     "URDU": "उर्दू",
@@ -530,6 +548,13 @@
     "MEDIUM": "माध्यम",
     "GRADE": "ग्रेड",
     "CONTACT": "संपर्क करा",
+    "USERNAME": "वापरकर्तानाव",
+    "DESCRIPTION": "वर्णन",
+    "PROGRAM_NAME": "कार्यक्रमाचे नाव",
+    "PROGRAM_DESCRIPTION": "कार्यक्रमाचे वर्णन",
+    "PROGRAM_TYPE": "कार्यक्रम प्रकार",
+    "PROGRAM_HEAD_NAME": "कार्यक्रम प्रमुखाचे नाव",
+    "PROGRAM_IMAGE": "कार्यक्रमाची प्रतिमा",
     "BATCH": "बॅच",
     "PREFERRED_LANGUAGE": "पसंतीची भाषा",
     "FIRST_NAME": "पहिले नाव",
@@ -543,7 +568,10 @@
     "CONFIRM_TO_ACTIVATE": "तुम्हाला खात्री आहे की तुम्ही या वापरकर्त्याला पुन्हा सक्रिय करू इच्छिता?",
     "WORKING_LOCATION": "कामाचे ठिकाण",
     "CATCHMENT_AREA": "पाणलोट क्षेत्र",
-    "TYPE_OF_BATCH": "बॅचचा प्रकार"
+    "TYPE_OF_BATCH": "बॅचचा प्रकार",
+    "BELONG_TO_MULTIPLE_CENTERS": "खालील केंद्रांशी संबंधित आहे",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "तुम्हाला वापरकर्त्याला सर्व केंद्रांमधून हटवायचे आहे का?",
+    "DO_YOU_WANT_TO_DELETE_FROM_LOCATION": "तुम्हाला या स्थानावरून वापरकर्ता हटवायचा आहे का?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "अमान्य इनपुट।",
@@ -636,6 +664,12 @@
     "CONTINUE_PROGRAM": "तुम्हाला पुढे जाण्याची आवश्यकता आहे का किंवा बदल नाकारू इच्छिता?",
     "DRAFTS": "ड्राफ्ट",
     "DISCARD_CHANGES": "बदल नाकारू",
+    "PROGRAMS": "कार्यक्रम",
+    "CREATE_PROGRAM": "कार्यक्रम तयार करा",
+    "EDIT_PROGRAM": "कार्यक्रम संपादित करा",
+    "DELETE_PROGRAM": "डिलीट करा",
+    "SEARCH_PROGRAM": "कार्यक्रम शोधा ",
+    "NO_PROGRAMS_FOUND": "कोणताही कार्यक्रम आढळला नाही",
     "EDIT": "संपादित करा"
   },
   "NOTIFICATION": {
@@ -654,7 +688,9 @@
     "UPDATE_TEMPLATE": "टेम्पलेट अपडेट करा",
     "DELETE_TEMPLATE_ALERT": "तुम्ही नक्कीच हा टेम्पलेट हटवू इच्छिता का?",
     "TEMPLATE_DELETED_SUCCESS": "आयडी {{templateId}} असलेला टेम्पलेट यशस्वीरित्या हटवला",
-    "Add_TEMPLATE": "नवीन टेम्पलेट जोडा"
+    "Add_TEMPLATE": "नवीन टेम्पलेट जोडा",
+    "ERROR_DELETING_TEMPLATE": "टेम्पलेट हटवतांना त्रुटी आली.",
+    "ERROR_LOADING_DATA": "डेटा लोड करतांना त्रुटी आली."
   },
   "CERTIFICATES": {
     "SEARCHBAR_PLACEHOLDER": "शोधा...",
@@ -859,6 +895,10 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "कामाचे ठिकाण आवश्यक आहे. कृपया सर्व ब्लॉकसाठी गावे निवडा. {{blocks}} आणि {{count}} अधिक ब्लॉकमध्ये गावे गहाळ आहेत.",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "कामाचे ठिकाण आवश्यक आहे. कृपया सर्व ब्लॉकसाठी गावे निवडा. {{ब्लॉक्स}} मध्ये गावे गहाळ आहेत.",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "कामाचे ठिकाण आवश्यक आहे. कृपया सर्व ब्लॉकमध्ये किमान एक गाव निवडा.",
-    "MOBILIZER_NAME": "मार्गदर्शकाचे नाव"
-  }
+    "MOBILIZER_NAME": "मार्गदर्शकाचे नाव",
+    "EDIT_MOBILIZER": "मोबिलायझर एडिट करा"
+  },
+  "WELCOME_TO_YOUR_DASHBOARD": "तुमच्या डॅशबोर्डवर आपले स्वागत आहे",
+  "Select_Language_For_Learning": "तुम्हाला ज्या भाषेत शिकायचे आहे ती भाषा निवडा.",
+  "Learning_Language_Info": "सामग्री, अभ्यासक्रम आणि मूल्यांकन तुम्ही निवडलेल्या भाषेत दाखवले जातील. तुम्ही ही भाषा कधीही प्रोफाइल विभागातून बदलू शकता."
 }
