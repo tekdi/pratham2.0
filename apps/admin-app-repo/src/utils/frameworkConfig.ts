@@ -15,7 +15,7 @@ export type FrameworkId = 'pos-framework' | 'scp-framework';
 export const LOOKUP = {
   // ── Shared ──────────────────────────────────────────────────
   // youtube uses mimeType video/x-youtube; URL goes in the File/Content URL column — no file download
-  FILE_TYPES: ['pdf', 'zip', 'mp4', 'h5p', 'youtube'],
+  FILE_TYPES: ['pdf', 'zip', 'mp4', 'mp3', 'h5p', 'youtube'],
   QUESTION_TYPES: ['MCQ', 'Arrange', 'Match', 'Subjective'],
   // Parent = question belongs to this QS only (not independently searchable)
   // Public = question is publicly accessible / independently discoverable (API value: 'Default')
