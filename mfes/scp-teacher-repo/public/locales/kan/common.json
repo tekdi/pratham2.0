@@ -167,7 +167,7 @@
     "NOT_ABLE_CREATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     "NOT_ABLE_CREATE_FACILITATOR": "ಫೆಸಿಲಿಟೆಟರ್  ರಚಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ",
     "LEARNER_CREATED_SUCCESSFULLY": "ಕಲಿಯುವವರ ಪ್ರೊಫೈಲ್ ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!",
-    "FACILITATOR_COUNT": "  \r\n \t\r\nಫೆಸಿಲಿಟೆಟರ್  ಒಟ್ಟು ಸಂಖ್ಯೆ: {{count}}",
+    "FACILITATOR_COUNT": "ಫೆಸಿಲಿಟೆಟರ್  ಒಟ್ಟು ಸಂಖ್ಯೆ: {{count}}",
     "LEARNER_COUNT": "ಕಲಿಕಾದಾರರು ಒಟ್ಟು ಸಂಖ್ಯೆ: {{count}}",
     "FILTER_BY_ATTENDANCE_PERCENTAGE": "ಹಾಜರಾತಿ ಶೇಕಡಾವಾರು ಪ್ರಕಾರ ಫಿಲ್ಟರ್‌ಗಳು",
     "MORE_THAN": "{{range}} ಕ್ಕಿಂತ ಹೆಚ್ಚು %",
