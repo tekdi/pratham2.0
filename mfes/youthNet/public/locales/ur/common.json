@@ -145,7 +145,6 @@
     "INCORRECT_DATA_ENTRY": "غلط ڈیٹا انٹری",
     "DUPLICATED_USER": "ڈپلیکیٹ صارف"
   },
-
   "LOGIN_PAGE": {
     "USERNAME": "صارف نام",
     "PASSWORD": "پاس ورڈ",
@@ -584,28 +583,6 @@
     "NO_RESOURCES_FOUND": "کوئی وسائل نہیں ملے",
     "INVALID_RESOURCE": "غلط وسیلہ"
   },
-  "ASSESSMENTS": {
-    "ASSESSMENTS": "جائزے",
-    "CENTER": "مرکز",
-    "ASSESSMENT_TYPE": "جائزے کی قسم",
-    "COMPLETED_THE_ASSESSMENT": "جائزہ مکمل کیا",
-    "SUBMITTED_ON": "جمع کرایا گیا",
-    "CORRECT_ANSWER": "درست جوابات",
-    "NO_DATA_FOUND": "کوئی ڈیٹا نہیں ملا",
-    "SEARCH_STUDENT": "طالب علم تلاش کریں",
-    "NO_ASSESSMENTS_FOUND": "کوئی جائزہ نہیں ملا",
-    "ASSESSMENT_STATUS": "جائزے کی حیثیت",
-    "NOT_STARTED": "شروع نہیں ہوا",
-    "IN_PROGRESS": "جاری ہے",
-    "COMPLETED": "مکمل",
-    "MARKS_OBTAINED": "حاصل کردہ نمبر",
-    "OVERALL_SCORE": "مجموعی اسکور",
-    "ASSESSMENT_NOT_STARTED_YET": "جائزہ ابھی شروع نہیں ہوا",
-    "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} میں سے {{totalCount}} مکمل",
-    "NO_SUBTOPIC_SELECTED": "کوئی ذیلی موضوع منتخب نہیں کیا گیا",
-    "NO_SUBJECT_FOUND": "کوئی مضمون نہیں ملا",
-    "NO_ASSIGNED": "کوئی تفویض نہیں"
-  },
   "BOARD_ENROLMENT": {
     "BOARD_ENROLLMENT": "بورڈ میں داخلہ",
     "BOARD_SELECTION": "بورڈ کا انتخاب",
@@ -654,6 +631,28 @@
     "OBSERVATION_STATUS": "سروے کی حیثیت",
     "OBSERVATION_NOT_STARTED_YET": "سروے ابھی شروع نہیں ہوا",
     "EXPIRED": "ختم ہو چکا"
+  },
+  "ASSESSMENTS": {
+    "ASSESSMENTS": "جائزے",
+    "CENTER": "مرکز",
+    "ASSESSMENT_TYPE": "جائزے کی قسم",
+    "COMPLETED_THE_ASSESSMENT": "جائزہ مکمل کیا",
+    "SUBMITTED_ON": "جمع کرایا گیا",
+    "CORRECT_ANSWER": "درست جوابات",
+    "NO_DATA_FOUND": "کوئی ڈیٹا نہیں ملا",
+    "SEARCH_STUDENT": "طالب علم تلاش کریں",
+    "NO_ASSESSMENTS_FOUND": "کوئی جائزہ نہیں ملا",
+    "ASSESSMENT_STATUS": "جائزے کی حیثیت",
+    "NOT_STARTED": "شروع نہیں ہوا",
+    "IN_PROGRESS": "جاری ہے",
+    "COMPLETED": "مکمل",
+    "MARKS_OBTAINED": "حاصل کردہ نمبر",
+    "OVERALL_SCORE": "مجموعی اسکور",
+    "ASSESSMENT_NOT_STARTED_YET": "جائزہ ابھی شروع نہیں ہوا",
+    "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} میں سے {{totalCount}} مکمل",
+    "NO_SUBTOPIC_SELECTED": "کوئی ذیلی موضوع منتخب نہیں کیا گیا",
+    "NO_SUBJECT_FOUND": "کوئی مضمون نہیں ملا",
+    "NO_ASSIGNED": "کوئی تفویض نہیں"
   },
   "YOUTHNET": {
     "SURVEY": {
