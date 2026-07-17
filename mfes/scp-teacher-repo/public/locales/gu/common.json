@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "ફેસિલિટેટરની આવશ્યકતાઓ",
     "PREREQUISITES": "પૂર્વજરૂરીયાતો",
     "POST_REQUISITES": "પોસ્ટ-જરૂરીયાતો",
+    "DURING_COURSE": "શીખો",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "વિષય અને સબટોપિક પસંદ કરી શકતા નથી કારણ કે ઇવેન્ટ પહેલેથી જ પસાર થઈ ગઈ છે અથવા લાઈવ છે.",
     "COURSE_TYPE": "અભ્યાસક્રમનો પ્રકાર",
     "IDENTIFIER_NOT_FOUND": "ઓળખકર્તા મળ્યો નથી! સામગ્રી ખોલી શકાતી નથી!",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "સમાપ્તિ તારીખ પ્રારંભ તારીખ કરતા પહેલાની ન હોઈ શકે",
     "DELETE_THIS_SESSION": "આ સત્ર કાઢી નાખો",
     "LEARNER_PREREQUISITES": "લર્નર ની પૂર્વજરૂરીયાતો",
-    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા",
-    "DURING_COURSE": "શીખો"
+    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "સેન્ટર એ સફળતાપૂર્વક વિનંતી કરી",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "કોઈ ડેટા મળ્યો નથી",
     "SEARCH_STUDENT": "વિદ્યાર્થી શોધો",
     "NO_ASSESSMENTS_FOUND": "કોઈ મૂલ્યાંકન મળ્યાં નથી",
+    "ASSESSMENTS_FOUND": "{{count}} મૂલ્યાંકન મળ્યું",
     "ASSESSMENT_STATUS": "અસેસમેન્ટ સ્થિતિ",
     "NOT_STARTED": "શરૂ થયું નથી",
     "IN_PROGRESS": "પ્રગતિમાં છે",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "કોઈ સોંપેલ નથી",
     "OUT_OF": "માંથી",
     "NUMBER_OUT_OF_COMPLETED": "{{totalCount}} માંથી {{completedCount}} પૂર્ણ",
-    "ASSESSMENTS_FOUND": "{{count}} મૂલ્યાંકન મળ્યું",
     "AI_ASSESSMENT": "એઆઈ આકારણી",
     "ASSESSMENT_LIST": "મૂલ્યાંકન યાદી",
     "AI_ASSESSMENT_LIST": "AI મૂલ્યાંકન યાદી",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "લર્નર બનાવી શકાતા નથી",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "વપરાશકર્તા ઓળખની વિગતો ટૂંક સમયમાં મોકલવામાં આવશે"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "નવા માર્ગદર્શક",
+    "FIRST_SELECT_REQUIRED_FIELDS": "પહેલા જરૂરી ક્ષેત્રો પસંદ કરો",
+    "MENTOR_CREATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક બનાવવામાં આવ્યો છે!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "માર્ગદર્શક બનાવવામાં આવ્યો છે, ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
+    "EDIT_MENTOR": "માર્ગદર્શક સંપાદિત કરો",
+    "NOT_ABLE_UPDATE_MENTOR": "માર્ગદર્શકને અપડેટ કરી શક્યા નથી",
+    "NOT_ABLE_CREATE_MENTOR": "માર્ગદર્શક બનાવવામાં અસમર્થ",
+    "UPDATE_MENTOR": "મેન્ટરને અપડેટ કરો",
+    "RE_ASSIGN_MENTOR": "માર્ગદર્શકને ફરીથી સોંપો"
+  },
   "VILLAGE": "ગામ",
   "first_name": "પ્રથમ નામ",
   "middle_name": "મધ્ય નામ",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "મૂલ્યાંકન વિગતો",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "નમૂના પ્રશ્ન અને જવાબ પત્ર",
+    "DOWNLOAD_QUESTION_PAPER": "પ્રશ્નપત્ર ડાઉનલોડ કરો",
     "SEARCH_LEARNER": "શીખનાર શોધો..",
     "TOTAL_LEARNERS": "{{count}} માંથી {{total}} શીખનાર",
     "SORT_AND_FILTER_LEARNERS": "શીખનારને ગોઠવો અને ફિલ્ટર કરો",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• છબી લો અને પોર્ટલ પર અપલોડ કરો",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• જો જવાબ શીટમાં અનેક પાનાં હોય તો દરેક પાનું અલગથી ફોટો લો અને અપલોડ કરો",
     "READ_LESS": "ઓછું વાંચો",
-    "READ_MORE": "વધુ વાંચો",
-    "DOWNLOAD_QUESTION_PAPER": "પ્રશ્નપત્ર ડાઉનલોડ કરો"
+    "READ_MORE": "વધુ વાંચો"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "બધા પસંદ કરો",
-    "DESELECT_ALL": "બધા નાપસંદ કરો",
     "LEARNER_REGISTRATIONS": "શીખનાર નોંધણીઓ",
     "SEARCH_LEARNER": "શીખનાર શોધો..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "પગલાં લેવા માટે, ઓછામાં ઓછો એક શીખનાર પસંદ કરો",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "અને બેચમાં ખસેડાયા",
     "OKAY": "ઠીક છે",
     "NOT_INTERESTED_TO_JOIN": "જોડાવામાં રસ નથી",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "રસ ધરાવો છો, આવતા વર્ષે જોડાઈ શકો છો"
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "નવા માર્ગદર્શક",
-    "FIRST_SELECT_REQUIRED_FIELDS": "પહેલા જરૂરી ક્ષેત્રો પસંદ કરો",
-    "MENTOR_CREATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક બનાવવામાં આવ્યો છે!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "માર્ગદર્શક બનાવવામાં આવ્યો છે, ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે.",
-    "MENTOR_UPDATED_SUCCESSFULLY": "માર્ગદર્શક સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!",
-    "EDIT_MENTOR": "માર્ગદર્શક સંપાદિત કરો",
-    "NOT_ABLE_UPDATE_MENTOR": "માર્ગદર્શકને અપડેટ કરી શક્યા નથી",
-    "NOT_ABLE_CREATE_MENTOR": "માર્ગદર્શક બનાવવામાં અસમર્થ",
-    "UPDATE_MENTOR": "મેન્ટરને અપડેટ કરો",
-    "RE_ASSIGN_MENTOR": "માર્ગદર્શકને ફરીથી સોંપો"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "રસ ધરાવો છો, આવતા વર્ષે જોડાઈ શકો છો",
+    "SELECT_ALL": "બધા પસંદ કરો",
+    "DESELECT_ALL": "બધા નાપસંદ કરો"
   }
 }

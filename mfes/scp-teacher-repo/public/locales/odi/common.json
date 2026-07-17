@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "ସୁବିଧାକାରୀଙ୍କ ଆବଶ୍ୟକତା |",
     "PREREQUISITES": "ପୂର୍ବ ଆବଶ୍ୟକତା",
     "POST_REQUISITES": "ପରବର୍ତ୍ତୀ ଆବଶ୍ୟକତା",
+    "DURING_COURSE": "ଶିଖନ୍ତୁ",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "ବିଷୟ ଏବଂ ଉପ-ବିଷୟଗୁଡିକ ଚୟନ କରିପାରିବ ନାହିଁ କାରଣ ପ୍ରୋଗ୍ରାମଟି ଶେଷ ହୋଇସାରିଛି କିମ୍ବା ଲାଇଭ୍ ଅଛି |",
     "COURSE_TYPE": "ପାଠ୍ୟକ୍ରମ ପ୍ରକାର",
     "IDENTIFIER_NOT_FOUND": "ପରିଚୟ ସଂକେତ ମିଳିଲା ନାହିଁ । ବିଷୟବସ୍ତୁ ଖୋଲିପାରିବ ନାହିଁ।",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "ଶେଷ ତାରିଖ ଆରମ୍ଭ ତାରିଖ ଠାରୁ ପୂର୍ବରୁ ହୋଇପାରିବ ନାହିଁ |",
     "DELETE_THIS_SESSION": "ଏହି ଅଧିବେଶନ ଡିଲିଟ୍ କରନ୍ତୁ |",
     "LEARNER_PREREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପୂର୍ବଆବଶ୍ୟକତା",
-    "LEARNER_POSTREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପରବର୍ତ୍ତୀ ଆବଶ୍ୟକତା |",
-    "DURING_COURSE": "ଶିଖନ୍ତୁ"
+    "LEARNER_POSTREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପରବର୍ତ୍ତୀ ଆବଶ୍ୟକତା |"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "କେନ୍ଦ୍ର ଅନୁରୋଧ ସଫଳତାର ସହିତ",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "କିଛି ତଥ୍ୟ ମିଳିଲା ନାହିଁ |",
     "SEARCH_STUDENT": "ଛାତ୍ର ଖୋଜ |",
     "NO_ASSESSMENTS_FOUND": "କିଛି ମୂଲ୍ୟାୟନ ମିଳିଲା ନାହିଁ |",
+    "ASSESSMENTS_FOUND": "{{count}} ମୂଲ୍ୟାଙ୍କନ ମିଳିଲା",
     "ASSESSMENT_STATUS": "ମୂଲ୍ୟାଙ୍କନ ସ୍ଥିତି",
     "NOT_STARTED": "ଆରମ୍ଭ ହୋଇନାହିଁ |",
     "IN_PROGRESS": "ପ୍ରଗତି ଚାଲିଛି |",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "କିଛି ନ୍ୟସ୍ତ ହୋଇନାହିଁ |",
     "OUT_OF": "ରୁ",
     "NUMBER_OUT_OF_COMPLETED": "{{totalCount}} ମଧ୍ୟରୁ {{completedCount}} ଟି ସମ୍ପୂର୍ଣ୍ଣ ହୋଇଛି",
-    "ASSESSMENTS_FOUND": "{{count}} ମୂଲ୍ୟାଙ୍କନ ମିଳିଲା",
     "AI_ASSESSMENT": "AI ମୂଲ୍ୟାଙ୍କନ",
     "ASSESSMENT_LIST": "ମୂଲ୍ୟାଙ୍କନ ତାଲିକା",
     "AI_ASSESSMENT_LIST": "AI ମୂଲ୍ୟାଙ୍କନ ତାଲିକା",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "ଶିକ୍ଷାର୍ଥୀ ସୃଷ୍ଟି କରିପାରିଲେ ନାହିଁ",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "ଉପଯୋଗକାରୀ ଆଇଡି ଶୀଘ୍ର ମେଳିବ"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "ନୂତନ ପରାମର୍ଶଦାତା",
+    "FIRST_SELECT_REQUIRED_FIELDS": "ପ୍ରଥମେ ଆବଶ୍ୟକୀୟ କ୍ଷେତ୍ରଗୁଡ଼ିକୁ ଚୟନ କରନ୍ତୁ",
+    "MENTOR_CREATED_SUCCESSFULLY": "ମେଣ୍ଟର ସଫଳତାର ସହ ସୃଷ୍ଟି ହୋଇଛି!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ମେଣ୍ଟର ତିଆରି ହୋଇଛି, ଶୀଘ୍ର ପ୍ରମାଣପତ୍ର ପଠାଯିବ।",
+    "MENTOR_UPDATED_SUCCESSFULLY": "ମେଣ୍ଟରଙ୍କୁ ସଫଳତାର ସହ ଅପଡେଟ୍ କରାଯାଇଛି!",
+    "EDIT_MENTOR": "ପରାମର୍ଶଦାତା ସମ୍ପାଦନ କରନ୍ତୁ",
+    "NOT_ABLE_UPDATE_MENTOR": "ପରାମର୍ଶଦାତାଙ୍କୁ ଅପଡେଟ୍ କରିପାରିଲେ ନାହିଁ",
+    "NOT_ABLE_CREATE_MENTOR": "ପରାମର୍ଶଦାତା ସୃଷ୍ଟି କରିପାରିଲେ ନାହିଁ",
+    "UPDATE_MENTOR": "ପରାମର୍ଶଦାତାଙ୍କୁ ଅପଡେଟ୍ କରନ୍ତୁ",
+    "RE_ASSIGN_MENTOR": "ମେଣ୍ଟରଙ୍କୁ ପୁନଃନିଯୁକ୍ତ କରନ୍ତୁ"
+  },
   "VILLAGE": "ଗାଁ",
   "first_name": "ପ୍ରଥମ ନାମ",
   "middle_name": "ମଧ୍ୟମ ନାମ",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "ମୂଲ୍ୟାଙ୍କନ ବିବରଣୀ",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "ନମୁନା ପ୍ରଶ୍ନ ଏବଂ ଉତ୍ତର ପତ୍ର",
+    "DOWNLOAD_QUESTION_PAPER": "ପ୍ରଶ୍ନପତ୍ର ଡାଉନଲୋଡ୍ କରନ୍ତୁ",
     "SEARCH_LEARNER": "ଶିକ୍ଷାର୍ଥୀକୁ ଖୋଜନ୍ତୁ..",
     "TOTAL_LEARNERS": "{{count}} / {{total}} ଶିକ୍ଷାର୍ଥୀ",
     "SORT_AND_FILTER_LEARNERS": "ଶିକ୍ଷାର୍ଥୀଙ୍କୁ ବିଭାଜନ ଏବଂ ଫିଲ୍ଟର କରନ୍ତୁ",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• ଛବି ନେଇ ପୋର୍ଟାଲରେ ଅପଲୋଡ୍ କରନ୍ତୁ",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• ଉତ୍ତର ପତ୍ରରେ ଯଦି ଅଧିକ ପୃଷ୍ଠା ଅଛି, ପ୍ରତ୍ୟେକ ପୃଷ୍ଠା ଅଲଗା ନେଇ ଅପଲୋଡ୍ କରନ୍ତୁ",
     "READ_LESS": "କମ୍ ପଢନ୍ତୁ",
-    "READ_MORE": "ଅଧିକ ପଢନ୍ତୁ",
-    "DOWNLOAD_QUESTION_PAPER": "ପ୍ରଶ୍ନପତ୍ର ଡାଉନଲୋଡ୍ କରନ୍ତୁ"
+    "READ_MORE": "ଅଧିକ ପଢନ୍ତୁ"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "ସମସ୍ତ ଚୟନ କରନ୍ତୁ",
-    "DESELECT_ALL": "ସମସ୍ତକୁ ଅଚୟନ କରନ୍ତୁ",
     "LEARNER_REGISTRATIONS": "ଶିକ୍ଷାର୍ଥୀ ପଞ୍ଜିକରଣ",
     "SEARCH_LEARNER": "ଶିକ୍ଷାର୍ଥୀ ଖୋଜନ୍ତୁ..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "ପଦକ୍ଷେପ ନେବା ପାଇଁ, ଅତି କମରେ ଜଣେ ଶିକ୍ଷାର୍ଥୀଙ୍କୁ ଚୟନ କରନ୍ତୁ।",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "ଏବଂ ବ୍ୟାଚକୁ ସ୍ଥାନାନ୍ତରିତ ହୋଇଗଲା",
     "OKAY": "ଠିକ୍ ଅଛି",
     "NOT_INTERESTED_TO_JOIN": "ଯୋଗଦେବାକୁ ଆଗ୍ରହୀ ନୁହେଁ",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ଆଗ୍ରହୀ, ଆସନ୍ତା ବର୍ଷ ଯୋଗ ଦେଇପାରିବେ"
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "ନୂତନ ପରାମର୍ଶଦାତା",
-    "FIRST_SELECT_REQUIRED_FIELDS": "ପ୍ରଥମେ ଆବଶ୍ୟକୀୟ କ୍ଷେତ୍ରଗୁଡ଼ିକୁ ଚୟନ କରନ୍ତୁ",
-    "MENTOR_CREATED_SUCCESSFULLY": "ମେଣ୍ଟର ସଫଳତାର ସହ ସୃଷ୍ଟି ହୋଇଛି!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ମେଣ୍ଟର ତିଆରି ହୋଇଛି, ଶୀଘ୍ର ପ୍ରମାଣପତ୍ର ପଠାଯିବ।",
-    "MENTOR_UPDATED_SUCCESSFULLY": "ମେଣ୍ଟରଙ୍କୁ ସଫଳତାର ସହ ଅପଡେଟ୍ କରାଯାଇଛି!",
-    "EDIT_MENTOR": "ପରାମର୍ଶଦାତା ସମ୍ପାଦନ କରନ୍ତୁ",
-    "NOT_ABLE_UPDATE_MENTOR": "ପରାମର୍ଶଦାତାଙ୍କୁ ଅପଡେଟ୍ କରିପାରିଲେ ନାହିଁ",
-    "NOT_ABLE_CREATE_MENTOR": "ପରାମର୍ଶଦାତା ସୃଷ୍ଟି କରିପାରିଲେ ନାହିଁ",
-    "UPDATE_MENTOR": "ପରାମର୍ଶଦାତାଙ୍କୁ ଅପଡେଟ୍ କରନ୍ତୁ",
-    "RE_ASSIGN_MENTOR": "ମେଣ୍ଟରଙ୍କୁ ପୁନଃନିଯୁକ୍ତ କରନ୍ତୁ"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ଆଗ୍ରହୀ, ଆସନ୍ତା ବର୍ଷ ଯୋଗ ଦେଇପାରିବେ",
+    "SELECT_ALL": "ସମସ୍ତ ଚୟନ କରନ୍ତୁ",
+    "DESELECT_ALL": "ସମସ୍ତକୁ ଅଚୟନ କରନ୍ତୁ"
   }
 }

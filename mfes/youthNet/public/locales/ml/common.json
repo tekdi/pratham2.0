@@ -238,7 +238,7 @@
     "NO_LEARNER_WITH_LOW_ATTENDANCE": "എന്തും ഇല്ല",
     "ATTENDANCE_MARKED_OUT_OF_DAYS": "ഹാജർ അടയാളപ്പെടുത്തിയിരിക്കുന്നു: {{count}} കഴിഞ്ഞ 7 ദിവസങ്ങളിൽ"
   },
-   "PROFILE": {
+  "PROFILE": {
     "EDIT_PROFILE": "പ്രൊഫൈൽ എഡിറ്റ് ചെയ്യുക",
     "CONTACT_INFORMATION": "ബന്ധപ്പെടാനുള്ള വിവരങ്ങൾ",
     "OTHER_INFORMATION": "മറ്റുള്ള വിവരങ്ങൾ",
@@ -301,7 +301,7 @@
     "MONTH_MOBILISATION": "സൗകര്യമാക്കുന്നതിനുള്ള മാസങ്ങൾ",
     "DROP_OUT_REASON": "സ്കൂളിൽ നിന്നും ഒഴിഞ്ഞതിന്റെ കാരണം"
   },
-   "DROPOUT_REASONS": {
+  "DROPOUT_REASONS": {
     "UNABLE_TO_COPE_WITH_STUDIES": "അഭ്യസിക്കുവാൻ സാധിക്കുന്നില്ല",
     "FAMILY_RESPONSIBILITIES": "കുടുംബത്തിന്റെ ഉത്തരവാദിത്തങ്ങൾ",
     "NEED_TO_GO_TO_WORK_OWN_WORK": "ജോലിക്ക് / സ്വന്തം ജോലിക്ക് പോകണം",
@@ -338,7 +338,7 @@
     "SEARCH_BLOCKS": "ബ്ലോക്കുകൾ തിരയുക",
     "REASSIGN_BLOCK_REQUESTED": "ബ്ലോക്ക് പുനർക്രമീകരണ ആവശ്യകം വിജയകരമായി അയച്ചു!"
   },
-   "CENTERS": {
+  "CENTERS": {
     "CENTERS": "കേന്ദ്രങ്ങൾ",
     "REGULAR_CENTERS": "സാധാരണ കേന്ദ്രങ്ങൾ",
     "REMOTE_CENTERS": "ദൂര കേന്ദ്രങ്ങൾ",
@@ -536,7 +536,7 @@
     "MUST_BE_GREATER_THAN": "{{fieldname}} {{minLength}}-നു കൂടുതലായിരിക്കണം",
     "ENTER_VALID_CENTER_NAME": "സാധുവായ കേന്ദ്രത്തിന്റെ പേര് നൽകുക"
   },
-    "COURSE_PLANNER": {
+  "COURSE_PLANNER": {
     "COURSE_PLANNER": "കഴിവുകളുടെ പദ്ധതി",
     "FOUNDATION_COURSE": "അധാരം കോഴ്‌സ്",
     "MAIN_COURSE": "പ്രധാന കോഴ്‌സ്",
@@ -544,7 +544,21 @@
     "EXPAND_ALL": "എല്ലാം വ്യാപിപ്പിക്കുക",
     "RESOURCES": "ശ്രദ്ധിക്കാവുന്ന കാര്യങ്ങൾ"
   },
-"ASSESSMENTS": {
+  "BOARD_ENROLMENT": {
+    "BOARD_ENROLLMENT": "ബോർഡ് രജിസ്ട്രേഷൻ",
+    "BOARD_SELECTION": "ബോർഡ് തിരഞ്ഞെടുപ്പ്",
+    "SUBJECTS_SELECTION": "വിദ്യാഭ്യാസ വിഷയങ്ങൾ തിരഞ്ഞെടുപ്പ്",
+    "DROPPED_OUT": "പുറത്തേയ്ക്ക് പോയത്",
+    "FEE_PAYMENT": "ഫീ പേയ്‌മെന്റ്",
+    "BOARD_ENROLLMENT_NUMBER": "ബോർഡ് രജിസ്ട്രേഷൻ നമ്പർ",
+    "EXAM_FEES_PAID": "പരീക്ഷാ ഫീസുകൾ അടച്ചുവേണമോ? (ആവശ്യമായില്ല)",
+    "SAVE_AND_NEXT": "സേവ് ചെയ്യുക & അടുത്തത്",
+    "TO_SAVE_YOUR_PROGRESS": "നിങ്ങളുടെ പുരോഗതി സംരക്ഷിക്കാൻ “സേവ് ചെയ്യുക & അടുത്തത്” ക്ലിക്ക് ചെയ്യുക. നിങ്ങൾക്ക് എപ്പോഴും തിരിച്ചുവരാൻ കഴിയും.",
+    "MANDATORY": "{{FeesStepBoards}} നു മാത്രം ആവിശ്യമാണ്. മറ്റ് ബോർഡുകൾക്കായി, ഈ ഘട്ടം സ്വയം പൂർത്തിയായിരിക്കുന്നു. ഡാറ്റ സമർപ്പിക്കാൻ ദയവായി സേവ് ക്ലിക്ക് ചെയ്യുക.",
+    "COMPLETED": "പൂർത്തിയായി",
+    "MARK_AS_COMPLETE": "പൂർണ്ണമായതായി അടയാളപ്പെടുത്തുക"
+  },
+  "ASSESSMENTS": {
     "ASSESSMENTS": "അവലോകനങ്ങൾ",
     "CENTER": "കേന്ദ്രം",
     "ASSESSMENT_TYPE": "അവലോകന തരം",
@@ -565,20 +579,5 @@
     "NO_SUBTOPIC_SELECTED": "തലവിഭാഗം തിരഞ്ഞെടുക്കപ്പെട്ടിട്ടില്ല",
     "NO_SUBJECT_FOUND": "വിദ്യാഭ്യാസ വിഷയം കണ്ടെത്തിയില്ല",
     "NO_ASSIGNED": "ഒന്നും നിയോഗിച്ചിട്ടില്ല"
-  },
-   "BOARD_ENROLMENT": {
-    "BOARD_ENROLLMENT": "ബോർഡ് രജിസ്ട്രേഷൻ",
-    "BOARD_SELECTION": "ബോർഡ് തിരഞ്ഞെടുപ്പ്",
-    "SUBJECTS_SELECTION": "വിദ്യാഭ്യാസ വിഷയങ്ങൾ തിരഞ്ഞെടുപ്പ്",
-    "REGISTRATION_COMPLETED": "രജിസ്ട്രേഷൻ പൂർത്തിയായി",
-    "DROPPED_OUT": "പുറത്തേയ്ക്ക് പോയത്",
-    "FEE_PAYMENT": "ഫീ പേയ്‌മെന്റ്",
-    "BOARD_ENROLLMENT_NUMBER": "ബോർഡ് രജിസ്ട്രേഷൻ നമ്പർ",
-    "EXAM_FEES_PAID": "പരീക്ഷാ ഫീസുകൾ അടച്ചുവേണമോ? (ആവശ്യമായില്ല)",
-    "SAVE_AND_NEXT": "സേവ് ചെയ്യുക & അടുത്തത്",
-    "TO_SAVE_YOUR_PROGRESS": "നിങ്ങളുടെ പുരോഗതി സംരക്ഷിക്കാൻ “സേവ് ചെയ്യുക & അടുത്തത്” ക്ലിക്ക് ചെയ്യുക. നിങ്ങൾക്ക് എപ്പോഴും തിരിച്ചുവരാൻ കഴിയും.",
-    "MANDATORY": "{{FeesStepBoards}} നു മാത്രം ആവിശ്യമാണ്. മറ്റ് ബോർഡുകൾക്കായി, ഈ ഘട്ടം സ്വയം പൂർത്തിയായിരിക്കുന്നു. ഡാറ്റ സമർപ്പിക്കാൻ ദയവായി സേവ് ക്ലിക്ക് ചെയ്യുക.",
-    "COMPLETED": "പൂർത്തിയായി",
-     "MARK_AS_COMPLETE": "പൂർണ്ണമായതായി അടയാളപ്പെടുത്തുക"
   }
 }
