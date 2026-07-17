@@ -632,6 +632,22 @@
     "OBSERVATION_NOT_STARTED_YET": "سروے ابھی شروع نہیں ہوا",
     "EXPIRED": "ختم ہو چکا"
   },
+  "YOUTHNET_SURVEY": {
+    "NEW_SURVEY": "نیا سروے",
+    "ASSIGN_VOLUNTEERS_NOW": "ابھی رضاکار تفویض کریں",
+    "REMIND_ME_LATER": "بعد میں یاد دہانی کریں",
+    "NEW_SURVEY_HAS_BEEN_ADDED": "ایک نیا سروے '{{surveyName}}' شامل کیا گیا ہے اور {{villageCount}} گاؤں میں تفویض کیا گیا ہے",
+    "ASSIGN_VOLUNTEERS_TO_ENSURE": "یقینی بنانے کے لیے رضاکاروں کو تفویض کریں کہ وہ سروے تک رسائی حاصل کر سکیں"
+  },
+  "YOUTHNET_DASHBOARD": {
+    "VILLAGES_MANAGED_BY_YOU": "آپ کے ذریعے منظم کیے گئے گاؤں: {{totalVillageCount}}",
+    "MONTHLY_REGISTRATIONS_OVERVIEW": "ماہانہ رجسٹریشن کا جائزہ",
+    "CLOSED_ON": "بند کیا گیا"
+  },
+  "YOUTHNET_VOLUNTEERLIST": {
+    "ENTRIES": "اندراجات",
+    "VOLUNTEERS_ASSIGNED": "رضاکار تفویض کیے گئے"
+  },
   "ASSESSMENTS": {
     "ASSESSMENTS": "جائزے",
     "CENTER": "مرکز",
@@ -653,23 +669,5 @@
     "NO_SUBTOPIC_SELECTED": "کوئی ذیلی موضوع منتخب نہیں کیا گیا",
     "NO_SUBJECT_FOUND": "کوئی مضمون نہیں ملا",
     "NO_ASSIGNED": "کوئی تفویض نہیں"
-  },
-  "YOUTHNET": {
-    "SURVEY": {
-      "NEW_SURVEY": "نیا سروے",
-      "ASSIGN_VOLUNTEERS_NOW": "ابھی رضاکار تفویض کریں",
-      "REMIND_ME_LATER": "بعد میں یاد دہانی کریں",
-      "NEW_SURVEY_HAS_BEEN_ADDED": "ایک نیا سروے '{{surveyName}}' شامل کیا گیا ہے اور {{villageCount}} گاؤں میں تفویض کیا گیا ہے",
-      "ASSIGN_VOLUNTEERS_TO_ENSURE": "یقینی بنانے کے لیے رضاکاروں کو تفویض کریں کہ وہ سروے تک رسائی حاصل کر سکیں"
-    },
-    "DASHBOARD": {
-      "VILLAGES_MANAGED_BY_YOU": "آپ کے ذریعے منظم کیے گئے گاؤں: {{totalVillageCount}}",
-      "MONTHLY_REGISTRATIONS_OVERVIEW": "ماہانہ رجسٹریشن کا جائزہ",
-      "CLOSED_ON": "بند کیا گیا"
-    },
-    "VOLUNTEERLIST": {
-      "ENTRIES": "اندراجات",
-      "VOLUNTEERS_ASSIGNED": "رضاکار تفویض کیے گئے"
-    }
   }
 }
