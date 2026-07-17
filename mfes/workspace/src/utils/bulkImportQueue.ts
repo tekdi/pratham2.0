@@ -1260,6 +1260,16 @@ function buildQuestionBody(
       ? [{ id: uuidv4(), type: 'html', value: `<p>${solution}</p>` }]
       : undefined,
     maxScore:  score,
+    // Mandatory at review time on this platform. Accepted here because
+    // questions are created through the QS hierarchy update (QuML 1.1
+    // schema) — the standalone question create API rejected this prop.
+    outcomeDeclaration: {
+      maxScore: {
+        cardinality: 'single',
+        type: 'integer',
+        defaultValue: score,
+      },
+    },
   };
 
   // ── MCQ ──────────────────────────────────────────────────────
@@ -1294,9 +1304,6 @@ function buildQuestionBody(
           mapping:         [{ value: ci, score }],
         },
       },
-      // NOTE: outcomeDeclaration is rejected as an invalid prop by the
-      // question create API on this platform version — maxScore (in base)
-      // carries the score instead.
     };
   }
 
