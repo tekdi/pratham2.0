@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "सुविधा प्रदाताच्या आवश्यकता",
     "PREREQUISITES": "पूर्व-आवश्यकता",
     "POST_REQUISITES": "नंतरची-आवश्यकता",
+    "DURING_COURSE": "शिका",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "विषय आणि उपविषय निवडू शकत नाही कारण कार्यक्रम आधीच समाप्त झाला आहे किंवा लाइव्ह आहे.",
     "COURSE_TYPE": "कोर्स प्रकार",
     "IDENTIFIER_NOT_FOUND": "ओळखकर्ता सापडला नाही! सामग्री उघडू शकत नाही!",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "समाप्तीची  तारीख सुरुवातीच्या तारखेपेक्षा आधी असू शकत नाही.",
     "DELETE_THIS_SESSION": "हे सत्र हटवा",
     "LEARNER_PREREQUISITES": "विद्यार्थ्यांच्या पूर्व आवश्यकता",
-    "LEARNER_POSTREQUISITES": "विद्यार्थ्यांच्या नंतरच्या आवश्यकता",
-    "DURING_COURSE": "शिका"
+    "LEARNER_POSTREQUISITES": "विद्यार्थ्यांच्या नंतरच्या आवश्यकता"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "केंद्राने यशस्वीरित्या विनंती केली",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "कोणतीही माहिती सापडली नाही",
     "SEARCH_STUDENT": "विद्यार्थी शोधा",
     "NO_ASSESSMENTS_FOUND": "कोणतेही मूल्यांकन सापडले नाही.",
+    "ASSESSMENTS_FOUND": "{{count}} मूल्यांकन आढळले",
     "ASSESSMENT_STATUS": "मूल्यांकन स्थिती",
     "NOT_STARTED": "सुरू झाले नाही",
     "IN_PROGRESS": "प्रगतीपथावर आहे.",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "नियुक्त नाही",
     "OUT_OF": "पैकी",
     "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} पैकी {{totalCount}} पूर्ण झाले",
-    "ASSESSMENTS_FOUND": "{{count}} मूल्यांकन आढळले",
     "AI_ASSESSMENT": "एआय मूल्यांकन",
     "ASSESSMENT_LIST": "मूल्यांकन यादी",
     "AI_ASSESSMENT_LIST": "एआय मूल्यांकन यादी",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "शिकणारा तयार करता आला नाही",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "वापरकर्त्याचे क्रेडेन्शियल्स लवकरच पाठवले जातील"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "नवीन मार्गदर्शक",
+    "FIRST_SELECT_REQUIRED_FIELDS": "प्रथम आवश्यक फील्ड निवडा",
+    "MENTOR_CREATED_SUCCESSFULLY": "मेंटर यशस्वीरित्या तयार झाला आहे!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "मेंटर तयार झाला आहे, लवकरच क्रेडेन्शियल्स पाठवले जातील.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "मेंटर यशस्वीरित्या अपडेट केले गेले आहे!",
+    "EDIT_MENTOR": "मार्गदर्शक संपादित करा",
+    "NOT_ABLE_UPDATE_MENTOR": "मार्गदर्शक अपडेट करू शकत नाही.",
+    "NOT_ABLE_CREATE_MENTOR": "मार्गदर्शक तयार करण्यास सक्षम नाही.",
+    "UPDATE_MENTOR": "मार्गदर्शक अद्यतनित करा",
+    "RE_ASSIGN_MENTOR": "मेंटर पुन्हा नियुक्त करा"
+  },
   "VILLAGE": "गाव",
   "first_name": "प्रथम नाव",
   "middle_name": "मधले नाव",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "मूल्यमापन तपशील",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "नमुना प्रश्न आणि उत्तरपत्रिका",
+    "DOWNLOAD_QUESTION_PAPER": "प्रश्नपत्रिका डाउनलोड करा",
     "SEARCH_LEARNER": "शिकणारा शोधा..",
     "TOTAL_LEARNERS": "{{count}} पैकी {{total}} शिकणारे",
     "SORT_AND_FILTER_LEARNERS": "शिकणारे क्रमबद्ध करा आणि फिल्टर करा",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• प्रतिमा काढा आणि पोर्टलवर अपलोड करा",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• उत्तरपत्रिकेत अनेक पाने असल्यास, प्रत्येक पान स्वतंत्रपणे काढा आणि अपलोड करा",
     "READ_LESS": "कमी वाचा",
-    "READ_MORE": "अधिक वाचा",
-    "DOWNLOAD_QUESTION_PAPER": "प्रश्नपत्रिका डाउनलोड करा"
+    "READ_MORE": "अधिक वाचा"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "सर्व निवडा",
-    "DESELECT_ALL": "सर्वांची निवड रद्द करा",
     "LEARNER_REGISTRATIONS": "शिकाऊ नोंदणी",
     "SEARCH_LEARNER": "शिकणारा शोधा..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "कृती करण्यासाठी, किमान एक शिकणारा निवडा",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "आणि बॅचमध्ये हलवले",
     "OKAY": "ठीक आहे",
     "NOT_INTERESTED_TO_JOIN": "सामील होण्यास रस नाही.",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "इच्छुक, पुढच्या वर्षी सामील होऊ शकता."
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "नवीन मार्गदर्शक",
-    "FIRST_SELECT_REQUIRED_FIELDS": "प्रथम आवश्यक फील्ड निवडा",
-    "MENTOR_CREATED_SUCCESSFULLY": "मेंटर यशस्वीरित्या तयार झाला आहे!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "मेंटर तयार झाला आहे, लवकरच क्रेडेन्शियल्स पाठवले जातील.",
-    "MENTOR_UPDATED_SUCCESSFULLY": "मेंटर यशस्वीरित्या अपडेट केले गेले आहे!",
-    "EDIT_MENTOR": "मार्गदर्शक संपादित करा",
-    "NOT_ABLE_UPDATE_MENTOR": "मार्गदर्शक अपडेट करू शकत नाही.",
-    "NOT_ABLE_CREATE_MENTOR": "मार्गदर्शक तयार करण्यास सक्षम नाही.",
-    "UPDATE_MENTOR": "मार्गदर्शक अद्यतनित करा",
-    "RE_ASSIGN_MENTOR": "मेंटर पुन्हा नियुक्त करा"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "इच्छुक, पुढच्या वर्षी सामील होऊ शकता.",
+    "SELECT_ALL": "सर्व निवडा",
+    "DESELECT_ALL": "सर्वांची निवड रद्द करा"
   }
 }

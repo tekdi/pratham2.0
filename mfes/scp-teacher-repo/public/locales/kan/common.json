@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "ಫೆಸಿಲಿಟೇಟರ್‌ನ ಅಗತ್ಯತೆಗಳು",
     "PREREQUISITES": "ಪೂರ್ವಾಪೇಕ್ಷಿತಗಳು",
     "POST_REQUISITES": "ನಂತರದ ಅವಶ್ಯಕತೆಗಳು",
+    "DURING_COURSE": "ಕಲಿ",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "ಈವೆಂಟ್ ಈಗಾಗಲೇ ಮುಗಿದಿರುವುದರಿಂದ ಅಥವಾ ಲೈವ್ ಆಗಿರುವುದರಿಂದ ವಿಷಯ ಮತ್ತು ಉಪವಿಷಯವನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ.",
     "COURSE_TYPE": "ಕೋರ್ಸ್ ಪ್ರಕಾರ",
     "IDENTIFIER_NOT_FOUND": "ಗುರುತಿಸುವಿಕೆ ಕಂಡುಬಂದಿಲ್ಲ! ವಿಷಯವನ್ನು ತೆರೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ!",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "ಅಂತಿಮ ದಿನಾಂಕವು ಪ್ರಾರಂಭ ದಿನಾಂಕಕ್ಕಿಂತ ಮೊದಲು ಇರಬಾರದು.",
     "DELETE_THIS_SESSION": "ಈ ಸೆಷನ್ ಅಳಿಸಿ",
     "LEARNER_PREREQUISITES": "ಕಲಿಯುವವರ ಪೂರ್ವಾಪೇಕ್ಷಿತಗಳು",
-    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು",
-    "DURING_COURSE": "ಕಲಿ"
+    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "ಕೇಂದ್ರವು ಯಶಸ್ವಿಯಾಗಿ ವಿನಂತಿಸಿದೆ",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "ಯಾವುದೇ ಡೇಟಾ ಕಂಡುಬಂದಿಲ್ಲ.",
     "SEARCH_STUDENT": "ವಿದ್ಯಾರ್ಥಿಯನ್ನು ಹುಡುಕಿ",
     "NO_ASSESSMENTS_FOUND": "ಯಾವುದೇ ಮೌಲ್ಯಮಾಪನಗಳು ಕಂಡುಬಂದಿಲ್ಲ.",
+    "ASSESSMENTS_FOUND": "{{count}} ಮೌಲ್ಯಮಾಪನ ಕಂಡುಬಂದಿದೆ",
     "ASSESSMENT_STATUS": "ಮೌಲ್ಯಮಾಪನ ಸ್ಥಿತಿ",
     "NOT_STARTED": "ಪ್ರಾರಂಭಿಸಲಾಗಿಲ್ಲ",
     "IN_PROGRESS": "ಪ್ರಗತಿಯಲ್ಲಿದೆ",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "ನಿಯೋಜಿಸಲಾಗಿಲ್ಲ",
     "OUT_OF": "ರಿಂದ",
     "NUMBER_OUT_OF_COMPLETED": "{{completedCount}} ರಲ್ಲಿ {{totalCount}} ಪೂರ್ಣಗೊಂಡಿದೆ",
-    "ASSESSMENTS_FOUND": "{{count}} ಮೌಲ್ಯಮಾಪನ ಕಂಡುಬಂದಿದೆ",
     "AI_ASSESSMENT": "AI ಮೌಲ್ಯಮಾಪನ",
     "ASSESSMENT_LIST": "ಮೌಲ್ಯಮಾಪನ ಪಟ್ಟಿ",
     "AI_ASSESSMENT_LIST": "AI ಮೌಲ್ಯಮಾಪನ ಪಟ್ಟಿ",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "ಕಲಿಯುವವರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ.",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "ಬಳಕೆದಾರರ ಮಾನ್ಯತೆಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸಲಾಗುತ್ತದೆ"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "ಹೊಸ ಮಾರ್ಗದರ್ಶಕ",
+    "FIRST_SELECT_REQUIRED_FIELDS": "ಮೊದಲು ಅಗತ್ಯವಿರುವ ಕ್ಷೇತ್ರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+    "MENTOR_CREATED_SUCCESSFULLY": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ರಚಿಸಲಾಗಿದೆ, ರುಜುವಾತುಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "ಮೆಂಟರ್ ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!",
+    "EDIT_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಸಂಪಾದಿಸಿ",
+    "NOT_ABLE_UPDATE_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
+    "NOT_ABLE_CREATE_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
+    "UPDATE_MENTOR": "ಮೆಂಟರ್ ಅನ್ನು ನವೀಕರಿಸಿ",
+    "RE_ASSIGN_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಮರು ನಿಯೋಜಿಸಿ"
+  },
   "VILLAGE": "ಗ್ರಾಮ",
   "first_name": "ಮೊದಲ ಹೆಸರು",
   "middle_name": "ಮಧ್ಯದ ಹೆಸರು",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "ಮೌಲ್ಯಮಾಪನ ವಿವರಗಳು",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "ಮಾದರಿ ಪ್ರಶ್ನೆ ಮತ್ತು ಉತ್ತರ ಪತ್ರಿಕೆ",
+    "DOWNLOAD_QUESTION_PAPER": "ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
     "SEARCH_LEARNER": "ಅಧ್ಯಯನಾರ್ಥಿಯನ್ನು ಹುಡುಕಿ..",
     "TOTAL_LEARNERS": "{{count}} / {{total}} ಅಧ್ಯಯನಾರ್ಥಿಗಳು",
     "SORT_AND_FILTER_LEARNERS": "ಅಧ್ಯಯನಾರ್ಥಿಗಳನ್ನು ವಿಂಗಡಿಸಿ ಮತ್ತು ಫಿಲ್ಟರ್ ಮಾಡಿ",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• ಚಿತ್ರವನ್ನು ತೆಗೆದು ಪೋರ್ಟಲ್‌ಗೆ ಅಪ್ಲೋಡ್ ಮಾಡಿ",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• ಉತ್ತರ ಶೀಟಿನಲ್ಲಿ ಅನೇಕ ಪುಟಗಳಿದ್ದರೆ, ಪ್ರತಿ ಪುಟವನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಫೋಟೋ ತೆಗೆದು ಅಪ್ಲೋಡ್ ಮಾಡಿ",
     "READ_LESS": "ಕಡಿಮೆ ಓದಿ",
-    "READ_MORE": "ಇನ್ನಷ್ಟು ಓದಿ",
-    "DOWNLOAD_QUESTION_PAPER": "ಪ್ರಶ್ನೆ ಪತ್ರಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ"
+    "READ_MORE": "ಇನ್ನಷ್ಟು ಓದಿ"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ",
-    "DESELECT_ALL": "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆ ರದ್ದುಮಾಡಿ",
     "LEARNER_REGISTRATIONS": "ಕಲಿಯುವವರ ನೋಂದಣಿಗಳು",
     "SEARCH_LEARNER": "ಕಲಿಯುವವರನ್ನು ಹುಡುಕಿ..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "ಕ್ರಮ ಕೈಗೊಳ್ಳಲು, ಕನಿಷ್ಠ ಒಬ್ಬ ಕಲಿಯುವವರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "ಮತ್ತು ಬ್ಯಾಚ್‌ಗೆ ಸ್ಥಳಾಂತರಗೊಂಡರು",
     "OKAY": "ಸರಿ",
     "NOT_INTERESTED_TO_JOIN": "ಸೇರಲು ಆಸಕ್ತಿ ಇಲ್ಲ.",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ಆಸಕ್ತಿ ಇದೆ, ಮುಂದಿನ ವರ್ಷ ಸೇರಬಹುದು."
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "ಹೊಸ ಮಾರ್ಗದರ್ಶಕ",
-    "FIRST_SELECT_REQUIRED_FIELDS": "ಮೊದಲು ಅಗತ್ಯವಿರುವ ಕ್ಷೇತ್ರಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ",
-    "MENTOR_CREATED_SUCCESSFULLY": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಯಶಸ್ವಿಯಾಗಿ ರಚಿಸಲಾಗಿದೆ!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ರಚಿಸಲಾಗಿದೆ, ರುಜುವಾತುಗಳನ್ನು ಶೀಘ್ರದಲ್ಲೇ ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
-    "MENTOR_UPDATED_SUCCESSFULLY": "ಮೆಂಟರ್ ಅನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!",
-    "EDIT_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಸಂಪಾದಿಸಿ",
-    "NOT_ABLE_UPDATE_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
-    "NOT_ABLE_CREATE_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ರಚಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ",
-    "UPDATE_MENTOR": "ಮೆಂಟರ್ ಅನ್ನು ನವೀಕರಿಸಿ",
-    "RE_ASSIGN_MENTOR": "ಮಾರ್ಗದರ್ಶಕರನ್ನು ಮರು ನಿಯೋಜಿಸಿ"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ಆಸಕ್ತಿ ಇದೆ, ಮುಂದಿನ ವರ್ಷ ಸೇರಬಹುದು.",
+    "SELECT_ALL": "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ",
+    "DESELECT_ALL": "ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆ ರದ್ದುಮಾಡಿ"
   }
 }

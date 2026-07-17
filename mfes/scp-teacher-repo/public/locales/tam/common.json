@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "பெசிலிடேட்டர்களரின் தேவைகள்",
     "PREREQUISITES": "முன்நிபந்தனைகள்",
     "POST_REQUISITES": "பின்நிபந்தனைகள்",
+    "DURING_COURSE": "அறிய",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "நிகழ்வு ஏற்கனவே கடந்துவிட்டதால் அல்லது நேரலையில் இருப்பதால் தலைப்பு மற்றும் துணைத் தலைப்பைத் தேர்ந்தெடுக்க முடியவில்லை.",
     "COURSE_TYPE": "பாட வகை",
     "IDENTIFIER_NOT_FOUND": "அடையாளங்காட்டி கிடைக்கவில்லை! உள்ளடக்கத்தைத் திறக்க முடியவில்லை!",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "இறுதித் தேதி தொடக்கத் தேதிக்கு முந்தையதாக இருக்கக்கூடாது",
     "DELETE_THIS_SESSION": "இந்த அமர்வை நீக்கு",
     "LEARNER_PREREQUISITES": "மாணவரின் முன்னேற்பாடுகள்",
-    "LEARNER_POSTREQUISITES": "மாணவரின் பின்னேற்பாடுகள்",
-    "DURING_COURSE": "அறிய"
+    "LEARNER_POSTREQUISITES": "மாணவரின் பின்னேற்பாடுகள்"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "மையம் வெற்றிகரமாக கோரப்பட்டது",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "தரவு எதுவும் கிடைக்கவில்லை",
     "SEARCH_STUDENT": "மாணவரை தேடு",
     "NO_ASSESSMENTS_FOUND": "மதிப்பீடுகள் எதுவும் காணப்படவில்லை.",
+    "ASSESSMENTS_FOUND": "{{count}} மதிப்பீடு கண்டறியப்பட்டது",
     "ASSESSMENT_STATUS": "மதிப்பீட்டு நிலை",
     "NOT_STARTED": "தொடங்கப்படவில்லை",
     "IN_PROGRESS": "முன்னேற்றத்தில் உள்ளது",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "ஒதுக்கப்படவில்லை",
     "OUT_OF": "இல் இருந்து",
     "NUMBER_OUT_OF_COMPLETED": "{{completeCount}} இல் {{totalCount}} நிறைவடைந்தது",
-    "ASSESSMENTS_FOUND": "{{count}} மதிப்பீடு கண்டறியப்பட்டது",
     "AI_ASSESSMENT": "AI மதிப்பீடு",
     "ASSESSMENT_LIST": "மதிப்பீட்டுப் பட்டியல்",
     "AI_ASSESSMENT_LIST": "AI மதிப்பீட்டுப் பட்டியல்",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "மாணவரை உருவாக்க முடியவில்லை",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "பயனர் உள்நுழைவு விவரங்கள் விரைவில் அனுப்பப்படும்"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "புதிய வழிகாட்டி",
+    "FIRST_SELECT_REQUIRED_FIELDS": "முதலில் தேவையான புலங்களைத் தேர்ந்தெடுக்கவும்.",
+    "MENTOR_CREATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாக உருவாக்கப்பட்டது!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "வழிகாட்டி உருவாக்கப்பட்டுவிட்டார், விரைவில் சான்றுகள் அனுப்பப்படும்.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது!",
+    "EDIT_MENTOR": "வழிகாட்டியைத் திருத்து",
+    "NOT_ABLE_UPDATE_MENTOR": "வழிகாட்டியைப் புதுப்பிக்க முடியவில்லை.",
+    "NOT_ABLE_CREATE_MENTOR": "வழிகாட்டியை உருவாக்க முடியவில்லை",
+    "UPDATE_MENTOR": "வழிகாட்டியைப் புதுப்பிக்கவும்",
+    "RE_ASSIGN_MENTOR": "வழிகாட்டியை மீண்டும் நியமிக்கவும்"
+  },
   "VILLAGE": "கிராமம்",
   "first_name": "முதல் பெயர்",
   "middle_name": "நடு பெயர்",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "மதிப்பீட்டு விவரங்கள்",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "மாதிரி கேள்வி மற்றும் பதில் தாள்",
+    "DOWNLOAD_QUESTION_PAPER": "வினாத்தாளைப் பதிவிறக்கவும்",
     "SEARCH_LEARNER": "கற்றவரை தேடுங்கள்..",
     "TOTAL_LEARNERS": "{{count}} / {{total}} கற்றவர்கள்",
     "SORT_AND_FILTER_LEARNERS": "கற்றவர்களை வரிசைப்படுத்தி வடிகட்டு",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• படத்தை எடுத்துப் போர்ட்டலில் பதிவேற்றவும்",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• பதில் தாளில் பல பக்கங்கள் இருந்தால், ஒவ்வொரு பக்கத்தையும் தனியாக எடுத்து பதிவேற்றவும்",
     "READ_LESS": "குறைவாக படிக்கவும்",
-    "READ_MORE": "மேலும் படிக்கவும்",
-    "DOWNLOAD_QUESTION_PAPER": "வினாத்தாளைப் பதிவிறக்கவும்"
+    "READ_MORE": "மேலும் படிக்கவும்"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "அனைத்தையும் தேர்ந்தெடுக்கவும்",
-    "DESELECT_ALL": "அனைத்தையும் தேர்வுநீக்கு",
     "LEARNER_REGISTRATIONS": "கற்பவர் பதிவுகள்",
     "SEARCH_LEARNER": "தேடு கற்பவர்..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "நடவடிக்கை எடுக்க, குறைந்தது ஒரு கற்பவரையாவது தேர்ந்தெடுக்கவும்.",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "மற்றும் தொகுதிக்கு மாற்றப்பட்டது",
     "OKAY": "சரி",
     "NOT_INTERESTED_TO_JOIN": "சேர ஆர்வமில்லை.",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ஆர்வமுள்ளவர்கள் அடுத்த ஆண்டு சேரலாம்."
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "புதிய வழிகாட்டி",
-    "FIRST_SELECT_REQUIRED_FIELDS": "முதலில் தேவையான புலங்களைத் தேர்ந்தெடுக்கவும்.",
-    "MENTOR_CREATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாக உருவாக்கப்பட்டது!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "வழிகாட்டி உருவாக்கப்பட்டுவிட்டார், விரைவில் சான்றுகள் அனுப்பப்படும்.",
-    "MENTOR_UPDATED_SUCCESSFULLY": "வழிகாட்டி வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது!",
-    "EDIT_MENTOR": "வழிகாட்டியைத் திருத்து",
-    "NOT_ABLE_UPDATE_MENTOR": "வழிகாட்டியைப் புதுப்பிக்க முடியவில்லை.",
-    "NOT_ABLE_CREATE_MENTOR": "வழிகாட்டியை உருவாக்க முடியவில்லை",
-    "UPDATE_MENTOR": "வழிகாட்டியைப் புதுப்பிக்கவும்",
-    "RE_ASSIGN_MENTOR": "வழிகாட்டியை மீண்டும் நியமிக்கவும்"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ஆர்வமுள்ளவர்கள் அடுத்த ஆண்டு சேரலாம்.",
+    "SELECT_ALL": "அனைத்தையும் தேர்ந்தெடுக்கவும்",
+    "DESELECT_ALL": "அனைத்தையும் தேர்வுநீக்கு"
   }
 }

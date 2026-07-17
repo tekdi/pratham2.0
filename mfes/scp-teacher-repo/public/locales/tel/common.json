@@ -507,6 +507,7 @@
     "FACILITATOR_REQUISITES": "ఫెసిలిటేటర్ యొక్క అవసరాలు",
     "PREREQUISITES": "ముందస్తు అవసరాలు",
     "POST_REQUISITES": "పోస్ట్-అవసరాలు",
+    "DURING_COURSE": "తెలుసుకోండి",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "ఈవెంట్ ఇప్పటికే పూర్తయినందున లేదా లైవ్‌లో ఉన్నందున అంశం మరియు ఉప-అంశాన్ని ఎంచుకోలేరు",
     "COURSE_TYPE": "కోర్సు రకం",
     "IDENTIFIER_NOT_FOUND": "ఐడెంటిఫైయర్ కనుగొనబడలేదు! కంటెంట్‌ను తెరవలేము!",
@@ -537,8 +538,7 @@
     "END_DATE_ERROR": "ముగింపు తేదీ ప్రారంభ తేదీ కంటే ముందు ఉండకూడదు",
     "DELETE_THIS_SESSION": "ఈ సెషన్‌ను తొలగించండి",
     "LEARNER_PREREQUISITES": "అభ్యాసకుల ముందస్తు అవసరాలు",
-    "LEARNER_POSTREQUISITES": "అభ్యాసకుల అనంతర అవసరాలు",
-    "DURING_COURSE": "తెలుసుకోండి"
+    "LEARNER_POSTREQUISITES": "అభ్యాసకుల అనంతర అవసరాలు"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "సెంటర్ విజయవంతంగా అభ్యర్థించబడింది",
@@ -734,6 +734,7 @@
     "NO_DATA_FOUND": "డేటా కనుగొనబడలేదు",
     "SEARCH_STUDENT": "విద్యార్థిని శోధించండి",
     "NO_ASSESSMENTS_FOUND": "మదింపులు ఏమీ కనుగొనబడలేదు",
+    "ASSESSMENTS_FOUND": "{{count}} అంచనా కనుగొనబడింది",
     "ASSESSMENT_STATUS": "మదింపు స్థితి (అసెస్మెంట్ స్థితి)",
     "NOT_STARTED": "ప్రారంభించబడలేదు",
     "IN_PROGRESS": "పురోగతిలో ఉంది",
@@ -746,7 +747,6 @@
     "NO_ASSIGNED": "కేటాయించబడలేదు",
     "OUT_OF": "మొత్తం (ఉదా: 100 కి)",
     "NUMBER_OUT_OF_COMPLETED": "{{totalCount}}' లో '{{completedCount}}' పూర్తయింది",
-    "ASSESSMENTS_FOUND": "{{count}} అంచనా కనుగొనబడింది",
     "AI_ASSESSMENT": "AI అసెస్‌మెంట్",
     "ASSESSMENT_LIST": "అసెస్‌మెంట్ జాబితా",
     "AI_ASSESSMENT_LIST": "AI అసెస్‌మెంట్ జాబితా",
@@ -909,6 +909,18 @@
     "NOT_ABLE_CREATE_LEARNER": "అభ్యాసకుడిని సృష్టించలేకపోతున్నారు",
     "LEARNERS.USER_CREDENTIALS_WILL_BE_SEND_SOON": "వినియోగదారు ఆధారాలు త్వరలో పంపబడతాయి"
   },
+  "MENTORS": {
+    "NEW_MENTOR": "కొత్త గురువు",
+    "FIRST_SELECT_REQUIRED_FIELDS": "ముందుగా అవసరమైన ఫీల్డ్‌లను ఎంచుకోండి",
+    "MENTOR_CREATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా సృష్టించబడింది!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "మెంటర్ సృష్టించబడింది, ఆధారాలు త్వరలో పంపబడతాయి.",
+    "MENTOR_UPDATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా నవీకరించబడింది!",
+    "EDIT_MENTOR": "మెంటర్‌ను సవరించు",
+    "NOT_ABLE_UPDATE_MENTOR": "మెంటార్‌ను అప్‌డేట్ చేయలేకపోతున్నాను",
+    "NOT_ABLE_CREATE_MENTOR": "గురువును సృష్టించలేకపోయారు",
+    "UPDATE_MENTOR": "మెంటర్‌ను అప్‌డేట్ చేయండి",
+    "RE_ASSIGN_MENTOR": "మెంటర్‌ను తిరిగి కేటాయించండి"
+  },
   "VILLAGE": "గ్రామం",
   "first_name": "మొదటి పేరు",
   "middle_name": "మధ్య పేరు",
@@ -1049,6 +1061,7 @@
   "AI": {
     "ASSESSMENT_DETAILS": "మూల్యాంకన వివరాలు",
     "SAMPLE_QUESTION_AND_ANSWER_PAPER": "నమూనా ప్రశ్న మరియు సమాధాన పత్రం",
+    "DOWNLOAD_QUESTION_PAPER": "ప్రశ్నపత్రాన్ని డౌన్‌లోడ్ చేసుకోండి",
     "SEARCH_LEARNER": "విద్యార్థిని శోధించండి..",
     "TOTAL_LEARNERS": "{{count}} / {{total}} విద్యార్థులు",
     "SORT_AND_FILTER_LEARNERS": "విద్యార్థులను క్రమబద్ధీకరించి ఫిల్టర్ చేయండి",
@@ -1100,12 +1113,9 @@
     "CLICK_IMAGE_AND_UPLOAD_TO_PORTAL": "• చిత్రాన్ని తీసి పోర్టల్‌లో అప్‌లోడ్ చేయండి",
     "IF_ANSWER_SHEET_MULTIPLE_PAGES": "• సమాధాన షీట్‌లో బహుళ పేజీలు ఉంటే, ప్రతి పేజీని విడిగా చిత్రీకరించి అప్‌లోడ్ చేయండి",
     "READ_LESS": "తక్కువగా చదవండి",
-    "READ_MORE": "మరింత చదవండి",
-    "DOWNLOAD_QUESTION_PAPER": "ప్రశ్నపత్రాన్ని డౌన్‌లోడ్ చేసుకోండి"
+    "READ_MORE": "మరింత చదవండి"
   },
   "USER_REGISTRATION": {
-    "SELECT_ALL": "అన్నీ ఎంచుకోండి",
-    "DESELECT_ALL": "అన్నీ ఎంపిక తీసివేయి",
     "LEARNER_REGISTRATIONS": "అభ్యాసకుల నమోదులు",
     "SEARCH_LEARNER": "శోధన అభ్యాసకుడు..",
     "TO_TAKE_ACTION_SELECT_LEARNER": "చర్య తీసుకోవడానికి, కనీసం ఒక అభ్యాసకుడిని ఎంచుకోండి",
@@ -1144,18 +1154,8 @@
     "MOVED_TO_BATCH": "మరియు బ్యాచ్‌కి తరలించబడింది",
     "OKAY": "సరే",
     "NOT_INTERESTED_TO_JOIN": "చేరడానికి ఆసక్తి లేదు",
-    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ఆసక్తి ఉన్నవారు వచ్చే ఏడాది చేరవచ్చు."
-  },
-  "MENTORS": {
-    "NEW_MENTOR": "కొత్త గురువు",
-    "FIRST_SELECT_REQUIRED_FIELDS": "ముందుగా అవసరమైన ఫీల్డ్‌లను ఎంచుకోండి",
-    "MENTOR_CREATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా సృష్టించబడింది!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "మెంటర్ సృష్టించబడింది, ఆధారాలు త్వరలో పంపబడతాయి.",
-    "MENTOR_UPDATED_SUCCESSFULLY": "మెంటర్ విజయవంతంగా నవీకరించబడింది!",
-    "EDIT_MENTOR": "మెంటర్‌ను సవరించు",
-    "NOT_ABLE_UPDATE_MENTOR": "మెంటార్‌ను అప్‌డేట్ చేయలేకపోతున్నాను",
-    "NOT_ABLE_CREATE_MENTOR": "గురువును సృష్టించలేకపోయారు",
-    "UPDATE_MENTOR": "మెంటర్‌ను అప్‌డేట్ చేయండి",
-    "RE_ASSIGN_MENTOR": "మెంటర్‌ను తిరిగి కేటాయించండి"
+    "INTERESTED_MAY_JOIN_NEXT_YEAR": "ఆసక్తి ఉన్నవారు వచ్చే ఏడాది చేరవచ్చు.",
+    "SELECT_ALL": "అన్నీ ఎంచుకోండి",
+    "DESELECT_ALL": "అన్నీ ఎంపిక తీసివేయి"
   }
 }
