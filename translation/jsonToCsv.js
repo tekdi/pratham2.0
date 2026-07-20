@@ -184,6 +184,25 @@ function escapeCsvField(field) {
   return s;
 }
 
+// Find keys with leading/trailing whitespace (e.g. a stray space or U+2009),
+// which are invisible in editors and silently break CSV matching.
+function findWhitespaceKeys(node, prefix, out) {
+  for (const k of Object.keys(node)) {
+    const p = prefix.concat(k);
+    if (k !== k.trim()) out.push(`${p.join(' > ')}   (raw: ${JSON.stringify(k)})`);
+    if (isPlainObject(node[k])) findWhitespaceKeys(node[k], p, out);
+  }
+  return out;
+}
+
+function warnWhitespaceKeys(masterData) {
+  const bad = findWhitespaceKeys(masterData, [], []);
+  if (bad.length) {
+    console.warn(`  ! ${bad.length} key(s) in en.json have leading/trailing whitespace — fix the source, they won't match the CSV:`);
+    bad.forEach((b) => console.warn(`      ${b}`));
+  }
+}
+
 /* ============================================================================
  * Main
  * ========================================================================== */
@@ -200,6 +219,7 @@ function processTarget(target) {
     console.error(`  ✗ Master file not found: ${master.filePath} — skipping target.`);
     return;
   }
+  warnWhitespaceKeys(master.data);
   const leaves = walkLeaves(master.data, [], []);
 
   // Load every language file once.
