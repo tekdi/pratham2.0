@@ -79,8 +79,8 @@ const App = ({
     returnUrl = searchParams.get('returnUrl');
   }
 
-  // Intercept browser back button when exitLink or returnUrl is present (new-tab scenario).
-  const effectiveExitLink = exitLink || returnUrl;
+  // Intercept browser back button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
+  const effectiveExitLink = exitLink || returnUrl || activeLink;
   useEffect(() => {
     if (!effectiveExitLink) return;
     window.history.pushState({ playerPage: true }, '', window.location.href);
@@ -519,8 +519,8 @@ const App = ({
               identifier={identifier}
               courseId={courseId}
               unitId={unitId}
+              exitLink={exitLink || returnUrl || activeLink}
               {..._config?.player}
-              exitLink={returnUrl || exitLink}
             />
             {item?.content?.artifactUrl &&
               isDownloadableMimeType(item?.content?.mimeType) &&
@@ -662,7 +662,17 @@ const PlayerBox = ({
 }: any) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
+  // The sbplayer iframe is hosted on a different origin (NEXT_PUBLIC_LEARNER_SBPLAYER).
+  // When its Exit button runs `window.top.location.href = exitLink`, a relative
+  // exitLink would resolve against the iframe's origin, switching the domain.
+  // Resolve exitLink to an absolute URL on the current (parent) origin so the
+  // player navigates back to the correct domain.
+  const absoluteExitLink =
+    exitLink && typeof window !== 'undefined'
+      ? new URL(exitLink, window.location.origin).href
+      : exitLink;
+
   // Check if content is video type (videos have their own fullscreen controls)
   const isVideoType = item?.content?.mimeType?.startsWith('video/');
 
@@ -736,7 +746,7 @@ const PlayerBox = ({
   src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${identifier}${
     courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ""
   }${
-    exitLink ? `&exitLink=${encodeURIComponent(exitLink)}` : ""
+    absoluteExitLink ? `&exitLink=${encodeURIComponent(absoluteExitLink)}` : ""
   }${
     userIdLocalstorageName
       ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`
