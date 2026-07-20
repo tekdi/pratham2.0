@@ -105,6 +105,38 @@ const EnrollProfileCompletionInner = () => {
       console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
 
       if (isRegisterationTestEnabled) {
+        // Enroll the user into the tenant immediately on Finish Enroll (parity with
+        // non-test programs). The eligibility test flow below still runs afterwards.
+        try {
+          const enrollUserId = localStorage.getItem('userId');
+          const enrollRoleId = localStorage.getItem('roleId');
+          const enrollTenantId = localStorage.getItem('tenantId');
+          const userTenantStatus = uiConfig?.isTenantPendingStatus;
+          if (enrollUserId && enrollRoleId && enrollTenantId) {
+            if (userTenantStatus) {
+              await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId, userTenantStatus: 'pending' });
+            } else {
+              await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId });
+            }
+            console.log('Enrolled into tenant:', enrollTenantId);
+            if (userTenantStatus) {
+              try {
+                await updateUser(enrollUserId, {
+                  userData: {},
+                  customFields: [{
+                    fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+                    value: 'pending',
+                  }],
+                });
+              } catch (updateError) {
+                console.error('Failed to update pending custom field:', updateError);
+              }
+            }
+          }
+        } catch (enrollError) {
+          console.error('Enrollment failed:', enrollError);
+        }
+
         // Check if user already has an active batch across all academic years
         try {
           const academicYearList = await getAcademicYear();
@@ -280,30 +312,8 @@ const EnrollProfileCompletionInner = () => {
 
   const handleAssessmentModalClose = async () => {
     setAssessmentRequiredModal(false);
-    try {
-      const storedUserId = localStorage.getItem('userId');
-      const storedRoleId = localStorage.getItem('roleId');
-      const enrollTenantId = localStorage.getItem('tenantId');
-      const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-      const userTenantStatus = uiConfig?.isTenantPendingStatus;
-      if (storedUserId && storedRoleId && enrollTenantId) {
-        if (userTenantStatus) {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-        } else {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
-        }
-        try {
-          await updateUser(storedUserId, {
-            userData: {},
-            customFields: [{ fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963', value: 'pending' }],
-          });
-        } catch (updateError) {
-          console.error('Failed to update pending custom field:', updateError);
-        }
-      }
-    } catch (enrollError) {
-      console.error('Enrollment failed on close:', enrollError);
-    }
+    // Enrollment already happened on Finish Enroll (handleAccessProgram); here we
+    // only mark the registration test as given and continue.
     localStorage.setItem('registerationTestGiven', 'Yes');
      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       console.log('isAndroid check:', isAndroid);
@@ -351,39 +361,7 @@ const EnrollProfileCompletionInner = () => {
   const onAssessmentUnavailableOk = async () => {
     setAssessmentUnavailableModal(false);
     localStorage.removeItem('enrollTenantId');
-
-    try {
-      const storedUserId = localStorage.getItem('userId');
-      const storedRoleId = localStorage.getItem('roleId');
-      const enrollTenantId = localStorage.getItem('tenantId');
-      const uiConfigRaw = localStorage.getItem('uiConfig');
-      const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
-      const userTenantStatus = uiConfig?.isTenantPendingStatus;
-
-      if (storedUserId && storedRoleId && enrollTenantId) {
-        if (userTenantStatus) {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-        } else {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
-        }
-        if (userTenantStatus) {
-          try {
-            await updateUser(storedUserId, {
-              userData: {},
-              customFields: [{
-                fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
-                value: 'pending',
-              }],
-            });
-          } catch (updateError) {
-            console.error('Failed to update pending custom field:', updateError);
-          }
-        }
-      }
-    } catch (enrollError) {
-      console.error('Enrollment failed on assessment unavailable:', enrollError);
-    }
-
+    // Enrollment already happened on Finish Enroll (handleAccessProgram).
     window.location.href = '/scp-dashboard';
   };
 
@@ -410,9 +388,13 @@ const EnrollProfileCompletionInner = () => {
 
     // Use window.location.href for guaranteed navigation (router.push can silently fail in modals)
      if(questionSetIdentifier){
-      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+      // Mark the registration test as addressed (parity with Close) so the
+      // ClientLayout route guard doesn't lock the user out of programs if they
+      // start the test and then abort it.
+      localStorage.setItem('registerationTestGiven', 'Yes');
+      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
 
-   
+
    }
   };
 
