@@ -1184,8 +1184,8 @@ if (familyField?.displayValue) {
         //   },
         // }}
         >
-          {/* Hiding button for edit learner until edit functionality is developed */}
-          {isActiveYear && userData?.createdBy !== userId && (
+          {/* Edit Profile button hidden for all users for now */}
+          {/* {isActiveYear && userData?.createdBy !== userId && (
             <Button
               sx={{
                 fontSize: '14px',
@@ -1219,7 +1219,7 @@ if (familyField?.displayValue) {
                 <CreateOutlinedIcon sx={{ fontSize: '14px' }} />
               </Box>
             </Button>
-          )}
+          )} */}
 
           {openAddLearnerModal && (
             <div>
