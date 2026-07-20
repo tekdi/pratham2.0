@@ -33,7 +33,7 @@ const OUTPUT_DIR = path.join(REPO_ROOT, 'translation', 'Outputs');
 const TARGETS = [
   {
     appName: 'learner_app',
-    csvPath: '/home/ttpl-rt-215/Downloads/pratham/translations/Pratham_ Translations - Learner web PLP (1).csv',
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Learner web PLP.csv'),
     localesDir: path.join(REPO_ROOT, 'libs/shared-lib-v2/src/lib/context/locales'),
     layout: 'file',                         // 'file' => <localesDir>/<code>.json
     keyColumns: ['Module', 'Submodule', 'Key'],
@@ -53,30 +53,74 @@ const TARGETS = [
     ],
   },
 
-  // ---- Scaffold for other repos (uncomment + confirm codes before use) ----
-  // NOTE for admin/scp/youthNet: those repos have BOTH `odi` and `or` folders.
-  //      Confirm which one is live and set `code` accordingly.
-  // {
-  //   appName: 'admin_app',
-  //   csvPath: '/path/to/admin.csv',
-  //   localesDir: path.join(REPO_ROOT, 'apps/admin-app-repo/public/locales'),
-  //   layout: 'dir',                        // 'dir' => <localesDir>/<code>/<namespace>
-  //   namespace: 'common.json',
-  //   keyColumns: ['Module', 'Key'],        // admin.csv has no Submodule column
-  //   sourceCode: 'en',
-  //   outputDir: path.join(OUTPUT_DIR, 'admin_app'),
-  //   languages: [
-  //     { column: 'English',  code: 'en' },
-  //     { column: 'Marathi',  code: 'mr' },
-  //     { column: 'Hindi',    code: 'hi' },
-  //     { column: 'Odiya',    code: 'odi' },  // <- odi vs or?
-  //     { column: 'Telugu',   code: 'tel' },
-  //     { column: 'Kannada',  code: 'kan' },
-  //     { column: 'Tamil',    code: 'tam' },
-  //     { column: 'Gujarati', code: 'gu'  },
-  //     { column: 'Urdu',     code: 'ur'  },
-  //   ],
-  // },
+  {
+    appName: 'scp_teacher',
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Facilitator.csv'),
+    localesDir: path.join(REPO_ROOT, 'mfes/scp-teacher-repo/public/locales'),
+    layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
+    namespace: 'common.json',
+    keyColumns: ['Module', 'Submodule', 'Key'],
+    sourceCode: 'en',
+    outputDir: path.join(OUTPUT_DIR, 'scp_teacher'),
+    // Odiya is written to BOTH `odi` and `or` (this repo has both folders).
+    languages: [
+      { column: 'English',  code: 'en' },
+      { column: 'Marathi',  code: 'mr' },
+      { column: 'Hindi',    code: 'hi' },
+      { column: 'Odiya',    code: 'odi' },
+      { column: 'Odiya',    code: 'or' },
+      { column: 'Telugu',   code: 'tel' },
+      { column: 'Kannada',  code: 'kan' },
+      { column: 'Tamil',    code: 'tam' },
+      { column: 'Gujarati', code: 'gu' },
+      { column: 'Urdu',     code: 'ur' },
+    ],
+  },
+
+  {
+    appName: 'admin_app',
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Admin.csv'),
+    localesDir: path.join(REPO_ROOT, 'apps/admin-app-repo/public/locales'),
+    layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
+    namespace: 'common.json',
+    keyColumns: ['Module', 'Submodule', 'Key'],
+    sourceCode: 'en',
+    outputDir: path.join(OUTPUT_DIR, 'admin_app'),
+    // Odiya is written to BOTH `odi` and `or` (this repo has both folders).
+    languages: [
+      { column: 'English',  code: 'en' },
+      { column: 'Marathi',  code: 'mr' },
+      { column: 'Hindi',    code: 'hi' },
+      { column: 'Odiya',    code: 'odi' },
+      { column: 'Odiya',    code: 'or' },
+      { column: 'Telugu',   code: 'tel' },
+      { column: 'Kannada',  code: 'kan' },
+      { column: 'Tamil',    code: 'tam' },
+      { column: 'Gujarati', code: 'gu' },
+      { column: 'Urdu',     code: 'ur' },
+    ],
+  },
+
+  {
+    appName: 'youthnet',
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Mentor.csv'),
+    localesDir: path.join(REPO_ROOT, 'mfes/youthNet/public/locales'),
+    layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
+    namespace: 'common.json',
+    keyColumns: ['Module', 'Submodule', 'Key'],
+    sourceCode: 'en',
+    outputDir: path.join(OUTPUT_DIR, 'youthnet'),
+    // youthNet supports only en, hi, mr, or, ur. Odiya -> `or` only.
+    // `ml` (Malayalam) is intentionally left untouched, and the CSV's
+    // Telugu/Kannada/Tamil/Gujarati columns are skipped (no folders for them).
+    languages: [
+      { column: 'English', code: 'en' },
+      { column: 'Hindi',   code: 'hi' },
+      { column: 'Marathi', code: 'mr' },
+      { column: 'Odiya',   code: 'or' },
+      { column: 'Urdu',    code: 'ur' },
+    ],
+  },
 ];
 
 /* ============================================================================
@@ -184,6 +228,25 @@ function loadLanguageFile(target, code) {
   }
 }
 
+// Find keys with leading/trailing whitespace (e.g. a stray space or U+2009),
+// which are invisible in editors and silently break CSV matching.
+function findWhitespaceKeys(node, prefix, out) {
+  for (const k of Object.keys(node)) {
+    const p = prefix.concat(k);
+    if (k !== k.trim()) out.push(`${p.join(' > ')}   (raw: ${JSON.stringify(k)})`);
+    if (isPlainObject(node[k])) findWhitespaceKeys(node[k], p, out);
+  }
+  return out;
+}
+
+function warnWhitespaceKeys(masterData) {
+  const bad = findWhitespaceKeys(masterData, [], []);
+  if (bad.length) {
+    console.warn(`  ! ${bad.length} key(s) in en.json have leading/trailing whitespace — fix the source, they won't match the CSV:`);
+    bad.forEach((b) => console.warn(`      ${b}`));
+  }
+}
+
 /* ============================================================================
  * Main
  * ========================================================================== */
@@ -202,6 +265,7 @@ function processTarget(target) {
     console.error(`  ✗ Master file not found: ${master.filePath} — skipping target.`);
     return;
   }
+  warnWhitespaceKeys(master.data);
 
   // Build CSV lookup: csvLookup[code][tripleKey] = trimmed value (non-empty only).
   const csvRows = rowsToObjects(parseCsv(fs.readFileSync(target.csvPath, 'utf-8')));
