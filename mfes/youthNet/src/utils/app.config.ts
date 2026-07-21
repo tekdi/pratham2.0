@@ -257,13 +257,17 @@ export const EMPTY_COURSE_STATUS_COUNTS: CourseStatusCounts = {
 
 // Backend status strings -> the 4 mutually-exclusive UI statuses. Unknown/missing values fall
 // back to 'notStarted' rather than throwing or silently dropping the learner from every count.
+// The real /tracking/content/course/status endpoint's actual status strings are
+// not_started / inprogress / completed / viewCertificate — not the underscored
+// not_started/in_progress/completed/certificate_issued guessed before the endpoint existed.
+// Both spellings are kept mapped here (single source of truth) so either shape normalizes
+// correctly everywhere in the dashboard.
 export const STATUS_NORMALIZATION_MAP: Record<string, NormalizedStatus> = {
   not_started: 'notStarted',
   in_progress: 'inProgress',
+  inprogress: 'inProgress',
   completed: 'completed',
   certificate_issued: 'certificateIssued',
-  // The real /tracking/content/course/status endpoint uses `viewCertificate` for this stage
-  // rather than `certificate_issued` — both normalize the same way everywhere in the dashboard.
   viewCertificate: 'certificateIssued',
 };
 
