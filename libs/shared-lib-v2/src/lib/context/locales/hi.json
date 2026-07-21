@@ -131,7 +131,7 @@
     "ENROLL_NOW": "अभी नामांकन करें",
     "GO_TO_MY_PROFILE": "मेरी प्रोफ़ाइल पर जाएं",
     "WHAT_YOU_LL_LEARN": "आप क्या सीखेंगे",
-    "VIEW_ALL": "View All",
+    "VIEW_ALL": "सभी देखें",
     "NO_DATA_FOUND": "कोई डेटा नहीं मिला",
     "LOAD_MORE": "अधिक लोड करें",
     "SKILLING_CENTERS": "कौशल केंद्र",
@@ -231,7 +231,7 @@
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त पाठ्यक्रम देखें"
     },
     "HOME": {
-      "WELCOME_TITLE": "Pratham myLearning में आपका स्वागत है!",
+      "WELCOME_TITLE": "प्रथम मायलर्निंग में आपका स्वागत है!",
       "WELCOME_SUBTITLE": "यहाँ से आपकी सीखने की यात्रा शुरू होती है",
       "SIGN_UP_BUTTON": "अभी प्रोग्राम के लिए साइन अप करें!",
       "ALREADY_SIGNED_UP": "पहले से साइन अप किया हुआ?",
@@ -255,7 +255,7 @@
       "NO_PROGRAMS_FOUND": "कोई प्रोग्राम नहीं मिला।"
     },
     "LOGIN": {
-      "welcome_title": "Pratham myLearning में आपका स्वागत है!",
+      "welcome_title": "प्रथम मायलर्निंग में आपका स्वागत है!",
       "welcome_subtitle": "यहाँ से आपकी सीखने की यात्रा शुरू होती है",
       "welcome_image_alt": "मुस्कराता चेहरा",
       "qr_get_app": "एप्लिकेशन प्राप्त करें",
@@ -310,7 +310,7 @@
       "PROGRAM": "कार्यक्रम",
       "ABOUT_US": "हमारे बारे में",
       "THEMATIC_REPOSITORY": "थीमैटिक रिपॉज़िटरी",
-      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
+      "COPYRIGHT_NOTICE": "वेबसाइट पर सभी संसाधन CC BY-NC-ND 4.0 अंतर्राष्ट्रीय लाइसेंस के अंतर्गत लाइसेंस प्राप्त हैं © प्रथम ओपन स्कूल |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "आपकी प्रतिक्रिया रिकॉर्ड कर ली गई है",
@@ -417,7 +417,7 @@
       "CAMERA_HERE": "कैमरा यहाँ",
       "OR": "या",
       "SEARCH_TEXT": "खोजें",
-      "APP_NAME": "Pratham myLearning",
+      "APP_NAME": "प्रथम मायलर्निंग",
       "ON_PLAYSTORE": "प्लेस्टोर पर"
     },
     "SSO": {
@@ -439,8 +439,8 @@
     "PROGRAMS": {
       "EXPLORE_PROGRAMS": "कार्यक्रमों का अन्वेषण करें",
       "MY_PROGRAMS": "मेरे कार्यक्रम",
-      "EXPLORE_VOLUNTEER_PROGRAMS": "Explore Volunteer Programs",
-      "MY_VOLUNTEER_PROGRAMS": "My Volunteer Programs",
+      "EXPLORE_VOLUNTEER_PROGRAMS": "स्वयंसेवक कार्यक्रम एक्सप्लोर करें",
+      "MY_VOLUNTEER_PROGRAMS": "मेरे स्वयंसेवक कार्यक्रम",
       "LOADING": "लोड हो रहा है..."
     },
     "REGISTRATION_FLOW": {
@@ -466,18 +466,18 @@
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "कक्षा 10 की आपकी यात्रा यहीं से शुरू होती है।\nआपके चुनी हुई भाषा में अभी सरल टेस्ट उपलब्ध नहीं है। हम इस पर काम कर रहे हैं। कृपया थोड़ी देर बाद फिर कोशिश करें।",
       "COME_BACK_LATER": "कृपया बाद में फिर आएं",
       "BACK_TO_PROGRAMS": "प्रोग्राम्स पर वापस जाएं",
-      "BACK_TO_DASHBOARD": "Back to Dashboard"
+      "BACK_TO_DASHBOARD": "डैशबोर्ड पर वापस जाएं"
     },
     "FOOTER": {
-      "SHOW_FOOTER": "Show footer",
-      "HIDE_FOOTER": "Hide footer",
-      "APP_NAME": "Pratham myLearning",
-      "COPYRIGHT": "© {{year}} Pratham",
-      "USEFUL_LINKS": "Useful Links",
-      "DESCRIPTION": "Pratham addresses education-related gaps through innovative and cost-effective programs. We engage directly with children, schools, families, and communities, and also work in collaboration with government systems. In our direct programs, instructional and community-based activities are implemented by Pratham teams. Core elements such as technology, measurement and evaluation, and research underpin all our programs, ensuring effectiveness, scalability, and continuous improvement.",
-      "PRIVACY_GUIDELINES": "Privacy Guidelines",
-      "COOKIE_GUIDELINES": "Cookie Guidelines",
-      "PRAGYANPATH": "Pragyanpath (For Pratham Employees only)"
+      "SHOW_FOOTER": "फ़ुटर दिखाएं",
+      "HIDE_FOOTER": "फ़ुटर छिपाएं",
+      "APP_NAME": "प्रथम मायलर्निंग",
+      "COPYRIGHT": "© {{year}} प्रथम",
+      "USEFUL_LINKS": "उपयोगी लिंक",
+      "DESCRIPTION": "प्रथम नवीन और कम लागत वाले कार्यक्रमों के माध्यम से शिक्षा से जुड़ी कमियों को दूर करता है। हम बच्चों, स्कूलों, परिवारों और समुदायों के साथ सीधे जुड़ते हैं, और सरकारी प्रणालियों के सहयोग से भी काम करते हैं। हमारे प्रत्यक्ष कार्यक्रमों में, शैक्षिक और समुदाय-आधारित गतिविधियां प्रथम की टीमों द्वारा लागू की जाती हैं। तकनीक, मापन और मूल्यांकन, तथा शोध जैसे मुख्य तत्व हमारे सभी कार्यक्रमों का आधार हैं, जो प्रभावशीलता, मापनीयता और निरंतर सुधार सुनिश्चित करते हैं।",
+      "PRIVACY_GUIDELINES": "गोपनीयता दिशानिर्देश",
+      "COOKIE_GUIDELINES": "कुकी दिशानिर्देश",
+      "PRAGYANPATH": "प्रज्ञानपथ (केवल प्रथम कर्मचारियों के लिए)"
     }
   },
   "Login with Newton ERP": "Newton ERP वापरून लॉगिन करें",
@@ -501,37 +501,37 @@
     "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "अभी अपनी सीखने की यात्रा शुरू करें!",
     "ABOUT_PRATHAM_TEXT": "प्रथम एजुकेशन फाउंडेशन (प्रथम) भारत के सबसे बड़े शिक्षा गैर-सरकारी संगठनों में से एक है, जिसके पास नवोन्मेषी और कड़ाई से मूल्यांकित कार्यक्रमों का एक लंबा इतिहास है, जिसने तीन महाद्वीपों में इसी तरह के कार्यक्रमों को प्रेरित किया है। 30 वर्षों के इतिहास के साथ, प्रथम का कार्य आज प्रारंभिक और प्राथमिक शिक्षा से लेकर लड़कियों और महिलाओं के लिए कार्यक्रमों और युवा कौशल विकास तक फैला हुआ है।\n\n25 राज्यों और केंद्र शासित प्रदेशों में फैले कार्यक्रमों के माध्यम से, प्रथम औसतन एक वर्ष में 60 लाख से अधिक बच्चों और युवाओं तक पहुंचता है। यह कई प्रयासों के संयोजन से हासिल किया जाता है: समुदायों में बच्चों और युवाओं के साथ सीधे काम करना, साथ ही राज्य और जिला स्तरीय सरकारों के साथ सहयोग करना। प्रथम को लुई चे वू पुरस्कार, नवाचार के लिए WISE पुरस्कार, सामाजिक उद्यमिता के लिए स्कोल पुरस्कार, नेतृत्व में हेनरी आर क्राविस पुरस्कार और लोक सेवा के लिए CNN-IBN इंडियन ऑफ द ईयर जैसे उल्लेखनीय पुरस्कार प्राप्त हुए हैं। प्रथम को 2021 में शिक्षा विकास के लिए यिदान पुरस्कार और 2025 में यशराज भारती सम्मान भी प्राप्त हुआ।",
     "ABOUT_PRATHAM_LEARNING_PLATFORM_TEXT": "Pratham Education Foundation (प्रथम) भारत के सबसे बड़े शिक्षा से जुड़े गैर-सरकारी संगठनों (NGO) में से एक है। यह संस्था नए और प्रभावी शिक्षा कार्यक्रमों के लिए जानी जाती है, जिनसे दुनिया के कई देशों में भी ऐसे ही कार्यक्रम शुरू हुए हैं। पिछले 30 वर्षों से काम करते हुए, आज प्रथम की गतिविधियाँ छोटे बच्चों की शुरुआती शिक्षा से लेकर लड़कियों, महिलाओं और युवाओं के कौशल विकास तक फैली हुई हैं।\n\nप्रथम के कार्यक्रम भारत के 25 राज्यों और केंद्र शासित प्रदेशों में चल रहे हैं और हर साल औसतन 60 लाख (6 मिलियन) से ज्यादा बच्चों और युवाओं तक पहुँचते हैं। यह काम सीधे समुदाय में बच्चों और युवाओं के साथ काम करके और राज्य व जिला स्तर की सरकारों के साथ मिलकर किया जाता है।\n\nप्रथम को अपने काम के लिए कई बड़े पुरस्कार भी मिले हैं, जैसे Lui Che Woo Prize, WISE Prize for Innovation, Skoll Award for Social Entrepreneurship, Henry R. Kravis Prize in Leadership और CNN-IBN Indian of the Year for Public Service। इसके अलावा, वर्ष 2021 में Yidan Prize for Education Development और 2025 में Yashraj Bharati Samman से भी सम्मानित किया गया है।",
-    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "How would you like to get started?",
-    "OUR_PROGRAMS_FOR_LEARNERS": "Our Programs for Learners",
-    "OUR_PROGRAMS_SUBTITLE": "Explore programs designed to support your learning journey.",
-    "OUR_PROGRAMS_FOR_VOLUNTEERS": "Our Programs for Volunteers",
-    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "Make a real difference — join one of our volunteer-driven programs.",
-    "ABOUT_THE_PROGRAM": "About the Program",
-    "READY_TO_JOIN": "Ready to join",
-    "ENROL_NOW": "Enrol Now",
-    "ALREADY_ENROLLED_LOGIN": "Already enrolled? Log in",
-    "ENROL_HINT": "New or already enrolled — just enter your phone number. We'll guide you through.",
-    "PROGRAM_NOT_FOUND": "Program not found",
-    "GO_BACK": "Go Back",
-    "CONTACT": "Contact",
-    "WRITE_TO_US": "Write to us at",
-    "NOT_ENROLLED_IN_PROGRAM": "You are not registered in",
-    "YOU_CAN_ENROLL": "You can enroll into this program.",
-    "ARE_YOU_HERE_TO_LEARN": "Are you here to learn?",
-    "REGISTER_FOR_LEARNING": "Register for the one that suits your learning aspiration",
-    "ARE_YOU_HERE_TO_VOLUNTEER": "Are you here to volunteer?",
-    "MAKE_A_DIFFERENCE": "Make a difference through our volunteer programs",
-    "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
-    "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
-    "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "आप कैसे शुरुआत करना चाहेंगे?",
+    "OUR_PROGRAMS_FOR_LEARNERS": "शिक्षार्थियों के लिए हमारे कार्यक्रम",
+    "OUR_PROGRAMS_SUBTITLE": "आपकी सीखने की यात्रा में सहायता के लिए बनाए गए कार्यक्रम एक्सप्लोर करें।",
+    "OUR_PROGRAMS_FOR_VOLUNTEERS": "स्वयंसेवकों के लिए हमारे कार्यक्रम",
+    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "वास्तविक बदलाव लाएं — हमारे स्वयंसेवक-संचालित कार्यक्रमों में से किसी एक में शामिल हों।",
+    "ABOUT_THE_PROGRAM": "कार्यक्रम के बारे में",
+    "READY_TO_JOIN": "शामिल होने के लिए तैयार",
+    "ENROL_NOW": "अभी नामांकन करें",
+    "ALREADY_ENROLLED_LOGIN": "पहले से नामांकित हैं? लॉग इन करें",
+    "ENROL_HINT": "नए हैं या पहले से नामांकित — बस अपना फ़ोन नंबर दर्ज करें। हम आपका मार्गदर्शन करेंगे।",
+    "PROGRAM_NOT_FOUND": "कार्यक्रम नहीं मिला",
+    "GO_BACK": "वापस जाएं",
+    "CONTACT": "संपर्क",
+    "WRITE_TO_US": "हमें यहां लिखें",
+    "NOT_ENROLLED_IN_PROGRAM": "आप इसमें पंजीकृत नहीं हैं",
+    "YOU_CAN_ENROLL": "आप इस कार्यक्रम में नामांकन कर सकते हैं।",
+    "ARE_YOU_HERE_TO_LEARN": "क्या आप सीखने के लिए यहां हैं?",
+    "REGISTER_FOR_LEARNING": "अपनी सीखने की आकांक्षा के अनुकूल कार्यक्रम के लिए पंजीकरण करें",
+    "ARE_YOU_HERE_TO_VOLUNTEER": "क्या आप स्वयंसेवा के लिए यहां हैं?",
+    "MAKE_A_DIFFERENCE": "हमारे स्वयंसेवक कार्यक्रमों के माध्यम से बदलाव लाएं",
+    "YES_CREATE_NEW_ACCOUNT": "हां, नया खाता बनाएं",
+    "ENROLLED_TO_BELOW_PROGRAMS": "हम देख सकते हैं कि आप नीचे दिए गए कार्यक्रमों में नामांकित हैं:",
+    "SURE_TO_ENROLL_INTO": "क्या आप वाकई इसमें नामांकन करना चाहते हैं",
+    "YES": "हां"
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "नवपथम में आपका स्वागत है!",
     "ABOUT_NAVAPATHAM": "नवपथम के बारे में",
     "TYPE_IN_ENGLISH": "कृपया यह जानकारी केवल अंग्रेजी में ही टाइप करें।",
     "ABOUT_NAVAPATHAM_TEXT": "\"నవపథం\" और अधिक पढ़ें मेरे पास एक अच्छा विकल्प है। और अधिक पढ़ें एक वर्ष से अधिक समय के लिए SERP डाउनलोड करें कृपया ध्यान दें, एक वर्ष से अधिक समय तक ऋण प्राप्त करें एक और वीडियो देखें \"నవపథం\"।",
-    "ABOUT_PRATHAM": "పరథమ్ గురించి",
+    "ABOUT_PRATHAM": "प्रथम के बारे में",
     "ABOUT_PRATHAM_INFO": "होम टैग्स (ప్రథమ్) భారతదేశంలోని అతిపెద్ద విద్యా స్వచ్ఛంద बहुत बढ़िया. और पढ़ें क्रेडिट कार्ड क्रेडिट कार्ड, ఇవి एक नया क्रेडिट कार्ड डाउनलोड करें उत्तर. 30 वर्ष पहले एक वर्ष से अधिक का समय क्रेडिट कार्ड डाउनलोड करें धन्यवाद क्रेडिट कार्ड, क्रेडिट कार्ड क्रेडिट कार्ड मेरे पास एक अच्छा विकल्प है।\n\n25 वर्ष पहले की तिथि क्रेडिट कार्ड, क्रेडिट कार्ड और क्रेडिट कार्ड एक वर्ष से अधिक समय तक 6 वर्ष की आयु यह एक अच्छा विचार है. और अधिक पढ़ें क्रेडिट कार्ड: क्रेडिट कार्ड डाउनलोड యువతతో और उत्तर, उत्तर और दक्षिण अफ्रीका एक वर्ष से अधिक समय तक ऋण प्राप्त करना धन्यवाद. लूई चे ​​वू (Lui Che Woo) के लिए धन्यवाद, धन्यवाद बुद्धिमान व्यक्ति, एक अच्छा विचार ठीक है, मेरे पति और पत्नी (हेनरी आर क्राविस) सीएनएन-आईबीएन पर एक और पोस्ट देखें और पढ़ें धन्यवाद. नया साल 2021 डाउनलोड करें బహుమతిని 2025 లో యశ్hరాజ్ భారతి उत्तर అందుకుంది.",
     "ACCOUNT_ALREADY_EXISTS_MESSAGE": "इस नाम, ईमेल आईडी और/या फ़ोन नंबर से एक या अधिक खाते पहले से मौजूद हैं, जैसा कि नीचे सूचीबद्ध है।",
     "LOGIN_WITH_USERNAME": "इस उपयोगकर्ता नाम से लॉग इन करें",
@@ -797,12 +797,12 @@
     "HINDI": "हिंदी",
     "MARATHI": "मराठी",
     "URDU": "उर्दू",
-    "ODIA": "ଓଡ଼ିଆ",
-    "TELUGU": "తెలుగు",
-    "KANNADA": "ಕನ್ನಡ",
-    "TAMIL": "தமிழ்",
-    "GUJARATI": "ગુજરાતી",
-    "BENGALI": "বাংলা",
+    "ODIA": "ओड़िया",
+    "TELUGU": "तेलुगू",
+    "KANNADA": "कन्नड़",
+    "TAMIL": "तमिल",
+    "GUJARATI": "गुजराती",
+    "BENGALI": "बंगाली",
     "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "आपकी पसंदीदा भाषा क्या है?",
     "DIVORCED/WIDOW": "तलाकशुदा/विधवा",
     "GRADUATE": "स्नातक",
@@ -957,7 +957,7 @@
     "DATE_MUST_BE_ON_OR_AFTER": "तिथि {{date}} या उसके बाद होनी चाहिए"
   },
   "Assessment Score": "परीक्षण स्कोर",
-  "CONSENT_FILE": "Consent File",
+  "CONSENT_FILE": "सहमति फ़ाइल",
   "VIEW_FILE": "फाइल देखें",
   "FILE_PREVIEW": "फाइल प्रीव्यू (फाइल की झलक)",
   "FILTER_KEY": {
@@ -1106,7 +1106,7 @@
   "Postrequisite": "अभ्यास करें",
   "Facilitator-requisite": "फैसिलिटेटर के लिए आवश्यक चीजें",
   "Prerequisite": "तैयारी करें",
-  "SECOND_CHANCE_DESCRIPTION": "<b>Did you have to stop your studies before completing Grade 10?</b>\nYou can continue your Education with Pratham’s Second Chance Program – a Second Chance to Complete Grade 10.\n\nPratham’s Second Chance Program supports young girls and women like you who want to continue their education and appear for Grade 10 Board/Open School examinations. Through accessible learning centres close to your home, supportive teachers, and flexible learning methods (including remote learning options), the program makes learning more accessible and achievable.\n\n<b>What the Program Offers:</b>\n• Foundation classes in Mathematics, English, Science, Language, and other subjects\n• Main Course focused on preparation for the Board-mandated curriculum.\n• Interactive and activity-based learning methods\n• Regular assessments and academic support\n• Life skills sessions focused on communication, confidence, decision-making, and critical thinking\n• Exposure to opportunities after Grade 10, including further education and skilling pathways\n\nThe Second Chance Program is currently operational in multiple states.\n\n<b>Register Your Interest:</b>\nFill in the Enrollment form to express your interest in joining the program. Our team will contact you and guide you through the next steps.\n\nIt is never too late to continue learning!",
-  "CAMP_TO_CLUB_DESCRIPTION": "<b>Do you enjoy working with children and supporting their learning?</b>\nPratham's Children's Club Volunteer Program gives you an opportunity to engage with children in your community through fun, interactive, and activity-based learning.\n\nAs a volunteer, you will receive access to simple activities and resources that you can use with children in local Children's Clubs. You will also get access to learning opportunities for your own growth and self-development.\n\n<b>What You Will Get</b>\n• Easy-to-use activities and learning resources for Children's Clubs\n• Guidance and support from the Pratham team\n• Opportunities to build communication, leadership, and facilitation skills\n• Access to self-learning courses focused on life skills and new-age skills\n• Experience of working with children and supporting community learning\n\n<b>Who Can Join?</b>\nYoung people and community members who:\n• Are above 14 years of age\n• Enjoy working with children\n• Want to contribute to their community\n• Are interested in learning and personal growth\n\n<b>Register Your Interest</b>\nFill in the enrollment form to express your interest in becoming a Children's Club Volunteer.\nOur team will contact you and guide you through the next steps.\n\nSmall efforts can create a big impact in a child's learning journey.",
-  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!"
+  "SECOND_CHANCE_DESCRIPTION": "<b>क्या आपको ग्रेड 10 पूरा करने से पहले अपनी पढ़ाई रोकनी पड़ी थी?</b>\nआप प्रथम के सेकंड चांस प्रोग्राम के साथ अपनी शिक्षा जारी रख सकते हैं – ग्रेड 10 पूरा करने का एक दूसरा अवसर।\n\nप्रथम का सेकंड चांस प्रोग्राम आप जैसी युवा लड़कियों और महिलाओं का समर्थन करता है जो अपनी शिक्षा जारी रखना चाहती हैं और ग्रेड 10 बोर्ड/ओपन स्कूल परीक्षाओं में शामिल होना चाहती हैं। आपके घर के पास सुलभ शिक्षण केंद्रों, सहयोगी शिक्षकों और लचीली शिक्षण पद्धतियों (दूरस्थ शिक्षण विकल्पों सहित) के माध्यम से, यह कार्यक्रम सीखने को अधिक सुलभ और प्राप्य बनाता है।\n\n<b>कार्यक्रम क्या प्रदान करता है:</b>\n• गणित, अंग्रेज़ी, विज्ञान, भाषा और अन्य विषयों में फ़ाउंडेशन कक्षाएं\n• बोर्ड-निर्धारित पाठ्यक्रम की तैयारी पर केंद्रित मुख्य कोर्स।\n• इंटरैक्टिव और गतिविधि-आधारित शिक्षण पद्धतियां\n• नियमित मूल्यांकन और शैक्षणिक सहायता\n• संवाद, आत्मविश्वास, निर्णय लेने और आलोचनात्मक सोच पर केंद्रित जीवन कौशल सत्र\n• ग्रेड 10 के बाद के अवसरों से परिचय, जिसमें आगे की शिक्षा और कौशल विकास के रास्ते शामिल हैं\n\nसेकंड चांस प्रोग्राम वर्तमान में कई राज्यों में संचालित है।\n\n<b>अपनी रुचि दर्ज करें:</b>\nकार्यक्रम में शामिल होने में अपनी रुचि व्यक्त करने के लिए नामांकन फ़ॉर्म भरें। हमारी टीम आपसे संपर्क करेगी और अगले चरणों में आपका मार्गदर्शन करेगी।\n\nसीखना जारी रखने में कभी देर नहीं होती!",
+  "CAMP_TO_CLUB_DESCRIPTION": "<b>क्या आपको बच्चों के साथ काम करना और उनकी सीखने में मदद करना अच्छा लगता है?</b>\nप्रथम का चिल्ड्रन्स क्लब वॉलंटियर प्रोग्राम आपको मज़ेदार, इंटरैक्टिव और गतिविधि-आधारित शिक्षण के माध्यम से अपने समुदाय के बच्चों के साथ जुड़ने का अवसर देता है।\n\nएक स्वयंसेवक के रूप में, आपको सरल गतिविधियों और संसाधनों तक पहुंच मिलेगी जिन्हें आप स्थानीय चिल्ड्रन्स क्लब में बच्चों के साथ उपयोग कर सकते हैं। आपको अपने स्वयं के विकास और आत्म-विकास के लिए सीखने के अवसर भी मिलेंगे।\n\n<b>आपको क्या मिलेगा</b>\n• चिल्ड्रन्स क्लब के लिए उपयोग में आसान गतिविधियां और शिक्षण संसाधन\n• प्रथम टीम से मार्गदर्शन और सहायता\n• संवाद, नेतृत्व और सुविधा कौशल विकसित करने के अवसर\n• जीवन कौशल और नए युग के कौशल पर केंद्रित स्व-शिक्षण कोर्स तक पहुंच\n• बच्चों के साथ काम करने और समुदाय की शिक्षा में सहायता करने का अनुभव\n\n<b>कौन शामिल हो सकता है?</b>\nयुवा और समुदाय के सदस्य जो:\n• 14 वर्ष से अधिक आयु के हैं\n• बच्चों के साथ काम करना पसंद करते हैं\n• अपने समुदाय में योगदान देना चाहते हैं\n• सीखने और व्यक्तिगत विकास में रुचि रखते हैं\n\n<b>अपनी रुचि दर्ज करें</b>\nचिल्ड्रन्स क्लब वॉलंटियर बनने में अपनी रुचि व्यक्त करने के लिए नामांकन फ़ॉर्म भरें।\nहमारी टीम आपसे संपर्क करेगी और अगले चरणों में आपका मार्गदर्शन करेगी।\n\nछोटे प्रयास एक बच्चे की सीखने की यात्रा में बड़ा प्रभाव डाल सकते हैं।",
+  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>नौकरी, करियर या बेहतर अवसरों के लिए कौशल बनाना चाहते हैं?</b><br/>प्रथम का वोकेशनल ट्रेनिंग एंड स्किलिंग प्रोग्राम आप जैसे युवाओं को रोज़गार, उद्यमिता और आगे की शिक्षा के लिए कौशल बनाने में सहायता करता है। यह कार्यक्रम आपको कार्य की दुनिया के लिए तैयार करने हेतु उद्योग-प्रासंगिक प्रशिक्षण, व्यावहारिक शिक्षण, करियर मार्गदर्शन और प्लेसमेंट सहायता प्रदान करता है।<br/><br/><b>कार्यक्रम क्या प्रदान करता है:</b><ul><li>इन क्षेत्रों में उद्योग-प्रासंगिक व्यावसायिक प्रशिक्षण कोर्स और प्रमाणपत्र:<ul style=\"list-style-type:circle\"><li><b>केयर इकोनॉमी:</b> ब्यूटी, अपैरल, हॉस्पिटैलिटी, हेल्थकेयर</li><li><b>STEM-संरेखित ट्रेड्स:</b> इलेक्ट्रिकल, ऑटोमोटिव, वेल्डिंग, कंस्ट्रक्शन</li><li><b>ग्रीन स्किल्स:</b> सोलर पैनल रिपेयर, प्लंबिंग, ड्राईवॉल, और फॉल्स सीलिंग रिपेयर</li><li><b>आईटी सक्षम सेवाएं (ITeS):</b> मल्टी-फंक्शनल ऑफिस असिस्टेंट, ग्राफिक डिज़ाइन, ऑटोमोटिव शोरूम होस्ट</li><li><b>ट्रैवल एंड टूरिज़्म</b></li></ul></li><li>बुनियादी अंग्रेज़ी और कंप्यूटर साक्षरता</li><li>संवाद, आत्मविश्वास और कार्यस्थल तत्परता कौशल पर केंद्रित जीवन कौशल</li><li>करियर और आजीविका के अवसरों पर मार्गदर्शन</li><li>नौकरियों और उद्यमिता के अवसरों के लिए सहायता</li></ul><br/><b>अपनी रुचि दर्ज करें:</b><br/>कार्यक्रम में शामिल होने में अपनी रुचि व्यक्त करने के लिए नामांकन फ़ॉर्म भरें। इसके बाद आपको अपने चुने हुए ट्रेड में एक ऑनलाइन लेवल 1 परिचयात्मक कोर्स में नामांकन करने और उसे पूरा करने के लिए मार्गदर्शन दिया जाएगा। हमारी टीम आपसे संपर्क करेगी और अगले चरणों में आपका मार्गदर्शन करेगी।<br/><br/>कौशल नए अवसरों का द्वार खोल सकते हैं!"
 }

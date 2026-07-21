@@ -310,7 +310,7 @@
       "PROGRAM": "కార్యక్రమం",
       "ABOUT_US": "మా గురించి",
       "THEMATIC_REPOSITORY": "ఇతివృత ఆదారిత నిల్వ",
-      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
+      "COPYRIGHT_NOTICE": "వెబ్‌సైట్‌లోని అన్ని వనరులు CC BY-NC-ND 4.0 అంతర్జాతీయ లైసెన్స్ కింద లైసెన్స్ పొందాయి © ప్రథమ్ ఓపెన్ స్కూల్ |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "మీ స్పందన రికార్డ్ చేయబడింది",
@@ -439,8 +439,8 @@
     "PROGRAMS": {
       "EXPLORE_PROGRAMS": "ప్రోగ్రామ్‌లను అన్వేషించండి",
       "MY_PROGRAMS": "నా ప్రోగ్రామ్‌లు",
-      "EXPLORE_VOLUNTEER_PROGRAMS": "Explore Volunteer Programs",
-      "MY_VOLUNTEER_PROGRAMS": "My Volunteer Programs",
+      "EXPLORE_VOLUNTEER_PROGRAMS": "వాలంటీర్ కార్యక్రమాలను అన్వేషించండి",
+      "MY_VOLUNTEER_PROGRAMS": "నా వాలంటీర్ కార్యక్రమాలు",
       "LOADING": "లోడ్ అవుతోంది..."
     },
     "REGISTRATION_FLOW": {
@@ -456,7 +456,7 @@
       "START_EXPLORING": "అన్వేషించడం ప్రారంభించండి",
       "START_LEARNING": "అభ్యాసం ప్రారంభించండి",
       "START_ASSESSMENT": "మూల్యాంకనాన్ని ప్రారంభించండి.",
-      "ATTEMPT_ASSESSMENT": "Attempt Assesment",
+      "ATTEMPT_ASSESSMENT": "మూల్యాంకనం ప్రారంభించండి",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "మీరు విజయవంతంగా నమోదు చేసుకున్నారు",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT": "10వ తరగతి వైపు మీ ప్రయాణం ఇక్కడ మొదలవుతుంది. సరళ్ పరీక్షతో ప్రారంభిద్దాం.",
       "LEARNING_JOURNEY_FIRST_STEP": "చాలా బాగా చేసారు! ప్రథమ్ తో మీ అభ్యాస ప్రయాణంలో మీరు మొదటి అడుగు వేశారు.",
@@ -466,18 +466,18 @@
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "10వ తరగతి వైపు మీ ప్రయాణం ఇక్కడ మొదలవుతుంది. మీరు ఎంచుకున్న భాషలో సరళ్ పరీక్ష ప్రస్తుతం అందుబాటులో లేదు. మేము దానిని మెరుగుపరిచే పని చేస్తున్నాము. దయచేసి తర్వాత మళ్ళీ ప్రయత్నించండి.",
       "COME_BACK_LATER": "దయచేసి తర్వాత తిరిగి రండి",
       "BACK_TO_PROGRAMS": "ప్రోగ్రామ్‌లకు తిరిగి వెళ్లండి",
-      "BACK_TO_DASHBOARD": "Back to Dashboard"
+      "BACK_TO_DASHBOARD": "డాష్‌బోర్డ్‌కు తిరిగి"
     },
     "FOOTER": {
-      "SHOW_FOOTER": "Show footer",
-      "HIDE_FOOTER": "Hide footer",
-      "APP_NAME": "Pratham myLearning",
-      "COPYRIGHT": "© {{year}} Pratham",
-      "USEFUL_LINKS": "Useful Links",
-      "DESCRIPTION": "Pratham addresses education-related gaps through innovative and cost-effective programs. We engage directly with children, schools, families, and communities, and also work in collaboration with government systems. In our direct programs, instructional and community-based activities are implemented by Pratham teams. Core elements such as technology, measurement and evaluation, and research underpin all our programs, ensuring effectiveness, scalability, and continuous improvement.",
-      "PRIVACY_GUIDELINES": "Privacy Guidelines",
-      "COOKIE_GUIDELINES": "Cookie Guidelines",
-      "PRAGYANPATH": "Pragyanpath (For Pratham Employees only)"
+      "SHOW_FOOTER": "ఫుటర్ చూపించు",
+      "HIDE_FOOTER": "ఫుటర్ దాచు",
+      "APP_NAME": "ప్రథమ్ మై లెర్నింగ్",
+      "COPYRIGHT": "© {{year}} ప్రథమ్",
+      "USEFUL_LINKS": "ఉపయోగకరమైన లింక్‌లు",
+      "DESCRIPTION": "ప్రథమ్ వినూత్నమైన మరియు తక్కువ ఖర్చుతో కూడిన కార్యక్రమాల ద్వారా విద్యకు సంబంధించిన అంతరాలను పరిష్కరిస్తుంది. మేము పిల్లలు, పాఠశాలలు, కుటుంబాలు మరియు సమాజాలతో నేరుగా పని చేస్తాము, అలాగే ప్రభుత్వ వ్యవస్థల సహకారంతో కూడా పని చేస్తాము. మా ప్రత్యక్ష కార్యక్రమాలలో, బోధనాపరమైన మరియు సమాజ-ఆధారిత కార్యకలాపాలను ప్రథమ్ బృందాలు అమలు చేస్తాయి. సాంకేతికత, కొలత మరియు మూల్యాంకనం, మరియు పరిశోధన వంటి ప్రధాన అంశాలు మా అన్ని కార్యక్రమాలకు ఆధారంగా ఉంటాయి, ఇవి ప్రభావశీలత, విస్తరణ సామర్థ్యం మరియు నిరంతర మెరుగుదలను నిర్ధారిస్తాయి.",
+      "PRIVACY_GUIDELINES": "గోప్యతా మార్గదర్శకాలు",
+      "COOKIE_GUIDELINES": "కుకీ మార్గదర్శకాలు",
+      "PRAGYANPATH": "ప్రజ్ఞానపథ్ (ప్రథమ్ ఉద్యోగుల కోసం మాత్రమే)"
     }
   },
   "Login with Newton ERP": "న్యూటన్ ERP తో లాగిన్ అవ్వండి",
@@ -501,30 +501,30 @@
     "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "మీ అభ్యాస ప్రయాణాన్ని ఇప్పుడే ప్రారంభించండి!",
     "ABOUT_PRATHAM_TEXT": "“ప్రథమ్ ఎడ్యుకేషన్ ఫౌండేషన్ (ప్రథమ్) భారతదేశంలోని అతిపెద్ద విద్యా స్వచ్ఛంద సంస్థలలో ఒకటి. నూతనతతో కూడిన, కఠినంగా మూల్యాంకనం చేయబడిన కార్యక్రమాల ద్వారా ప్రథమ్ మూడు ఖండాల్లో సమానమైన కార్యక్రమాలకు ప్రేరణనిచ్చింది. 30 సంవత్సరాల చరిత్ర కలిగిన ప్రథమ్, ప్రస్తుతం చిన్నారులు మరియు ప్రాథమిక విద్య నుండి అమ్మాయిలు, మహిళలు మరియు యువత నైపుణ్యాభివృద్ధి కార్యక్రమాల వరకు తన సేవలను విస్తరించింది.\n\n\n25 రాష్ట్రాలు మరియు కేంద్రపాలిత ప్రాంతాలలో అమలవుతున్న కార్యక్రమాల ద్వారా, ఒక సగటు సంవత్సరంలో ప్రథమ్ సుమారు 60 లక్షల మంది పిల్లలు మరియు యువతను చేరుకుంటుంది. ఇది సమాజాల్లో పిల్లలు మరియు యువతతో నేరుగా పనిచేయడం, అలాగే రాష్ట్ర మరియు జిల్లా స్థాయి ప్రభుత్వాలతో భాగస్వామ్యాల ద్వారా సాధ్యమవుతోంది. ప్రథమ్ లూయి చె వూ ప్రైజ్, వైజ్ ఇన్నోవేషన్ ప్రైజ్, స్కోల్ అవార్డ్ ఫర్ సోషల్ ఎంటర్‌ప్రెన్యూర్‌షిప్, హెన్రీ ఆర్. క్రావిస్ ప్రైజ్ ఇన్ లీడర్‌షిప్, మరియు సిఎన్‌ఎన్-ఐబిఎన్ ఇండియన్ ఆఫ్ ది ఇయర్ ఫర్ పబ్లిక్ సర్వీస్ వంటి ప్రముఖ అవార్డులను పొందింది. అదనంగా, ప్రథమ్ 2021లో యిడాన్ ప్రైజ్ ఫర్ ఎడ్యుకేషన్ డెవలప్‌మెంట్‌ను మరియు 2025లో యశ్‌రాజ్ భారతి సమ్మాన్‌ను కూడా అందుకుంది.",
     "ABOUT_PRATHAM_LEARNING_PLATFORM_TEXT": ".ప్రథమ్ ఎడ్యుకేషన్ ఫౌండేషన్ (ప్రథమ్) భారతదేశంలోని అతిపెద్ద విద్యా స్వచ్ఛంద సంస్థలలో ఒకటి. ఇది వినూత్నమైన, కఠినంగా మూల్యాంకనం చేయబడిన కార్యక్రమాలను రూపొందించి, మూడు ఖండాలలో ఇలాంటి కార్యక్రమాలకు స్ఫూర్తినిచ్చింది. 30 సంవత్సరాల చరిత్ర కలిగిన ప్రథమ్ యొక్క కార్యకలాపాలు నేడు ప్రాథమిక మరియు ప్రాథమిక తరగతుల కార్యక్రమాల నుండి బాలికలు, మహిళలు మరియు యువత నైపుణ్యాభివృద్ధి వరకు విస్తరించి ఉన్నాయి.\n\nసగటున ఒక సంవత్సరంలో, 25 రాష్ట్రాలు మరియు కేంద్రపాలిత ప్రాంతాలలోని కార్యక్రమాల ద్వారా, ప్రథమ్ సాధారణంగా 60 లక్షల మందికి పైగా పిల్లలు మరియు యువతను చేరుకుంటుంది. సమాజంలోని పిల్లలు మరియు యువతతో నేరుగా కలిసి పనిచేయడం, అలాగే రాష్ట్ర మరియు జిల్లా స్థాయి ప్రభుత్వాలతో సహకరించడం వంటి సమిష్టి కృషి ద్వారా ఇది సాధ్యమవుతుంది. ప్రథమ్, లూయీ చే వూ ప్రైజ్, ఆవిష్కరణల కోసం వైజ్ ప్రైజ్, సామాజిక వ్యవస్థాపకత కోసం స్కోల్ అవార్డు, నాయకత్వంలో హెన్రీ ఆర్. క్రావిస్ ప్రైజ్ మరియు ప్రజా సేవకు గాను CNN-IBN ఇండియన్ ఆఫ్ ది ఇయర్ వంటి ప్రముఖ అవార్డులను అందుకుంది. ప్రథమ్ 2021లో విద్యాభివృద్ధికి యిడాన్ ప్రైజ్‌ను మరియు 2025లో యశ్‌రాజ్ భారతి సమ్మాన్‌ను కూడా అందుకుంది.",
-    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "How would you like to get started?",
-    "OUR_PROGRAMS_FOR_LEARNERS": "Our Programs for Learners",
-    "OUR_PROGRAMS_SUBTITLE": "Explore programs designed to support your learning journey.",
-    "OUR_PROGRAMS_FOR_VOLUNTEERS": "Our Programs for Volunteers",
-    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "Make a real difference — join one of our volunteer-driven programs.",
-    "ABOUT_THE_PROGRAM": "About the Program",
-    "READY_TO_JOIN": "Ready to join",
-    "ENROL_NOW": "Enrol Now",
-    "ALREADY_ENROLLED_LOGIN": "Already enrolled? Log in",
-    "ENROL_HINT": "New or already enrolled — just enter your phone number. We'll guide you through.",
-    "PROGRAM_NOT_FOUND": "Program not found",
-    "GO_BACK": "Go Back",
-    "CONTACT": "Contact",
-    "WRITE_TO_US": "Write to us at",
-    "NOT_ENROLLED_IN_PROGRAM": "You are not registered in",
-    "YOU_CAN_ENROLL": "You can enroll into this program.",
-    "ARE_YOU_HERE_TO_LEARN": "Are you here to learn?",
-    "REGISTER_FOR_LEARNING": "Register for the one that suits your learning aspiration",
-    "ARE_YOU_HERE_TO_VOLUNTEER": "Are you here to volunteer?",
-    "MAKE_A_DIFFERENCE": "Make a difference through our volunteer programs",
-    "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
-    "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
-    "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "మీరు ఎలా ప్రారంభించాలనుకుంటున్నారు?",
+    "OUR_PROGRAMS_FOR_LEARNERS": "అభ్యాసకుల కోసం మా కార్యక్రమాలు",
+    "OUR_PROGRAMS_SUBTITLE": "మీ అభ్యాస ప్రయాణానికి మద్దతు ఇచ్చేలా రూపొందించిన కార్యక్రమాలను అన్వేషించండి.",
+    "OUR_PROGRAMS_FOR_VOLUNTEERS": "వాలంటీర్ల కోసం మా కార్యక్రమాలు",
+    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "నిజమైన మార్పు తీసుకురండి — మా వాలంటీర్-ఆధారిత కార్యక్రమాలలో ఒకదానిలో చేరండి.",
+    "ABOUT_THE_PROGRAM": "కార్యక్రమం గురించి",
+    "READY_TO_JOIN": "చేరడానికి సిద్ధం",
+    "ENROL_NOW": "ఇప్పుడు నమోదు చేసుకోండి",
+    "ALREADY_ENROLLED_LOGIN": "ఇప్పటికే నమోదు చేసుకున్నారా? లాగిన్ చేయండి",
+    "ENROL_HINT": "కొత్తవారు లేదా ఇప్పటికే నమోదు చేసుకున్నవారు — మీ ఫోన్ నంబర్ నమోదు చేయండి. మేము మీకు మార్గనిర్దేశం చేస్తాము.",
+    "PROGRAM_NOT_FOUND": "కార్యక్రమం కనుగొనబడలేదు",
+    "GO_BACK": "వెనుకకు",
+    "CONTACT": "సంప్రదింపు",
+    "WRITE_TO_US": "మాకు ఇక్కడ రాయండి",
+    "NOT_ENROLLED_IN_PROGRAM": "మీరు దీనిలో నమోదు కాలేదు",
+    "YOU_CAN_ENROLL": "మీరు ఈ కార్యక్రమంలో నమోదు చేసుకోవచ్చు.",
+    "ARE_YOU_HERE_TO_LEARN": "మీరు నేర్చుకోవడానికి ఇక్కడ ఉన్నారా?",
+    "REGISTER_FOR_LEARNING": "మీ అభ్యాస ఆకాంక్షకు సరిపోయే దానికి నమోదు చేసుకోండి",
+    "ARE_YOU_HERE_TO_VOLUNTEER": "మీరు వాలంటీర్ చేయడానికి ఇక్కడ ఉన్నారా?",
+    "MAKE_A_DIFFERENCE": "మా వాలంటీర్ కార్యక్రమాల ద్వారా మార్పు తీసుకురండి",
+    "YES_CREATE_NEW_ACCOUNT": "అవును, కొత్త ఖాతా సృష్టించండి",
+    "ENROLLED_TO_BELOW_PROGRAMS": "మీరు క్రింది కార్యక్రమాలలో నమోదు అయ్యారని మేము చూడగలము:",
+    "SURE_TO_ENROLL_INTO": "మీరు దీనిలో నమోదు చేసుకోవాలనుకుంటున్నారని ఖచ్చితంగా ఉన్నారా",
+    "YES": "అవును"
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "నవపథం కు స్వాగతం!",
@@ -1106,7 +1106,7 @@
   "Postrequisite": "సాధన",
   "Facilitator-requisite": "ఫెసిలిటేటర్- అవసరం",
   "Prerequisite": "సిద్ధం",
-  "SECOND_CHANCE_DESCRIPTION": "<b>Did you have to stop your studies before completing Grade 10?</b>\nYou can continue your Education with Pratham’s Second Chance Program – a Second Chance to Complete Grade 10.\n\nPratham’s Second Chance Program supports young girls and women like you who want to continue their education and appear for Grade 10 Board/Open School examinations. Through accessible learning centres close to your home, supportive teachers, and flexible learning methods (including remote learning options), the program makes learning more accessible and achievable.\n\n<b>What the Program Offers:</b>\n• Foundation classes in Mathematics, English, Science, Language, and other subjects\n• Main Course focused on preparation for the Board-mandated curriculum.\n• Interactive and activity-based learning methods\n• Regular assessments and academic support\n• Life skills sessions focused on communication, confidence, decision-making, and critical thinking\n• Exposure to opportunities after Grade 10, including further education and skilling pathways\n\nThe Second Chance Program is currently operational in multiple states.\n\n<b>Register Your Interest:</b>\nFill in the Enrollment form to express your interest in joining the program. Our team will contact you and guide you through the next steps.\n\nIt is never too late to continue learning!",
-  "CAMP_TO_CLUB_DESCRIPTION": "<b>Do you enjoy working with children and supporting their learning?</b>\nPratham's Children's Club Volunteer Program gives you an opportunity to engage with children in your community through fun, interactive, and activity-based learning.\n\nAs a volunteer, you will receive access to simple activities and resources that you can use with children in local Children's Clubs. You will also get access to learning opportunities for your own growth and self-development.\n\n<b>What You Will Get</b>\n• Easy-to-use activities and learning resources for Children's Clubs\n• Guidance and support from the Pratham team\n• Opportunities to build communication, leadership, and facilitation skills\n• Access to self-learning courses focused on life skills and new-age skills\n• Experience of working with children and supporting community learning\n\n<b>Who Can Join?</b>\nYoung people and community members who:\n• Are above 14 years of age\n• Enjoy working with children\n• Want to contribute to their community\n• Are interested in learning and personal growth\n\n<b>Register Your Interest</b>\nFill in the enrollment form to express your interest in becoming a Children's Club Volunteer.\nOur team will contact you and guide you through the next steps.\n\nSmall efforts can create a big impact in a child's learning journey.",
-  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!"
+  "SECOND_CHANCE_DESCRIPTION": "<b>గ్రేడ్ 10 పూర్తి చేయకముందే మీరు మీ చదువును ఆపవలసి వచ్చిందా?</b>\nమీరు ప్రథమ్ సెకండ్ ఛాన్స్ ప్రోగ్రామ్‌తో మీ విద్యను కొనసాగించవచ్చు – గ్రేడ్ 10 పూర్తి చేయడానికి ఒక రెండవ అవకాశం.\n\nప్రథమ్ సెకండ్ ఛాన్స్ ప్రోగ్రామ్ మీలాంటి యువతులు మరియు మహిళలకు మద్దతు ఇస్తుంది, వారు తమ విద్యను కొనసాగించి గ్రేడ్ 10 బోర్డు/ఓపెన్ స్కూల్ పరీక్షలకు హాజరు కావాలనుకుంటారు. మీ ఇంటికి దగ్గరలో అందుబాటులో ఉన్న అభ్యాస కేంద్రాలు, సహకార ఉపాధ్యాయులు మరియు సౌకర్యవంతమైన అభ్యాస పద్ధతుల (రిమోట్ లెర్నింగ్ ఎంపికలతో సహా) ద్వారా, ఈ కార్యక్రమం అభ్యాసాన్ని మరింత అందుబాటులో మరియు సాధించదగినదిగా చేస్తుంది.\n\n<b>కార్యక్రమం అందించేవి:</b>\n• గణితం, ఆంగ్లం, సైన్స్, భాష మరియు ఇతర విషయాలలో ఫౌండేషన్ తరగతులు\n• బోర్డు నిర్దేశిత పాఠ్యాంశాల తయారీపై దృష్టి సారించిన మెయిన్ కోర్సు.\n• ఇంటరాక్టివ్ మరియు కార్యకలాప-ఆధారిత అభ్యాస పద్ధతులు\n• క్రమం తప్పని మూల్యాంకనాలు మరియు విద్యాపరమైన మద్దతు\n• సంభాషణ, ఆత్మవిశ్వాసం, నిర్ణయం తీసుకోవడం మరియు విమర్శనాత్మక ఆలోచనపై దృష్టి సారించిన జీవన నైపుణ్య సెషన్‌లు\n• గ్రేడ్ 10 తర్వాత అవకాశాలకు పరిచయం, తదుపరి విద్య మరియు నైపుణ్యాభివృద్ధి మార్గాలతో సహా\n\nసెకండ్ ఛాన్స్ ప్రోగ్రామ్ ప్రస్తుతం అనేక రాష్ట్రాలలో నిర్వహించబడుతోంది.\n\n<b>మీ ఆసక్తిని నమోదు చేయండి:</b>\nకార్యక్రమంలో చేరడానికి మీ ఆసక్తిని తెలియజేయడానికి నమోదు ఫారమ్‌ను పూరించండి. మా బృందం మిమ్మల్ని సంప్రదించి తదుపరి దశలలో మీకు మార్గనిర్దేశం చేస్తుంది.\n\nనేర్చుకోవడం కొనసాగించడానికి ఎప్పుడూ ఆలస్యం కాదు!",
+  "CAMP_TO_CLUB_DESCRIPTION": "<b>మీరు పిల్లలతో పని చేయడం మరియు వారి అభ్యాసానికి మద్దతు ఇవ్వడం ఇష్టపడతారా?</b>\nప్రథమ్ చిల్డ్రన్స్ క్లబ్ వాలంటీర్ ప్రోగ్రామ్ మీకు సరదాగా, ఇంటరాక్టివ్ మరియు కార్యకలాప-ఆధారిత అభ్యాసం ద్వారా మీ సమాజంలోని పిల్లలతో నిమగ్నం కావడానికి అవకాశం ఇస్తుంది.\n\nవాలంటీర్‌గా, స్థానిక చిల్డ్రన్స్ క్లబ్‌లలో పిల్లలతో మీరు ఉపయోగించగల సరళమైన కార్యకలాపాలు మరియు వనరులకు మీకు ప్రాప్యత లభిస్తుంది. మీ స్వంత ఎదుగుదల మరియు స్వీయ-అభివృద్ధి కోసం అభ్యాస అవకాశాలను కూడా మీరు పొందుతారు.\n\n<b>మీరు ఏమి పొందుతారు</b>\n• చిల్డ్రన్స్ క్లబ్‌ల కోసం సులభంగా ఉపయోగించగల కార్యకలాపాలు మరియు అభ్యాస వనరులు\n• ప్రథమ్ బృందం నుండి మార్గదర్శకత్వం మరియు మద్దతు\n• సంభాషణ, నాయకత్వం మరియు సులభతర నైపుణ్యాలను పెంపొందించే అవకాశాలు\n• జీవన నైపుణ్యాలు మరియు కొత్త యుగపు నైపుణ్యాలపై దృష్టి సారించిన స్వీయ-అభ్యాస కోర్సులకు ప్రాప్యత\n• పిల్లలతో పని చేయడం మరియు సమాజ అభ్యాసానికి మద్దతు ఇచ్చే అనుభవం\n\n<b>ఎవరు చేరవచ్చు?</b>\nయువకులు మరియు సమాజ సభ్యులు ఎవరైతే:\n• 14 సంవత్సరాల కంటే ఎక్కువ వయస్సు కలిగి ఉంటారు\n• పిల్లలతో పని చేయడం ఇష్టపడతారు\n• తమ సమాజానికి దోహదపడాలనుకుంటారు\n• అభ్యాసం మరియు వ్యక్తిగత ఎదుగుదలపై ఆసక్తి కలిగి ఉంటారు\n\n<b>మీ ఆసక్తిని నమోదు చేయండి</b>\nచిల్డ్రన్స్ క్లబ్ వాలంటీర్ కావడానికి మీ ఆసక్తిని తెలియజేయడానికి నమోదు ఫారమ్‌ను పూరించండి.\nమా బృందం మిమ్మల్ని సంప్రదించి తదుపరి దశలలో మీకు మార్గనిర్దేశం చేస్తుంది.\n\nచిన్న ప్రయత్నాలు ఒక పిల్లవాడి అభ్యాస ప్రయాణంలో పెద్ద ప్రభావాన్ని సృష్టించగలవు.",
+  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>ఉద్యోగం, కెరీర్ లేదా మెరుగైన అవకాశాల కోసం నైపుణ్యాలను పెంపొందించుకోవాలనుకుంటున్నారా?</b><br/>ప్రథమ్ వొకేషనల్ ట్రైనింగ్ & స్కిల్లింగ్ ప్రోగ్రామ్ మీలాంటి యువతకు ఉపాధి, వ్యవస్థాపకత మరియు తదుపరి విద్య కోసం నైపుణ్యాలను పెంపొందించడంలో మద్దతు ఇస్తుంది. ఈ కార్యక్రమం మిమ్మల్ని పని ప్రపంచానికి సిద్ధం చేయడానికి పరిశ్రమ-సంబంధిత శిక్షణ, ఆచరణాత్మక అభ్యాసం, కెరీర్ మార్గదర్శకత్వం మరియు ప్లేస్‌మెంట్ మద్దతును అందిస్తుంది.<br/><br/><b>కార్యక్రమం అందించేవి:</b><ul><li>ఈ రంగాలలో పరిశ్రమ-సంబంధిత వృత్తి శిక్షణ కోర్సులు మరియు సర్టిఫికేషన్లు:<ul style=\"list-style-type:circle\"><li><b>కేర్ ఎకానమీ:</b> బ్యూటీ, అపెరల్, హాస్పిటాలిటీ, హెల్త్‌కేర్</li><li><b>STEM-అనుసంధాన ట్రేడ్‌లు:</b> ఎలక్ట్రికల్, ఆటోమోటివ్, వెల్డింగ్, కన్‌స్ట్రక్షన్</li><li><b>గ్రీన్ స్కిల్స్:</b> సోలార్ ప్యానెల్ రిపేర్, ప్లంబింగ్, డ్రైవాల్, మరియు ఫాల్స్ సీలింగ్ రిపేర్</li><li><b>ఐటీ ఎనేబుల్డ్ సర్వీసెస్ (ITeS):</b> మల్టీ-ఫంక్షనల్ ఆఫీస్ అసిస్టెంట్, గ్రాఫిక్ డిజైన్, ఆటోమోటివ్ షోరూమ్ హోస్ట్</li><li><b>ట్రావెల్ & టూరిజం</b></li></ul></li><li>ప్రాథమిక ఆంగ్లం మరియు కంప్యూటర్ అక్షరాస్యత</li><li>సంభాషణ, ఆత్మవిశ్వాసం మరియు పని ప్రదేశ సంసిద్ధత నైపుణ్యాలపై దృష్టి సారించిన జీవన నైపుణ్యాలు</li><li>కెరీర్‌లు మరియు జీవనోపాధి అవకాశాలపై మార్గదర్శకత్వం</li><li>ఉద్యోగాలు మరియు వ్యవస్థాపకత అవకాశాలకు మద్దతు</li></ul><br/><b>మీ ఆసక్తిని నమోదు చేయండి:</b><br/>కార్యక్రమంలో చేరడానికి మీ ఆసక్తిని తెలియజేయడానికి నమోదు ఫారమ్‌ను పూరించండి. ఆ తర్వాత మీరు ఎంచుకున్న ట్రేడ్‌లో ఆన్‌లైన్ లెవెల్ 1 పరిచయ కోర్సులో నమోదు చేసుకుని పూర్తి చేయడానికి మీకు మార్గనిర్దేశం చేయబడుతుంది. మా బృందం మిమ్మల్ని సంప్రదించి తదుపరి దశలలో మీకు మార్గనిర్దేశం చేస్తుంది.<br/><br/>నైపుణ్యాలు కొత్త అవకాశాల తలుపును తెరవగలవు!"
 }

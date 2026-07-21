@@ -148,7 +148,7 @@
     "WE_ARE_HERE_TO_HELP": "ہم مدد کے لیے حاضر ہیں۔",
     "Job family": "ملازمت کرنے والا خاندان",
     "Group Membership": "گروپ ممبر شپ",
-    "PSU": "psu",
+    "PSU": "پی ایس یو",
     "UNAUTHORIZED": "آپ اس سائٹ تک رسائی کے مجاز نہیں ہیں۔",
     "For Children": "بچوں کے لیے",
     "Self": "خود",
@@ -158,7 +158,7 @@
       "in_progress": "جاری ہے۔",
       "enrolled_not_started": "اندراج  شروع نہیں ہوا۔",
       "not_started": "شروع نہیں ہوا۔",
-      "tracking_sync_pending": "Tracking Sync Pending"
+      "tracking_sync_pending": "ٹریکنگ سنک زیر التوا"
     },
     "CHANGE_USER": "صارف کو تبدیل کریں۔",
     "FETCH_USER": "صارف بازیافت کریں۔",
@@ -194,7 +194,7 @@
       "L1_COURSES": "L1 کورسز",
       "EXPLORE": "دریافت کریں۔",
       "SURVEYS": "سروے",
-      "plp_surveys": "Surveys",
+      "plp_surveys": "سروے",
       "PROFILE": "پروفائل",
       "UNITS": "یونٹس",
       "COURSES": "کورسز",
@@ -310,7 +310,7 @@
       "PROGRAM": "پروگرام",
       "ABOUT_US": "ہمارے بارے میں",
       "THEMATIC_REPOSITORY": "موضوعاتی ذخیرہ",
-      "COPYRIGHT_NOTICE": "All resources on the website are licensed under a CC BY-NC-ND 4.0 International License © Pratham Open School |"
+      "COPYRIGHT_NOTICE": "ویب سائٹ پر تمام وسائل CC BY-NC-ND 4.0 بین الاقوامی لائسنس کے تحت لائسنس یافتہ ہیں © پرتھم اوپن اسکول |"
     },
     "RESPONSE_RECORDED": {
       "TITLE": "آپ کا جواب ریکارڈ کر لیا گیا ہے۔",
@@ -439,8 +439,8 @@
     "PROGRAMS": {
       "EXPLORE_PROGRAMS": "پروگراموں کو دریافت کریں۔",
       "MY_PROGRAMS": "میرے پروگرام",
-      "EXPLORE_VOLUNTEER_PROGRAMS": "Explore Volunteer Programs",
-      "MY_VOLUNTEER_PROGRAMS": "My Volunteer Programs",
+      "EXPLORE_VOLUNTEER_PROGRAMS": "رضاکار پروگرام دریافت کریں",
+      "MY_VOLUNTEER_PROGRAMS": "میرے رضاکار پروگرام",
       "LOADING": "لوڈ ہو رہا ہے..."
     },
     "REGISTRATION_FLOW": {
@@ -456,7 +456,7 @@
       "START_EXPLORING": "دریافت کرنا شروع کریں۔",
       "START_LEARNING": "سیکھنا شروع کریں۔",
       "START_ASSESSMENT": "تشخیص شروع کریں۔",
-      "ATTEMPT_ASSESSMENT": "Attempt Assesment",
+      "ATTEMPT_ASSESSMENT": "تشخیص شروع کریں",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "آپ نے کامیابی کے ساتھ سائن اپ کر لیا ہے۔",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT": "یہاں سے  آپ کادسویں جماعت کا سفر شروع ہوتا ہے۔ آئیے سرل ٹیسٹ کے ساتھ شروع کریں۔",
       "LEARNING_JOURNEY_FIRST_STEP": "بہت خوب ! آپ نے پرتھم کے ساتھ اپنے سیکھنے کے سفر میں پہلا قدم اٹھایا ہے۔",
@@ -466,18 +466,18 @@
       "ASSESSMENT_BEFORE_ACCESS_UNAVAILABLE_MESSAGE": "یہاں سے آپ کا دسویں جماعت کا سفر شروع ہوتا ہے۔سرل ٹیسٹ فی الحال آپ کی منتخب کردہ زبان میں دستیاب نہیں ہے۔ ہم اس پر کام کر رہے ہیں۔ براہ کرم بعد میں دوبارہ کوشش کریں۔",
       "COME_BACK_LATER": "براہ کرم بعد میں واپس آئیں",
       "BACK_TO_PROGRAMS": "پروگرامز پر واپس جائیں۔",
-      "BACK_TO_DASHBOARD": "Back to Dashboard"
+      "BACK_TO_DASHBOARD": "ڈیش بورڈ پر واپس جائیں"
     },
     "FOOTER": {
-      "SHOW_FOOTER": "Show footer",
-      "HIDE_FOOTER": "Hide footer",
-      "APP_NAME": "Pratham myLearning",
-      "COPYRIGHT": "© {{year}} Pratham",
-      "USEFUL_LINKS": "Useful Links",
-      "DESCRIPTION": "Pratham addresses education-related gaps through innovative and cost-effective programs. We engage directly with children, schools, families, and communities, and also work in collaboration with government systems. In our direct programs, instructional and community-based activities are implemented by Pratham teams. Core elements such as technology, measurement and evaluation, and research underpin all our programs, ensuring effectiveness, scalability, and continuous improvement.",
-      "PRIVACY_GUIDELINES": "Privacy Guidelines",
-      "COOKIE_GUIDELINES": "Cookie Guidelines",
-      "PRAGYANPATH": "Pragyanpath (For Pratham Employees only)"
+      "SHOW_FOOTER": "فوٹر دکھائیں",
+      "HIDE_FOOTER": "فوٹر چھپائیں",
+      "APP_NAME": "پرتھم مائی لرننگ",
+      "COPYRIGHT": "© {{year}} پرتھم",
+      "USEFUL_LINKS": "مفید لنکس",
+      "DESCRIPTION": "پرتھم اختراعی اور کم لاگت والے پروگراموں کے ذریعے تعلیم سے متعلق خلا کو دور کرتا ہے۔ ہم بچوں، اسکولوں، خاندانوں اور برادریوں کے ساتھ براہ راست منسلک ہوتے ہیں، اور سرکاری نظاموں کے تعاون سے بھی کام کرتے ہیں۔ ہمارے براہ راست پروگراموں میں، تدریسی اور برادری پر مبنی سرگرمیاں پرتھم کی ٹیموں کے ذریعے نافذ کی جاتی ہیں۔ ٹیکنالوجی، پیمائش اور تشخیص، اور تحقیق جیسے بنیادی عناصر ہمارے تمام پروگراموں کی بنیاد ہیں، جو مؤثریت، توسیع پذیری اور مسلسل بہتری کو یقینی بناتے ہیں۔",
+      "PRIVACY_GUIDELINES": "رازداری کے رہنما اصول",
+      "COOKIE_GUIDELINES": "کوکی کے رہنما اصول",
+      "PRAGYANPATH": "پرگیان پتھ (صرف پرتھم ملازمین کے لیے)"
     }
   },
   "Login with Newton ERP": "نیوٹن ERP کے ساتھ لاگ ان کریں۔",
@@ -501,30 +501,30 @@
     "GET_STARTED_WITH_YOUR_LEARNING_JOURNEY_NOW": "ابھی اپنے سیکھنے کے سفر کے ساتھ شروع کریں!",
     "ABOUT_PRATHAM_TEXT": "پرتھم ایجوکیشن فاؤنڈیشن (پرتھم) ہندوستان کی سب سے بڑی تعلیمی این جی اوز میں سے ایک ہے جس کے پاس جدید، سختی سے جانچے گئے پروگراموں کا ریکارڈ ہے جس نے تین براعظموں میں اسی طرح کے پروگراموں کو متاثر کیا ہے۔ 30 سال پر محیط تاریخ کے ساتھ، پرتھم کا کام آج ابتدائی اور ابتدائی سالوں کے پروگراموں سے لے کر لڑکیوں اور خواتین اور نوجوانوں کی مہارت تک پھیلا ہوا ہے۔\n\n25 ریاستوں اور مرکز کے زیر انتظام علاقوں کا احاطہ کرنے والے پروگراموں کے ذریعے، ایک اوسط سال میں، پرتھم عام طور پر 6 ملین سے زیادہ بچوں اور نوجوانوں تک پہنچتا ہے۔ یہ کوششوں کے امتزاج سے حاصل ہوتا ہے: کمیونٹیز میں بچوں اور نوجوانوں کے ساتھ براہ راست کام کرنے کے ساتھ ساتھ ریاستی اور ضلعی سطح کی حکومتوں کے ساتھ تعاون کے ذریعے۔ پرتھم نے قابل ذکر ایوارڈز حاصل کیے ہیں جیسے Lui Che Woo پرائز، WISE پرائز برائے اختراع، Skoll Award for Social Entrepreneurship، The Henry R Kravis Prize in Leadership اور CNN-IBN انڈین آف دی ایئر فار پبلک سروس۔ پرتھم کو 2021 کا یدان انعام برائے تعلیم ترقی اور 2025 میں یشراج بھارتی سمان بھی ملا۔",
     "ABOUT_PRATHAM_LEARNING_PLATFORM_TEXT": "پرتھم ایجوکیشن فاؤنڈیشن (پرتھم) ہندوستان کی سب سے بڑی تعلیمی این جی اوز میں سے ایک ہے جس کے پاس جدید، سختی سے جانچے گئے پروگراموں کا ریکارڈ ہے جس نے تین براعظموں میں اسی طرح کے پروگراموں کو متاثر کیا ہے۔ 30 سال پر محیط تاریخ کے ساتھ، پرتھم کا کام آج ابتدائی اور ابتدائی سالوں کے پروگراموں سے لے کر لڑکیوں اور خواتین اور نوجوانوں کی مہارت تک پھیلا ہوا ہے۔\n\n25 ریاستوں اور مرکز کے زیر انتظام علاقوں کا احاطہ کرنے والے پروگراموں کے ذریعے، ایک اوسط سال میں، پرتھم عام طور پر 6 ملین سے زیادہ بچوں اور نوجوانوں تک پہنچتا ہے۔ یہ کوششوں کے امتزاج سے حاصل ہوتا ہے: کمیونٹیز میں بچوں اور نوجوانوں کے ساتھ براہ راست کام کرنے کے ساتھ ساتھ ریاستی اور ضلعی سطح کی حکومتوں کے ساتھ تعاون کے ذریعے۔ پرتھم نے قابل ذکر ایوارڈز حاصل کیے ہیں جیسے Lui Che Woo پرائز، WISE پرائز برائے اختراع، Skoll Award for Social Entrepreneurship، The Henry R Kravis Prize in Leadership اور CNN-IBN انڈین آف دی ایئر فار پبلک سروس۔ پرتھم کو 2021 کا یدان انعام برائے تعلیم ترقی اور 2025 میں یشراج بھارتی سمان بھی ملا۔",
-    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "How would you like to get started?",
-    "OUR_PROGRAMS_FOR_LEARNERS": "Our Programs for Learners",
-    "OUR_PROGRAMS_SUBTITLE": "Explore programs designed to support your learning journey.",
-    "OUR_PROGRAMS_FOR_VOLUNTEERS": "Our Programs for Volunteers",
-    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "Make a real difference — join one of our volunteer-driven programs.",
-    "ABOUT_THE_PROGRAM": "About the Program",
-    "READY_TO_JOIN": "Ready to join",
-    "ENROL_NOW": "Enrol Now",
-    "ALREADY_ENROLLED_LOGIN": "Already enrolled? Log in",
-    "ENROL_HINT": "New or already enrolled — just enter your phone number. We'll guide you through.",
-    "PROGRAM_NOT_FOUND": "Program not found",
-    "GO_BACK": "Go Back",
-    "CONTACT": "Contact",
-    "WRITE_TO_US": "Write to us at",
-    "NOT_ENROLLED_IN_PROGRAM": "You are not registered in",
-    "YOU_CAN_ENROLL": "You can enroll into this program.",
-    "ARE_YOU_HERE_TO_LEARN": "Are you here to learn?",
-    "REGISTER_FOR_LEARNING": "Register for the one that suits your learning aspiration",
-    "ARE_YOU_HERE_TO_VOLUNTEER": "Are you here to volunteer?",
-    "MAKE_A_DIFFERENCE": "Make a difference through our volunteer programs",
-    "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
-    "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
-    "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "HOW_WOULD_YOU_LIKE_TO_GET_STARTED": "آپ کیسے شروع کرنا چاہیں گے؟",
+    "OUR_PROGRAMS_FOR_LEARNERS": "سیکھنے والوں کے لیے ہمارے پروگرام",
+    "OUR_PROGRAMS_SUBTITLE": "اپنے سیکھنے کے سفر میں مدد کے لیے بنائے گئے پروگرام دریافت کریں۔",
+    "OUR_PROGRAMS_FOR_VOLUNTEERS": "رضاکاروں کے لیے ہمارے پروگرام",
+    "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "حقیقی تبدیلی لائیں — ہمارے رضاکار پر مبنی پروگراموں میں سے کسی ایک میں شامل ہوں۔",
+    "ABOUT_THE_PROGRAM": "پروگرام کے بارے میں",
+    "READY_TO_JOIN": "شامل ہونے کے لیے تیار",
+    "ENROL_NOW": "ابھی اندراج کریں",
+    "ALREADY_ENROLLED_LOGIN": "پہلے سے اندراج شدہ؟ لاگ ان کریں",
+    "ENROL_HINT": "نئے ہیں یا پہلے سے اندراج شدہ — بس اپنا فون نمبر درج کریں۔ ہم آپ کی رہنمائی کریں گے۔",
+    "PROGRAM_NOT_FOUND": "پروگرام نہیں ملا",
+    "GO_BACK": "واپس جائیں",
+    "CONTACT": "رابطہ",
+    "WRITE_TO_US": "ہمیں یہاں لکھیں",
+    "NOT_ENROLLED_IN_PROGRAM": "آپ اس میں رجسٹرڈ نہیں ہیں",
+    "YOU_CAN_ENROLL": "آپ اس پروگرام میں اندراج کر سکتے ہیں۔",
+    "ARE_YOU_HERE_TO_LEARN": "کیا آپ سیکھنے کے لیے یہاں ہیں؟",
+    "REGISTER_FOR_LEARNING": "اپنی سیکھنے کی خواہش کے مطابق پروگرام کے لیے رجسٹر کریں",
+    "ARE_YOU_HERE_TO_VOLUNTEER": "کیا آپ رضاکارانہ خدمت کے لیے یہاں ہیں؟",
+    "MAKE_A_DIFFERENCE": "ہمارے رضاکار پروگراموں کے ذریعے تبدیلی لائیں",
+    "YES_CREATE_NEW_ACCOUNT": "ہاں، نیا اکاؤنٹ بنائیں",
+    "ENROLLED_TO_BELOW_PROGRAMS": "ہم دیکھ سکتے ہیں کہ آپ نیچے دیے گئے پروگراموں میں اندراج شدہ ہیں:",
+    "SURE_TO_ENROLL_INTO": "کیا آپ واقعی اس میں اندراج کرنا چاہتے ہیں",
+    "YES": "ہاں"
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "NavaPatham میں خوش آمدید!",
@@ -797,12 +797,12 @@
     "HINDI": "ہندی",
     "MARATHI": "مراٹھی",
     "URDU": "اردو",
-    "ODIA": "ଓଡ଼ିଆ",
-    "TELUGU": "తెలుగు",
-    "KANNADA": "ಕನ್ನಡ",
-    "TAMIL": "தமிழ்",
-    "GUJARATI": "ગુજરાતી",
-    "BENGALI": "বাংলা",
+    "ODIA": "اوڈیا",
+    "TELUGU": "تیلگو",
+    "KANNADA": "کنڑ",
+    "TAMIL": "تمل",
+    "GUJARATI": "گجراتی",
+    "BENGALI": "بنگالی",
     "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "آپ کی پسندیدہ زبان کون سی ہے۔",
     "DIVORCED/WIDOW": "طلاق یافتہ/ بیوہ",
     "GRADUATE": "گریجویٹ",
@@ -836,7 +836,7 @@
     "APPAREL": "ملبوسات",
     "CONSTRUCTION": "تعمیر",
     "GRAPHIC_DESIGN": "گرافک ڈیزائن",
-    "TYPE_OF_PHONE_ACCESSIBLE ": "Type of Phone Accessible",
+    "TYPE_OF_PHONE_ACCESSIBLE": "قابل رسائی فون کی قسم",
     "FAMILY_MEMBER_DETAILS": "فیملی ممبر کی تفصیلات",
     "WHAT_IS_YOUR_PRIMARY_WORK": "آپ کا بنیادی کام کیا ہے؟",
     "NOPHONE": "کوئی فون نہیں۔",
@@ -933,7 +933,7 @@
     "NO_ACTIVE_COHORTS_FOUND": "کوئی فعال گروہ نہیں ملا",
     "ORGANISATION_TYPE": "تنظیم کی قسم"
   },
-  "ORGANISATION_NAME": "Organisation Name",
+  "ORGANISATION_NAME": "ادارے کا نام",
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "غلط ان پٹ۔",
     "FIELD_REQUIRED": "{{field}} درکار ہے۔",
@@ -963,7 +963,7 @@
   "FILTER_KEY": {
     "GROUP_MEMBERSHIP": "گروپ ممبرشپ",
     "JOB_FAMILY": "ملازمت کا خاندان",
-    "PSU": "psu"
+    "PSU": "پی ایس یو"
   },
   "AI": {
     "ASSESSMENT_DETAILS": "تشخیص کی تفصیلات",
@@ -1106,7 +1106,7 @@
   "Postrequisite": "مشق کریں۔",
   "Facilitator-requisite": "سہولت کار- مطلوبہ",
   "Prerequisite": "تیار کریں۔",
-  "SECOND_CHANCE_DESCRIPTION": "<b>Did you have to stop your studies before completing Grade 10?</b>\nYou can continue your Education with Pratham’s Second Chance Program – a Second Chance to Complete Grade 10.\n\nPratham’s Second Chance Program supports young girls and women like you who want to continue their education and appear for Grade 10 Board/Open School examinations. Through accessible learning centres close to your home, supportive teachers, and flexible learning methods (including remote learning options), the program makes learning more accessible and achievable.\n\n<b>What the Program Offers:</b>\n• Foundation classes in Mathematics, English, Science, Language, and other subjects\n• Main Course focused on preparation for the Board-mandated curriculum.\n• Interactive and activity-based learning methods\n• Regular assessments and academic support\n• Life skills sessions focused on communication, confidence, decision-making, and critical thinking\n• Exposure to opportunities after Grade 10, including further education and skilling pathways\n\nThe Second Chance Program is currently operational in multiple states.\n\n<b>Register Your Interest:</b>\nFill in the Enrollment form to express your interest in joining the program. Our team will contact you and guide you through the next steps.\n\nIt is never too late to continue learning!",
-  "CAMP_TO_CLUB_DESCRIPTION": "<b>Do you enjoy working with children and supporting their learning?</b>\nPratham's Children's Club Volunteer Program gives you an opportunity to engage with children in your community through fun, interactive, and activity-based learning.\n\nAs a volunteer, you will receive access to simple activities and resources that you can use with children in local Children's Clubs. You will also get access to learning opportunities for your own growth and self-development.\n\n<b>What You Will Get</b>\n• Easy-to-use activities and learning resources for Children's Clubs\n• Guidance and support from the Pratham team\n• Opportunities to build communication, leadership, and facilitation skills\n• Access to self-learning courses focused on life skills and new-age skills\n• Experience of working with children and supporting community learning\n\n<b>Who Can Join?</b>\nYoung people and community members who:\n• Are above 14 years of age\n• Enjoy working with children\n• Want to contribute to their community\n• Are interested in learning and personal growth\n\n<b>Register Your Interest</b>\nFill in the enrollment form to express your interest in becoming a Children's Club Volunteer.\nOur team will contact you and guide you through the next steps.\n\nSmall efforts can create a big impact in a child's learning journey.",
-  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!"
+  "SECOND_CHANCE_DESCRIPTION": "<b>کیا آپ کو گریڈ 10 مکمل کرنے سے پہلے اپنی تعلیم روکنی پڑی تھی؟</b>\nآپ پرتھم کے سیکنڈ چانس پروگرام کے ساتھ اپنی تعلیم جاری رکھ سکتے ہیں – گریڈ 10 مکمل کرنے کا ایک دوسرا موقع۔\n\nپرتھم کا سیکنڈ چانس پروگرام آپ جیسی نوجوان لڑکیوں اور خواتین کی مدد کرتا ہے جو اپنی تعلیم جاری رکھنا اور گریڈ 10 بورڈ/اوپن اسکول امتحانات میں شرکت کرنا چاہتی ہیں۔ آپ کے گھر کے قریب قابل رسائی تعلیمی مراکز، معاون اساتذہ اور لچکدار تعلیمی طریقوں (بشمول ریموٹ لرننگ کے اختیارات) کے ذریعے، یہ پروگرام سیکھنے کو زیادہ قابل رسائی اور حاصل کرنے کے قابل بناتا ہے۔\n\n<b>پروگرام کیا پیش کرتا ہے:</b>\n• ریاضی، انگریزی، سائنس، زبان اور دیگر مضامین میں فاؤنڈیشن کلاسز\n• بورڈ کے مقرر کردہ نصاب کی تیاری پر مرکوز مین کورس۔\n• انٹرایکٹو اور سرگرمی پر مبنی تعلیمی طریقے\n• باقاعدہ تشخیص اور تعلیمی معاونت\n• رابطے، اعتماد، فیصلہ سازی اور تنقیدی سوچ پر مرکوز زندگی کی مہارتوں کے سیشن\n• گریڈ 10 کے بعد کے مواقع سے تعارف، بشمول مزید تعلیم اور مہارت کے راستے\n\nسیکنڈ چانس پروگرام فی الحال متعدد ریاستوں میں کام کر رہا ہے۔\n\n<b>اپنی دلچسپی درج کریں:</b>\nپروگرام میں شامل ہونے میں اپنی دلچسپی ظاہر کرنے کے لیے اندراج فارم بھریں۔ ہماری ٹیم آپ سے رابطہ کرے گی اور اگلے مراحل میں آپ کی رہنمائی کرے گی۔\n\nسیکھنا جاری رکھنے میں کبھی دیر نہیں ہوتی!",
+  "CAMP_TO_CLUB_DESCRIPTION": "<b>کیا آپ کو بچوں کے ساتھ کام کرنا اور ان کے سیکھنے میں مدد کرنا اچھا لگتا ہے؟</b>\nپرتھم کا چلڈرنز کلب رضاکار پروگرام آپ کو تفریحی، انٹرایکٹو اور سرگرمی پر مبنی سیکھنے کے ذریعے اپنی برادری کے بچوں کے ساتھ منسلک ہونے کا موقع دیتا ہے۔\n\nایک رضاکار کے طور پر، آپ کو سادہ سرگرمیوں اور وسائل تک رسائی ملے گی جنہیں آپ مقامی چلڈرنز کلب میں بچوں کے ساتھ استعمال کر سکتے ہیں۔ آپ کو اپنی نشوونما اور خود کی ترقی کے لیے سیکھنے کے مواقع بھی ملیں گے۔\n\n<b>آپ کو کیا ملے گا</b>\n• چلڈرنز کلب کے لیے استعمال میں آسان سرگرمیاں اور تعلیمی وسائل\n• پرتھم ٹیم سے رہنمائی اور مدد\n• رابطے، قیادت اور سہولت کاری کی مہارتیں بنانے کے مواقع\n• زندگی کی مہارتوں اور نئے دور کی مہارتوں پر مرکوز خود سیکھنے کے کورسز تک رسائی\n• بچوں کے ساتھ کام کرنے اور برادری کے سیکھنے میں مدد کرنے کا تجربہ\n\n<b>کون شامل ہو سکتا ہے؟</b>\nنوجوان اور برادری کے افراد جو:\n• 14 سال سے زیادہ عمر کے ہیں\n• بچوں کے ساتھ کام کرنا پسند کرتے ہیں\n• اپنی برادری میں حصہ ڈالنا چاہتے ہیں\n• سیکھنے اور ذاتی نشوونما میں دلچسپی رکھتے ہیں\n\n<b>اپنی دلچسپی درج کریں</b>\nچلڈرنز کلب رضاکار بننے میں اپنی دلچسپی ظاہر کرنے کے لیے اندراج فارم بھریں۔\nہماری ٹیم آپ سے رابطہ کرے گی اور اگلے مراحل میں آپ کی رہنمائی کرے گی۔\n\nچھوٹی کوششیں بچے کے سیکھنے کے سفر میں بڑا اثر پیدا کر سکتی ہیں۔",
+  "VOCATIONAL_TRAINING_DESCRIPTION": "<b>نوکری، کیریئر یا بہتر مواقع کے لیے مہارتیں بنانا چاہتے ہیں؟</b><br/>پرتھم کا ووکیشنل ٹریننگ اینڈ اسکلنگ پروگرام آپ جیسے نوجوانوں کو روزگار، کاروبار اور مزید تعلیم کے لیے مہارتیں بنانے میں مدد کرتا ہے۔ یہ پروگرام آپ کو کام کی دنیا کے لیے تیار کرنے کے لیے صنعت سے متعلق تربیت، عملی سیکھنے، کیریئر کی رہنمائی اور پلیسمنٹ کی مدد فراہم کرتا ہے۔<br/><br/><b>پروگرام کیا پیش کرتا ہے:</b><ul><li>ان شعبوں میں صنعت سے متعلق ووکیشنل تربیتی کورسز اور سرٹیفیکیشنز:<ul style=\"list-style-type:circle\"><li><b>کیئر اکانومی:</b> بیوٹی، اپیرل، ہاسپیٹیلیٹی، ہیلتھ کیئر</li><li><b>STEM سے منسلک تجارتیں:</b> الیکٹریکل، آٹوموٹو، ویلڈنگ، کنسٹرکشن</li><li><b>گرین اسکلز:</b> سولر پینل مرمت، پلمبنگ، ڈرائی وال، اور فالس سیلنگ مرمت</li><li><b>آئی ٹی سے چلنے والی خدمات (ITeS):</b> ملٹی فنکشنل آفس اسسٹنٹ، گرافک ڈیزائن، آٹوموٹو شوروم ہوسٹ</li><li><b>ٹریول اینڈ ٹورازم</b></li></ul></li><li>بنیادی انگریزی اور کمپیوٹر خواندگی</li><li>رابطے، اعتماد اور کام کی جگہ کی تیاری کی مہارتوں پر مرکوز زندگی کی مہارتیں</li><li>کیریئر اور روزگار کے مواقع پر رہنمائی</li><li>نوکریوں اور کاروبار کے مواقع کے لیے مدد</li></ul><br/><b>اپنی دلچسپی درج کریں:</b><br/>پروگرام میں شامل ہونے میں اپنی دلچسپی ظاہر کرنے کے لیے اندراج فارم بھریں۔ اس کے بعد آپ کو اپنی منتخب کردہ تجارت میں آن لائن لیول 1 تعارفی کورس میں اندراج کرنے اور مکمل کرنے کی رہنمائی کی جائے گی۔ ہماری ٹیم آپ سے رابطہ کرے گی اور اگلے مراحل میں آپ کی رہنمائی کرے گی۔<br/><br/>مہارتیں نئے مواقع کا دروازہ کھول سکتی ہیں!"
 }
