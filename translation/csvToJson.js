@@ -110,15 +110,18 @@ const TARGETS = [
     keyColumns: ['Module', 'Submodule', 'Key'],
     sourceCode: 'en',
     outputDir: path.join(OUTPUT_DIR, 'youthnet'),
-    // youthNet supports only en, hi, mr, or, ur. Odiya -> `or` only.
-    // `ml` (Malayalam) is intentionally left untouched, and the CSV's
-    // Telugu/Kannada/Tamil/Gujarati columns are skipped (no folders for them).
+    // All languages from the Mentor CSV. Odiya -> `or` (youthNet's folder).
+    // `ml` (Malayalam) is left untouched — the CSV has no Malayalam column.
     languages: [
-      { column: 'English', code: 'en' },
-      { column: 'Hindi',   code: 'hi' },
-      { column: 'Marathi', code: 'mr' },
-      { column: 'Odiya',   code: 'or' },
-      { column: 'Urdu',    code: 'ur' },
+      { column: 'English',  code: 'en' },
+      { column: 'Marathi',  code: 'mr' },
+      { column: 'Hindi',    code: 'hi' },
+      { column: 'Odiya',    code: 'or' },
+      { column: 'Telugu',   code: 'tel' },
+      { column: 'Kannada',  code: 'kan' },
+      { column: 'Tamil',    code: 'tam' },
+      { column: 'Gujarati', code: 'gu' },
+      { column: 'Urdu',     code: 'ur' },
     ],
   },
 ];
