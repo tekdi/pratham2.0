@@ -542,6 +542,18 @@ const LoginPageContent = () => {
             setEnrollConfirmTargetId(programTenantId);
             setEnrollConfirmModal(true);
           } else {
+            // Collect the programs the user is already enrolled in so the
+            // not-enrolled popup can surface them (e.g. "You have already
+            // enrolled to the program: Second Chance and Camp to Club").
+            const userProgramNames: string[] = (userResponse?.tenantData || [])
+              .filter(
+                (t: any) =>
+                  (t?.tenantStatus === 'active' || t?.tenantStatus === 'pending') &&
+                  t?.roles?.some((r: any) => r?.roleName === 'Learner') &&
+                  t?.tenantName !== 'Pratham'
+              )
+              .map((t: any) => t.tenantName as string);
+            setEnrolledProgramNames(userProgramNames);
             setNotEnrolledProgramName(programName);
             setNotEnrolledTenantId(programTenantId);
             setNotEnrolledModal(true);
@@ -1037,6 +1049,33 @@ const LoginPageContent = () => {
         // secondaryActionHandler={() => { setNotEnrolledModal(false); router.push('/programs'); }}
       >
         <Box p="10px" display="flex" flexDirection="column" alignItems="center" gap={1}>
+          {enrolledProgramNames.length === 1 && (
+            <Typography variant="body1" textAlign="center">
+              {t('LANDING.ALREADY_ENROLLED_TO_PROGRAM') ||
+                'You have already enrolled to the program:'}{' '}
+              <Box component="span" fontWeight={700}>
+                {enrolledProgramNames[0]}
+              </Box>
+              .
+            </Typography>
+          )}
+          {enrolledProgramNames.length > 1 && (
+            <Box width="100%">
+              <Typography variant="body1" textAlign="center">
+                {t('LANDING.ALREADY_ENROLLED_TO_PROGRAMS') ||
+                  'You have already enrolled to the programs:'}
+              </Typography>
+              <Box component="ul" sx={{ pl: 3, m: 0, mt: 0.5 }}>
+                {enrolledProgramNames.map((name, idx) => (
+                  <Box component="li" key={idx}>
+                    <Typography variant="body1" fontWeight={700}>
+                      {name}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
           <Typography variant="body1" textAlign="center">
             {t('LANDING.NOT_ENROLLED_IN_PROGRAM') || 'You are not registered in'}{' '}
             <Box component="span" fontWeight={700}>

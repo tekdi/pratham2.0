@@ -524,6 +524,8 @@
     "MAKE_A_DIFFERENCE": "Make a difference through our volunteer programs",
     "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
     "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "You have already enrolled to the program:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "You have already enrolled to the programs:",
     "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
     "YES": "Yes"
   },
