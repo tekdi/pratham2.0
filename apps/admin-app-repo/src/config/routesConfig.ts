@@ -26,6 +26,17 @@ export const ROLE_BASED_ROUTES = {
     [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
     [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
   },
+  [TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS]: {
+    [Role.ADMIN]: [],
+    [Role.CENTRAL_ADMIN]: [
+      '/notification-templates/create',
+      '/notification-templates/update/[identifier]',
+      '/edit-password',
+      '/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'
+    ],
+    [Role.CCTA]: ['/subjectDetails', '/importCsv', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
+    [Role.SCTA]: ['/subjectDetails', '/importCsv ', '/edit-password', '/resourceList', '/csvDetails', '/csvList', '/play'],
+  },
   [TenantName.YOUTHNET]: {
     [Role.ADMIN]: ['/edit-password'],
     [Role.CENTRAL_ADMIN]: ['/edit-password'],

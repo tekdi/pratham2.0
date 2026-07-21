@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { filterContent } from '@shared-lib-v2/utils/AuthService';
-import { 
-  KeyboardArrowDown, 
-  KeyboardArrowUp 
+import {
+  KeyboardArrowDown,
+  KeyboardArrowUp
 } from '@mui/icons-material';
 import {
   Box,
@@ -99,8 +99,9 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   }, []);
 
   const isSecondChanceProgram =
-    typeof window !== 'undefined' &&
-    localStorage.getItem('userProgram') === 'Second Chance Program';
+    (typeof window !== 'undefined' &&
+      localStorage.getItem('userProgram') === 'Second Chance Program') ||
+    'Second Chance Program Pathways';
 
   const ITEMS_TO_SHOW = 3; // Number of items to show initially
 

@@ -120,8 +120,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       {isLogin && (
         <>
           {typeof window !== 'undefined' &&
-            localStorage.getItem('userProgram') ===
-              TenantName.SECOND_CHANCE_PROGRAM && (
+            (localStorage.getItem('userProgram') ===
+              TenantName.SECOND_CHANCE_PROGRAM ||
+              localStorage.getItem('userProgram') ===
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
               <Box
                 sx={{
                   display: 'flex',

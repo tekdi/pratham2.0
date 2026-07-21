@@ -9,6 +9,13 @@ export const mockData: Record<string, any> = {
     QUESTION_SET_FRAMEWORK: 'scp-framework'
 
   },
+  '52e0ae12-b7cf-4ad8-8f2a-2d8038cdb7d2': {
+    CHANNEL_ID: 'scp-pathways-channel',
+    CONTENT_FRAMEWORK: 'pos-framework',
+    COLLECTION_FRAMEWORK: 'scp-framework',
+    QUESTION_SET_FRAMEWORK: 'scp-framework'
+
+  },
   '29f8c9a6-032f-48c7-a14a-9e3db3d7b76e': {
     CHANNEL_ID: 'pos-channel',
     CONTENT_FRAMEWORK: 'pos-framework',
