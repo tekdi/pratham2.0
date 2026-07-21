@@ -19,8 +19,11 @@ import {
 
 export const FILE_MIME_MAP: Record<string, string> = {
   pdf:     'application/pdf',
-  zip:     'application/zip',
+  // Platform does not accept application/zip — uploaded zips are HTML5
+  // content archives (extracted by the platform on upload/publish)
+  zip:     'application/vnd.ekstep.html-archive',
   mp4:     'video/mp4',
+  mp3:     'audio/mp3',
   h5p:     'application/vnd.ekstep.h5p-archive',
   youtube: 'video/x-youtube',  // URL set directly as artifactUrl — no file download needed
 };

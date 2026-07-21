@@ -68,6 +68,14 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+  const [homeHref, setHomeHref] = useState('/home');
+
+  useEffect(() => {
+    const landingPage = localStorage.getItem('landingPage');
+    if (landingPage) {
+      setHomeHref(landingPage);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -364,23 +372,17 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
     }
   };
 
-  const handleShowAllPrograms = () => {
+  const handleShowAllPrograms = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     localStorage.removeItem('learnerCourseFilters');
     onClose();
     router.push('/programs');
   };
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     onClose();
-    const landingPage =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('landingPage')
-        : null;
-    if (landingPage) {
-      router.push(landingPage);
-    } else {
-      router.push('/home');
-    }
+    router.push(homeHref);
   };
 
   const formatDate = (dateString?: string) => {
@@ -552,7 +554,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
             variant="outlined"
             fullWidth
             component="a"
-            href="/home"
+            href={homeHref}
             onClick={handleHomeClick}
             startIcon={<HomeIcon />}
             sx={{
@@ -628,9 +630,13 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
           onClose();
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}

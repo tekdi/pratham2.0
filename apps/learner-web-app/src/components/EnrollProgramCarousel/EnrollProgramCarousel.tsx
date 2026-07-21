@@ -1039,9 +1039,13 @@ console.log('result=====>', result);
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}

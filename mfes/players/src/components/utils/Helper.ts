@@ -40,16 +40,39 @@ export const debounce = <T extends (...args: any[]) => any>(
   };
 };
 
-export const handleExitEvent = () => {
-  // New-tab scenario: exitLink is forwarded into the iframe src from the player page
-  const urlParams = new URLSearchParams(window.location.search);
-  const exitLinkFromUrl = urlParams.get('exitLink');
-  if (exitLinkFromUrl) {
-    const target = window.top || window;
-    target.location.href = exitLinkFromUrl;
-    return;
+export const handleExitEvent = (options?: { preferPreviousPage?: boolean }) => {
+  // Prefer exitLink/activeLink from the iframe URL — set by the parent player page.
+  // This avoids using sessionStorage['previousPage'] which may point to a different domain.
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    // Android app + abandoned flow: this player runs in a cross-origin iframe, so it
+    // cannot reach the native bridge (window.ReactNativeWebView) itself. Relay to the
+    // parent (learner app) which hands control back to the native view via
+    // ENROLL_PROGRAM_EVENT, instead of navigating the WebView to a web page.
+    // (isAndroidApp is forwarded into this iframe's URL by the learner player page.)
+    if (options?.preferPreviousPage && params.get('isAndroidApp') === 'yes') {
+      window.parent?.postMessage({ type: 'player:exit-native' }, '*');
+      return;
+    }
+    // Abandoned flow (e.g. exiting an assessment before completing): return to
+    // previousPage (where the learner launched from) instead of the
+    // post-completion gate (exitLink, e.g. /reattempt-check).
+    if (options?.preferPreviousPage) {
+      const previousUrl = params.get('previousPage');
+      if (previousUrl) {
+        const target = window.top ?? window;
+        target.location.href = previousUrl;
+        return;
+      }
+    }
+    const exitUrl = params.get('exitLink') || params.get('activeLink');
+    if (exitUrl) {
+      const target = window.top ?? window;
+      target.location.href = exitUrl;
+      return;
+    }
   }
-  // Same-tab scenario: sessionStorage was set before router.push to the player
+
   const previousPage = sessionStorage.getItem('previousPage');
   if (previousPage) {
     window.location.href = previousPage;
