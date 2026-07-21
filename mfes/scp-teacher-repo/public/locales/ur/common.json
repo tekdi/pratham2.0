@@ -15,8 +15,8 @@
     "SEARCH_STUDENT": "طلباء کی تلاش کریں",
     "SORT_BY": "ترتیب دیں",
     "APPLY": "لاگو کریں",
-    "A_TO_Z": "A سے Z تک",
-    "Z_TO_A": "A سے Z تک",
+    "A_TO_Z": "A سے Z",
+    "Z_TO_A": "Z سے A",
     "HIGH_TO_LOW": "زیاده سے کم",
     "LOW_TO_HIGH": "کم سے زیادہ",
     "NAMES": "نام",
@@ -54,7 +54,7 @@
     "OK": "ٹھیک ہے",
     "FROM_TO_DATE": "شروع سے - تک کی تاریخ",
     "REMOVE": "ہٹا دیں۔",
-    "RESET": "Reset",
+    "RESET": "ری سیٹ",
     "RESET_ATTENDANCE": "حاضری کو دوبارہ ترتیب دیں؟",
     "RESET_ATTENDANCE_CONFIRM_MESSAGE": "حاضری کو دوبارہ ترتیب دینے سے اس دن کی تمام نشان زد حاضری مٹ جائے گی، بشمول ذاتی اور آن لائن سیشن۔ اس کارروائی کو کالعدم نہیں کیا جا سکتا۔",
     "RESET_ATTENDANCE_BUTTON": "حاضری کو دوبارہ ترتیب دیں۔",
@@ -647,7 +647,7 @@
     "SOCIAL_SCIENCE": "سماجی سائنس",
     "LIFE_SKILLS": "زندگی کی مہارتیں",
     "PREFERRED_LANGUAGE": "ترجیحی زبان",
-    "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "What Is Your Preferred Language?",
+    "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "آپ کی ترجیحی زبان کون سی ہے؟",
     "FIRST_NAME": "پہلا نام",
     "MIDDLE_NAME_OR_FATHER_NAME": "درمیانی نام یا والد کا نام",
     "LAST_NAME": "آخری نام",
@@ -882,7 +882,7 @@
     "USERNAME": "صارف نام",
     "SUBJECTS_I_TEACH": "وہ مضامین جو میں پڑھاتا ہوں",
     "MY_MAIN_SUBJECTS": "میرے اہم مضامین",
-    "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?"
+    "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "آپ کی سیکھنے کی ترجیحی طریقہ کیا ہے؟"
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "مینٹرس",
@@ -1187,13 +1187,13 @@
     "ASSESSMENT_SCORES": "تشخیص کے نشانات",
     "READ_MORE": "Read more",
     "READ_LESS": "Read less",
-    "MODE_OF_LEARNING": "Mode of Learning",
-    "ALL": "All",
-    "REMOTE_LEARNERS": "Remote Learners",
-    "REGULAR_LEARNERS": "Regular Learners",
-    "ASSESSMENT_ATTEMPTS_FILTER": "Number of Assessment Attempts Completed",
-    "NO_ATTEMPT": "No Attempt",
-    "ONE_ATTEMPT": "1 Attempt",
-    "TWO_ATTEMPTS": "2 Attempts"
+    "MODE_OF_LEARNING": "سیکھنے کا طریقہ",
+    "ALL": "سب",
+    "REMOTE_LEARNERS": "ریموٹ سیکھنے والے",
+    "REGULAR_LEARNERS": "باقاعدہ سیکھنے والے",
+    "ASSESSMENT_ATTEMPTS_FILTER": "مکمل شدہ تشخیصی کوششوں کی تعداد",
+    "NO_ATTEMPT": "کوئی کوشش نہیں",
+    "ONE_ATTEMPT": "1 کوشش",
+    "TWO_ATTEMPTS": "2 کوششیں"
   }
 }
