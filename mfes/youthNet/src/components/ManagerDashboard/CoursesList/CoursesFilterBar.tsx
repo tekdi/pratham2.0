@@ -5,7 +5,12 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { CoursesFilterBarProps, FilterPillOption } from '../../../utils/Interface';
 import { DEFAULT_COURSE_LIST_FILTERS, COURSE_LANGUAGE_OPTIONS } from '../../../utils/app.config';
-import { getCourseDisplayName, getCourseLanguageLabel, getCourseTypeValue } from '../../../utils/managerDashboardHelpers';
+import {
+  getCourseDisplayName,
+  getCourseLanguageLabel,
+  getCourseLanguageName,
+  getCourseTypeValue,
+} from '../../../utils/managerDashboardHelpers';
 import SearchableMultiSelectDropdown from '../../common/SearchableMultiSelectDropdown';
 import FilterPill from './FilterPill';
 
@@ -22,6 +27,18 @@ const CoursesFilterBar: React.FC<CoursesFilterBarProps> = ({ courses, filters, o
       label: type.toLowerCase() === 'optional' ? t('MANAGER_OVERVIEW.NON_MANDATORY') : type,
     }));
   }, [courses, t]);
+
+  // EN/HI are always offered even before any such course has loaded; any other language present
+  // in the fetched courses (e.g. Marathi, Tamil) is appended using its raw name as the label.
+  const courseLanguageOptions: FilterPillOption[] = useMemo(() => {
+    const options = new Map<string, string>(COURSE_LANGUAGE_OPTIONS.map((option) => [option.value, option.label]));
+    courses.forEach((course) => {
+      const name = getCourseLanguageName(course);
+      const code = getCourseLanguageLabel(course).toLowerCase();
+      if (!options.has(code)) options.set(code, name);
+    });
+    return Array.from(options.entries()).map(([value, label]) => ({ value, label }));
+  }, [courses]);
 
   // Scoped to the currently selected Course Type / Language, so the Course Name list never
   // offers a name that couldn't actually match those filters.
@@ -83,7 +100,7 @@ const CoursesFilterBar: React.FC<CoursesFilterBarProps> = ({ courses, filters, o
         label={t('MANAGER_OVERVIEW.FILTER_LANGUAGE')}
         value={filters.language}
         allLabel={t('MANAGER_OVERVIEW.ALL_LANGUAGES')}
-        options={COURSE_LANGUAGE_OPTIONS}
+        options={courseLanguageOptions}
         onChange={(value) => applyParentFilterChange({ ...filters, language: value })}
       />
 

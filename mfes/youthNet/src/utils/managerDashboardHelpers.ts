@@ -82,13 +82,18 @@ export const getCourseDisplayName = (course: Course | undefined, fallback: strin
   course?.name || course?.englishName || fallback;
 
 export const getCourseLanguageLabel = (course: Course | undefined): string => {
-  const raw = course?.language?.[0];
+  const raw = course?.contentLanguage ?? course?.language?.[0];
   if (!raw) return 'EN';
   const normalized = raw.trim().toLowerCase();
   if (normalized.startsWith('hi')) return 'HI';
   if (normalized.startsWith('en')) return 'EN';
   return raw.slice(0, 2).toUpperCase();
 };
+
+// Full, human-readable language name for display (e.g. "Marathi", "Tamil") — falls back to the
+// `language` array's raw value, then "English", when `contentLanguage` isn't present.
+export const getCourseLanguageName = (course: Course | undefined): string =>
+  course?.contentLanguage?.trim() || course?.language?.[0]?.trim() || 'English';
 
 // The composite search API returns `courseType` inconsistently — sometimes a plain string,
 // sometimes an array (e.g. ["Mandatory"]) — so normalize to a single trimmed string before any

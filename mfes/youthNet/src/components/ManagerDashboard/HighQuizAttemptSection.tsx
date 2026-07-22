@@ -172,7 +172,7 @@ const HighQuizAttemptSection: React.FC<HighQuizAttemptSectionProps> = ({
             variant="outlined"
             onClick={() => onSortOrderChange(sortOrder === 'desc' ? 'asc' : 'desc')}
             startIcon={sortOrder === 'desc' ? <ArrowDownwardIcon fontSize="small" /> : <ArrowUpwardIcon fontSize="small" />}
-            sx={{ textTransform: 'none', fontSize: '12px', borderColor: theme.palette.warning['700'], color: theme.palette.text.secondary }}
+            sx={{ textTransform: 'none', fontSize: '12px', borderColor: theme.palette.warning['700'], color: theme.palette.text.secondary, minWidth: '120px' }}
           >
             {sortOrder === 'desc' ? t('MANAGER_OVERVIEW.SORT_HIGH_LOW') : t('MANAGER_OVERVIEW.SORT_LOW_HIGH')}
           </Button>

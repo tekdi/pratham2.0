@@ -48,6 +48,9 @@ export interface Course {
   // than reading this directly.
   courseType?: string | string[];
   language?: string[];
+  // Preferred over `language` for filtering/display — a single human-readable name
+  // (e.g. "Marathi", "Tamil") rather than the ISO-ish `language` array.
+  contentLanguage?: string;
   [key: string]: unknown;
 }
 
