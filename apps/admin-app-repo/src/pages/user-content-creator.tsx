@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentCreatorSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -105,6 +105,10 @@ const ContentCreator = () => {
       : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+  const selectedTenantData = getSelectedTenantData(
+    storedUserData?.tenantData,
+    localStorage.getItem('tenantId')
+  );
 
   console.log(
     '########### type Content Creator process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
@@ -359,10 +363,10 @@ const ContentCreator = () => {
     },
   ];
   if (
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
   ) {
     columns = [...columns, ...scpCustomColumns];
-  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+  } else if (selectedTenantData?.tenantName === TenantName.YOUTHNET) {
     columns = [...columns, ...youthnetCustomColumns];
   }
 
@@ -534,7 +538,7 @@ const ContentCreator = () => {
   const failureCreateMessage =
     'CONTENT_CREATORS.NOT_ABLE_CREATE_CONTENT_CREATOR';
   const notificationKey =
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
       ? 'onScpContentCreatorCreate'
       : 'onYouthnetContentCreatorCreate';
   const notificationMessage =

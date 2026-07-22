@@ -62,6 +62,13 @@ export enum TenantName {
   CAMP_TO_CLUB = 'Camp to Club'
 }
 
+export const isSecondChanceTenant = (tenantName?: string | null): boolean =>
+  tenantName === TenantName.SECOND_CHANCE_PROGRAM ||
+  tenantName === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
+
+export const getSelectedTenantData = (tenantData?: any[] | null, tenantId?: string | null) =>
+  tenantData?.find((tenant: any) => tenant?.tenantId === tenantId) ?? tenantData?.[0];
+
 export enum Status {
   ARCHIVED = 'archived',
   ARCHIVED_LABEL = 'Archived',

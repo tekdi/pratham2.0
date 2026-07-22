@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentCreatorSearch';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
-import { RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, TextField, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -79,6 +79,10 @@ const ContentCreator = () => {
       : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+  const selectedTenantData = getSelectedTenantData(
+    storedUserData?.tenantData,
+    localStorage.getItem('tenantId')
+  );
 
   useEffect(() => {
     if (response?.result?.totalCount !== 0) {
@@ -265,10 +269,10 @@ const ContentCreator = () => {
     },
   ];
   if (
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
   ) {
     columns = [...columns, ...scpCustomColumns];
-  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+  } else if (selectedTenantData?.tenantName === TenantName.YOUTHNET) {
     columns = [...columns, ...youthnetCustomColumns];
   }
 
@@ -424,7 +428,7 @@ const ContentCreator = () => {
   const failureCreateMessage =
     'CONTENT_CREATORS.NOT_ABLE_CREATE_CONTENT_CREATOR';
   const notificationKey =
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
       ? 'onScpContentCreatorCreate'
       : 'onYouthnetContentCreatorCreate';
   const notificationMessage =

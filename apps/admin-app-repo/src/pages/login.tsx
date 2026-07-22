@@ -31,7 +31,7 @@ import Link from '@mui/material/Link';
 import loginImage from '../../public/loginImage.jpg';
 import { useUserIdStore } from '@/store/useUserIdStore';
 import { getUserDetailsInfo } from '@/services/UserList';
-import { Storage, TenantName } from '@/utils/app.constant';
+import { Storage, TenantName, isSecondChanceTenant } from '@/utils/app.constant';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import { Role } from '@/utils/app.constant';
 import { AcademicYear } from '@/utils/Interfaces';
@@ -95,8 +95,7 @@ const LoginPage = () => {
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
               if (
-                tenantData?.tenantName !=
-                TenantName.SECOND_CHANCE_PROGRAM
+                !isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 // router.push('/workspace');
                 router.push('/faqs');
@@ -105,16 +104,12 @@ const LoginPage = () => {
               }
             } else if (
               role?.role === Role.CENTRAL_ADMIN &&
-              (tenantData?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM ||
-                tenantData?.tenantName ==
-                  TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/programs', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
-              tenantData?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/centers', undefined, { locale: locale });
             } else if (
@@ -137,16 +132,12 @@ const LoginPage = () => {
             }
             if (
               role?.role === Role.CENTRAL_ADMIN &&
-              (tenantData?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM ||
-                tenantData?.tenantName ==
-                  TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/programs');
             } else if (
               role?.role === Role.ADMIN &&
-              tenantData?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/centers');
             } else if (
@@ -335,7 +326,7 @@ const LoginPage = () => {
           if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
             const { locale } = router;
             // To do :- hardcoding to be removed
-            if (tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
+            if (!isSecondChanceTenant(tenantData?.tenantName)) {
               // window.location.href = '/workspace';
               // router.push('/workspace');
               window.location.href = '/faqs';
@@ -360,15 +351,13 @@ const LoginPage = () => {
             if (locale) {
               if (
                 userInfo?.role === Role.CENTRAL_ADMIN &&
-                (tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM ||
-                  tenantData?.tenantName ==
-                    TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 window.location.href = '/programs';
                 router.push('/programs', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 window.location.href = '/centers';
                 router.push('/centers', undefined, { locale: locale });
@@ -383,15 +372,13 @@ const LoginPage = () => {
             } else {
               if (
                 userInfo?.role === Role.CENTRAL_ADMIN &&
-                (tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM ||
-                  tenantData?.tenantName ==
-                    TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 window.location.href = '/programs';
                 router.push('/programs');
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 window.location.href = '/centers';
                 router.push('/centers');
@@ -432,7 +419,7 @@ const LoginPage = () => {
                   const { locale } = router;
                   // To do :- hardcoding to be removed
                   if (
-                    tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM
+                    !isSecondChanceTenant(tenantData?.tenantName)
                   ) {
                     // window.location.href = '/workspace';
                     // router.push('/workspace');
@@ -452,16 +439,13 @@ const LoginPage = () => {
                   if (locale) {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
-                      (tenantData?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM ||
-                        tenantData?.tenantName ==
-                          TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+                      isSecondChanceTenant(tenantData?.tenantName)
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs', undefined, { locale: locale });
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                      isSecondChanceTenant(tenantData?.tenantName)
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers', undefined, { locale: locale });
@@ -478,16 +462,13 @@ const LoginPage = () => {
                   } else {
                     if (
                       userInfo?.role === Role.CENTRAL_ADMIN &&
-                      (tenantData?.tenantName ==
-                        TenantName.SECOND_CHANCE_PROGRAM ||
-                        tenantData?.tenantName ==
-                          TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS)
+                      isSecondChanceTenant(tenantData?.tenantName)
                     ) {
                       window.location.href = '/programs';
                       router.push('/programs');
                     } else if (
                       userInfo?.role === Role.ADMIN &&
-                      tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                      isSecondChanceTenant(tenantData?.tenantName)
                     ) {
                       window.location.href = '/centers';
                       router.push('/centers');
@@ -616,8 +597,8 @@ const LoginPage = () => {
 
       localStorage.setItem('name', userResponse?.firstName);
       localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
-      const frameworkId = userResponse?.tenantData?.[0]?.collectionFramework;
-      const channel = userResponse?.tenantData?.[0]?.channelId;
+      const frameworkId = tenant?.collectionFramework;
+      const channel = tenant?.channelId;
       TenantService.setTenantId(tenantId);
       localStorage.setItem('collectionFramework', frameworkId);
       localStorage.setItem('channelId', channel);

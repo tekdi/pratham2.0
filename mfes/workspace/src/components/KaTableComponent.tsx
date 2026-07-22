@@ -24,7 +24,7 @@ import QrModal from './QrModal';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { table } from 'console';
 import Checkbox from '@mui/material/Checkbox';
-import { Role, TENANT_DATA } from '@workspace/utils/app.constant';
+import { Role, TENANT_DATA, isSecondChanceTenant } from '@workspace/utils/app.constant';
 import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
 
 interface CustomTableProps {
@@ -480,8 +480,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                     : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
                                 handleOpenQrModal(link);
                               } else if (
-                                loggedInProgram ===
-                                TENANT_DATA.SECOND_CHANCE_PROGRAM
+                                isSecondChanceTenant(loggedInProgram)
                               ) {
                                 link =
                                   contentType === 'Course'
@@ -514,8 +513,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                     : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
                                 handleCopyLink(link);
                               } else if (
-                                loggedInProgram ===
-                                TENANT_DATA.SECOND_CHANCE_PROGRAM
+                                isSecondChanceTenant(loggedInProgram)
                               ) {
                                 link =
                                   contentType === 'Course'
@@ -567,8 +565,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                   : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
                               handleOpenQrModal(link);
                             } else if (
-                              loggedInProgram ===
-                              TENANT_DATA.SECOND_CHANCE_PROGRAM
+                              isSecondChanceTenant(loggedInProgram)
                             ) {
                               link =
                                 contentType === 'Course'
@@ -601,8 +598,7 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                                   : `${loggedInProgramDomain}pos/player/${identifier}?activeLink=/pos/program`;
                               handleCopyLink(link);
                             } else if (
-                              loggedInProgram ===
-                              TENANT_DATA.SECOND_CHANCE_PROGRAM
+                              isSecondChanceTenant(loggedInProgram)
                             ) {
                               link =
                                 contentType === 'Course'
