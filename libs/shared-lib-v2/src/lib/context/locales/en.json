@@ -147,6 +147,7 @@
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "Job family": "Job family",
+    "Job Family": "Job Family",
 "Group Membership": "Group Membership",
     "PSU": "PSU",
     "UNAUTHORIZED": "You are not authorized to access this site",
@@ -189,6 +190,11 @@
       "INVALID_LINK": "Invalid Link",
       "FUTURE_WORK": "What do you want to become?",
       "ENROLL_IN_TO": "Enroll in to"
+    },
+    "PROGRAM_SWITCH_MODAL": {
+      "REGISTERED_ON": "Registered on",
+      "OTHER_PROGRAMS_ENROLLED": "Other programs you are enrolled in",
+      "SHOW_ALL_PROGRAMS": "Show All Programs"
     },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
