@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { Box, Button, Card, CardContent, Typography } from '@mui/material';
+import { useTranslation } from '@shared-lib';
 
 interface ProgramCardProps {
   image: string;
@@ -16,9 +17,11 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
   title,
   description,
   buttonColor,
-  buttonLabel = 'Explore & Register',
+  buttonLabel,
   onExplore,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Card
       sx={{
@@ -113,7 +116,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             // },
           }}
         >
-          {buttonLabel}
+          {buttonLabel || t('LANDING.EXPLORE_AND_REGISTER')}
         </Button>
       </CardContent>
     </Card>

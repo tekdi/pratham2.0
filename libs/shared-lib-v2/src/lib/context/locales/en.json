@@ -226,7 +226,9 @@
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
       "APPLY_FILTER": "Apply Filter",
-      "DONE": "Done"
+      "DONE": "Done",
+      "CONTENT_FILTERS": "Content Filters",
+      "CLEAR_ALL": "Clear All"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -507,6 +509,7 @@
     "OUR_PROGRAMS_SUBTITLE": "Explore programs designed to support your learning journey.",
     "OUR_PROGRAMS_FOR_VOLUNTEERS": "Our Programs for Volunteers",
     "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "Make a real difference — join one of our volunteer-driven programs.",
+    "EXPLORE_AND_REGISTER": "Explore & Register",
     "ABOUT_THE_PROGRAM": "About the Program",
     "READY_TO_JOIN": "Ready to join",
     "ENROL_NOW": "Enrol Now",
@@ -525,7 +528,29 @@
     "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
     "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
     "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "YES": "Yes",
+    "ENROL_MODAL": {
+      "ENTER_MOBILE_NUMBER": "Enter Mobile Number",
+      "VERIFICATION_CODE_SUBTITLE": "We'll send a verification code",
+      "MOBILE_NUMBER_INSTRUCTIONS": "To begin your registration, please enter your mobile number. Don't have a mobile phone? You can enter your parent's or guardian's number instead.",
+      "OTP_INSTRUCTIONS": "We will send an OTP to this number for verification.",
+      "MOBILE_NUMBER_LABEL": "Mobile Number",
+      "SENDING": "Sending…",
+      "SEND_OTP": "Send OTP",
+      "AWESOME": "Awesome!",
+      "PHONE_VERIFIED_SUCCESS": "Your phone number has been successfully verified",
+      "GO_BACK": "Go back",
+      "INVALID_MOBILE_NUMBER": "Please enter a valid 10-digit mobile number",
+      "FAILED_TO_SEND_OTP": "Failed to send OTP. Please try again.",
+      "ENTER_COMPLETE_OTP": "Please enter the complete OTP",
+      "INVALID_OTP": "Invalid OTP. Please try again.",
+      "VERIFICATION_FAILED": "Verification failed. Please try again.",
+      "ENTER_VERIFICATION_CODE": "Enter Verification Code",
+      "VERIFY": "Verify",
+      "VERIFYING": "Verifying…",
+      "RESEND_CODE_IN": "Resend code in",
+      "RESEND_CODE": "Resend code"
+    }
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "Welcome to NavaPatham!",
