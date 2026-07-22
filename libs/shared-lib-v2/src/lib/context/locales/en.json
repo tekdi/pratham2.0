@@ -538,7 +538,18 @@
       "SENDING": "Sending…",
       "SEND_OTP": "Send OTP",
       "AWESOME": "Awesome!",
-      "PHONE_VERIFIED_SUCCESS": "Your phone number has been successfully verified"
+      "PHONE_VERIFIED_SUCCESS": "Your phone number has been successfully verified",
+      "GO_BACK": "Go back",
+      "INVALID_MOBILE_NUMBER": "Please enter a valid 10-digit mobile number",
+      "FAILED_TO_SEND_OTP": "Failed to send OTP. Please try again.",
+      "ENTER_COMPLETE_OTP": "Please enter the complete OTP",
+      "INVALID_OTP": "Invalid OTP. Please try again.",
+      "VERIFICATION_FAILED": "Verification failed. Please try again.",
+      "ENTER_VERIFICATION_CODE": "Enter Verification Code",
+      "VERIFY": "Verify",
+      "VERIFYING": "Verifying…",
+      "RESEND_CODE_IN": "Resend code in",
+      "RESEND_CODE": "Resend code"
     }
   },
   "NAVAPATHAM": {
