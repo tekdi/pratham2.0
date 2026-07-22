@@ -526,7 +526,18 @@
     "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
     "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
     "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "YES": "Yes",
+    "ENROL_MODAL": {
+      "ENTER_MOBILE_NUMBER": "Enter Mobile Number",
+      "VERIFICATION_CODE_SUBTITLE": "We'll send a verification code",
+      "MOBILE_NUMBER_INSTRUCTIONS": "To begin your registration, please enter your mobile number. Don't have a mobile phone? You can enter your parent's or guardian's number instead.",
+      "OTP_INSTRUCTIONS": "We will send an OTP to this number for verification.",
+      "MOBILE_NUMBER_LABEL": "Mobile Number",
+      "SENDING": "Sending…",
+      "SEND_OTP": "Send OTP",
+      "AWESOME": "Awesome!",
+      "PHONE_VERIFIED_SUCCESS": "Your phone number has been successfully verified"
+    }
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "Welcome to NavaPatham!",

@@ -252,12 +252,12 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
             <Typography
               sx={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '20px', mb: 0.5 }}
             >
-              Enter Mobile Number
+              {t('LANDING.ENROL_MODAL.ENTER_MOBILE_NUMBER')}
             </Typography>
             <Typography
               sx={{ fontFamily: 'Poppins', fontSize: '13px', color: '#555', mb: 2 }}
             >
-              We'll send a verification code
+              {t('LANDING.ENROL_MODAL.VERIFICATION_CODE_SUBTITLE')}
             </Typography>
 
             <Box
@@ -269,16 +269,14 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
               }}
             >
               <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#444', lineHeight: 1.6 }}>
-                To begin your registration, please enter your mobile number.
-                Don't have a mobile phone? You can enter your parent's or guardian's
-                number instead.
+                {t('LANDING.ENROL_MODAL.MOBILE_NUMBER_INSTRUCTIONS')}
                 <br />
-                We will send an OTP to this number for verification.
+                {t('LANDING.ENROL_MODAL.OTP_INSTRUCTIONS')}
               </Typography>
             </Box>
 
             <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '13px', mb: 0.5 }}>
-              Mobile Number
+              {t('LANDING.ENROL_MODAL.MOBILE_NUMBER_LABEL')}
             </Typography>
             <TextField
               fullWidth
@@ -332,7 +330,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 '&.Mui-disabled': { backgroundColor: '#FFE48A', color: '#1F1B13' },
               }}
             >
-              {loading ? 'Sending…' : 'Send OTP'}
+              {loading ? t('LANDING.ENROL_MODAL.SENDING') : t('LANDING.ENROL_MODAL.SEND_OTP')}
             </Button>
           </Box>
         )}
@@ -366,7 +364,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 '&:hover': { backgroundColor: '#f0b000' },
               }}
             >
-              Continue
+              {t('CONTINUE')}
             </Button>
           </Box>
         )}
