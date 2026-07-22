@@ -11,6 +11,7 @@ import {
   Paper,
 } from '@mui/material';
 import { KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { useTranslation } from '@shared-lib';
 
 interface StaticFilterFieldsProps {
   onFiltersChange?: (filters: Record<string, string[]>) => void;
@@ -33,6 +34,7 @@ interface StaticFilterField {
 }
 
 const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange, showHeader = false, clearTrigger = 0, filterTypes }) => {
+  const { t } = useTranslation();
   const storageKey = `staticFilters_${(filterTypes ?? ['contentLanguage', 'skills', 'courseType']).join('_')}`;
 
   const [filterFields, setFilterFields] = useState<StaticFilterField[]>([]);
@@ -274,7 +276,7 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
               fontSize: '1.1rem',
             }}
           >
-            Content Filters{' '}
+            {t('LEARNER_APP.COURSE.CONTENT_FILTERS')}{' '}
             {filterCount > 0 && `(${filterCount})`}
           </Typography>
           {filterCount > 0 && (
@@ -288,7 +290,7 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
               }}
               onClick={clearAllFilters}
             >
-              Clear All
+              {t('LEARNER_APP.COURSE.CLEAR_ALL')}
             </Button>
           )}
         </Box>
@@ -463,7 +465,7 @@ const StaticFilterFields: React.FC<StaticFilterFieldsProps> = ({ onFiltersChange
                         }
                       }}
                     >
-                      {showMore ? 'Show less ▲' : 'Show more ▼'}
+                      {showMore ? t('SHOW_LESS') : t('SHOW_MORE')}
                     </Button>
                   </Box>
                 )}

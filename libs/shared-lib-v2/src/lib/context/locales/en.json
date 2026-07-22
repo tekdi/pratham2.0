@@ -226,7 +226,9 @@
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
       "APPLY_FILTER": "Apply Filter",
-      "DONE": "Done"
+      "DONE": "Done",
+      "CONTENT_FILTERS": "Content Filters",
+      "CLEAR_ALL": "Clear All"
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
