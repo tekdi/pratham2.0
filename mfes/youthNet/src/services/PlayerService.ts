@@ -108,6 +108,7 @@ export const fetchCourses = async (filters: any = {}) => {
           'leafNodes',
           'courseType',
           'language',
+          'contentLanguage',
         ],
       },
     };

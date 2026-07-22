@@ -220,8 +220,8 @@ export const DEFAULT_COURSE_LIST_FILTERS: CourseListFilters = {
 // Fixed rather than derived from the currently-loaded courses — Hindi should always be
 // selectable even before any Hindi course has been fetched/paged into view.
 export const COURSE_LANGUAGE_OPTIONS: FilterPillOption[] = [
-  { value: 'en', label: 'EN' },
-  { value: 'hi', label: 'HI' },
+  { value: 'en', label: 'English' },
+  { value: 'hi', label: 'Hindi' },
 ];
 
 // Single source of truth for the 5 status chips rendered per course row — add/remove/reorder a
