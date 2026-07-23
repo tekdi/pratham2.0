@@ -33,7 +33,7 @@ const OUTPUT_DIR = path.join(REPO_ROOT, 'translation', 'Outputs');
 const TARGETS = [
   {
     appName: 'learner_app',
-    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 20th July 2026 - Learner Web App (PLP).csv'),
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 22th July 2026 - Learner Web App (PLP).csv'),
     localesDir: path.join(REPO_ROOT, 'libs/shared-lib-v2/src/lib/context/locales'),
     layout: 'file',                         // 'file' => <localesDir>/<code>.json
     keyColumns: ['Module', 'Submodule', 'Key'],
