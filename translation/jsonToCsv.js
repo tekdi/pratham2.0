@@ -114,14 +114,18 @@ const TARGETS = [
     namespace: 'common.json',
     keyColumns: ['Module', 'Submodule', 'Key'],
     outputCsv: path.join(OUTPUT_DIR, 'youthnet.csv'),
-    // youthNet has only en, hi, ml, mr, or, ur. Odiya -> `or` (no `odi` folder).
-    // `ml` (Malayalam) is intentionally left out of the sheet.
+    // Odiya -> `or` (no `odi` folder). `ml` (Malayalam) is left out of the sheet.
+    // tel/kan/tam/gu were newly added to youthNet and are included here too.
     languages: [
-      { column: 'English', code: 'en', script: null },
-      { column: 'Marathi', code: 'mr', script: 'devanagari' },
-      { column: 'Hindi',   code: 'hi', script: 'devanagari' },
-      { column: 'Odiya',   code: 'or', script: 'odia' },
-      { column: 'Urdu',    code: 'ur', script: 'arabic' },
+      { column: 'English',  code: 'en',  script: null },
+      { column: 'Marathi',  code: 'mr',  script: 'devanagari' },
+      { column: 'Hindi',    code: 'hi',  script: 'devanagari' },
+      { column: 'Odiya',    code: 'or',  script: 'odia' },
+      { column: 'Telugu',   code: 'tel', script: 'telugu' },
+      { column: 'Kannada',  code: 'kan', script: 'kannada' },
+      { column: 'Tamil',    code: 'tam', script: 'tamil' },
+      { column: 'Gujarati', code: 'gu',  script: 'gujarati' },
+      { column: 'Urdu',     code: 'ur',  script: 'arabic' },
     ],
   },
 ];

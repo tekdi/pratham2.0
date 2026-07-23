@@ -115,7 +115,7 @@ const Calendar: React.FC<any> = ({
 
       if (!dayDataValuesExist && eventScheduled) {
         showCircularProgress = true;
-        pathColor = theme.palette.warning['400'];
+        pathColor = '#E6E6E6';
         percentage = 100;
       } else {
         showCircularProgress = dayDataValuesExist;

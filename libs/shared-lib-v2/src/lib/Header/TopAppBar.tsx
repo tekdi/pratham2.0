@@ -162,13 +162,14 @@ const LanguageSelect = ({
       }}
     >
       <MuiMenuItem value="en">English</MuiMenuItem>
-      {/* <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
+      <MuiMenuItem value="hi">हिंदी</MuiMenuItem>
       <MuiMenuItem value="mr">मराठी</MuiMenuItem>
       <MuiMenuItem value="odi">ଓଡ଼ିଆ</MuiMenuItem>
       <MuiMenuItem value="tel">తెలుగు</MuiMenuItem>
       <MuiMenuItem value="kan">ಕನ್ನಡ</MuiMenuItem>
       <MuiMenuItem value="tam">தமிழ்</MuiMenuItem>
-      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem> */}
+      <MuiMenuItem value="guj">ગુજરાતી</MuiMenuItem>
+      <MuiMenuItem value="ur">اردو</MuiMenuItem>
     </Select>
   );
 };

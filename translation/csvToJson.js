@@ -33,7 +33,7 @@ const OUTPUT_DIR = path.join(REPO_ROOT, 'translation', 'Outputs');
 const TARGETS = [
   {
     appName: 'learner_app',
-    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Learner web PLP.csv'),
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 22th July 2026 - Learner Web App (PLP).csv'),
     localesDir: path.join(REPO_ROOT, 'libs/shared-lib-v2/src/lib/context/locales'),
     layout: 'file',                         // 'file' => <localesDir>/<code>.json
     keyColumns: ['Module', 'Submodule', 'Key'],
@@ -55,7 +55,7 @@ const TARGETS = [
 
   {
     appName: 'scp_teacher',
-    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Facilitator.csv'),
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 20th July 2026 - Facilitator.csv'),
     localesDir: path.join(REPO_ROOT, 'mfes/scp-teacher-repo/public/locales'),
     layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
     namespace: 'common.json',
@@ -79,7 +79,7 @@ const TARGETS = [
 
   {
     appName: 'admin_app',
-    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Admin.csv'),
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 20th July 2026 - Admin App.csv'),
     localesDir: path.join(REPO_ROOT, 'apps/admin-app-repo/public/locales'),
     layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
     namespace: 'common.json',
@@ -103,7 +103,7 @@ const TARGETS = [
 
   {
     appName: 'youthnet',
-    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - Mentor.csv'),
+    csvPath: path.join(REPO_ROOT, 'translation/Pratham_ Translations - 20th July 2026 - Mentor.csv'),
     localesDir: path.join(REPO_ROOT, 'mfes/youthNet/public/locales'),
     layout: 'dir',                          // 'dir' => <localesDir>/<code>/<namespace>
     namespace: 'common.json',
