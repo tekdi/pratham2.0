@@ -75,7 +75,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
             color: '#1F1B13',
           }}
         >
-          {title}
+          {t(`PROGRAMS.${title}`)}
         </Typography>
 
         {description && (
@@ -90,7 +90,7 @@ const ProgramCard: React.FC<ProgramCardProps> = ({
               flexGrow: 1,
             }}
           >
-            {description}
+            {t(`PROGRAMS.${description}`)}
           </Typography>
         )}
 
