@@ -987,13 +987,57 @@ const LoginPageContent = () => {
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/scp-dashboard');
+          if (localStorage.getItem('isAndroidApp') == 'yes') {
+            // Android: hand back to the native dashboard instead of loading the
+            // web /scp-dashboard page in the WebView.
+            if ((window as any).ReactNativeWebView) {
+              let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+              if (!refreshToken || refreshToken === '') {
+                refreshToken = localStorage.getItem('refreshToken');
+              }
+              (window as any).ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'ENROLL_PROGRAM_EVENT',
+                  data: {
+                    userId: localStorage.getItem('userId'),
+                    tenantId: localStorage.getItem('tenantId'),
+                    token: localStorage.getItem('token'),
+                    refreshToken: refreshToken,
+                  },
+                })
+              );
+            }
+          } else {
+            router.push('/scp-dashboard');
+          }
         }}
         showFooter={true}
         primaryText={t('COMMON.OK')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/scp-dashboard');
+          if (localStorage.getItem('isAndroidApp') == 'yes') {
+            // Android: hand back to the native dashboard instead of loading the
+            // web /scp-dashboard page in the WebView.
+            if ((window as any).ReactNativeWebView) {
+              let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+              if (!refreshToken || refreshToken === '') {
+                refreshToken = localStorage.getItem('refreshToken');
+              }
+              (window as any).ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'ENROLL_PROGRAM_EVENT',
+                  data: {
+                    userId: localStorage.getItem('userId'),
+                    tenantId: localStorage.getItem('tenantId'),
+                    token: localStorage.getItem('token'),
+                    refreshToken: refreshToken,
+                  },
+                })
+              );
+            }
+          } else {
+            router.push('/scp-dashboard');
+          }
         }}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
