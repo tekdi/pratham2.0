@@ -50,7 +50,7 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const allowedPaths = ["/workspace","/course-planner", "/subjectDetails","/stateDetails" ];
     const notAllowedPathsForCentralAdmin = ["/team-leader", "/faciliator", "/learners", "/centers", "/certificate-issuance", "/mentor", "/central-head", "/user-leader" ];
-    
+
     const isWorkspaceContent = router.pathname.startsWith("/workspace");
     const coursePlannerPaths = [
       // "/course-planner",
@@ -129,7 +129,7 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         router.push("/unauthorized");
       }
     }
-    
+
 
     if (
       user.role === Role.ADMIN &&
@@ -140,8 +140,8 @@ const RouteGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
 
     const isSecondChanceTenant =
-      selectedTenant?.tenantName == TenantName.SECOND_CHANCE_PROGRAM ||
-      selectedTenant?.tenantName == TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
+      selectedTenant?.tenantName === TenantName.SECOND_CHANCE_PROGRAM ||
+      selectedTenant?.tenantName === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
 
     if ((((user.role === Role.ADMIN && isSecondChanceTenant) || (user.role === Role.CENTRAL_ADMIN && isSecondChanceTenant)) && (allowedPaths.includes(router.pathname) || isWorkspaceContent || isCoursePlannerContent)) || (user.role === Role.ADMIN && (router.pathname === "/programs" || router.pathname === "/notification-templates"))) {
       if (router.pathname !== "/login" && router.pathname !== "/logout" && router.pathname !== "/edit-password") {
