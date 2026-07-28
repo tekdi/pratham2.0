@@ -1103,12 +1103,46 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
         showFooter={true}
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
       >
