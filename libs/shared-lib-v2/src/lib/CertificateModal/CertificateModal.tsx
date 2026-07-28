@@ -267,9 +267,15 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         await new Promise((resolve) => setTimeout(resolve, 600));
 
         const certDoc = iframe.contentDocument as Document;
-        const pageEl = certDoc.querySelector(
-          '.page, .certificate-container, .scale-container'
-        ) as HTMLElement;
+        // Prefer the innermost content box. `.scale-container`/`.viewport-frame` wrappers
+        // center themselves via `transform: translate(-50%, -50%)`, which shifts the
+        // rendered content off-canvas when captured in isolation — querySelector with a
+        // grouped selector matches by document order, not by the order listed here, so
+        // that ancestor can win over the safe inner box if not checked explicitly first.
+        const pageEl = (certDoc.querySelector('.certificate-container') ||
+          certDoc.querySelector('.certificate') ||
+          certDoc.querySelector('.page') ||
+          certDoc.querySelector('.scale-container')) as HTMLElement;
         if (!pageEl) throw new Error('Certificate .page element not found');
 
         const dataUrl = await domtoimage.toJpeg(pageEl, {
