@@ -61,6 +61,101 @@ interface CertificateModalProps {
   setOpen: any;
 }
 
+const CertificatePage: React.FC<{
+  htmlContent: string;
+  deviceType: 'mobile' | 'desktop';
+  onLoad: () => void;
+}> = ({ htmlContent, deviceType, onLoad }) => {
+  const responsiveHtml =
+    deviceType === 'mobile'
+      ? `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+        <style>
+          html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            background: white;
+            overflow-x: hidden;
+          }
+          * {
+            box-sizing: border-box;
+          }
+        </style>
+      </head>
+      <body>
+        ${htmlContent}
+      </body>
+    </html>
+  `
+      : `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+            background: white;
+          }
+          * {
+            box-sizing: border-box;
+          }
+        </style>
+      </head>
+      <body>
+        ${htmlContent}
+      </body>
+    </html>
+  `;
+
+  const encodedHtml = encodeURIComponent(responsiveHtml);
+  const dataUri = `data:text/html;charset=utf-8,${encodedHtml}`;
+
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        minWidth: 0,
+        minHeight: 0,
+        display: 'block',
+        overflow: 'visible',
+      }}
+    >
+      <iframe
+        key={deviceType}
+        src={dataUri}
+        title="Certificate"
+        onLoad={onLoad}
+        scrolling="auto"
+        style={{
+          width: '100%',
+          height: '100%',
+          minWidth: '100%',
+          minHeight: '100%',
+          border: 'none',
+          backgroundColor: 'white',
+          display: 'block',
+          boxSizing: 'border-box',
+        }}
+      />
+    </Box>
+  );
+};
+
 export const CertificateModal: React.FC<CertificateModalProps> = ({
   certificateId,
   open,
@@ -70,7 +165,6 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isIframeLoaded, setIsIframeLoaded] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
-  const [certificateSite, setCertificateSite] = useState('');
   const [deviceType, setDeviceType] = useState<'mobile' | 'desktop'>('desktop');
 
   useEffect(() => {
@@ -126,142 +220,6 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       window.removeEventListener('orientationchange', detectDeviceType);
     };
   }, []);
-
-  const CertificatePage: React.FC<{ htmlContent: string; onLoad: () => void }> = ({
-    htmlContent,
-    onLoad,
-  }) => {
-    const responsiveHtml =
-      deviceType === 'mobile'
-        ? `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              font-family: Arial, sans-serif;
-              width: 100%;
-              height: 100%;
-              box-sizing: border-box;
-              background: white;
-              overflow-x: hidden;
-            }
-            * {
-              box-sizing: border-box;
-            }
-            .main-container {
-              width: 100% !important;
-              min-width: 100% !important;
-              padding: 10px !important;
-              overflow-x: hidden !important;
-              display: flex !important;
-              justify-content: center !important;
-              align-items: flex-start !important;
-            }
-            .scale-container {
-              max-width: 100% !important;
-              margin: 0 auto !important;
-              display: flex !important;
-              justify-content: center !important;
-              position: relative !important;
-              left: 0 !important;
-              right: 0 !important;
-            }
-            div[style*="font-family"], 
-            .certificate-container {
-              max-width: 100%;
-              margin: 0 auto;
-            }
-          </style>
-          <script>
-            window.addEventListener('load', function() {
-              const container = document.querySelector('.scale-container');
-              if (container) {
-                const scale = Math.min((window.innerWidth - 20) / 1100, 1);
-                container.style.transform = 'scale(' + scale + ')';
-                container.style.transformOrigin = 'center top';
-              }
-            });
-            
-            window.addEventListener('resize', function() {
-              const container = document.querySelector('.scale-container');
-              if (container) {
-                const scale = Math.min((window.innerWidth - 20) / 1100, 1);
-                container.style.transform = 'scale(' + scale + ')';
-              }
-            });
-          </script>
-        </head>
-        <body>
-          ${htmlContent}
-        </body>
-      </html>
-    `
-        : `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <style>
-            body {
-              margin: 0;
-              padding: 20px;
-              font-family: Arial, sans-serif;
-              width: 100%;
-              box-sizing: border-box;
-              background: white;
-            }
-            * {
-              box-sizing: border-box;
-            }
-          </style>
-        </head>
-        <body>
-          ${htmlContent}
-        </body>
-      </html>
-    `;
-
-    const encodedHtml = encodeURIComponent(responsiveHtml);
-    const dataUri = `data:text/html;charset=utf-8,${encodedHtml}`;
-    setCertificateSite(dataUri);
-
-    return (
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          minWidth: 0,
-          minHeight: 0,
-          display: 'block',
-          overflow: 'visible',
-        }}
-      >
-        <iframe
-          key={deviceType}
-          src={dataUri}
-          title="Certificate"
-          onLoad={onLoad}
-          scrolling="auto"
-          style={{
-            width: '100%',
-            height: '100%',
-            minWidth: '100%',
-            minHeight: '100%',
-            border: 'none',
-            backgroundColor: 'white',
-            display: 'block',
-            boxSizing: 'border-box',
-          }}
-        />
-      </Box>
-    );
-  };
 
   const onDownloadCertificate = async () => {
     try {
@@ -450,6 +408,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
                 <CertificatePage
                   key={`${deviceType}-${certificateId}`}
                   htmlContent={certificateHtml}
+                  deviceType={deviceType}
                   onLoad={() => setIsIframeLoaded(true)}
                 />
               </Box>
