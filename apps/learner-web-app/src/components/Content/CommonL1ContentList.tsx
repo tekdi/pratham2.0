@@ -8,6 +8,7 @@ import {
   Grid,
   Typography,
   Link,
+  Paper,
   useMediaQuery,
   useTheme,
 } from '@mui/material';
@@ -24,6 +25,7 @@ import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
 import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
@@ -122,90 +124,113 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
           {typeof window !== 'undefined' &&
             localStorage.getItem('userProgram') ===
               TenantName.SECOND_CHANCE_PROGRAM && (
-              <Box
+              <Paper
+                elevation={0}
                 sx={{
                   display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: '#F5F6FA',
-                  p: { xs: 2, md: 4 },
-                  mb: 3,
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: 'stretch',
+          
+                  border: '1px solid #FBE6B0',
+                  borderLeft: { xs: '4px solid #FDBE16', md: '5px solid #FDBE16' },
+                  margin: { xs: 1, md: 3 },
                   borderRadius: 2,
-                  gap: 1,
+                  overflow: 'hidden',
                 }}
               >
-                <InfoIcon
-                  sx={{
-                    fontSize: { xs: '28px', md: '36px' },
-                    color: '#FDBE16',
-                    flexShrink: 0,
-                  }}
-                />
                 <Box
                   sx={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                    maxWidth: '650px',
+                    alignItems: 'flex-start',
+                    gap: { xs: 1.5, md: 2 },
+                    p: { xs: 2, md: 3 },
+                    flex: { md: 1.4 },
+                    borderBottom: { xs: '1px solid #FBE6B0', md: 'none' },
+                    borderRight: { xs: 'none', md: '1px solid #FBE6B0' },
                   }}
                 >
-                  <Typography
-                    variant="h5"
+                  <Box
                     sx={{
-                      textAlign: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: { xs: 32, md: 40 },
+                      height: { xs: 32, md: 40 },
+                      borderRadius: '50%',
+                      bgcolor: '#FFEFC2',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <InfoIcon
+                      sx={{
+                        fontSize: { xs: '18px', md: '24px' },
+                        color: '#B4790C',
+                      }}
+                    />
+                  </Box>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      textAlign: 'left',
                       color: '#1F1B13',
                       fontWeight: 600,
-                      fontSize: { xs: '12px', md: '16px' },
+                      fontSize: { xs: '13px', md: '16px' },
                       lineHeight: { xs: '18px', md: '24px' },
                     }}
                   >
                     {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
                   </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: { xs: 'flex-start', md: 'center' },
+                    justifyContent: 'center',
+                    textAlign: { xs: 'left', md: 'center' },
+                    gap: 1.5,
+                    p: { xs: 2, md: 3 },
+                    flex: 1,
+                  }}
+                >
                   <Typography
                     variant="body2"
                     sx={{
-                      textAlign: 'center',
-                      color: '#1F1B13',
-                      fontWeight: 400,
+                      color: '#5A5548',
+                      fontWeight: 600,
                       fontSize: { xs: '11px', md: '14px' },
                       lineHeight: { xs: '16px', md: '20px' },
+
                     }}
                   >
-                    {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE')
-                      .split('{playStoreLink}')
-                      .map((part, index, array) => {
-                        if (index === array.length - 1) {
-                          return (
-                            <React.Fragment key={index}>{part}</React.Fragment>
-                          );
-                        }
-                        return (
-                          <React.Fragment key={index}>
-                            {part}
-                            <Link
-                              href="https://play.google.com/store/apps/details?id=com.pratham.learning"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              sx={{
-                                //color: '#FDBE16',
-                                color: 'blue',
-                                textDecoration: 'underline',
-                                fontWeight: 500,
-                                '&:hover': {
-                               //   color: '#fdbe16',
-                                  textDecoration: 'underline',
-                                },
-                              }}
-                            >
-                              Play Store
-                            </Link>
-                          </React.Fragment>
-                        );
-                      })}
+                    {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').replace(
+                      '{playStoreLink}',
+                      'Play Store'
+                    )}
                   </Typography>
+                  <Button
+                    href="https://play.google.com/store/apps/details?id=com.pratham.learning"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="outlined"
+                    startIcon={<GetAppIcon />}
+                    sx={{
+                      color: '#0D599E',
+                      borderColor: '#0D599E',
+                      fontWeight: 600,
+                      fontSize: { xs: '12px', md: '14px' },
+                      textTransform: 'none',
+                      px: 2.5,
+                      '&:hover': {
+                        borderColor: '#0D599E',
+                        backgroundColor: '#E7F3F8',
+                      },
+                    }}
+                  >
+                    Play Store
+                  </Button>
                 </Box>
-              </Box>
+              </Paper>
             )}
           {!notab && (
             <Box
@@ -214,8 +239,8 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { xs: 'flex-start', sm: 'center' },
                 justifyContent: 'space-between',
-                py: '36px',
-                px: '34px',
+                py: '20px',
+                px: '20px',
                 bgcolor: '#fff',
                 gap: 2,
               }}
