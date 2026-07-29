@@ -485,6 +485,7 @@ console.log('result=====>', result);
           return;
         }
         if (assessmentStatus === 'assessmentUnavailable') {
+          setPendingProgramTenantId(program.tenantId);
           return;
         } else {
        // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
