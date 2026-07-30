@@ -36,12 +36,12 @@ import { useTranslation } from '../lib/context/LanguageContext';
 import switchAccountConfig from './SwitchAccount.config';
 
 // TypeScript interfaces
-interface Role {
+export interface Role {
   roleId: string;
   roleName: string;
 }
 
-interface TenantData {
+export interface TenantData {
   tenantName: string;
   tenantId: string;
   tenantStatus?: string;
@@ -84,6 +84,8 @@ interface SwitchAccountDialogProps {
     roleName: string
   ) => void;
   authResponse: TenantData[];
+  currentTenantId?: string;
+  currentRoleId?: string;
 }
 
 const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
@@ -91,6 +93,8 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   onClose,
   callbackFunction,
   authResponse,
+  currentTenantId,
+  currentRoleId,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const theme = useTheme();
@@ -333,6 +337,32 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       setTimeout(() => {
         setSnackbarOpen(true);
       }, 300);
+      return;
+    }
+
+    // Post-login switching: preselect the currently active tenant/role (if provided)
+    // instead of auto-confirming, so the user can see and change their current selection.
+    if (currentTenantId) {
+      autoConfirmedRef.current = true;
+      const currentTenant = tenants.find((t) => t.tenantId === currentTenantId);
+      if (currentTenant) {
+        setSelectedTenant(currentTenant);
+        const currentRole = currentTenant.roles?.find(
+          (r) => r.roleId === currentRoleId
+        );
+        if (currentRole) {
+          setSelectedRole(currentRole);
+        }
+        setActiveStep(
+          tenants.length > 1
+            ? 0
+            : (currentTenant.roles?.length ?? 0) > 1
+            ? 1
+            : 0
+        );
+      } else {
+        setActiveStep(0);
+      }
       return;
     }
 
