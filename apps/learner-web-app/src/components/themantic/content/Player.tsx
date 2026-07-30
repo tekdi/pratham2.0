@@ -352,7 +352,15 @@ const App = ({
   // };
 
   return (
-    <Box className="bs-px-5" sx={{ mx: { xs: '0.5vh', sm: '1vh', md: '2vh' }, position: 'relative' }}>
+    <Box
+      className="bs-px-5"
+      sx={{
+        mx: { xs: 0, sm: '1vh', md: '2vh' },
+        // bs-px-5 forces 3rem !important; trim to 15px on mobile, keep 3rem on tablet/desktop
+        px: { xs: '15px !important', sm: '3rem !important' },
+        position: 'relative',
+      }}
+    >
       <Box
         sx={{
           display: 'flex',

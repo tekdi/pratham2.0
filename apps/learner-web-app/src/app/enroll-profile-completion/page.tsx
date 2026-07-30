@@ -362,7 +362,34 @@ const EnrollProfileCompletionInner = () => {
     setAssessmentUnavailableModal(false);
     localStorage.removeItem('enrollTenantId');
     // Enrollment already happened on Finish Enroll (handleAccessProgram).
-    window.location.href = '/scp-dashboard';
+    console.log('========== onAssessmentUnavailableOk CALLED ==========');
+    const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+    console.log('isAndroid check:', isAndroid);
+
+    if (isAndroid) {
+      console.log('Android path - sending message to WebView');
+      if (window.ReactNativeWebView) {
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
+        }
+        console.log('Posting ENROLL_PROGRAM_EVENT to ReactNativeWebView');
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken: refreshToken,
+          }
+        }));
+      } else {
+        console.log('isAndroidApp is yes but window.ReactNativeWebView is missing');
+      }
+    } else {
+      console.log('Web path - navigating to /scp-dashboard');
+      window.location.href = '/scp-dashboard';
+    }
   };
 
   const handleStartAssessment = async () => {
