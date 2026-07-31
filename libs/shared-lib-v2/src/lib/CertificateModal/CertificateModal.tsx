@@ -286,9 +286,21 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
         const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
-        const naturalWidth = pageEl.scrollWidth || pageEl.offsetWidth;
-        const naturalHeight = pageEl.scrollHeight || pageEl.offsetHeight;
-        const aspect = naturalHeight / naturalWidth;
+        // The aspect ratio must come from the rasterised bitmap, never from the
+        // element's scroll box. dom-to-image renders the *layout* box, so any
+        // template whose children overflow it (e.g. a deliberately over-tall,
+        // clipped icon strip) reports a larger scrollHeight — jsPDF would then
+        // draw the bitmap into a wrongly-proportioned rectangle, stretching the
+        // certificate and letterboxing it on the wrong axis. scrollWidth/Height
+        // are also rounded integers that exclude borders, so they can never be
+        // exact; the bitmap's own dimensions always are.
+        const bitmap = new Image();
+        bitmap.src = dataUrl;
+        await new Promise<void>((resolve, reject) => {
+          bitmap.onload = () => resolve();
+          bitmap.onerror = () => reject(new Error('Certificate image failed to decode'));
+        });
+        const aspect = bitmap.naturalHeight / bitmap.naturalWidth;
 
         let imgW = pageW;
         let imgH = imgW * aspect;
