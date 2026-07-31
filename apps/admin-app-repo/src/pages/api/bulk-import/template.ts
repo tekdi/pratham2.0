@@ -612,10 +612,29 @@ const getQuestionsample = (): (string | number)[][] => [
   ],
 ];
 
+// CourseChildrenMapping columns (7): CourseTempID, UnitName, UnitDescription,
+//   UnitIconDriveURL, ChildRef, ChildType, Sequence
+// Unit Description and Unit Icon Drive URL are unit-level: fill them on the
+// FIRST row of each unit and leave blank on the remaining rows of that unit.
 const getCourseMappingsSample = (): (string | number)[][] => [
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_CONTENT_1', 'content',     1],
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_QS_1',      'questionset', 2],
-  ['TEMP_COURSE_1', 'Unit 2: Assessment',    'TEMP_QS_2',      'questionset', 1],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    'Foundational concepts to get started',                              // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_CONTENT_1', 'content', 1,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    '',   // blank — unit metadata already set on the first row of this unit
+    '',
+    'TEMP_QS_1', 'questionset', 2,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 2: Assessment',
+    'End-of-course assessment',                                          // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_QS_2', 'questionset', 1,
+  ],
 ];
 
 // ExistingContentMapping columns (6): TempID, ExistingIdentifier, EntityType,
@@ -649,7 +668,7 @@ const buildInstructionsSheet = (workbook: ExcelJS.Workbook, fw: FrameworkId) => 
     ['QuestionSets',          'Create question set containers with metadata.'],
     ['Questions',             'Add MCQ / Arrange / Match / Subjective questions linked to a QuestionSet.'],
     ['Courses',               'Create course containers.'],
-    ['CourseChildrenMapping', 'Map content and question sets into course units.'],
+    ['CourseChildrenMapping', 'Map content and question sets into course units. Also sets each unit\'s description and icon.'],
     ['ExistingContentMapping','Reference existing platform items (do_xxx) using a Temp ID.'],
     ['Examples',              'Sample rows for every sheet. NOT imported — copy a row into the sheet above and edit it.'],
     ['LookupData',            'Reference sheet — all valid dropdown values. Do NOT edit this sheet.'],
