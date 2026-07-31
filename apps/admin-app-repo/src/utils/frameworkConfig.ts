@@ -747,11 +747,14 @@ export const QUESTION_COLUMNS: ColumnDef[] = [
 ];
 
 export const COURSE_MAPPING_COLUMNS: ColumnDef[] = [
-  { header: 'Course Temp ID*', apiField: 'courseTempId', required: true,  note: 'Must match a Temp ID from Courses sheet' },
-  { header: 'Unit Name*',      apiField: 'unitName',     required: true,  note: 'e.g. Unit 1: Introduction — groups children under a unit' },
-  { header: 'Child Ref*',      apiField: 'childRef',     required: true,  note: 'Temp ID (TEMP_CONTENT_1, TEMP_QS_1) OR real do_xxxx identifier' },
-  { header: 'Child Type*',     apiField: 'childType',    required: true,  lookupKey: 'CHILD_TYPES' },
-  { header: 'Sequence*',       apiField: 'sequence',     required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
+  { header: 'Course Temp ID*',      apiField: 'courseTempId',     required: true,  note: 'Must match a Temp ID from Courses sheet' },
+  { header: 'Unit Name*',           apiField: 'unitName',         required: true,  note: 'e.g. Unit 1: Introduction — groups children under a unit' },
+  // Unit-level metadata — fill on any one row of the unit; blank on the rest.
+  { header: 'Unit Description',     apiField: 'unitDescription',  required: false, note: 'Optional description for this unit (shown to learners). Fill on the first row of each unit.' },
+  { header: 'Unit Icon Drive URL',  apiField: 'unitAppIconUrl',   required: false, note: 'Optional Google Drive public share URL for the unit icon image. Fill on the first row of each unit.' },
+  { header: 'Child Ref*',           apiField: 'childRef',         required: true,  note: 'Temp ID (TEMP_CONTENT_1, TEMP_QS_1) OR real do_xxxx identifier' },
+  { header: 'Child Type*',          apiField: 'childType',        required: true,  lookupKey: 'CHILD_TYPES' },
+  { header: 'Sequence*',            apiField: 'sequence',         required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
 ];
 
 // ExistingContentMapping: reference existing platform content by its do_xxx identifier.

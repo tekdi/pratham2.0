@@ -1064,7 +1064,15 @@ export class BulkImportQueue {
 
     // ── 1. Group children by unit (preserve insertion order with Map) ──
     // Each unique Unit Name becomes one unit node with a client-generated UUID.
-    const unitMap = new Map<string, { name: string; unitId: string; children: string[] }>();
+    // Unit-level description/icon are taken from the first row of each unit
+    // that supplies them, so users only need to fill them once per unit.
+    const unitMap = new Map<string, {
+      name: string;
+      unitId: string;
+      description?: string;
+      appIconUrl?: string;
+      children: string[];
+    }>();
 
     _childMappings
       .sort((a: any, b: any) => a.sequence - b.sequence)
@@ -1079,17 +1087,49 @@ export class BulkImportQueue {
           });
         }
 
+        const unit = unitMap.get(unitName)!;
+
+        // First non-empty value wins — lets users fill these on any single row
+        if (!unit.description && mapping.unitDescription) {
+          unit.description = String(mapping.unitDescription).trim();
+        }
+        if (!unit.appIconUrl && mapping.unitAppIconUrl) {
+          unit.appIconUrl = String(mapping.unitAppIconUrl).trim();
+        }
+
         // Resolve child identifier (temp ID → resolved do_xxx, or direct do_xxx)
         const childId =
           this.resolvedIds.get(mapping.childRef) ||
           mapping.childRef;
 
         if (childId) {
-          unitMap.get(unitName)!.children.push(childId);
+          unit.children.push(childId);
         }
       });
 
     const units = Array.from(unitMap.values());
+
+    // ── 1b. Upload unit icons from Drive → permanent S3 URLs ──────
+    // Unit nodes don't exist yet (they're created inline by the hierarchy
+    // update), so there's no unit identifier to upload against. We use the
+    // parent course's upload endpoint instead — the returned S3 URL is just a
+    // storage location and is valid as any node's `appIcon`.
+    // A failed icon must not abort the whole course, so failures are logged
+    // and the unit is created without an icon.
+    const unitIconUrls = new Map<string, string>();
+
+    for (const unit of units) {
+      if (!unit.appIconUrl) continue;
+      try {
+        const uploadedUrl = await uploadAppIconFromDrive(courseId, unit.appIconUrl);
+        unitIconUrls.set(unit.unitId, uploadedUrl);
+      } catch (err: any) {
+        console.warn(
+          `[bulk-import] Unit icon upload failed for "${unit.name}" in ${_courseTempId}: ${err?.message}. `
+          + 'Unit will be created without an icon.'
+        );
+      }
+    }
 
     // ── 2. nodesModified ──────────────────────────────────────────
     const nodesModified: Record<string, any> = {
@@ -1097,12 +1137,15 @@ export class BulkImportQueue {
     };
 
     units.forEach((unit) => {
+      const iconUrl = unitIconUrls.get(unit.unitId);
       nodesModified[unit.unitId] = {
         root: false,
         objectType: 'Collection',
         isNew: true,
         metadata: {
           name: unit.name,
+          ...(unit.description && { description: unit.description }),
+          ...(iconUrl        && { appIcon: iconUrl }),
           mimeType: 'application/vnd.ekstep.content-collection',
           primaryCategory: 'Course Unit',
           contentType: 'CourseUnit',

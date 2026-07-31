@@ -154,6 +154,18 @@ export interface CourseChildMappingRow {
   courseTempId: string;
   /** Unit/Section name */
   unitName: string;
+  /**
+   * Optional description for the unit itself (not the child content).
+   * Only needs to be filled on one row per unit — the first non-empty
+   * value found for a given unitName wins.
+   */
+  unitDescription?: string;
+  /**
+   * Optional Google Drive public share URL for the unit's icon image.
+   * Uploaded to S3 and set as the unit node's `appIcon`.
+   * Only needs to be filled on one row per unit.
+   */
+  unitAppIconUrl?: string;
   /** TEMP_CONTENT_1 | TEMP_QS_1 | an existing do_xxx identifier */
   childRef: string;
   childType: 'content' | 'questionset';
