@@ -473,6 +473,30 @@ console.log('result=====>', result);
       }
  if(localStorage.getItem('isAndroidApp') == 'yes')
       {
+        // The API interceptor takes tenantid/academicyearid from localStorage, so the
+        // batch and question-set lookups inside the gate must run with the target
+        // program's tenant already in place. The web branch below sets these before
+        // calling the gate; without the same setup here the cohort lookup runs against
+        // whatever tenant the webview was last on, finds no active batch, and the
+        // "assessment unavailable" popup appears even for a learner who already has a
+        // batch assigned.
+        if (tenantData?.tenantId) {
+          localStorage.setItem('tenantId', tenantData.tenantId);
+        }
+        if (tenantData?.tenantName) {
+          localStorage.setItem('userProgram', tenantData.tenantName);
+        }
+        localStorage.setItem(
+          'uiConfig',
+          JSON.stringify(tenantData?.params?.uiConfig || {})
+        );
+        if (tenantData?.params?.uiConfig?.landingPage) {
+          localStorage.setItem(
+            'landingPage',
+            tenantData.params.uiConfig.landingPage
+          );
+        }
+
         const assessmentStatus = await checkRegistrationTestStatus(
           tenantData?.params?.uiConfig,
           program?.name,
