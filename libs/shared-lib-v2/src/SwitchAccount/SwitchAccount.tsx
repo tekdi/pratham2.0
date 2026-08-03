@@ -440,23 +440,37 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   };
 
   const handleConfirm = () => {
-    if (selectedTenant && selectedRole) {
-      // Prevent confirmation if tenant is archived
-      if (selectedTenant?.tenantStatus?.toLowerCase() === 'archived') {
+    if (!selectedTenant || !selectedRole) {
+      return;
+    }
+
+    // Prevent confirmation if tenant is archived
+    if (selectedTenant?.tenantStatus?.toLowerCase() === 'archived') {
+      return;
+    }
+
+    // If we're still on the tenant-selection step (e.g. the current tenant/role
+    // came preselected via currentTenantId/currentRoleId), Confirm should behave
+    // like picking that tenant card: advance to role selection instead of
+    // immediately finalizing a "switch" back to the same account.
+    if (activeStep === 0) {
+      const roles = selectedTenant.roles ?? [];
+      if (roles.length > 1) {
+        setActiveStep(1);
         return;
       }
-
-      // Call the callback function with the 5 required parameters
-      callbackFunction(
-        selectedTenant.tenantId,
-        selectedTenant.tenantName,
-        selectedTenant.tenantType,
-        selectedRole.roleId,
-        selectedRole.roleName
-      );
-
-      onClose();
     }
+
+    // Call the callback function with the 5 required parameters
+    callbackFunction(
+      selectedTenant.tenantId,
+      selectedTenant.tenantName,
+      selectedTenant.tenantType,
+      selectedRole.roleId,
+      selectedRole.roleName
+    );
+
+    onClose();
   };
 
   const steps = [
