@@ -39,6 +39,7 @@ import { useRouter } from 'next/router';
 import { ArrowDropDownIcon } from '@mui/x-date-pickers';
 import SwitchAccountDialog, {
   TenantData,
+  getVisibleTenants,
 } from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const Profile = () => {
@@ -239,7 +240,11 @@ const Profile = () => {
   };
 
   const tenantData: TenantData[] = adminInfo?.tenantData ?? [];
-  const totalAccountCombinations = tenantData.reduce(
+  const visibleTenants = getVisibleTenants(
+    tenantData,
+    typeof window !== 'undefined' ? window.location.host : ''
+  );
+  const totalAccountCombinations = visibleTenants.reduce(
     (count: number, tenant: TenantData) => count + (tenant.roles?.length ?? 0),
     0
   );

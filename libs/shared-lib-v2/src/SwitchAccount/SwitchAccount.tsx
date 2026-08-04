@@ -88,6 +88,64 @@ interface SwitchAccountDialogProps {
   currentRoleId?: string;
 }
 
+// Resolves the switchAccountConfig entry for the given host, trying a few
+// common variants (with/without port, with/without "www.").
+const resolveAllowedRoleIds = (host: string): string[] | undefined => {
+  const config = switchAccountConfig as any;
+  const candidates: string[] = [];
+  if (host) {
+    const noPort = host.split(':')[0];
+    candidates.push(host);
+    if (noPort && noPort !== host) candidates.push(noPort);
+    const stripWww = (h: string) => (h.startsWith('www.') ? h.slice(4) : h);
+    const addWww = (h: string) => (h.startsWith('www.') ? h : `www.${h}`);
+    candidates.push(stripWww(host));
+    candidates.push(addWww(host));
+    if (noPort) {
+      candidates.push(stripWww(noPort));
+      candidates.push(addWww(noPort));
+    }
+  }
+
+  for (const key of candidates) {
+    const val = config?.[key];
+    if (Array.isArray(val) && val.length) {
+      return val as string[];
+    }
+  }
+  return undefined;
+};
+
+// Same tenant/role visibility rules the dialog itself applies: drop archived
+// tenants, and (when this host has a switchAccountConfig entry) drop roles
+// not permitted on this host, then drop tenants left with no roles.
+// Exported so callers (e.g. the header) can determine whether there is
+// actually more than one selectable Program/Role combination, without
+// duplicating this filtering logic.
+export const getVisibleTenants = (
+  tenantData: TenantData[] | undefined | null,
+  host: string
+): TenantData[] => {
+  const tenants = tenantData ?? [];
+  const activeTenants = tenants.filter(
+    (tenant) => tenant?.tenantStatus?.toLowerCase() !== 'archived'
+  );
+
+  const allowedRoleIds = resolveAllowedRoleIds(host);
+  if (!allowedRoleIds || allowedRoleIds.length === 0) {
+    return activeTenants;
+  }
+
+  const filteredTenants = activeTenants.map((tenant) => ({
+    ...tenant,
+    roles: (tenant?.roles ?? []).filter((r) =>
+      allowedRoleIds.includes(r.roleId)
+    ),
+  }));
+
+  return filteredTenants.filter((t) => (t.roles ?? []).length > 0);
+};
+
 const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   open,
   onClose,
@@ -121,47 +179,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     return '';
   }, []);
 
-  const allowedRoleIds = useMemo(() => {
-    const config = switchAccountConfig as any;
-    const candidates: string[] = [];
-    if (host) {
-      const noPort = host.split(':')[0];
-      candidates.push(host);
-      // try without port
-      if (noPort && noPort !== host) candidates.push(noPort);
-      // try stripping/adding www
-      const stripWww = (h: string) => (h.startsWith('www.') ? h.slice(4) : h);
-      const addWww = (h: string) => (h.startsWith('www.') ? h : `www.${h}`);
-      candidates.push(stripWww(host));
-      candidates.push(addWww(host));
-      if (noPort) {
-        candidates.push(stripWww(noPort));
-        candidates.push(addWww(noPort));
-      }
-    }
-
-    let matchedHost: string | undefined;
-    let resolved: string[] | undefined;
-    for (const key of candidates) {
-      const val = config?.[key];
-      if (Array.isArray(val) && val.length) {
-        matchedHost = key;
-        resolved = val as string[];
-        break;
-      }
-    }
-
-    // console.log('SwitchAccount host resolution', {
-    //   host,
-    //   candidates,
-    //   matchedHost: matchedHost ?? null,
-    //   allowedRoleIds: resolved ?? null,
-    // });
-
-    // If no mapping found, return undefined to signal no filtering
-    return resolved as unknown as string[] | undefined;
-  }, [host]);
-
   // Sync component's language with apps that use `preferredLanguage` key
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -192,66 +209,10 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     return () => window.removeEventListener('storage', handleStorage);
   }, [language, setLanguage]);
 
-  const visibleTenants: TenantData[] = useMemo(() => {
-    const tenants = authResponse ?? [];
-
-    // Filter out archived tenants
-    const activeTenants = tenants.filter(
-      (tenant) => tenant?.tenantStatus?.toLowerCase() !== 'archived'
-    );
-
-    // If no host mapping found, do not filter roles
-    if (
-      !allowedRoleIds ||
-      (Array.isArray(allowedRoleIds) && allowedRoleIds.length === 0)
-    ) {
-      console.log('SwitchAccount role filter', {
-        note: 'No host mapping found, using backend roles as-is',
-        host,
-        tenants: activeTenants.map((t) => ({
-          tenantId: t.tenantId,
-          tenantName: t.tenantName,
-          inputRoles: (t.roles ?? []).map((r) => r.roleId),
-        })),
-      });
-      // console.log('tenants', activeTenants);
-      return activeTenants;
-    }
-
-    const filteredTenants = activeTenants.map((tenant) => {
-      const inputRoles = tenant?.roles ?? [];
-      const filteredRoles = inputRoles.filter((r) =>
-        (allowedRoleIds as string[]).includes(r.roleId)
-      );
-      return {
-        ...tenant,
-        roles: filteredRoles,
-      };
-    });
-
-    // Remove tenants where no roles remain after filtering
-    const nonEmptyTenants = filteredTenants.filter(
-      (t) => (t.roles ?? []).length > 0
-    );
-
-    console.log('SwitchAccount role filter', {
-      allowedRoleIds,
-      host,
-      tenants: activeTenants.map((t, idx) => ({
-        tenantId: t.tenantId,
-        tenantName: t.tenantName,
-        inputRoles: (t.roles ?? []).map((r) => r.roleId),
-        filteredRoles: (filteredTenants[idx]?.roles ?? []).map((r) => r.roleId),
-      })),
-      finalTenants: nonEmptyTenants.map((t) => ({
-        tenantId: t.tenantId,
-        tenantName: t.tenantName,
-        filteredRoles: (t.roles ?? []).map((r) => r.roleId),
-      })),
-    });
-
-    return nonEmptyTenants;
-  }, [authResponse, allowedRoleIds, host]);
+  const visibleTenants: TenantData[] = useMemo(
+    () => getVisibleTenants(authResponse, host),
+    [authResponse, host]
+  );
 
   useEffect(() => {
     if (!open) {
