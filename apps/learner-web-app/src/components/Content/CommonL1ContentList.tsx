@@ -122,8 +122,13 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
           {typeof window !== 'undefined' &&
             localStorage.getItem('userProgram') ===
               TenantName.SECOND_CHANCE_PROGRAM && (
-              <Grid container spacing={2} sx={{ mb: 0, p: { xs: 2, md: 4 } }}>
-                <Grid item xs={12} md={5}>
+              <Grid
+                container
+                spacing={2}
+                alignItems="stretch"
+                sx={{ mb: 0, p: { xs: 2, md: 4 } }}
+              >
+                <Grid item xs={12} md={5} sx={{ display: 'flex' }}>
                   <RegistrationSuccessCard
                     programName={TenantName.SECOND_CHANCE_PROGRAM.replace(
                       ' Program',
@@ -132,7 +137,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                     statusLabel={t('LEARNER_APP.COURSE.REGISTERED')}
                   />
                 </Grid>
-                <Grid item xs={12} md={7}>
+                <Grid item xs={12} md={7} sx={{ display: 'flex' }}>
                   {!notab && <AssessmentAttempts />}
                 </Grid>
               </Grid>

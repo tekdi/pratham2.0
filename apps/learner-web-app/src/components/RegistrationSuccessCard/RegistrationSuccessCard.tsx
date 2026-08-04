@@ -25,18 +25,22 @@ const RegistrationSuccessCard: React.FC<RegistrationSuccessCardProps> = ({
       sx={{
         bgcolor: customColors.registrationCardBackground,
         borderRadius: 3,
-        p: { xs: 2, md: 2.5 },
-        mb: 2,
-        height: '100%',
+        p: { xs: 1.5, md: 2 },
+        width: '100%',
+        flexGrow: 1,
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
         boxShadow:
           '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <Stack direction="row" spacing={1.25} alignItems="flex-start">
+      <Stack direction="row" spacing={1} alignItems="flex-start">
         <Box
           sx={{
-            width: 24,
-            height: 24,
+            width: 22,
+            height: 22,
             borderRadius: '50%',
             bgcolor: customColors.registrationCardIconBg,
             display: 'flex',
@@ -46,7 +50,7 @@ const RegistrationSuccessCard: React.FC<RegistrationSuccessCardProps> = ({
             mt: '2px',
           }}
         >
-          <InfoIcon sx={{ fontSize: '16px', color: '#FFFFFF' }} />
+          <InfoIcon sx={{ fontSize: '14px', color: '#FFFFFF' }} />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography
@@ -57,53 +61,61 @@ const RegistrationSuccessCard: React.FC<RegistrationSuccessCardProps> = ({
           </Typography>
           <Typography
             variant="body2"
-            sx={{ color: theme.palette.text.secondary, mt: 0.5 }}
+            sx={{ color: theme.palette.text.secondary, mt: 0.25 }}
           >
             {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
           </Typography>
         </Box>
       </Stack>
 
-      <Divider sx={{ my: 1.75, borderColor: customColors.registrationDivider }} />
+      <Divider sx={{ my: 1, borderColor: customColors.registrationDivider }} />
 
-      <Typography
-        variant="body2"
-        sx={{ color: theme.palette.text.secondary, mt: 1.75, mb: 1.25 }}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        flexWrap="wrap"
+        gap={1.25}
+        rowGap={1}
       >
-        {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').split(
-          '{playStoreLink}'
-        )[0]}
-      </Typography>
+        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+          {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').split(
+            '{playStoreLink}'
+          )[0]}
+        </Typography>
 
-      <Button
-        href={PLAY_STORE_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="outlined"
-        startIcon={<GetAppIcon sx={{ fontSize: '18px' }} />}
-        size="small"
-        disableRipple
-        disableElevation
-        sx={{
-          bgcolor: '#FFFFFF',
-          color: theme.palette.secondary.main,
-          borderColor: customColors.registrationDivider,
-          boxShadow: 'none',
-          fontWeight: 600,
-          fontSize: '13px',
-          textTransform: 'none',
-          borderRadius: 5,
-          px: 2.25,
-          py: 0.75,
-          '&:hover': {
+        <Button
+          href={PLAY_STORE_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="outlined"
+          startIcon={<GetAppIcon sx={{ fontSize: '18px' }} />}
+          size="small"
+          disableRipple
+          disableElevation
+          sx={{
             bgcolor: '#FFFFFF',
+            color: theme.palette.secondary.main,
             borderColor: customColors.registrationDivider,
             boxShadow: 'none',
-          },
-        }}
-      >
-        {t('LEARNER_APP.COURSE.PLAY_STORE')}
-      </Button>
+            fontWeight: 600,
+            fontSize: '13px',
+            textTransform: 'none',
+            borderRadius: 5,
+            m: '0 !important',
+            px: 2.25,
+            py: 0.75,
+            flexShrink: 0,
+            '&:hover': {
+              bgcolor: '#FFFFFF',
+              borderColor: customColors.registrationDivider,
+              boxShadow: 'none',
+            },
+          }}
+        >
+          {t('LEARNER_APP.COURSE.PLAY_STORE')}
+        </Button>
+      </Stack>
     </Box>
   );
 };

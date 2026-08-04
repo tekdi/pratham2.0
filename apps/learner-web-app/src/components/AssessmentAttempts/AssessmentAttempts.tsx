@@ -120,8 +120,11 @@ const AssessmentAttempts: React.FC = () => {
     bgcolor: customColors.assessmentContainerBackground,
     border: `1px solid ${customColors.assessmentContainerBorder}`,
     borderRadius: 3,
-    mb: 2,
     overflow: 'hidden',
+    width: '100%',
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
   };
 
   if (loadState === 'loading') {
@@ -214,7 +217,7 @@ const AssessmentAttempts: React.FC = () => {
           alignItems: { xs: 'flex-start', sm: 'center' },
           justifyContent: 'space-between',
           gap: 1.5,
-          py: 1.5,
+          py: 2.25,
           px: { xs: 2, md: 2.5 },
         }}
       >
@@ -315,12 +318,21 @@ const AssessmentAttempts: React.FC = () => {
         </Typography>
       </Box>
       <Divider sx={{ borderColor: customColors.assessmentRowDivider }} />
-      {attemptCards.map((attempt, index) => (
-        <React.Fragment key={attempt.attemptNumber}>
-          {index > 0 && <Divider sx={{ borderColor: customColors.assessmentRowDivider }} />}
-          {renderAttemptRow(attempt, index)}
-        </React.Fragment>
-      ))}
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+        }}
+      >
+        {attemptCards.map((attempt, index) => (
+          <React.Fragment key={attempt.attemptNumber}>
+            {index > 0 && <Divider sx={{ borderColor: customColors.assessmentRowDivider }} />}
+            {renderAttemptRow(attempt, index)}
+          </React.Fragment>
+        ))}
+      </Box>
     </Box>
   );
 };

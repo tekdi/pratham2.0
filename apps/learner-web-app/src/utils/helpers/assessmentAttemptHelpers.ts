@@ -101,10 +101,11 @@ export const mapAttemptCards = (
   attempts: AssessmentRecord[]
 ): AssessmentAttemptCardData[] => {
   const sortedAttempts = sortAttemptsByDate(attempts);
-  const bestAttempt = getBestAttempt(sortedAttempts);
-  const latestAttempt = getLatestAttempt(sortedAttempts);
-  const allAttemptsCompleted = sortedAttempts.length === TOTAL_ATTEMPT_SLOTS;
-  const hasNonZeroScore = sortedAttempts.some(
+  const visibleAttempts = sortedAttempts.slice(0, TOTAL_ATTEMPT_SLOTS);
+  const bestAttempt = getBestAttempt(visibleAttempts);
+  const latestAttempt = getLatestAttempt(visibleAttempts);
+  const allAttemptsCompleted = visibleAttempts.length === TOTAL_ATTEMPT_SLOTS;
+  const hasNonZeroScore = visibleAttempts.some(
     (attempt) => Number(attempt.totalScore) > 0
   );
   const canShowBestScore = allAttemptsCompleted && hasNonZeroScore;
