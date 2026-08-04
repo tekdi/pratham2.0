@@ -26,6 +26,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InfoIcon from '@mui/icons-material/Info';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
+import GetAppIcon from '@mui/icons-material/GetApp';
 import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
 
 interface CommonL1ContentListProps {
@@ -183,23 +184,27 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                         return (
                           <React.Fragment key={index}>
                             {part}
-                            <Link
+                            <Button
                               href="https://play.google.com/store/apps/details?id=com.pratham.learning"
                               target="_blank"
                               rel="noopener noreferrer"
+                              variant="outlined"
+                              startIcon={<GetAppIcon />}
                               sx={{
-                                //color: '#FDBE16',
-                                color: 'blue',
-                                textDecoration: 'underline',
-                                fontWeight: 500,
+                                color: '#0D599E',
+                                borderColor: '#0D599E',
+                                fontWeight: 600,
+                                fontSize: { xs: '12px', md: '14px' },
+                                textTransform: 'none',
+                                px: 2.5,
                                 '&:hover': {
-                               //   color: '#fdbe16',
-                                  textDecoration: 'underline',
+                                  borderColor: '#0D599E',
+                                  backgroundColor: '#E7F3F8',
                                 },
                               }}
                             >
                               Play Store
-                            </Link>
+                            </Button>
                           </React.Fragment>
                         );
                       })}
