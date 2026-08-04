@@ -150,8 +150,7 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
                   cohortMemberStatus?: string;
                 }) =>
                   cohort?.type === 'BATCH' &&
-                  cohort?.cohortStatus === 'active' &&
-                  cohort?.cohortMemberStatus === 'active'
+                  cohort?.cohortStatus === 'active'
               )
             : false;
           if (hasBatch) {
@@ -497,6 +496,7 @@ console.log('result=====>', result);
           return;
         }
         if (assessmentStatus === 'assessmentUnavailable') {
+          setPendingProgramTenantId(program.tenantId);
           return;
         } else {
        // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
@@ -1051,9 +1051,13 @@ console.log('result=====>', result);
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}
@@ -1111,12 +1115,46 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
         showFooter={true}
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
       >

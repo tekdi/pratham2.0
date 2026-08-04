@@ -70,10 +70,28 @@ const App = ({
   } | null>(null);
 
   let activeLink = null;
+  let exitLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    exitLink = searchParams.get('exitLink');
+    returnUrl = searchParams.get('returnUrl');
   }
+
+  // Intercept browser back button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
+  const effectiveExitLink = exitLink || returnUrl || activeLink;
+  useEffect(() => {
+    if (!effectiveExitLink) return;
+    window.history.pushState({ playerPage: true }, '', window.location.href);
+    const handlePopState = () => {
+      window.location.href = effectiveExitLink as string;
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [effectiveExitLink]);
   useEffect(() => {
     const fetch = async () => {
       const response = await fetchContent(identifier);
@@ -334,7 +352,15 @@ const App = ({
   // };
 
   return (
-    <Box className="bs-px-5" sx={{ mx: { xs: '0.5vh', sm: '1vh', md: '2vh' }, position: 'relative' }}>
+    <Box
+      className="bs-px-5"
+      sx={{
+        mx: { xs: 0, sm: '1vh', md: '2vh' },
+        // bs-px-5 forces 3rem !important; trim to 15px on mobile, keep 3rem on tablet/desktop
+        px: { xs: '15px !important', sm: '3rem !important' },
+        position: 'relative',
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
@@ -501,6 +527,7 @@ const App = ({
               identifier={identifier}
               courseId={courseId}
               unitId={unitId}
+              exitLink={exitLink || returnUrl || activeLink}
               {..._config?.player}
             />
             {item?.content?.artifactUrl &&
@@ -639,10 +666,21 @@ const PlayerBox = ({
   unitId,
   userIdLocalstorageName,
   item,
+  exitLink,
 }: any) => {
   const playerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
+
+  // The sbplayer iframe is hosted on a different origin (NEXT_PUBLIC_LEARNER_SBPLAYER).
+  // When its Exit button runs `window.top.location.href = exitLink`, a relative
+  // exitLink would resolve against the iframe's origin, switching the domain.
+  // Resolve exitLink to an absolute URL on the current (parent) origin so the
+  // player navigates back to the correct domain.
+  const absoluteExitLink =
+    exitLink && typeof window !== 'undefined'
+      ? new URL(exitLink, window.location.origin).href
+      : exitLink;
+
   // Check if content is video type (videos have their own fullscreen controls)
   const isVideoType = item?.content?.mimeType?.startsWith('video/');
 
@@ -715,6 +753,8 @@ const PlayerBox = ({
       <iframe
   src={`${process.env.NEXT_PUBLIC_LEARNER_SBPLAYER}?identifier=${identifier}${
     courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ""
+  }${
+    absoluteExitLink ? `&exitLink=${encodeURIComponent(absoluteExitLink)}` : ""
   }${
     userIdLocalstorageName
       ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`

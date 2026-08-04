@@ -289,11 +289,11 @@ const Learner = () => {
         `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
           } ${transformLabel(row.lastName) || ''}`.trim(),
     },
-    {
-      keys: ['age'],
-      label: 'Age',
-      render: (row) => calculateAgeFromDate(row.dob) || '',
-    },
+    // {
+    //   keys: ['age'],
+    //   label: 'Age',
+    //   render: (row) => calculateAgeFromDate(row.dob) || '',
+    // },
     {
       keys: ['dob'],
       label: 'Date Of Birth',

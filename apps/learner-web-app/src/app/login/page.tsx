@@ -89,8 +89,7 @@ const activeAcademicYear = Array.isArray(academicYearList)
                 cohortMemberStatus?: string;
               }) =>
                 cohort?.type === 'BATCH' &&
-                cohort?.cohortStatus === 'active' &&
-                cohort?.cohortMemberStatus === 'active'
+                cohort?.cohortStatus === 'active'
             )
           : false;
         if (hasBatch) {
@@ -415,6 +414,40 @@ const LoginPageContent = () => {
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
           await profileComplitionCheck();
 
+          // Fetch user details and store preferred language BEFORE the registration
+          // test check — the main-login path does this. Without it, ContentSearch in
+          // checkRegistrationTestStatus runs without the contentLanguage filter and
+          // resolves a different question set than the one the learner attempted, so
+          // getAssessmentStatus returns [] and the Saral popup wrongly re-appears.
+          try {
+            const userDetails = await getUserDetails(userResponse?.userId, true);
+            if (userDetails?.result?.userData?.customFields) {
+              userDetails.result.userData.customFields.forEach((field: any) => {
+                const { label, selectedValues } = field;
+                if (label === 'WHAT_IS_YOUR_PREFERRED_LANGUAGE') {
+                  let preferred = '';
+                  if (Array.isArray(selectedValues) && selectedValues.length > 0) {
+                    const first = selectedValues[0] as unknown;
+                    preferred =
+                      typeof first === 'string'
+                        ? first
+                        : (first as { value?: string })?.value ?? String(first);
+                  } else if (typeof selectedValues === 'string') {
+                    preferred = selectedValues;
+                  }
+                  if (preferred) {
+                    localStorage.setItem('preferred_language', preferred);
+                  }
+                }
+              });
+            }
+          } catch (error) {
+            console.error(
+              'Failed to fetch user details for preferred language',
+              error
+            );
+          }
+
           const assessmentStatus = await checkRegistrationTestStatus(
             uiConfig,
             enrolledTenant.tenantName,
@@ -509,6 +542,18 @@ const LoginPageContent = () => {
             setEnrollConfirmTargetId(programTenantId);
             setEnrollConfirmModal(true);
           } else {
+            // Collect the programs the user is already enrolled in so the
+            // not-enrolled popup can surface them (e.g. "You have already
+            // enrolled to the program: Second Chance and Camp to Club").
+            const userProgramNames: string[] = (userResponse?.tenantData || [])
+              .filter(
+                (t: any) =>
+                  (t?.tenantStatus === 'active' || t?.tenantStatus === 'pending') &&
+                  t?.roles?.some((r: any) => r?.roleName === 'Learner') &&
+                  t?.tenantName !== 'Pratham'
+              )
+              .map((t: any) => t.tenantName as string);
+            setEnrolledProgramNames(userProgramNames);
             setNotEnrolledProgramName(programName);
             setNotEnrolledTenantId(programTenantId);
             setNotEnrolledModal(true);
@@ -925,12 +970,17 @@ const LoginPageContent = () => {
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it. The Saral popup still re-appears based
+          // on remaining attempts (getAssessmentStatus), not this flag.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           const pendingAssessmentIdentifier = localStorage.getItem(
             'registerationTestQuestionSetIdentifier'
           );
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              window.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}
@@ -940,15 +990,29 @@ const LoginPageContent = () => {
           localStorage.setItem('registerationTestGiven', 'Yes');
           if(localStorage.getItem('isAndroidApp') == 'yes')
             {
-                          router.push(`/programs`);
-                                    window.location.href = `/programs`;
-
-
+              // Android: hand back to the native dashboard instead of loading the
+              // web /programs page in the WebView.
+              if ((window as any).ReactNativeWebView) {
+                let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+                if (!refreshToken || refreshToken === '') {
+                  refreshToken = localStorage.getItem('refreshToken');
+                }
+                (window as any).ReactNativeWebView.postMessage(
+                  JSON.stringify({
+                    type: 'ENROLL_PROGRAM_EVENT',
+                    data: {
+                      userId: localStorage.getItem('userId'),
+                      tenantId: localStorage.getItem('tenantId'),
+                      token: localStorage.getItem('token'),
+                      refreshToken: refreshToken,
+                    },
+                  })
+                );
+              }
             }
             else{
                 const landingPage = localStorage.getItem('landingPage') || '/home';
           window.location.href = landingPage;
-   
             }
               }}
       >
@@ -963,13 +1027,57 @@ const LoginPageContent = () => {
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/scp-dashboard');
+          if (localStorage.getItem('isAndroidApp') == 'yes') {
+            // Android: hand back to the native dashboard instead of loading the
+            // web /scp-dashboard page in the WebView.
+            if ((window as any).ReactNativeWebView) {
+              let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+              if (!refreshToken || refreshToken === '') {
+                refreshToken = localStorage.getItem('refreshToken');
+              }
+              (window as any).ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'ENROLL_PROGRAM_EVENT',
+                  data: {
+                    userId: localStorage.getItem('userId'),
+                    tenantId: localStorage.getItem('tenantId'),
+                    token: localStorage.getItem('token'),
+                    refreshToken: refreshToken,
+                  },
+                })
+              );
+            }
+          } else {
+            router.push('/scp-dashboard');
+          }
         }}
         showFooter={true}
         primaryText={t('COMMON.OK')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
-          router.push('/scp-dashboard');
+          if (localStorage.getItem('isAndroidApp') == 'yes') {
+            // Android: hand back to the native dashboard instead of loading the
+            // web /scp-dashboard page in the WebView.
+            if ((window as any).ReactNativeWebView) {
+              let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+              if (!refreshToken || refreshToken === '') {
+                refreshToken = localStorage.getItem('refreshToken');
+              }
+              (window as any).ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: 'ENROLL_PROGRAM_EVENT',
+                  data: {
+                    userId: localStorage.getItem('userId'),
+                    tenantId: localStorage.getItem('tenantId'),
+                    token: localStorage.getItem('token'),
+                    refreshToken: refreshToken,
+                  },
+                })
+              );
+            }
+          } else {
+            router.push('/scp-dashboard');
+          }
         }}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
@@ -1013,6 +1121,33 @@ const LoginPageContent = () => {
         // secondaryActionHandler={() => { setNotEnrolledModal(false); router.push('/programs'); }}
       >
         <Box p="10px" display="flex" flexDirection="column" alignItems="center" gap={1}>
+          {enrolledProgramNames.length === 1 && (
+            <Typography variant="body1" textAlign="center">
+              {t('LANDING.ALREADY_ENROLLED_TO_PROGRAM') ||
+                'You have already enrolled to the program:'}{' '}
+              <Box component="span" fontWeight={700}>
+                {enrolledProgramNames[0]}
+              </Box>
+              .
+            </Typography>
+          )}
+          {enrolledProgramNames.length > 1 && (
+            <Box width="100%">
+              <Typography variant="body1" textAlign="center">
+                {t('LANDING.ALREADY_ENROLLED_TO_PROGRAMS') ||
+                  'You have already enrolled to the programs:'}
+              </Typography>
+              <Box component="ul" sx={{ pl: 3, m: 0, mt: 0.5 }}>
+                {enrolledProgramNames.map((name, idx) => (
+                  <Box component="li" key={idx}>
+                    <Typography variant="body1" fontWeight={700}>
+                      {name}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
           <Typography variant="body1" textAlign="center">
             {t('LANDING.NOT_ENROLLED_IN_PROGRAM') || 'You are not registered in'}{' '}
             <Box component="span" fontWeight={700}>

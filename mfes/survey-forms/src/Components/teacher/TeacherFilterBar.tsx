@@ -15,6 +15,15 @@ interface Option {
   label: string;
 }
 
+export type StatusFilterValue = 'all' | 'completed' | 'inProgress' | 'notStarted';
+
+const STATUS_FILTER_OPTIONS: { id: StatusFilterValue; label: string }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'inProgress', label: 'In Progress' },
+  { id: 'notStarted', label: 'Not Started' },
+];
+
 interface Props {
   search: string;
   onSearchChange: (value: string) => void;
@@ -26,6 +35,9 @@ interface Props {
   batches?: Option[];
   batchId?: string;
   onBatchChange?: (batchId: string) => void;
+  showStatusFilter?: boolean;
+  statusFilter?: StatusFilterValue;
+  onStatusFilterChange?: (status: StatusFilterValue) => void;
   totalLabel?: string;
 }
 
@@ -40,6 +52,9 @@ const TeacherFilterBar: React.FC<Props> = ({
   batches,
   batchId,
   onBatchChange,
+  showStatusFilter = false,
+  statusFilter = 'all',
+  onStatusFilterChange,
   totalLabel,
 }) => {
   return (
@@ -95,6 +110,25 @@ const TeacherFilterBar: React.FC<Props> = ({
                 ))}
               </Select>
             </FormControl>
+      )}
+
+      {showStatusFilter && onStatusFilterChange && (
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel id="teacher-status-label">Status</InputLabel>
+          <Select
+            labelId="teacher-status-label"
+            label="Status"
+            value={statusFilter}
+            onChange={(e) => onStatusFilterChange(e.target.value as StatusFilterValue)}
+            sx={{ borderRadius: '8px' }}
+          >
+            {STATUS_FILTER_OPTIONS.map((o) => (
+              <MenuItem key={o.id} value={o.id}>
+                {o.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       )}
 
       {totalLabel && (

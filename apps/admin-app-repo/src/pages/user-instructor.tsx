@@ -314,11 +314,11 @@ const Facilitator = () => {
           transformLabel(row.middleName) || ''
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
-    {
-      keys: ['age'],
-      label: 'Age',
-      render: (row) => calculateAgeFromDate(row.dob) || '',
-    },
+    // {
+    //   keys: ['age'],
+    //   label: 'Age',
+    //   render: (row) => calculateAgeFromDate(row.dob) || '',
+    // },
     {
       keys: ['gender'],
       label: 'Gender',

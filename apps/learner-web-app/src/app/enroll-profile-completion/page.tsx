@@ -105,6 +105,56 @@ const EnrollProfileCompletionInner = () => {
       console.log('isRegisterationTestEnabled', isRegisterationTestEnabled);
 
       if (isRegisterationTestEnabled) {
+        // Enroll the user into the tenant immediately on Finish Enroll (parity with
+        // non-test programs). The eligibility test flow below still runs afterwards.
+        try {
+          const enrollUserId = localStorage.getItem('userId');
+          const enrollRoleId = localStorage.getItem('roleId');
+          const enrollTenantId = localStorage.getItem('tenantId');
+          const userTenantStatus = uiConfig?.isTenantPendingStatus;
+          if (enrollUserId && enrollRoleId && enrollTenantId) {
+            // FIX (PS-7093): Two-step enrollment to handle re-enrollment of admin-deleted users.
+            //
+            // Step 1 — POST (standard path for first-time enrollees):
+            //   enrollUserTenant calls POST /user-tenant to create a new mapping.
+            //   For a user who was previously deleted (tenantStatus = 'archived'), a mapping
+            //   already exists, so POST throws an error.
+            //
+            // Step 2 — PATCH fallback (for previously-deleted users):
+            //   reactivateUserTenant calls PATCH /user-tenant/status to update the existing
+            //   archived mapping's status back to 'pending'/'active', completing the re-enrollment.
+            try {
+              if (userTenantStatus) {
+                await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId, userTenantStatus: 'pending' });
+              } else {
+                await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId });
+              }
+            } catch {
+              try {
+                await reactivateUserTenant(enrollUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
+              } catch (patchErr) {
+                console.error('Re-activation also failed:', patchErr);
+              }
+            }
+            console.log('Enrolled into tenant:', enrollTenantId);
+            if (userTenantStatus) {
+              try {
+                await updateUser(enrollUserId, {
+                  userData: {},
+                  customFields: [{
+                    fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+                    value: 'pending',
+                  }],
+                });
+              } catch (updateError) {
+                console.error('Failed to update pending custom field:', updateError);
+              }
+            }
+          }
+        } catch (enrollError) {
+          console.error('Enrollment failed:', enrollError);
+        }
+
         // Check if user already has an active batch across all academic years
         try {
           const academicYearList = await getAcademicYear();
@@ -125,8 +175,7 @@ const EnrollProfileCompletionInner = () => {
               ? cohortResponse.result.some(
                   (cohort: { type?: string; cohortStatus?: string; cohortMemberStatus?: string }) =>
                     cohort?.type === 'BATCH' &&
-                    cohort?.cohortStatus === 'active' &&
-                    cohort?.cohortMemberStatus === 'active'
+                    cohort?.cohortStatus === 'active'
                 )
               : false;
             if (hasBatch) {
@@ -281,45 +330,9 @@ const EnrollProfileCompletionInner = () => {
 
   const handleAssessmentModalClose = async () => {
     setAssessmentRequiredModal(false);
-    // Declare outside try so they are accessible in the catch for the PATCH fallback
-    const storedUserId = localStorage.getItem('userId');
-    const storedRoleId = localStorage.getItem('roleId');
-    const enrollTenantId = localStorage.getItem('tenantId');
-    const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
-    const userTenantStatus = uiConfig?.isTenantPendingStatus;
-    if (storedUserId && storedRoleId && enrollTenantId) {
-      // FIX: Two-step enrollment to handle re-enrollment of admin-deleted users.
-      //
-      // Step 1 — POST (standard path for first-time enrollees):
-      //   enrollUserTenant calls POST /user-tenant to create a new mapping.
-      //   For a user who was previously deleted (tenantStatus = 'archived'), a mapping
-      //   already exists, so POST throws an error.
-      //
-      // Step 2 — PATCH fallback (for previously-deleted users):
-      //   reactivateUserTenant calls PATCH /user-tenant/status to update the existing
-      //   archived mapping's status back to 'pending', completing the re-enrollment.
-      try {
-        if (userTenantStatus) {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-        } else {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
-        }
-      } catch {
-        try {
-          await reactivateUserTenant(storedUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
-        } catch (patchErr) {
-          console.error('Re-activation also failed:', patchErr);
-        }
-      }
-      try {
-        await updateUser(storedUserId, {
-          userData: {},
-          customFields: [{ fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963', value: 'pending' }],
-        });
-      } catch (updateError) {
-        console.error('Failed to update pending custom field:', updateError);
-      }
-    }
+    // Enrollment already happened on Finish Enroll (handleAccessProgram), including
+    // the POST -> PATCH re-activation fallback for previously-deleted users; here we
+    // only mark the registration test as given and continue.
     localStorage.setItem('registerationTestGiven', 'Yes');
      const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       console.log('isAndroid check:', isAndroid);
@@ -368,47 +381,36 @@ const EnrollProfileCompletionInner = () => {
     setAssessmentUnavailableModal(false);
     localStorage.removeItem('enrollTenantId');
     localStorage.removeItem('onboardTenantId');
+    // Enrollment already happened on Finish Enroll (handleAccessProgram), including
+    // the POST -> PATCH re-activation fallback for previously-deleted users.
+    console.log('========== onAssessmentUnavailableOk CALLED ==========');
+    const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+    console.log('isAndroid check:', isAndroid);
 
-    const storedUserId = localStorage.getItem('userId');
-    const storedRoleId = localStorage.getItem('roleId');
-    const enrollTenantId = localStorage.getItem('tenantId');
-    const uiConfigRaw = localStorage.getItem('uiConfig');
-    const uiConfig = uiConfigRaw ? JSON.parse(uiConfigRaw) : {};
-    const userTenantStatus = uiConfig?.isTenantPendingStatus;
-
-    if (storedUserId && storedRoleId && enrollTenantId) {
-      // FIX: Same POST → PATCH fallback as handleAssessmentModalClose above.
-      // Enrolls the user via POST for first-time enrolments, or re-activates an
-      // existing archived mapping via PATCH for previously-deleted users.
-      try {
-        if (userTenantStatus) {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-        } else {
-          await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
+    if (isAndroid) {
+      console.log('Android path - sending message to WebView');
+      if (window.ReactNativeWebView) {
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
         }
-      } catch {
-        try {
-          await reactivateUserTenant(storedUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
-        } catch (patchErr) {
-          console.error('Re-activation also failed:', patchErr);
-        }
+        console.log('Posting ENROLL_PROGRAM_EVENT to ReactNativeWebView');
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken: refreshToken,
+          }
+        }));
+      } else {
+        console.log('isAndroidApp is yes but window.ReactNativeWebView is missing');
       }
-      if (userTenantStatus) {
-        try {
-          await updateUser(storedUserId, {
-            userData: {},
-            customFields: [{
-              fieldId: 'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
-              value: 'pending',
-            }],
-          });
-        } catch (updateError) {
-          console.error('Failed to update pending custom field:', updateError);
-        }
-      }
+    } else {
+      console.log('Web path - navigating to /scp-dashboard');
+      window.location.href = '/scp-dashboard';
     }
-
-    window.location.href = '/scp-dashboard';
   };
 
   const handleStartAssessment = async () => {
@@ -434,9 +436,13 @@ const EnrollProfileCompletionInner = () => {
 
     // Use window.location.href for guaranteed navigation (router.push can silently fail in modals)
      if(questionSetIdentifier){
-      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+      // Mark the registration test as addressed (parity with Close) so the
+      // ClientLayout route guard doesn't lock the user out of programs if they
+      // start the test and then abort it.
+      localStorage.setItem('registerationTestGiven', 'Yes');
+      window.location.href = `/player/${questionSetIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
 
-   
+
    }
   };
 

@@ -92,7 +92,7 @@ const Sidebar = ({
 
             return (
               <div key={key}>
-                <ListItemButton
+                {/* <ListItemButton
                   onClick={() => {
                     if (hasSubMenu) {
                       handleToggle(key);
@@ -102,7 +102,19 @@ const Sidebar = ({
                     }
                   }}
                   style={getActiveStyle(item.link)}
-                >
+                > */}
+                <ListItemButton
+                    component={hasSubMenu ? 'div' : 'a'}      // <-- add this
+                    href={hasSubMenu ? undefined : item.link}  // <-- add this
+                    onClick={() => {
+                      if (hasSubMenu) {
+                        handleToggle(key);
+                      } else {
+                        onSidebarClose(); // keep drawer-close behavior; navigation now handled by href
+                      }
+                    }}
+                    style={getActiveStyle(item.link)}
+                  >
                   <ListItemIcon sx={{ minWidth: '40px' }}>
                     <Image
                       src={item.icon}
@@ -128,6 +140,8 @@ const Sidebar = ({
                         .filter((sub) => sub.roles.includes(storedRole))
                         .map((sub) => (
                           <ListItemButton
+                            component="a"
+                            href={sub.link}
                             key={sub.link}
                             sx={{ pl: 7 }}
                             onClick={() => {

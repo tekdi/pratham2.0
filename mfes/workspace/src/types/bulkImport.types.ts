@@ -38,8 +38,8 @@ export interface ContentRow {
   creator?: string;
   /** Google Drive share URL or YouTube URL (for youtube file type) */
   driveUrl: string;
-  /** pdf | zip | mp4 | h5p | youtube */
-  fileType: 'pdf' | 'zip' | 'mp4' | 'h5p' | 'youtube';
+  /** pdf | zip | mp4 | mp3 | h5p | youtube */
+  fileType: 'pdf' | 'zip' | 'mp4' | 'mp3' | 'h5p' | 'youtube';
   /** Resolved after creation */
   resolvedIdentifier?: string;
   status?: ImportItemStatus;
@@ -89,6 +89,10 @@ export interface QuestionRow {
   questionSetTempId: string;
   /** e.g. Section 1 */
   sectionName?: string;
+  /** Optional description for the section this question belongs to */
+  sectionDescription?: string;
+  /** Optional instructions shown to the student at the start of this section */
+  sectionInstructions?: string;
   /** MCQ | Arrange | Match | Subjective */
   questionType: QuestionType;
   questionText: string;
@@ -100,6 +104,8 @@ export interface QuestionRow {
   difficulty?: string;
   hint?: string;
   solution?: string;
+  /** Parent = belongs to this QS only; Public = independently searchable (maps to API 'Default') */
+  visibility?: 'Parent' | 'Public';
   status?: ImportItemStatus;
   error?: string;
 }
@@ -148,6 +154,18 @@ export interface CourseChildMappingRow {
   courseTempId: string;
   /** Unit/Section name */
   unitName: string;
+  /**
+   * Optional description for the unit itself (not the child content).
+   * Only needs to be filled on one row per unit — the first non-empty
+   * value found for a given unitName wins.
+   */
+  unitDescription?: string;
+  /**
+   * Optional Google Drive public share URL for the unit's icon image.
+   * Uploaded to S3 and set as the unit node's `appIcon`.
+   * Only needs to be filled on one row per unit.
+   */
+  unitAppIconUrl?: string;
   /** TEMP_CONTENT_1 | TEMP_QS_1 | an existing do_xxx identifier */
   childRef: string;
   childType: 'content' | 'questionset';
@@ -252,6 +270,7 @@ export type JobType =
   | 'upload_content_file'
   | 'upload_app_icon'
   | 'review_content'
+  | 'publish_content'
   | 'create_questionset'
   | 'create_question'
   | 'update_questionset_hierarchy'
