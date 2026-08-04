@@ -23,11 +23,10 @@ import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import InfoIcon from '@mui/icons-material/Info';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
+import AssessmentAttempts from '@learner/components/AssessmentAttempts/AssessmentAttempts';
+import RegistrationSuccessCard from '@learner/components/RegistrationSuccessCard/RegistrationSuccessCard';
 
 interface CommonL1ContentListProps {
   notab?: boolean;
@@ -123,94 +122,25 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
           {typeof window !== 'undefined' &&
             localStorage.getItem('userProgram') ===
               TenantName.SECOND_CHANCE_PROGRAM && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: '#F5F6FA',
-                  p: { xs: 2, md: 4 },
-                  mb: 3,
-                  borderRadius: 2,
-                  gap: 1,
-                }}
+              <Grid
+                container
+                spacing={2}
+                alignItems="stretch"
+                sx={{ mb: 0, p: { xs: 2, md: 4 } }}
               >
-                <InfoIcon
-                  sx={{
-                    fontSize: { xs: '28px', md: '36px' },
-                    color: '#FDBE16',
-                    flexShrink: 0,
-                  }}
-                />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                    maxWidth: '650px',
-                  }}
-                >
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      textAlign: 'center',
-                      color: '#1F1B13',
-                      fontWeight: 600,
-                      fontSize: { xs: '12px', md: '16px' },
-                      lineHeight: { xs: '18px', md: '24px' },
-                    }}
-                  >
-                    {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      textAlign: 'center',
-                      color: '#1F1B13',
-                      fontWeight: 400,
-                      fontSize: { xs: '11px', md: '14px' },
-                      lineHeight: { xs: '16px', md: '20px' },
-                    }}
-                  >
-                    {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE')
-                      .split('{playStoreLink}')
-                      .map((part, index, array) => {
-                        if (index === array.length - 1) {
-                          return (
-                            <React.Fragment key={index}>{part}</React.Fragment>
-                          );
-                        }
-                        return (
-                          <React.Fragment key={index}>
-                            {part}
-                            <Button
-                              href="https://play.google.com/store/apps/details?id=com.pratham.learning"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              variant="outlined"
-                              startIcon={<GetAppIcon />}
-                              sx={{
-                                color: '#0D599E',
-                                borderColor: '#0D599E',
-                                fontWeight: 600,
-                                fontSize: { xs: '12px', md: '14px' },
-                                textTransform: 'none',
-                                px: 2.5,
-                                '&:hover': {
-                                  borderColor: '#0D599E',
-                                  backgroundColor: '#E7F3F8',
-                                },
-                              }}
-                            >
-                              Play Store
-                            </Button>
-                          </React.Fragment>
-                        );
-                      })}
-                  </Typography>
-                </Box>
-              </Box>
+                <Grid item xs={12} md={5} sx={{ display: 'flex' }}>
+                  <RegistrationSuccessCard
+                    programName={TenantName.SECOND_CHANCE_PROGRAM.replace(
+                      ' Program',
+                      ''
+                    )}
+                    statusLabel={t('LEARNER_APP.COURSE.REGISTERED')}
+                  />
+                </Grid>
+                <Grid item xs={12} md={7} sx={{ display: 'flex' }}>
+                  {!notab && <AssessmentAttempts />}
+                </Grid>
+              </Grid>
             )}
           {!notab && (
             <Box
@@ -219,17 +149,22 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { xs: 'flex-start', sm: 'center' },
                 justifyContent: 'space-between',
-                py: '36px',
-                px: '34px',
+                py: 2,
+                px: { xs: 2, md: 2.5 },
                 bgcolor: '#fff',
-                gap: 2,
+                border: '1px solid',
+                borderColor: (theme) =>
+                  theme.palette.customColors.welcomeBannerBorder,
+                borderRadius: 3,
+                mb: 3,
+                gap: 1,
               }}
             >
               <Typography
                 variant="body1"
                 component="h2"
                 sx={{
-                  fontWeight: 500,
+                  fontWeight: 600,
                   color: '#1F1B13',
                   textTransform: 'capitalize',
                   mb: 0,
@@ -240,7 +175,9 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 </span>
                 {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
               </Typography>
-              <AttemptAssessmentButton />
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {t('LEARNER_APP.COURSE.COURSE_WELCOME_SUBTITLE')}
+              </Typography>
             </Box>
           )}
           {!notab && <InProgressContent />}

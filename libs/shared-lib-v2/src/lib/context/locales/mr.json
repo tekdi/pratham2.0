@@ -228,12 +228,31 @@
       "EXPLORE_ADDITIONAL_RESOURCES": "अतिरिक्त संसाधने आणि साहित्य एक्सप्लोर करा",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "सेकंड चान्स कार्यक्रमासाठी नोंदणी केल्याबद्दल धन्यवाद. आमची टीम लवकरच तुमच्याशी संपर्क साधेल. तोपर्यंत, उपलब्ध अभ्यासक्रमांची माहिती तुम्ही पाहू शकता.",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "तुमच्या खात्यात प्रवेश करण्यासाठी तुम्ही {playStoreLink} येथून app डाउनलोड करू शकता.",
+      "REGISTRATION_SUCCESSFUL_TITLE": "नोंदणी यशस्वी",
+      "REGISTERED": "नोंदणीकृत",
+      "PLAY_STORE": "प्ले स्टोअर",
+      "PROGRAM_LABEL": "कार्यक्रम",
+      "STATUS_LABEL": "स्थिती",
+      "COURSE_WELCOME_SUBTITLE": "शोध सुरू ठेवा — नवीन अभ्यासक्रम नियमितपणे जोडले जातात.",
       "FILTER_BY": "फिल्टर करा",
       "CLEAR_FILTER": "फिल्टर काढा.",
       "APPLY_FILTER": "फिल्टर लागू करा",
       "DONE": "पूर्ण झाले",
       "CONTENT_FILTERS": "सामग्री फिल्टर",
-      "CLEAR_ALL": "सर्व साफ करा"
+      "CLEAR_ALL": "सर्व साफ करा",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "मूल्यांकन प्रयत्न",
+        "OF": "पैकी",
+        "COMPLETED_LOWERCASE": "पूर्ण",
+        "ATTEMPT_LABEL": "प्रयत्न",
+        "COMPLETED": "पूर्ण",
+        "NOT_ATTEMPTED": "प्रयत्न केला नाही",
+        "LOCKED": "लॉक",
+        "AFTER_ATTEMPT_PREFIX": "प्रयत्नानंतर",
+        "BEST_SCORE": "सर्वोत्तम गुण",
+        "LATEST": "नवीनतम",
+        "LOAD_ERROR": "सध्या मूल्यांकन प्रयत्न लोड करता आले नाहीत."
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त अभ्यासक्रम पाहा"
