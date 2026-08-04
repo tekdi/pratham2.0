@@ -54,6 +54,29 @@ declare module '@mui/material/styles' {
       warningA400: string;
       warningA700: string;
       warningContrastText: string;
+      assessmentCardBorder: string;
+      assessmentCardBackground: string;
+      assessmentCompletedBadgeBg: string;
+      assessmentCompletedBadgeText: string;
+      assessmentBestScoreBadgeBg: string;
+      assessmentBestScoreBadgeText: string;
+      assessmentLatestBadgeBg: string;
+      assessmentLatestBadgeText: string;
+      assessmentNotAttemptedText: string;
+      assessmentScoreText: string;
+      assessmentContainerBorder: string;
+      assessmentContainerBackground: string;
+      assessmentRowDivider: string;
+      assessmentNotAttemptedBadgeBg: string;
+      assessmentNotAttemptedBadgeText: string;
+      assessmentLockedBadgeBg: string;
+      assessmentLockedBadgeText: string;
+      registrationCardBackground: string;
+      registrationCardIconBg: string;
+      registrationDivider: string;
+      registrationStatusText: string;
+      welcomeBannerBackground: string;
+      welcomeBannerBorder: string;
     };
   }
 
@@ -77,6 +100,29 @@ declare module '@mui/material/styles' {
       warningA400?: string;
       warningA700?: string;
       warningContrastText?: string;
+      assessmentCardBorder?: string;
+      assessmentCardBackground?: string;
+      assessmentCompletedBadgeBg?: string;
+      assessmentCompletedBadgeText?: string;
+      assessmentBestScoreBadgeBg?: string;
+      assessmentBestScoreBadgeText?: string;
+      assessmentLatestBadgeBg?: string;
+      assessmentLatestBadgeText?: string;
+      assessmentNotAttemptedText?: string;
+      assessmentScoreText?: string;
+      assessmentContainerBorder?: string;
+      assessmentContainerBackground?: string;
+      assessmentRowDivider?: string;
+      assessmentNotAttemptedBadgeBg?: string;
+      assessmentNotAttemptedBadgeText?: string;
+      assessmentLockedBadgeBg?: string;
+      assessmentLockedBadgeText?: string;
+      registrationCardBackground?: string;
+      registrationCardIconBg?: string;
+      registrationDivider?: string;
+      registrationStatusText?: string;
+      welcomeBannerBackground?: string;
+      welcomeBannerBorder?: string;
     };
   }
 }

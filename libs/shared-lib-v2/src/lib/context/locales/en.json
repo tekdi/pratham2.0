@@ -228,13 +228,32 @@
       "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app from {playStoreLink} to access your account also.",
+      "REGISTRATION_SUCCESSFUL_TITLE": "Registration successful",
+      "REGISTERED": "Registered",
+      "PLAY_STORE": "Play Store",
+      "PROGRAM_LABEL": "Program",
+      "STATUS_LABEL": "Status",
+      "COURSE_WELCOME_SUBTITLE": "Keep exploring — new courses are added regularly.",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
       "APPLY_FILTER": "Apply Filter",
       "DONE": "Done",
       "CONTENT_FILTERS": "Content Filters",
-      "CLEAR_ALL": "Clear All"
+      "CLEAR_ALL": "Clear All",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "Assessment Attempts",
+        "OF": "of",
+        "COMPLETED_LOWERCASE": "completed",
+        "ATTEMPT_LABEL": "Attempt",
+        "COMPLETED": "Completed",
+        "NOT_ATTEMPTED": "Not Attempted",
+        "LOCKED": "Locked",
+        "AFTER_ATTEMPT_PREFIX": "After Attempt",
+        "BEST_SCORE": "Best Score",
+        "LATEST": "Latest",
+        "LOAD_ERROR": "Unable to load assessment attempts right now."
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"

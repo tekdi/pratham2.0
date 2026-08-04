@@ -228,12 +228,31 @@
       "EXPLORE_ADDITIONAL_RESOURCES": "అదనపు వనరులు & సామగ్రిని అన్వేషించండి",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "సెకండ్ ఛాన్స్ ప్రోగ్రామ్‌కు నమోదు చేసుకున్నందుకు ధన్యవాదాలు. మా బృందం త్వరలో మీతో సంప్రదిస్తుంది. అంతవరకు అందుబాటులో ఉన్న కోర్సులను మీరు అన్వేషించవచ్చు.",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "మీ ఖాతాను యాక్సెస్ చేయడానికి {playStoreLink} నుండి యాప్‌ను డౌన్‌లోడ్ చేసుకోవచ్చు.",
+      "REGISTRATION_SUCCESSFUL_TITLE": "నమోదు విజయవంతమైంది",
+      "REGISTERED": "నమోదైంది",
+      "PLAY_STORE": "ప్లే స్టోర్",
+      "PROGRAM_LABEL": "కార్యక్రమం",
+      "STATUS_LABEL": "స్థితి",
+      "COURSE_WELCOME_SUBTITLE": "అన్వేషణ కొనసాగించండి — కొత్త కోర్సులు క్రమం తప్పకుండా జోడించబడతాయి.",
       "FILTER_BY": "ఫిల్టర్ చేయండి",
       "CLEAR_FILTER": "ఫిల్టర్‌ను తొలగించు",
       "APPLY_FILTER": "ఫిల్టర్ వర్తింపజేయి",
       "DONE": "పూర్తయింది",
       "CONTENT_FILTERS": "కంటెంట్ ఫిల్టర్‌లు",
-      "CLEAR_ALL": "అన్నీ తొలగించు"
+      "CLEAR_ALL": "అన్నీ తొలగించు",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "మూల్యాంకన ప్రయత్నాలు",
+        "OF": "లో",
+        "COMPLETED_LOWERCASE": "పూర్తయింది",
+        "ATTEMPT_LABEL": "ప్రయత్నం",
+        "COMPLETED": "పూర్తయింది",
+        "NOT_ATTEMPTED": "ప్రయత్నించలేదు",
+        "LOCKED": "లాక్",
+        "AFTER_ATTEMPT_PREFIX": "ప్రయత్నం తర్వాత",
+        "BEST_SCORE": "అత్యుత్తమ స్కోరు",
+        "LATEST": "తాజా",
+        "LOAD_ERROR": "ప్రస్తుతం మూల్యాంకన ప్రయత్నాలను లోడ్ చేయలేకపోయాము."
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "అదనపు కోర్సులను అన్వేషించండి"

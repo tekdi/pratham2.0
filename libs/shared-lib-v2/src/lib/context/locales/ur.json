@@ -228,12 +228,31 @@
       "EXPLORE_ADDITIONAL_RESOURCES": "اضافی وسائل اور مواد دریافت کریں۔",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "سیکنڈ چانس کے پروگرام کے لیے اندراج کے لیے آپ کا شکریہ۔ ہماری ٹیم جلد ہی آپ سے رابطہ کرے گی۔ تب تک، آپ دستیاب کورسز کو تلاش کر سکتے ہیں۔",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "آپ اپنے اکاؤنٹ تک رسائی کے لیے {playStoreLink} سے ایپ ڈاؤن لوڈ کر سکتے ہیں۔",
+      "REGISTRATION_SUCCESSFUL_TITLE": "رجسٹریشن کامیاب",
+      "REGISTERED": "رجسٹرڈ",
+      "PLAY_STORE": "پلے اسٹور",
+      "PROGRAM_LABEL": "پروگرام",
+      "STATUS_LABEL": "حیثیت",
+      "COURSE_WELCOME_SUBTITLE": "تلاش جاری رکھیں — نئے کورسز باقاعدگی سے شامل کیے جاتے ہیں۔",
       "FILTER_BY": "کے لحاظ سے فلٹر کریں۔",
       "CLEAR_FILTER": "فلٹر صاف کریں۔",
       "APPLY_FILTER": "فلٹر لگائیں۔",
       "DONE": "ہو گیا",
       "CONTENT_FILTERS": "مواد کے فلٹرز",
-      "CLEAR_ALL": "سب صاف کریں"
+      "CLEAR_ALL": "سب صاف کریں",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "تشخیصی کوششیں",
+        "OF": "میں سے",
+        "COMPLETED_LOWERCASE": "مکمل",
+        "ATTEMPT_LABEL": "کوشش",
+        "COMPLETED": "مکمل",
+        "NOT_ATTEMPTED": "کوشش نہیں کی گئی",
+        "LOCKED": "مقفل",
+        "AFTER_ATTEMPT_PREFIX": "کوشش کے بعد",
+        "BEST_SCORE": "بہترین اسکور",
+        "LATEST": "تازہ ترین",
+        "LOAD_ERROR": "ابھی تشخیصی کوششیں لوڈ نہیں ہو سکیں۔"
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "اضافی کورسز دریافت کریں۔"
