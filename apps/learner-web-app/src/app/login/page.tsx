@@ -292,7 +292,7 @@ const WelcomeMessage = () => {
         sx={{ verticalAlign: 'middle' }}
         mb={2}
       >
-        {t('LEARNER_APP.LOGIN.welcome_subtitle')} sss
+        {t('LEARNER_APP.LOGIN.welcome_subtitle')}
       </Typography>
     </Box>
   );
