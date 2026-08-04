@@ -30,6 +30,53 @@ const EnrollProfileCompletionInner = () => {
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
   const [landingPage, setLandingPage] = useState<string>('');
 
+  // FIX (PS-7093): Enroll a user into a tenant, covering the admin-deleted case.
+  //
+  // When an admin deletes a learner from a program the user-tenant mapping is kept and
+  // its tenantStatus set to 'archived'. POST /user-tenant only CREATES mappings, so it
+  // cannot re-enroll such a user — that requires PATCH /user-tenant/status.
+  //
+  // Rather than relying on POST throwing (it may return success without actually
+  // re-activating, leaving the learner archived), we read the mapping's current status
+  // from tenantData and call the right endpoint first, keeping the other as a fallback.
+  const enrollOrReactivateTenant = async (
+    userId: string,
+    tenantId: string,
+    roleId: string,
+    isPendingStatus: boolean,
+    tenantData: any[]
+  ) => {
+    const targetStatus = isPendingStatus ? 'pending' : 'active';
+    const isArchived = (tenantData || []).some(
+      (tenant: any) =>
+        tenant?.tenantId === tenantId && tenant?.tenantStatus === 'archived'
+    );
+
+    const doEnroll = () =>
+      isPendingStatus
+        ? enrollUserTenant({ userId, tenantId, roleId, userTenantStatus: 'pending' })
+        : enrollUserTenant({ userId, tenantId, roleId });
+    const doReactivate = () => reactivateUserTenant(userId, tenantId, targetStatus);
+
+    const [primary, fallback] = isArchived
+      ? [doReactivate, doEnroll]
+      : [doEnroll, doReactivate];
+
+    try {
+      await primary();
+    } catch (primaryError) {
+      console.error(
+        `Enrollment call failed (archived=${isArchived}), trying fallback:`,
+        primaryError
+      );
+      try {
+        await fallback();
+      } catch (fallbackError) {
+        console.error('Enrollment fallback also failed:', fallbackError);
+      }
+    }
+  };
+
   const handleAccessProgram = async () => {
     try {
       const storedUserId = localStorage.getItem('userId');
@@ -56,6 +103,34 @@ const EnrollProfileCompletionInner = () => {
       localStorage.setItem('userIdName', userResponse?.result?.userData?.username);
       localStorage.setItem('firstName', userResponse?.result?.userData?.firstName || '');
       localStorage.setItem('lastName', userResponse?.result?.userData?.lastName || '');
+
+      // FIX (PS-7093): Guarantee a roleId before the enrollment blocks below.
+      //
+      // Both enrollment paths are guarded by `if (userId && roleId && tenantId)`. When
+      // roleId is missing the guard fails silently — no POST, no PATCH fallback, no error
+      // logged — so the learner reaches the dashboard un-enrolled and the ClientLayout
+      // archived-tenant guard bounces them to /login.
+      //
+      // This happens for a learner deleted from every program: the login path has no
+      // active tenant to read a roleId from. Derive it from tenantData here (preferring
+      // the target tenant's own Learner role) so re-enrollment works from any entry point.
+      if (!localStorage.getItem('roleId')) {
+        const allTenantData = userResponse?.result?.userData?.tenantData || [];
+        const learnerRoleId =
+          allTenantData
+            .find((tenant: any) => tenant?.tenantId === tenantId)
+            ?.roles?.find((role: any) => role?.roleName === 'Learner')?.roleId ||
+          allTenantData
+            .flatMap((tenant: any) => tenant?.roles || [])
+            .find((role: any) => role?.roleName === 'Learner')?.roleId;
+        if (learnerRoleId) {
+          localStorage.setItem('roleId', learnerRoleId);
+        } else {
+          console.error(
+            'No Learner roleId could be resolved — tenant enrollment will be skipped'
+          );
+        }
+      }
 
       if (program.params?.templateId) {
         localStorage.setItem('templtateId', program.params.templateId);
@@ -113,29 +188,13 @@ const EnrollProfileCompletionInner = () => {
           const enrollTenantId = localStorage.getItem('tenantId');
           const userTenantStatus = uiConfig?.isTenantPendingStatus;
           if (enrollUserId && enrollRoleId && enrollTenantId) {
-            // FIX (PS-7093): Two-step enrollment to handle re-enrollment of admin-deleted users.
-            //
-            // Step 1 — POST (standard path for first-time enrollees):
-            //   enrollUserTenant calls POST /user-tenant to create a new mapping.
-            //   For a user who was previously deleted (tenantStatus = 'archived'), a mapping
-            //   already exists, so POST throws an error.
-            //
-            // Step 2 — PATCH fallback (for previously-deleted users):
-            //   reactivateUserTenant calls PATCH /user-tenant/status to update the existing
-            //   archived mapping's status back to 'pending'/'active', completing the re-enrollment.
-            try {
-              if (userTenantStatus) {
-                await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId, userTenantStatus: 'pending' });
-              } else {
-                await enrollUserTenant({ userId: enrollUserId, tenantId: enrollTenantId, roleId: enrollRoleId });
-              }
-            } catch {
-              try {
-                await reactivateUserTenant(enrollUserId, enrollTenantId, userTenantStatus ? 'pending' : 'active');
-              } catch (patchErr) {
-                console.error('Re-activation also failed:', patchErr);
-              }
-            }
+            await enrollOrReactivateTenant(
+              enrollUserId,
+              enrollTenantId,
+              enrollRoleId,
+              Boolean(userTenantStatus),
+              userResponse?.result?.userData?.tenantData || []
+            );
             console.log('Enrolled into tenant:', enrollTenantId);
             if (userTenantStatus) {
               try {
@@ -237,11 +296,15 @@ const EnrollProfileCompletionInner = () => {
           const enrollTenantId = localStorage.getItem('tenantId');
           const userTenantStatus = uiConfig?.isTenantPendingStatus;
           if (storedUserId && storedRoleId && enrollTenantId) {
-            if (userTenantStatus) {
-              await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId, userTenantStatus: 'pending' });
-            } else {
-              await enrollUserTenant({ userId: storedUserId, tenantId: enrollTenantId, roleId: storedRoleId });
-            }
+            // Same archived-aware enrollment as the registration-test branch above, so a
+            // previously-deleted learner can also re-enroll into non-test programs.
+            await enrollOrReactivateTenant(
+              storedUserId,
+              enrollTenantId,
+              storedRoleId,
+              Boolean(userTenantStatus),
+              userResponse?.result?.userData?.tenantData || []
+            );
             console.log('Enrolled into tenant:', enrollTenantId);
             // Always update user with pending custom field after enrollment
             try {

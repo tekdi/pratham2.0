@@ -20,11 +20,14 @@ interface EnrollUserTenantParams {
  * the user is never actually re-enrolled.
  *
  * Solution: This function uses PATCH /user-tenant/status to UPDATE the existing archived
- * mapping's status back to 'pending' (or 'active'). It must be called as a fallback inside
- * a catch block whenever enrollUserTenant() throws, which indicates an existing mapping.
+ * mapping's status back to 'pending' (or 'active').
  *
- * Usage: See handleAssessmentModalClose and onAssessmentUnavailableOk in
- *        enroll-profile-completion/page.tsx
+ * Call this INSTEAD of enrollUserTenant whenever the user's tenantData shows the target
+ * tenant with tenantStatus === 'archived'. Do not rely on enrollUserTenant throwing to
+ * detect that case — the POST can report success without re-activating the mapping,
+ * which silently leaves the learner un-enrolled.
+ *
+ * Usage: See enrollOrReactivateTenant in enroll-profile-completion/page.tsx
  */
 export const reactivateUserTenant = async (
   userId: string,

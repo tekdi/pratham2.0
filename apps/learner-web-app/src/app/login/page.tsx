@@ -766,6 +766,33 @@ const LoginPageContent = () => {
           localStorage.setItem('userId', userResponse?.userId);
           localStorage.setItem('userIdName', userResponse?.username);
           localStorage.setItem('firstName', userResponse?.firstName || '');
+
+          // FIX (PS-7093): Store the Learner roleId even though no ACTIVE tenant exists.
+          //
+          // selectedRoleId above is derived only from active/pending tenants, so for a
+          // fully-deleted learner it is '' and roleId never reaches localStorage
+          // (preserveLocalStorage() has already cleared it on page load).
+          //
+          // Re-enrollment then fails silently: handleAccessProgram in
+          // enroll-profile-completion guards its enrollment block with
+          // `if (userId && roleId && tenantId)`, so a missing roleId skips BOTH the
+          // POST /user-tenant and the PATCH /user-tenant/status fallback. The learner is
+          // never re-enrolled, the ClientLayout guard then sees tenantStatus still
+          // 'archived' and kicks them back to /login.
+          //
+          // The archived tenant mapping still carries the Learner role, so read it there.
+          const archivedLearnerRoleId = userResponse?.tenantData
+            ?.filter(
+              (tenant: any) =>
+                tenant?.tenantStatus === 'archived' &&
+                tenant?.tenantName !== 'Pratham'
+            )
+            ?.flatMap((tenant: any) => tenant?.roles || [])
+            ?.find((role: any) => role?.roleName === 'Learner')?.roleId;
+          if (archivedLearnerRoleId) {
+            localStorage.setItem('roleId', archivedLearnerRoleId);
+          }
+
           document.cookie = `token=${token}; path=/; secure; SameSite=Strict`;
           router.push('/programs');
         } else {
