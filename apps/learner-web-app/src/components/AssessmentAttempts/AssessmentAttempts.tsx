@@ -23,6 +23,7 @@ import { TenantName } from '@learner/utils/app.constant';
 import {
   AssessmentAttemptCardData,
   mapAttemptCards,
+  TOTAL_ATTEMPT_SLOTS,
 } from '@learner/utils/helpers/assessmentAttemptHelpers';
 import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
 
@@ -99,7 +100,7 @@ const AssessmentAttempts: React.FC = () => {
 
       const attempts = Array.isArray(result) ? result : [];
       setAttemptCards(mapAttemptCards(attempts));
-      setCompletedCount(attempts.length);
+      setCompletedCount(Math.min(attempts.length, TOTAL_ATTEMPT_SLOTS));
       setLoadState('loaded');
     } catch (error) {
       console.error('AssessmentAttempts: failed to load attempts', error);
