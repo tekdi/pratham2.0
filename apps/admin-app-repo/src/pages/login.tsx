@@ -1,38 +1,35 @@
+import { showToastMessage } from '@/components/Toastify';
+import { useAccountSwitch } from '@/hooks/useAccountSwitch';
+import { Role, TenantName } from '@/utils/app.constant';
+import { logEvent } from '@/utils/googleAnalytics';
+import { telemetryFactory } from '@/utils/telemetry';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
   FormControl,
+  Grid,
   IconButton,
   InputAdornment,
   TextField,
-  Grid,
   Typography,
   useMediaQuery, // Import useMediaQuery hook
 } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import ReactGA from 'react-ga4';
 import Checkbox from '@mui/material/Checkbox';
-import Image from 'next/image';
-import Loader from '../components/Loader';
 import MenuItem from '@mui/material/MenuItem';
-import appLogo from '../../public/images/appLogo.png';
-import config from '../../config.json';
-import { getUserId, login } from '../services/LoginService';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
-import { telemetryFactory } from '@/utils/telemetry';
-import { logEvent } from '@/utils/googleAnalytics';
-import { showToastMessage } from '@/components/Toastify';
-import Link from '@mui/material/Link';
-import loginImage from '../../public/loginImage.jpg';
-import { TenantName } from '@/utils/app.constant';
-import { Role } from '@/utils/app.constant';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import React, { useEffect, useRef, useState } from 'react';
+import ReactGA from 'react-ga4';
+import config from '../../config.json';
+import appLogo from '../../public/images/appLogo.png';
 import loginImg from '../../public/images/login-image.jpg';
-import { useAccountSwitch } from '@/hooks/useAccountSwitch';
+import Loader from '../components/Loader';
+import { getUserId, login } from '../services/LoginService';
 
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
@@ -533,7 +530,7 @@ const LoginPage = () => {
                   {t('LOGIN_PAGE.LOGIN')}
                 </Button>
               </Box>
-              
+
               {/* SSO Login Button */}
               <Box
                 sx={{
@@ -574,14 +571,14 @@ const LoginPage = () => {
                         : '';
                     const callbackUrl = `${currentBaseUrl}/sso?env=newton`;
                     const encodedCallbackUrl = callbackUrl;
-                    
+
                     // Get SSO URL from environment variable
                     const ssoBaseUrl = "https://prathamerp.org/Config/OAuthLogin/PRATHAM";
-                    
+
                     // Construct SSO URL - use ? if no existing query params, otherwise use &
                     const hasQueryParams = ssoBaseUrl.includes('?');
                     const ssoUrl = `${ssoBaseUrl}${hasQueryParams ? '&' : '?'}callbackurl=${encodedCallbackUrl}`;
-                    
+
                     console.log('Redirecting to SSO URL:', ssoUrl);
 
                     // Open SSO URL in new tab (matching OurProgramCarousel behavior)
