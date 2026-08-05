@@ -1,8 +1,19 @@
 import React from 'react';
-import { Box, Button, Divider, Stack, Typography, useTheme } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Stack,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InfoIcon from '@mui/icons-material/Info';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { useTranslation } from '@shared-lib';
+import { useSharedAccordionState } from '@learner/utils/hooks/useSharedAccordionState';
 
 interface RegistrationSuccessCardProps {
   programName: string;
@@ -19,104 +30,123 @@ const RegistrationSuccessCard: React.FC<RegistrationSuccessCardProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
   const { customColors } = theme.palette;
+  const [isOpen, setIsOpen] = useSharedAccordionState();
 
-  return (
+  const downloadAppText = t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').split(
+    '{playStoreLink}'
+  )[0];
+
+  const icon = (
     <Box
       sx={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        bgcolor: customColors.registrationCardIconBg,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <InfoIcon sx={{ fontSize: '14px', color: '#FFFFFF' }} />
+    </Box>
+  );
+
+  const description = (
+    <Typography
+      variant="body2"
+      sx={{ color: theme.palette.text.secondary, fontSize: '12px' }}
+    >
+      {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}{' '}
+      {downloadAppText}
+    </Typography>
+  );
+
+  const playStoreButton = (
+    <Button
+      href={PLAY_STORE_LINK}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="contained"
+      color="primary"
+      startIcon={<GetAppIcon sx={{ fontSize: '18px' }} />}
+      sx={{
+        minWidth: { xs: 'auto', sm: '120px' },
+        fontWeight: 500,
+        fontSize: '12px',
+        lineHeight: '20px',
+        letterSpacing: '0.1px',
+        whiteSpace: 'nowrap',
+        px: { xs: 2, sm: 3 },
+        py: 1,
+        m: '0 !important',
+        boxShadow: '0px 3px 5px rgba(0, 0, 0, 0.2)',
+        flexShrink: 0,
+      }}
+    >
+      {t('LEARNER_APP.COURSE.PLAY_STORE')}
+    </Button>
+  );
+
+  return (
+    <Accordion
+      expanded={isOpen}
+      onChange={(_event, expanded) => setIsOpen(expanded)}
+      disableGutters
+      elevation={0}
+      sx={{
         bgcolor: customColors.registrationCardBackground,
-        borderRadius: 3,
-        p: { xs: 1.5, md: 2 },
+        borderRadius: '12px !important',
         width: '100%',
         flexGrow: 1,
         boxSizing: 'border-box',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
         boxShadow:
           '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+        '&:before': { display: 'none' },
       }}
     >
-      <Stack direction="row" spacing={1} alignItems="flex-start">
-        <Box
-          sx={{
-            width: 22,
-            height: 22,
-            borderRadius: '50%',
-            bgcolor: customColors.registrationCardIconBg,
-            display: 'flex',
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          px: { xs: 1.5, md: 2 },
+          minHeight: 'auto',
+          '& .MuiAccordionSummary-content': {
+            my: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            mt: '2px',
-          }}
-        >
-          <InfoIcon sx={{ fontSize: '14px', color: '#FFFFFF' }} />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+          },
+        }}
+      >
+        <Stack direction="row" alignItems="center" gap={1}>
+          {icon}
           <Typography
             variant="subtitle1"
-            sx={{ fontWeight: 700, color: theme.palette.text.primary, fontSize: '16px' }}
+            sx={{ fontWeight: 700, color: theme.palette.text.primary, fontSize: '14px' }}
           >
             {t('LEARNER_APP.COURSE.REGISTRATION_SUCCESSFUL_TITLE')}
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: theme.palette.text.secondary, mt: 0.25 }}
-          >
-            {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
-          </Typography>
+        </Stack>
+      </AccordionSummary>
+
+      <AccordionDetails sx={{ px: { xs: 1.5, md: 2 }, pt: 0, pb: { xs: 1.5, md: 2 } }}>
+        {/* Mobile layout: description, then button below */}
+        <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+          <Box sx={{ mb: 1.25 }}>{description}</Box>
+          {playStoreButton}
         </Box>
-      </Stack>
 
-      <Divider sx={{ my: 1, borderColor: customColors.registrationDivider }} />
-
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="space-between"
-        flexWrap="wrap"
-        gap={1.25}
-        rowGap={1}
-      >
-        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-          {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').split(
-            '{playStoreLink}'
-          )[0]}
-        </Typography>
-
-        <Button
-          href={PLAY_STORE_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="outlined"
-          startIcon={<GetAppIcon sx={{ fontSize: '18px' }} />}
-          size="small"
-          disableRipple
-          disableElevation
-          sx={{
-            bgcolor: '#FFFFFF',
-            color: theme.palette.secondary.main,
-            borderColor: customColors.registrationDivider,
-            boxShadow: 'none',
-            fontWeight: 600,
-            fontSize: '13px',
-            textTransform: 'none',
-            borderRadius: 5,
-            m: '0 !important',
-            px: 2.25,
-            py: 0.75,
-            flexShrink: 0,
-            '&:hover': {
-              bgcolor: '#FFFFFF',
-              borderColor: customColors.registrationDivider,
-              boxShadow: 'none',
-            },
-          }}
+        {/* Desktop layout: description + button, single row */}
+        <Stack
+          direction="row"
+          alignItems="center"
+          gap={1.5}
+          sx={{ display: { xs: 'none', sm: 'flex' } }}
         >
-          {t('LEARNER_APP.COURSE.PLAY_STORE')}
-        </Button>
-      </Stack>
-    </Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>{description}</Box>
+          {playStoreButton}
+        </Stack>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
