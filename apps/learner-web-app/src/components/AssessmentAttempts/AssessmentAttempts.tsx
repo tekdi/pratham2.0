@@ -2,19 +2,19 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
-  Chip,
-  Divider,
   Skeleton,
   Stack,
   Typography,
   useTheme,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import LockIcon from '@mui/icons-material/Lock';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@shared-lib';
 import { ContentSearch } from '@learner/utils/API/contentService';
@@ -25,20 +25,30 @@ import {
   mapAttemptCards,
   TOTAL_ATTEMPT_SLOTS,
 } from '@learner/utils/helpers/assessmentAttemptHelpers';
+import { checkUserHasActiveBatch } from '@learner/utils/helpers/cohortAssignmentHelper';
+import { useSharedAccordionState } from '@learner/utils/hooks/useSharedAccordionState';
 import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
 
 type LoadState = 'idle' | 'loading' | 'loaded' | 'error' | 'notApplicable';
 
-type BadgeVariant = 'completed' | 'bestScore' | 'latest' | 'notAttempted' | 'locked';
+type PillVariant = 'completed' | 'notAttempted';
 
-const AssessmentAttempts: React.FC = () => {
+interface AssessmentAttemptsProps {
+  onVisibilityChange?: (isVisible: boolean) => void;
+}
+
+const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
+  onVisibilityChange,
+}) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { customColors } = theme.palette;
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useSharedAccordionState();
   const [loadState, setLoadState] = useState<LoadState>('idle');
   const [attemptCards, setAttemptCards] = useState(mapAttemptCards([]));
   const [completedCount, setCompletedCount] = useState(0);
+  const [isBatchAssigned, setIsBatchAssigned] = useState(false);
 
   const loadAssessmentAttempts = useCallback(async () => {
     if (typeof window === 'undefined') return;
@@ -71,19 +81,22 @@ const AssessmentAttempts: React.FC = () => {
       const programFilter = [userProgram, 'Second Chance'];
       const preferredLanguage = localStorage.getItem('preferred_language');
 
-      const response = await ContentSearch({
-        query: '',
-        filters: {
-          status: ['Live'],
-          primaryCategory: ['Practice Question Set'],
-          assessmentType: 'Eligibility Test',
-          program: programFilter,
-          ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
-        },
-        sort_by: { lastUpdatedOn: 'desc' },
-        limit: 1,
-        offset: 0,
-      });
+      const [response, hasActiveBatch] = await Promise.all([
+        ContentSearch({
+          query: '',
+          filters: {
+            status: ['Live'],
+            primaryCategory: ['Practice Question Set'],
+            assessmentType: 'Eligibility Test',
+            program: programFilter,
+            ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
+          },
+          sort_by: { lastUpdatedOn: 'desc' },
+          limit: 1,
+          offset: 0,
+        }),
+        checkUserHasActiveBatch(storedUserId),
+      ]);
 
       const identifier = response?.result?.QuestionSet?.[0]?.identifier;
       if (!identifier) {
@@ -99,6 +112,15 @@ const AssessmentAttempts: React.FC = () => {
       });
 
       const attempts = Array.isArray(result) ? result : [];
+
+      // A batch-assigned learner with no completed attempts has nothing to show —
+      // hide the section entirely rather than a section with only locked/empty pills.
+      if (hasActiveBatch && attempts.length === 0) {
+        setLoadState('notApplicable');
+        return;
+      }
+
+      setIsBatchAssigned(hasActiveBatch);
       setAttemptCards(mapAttemptCards(attempts));
       setCompletedCount(Math.min(attempts.length, TOTAL_ATTEMPT_SLOTS));
       setLoadState('loaded');
@@ -112,228 +134,236 @@ const AssessmentAttempts: React.FC = () => {
     loadAssessmentAttempts();
   }, [loadAssessmentAttempts, pathname]);
 
+  useEffect(() => {
+    if (loadState === 'idle') return;
+    onVisibilityChange?.(loadState !== 'notApplicable');
+  }, [loadState, onVisibilityChange]);
+
   if (loadState === 'idle' || loadState === 'notApplicable') {
     return null;
   }
 
-  const containerSx = {
+  const accordionSx = {
     bgcolor: customColors.assessmentContainerBackground,
     border: `1px solid ${customColors.assessmentContainerBorder}`,
-    borderRadius: 3,
-    overflow: 'hidden',
+    borderRadius: '12px !important',
     width: '100%',
     flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
+    boxSizing: 'border-box',
+    '&:before': { display: 'none' },
   };
+
+  // Once batch-assigned, a partial (1/2) count is meaningless — the batch
+  // already decided the learner's path, so only show the count once both
+  // attempts are completed.
+  const showCompletionCount =
+    loadState === 'loaded' && (!isBatchAssigned || completedCount === attemptCards.length);
+
+  const summary = (
+    <AccordionSummary
+      expandIcon={<ExpandMoreIcon />}
+      sx={{
+        px: { xs: 2, md: 2.5 },
+        minHeight: 'auto',
+        '& .MuiAccordionSummary-content': {
+          my: 1,
+          alignItems: 'baseline',
+          gap: 1,
+          flexWrap: 'wrap',
+        },
+      }}
+    >
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '14px' }}>
+        {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.TITLE')}
+      </Typography>
+      {showCompletionCount && (
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '12px' }}>
+          {completedCount} {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.OF')}{' '}
+          {attemptCards.length}{' '}
+          {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.COMPLETED_LOWERCASE')}
+        </Typography>
+      )}
+    </AccordionSummary>
+  );
 
   if (loadState === 'loading') {
     return (
-      <Box sx={{ ...containerSx, p: { xs: 2, md: 2.5 } }}>
-        <Skeleton variant="text" width={180} height={28} />
-        <Stack spacing={1.5} mt={1.5}>
-          <Skeleton variant="rounded" width="100%" height={48} />
-          <Skeleton variant="rounded" width="100%" height={48} />
-        </Stack>
-      </Box>
+      <Accordion
+        expanded={isOpen}
+        onChange={(_event, expanded) => setIsOpen(expanded)}
+        disableGutters
+        elevation={0}
+        sx={accordionSx}
+      >
+        {summary}
+        <AccordionDetails sx={{ px: { xs: 2, md: 2.5 }, pt: 0 }}>
+          <Stack direction="row" spacing={1} flexWrap="wrap">
+            <Skeleton variant="rounded" width={160} height={32} />
+            <Skeleton variant="rounded" width={160} height={32} />
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
     );
   }
 
   if (loadState === 'error') {
     return (
-      <Box sx={{ ...containerSx, p: { xs: 2, md: 2.5 } }}>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.LOAD_ERROR')}
-        </Typography>
-      </Box>
+      <Accordion
+        expanded={isOpen}
+        onChange={(_event, expanded) => setIsOpen(expanded)}
+        disableGutters
+        elevation={0}
+        sx={accordionSx}
+      >
+        {summary}
+        <AccordionDetails sx={{ px: { xs: 2, md: 2.5 }, pt: 0 }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.LOAD_ERROR')}
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
     );
   }
 
-  const renderBadge = (variant: BadgeVariant, label: string) => {
-    const variantStyles: Record<
-      BadgeVariant,
-      { bg: string; text: string; icon: React.ReactElement }
-    > = {
-      completed: {
-        bg: customColors.assessmentCompletedBadgeBg,
-        text: customColors.assessmentCompletedBadgeText,
-        icon: <CheckCircleIcon sx={{ fontSize: '14px !important' }} />,
-      },
-      bestScore: {
-        bg: customColors.assessmentBestScoreBadgeBg,
-        text: customColors.assessmentBestScoreBadgeText,
-        icon: <EmojiEventsIcon sx={{ fontSize: '14px !important' }} />,
-      },
-      latest: {
-        bg: customColors.assessmentLatestBadgeBg,
-        text: customColors.assessmentLatestBadgeText,
-        icon: <AutorenewIcon sx={{ fontSize: '14px !important' }} />,
-      },
-      notAttempted: {
-        bg: customColors.assessmentNotAttemptedBadgeBg,
-        text: customColors.assessmentNotAttemptedBadgeText,
-        icon: <VpnKeyIcon sx={{ fontSize: '14px !important' }} />,
-      },
-      locked: {
-        bg: customColors.assessmentLockedBadgeBg,
-        text: customColors.assessmentLockedBadgeText,
-        icon: <LockIcon sx={{ fontSize: '14px !important' }} />,
-      },
-    };
-    const style = variantStyles[variant];
+  const pillStyles: Record<PillVariant, { bg: string; text: string }> = {
+    completed: {
+      bg: customColors.assessmentCompletedBadgeBg,
+      text: customColors.assessmentCompletedBadgeText,
+    },
+    notAttempted: {
+      bg: customColors.assessmentNotAttemptedBadgeBg,
+      text: customColors.assessmentNotAttemptedBadgeText,
+    },
+  };
+
+  // Trophy goes to the completed attempt with the highest score; ties break to
+  // the latest completed attempt; no trophy at all if every completed score is 0.
+  const completedAttempts = attemptCards.filter((attempt) => attempt.isAttempted);
+  const highestScore = completedAttempts.reduce(
+    (max, attempt) => Math.max(max, attempt.score ?? 0),
+    0
+  );
+  const trophyAttemptNumber =
+    highestScore > 0
+      ? completedAttempts
+          .filter((attempt) => (attempt.score ?? 0) === highestScore)
+          .reduce((latest, attempt) =>
+            attempt.attemptNumber > latest.attemptNumber ? attempt : latest
+          ).attemptNumber
+      : null;
+
+  const renderAttemptPill = (attempt: AssessmentAttemptCardData) => {
+    const variant: PillVariant = attempt.isAttempted ? 'completed' : 'notAttempted';
+    const style = pillStyles[variant];
+
+    const statusLabel = attempt.isAttempted
+      ? t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.COMPLETED')
+      : t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.NOT_ATTEMPTED');
+
+    const StatusIcon = attempt.isAttempted ? CheckCircleIcon : VpnKeyIcon;
 
     return (
-      <Chip
-        label={label}
-        icon={style.icon}
-        size="small"
+      <Stack
+        key={attempt.attemptNumber}
+        direction="row"
+        alignItems="center"
+        spacing={0.75}
         sx={{
           bgcolor: style.bg,
           color: style.text,
-          fontWeight: 600,
-          fontSize: '12px',
-          height: '24px',
-          '& .MuiChip-icon': { color: style.text },
-        }}
-      />
-    );
-  };
-
-  const renderAttemptRow = (attempt: AssessmentAttemptCardData, index: number) => {
-    const isNextAttempt =
-      !attempt.isAttempted && !attempt.isLocked && index === completedCount;
-
-    const scoreDisplay =
-      attempt.isAttempted && attempt.score !== null && attempt.totalMaxScore !== null
-        ? `${attempt.score}/${attempt.totalMaxScore}`
-        : '--';
-
-    return (
-      <Box
-        key={attempt.attemptNumber}
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          justifyContent: 'space-between',
-          gap: 1.5,
-          py: 2.25,
-          px: { xs: 2, md: 2.5 },
+          borderRadius: 5,
+          px: 1.5,
+          py: 0.75,
+          flexWrap: 'wrap',
         }}
       >
-        <Stack
-          direction="row"
-          spacing={1.25}
-          alignItems="center"
-          flexWrap="wrap"
-          rowGap={0.5}
+        <StatusIcon sx={{ fontSize: '14px' }} />
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 700, whiteSpace: 'nowrap', fontSize: '11px' }}
         >
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 700, color: theme.palette.text.primary, whiteSpace: 'nowrap' }}
-          >
-            {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.ATTEMPT_LABEL')}{' '}
-            {attempt.attemptNumber}
-          </Typography>
-
-          {attempt.isAttempted &&
-            renderBadge('completed', t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.COMPLETED'))}
-          {!attempt.isAttempted &&
-            attempt.isLocked &&
-            renderBadge('locked', t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.LOCKED'))}
-          {!attempt.isAttempted &&
-            !attempt.isLocked &&
-            renderBadge(
-              'notAttempted',
-              t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.NOT_ATTEMPTED')
-            )}
-
-          {attempt.isAttempted && attempt.date && (
-            <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
-              {attempt.date}
-            </Typography>
-          )}
-
-          {attempt.isAttempted && (attempt.isBestScore || attempt.isLatest) && (
-            <Stack direction="row" spacing={0.75} flexWrap="wrap" rowGap={0.5}>
-              {attempt.isBestScore &&
-                renderBadge('bestScore', t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.BEST_SCORE'))}
-              {attempt.isLatest &&
-                renderBadge('latest', t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.LATEST'))}
-            </Stack>
-          )}
-        </Stack>
-
-        <Stack direction="row" spacing={2} alignItems="center" sx={{ flexShrink: 0 }}>
-          <Typography
-            variant="body1"
-            sx={{
-              fontWeight: 700,
-              minWidth: '48px',
-              whiteSpace: 'nowrap',
-              textAlign: 'right',
-              color: attempt.isAttempted
-                ? customColors.assessmentScoreText
-                : customColors.assessmentNotAttemptedText,
-            }}
-          >
-            {scoreDisplay}
-          </Typography>
-
-          {isNextAttempt && <AttemptAssessmentButton />}
-          {!isNextAttempt && attempt.isLocked && (
+          {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.ATTEMPT_LABEL')}{' '}
+          {attempt.attemptNumber}
+        </Typography>
+        <Box
+          sx={{
+            width: 4,
+            height: 4,
+            borderRadius: '50%',
+            bgcolor: 'currentColor',
+            opacity: 0.6,
+            flexShrink: 0,
+          }}
+        />
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 500, whiteSpace: 'nowrap', fontSize: '11px' }}
+        >
+          {statusLabel}
+        </Typography>
+        {attempt.isAttempted &&
+          attempt.score !== null &&
+          attempt.totalMaxScore !== null && (
             <Typography
-              variant="caption"
-              sx={{ color: customColors.assessmentNotAttemptedText, whiteSpace: 'nowrap' }}
+              variant="body2"
+              sx={{ fontWeight: 700, whiteSpace: 'nowrap', fontSize: '11px' }}
             >
-              {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.AFTER_ATTEMPT_PREFIX')}{' '}
-              {attempt.attemptNumber - 1}
+              {attempt.score}/{attempt.totalMaxScore}
             </Typography>
           )}
-        </Stack>
-      </Box>
+        {attempt.isAttempted &&
+          attempt.attemptNumber === trophyAttemptNumber && (
+            <EmojiEventsOutlinedIcon
+              sx={{
+                fontSize: '16px',
+                color: style.text,
+              }}
+            />
+          )}
+      </Stack>
     );
   };
+
+  const hasNextAttempt =
+    !isBatchAssigned && completedCount < attemptCards.length;
+
+  // Batch-assigned learners only ever see the attempts they've actually
+  // completed — no locked/not-attempted chips, since those slots are moot
+  // once a batch decides the learner's path forward.
+  const visibleAttempts = isBatchAssigned
+    ? attemptCards.filter((attempt) => attempt.isAttempted)
+    : attemptCards;
 
   return (
-    <Box sx={containerSx}>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 1,
-          px: { xs: 2, md: 2.5 },
-          py: 1.5,
-        }}
-      >
-        <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '16px' }}>
-          {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.TITLE')}
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-          {completedCount} {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.OF')}{' '}
-          {attemptCards.length}{' '}
-          {t('LEARNER_APP.COURSE.ASSESSMENT_ATTEMPTS.COMPLETED_LOWERCASE')}
-        </Typography>
-      </Box>
-      <Divider sx={{ borderColor: customColors.assessmentRowDivider }} />
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-around',
-        }}
-      >
-        {attemptCards.map((attempt, index) => (
-          <React.Fragment key={attempt.attemptNumber}>
-            {index > 0 && <Divider sx={{ borderColor: customColors.assessmentRowDivider }} />}
-            {renderAttemptRow(attempt, index)}
-          </React.Fragment>
-        ))}
-      </Box>
-    </Box>
+    <Accordion
+      expanded={isOpen}
+      onChange={(_event, expanded) => setIsOpen(expanded)}
+      disableGutters
+      elevation={0}
+      sx={accordionSx}
+    >
+      {summary}
+      <AccordionDetails sx={{ px: { xs: 2, md: 2.5 }, pt: 0, pb: { xs: 2, md: 2.5 } }}>
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          justifyContent="space-between"
+          flexWrap="wrap"
+          gap={1.25}
+        >
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            alignItems={{ xs: 'flex-start', sm: 'center' }}
+            flexWrap="wrap"
+            gap={1}
+          >
+            {visibleAttempts.map((attempt) => renderAttemptPill(attempt))}
+          </Stack>
+
+          {hasNextAttempt && <AttemptAssessmentButton />}
+        </Stack>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 

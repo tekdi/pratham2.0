@@ -41,6 +41,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCard, setIsProfileCard] = useState(false);
+  const [showAssessmentAttempts, setShowAssessmentAttempts] = useState(true);
   const storedConfig =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
@@ -126,9 +127,19 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 container
                 spacing={2}
                 alignItems="stretch"
-                sx={{ mb: 0, p: { xs: 2, md: 4 } }}
+                sx={{
+                  mb: 0,
+                  px: { xs: 2, md: 4 },
+                  pt: { xs: 2, md: 3 },
+                  pb: { xs: 1, md: 1.5 },
+                }}
               >
-                <Grid item xs={12} md={5} sx={{ display: 'flex' }}>
+                <Grid
+                  item
+                  xs={12}
+                  lg={showAssessmentAttempts ? 6 : 12}
+                  sx={{ display: 'flex' }}
+                >
                   <RegistrationSuccessCard
                     programName={TenantName.SECOND_CHANCE_PROGRAM.replace(
                       ' Program',
@@ -137,9 +148,20 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                     statusLabel={t('LEARNER_APP.COURSE.REGISTERED')}
                   />
                 </Grid>
-                <Grid item xs={12} md={7} sx={{ display: 'flex' }}>
-                  {!notab && <AssessmentAttempts />}
-                </Grid>
+                {!notab && (
+                  <Grid
+                    item
+                    xs={12}
+                    lg={6}
+                    sx={{
+                      display: showAssessmentAttempts ? 'flex' : 'none',
+                    }}
+                  >
+                    <AssessmentAttempts
+                      onVisibilityChange={setShowAssessmentAttempts}
+                    />
+                  </Grid>
+                )}
               </Grid>
             )}
           {!notab && (
@@ -149,14 +171,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { xs: 'flex-start', sm: 'center' },
                 justifyContent: 'space-between',
-                py: 2,
-                px: { xs: 2, md: 2.5 },
-                bgcolor: '#fff',
-                border: '1px solid',
-                borderColor: (theme) =>
-                  theme.palette.customColors.welcomeBannerBorder,
-                borderRadius: 3,
-                mb: 3,
+
+                mx: { xs: 2, md: 4 },
+
+                mb: 2,
                 gap: 1,
               }}
             >
@@ -167,6 +185,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                   fontWeight: 600,
                   color: '#1F1B13',
                   textTransform: 'capitalize',
+                  fontSize: '14px',
                   mb: 0,
                 }}
               >
@@ -175,7 +194,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 </span>
                 {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', fontSize: '12px' }}
+              >
                 {t('LEARNER_APP.COURSE.COURSE_WELCOME_SUBTITLE')}
               </Typography>
             </Box>

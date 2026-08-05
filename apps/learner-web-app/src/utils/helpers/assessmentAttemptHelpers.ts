@@ -11,7 +11,6 @@ export interface AssessmentAttemptCardData {
   date: string | null;
   isBestScore: boolean;
   isLatest: boolean;
-  isLocked: boolean;
 }
 
 const getAttemptDateValue = (attempt: AssessmentRecord): number => {
@@ -122,7 +121,6 @@ export const mapAttemptCards = (
         date: null,
         isBestScore: false,
         isLatest: false,
-        isLocked: index > 0 && !sortedAttempts[index - 1],
       };
     }
 
@@ -135,7 +133,6 @@ export const mapAttemptCards = (
       date: formatAttemptDate(attempt.lastAttemptedOn || attempt.createdOn),
       isBestScore: canShowBestScore && !!bestAttempt && attempt === bestAttempt,
       isLatest: !!latestAttempt && attempt === latestAttempt,
-      isLocked: false,
     };
   });
 };
