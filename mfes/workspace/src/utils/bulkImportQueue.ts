@@ -42,6 +42,8 @@ import {
   publishContent,
   createQuestionSetNode,
   updateQuestionSetHierarchy,
+  reviewQuestionSet,
+  publishQuestionSet,
   retireQuestionSet,
   createCourseNode,
   updateCourseHierarchy,
@@ -274,12 +276,16 @@ export class BulkImportQueue {
 
       // NOTE: QS app icon upload skipped — QS uses a different API for icons (will be added later)
 
+      // Tracks the last structural job for this QS — review must wait for it.
+      let lastStructuralJobId = createQsJobId;
+
       if (questionsForQs.length > 0) {
         // Sections AND questions are created inside this single atomic
         // hierarchy update (editor-style). If any question is invalid the
         // whole update fails, nothing is attached, and the queue retires
         // the QS — so no incomplete QuestionSet is left on the platform.
         const hierarchyJobId = `hierarchy_qs_${qs.tempId}`;
+        lastStructuralJobId = hierarchyJobId;
         this.addJob({
           id: hierarchyJobId,
           type: 'update_questionset_hierarchy',
@@ -303,6 +309,34 @@ export class BulkImportQueue {
           maxRetries: MAX_RETRIES,
         });
       }
+
+      // Auto-publish: review → publish, mirroring the content pipeline.
+      // Publishing the QuestionSet also publishes the questions inside its
+      // hierarchy, so the questions need no separate publish jobs.
+      // Both run after the hierarchy update — reviewing an empty QS would
+      // leave its questions in Draft.
+      const reviewQsJobId = `review_qs_${qs.tempId}`;
+      this.addJob({
+        id: reviewQsJobId,
+        type: 'review_questionset',
+        tempId: qs.tempId,
+        dependsOn: [lastStructuralJobId],
+        payload: { _qsTempId: qs.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
+
+      this.addJob({
+        id: `publish_qs_${qs.tempId}`,
+        type: 'publish_questionset',
+        tempId: qs.tempId,
+        dependsOn: [reviewQsJobId],
+        payload: { _qsTempId: qs.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
     });
 
     // ── COURSE JOBS ──
@@ -337,8 +371,10 @@ export class BulkImportQueue {
             return `publish_content_${childRef}`;
           }
           if (childRef.startsWith('TEMP_QS_')) {
-            const hasQuestions = data.questions.some((q) => q.questionSetTempId === childRef);
-            return hasQuestions ? `hierarchy_qs_${childRef}` : `create_qs_${childRef}`;
+            // Every QS now ends with a publish job (regardless of whether it has
+            // questions), so the course waits for the QS to reach "Live" — the
+            // same contract used for content above.
+            return `publish_qs_${childRef}`;
           }
           // Existing identifier or TEMP_EXISTING — already resolved, no dependency
           return null;
@@ -646,6 +682,12 @@ export class BulkImportQueue {
         break;
       case 'update_questionset_hierarchy':
         await this.handleUpdateQsHierarchy(job);
+        break;
+      case 'review_questionset':
+        await this.handleReviewQuestionSet(job);
+        break;
+      case 'publish_questionset':
+        await this.handlePublishQuestionSet(job);
         break;
       case 'create_course':
         await this.handleCreateCourse(job);
@@ -1172,6 +1214,28 @@ export class BulkImportQueue {
 
     await updateCourseHierarchy(courseId, nodesModified, hierarchy);
     job.resolvedIdentifier = courseId;
+  }
+
+  // ── QuestionSet review / publish handlers ──────────────────────
+
+  private async handleReviewQuestionSet(job: QueueJob): Promise<void> {
+    const { _qsTempId } = job.payload;
+    const qsId = this.resolvedIds.get(_qsTempId);
+    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
+
+    await reviewQuestionSet(qsId);
+    job.resolvedIdentifier = qsId;
+  }
+
+  private async handlePublishQuestionSet(job: QueueJob): Promise<void> {
+    const { _qsTempId } = job.payload;
+    const qsId = this.resolvedIds.get(_qsTempId);
+    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
+
+    // Publishing the QS also publishes the questions in its hierarchy and
+    // transitions the QS to "Live" so the QuML player can load it.
+    await publishQuestionSet(qsId);
+    job.resolvedIdentifier = qsId;
   }
 
   // ─── Progress Snapshot ─────────────────────────────────────
