@@ -32,9 +32,7 @@ const RegistrationSuccessCard: React.FC<RegistrationSuccessCardProps> = ({
   const { customColors } = theme.palette;
   const [isOpen, setIsOpen] = useSharedAccordionState();
 
-  const downloadAppText = t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE').split(
-    '{playStoreLink}'
-  )[0];
+  const downloadAppText = t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE');
 
   const icon = (
     <Box
