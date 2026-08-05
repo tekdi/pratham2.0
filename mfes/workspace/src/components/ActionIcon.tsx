@@ -5,6 +5,7 @@ import UnpublishedIcon from '@mui/icons-material/Unpublished';
 import PublishIcon from '@mui/icons-material/Publish';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Role } from "@workspace/utils/app.constant";
+import { MIME_TYPE } from "@workspace/utils/app.config";
 import { getLocalStoredUserRole } from "@workspace/services/LocalStorageService";
 import router from 'next/router';
 
@@ -37,6 +38,19 @@ const ActionIcon: React.FC<ActionCellProps> = ({
     return null; // Don't render anything if delete should be hidden
   }
 
+  // Deleted (Retired) content has no actions left
+  if (rowData?.status === 'Retired') {
+    return (
+      <Typography
+        sx={{ fontSize: '14px', fontWeight: 500 }}
+        variant="body2"
+        color={'#635E57'}
+      >
+        -
+      </Typography>
+    );
+  }
+
   return (
     <Box
       sx={{
@@ -64,8 +78,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
           <img src={'/delete.png'} height="20px" alt="Image" />
         </Box>
       </Tooltip>
-{/* 
-      {rowData?.status === 'Live' &&  getLocalStoredUserRole()!==Role.SCTA&& (
+      {rowData?.status === 'Live' && getLocalStoredUserRole() !== Role.SCTA && (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {
@@ -86,7 +99,9 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         </Tooltip>
       )}
 
-      {rowData?.status === 'Unlisted' && getLocalStoredUserRole()!==Role.SCTA && (
+      {rowData?.status === 'Unlisted' &&
+        rowData?.mimeType !== MIME_TYPE.QUESTIONSET_MIME_TYPE &&
+        getLocalStoredUserRole() !== Role.SCTA && (
         <Tooltip title="Publish">
           <Box
             onClick={() => {
@@ -105,7 +120,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
             <PublishIcon sx={{ color: 'green' }} />
           </Box>
         </Tooltip>
-      )} */}
+      )}
 
       {rowData?.status === 'Processing' && (
         <Tooltip title="Republish">
