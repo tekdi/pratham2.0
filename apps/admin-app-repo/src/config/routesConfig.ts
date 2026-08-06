@@ -23,7 +23,6 @@ export const ROLE_BASED_ROUTES = {
       '/edit-password',
       '/subjectDetails',
       '/importCsv',
-      '/edit-password',
       '/resourceList',
       '/csvDetails',
       '/csvList',
@@ -40,7 +39,7 @@ export const ROLE_BASED_ROUTES = {
     ],
     [Role.SCTA]: [
       '/subjectDetails',
-      '/importCsv ',
+      '/importCsv',
       '/edit-password',
       '/resourceList',
       '/csvDetails',
