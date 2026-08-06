@@ -13,6 +13,19 @@ import {
   UpdateCustomField,
 } from '../utils/Interfaces';
 import { format, parseISO } from 'date-fns';
+
+// Natural sort comparator: sorts strings with embedded numbers in human
+// numeric order (e.g. "Grade 2" before "Grade 10") instead of plain
+// lexicographic order. Falls back to alphabetical ordering for non-numeric
+// labels, so it's safe as a generic replacement for a plain localeCompare sort.
+export const naturalCompare = (a: string, b: string): number =>
+  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+// Sorts a list of { label, value } style options using natural sort on label.
+// Use this in place of a plain alphabetical sort for any RJSF dropdown widget.
+export const naturalSortOptions = <T extends { label: string }>(
+  optionsList: T[]
+): T[] => [...optionsList].sort((a, b) => naturalCompare(a.label, b.label));
 import manageUserStore from '../store/manageUserStore';
 import {
   AssessmentType,
