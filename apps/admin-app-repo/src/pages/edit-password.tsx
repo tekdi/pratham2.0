@@ -13,7 +13,7 @@ import { showToastMessage } from '@/components/Toastify';
 import { telemetryFactory } from '@/utils/telemetry';
 import PasswordCreate from '@/components/PasswordCreate';
 import CentralizedModal from '@/components/CentralizedModal';
-import { Role, TenantName } from '@/utils/app.constant';
+import { Role, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
 
 const EditForgotPassword = () => {
   const { t } = useTranslation();
@@ -49,16 +49,20 @@ const EditForgotPassword = () => {
     const storedUserData = JSON.parse(
       localStorage.getItem("adminInfo") || "{}"
     );
-    const { locale } = router; 
+    const selectedTenantData = getSelectedTenantData(
+      storedUserData?.tenantData,
+      localStorage.getItem('tenantId')
+    );
+    const { locale } = router;
 
     if(storedUserData?.role === Role.SCTA || storedUserData?.role === Role.CCTA)
     {
       // To do :- hardcoding to be removed
-      if(storedUserData?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM ) {
+      if(!isSecondChanceTenant(selectedTenantData?.tenantName)) {
         // router.push("/workspace");
         router.push('/faqs');
       } else {
-        if (locale) 
+        if (locale)
           router.push("/course-planner", undefined, { locale: locale });
         else
           router.push("/course-planner");
@@ -67,30 +71,30 @@ const EditForgotPassword = () => {
     {
       if(locale)
       {
-        if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
+        if (storedUserData?.role === Role.CENTRAL_ADMIN && isSecondChanceTenant(selectedTenantData?.tenantName)) {
 
           router.push("/programs", undefined, { locale: locale });
-        } else if (storedUserData?.role === Role.ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
+        } else if (storedUserData?.role === Role.ADMIN && isSecondChanceTenant(selectedTenantData?.tenantName)) {
 
           router.push("/centers", undefined, { locale: locale });
         } else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
-                    storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
+                    storedUserData?.role === Role.ADMIN)  && selectedTenantData?.tenantName == TenantName.YOUTHNET) {
           router.push("/user-mobilizer", undefined, { locale: locale });
       }
-   
-      } 
+
+      }
     else
     {
-        if (storedUserData?.role === Role.CENTRAL_ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
+        if (storedUserData?.role === Role.CENTRAL_ADMIN && isSecondChanceTenant(selectedTenantData?.tenantName)) {
 
           router.push("/programs");
         }
-        else if (storedUserData?.role === Role.ADMIN && storedUserData?.tenantData[0]?.tenantName == TenantName.SECOND_CHANCE_PROGRAM) {
+        else if (storedUserData?.role === Role.ADMIN && isSecondChanceTenant(selectedTenantData?.tenantName)) {
 
           router.push("/centers");
         }
         else if ((storedUserData?.role === Role.CENTRAL_ADMIN ||
-                    storedUserData?.role === Role.ADMIN)  && storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET) {
+                    storedUserData?.role === Role.ADMIN)  && selectedTenantData?.tenantName == TenantName.YOUTHNET) {
           router.push("/user-mobilizer", undefined, { locale: locale });
         }
 

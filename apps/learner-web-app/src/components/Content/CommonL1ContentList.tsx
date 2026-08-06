@@ -120,8 +120,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       {isLogin && (
         <>
           {typeof window !== 'undefined' &&
-            localStorage.getItem('userProgram') ===
-              TenantName.SECOND_CHANCE_PROGRAM && (
+            (localStorage.getItem('userProgram') ===
+              TenantName.SECOND_CHANCE_PROGRAM ||
+              localStorage.getItem('userProgram') ===
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
               <Box
                 sx={{
                   display: 'flex',
@@ -160,7 +162,12 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                       lineHeight: { xs: '18px', md: '24px' },
                     }}
                   >
-                    {t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
+                    {localStorage.getItem('userProgram') ===
+                    TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS
+                      ? t(
+                          'LEARNER_APP.COURSE.SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE'
+                        )
+                      : t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
                   </Typography>
                   <Typography
                     variant="body2"
