@@ -53,6 +53,29 @@ declare module '@mui/material/styles' {
       warningA400: string;
       warningA700: string;
       warningContrastText: string;
+      assessmentCardBorder: string;
+      assessmentCardBackground: string;
+      assessmentCompletedBadgeBg: string;
+      assessmentCompletedBadgeText: string;
+      assessmentBestScoreBadgeBg: string;
+      assessmentBestScoreBadgeText: string;
+      assessmentLatestBadgeBg: string;
+      assessmentLatestBadgeText: string;
+      assessmentNotAttemptedText: string;
+      assessmentScoreText: string;
+      assessmentContainerBorder: string;
+      assessmentContainerBackground: string;
+      assessmentRowDivider: string;
+      assessmentNotAttemptedBadgeBg: string;
+      assessmentNotAttemptedBadgeText: string;
+      assessmentLockedBadgeBg: string;
+      assessmentLockedBadgeText: string;
+      registrationCardBackground: string;
+      registrationCardIconBg: string;
+      registrationDivider: string;
+      registrationStatusText: string;
+      welcomeBannerBackground: string;
+      welcomeBannerBorder: string;
     };
   }
 
@@ -73,6 +96,29 @@ declare module '@mui/material/styles' {
       warning900?: string;
       warningA100?: string;
       warningA200?: string;
+      assessmentCardBorder?: string;
+      assessmentCardBackground?: string;
+      assessmentCompletedBadgeBg?: string;
+      assessmentCompletedBadgeText?: string;
+      assessmentBestScoreBadgeBg?: string;
+      assessmentBestScoreBadgeText?: string;
+      assessmentLatestBadgeBg?: string;
+      assessmentLatestBadgeText?: string;
+      assessmentNotAttemptedText?: string;
+      assessmentScoreText?: string;
+      assessmentContainerBorder?: string;
+      assessmentContainerBackground?: string;
+      assessmentRowDivider?: string;
+      assessmentNotAttemptedBadgeBg?: string;
+      assessmentNotAttemptedBadgeText?: string;
+      assessmentLockedBadgeBg?: string;
+      assessmentLockedBadgeText?: string;
+      registrationCardBackground?: string;
+      registrationCardIconBg?: string;
+      registrationDivider?: string;
+      registrationStatusText?: string;
+      welcomeBannerBackground?: string;
+      welcomeBannerBorder?: string;
       warningA400?: string;
       warningA700?: string;
       warningContrastText?: string;
@@ -249,6 +295,29 @@ export const theme = createTheme({
       warningA400: '#FFFFFF',
       warningA700: '#EDEDED',
       warningContrastText: '#3B383E',
+      assessmentCardBorder: '#E5E1D8',
+      assessmentCardBackground: '#FFFFFF',
+      assessmentCompletedBadgeBg: '#DFF5E1',
+      assessmentCompletedBadgeText: '#1A8825',
+      assessmentBestScoreBadgeBg: '#FCEFC7',
+      assessmentBestScoreBadgeText: '#8A6D1D',
+      assessmentLatestBadgeBg: '#E1F5EA',
+      assessmentLatestBadgeText: '#1A8825',
+      assessmentNotAttemptedText: '#7C766F',
+      assessmentScoreText: '#1A8825',
+      assessmentContainerBorder: '#E5E1D8',
+      assessmentContainerBackground: '#FFFFFF',
+      assessmentRowDivider: '#EFECE4',
+      assessmentNotAttemptedBadgeBg: '#F8EFE7',
+      assessmentNotAttemptedBadgeText: '#8A6D1D',
+      assessmentLockedBadgeBg: '#F0EFEC',
+      assessmentLockedBadgeText: '#8C877E',
+      registrationCardBackground: 'white',
+      registrationCardIconBg: '#FDBE16',
+      registrationDivider: '#DAD7EE',
+      registrationStatusText: '#1A8825',
+      welcomeBannerBackground: '#FFFFFF',
+      welcomeBannerBorder: '#EFECE4',
     },
   },
   components: {

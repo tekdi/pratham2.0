@@ -8,6 +8,7 @@ import {
   CourseCompletionBanner,
   trackDataPorps,
   findCourseUnitPath,
+  getUnitCardHref,
 } from '@shared-lib';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { trackingData } from '@content-mfes/services/TrackingService';
@@ -355,13 +356,15 @@ export default function Details(props: DetailsProps) {
       props?._config.handleCardClick?.(subItem);
     } else {
       localStorage.setItem('unitId', subItem?.courseId);
-      const path =
-        subItem.mimeType === 'application/vnd.ekstep.content-collection'
-          ? `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}/${subItem?.identifier
-          }`
-          : `${props?._config?.contentBaseUrl ?? '/content'
-          }/${courseId}/${effectiveUnitId}/${subItem?.identifier}`;
-      router.push(`${path}${activeLink ? `?activeLink=${activeLink}` : ''}`);
+      const path = getUnitCardHref(subItem, {
+        courseId: courseId as string,
+        effectiveUnitId,
+        contentBaseUrl: props?._config?.contentBaseUrl ?? '/content',
+        activeLink,
+      });
+      if (path) {
+        router.push(path);
+      }
     }
   };
 
@@ -470,7 +473,16 @@ export default function Details(props: DetailsProps) {
               typeof contentId === 'string' ? contentId : undefined
             }
             trackData={trackData}
-            _config={props?._config}
+            _config={{
+              ...props?._config,
+              courseId: courseId as string,
+              effectiveUnitId,
+              activeLink,
+              contentBaseUrl: props?._config?.contentBaseUrl ?? '/content',
+              enableCardHref: props?._config?.handleCardClick
+                ? false
+                : props?._config?.enableCardHref,
+            }}
           />
         )}
       </Box>

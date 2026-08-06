@@ -5,8 +5,10 @@ import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import theme from '../theme';
+import { useChunkErrorReload } from '@shared-lib-v2/hooks/useChunkErrorReload';
 
 export default function App(props: AppProps) {
+  useChunkErrorReload();
   const { Component, pageProps } = props;
   return (
     <AppCacheProvider {...props}>

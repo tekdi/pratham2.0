@@ -249,6 +249,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     router.push('/manual-assessments');
   };
 
+  const withBasePath = (path: string) => `${router.basePath}${path}`;
+
   const isDashboard = [
     '/dashboard',
     '/',
@@ -435,6 +437,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={navigateToDashboard}
+              component="a"
+              href={withBasePath('/dashboard')}
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
@@ -469,6 +473,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={navigateToYouthBoard}
+              component="a"
+              href={withBasePath('/')}
             >
               {t('DASHBOARD.DASHBOARD')}
             </Button>
@@ -502,6 +508,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/villages`);
               }}
+              component="a"
+              href={withBasePath('/villages')}
             >
               {typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
                 ? t('DASHBOARD.USERS_&_VILLAGES')
@@ -541,6 +549,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/surveys`);
               }}
+              component="a"
+              href={withBasePath('/surveys')}
             >
               {t('SURVEYS.SURVEYS')}
             </Button>
@@ -571,6 +581,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <EditNoteIcon sx={{ fontSize: '24px !important' }} />
               }
               onClick={navigateToManualAssessments}
+              component="a"
+              href={withBasePath('/manual-assessments')}
             >
               {t('ASSESSMENTS.MANUAL_ASSESSMENT')}
             </Button>
@@ -611,6 +623,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/support-request`);
                 }}
+                component="a"
+                href={withBasePath('/support-request')}
               >
                 {t('COMMON.SUPPORT_REQUEST')}
               </Button>
@@ -649,6 +663,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push('/manager-dashboard');
               }}
+              component="a"
+              href={withBasePath('/manager-dashboard')}
             >
               Manager Dashboard
             </Button>
@@ -685,6 +701,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push('/individual-volunteer');
               }}
+              component="a"
+              href={withBasePath('/individual-volunteer')}
             >
               Individual Volunteer 
             </Button>
@@ -719,6 +737,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push('/organisation');
               }}
+              component="a"
+              href={withBasePath('/organisation')}
             >
               Organisation 
             </Button>
@@ -751,6 +771,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push('/organisation-volunteer');
               }}
+              component="a"
+              href={withBasePath('/organisation-volunteer')}
             >
               Via Organisation
             </Button>
@@ -789,6 +811,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/centers`); // Check route
               }}
+              component="a"
+              href={withBasePath('/centers?tab=1')}
             >
               {accessGranted('showTeachingCenter', accessControl, userRole)
                 ? t('DASHBOARD.TEACHING_CENTERS')
@@ -830,6 +854,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 />
               }
               onClick={navigateToObservation}
+              component="a"
+              href={withBasePath('/observation')}
             >
               {t('OBSERVATION.SURVEY_FORMS')}
             </Button>
@@ -871,6 +897,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/curriculum-planner`);
               }}
+              component="a"
+              href={withBasePath('/curriculum-planner')}
             >
               {t('COURSE_PLANNER.COURSE_PLANNER')}
             </Button>
@@ -914,6 +942,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/assessments`);
                 }}
+                component="a"
+                href={withBasePath('/assessments')}
               >
                 {t('ASSESSMENTS.ASSESSMENTS')}
               </Button>
@@ -950,6 +980,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/board-enrollment`);
               }}
+              component="a"
+              href={withBasePath('/board-enrollment')}
             >
               {t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
             </Button>
@@ -992,6 +1024,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/support-request`);
               }}
+              component="a"
+              href={withBasePath('/support-request')}
             >
               {t('COMMON.SUPPORT_REQUEST')}
             </Button>

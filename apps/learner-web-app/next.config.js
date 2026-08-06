@@ -2,6 +2,8 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { composePlugins, withNx } = require('@nx/next');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const path = require('path');
 
 const PORTAL_BASE_URL = 'https://sunbird-editor.tekdinext.com';
 
@@ -33,11 +35,33 @@ const nextConfig = {
   },
 
   //cross import support
-  transpilePackages: ['@shared-lib-v2/*'],
+  transpilePackages: ['@shared-lib-v2/*', '@survey-forms'],
 
   images: {
     domains: ['program-image-dev.s3.ap-south-1.amazonaws.com'],
   },
+  webpack(config) {
+    config.resolve.alias['@survey-forms'] = path.resolve(__dirname, '../../mfes/survey-forms/src');
+    return config;
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/((?!_next/static).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+        ],
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {

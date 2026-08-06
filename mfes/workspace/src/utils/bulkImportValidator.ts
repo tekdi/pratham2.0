@@ -27,6 +27,7 @@ import {
   ColumnDef,
   POS_DOMAIN_TO_SUBDOMAINS,
   POS_SUBDOMAIN_TO_SUBJECTS,
+  splitMultiValue,
 } from './frameworkConfig';
 import { extractDriveFileId } from '../services/BulkImportService';
 
@@ -57,8 +58,16 @@ const err = (
 // first content / QS / course row's framework field.
 
 const detectFramework = (data: ParsedImportData): FrameworkId => {
+  // IMPORTANT: content rows are NOT a framework signal. The parser tags every
+  // content row with 'pos-framework' unconditionally, because the Content sheet
+  // uses the POS column set for all users regardless of the collection framework.
+  // Consulting contents first therefore forced every workbook containing even a
+  // single content row to validate as POS — which made SCP QuestionSets/Courses
+  // fail with "Domain*/Sub Domain*/Target Age Group* is required".
+  //
+  // QuestionSets and Courses carry the framework actually detected from the
+  // workbook's LookupData sheet, so only those are authoritative here.
   return (
-    (data.contents[0]?.framework as FrameworkId) ||
     (data.questionSets[0]?.framework as FrameworkId) ||
     (data.courses[0]?.framework as FrameworkId) ||
     'pos-framework'
@@ -89,6 +98,8 @@ const checkRequired = <T extends object>(
 // ─── Dropdown value validator ────────────────────────────────────
 // For every column that has a lookupKey, verify the entered value exists
 // in the allowed list. Skips blank values (required check handles those).
+// Multi-select columns accept pipe- or comma-separated values; each
+// individual value is validated against the allowed list.
 
 const checkDropdownValues = <T extends object>(
   rows: T[],
@@ -101,24 +112,26 @@ const checkDropdownValues = <T extends object>(
 
   rows.forEach((row, idx) => {
     const rowNum = idx + 2;
-    dropdownCols.forEach(({ apiField, header, lookupKey }) => {
+    dropdownCols.forEach(({ apiField, header, lookupKey, multiSelect }) => {
       const raw = (row as any)[apiField];
       if (raw === undefined || raw === null || String(raw).trim() === '') return;
 
       const allowed = LOOKUP[lookupKey!] as readonly string[];
       if (!allowed) return;
 
-      const val = String(raw).trim();
-      if (!allowed.includes(val)) {
-        // Show at most 8 example values so the error message stays readable
-        const examples = (allowed as readonly string[]).slice(0, 8).join(', ');
-        const ellipsis = allowed.length > 8 ? ` … (${allowed.length} total)` : '';
-        errors.push(err(
-          sheet, rowNum, header,
-          `"${val}" is not a valid value for "${header}". Examples: ${examples}${ellipsis}`,
-          getTempId(row)
-        ));
-      }
+      const values = multiSelect ? splitMultiValue(String(raw)) : [String(raw).trim()];
+      values.forEach((val) => {
+        if (!allowed.includes(val)) {
+          // Show at most 8 example values so the error message stays readable
+          const examples = (allowed as readonly string[]).slice(0, 8).join(', ');
+          const ellipsis = allowed.length > 8 ? ` … (${allowed.length} total)` : '';
+          errors.push(err(
+            sheet, rowNum, header,
+            `"${val}" is not a valid value for "${header}". Examples: ${examples}${ellipsis}`,
+            getTempId(row)
+          ));
+        }
+      });
     });
   });
 };
@@ -190,7 +203,7 @@ const validateContents = (
     // Domain → Sub Domain → Subject association validation
     if (row.domain && row.subDomain) {
       const allowedSubDomains = POS_DOMAIN_TO_SUBDOMAINS[row.domain] ?? [];
-      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
+      const selectedSubDomains = splitMultiValue(row.subDomain);
       const invalidSubs = selectedSubDomains.filter((sd) => allowedSubDomains.length > 0 && !allowedSubDomains.includes(sd));
       if (invalidSubs.length > 0) {
         errors.push(err('Content', rowNum, 'Sub Domain*',
@@ -199,8 +212,8 @@ const validateContents = (
       }
     }
     if (row.subDomain && row.subject) {
-      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
-      const selectedSubjects = row.subject.split('|').map((s) => s.trim());
+      const selectedSubDomains = splitMultiValue(row.subDomain);
+      const selectedSubjects = splitMultiValue(row.subject);
       selectedSubjects.forEach((subj) => {
         const validForAny = selectedSubDomains.some((sd) => {
           const allowed = POS_SUBDOMAIN_TO_SUBJECTS[sd] ?? [];
@@ -259,7 +272,7 @@ const validateQuestionSets = (
     // Domain → Sub Domain → Subject association validation (POS QS)
     if (row.domain && row.subDomain) {
       const allowedSubDomains = POS_DOMAIN_TO_SUBDOMAINS[row.domain] ?? [];
-      const selectedSubDomains = row.subDomain.split('|').map((s) => s.trim());
+      const selectedSubDomains = splitMultiValue(row.subDomain);
       const invalidSubs = selectedSubDomains.filter((sd) => allowedSubDomains.length > 0 && !allowedSubDomains.includes(sd));
       if (invalidSubs.length > 0) {
         errors.push(err('QuestionSets', rowNum, 'Sub Domain*',
@@ -339,6 +352,45 @@ const validateQuestions = (
     if ((row.questionType === 'MCQ' || row.questionType === 'Match') && !row.correctAnswer) {
       errors.push(err('Questions', rowNum, 'Correct Answer',
         `${row.questionType} questions should have a Correct Answer`, undefined, 'warning'));
+    }
+  });
+
+  // ── Section Description / Instructions — required per section ──
+  // The hierarchy update takes them from the first filled row of each
+  // section, so each (QS, section) group must have them on at least one row.
+  const sectionGroups = new Map<string, {
+    firstRowNum: number;
+    sectionName: string;
+    hasDescription: boolean;
+    hasInstructions: boolean;
+  }>();
+
+  questions.forEach((row, idx) => {
+    const rowNum = idx + 2;
+    const sectionName = (row.sectionName || 'Section 1').trim();
+    const key = `${row.questionSetTempId || ''}::${sectionName}`;
+
+    let group = sectionGroups.get(key);
+    if (!group) {
+      group = { firstRowNum: rowNum, sectionName, hasDescription: false, hasInstructions: false };
+      sectionGroups.set(key, group);
+    }
+    if (row.sectionDescription && String(row.sectionDescription).trim() !== '') {
+      group.hasDescription = true;
+    }
+    if (row.sectionInstructions && String(row.sectionInstructions).trim() !== '') {
+      group.hasInstructions = true;
+    }
+  });
+
+  sectionGroups.forEach((group) => {
+    if (!group.hasDescription) {
+      errors.push(err('Questions', group.firstRowNum, 'Section Description*',
+        `"Section Description*" is required for section "${group.sectionName}" — fill it on at least one row of the section`));
+    }
+    if (!group.hasInstructions) {
+      errors.push(err('Questions', group.firstRowNum, 'Section Instructions*',
+        `"Section Instructions*" is required for section "${group.sectionName}" — fill it on at least one row of the section`));
     }
   });
 };

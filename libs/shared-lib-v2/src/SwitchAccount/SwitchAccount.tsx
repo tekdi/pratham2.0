@@ -36,12 +36,12 @@ import { useTranslation } from '../lib/context/LanguageContext';
 import switchAccountConfig from './SwitchAccount.config';
 
 // TypeScript interfaces
-interface Role {
+export interface Role {
   roleId: string;
   roleName: string;
 }
 
-interface TenantData {
+export interface TenantData {
   tenantName: string;
   tenantId: string;
   tenantStatus?: string;
@@ -84,13 +84,75 @@ interface SwitchAccountDialogProps {
     roleName: string
   ) => void;
   authResponse: TenantData[];
+  currentTenantId?: string;
+  currentRoleId?: string;
 }
+
+// Resolves the switchAccountConfig entry for the given host, trying a few
+// common variants (with/without port, with/without "www.").
+const resolveAllowedRoleIds = (host: string): string[] | undefined => {
+  const config = switchAccountConfig as any;
+  const candidates: string[] = [];
+  if (host) {
+    const noPort = host.split(':')[0];
+    candidates.push(host);
+    if (noPort && noPort !== host) candidates.push(noPort);
+    const stripWww = (h: string) => (h.startsWith('www.') ? h.slice(4) : h);
+    const addWww = (h: string) => (h.startsWith('www.') ? h : `www.${h}`);
+    candidates.push(stripWww(host));
+    candidates.push(addWww(host));
+    if (noPort) {
+      candidates.push(stripWww(noPort));
+      candidates.push(addWww(noPort));
+    }
+  }
+
+  for (const key of candidates) {
+    const val = config?.[key];
+    if (Array.isArray(val) && val.length) {
+      return val as string[];
+    }
+  }
+  return undefined;
+};
+
+// Same tenant/role visibility rules the dialog itself applies: drop archived
+// tenants, and (when this host has a switchAccountConfig entry) drop roles
+// not permitted on this host, then drop tenants left with no roles.
+// Exported so callers (e.g. the header) can determine whether there is
+// actually more than one selectable Program/Role combination, without
+// duplicating this filtering logic.
+export const getVisibleTenants = (
+  tenantData: TenantData[] | undefined | null,
+  host: string
+): TenantData[] => {
+  const tenants = tenantData ?? [];
+  const activeTenants = tenants.filter(
+    (tenant) => tenant?.tenantStatus?.toLowerCase() !== 'archived'
+  );
+
+  const allowedRoleIds = resolveAllowedRoleIds(host);
+  if (!allowedRoleIds || allowedRoleIds.length === 0) {
+    return activeTenants;
+  }
+
+  const filteredTenants = activeTenants.map((tenant) => ({
+    ...tenant,
+    roles: (tenant?.roles ?? []).filter((r) =>
+      allowedRoleIds.includes(r.roleId)
+    ),
+  }));
+
+  return filteredTenants.filter((t) => (t.roles ?? []).length > 0);
+};
 
 const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   open,
   onClose,
   callbackFunction,
   authResponse,
+  currentTenantId,
+  currentRoleId,
 }) => {
   const { t, language, setLanguage } = useTranslation();
   const theme = useTheme();
@@ -116,47 +178,6 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     }
     return '';
   }, []);
-
-  const allowedRoleIds = useMemo(() => {
-    const config = switchAccountConfig as any;
-    const candidates: string[] = [];
-    if (host) {
-      const noPort = host.split(':')[0];
-      candidates.push(host);
-      // try without port
-      if (noPort && noPort !== host) candidates.push(noPort);
-      // try stripping/adding www
-      const stripWww = (h: string) => (h.startsWith('www.') ? h.slice(4) : h);
-      const addWww = (h: string) => (h.startsWith('www.') ? h : `www.${h}`);
-      candidates.push(stripWww(host));
-      candidates.push(addWww(host));
-      if (noPort) {
-        candidates.push(stripWww(noPort));
-        candidates.push(addWww(noPort));
-      }
-    }
-
-    let matchedHost: string | undefined;
-    let resolved: string[] | undefined;
-    for (const key of candidates) {
-      const val = config?.[key];
-      if (Array.isArray(val) && val.length) {
-        matchedHost = key;
-        resolved = val as string[];
-        break;
-      }
-    }
-
-    // console.log('SwitchAccount host resolution', {
-    //   host,
-    //   candidates,
-    //   matchedHost: matchedHost ?? null,
-    //   allowedRoleIds: resolved ?? null,
-    // });
-
-    // If no mapping found, return undefined to signal no filtering
-    return resolved as unknown as string[] | undefined;
-  }, [host]);
 
   // Sync component's language with apps that use `preferredLanguage` key
   useEffect(() => {
@@ -188,66 +209,10 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
     return () => window.removeEventListener('storage', handleStorage);
   }, [language, setLanguage]);
 
-  const visibleTenants: TenantData[] = useMemo(() => {
-    const tenants = authResponse ?? [];
-
-    // Filter out archived tenants
-    const activeTenants = tenants.filter(
-      (tenant) => tenant?.tenantStatus?.toLowerCase() !== 'archived'
-    );
-
-    // If no host mapping found, do not filter roles
-    if (
-      !allowedRoleIds ||
-      (Array.isArray(allowedRoleIds) && allowedRoleIds.length === 0)
-    ) {
-      console.log('SwitchAccount role filter', {
-        note: 'No host mapping found, using backend roles as-is',
-        host,
-        tenants: activeTenants.map((t) => ({
-          tenantId: t.tenantId,
-          tenantName: t.tenantName,
-          inputRoles: (t.roles ?? []).map((r) => r.roleId),
-        })),
-      });
-      // console.log('tenants', activeTenants);
-      return activeTenants;
-    }
-
-    const filteredTenants = activeTenants.map((tenant) => {
-      const inputRoles = tenant?.roles ?? [];
-      const filteredRoles = inputRoles.filter((r) =>
-        (allowedRoleIds as string[]).includes(r.roleId)
-      );
-      return {
-        ...tenant,
-        roles: filteredRoles,
-      };
-    });
-
-    // Remove tenants where no roles remain after filtering
-    const nonEmptyTenants = filteredTenants.filter(
-      (t) => (t.roles ?? []).length > 0
-    );
-
-    console.log('SwitchAccount role filter', {
-      allowedRoleIds,
-      host,
-      tenants: activeTenants.map((t, idx) => ({
-        tenantId: t.tenantId,
-        tenantName: t.tenantName,
-        inputRoles: (t.roles ?? []).map((r) => r.roleId),
-        filteredRoles: (filteredTenants[idx]?.roles ?? []).map((r) => r.roleId),
-      })),
-      finalTenants: nonEmptyTenants.map((t) => ({
-        tenantId: t.tenantId,
-        tenantName: t.tenantName,
-        filteredRoles: (t.roles ?? []).map((r) => r.roleId),
-      })),
-    });
-
-    return nonEmptyTenants;
-  }, [authResponse, allowedRoleIds, host]);
+  const visibleTenants: TenantData[] = useMemo(
+    () => getVisibleTenants(authResponse, host),
+    [authResponse, host]
+  );
 
   useEffect(() => {
     if (!open) {
@@ -336,6 +301,32 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
       return;
     }
 
+    // Post-login switching: preselect the currently active tenant/role (if provided)
+    // instead of auto-confirming, so the user can see and change their current selection.
+    if (currentTenantId) {
+      autoConfirmedRef.current = true;
+      const currentTenant = tenants.find((t) => t.tenantId === currentTenantId);
+      if (currentTenant) {
+        setSelectedTenant(currentTenant);
+        const currentRole = currentTenant.roles?.find(
+          (r) => r.roleId === currentRoleId
+        );
+        if (currentRole) {
+          setSelectedRole(currentRole);
+        }
+        setActiveStep(
+          tenants.length > 1
+            ? 0
+            : (currentTenant.roles?.length ?? 0) > 1
+            ? 1
+            : 0
+        );
+      } else {
+        setActiveStep(0);
+      }
+      return;
+    }
+
     if (tenants.length === 1) {
       const tenant = tenants[0];
       // Skip if tenant is archived
@@ -410,23 +401,37 @@ const SwitchAccountDialog: React.FC<SwitchAccountDialogProps> = ({
   };
 
   const handleConfirm = () => {
-    if (selectedTenant && selectedRole) {
-      // Prevent confirmation if tenant is archived
-      if (selectedTenant?.tenantStatus?.toLowerCase() === 'archived') {
+    if (!selectedTenant || !selectedRole) {
+      return;
+    }
+
+    // Prevent confirmation if tenant is archived
+    if (selectedTenant?.tenantStatus?.toLowerCase() === 'archived') {
+      return;
+    }
+
+    // If we're still on the tenant-selection step (e.g. the current tenant/role
+    // came preselected via currentTenantId/currentRoleId), Confirm should behave
+    // like picking that tenant card: advance to role selection instead of
+    // immediately finalizing a "switch" back to the same account.
+    if (activeStep === 0) {
+      const roles = selectedTenant.roles ?? [];
+      if (roles.length > 1) {
+        setActiveStep(1);
         return;
       }
-
-      // Call the callback function with the 5 required parameters
-      callbackFunction(
-        selectedTenant.tenantId,
-        selectedTenant.tenantName,
-        selectedTenant.tenantType,
-        selectedRole.roleId,
-        selectedRole.roleName
-      );
-
-      onClose();
     }
+
+    // Call the callback function with the 5 required parameters
+    callbackFunction(
+      selectedTenant.tenantId,
+      selectedTenant.tenantName,
+      selectedTenant.tenantType,
+      selectedRole.roleId,
+      selectedRole.roleName
+    );
+
+    onClose();
   };
 
   const steps = [

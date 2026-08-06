@@ -98,30 +98,31 @@ const App = ({
   let activeLink = null;
   let previousPage = null;
   let exitLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
     previousPage = searchParams.get('previousPage');
     exitLink = searchParams.get('exitLink');
+    returnUrl = searchParams.get('returnUrl');
   }
 
-  // Intercept SBPlayer iframe's Exit button which calls window.history.back()
-  // When exitLink param is present, redirect there instead of going back in history
+  // Intercept browser ← button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
+  const effectiveExitLink = exitLink || returnUrl || activeLink;
   useEffect(() => {
-    if (!exitLink) return;
+    if (!effectiveExitLink) return;
 
-    // Push a dummy state so when SBPlayer calls history.back(), popstate fires
     window.history.pushState({ playerPage: true }, '', window.location.href);
 
     const handlePopState = () => {
-       window.location.href = exitLink as string;
-       };
+      window.location.href = effectiveExitLink as string;
+    };
 
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [exitLink]);
+  }, [effectiveExitLink]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -245,7 +246,32 @@ const App = ({
       //       }));
       //     }
       //   }
-   if (previousPage) {
+   if (returnUrl) {
+      window.location.href = returnUrl;
+      return;
+    }
+    if (previousPage) {
+      // Android app (Saral/registration flow uses previousPage): hand control back
+      // to the native view instead of loading the web dashboard in the WebView.
+      // Gated on isAndroidApp, so web keeps the existing router.push(previousPage).
+      if (isAndroid && (window as any).ReactNativeWebView) {
+        let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+        if (!refreshToken || refreshToken === '') {
+          refreshToken = localStorage.getItem('refreshToken');
+        }
+        (window as any).ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: 'ENROLL_PROGRAM_EVENT',
+            data: {
+              userId: localStorage.getItem('userId'),
+              tenantId: localStorage.getItem('tenantId'),
+              token: localStorage.getItem('token'),
+              refreshToken: refreshToken,
+            },
+          })
+        );
+        return;
+      }
       router.push(previousPage);
       return;
     }
@@ -497,6 +523,8 @@ const App = ({
           courseId={courseId}
           unitId={unitId}
           mimeType={mimeType}
+          exitLink={exitLink || returnUrl || activeLink}
+          previousPage={previousPage}
           {..._config?.player}
           isPortrait={isPortrait}
           isVideo={isVideo}
@@ -716,13 +744,34 @@ const PlayerBox = ({
   isShowMoreContent,
   mimeType,
   isPortrait,
-  isVideo
+  isVideo,
+  exitLink,
+  previousPage,
 }: any) => {
   const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
+
+  // The sbplayer iframe is hosted on a different origin (NEXT_PUBLIC_LEARNER_SBPLAYER).
+  // When its Exit button runs `window.top.location.href = exitLink`, a relative
+  // exitLink would resolve against the iframe's origin, switching the domain.
+  // Resolve exitLink to an absolute URL on the current (parent) origin so the
+  // player navigates back to the correct domain.
+  const absoluteExitLink =
+    exitLink && typeof window !== 'undefined'
+      ? new URL(exitLink, window.location.origin).href
+      : exitLink;
+
+  // previousPage is where the learner should return when they abandon the flow
+  // (e.g. exiting an assessment before completing). Resolve to an absolute URL on
+  // the parent origin — same reason as absoluteExitLink above — so the player can
+  // navigate back to the correct domain from inside the cross-origin iframe.
+  const absolutePreviousPage =
+    previousPage && typeof window !== 'undefined'
+      ? new URL(previousPage, window.location.origin).href
+      : previousPage;
 
   // Determine aspectRatio based on mimeType and mobile mode
   const getAspectRatio = () => {
@@ -736,6 +785,38 @@ const PlayerBox = ({
     if (checkAuth() || userIdLocalstorageName) {
       setPlay(true);
     }
+  }, []);
+
+  // Android bridge relay: the player runs in a cross-origin iframe and cannot reach
+  // the native bridge (`window.ReactNativeWebView`) or read `isAndroidApp`. On an
+  // Android exit it posts `player:exit-native` up to this (top) window, and we hand
+  // control back to the native view via ENROLL_PROGRAM_EVENT. On web this listener
+  // never fires (the player navigates normally), so web behaviour is unchanged.
+  useEffect(() => {
+    const handlePlayerExitNative = (event: MessageEvent) => {
+      if (event?.data?.type !== 'player:exit-native') return;
+      if (typeof window === 'undefined') return;
+      if (localStorage.getItem('isAndroidApp') !== 'yes') return;
+      const nativeBridge = (window as any).ReactNativeWebView;
+      if (!nativeBridge) return;
+      let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+      if (!refreshToken || refreshToken === '') {
+        refreshToken = localStorage.getItem('refreshToken');
+      }
+      nativeBridge.postMessage(
+        JSON.stringify({
+          type: 'ENROLL_PROGRAM_EVENT',
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken: refreshToken,
+          },
+        })
+      );
+    };
+    window.addEventListener('message', handlePlayerExitNative);
+    return () => window.removeEventListener('message', handlePlayerExitNative);
   }, []);
 
   const handlePlay = () => {
@@ -811,6 +892,19 @@ const PlayerBox = ({
               process.env.NEXT_PUBLIC_LEARNER_SBPLAYER
             }?identifier=${identifier}${
               courseId && unitId ? `&courseId=${courseId}&unitId=${unitId}` : ''
+            }${
+              absoluteExitLink
+                ? `&exitLink=${encodeURIComponent(absoluteExitLink)}`
+                : ''
+            }${
+              absolutePreviousPage
+                ? `&previousPage=${encodeURIComponent(absolutePreviousPage)}`
+                : ''
+            }${
+              typeof window !== 'undefined' &&
+              localStorage.getItem('isAndroidApp') === 'yes'
+                ? `&isAndroidApp=yes`
+                : ''
             }${
               userIdLocalstorageName
                 ? `&userId=${localStorage.getItem(userIdLocalstorageName)}`

@@ -19,6 +19,8 @@ export interface DrawerItemProp {
   title: React.ReactNode;
   icon?: React.ReactNode;
   to?: string | ((event: React.MouseEvent<HTMLAnchorElement>) => void);
+  /** Used for open-in-new-tab; `to` still handles client-side navigation on normal click */
+  href?: string;
   child?: DrawerItemProp[];
   isActive?: boolean;
 }
@@ -45,15 +47,27 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
     setOpenKeys((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const isModifiedNavClick = (e: React.MouseEvent) =>
+    e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0;
+
   const handleNavigation = (
-    to: string | ((event: React.MouseEvent<HTMLAnchorElement>) => void),
+    item: DrawerItemProp,
     e: React.MouseEvent<HTMLAnchorElement>
   ) => {
+    if (item.href && isModifiedNavClick(e)) {
+      onDrawerClose();
+      return;
+    }
     onDrawerClose();
-    if (typeof to === 'string') {
-      window.location.href = to;
-    } else {
-      to(e);
+    if (item.to) {
+      if (item.href) {
+        e.preventDefault();
+      }
+      if (typeof item.to === 'string') {
+        window.location.href = item.to;
+      } else {
+        item.to(e);
+      }
     }
   };
 
@@ -92,15 +106,21 @@ export const CommonDrawer: React.FC<CommonDrawerProps> = ({
             }}
           >
             <ListItemButton
-              component="div"
-              onClick={(e) => {
-                if (item.to) {
+              component={item.href ? 'a' : 'div'}
+              href={item.href}
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                if (item.to || item.href) {
                   const anchorEvent =
                     e as unknown as React.MouseEvent<HTMLAnchorElement>;
-                  handleNavigation(item.to, anchorEvent);
+                  handleNavigation(item, anchorEvent);
                 }
               }}
-              sx={{ pl: 2 + level * 2 }}
+              sx={{
+                pl: 2 + level * 2,
+                ...(item.href
+                  ? { textDecoration: 'none', color: 'inherit' }
+                  : {}),
+              }}
             >
               {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
               <ListItemText primary={item.title} />

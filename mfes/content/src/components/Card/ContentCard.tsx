@@ -1,5 +1,5 @@
 import { Box, CSSObject, useTheme } from '@mui/material';
-import { CommonCard, ContentItem } from '@shared-lib';
+import { CommonCard, ContentItem, getContentCardHref } from '@shared-lib';
 import AppConst from '../../utils/AppConst/AppConst';
 import { StatusIcon } from '../CommonCollapse';
 import Description from './Description';
@@ -72,6 +72,12 @@ const ContentCard = ({
   trackData?: [];
 }) => {
   const { isWrap } = _card ?? {};
+  // Resolve real href for CommonCard; skipped when a custom handleCardClick owns navigation.
+  const cardHref =
+    _card?.href ??
+    (_card?.enableCardHref !== false
+      ? getContentCardHref(item, _card?.contentBaseUrl ?? '')
+      : undefined);
 
   if (_card?.cardComponent) {
     return (
@@ -85,6 +91,7 @@ const ContentCard = ({
           type={type}
           default_img={default_img}
           _card={_card}
+          href={cardHref}
           handleCardClick={handleCardClick}
           trackData={trackData}
           englishTitle={item?.englishName}
@@ -133,6 +140,7 @@ const ContentCard = ({
         item={item}
         TrackData={trackData}
         type={type}
+        href={cardHref}
         onClick={(e: any) => handleCardClick(item, e)}
         _card={{
           _contentParentText: {

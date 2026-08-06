@@ -6,7 +6,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import { get, post, patch } from './RestClient';
+import { get, post, patch, delApi } from './RestClient';
 import { getLocalStoredUserId } from './LocalStorageService';
 import {
   ContentCreatePayload,
@@ -19,8 +19,11 @@ import {
 
 export const FILE_MIME_MAP: Record<string, string> = {
   pdf:     'application/pdf',
-  zip:     'application/zip',
+  // Platform does not accept application/zip — uploaded zips are HTML5
+  // content archives (extracted by the platform on upload/publish)
+  zip:     'application/vnd.ekstep.html-archive',
   mp4:     'video/mp4',
+  mp3:     'audio/mp3',
   h5p:     'application/vnd.ekstep.h5p-archive',
   youtube: 'video/x-youtube',  // URL set directly as artifactUrl — no file download needed
 };
@@ -309,7 +312,7 @@ export const createQuestion = async (
 export const updateQuestionSetHierarchy = async (
   questionSetId: string,
   payload: HierarchyUpdatePayload
-): Promise<void> => {
+): Promise<Record<string, string>> => {
   const userId = getLocalStoredUserId();
 
   const reqBody = {
@@ -322,10 +325,61 @@ export const updateQuestionSetHierarchy = async (
     },
   };
 
-  await patch('/action/questionset/v2/hierarchy/update', reqBody, {
+  const response = await patch('/action/questionset/v2/hierarchy/update', reqBody, {
     Accept: 'application/json',
     'Content-Type': 'application/json',
   });
+
+  // Maps client-generated ids of isNew nodes (section UUIDs) to the real
+  // platform identifiers assigned during the update
+  return (response as any)?.data?.result?.identifiers ?? {};
+};
+
+/**
+ * Submit a QuestionSet for review
+ * POST /action/questionset/v2/review/{identifier}
+ *
+ * Must run AFTER the hierarchy update, otherwise the QuestionSet is reviewed
+ * while still empty and its questions never reach a reviewable state.
+ */
+export const reviewQuestionSet = async (questionSetId: string): Promise<void> => {
+  await post(`/action/questionset/v2/review/${questionSetId}`, {
+    request: {
+      questionset: {
+        lastUpdatedBy: getLocalStoredUserId(),
+      },
+    },
+  });
+};
+
+/**
+ * Publish a QuestionSet
+ * POST /action/questionset/v2/publish/{identifier}
+ *
+ * Publishing the QuestionSet also publishes the questions in its hierarchy —
+ * child questions (visibility 'Parent') are part of the QS package and do not
+ * need to be published individually. This transitions the QS to "Live" and
+ * generates the package the QuML player consumes.
+ *
+ * Bulk import runs as an admin operation, so we publish straight after review.
+ */
+export const publishQuestionSet = async (questionSetId: string): Promise<void> => {
+  await post(`/action/questionset/v2/publish/${questionSetId}`, {
+    request: {
+      questionset: {
+        lastPublishedBy: getLocalStoredUserId(),
+      },
+    },
+  });
+};
+
+/**
+ * Retire (soft-delete) a QuestionSet — used to clean up when the hierarchy
+ * update fails so no QuestionSet is left without its questions.
+ * DELETE /action/questionset/v2/retire/{identifier}
+ */
+export const retireQuestionSet = async (identifier: string): Promise<void> => {
+  await delApi(`/action/questionset/v2/retire/${identifier}`);
 };
 
 // ─── COURSE APIs ──────────────────────────────────────────────

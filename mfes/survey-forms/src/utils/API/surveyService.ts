@@ -37,7 +37,7 @@ export const fetchSurveyList = async (
   limit = 20,
   sortBy = 'createdAt',
   sortOrder: 'ASC' | 'DESC' = 'DESC',
-  listFilters?: { contextType?: string }
+  listFilters?: { contextType?: string; skipAcademicYear?: boolean }
 ) => {
   const filters: { status: string; contextType?: string; academicYear?: string } = {
     status: 'published',
@@ -45,10 +45,12 @@ export const fetchSurveyList = async (
   if (listFilters?.contextType) {
     filters.contextType = listFilters.contextType;
   }
-  const session =
-    typeof window !== 'undefined' ? localStorage.getItem('session') : null;
-  if (session) {
-    filters.academicYear = session;
+  if (!listFilters?.skipAcademicYear) {
+    const session =
+      typeof window !== 'undefined' ? localStorage.getItem('session') : null;
+    if (session) {
+      filters.academicYear = session;
+    }
   }
   const response = await post<{
     page: number;
@@ -362,53 +364,63 @@ export interface ContextResponseInfo {
   submittedAt: string | null;
 }
 
-export const fetchResponseStatusByContext = async (
-  surveyId: string,
-  contextIds: string[],
-  respondentId?: string | null
-): Promise<Record<string, ContextResponseInfo>> => {
-  if (contextIds.length === 0) return {};
+export interface CohortResponseRow {
+  contextId: string;
+  status: 'in_progress' | 'submitted' | 'reviewed';
+  submittedAt: string | null;
+}
 
-  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
+/**
+ * Every learner's current response status for a survey, scoped to one batch —
+ * one row per learner who has responded (their latest status if resubmitted).
+ * Learners with no row are "not started"; the caller derives that by diffing
+ * this against the batch's full roster (survey service has no roster visibility).
+ */
+export const fetchResponseListByCohort = async (
+  surveyId: string,
+  cohortId: string
+): Promise<CohortResponseRow[]> => {
+  const response = await get(API_ENDPOINTS.RESPONSE_LIST_BY_COHORT(surveyId, cohortId));
+  return (response.data as { result?: CohortResponseRow[] })?.result ?? [];
+};
+
+/**
+ * Single-request alternative to calling fetchSubmittedResponse + fetchInProgressResponse
+ * separately. Fetches the response list once for a given contextId/respondentId and
+ * returns the learner's status — 'submitted', 'in_progress', or 'none'.
+ * Use this in list views to avoid 2× the API calls per survey.
+ */
+export const fetchSurveyResponseStatus = async (
+  surveyId: string,
+  contextId: string,
+  respondentId?: string | null
+): Promise<'none' | 'in_progress' | 'submitted'> => {
+  const resolvedContextId = contextId === 'self' ? '' : contextId;
+  const body: Record<string, unknown> = {
     page: 1,
-    limit: contextIds.length,
+    limit: 20,
     sortBy: 'updatedAt',
     sortOrder: 'DESC',
-    contextIds,
-  });
+  };
+  if (resolvedContextId) body.contextIds = [resolvedContextId];
 
-  const rows =
-    (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ??
-    [];
+  try {
+    const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
+    const rows: SurveyResponse[] =
+      (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ?? [];
 
-  const scoped = respondentId
-    ? rows.filter((r) => r.respondentId === respondentId)
-    : rows;
+    const matches = rows.filter(
+      (r) =>
+        (resolvedContextId === ''
+          ? !r.contextId || r.contextId === ''
+          : r.contextId === resolvedContextId) &&
+        (!respondentId || r.respondentId === respondentId)
+    );
 
-  const byContext = new Map<string, SurveyResponse>();
-  scoped.forEach((r) => {
-    if (!r.contextId || !contextIds.includes(r.contextId)) return;
-    const prev = byContext.get(r.contextId);
-    if (!prev) {
-      byContext.set(r.contextId, r);
-      return;
-    }
-    // Keep newest response if multiple exist.
-    if (new Date(r.updatedAt).getTime() > new Date(prev.updatedAt).getTime()) {
-      byContext.set(r.contextId, r);
-    }
-  });
-
-  const out: Record<string, ContextResponseInfo> = {};
-  contextIds.forEach((id) => {
-    const r = byContext.get(id);
-    if (!r) {
-      out[id] = { status: 'none', submittedAt: null };
-    } else if (r.status === 'submitted') {
-      out[id] = { status: 'submitted', submittedAt: r.submittedAt ?? null };
-    } else {
-      out[id] = { status: 'draft', submittedAt: null };
-    }
-  });
-  return out;
+    if (matches.some((r) => r.status === 'submitted')) return 'submitted';
+    if (matches.some((r) => r.status === 'in_progress')) return 'in_progress';
+    return 'none';
+  } catch {
+    return 'none';
+  }
 };

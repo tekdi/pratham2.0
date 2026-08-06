@@ -8,7 +8,7 @@ import {
   CircularProgress,
   LinearProgress,
 } from '@mui/material';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { toast, ToastContainer } from 'react-toastify';
 import { useSurveyStore } from '../../../../store/surveyFormStore';
 import {
@@ -68,8 +68,12 @@ function fromApiPayload(
 const SurveyRenderer: React.FC = () => {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const surveyId = params.surveyId as string;
   const contextId = params.contextId as string;
+  // Batch the teacher was viewing when they navigated here — recorded on the
+  // response so it can be counted toward that batch's completion stats.
+  const cohortId = searchParams.get('cohortId') || undefined;
 
   const {
     form,
@@ -203,7 +207,11 @@ const SurveyRenderer: React.FC = () => {
 
     const resolvedContextId = contextId === 'self' ? '' : contextId;
     try {
-      const result = await createResponse(surveyId, resolvedContextId);
+      const result = await createResponse(
+        surveyId,
+        resolvedContextId,
+        cohortId ? { cohortId } : undefined
+      );
       if (result.params.status === 'successful') {
         const resp = result.result.data;
         setResponse(resp);
@@ -228,8 +236,10 @@ const SurveyRenderer: React.FC = () => {
     }
   }, [
     form.response?.responseId,
+    form.survey,
     surveyId,
     contextId,
+    cohortId,
     setResponse,
     setFormValues,
     router,
@@ -451,7 +461,7 @@ const SurveyRenderer: React.FC = () => {
           </Typography>
           <Button
             variant="contained"
-            onClick={() => { toast.dismiss({ containerId: 'survey-renderer-toast' }); router.push('/teacher-survey-list'); }}
+            onClick={() => { toast.dismiss({ containerId: 'survey-renderer-toast' }); router.back(); }}
             sx={{
               mt: 2,
               backgroundColor: '#FDBE16',

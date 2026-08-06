@@ -9,6 +9,18 @@ import { customStoreSet } from '../utils/customIdbStore';
 const lastAccessOn = new Date().toISOString();
 
 export const handleExitEvent = () => {
+  // Prefer exitLink/activeLink from the iframe URL — set by the parent player page.
+  // This avoids using sessionStorage['previousPage'] which may point to a different domain.
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const exitUrl = params.get('exitLink') || params.get('activeLink');
+    if (exitUrl) {
+      const target = window.top ?? window;
+      target.location.href = exitUrl;
+      return;
+    }
+  }
+
   const previousPage = sessionStorage.getItem('previousPage');
   if (previousPage) {
     window.location.href = previousPage;
@@ -86,6 +98,10 @@ export const getTelemetryEvents = async (
   }
 
   if (eid === 'END' || (contentType === 'quml' && eid === 'SUMMARY')) {
+    // [QuML-DIAG] TEMPORARY — remove after analysis. Confirms that the
+    // completion-tracking branch fires (which marks the course/unit complete),
+    // and on which event, so we can verify it also fires on an aborted exit.
+    console.log('[QuML-DIAG] completion branch fired', { contentType, eid, identifier });
     try {
       const detailsObject: any[] = [];
 
