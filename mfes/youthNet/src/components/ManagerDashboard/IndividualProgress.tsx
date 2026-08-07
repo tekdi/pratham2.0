@@ -8,7 +8,6 @@ import {
   buildIndividualProgressRows,
   buildUserCourseLearningMap,
   filterCourses,
-  isMandatoryCourse,
   paginateUsers,
 } from '../../utils/managerDashboardHelpers';
 import CoursesFilterBar from './CoursesList/CoursesFilterBar';
@@ -38,17 +37,10 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   const { t } = useTranslation();
 
   // Language / Course Type / Course Name filters narrow down which courses count toward
-  // progress — they never remove an employee from the table.
+  // progress — they never remove an employee from the table. Eligibility (does this course even
+  // apply to a given user's JOB_FAMILY/PSU/EMP_GROUP) is applied per user, inside
+  // buildIndividualProgressRows, since it differs from row to row.
   const filteredCourses = useMemo(() => filterCourses(courses, filters), [courses, filters]);
-
-  const mandatoryCourseIds = useMemo(
-    () => filteredCourses.filter(isMandatoryCourse).map((course) => course.identifier),
-    [filteredCourses]
-  );
-  const nonMandatoryCourseIds = useMemo(
-    () => filteredCourses.filter((course) => !isMandatoryCourse(course)).map((course) => course.identifier),
-    [filteredCourses]
-  );
 
   const userCourseLearningMap = useMemo(
     () => buildUserCourseLearningMap(courseLearningSummary),
@@ -56,8 +48,8 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   );
 
   const individualProgressRows = useMemo(
-    () => buildIndividualProgressRows(users, mandatoryCourseIds, nonMandatoryCourseIds, userCourseLearningMap),
-    [users, mandatoryCourseIds, nonMandatoryCourseIds, userCourseLearningMap]
+    () => buildIndividualProgressRows(users, filteredCourses, userCourseLearningMap),
+    [users, filteredCourses, userCourseLearningMap]
   );
 
   const { visibleItems: visibleRows, totalPages } = useMemo(

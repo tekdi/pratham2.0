@@ -283,6 +283,14 @@ export interface StatusConfigItem {
   colorToken: NormalizedStatus;
 }
 
+// One of a user's own JOB_FAMILY/PSU/EMP_GROUP custom field values — only labels the user
+// actually carries a value for are ever produced (see getUserCustomFieldChipValues), so this
+// never needs an "empty" state of its own.
+export interface CustomFieldChipValue {
+  label: string;
+  value: string;
+}
+
 export interface IndividualProgressRow {
   userId: string;
   userName: string;
@@ -290,6 +298,7 @@ export interface IndividualProgressRow {
   mandatoryProgress: UserProgressCounts;
   nonMandatoryProgress: UserProgressCounts;
   flags: EmployeeFlags;
+  customFieldValues: CustomFieldChipValue[];
 }
 
 export interface UserCourseProgressProps {
@@ -429,11 +438,14 @@ export interface EmployeeProfileCardProps {
   employeeName: string;
   metadata: string;
   email?: string;
+  customFieldValues?: CustomFieldChipValue[];
 }
 
 export interface EmployeeSummaryCardProps {
   title: string;
-  value: number;
+  // Most callers show a raw count; the Dashboard tab's Certificate Rate tile needs a
+  // pre-formatted "72%" string instead of forcing every consumer through a formatter.
+  value: number | string;
   subtitle: string;
   colorToken?: CourseStatusKey;
 }
@@ -466,4 +478,66 @@ export interface ModalProps {
   // Custom styling for the dialog's Paper — merged after the component's own base styles, so
   // callers can override sizing (e.g. a fixed max-width) without forking the shared shell.
   sx?: SxProps<Theme>;
+}
+
+// --- Dashboard Overview (Dashboard tab) --------------------------------------------------------
+
+// How many team members carry a given JOB_FAMILY/PSU/EMP_GROUP value — the Dashboard tab's team
+// composition charts, sorted by count desc (see getUserCustomFieldValueCounts).
+export interface CustomFieldValueCount {
+  value: string;
+  count: number;
+}
+
+// Certificates issued in one calendar month (UTC) — see getCertificatesIssuedByMonth.
+export interface MonthlyCertificateCount {
+  monthKey: string; // "YYYY-MM", sortable as a plain string
+  label: string; // "Jan 2026", for axis/tooltip display
+  count: number;
+}
+
+// Generic Paper-card shell shared by every Dashboard tab chart — title/subtitle header plus a
+// loading/error/empty slot, so each chart component only has to supply its own visualization.
+export interface ChartCardProps {
+  title: string;
+  subtitle?: string;
+  loading?: boolean;
+  error?: boolean;
+  isEmpty?: boolean;
+  emptyLabel?: string;
+  children: ReactNode;
+}
+
+export interface StatusOverviewSectionProps {
+  counts: UserProgressCounts;
+}
+
+export interface CustomFieldDistributionChartProps {
+  title: string;
+  data: CustomFieldValueCount[];
+}
+
+export interface TopCoursesChartProps {
+  courses: CourseCardModel[];
+}
+
+export interface HighAttemptLevelsChartProps {
+  counts: Record<HighAttemptFilter, number>;
+}
+
+export interface CertificatesTrendChartProps {
+  data: MonthlyCertificateCount[];
+}
+
+export interface DashboardOverviewProps {
+  users: ManagerTeamUser[];
+  courses: Course[];
+  courseLearningSummary: CourseLearningSummaryResult;
+  userCustom: Record<string, string[]>;
+  usersLoading: boolean;
+  usersError: boolean;
+  coursesLoading: boolean;
+  coursesError: boolean;
+  summaryLoading: boolean;
+  summaryError: boolean;
 }

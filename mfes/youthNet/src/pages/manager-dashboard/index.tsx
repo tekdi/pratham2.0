@@ -26,6 +26,7 @@ import {
   HighQuizAttemptSection,
   TopPerformersSection,
   CourseBreakdownList,
+  DashboardOverview,
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -39,9 +40,12 @@ import {
   CourseStatusSelection,
   HighAttemptFilter,
 } from '../../utils/Interface';
+import { MANAGER_DASHBOARD_ALL_FILTER_OPTION } from '../../utils/app.config';
 import {
   buildCourseById,
   buildUserById,
+  filterCourseLearningSummaryForFilteredCourses,
+  filterCoursesByUserCustomFilters,
   filterHighAttemptUsersByAttempt,
   filterSummaryByCourseIds,
   getCourseEntryCount,
@@ -55,7 +59,7 @@ import {
 
 // Sentinel option shown at the top of each JOB_FAMILY/PSU/EMP_GROUP dropdown — checking it selects
 // every real option for that label in one go, unchecking it clears the whole filter.
-const ALL_OPTION = 'ALL';
+const ALL_OPTION = MANAGER_DASHBOARD_ALL_FILTER_OPTION;
 
 const ManagerDashboard = () => {
   const { t } = useTranslation();
@@ -88,43 +92,88 @@ const ManagerDashboard = () => {
   } = useManagerDashboardData();
 
   console.log("##########namane courseLearningSummary",courseLearningSummary);
+
+  // --- UI state (filters, pagination, sort) — kept in a module-level singleton via
+  // `useManagerDashboardUIState` (not plain `useState`) so it survives navigating to the Employee
+  // Detail Page and back, instead of resetting to defaults on that full page remount, and is
+  // mirrored to sessionStorage so a hard refresh doesn't lose it either. -------------------------
+  const [
+    {
+      courseFilters,
+      currentCoursePage,
+      selectedAttemptFilter,
+      attemptSortOrder,
+      teamFilters,
+      teamCurrentPage,
+      courseBreakdownFilters,
+      courseBreakdownPage,
+      userFilterFamily: user_filter_family,
+    },
+    setUIState,
+  ] = useManagerDashboardUIState();
+
   // Explicit picks per user_custom label (JOB_FAMILY / PSU / EMP_GROUP). A label with no entry
   // here (or an empty one) means "nothing explicitly picked yet" — the dropdown then shows and
   // filters by every option for that label, i.e. behaves as if ALL_OPTION plus every real option
   // were selected.
-  const [user_filter_family, setUserFilterFamily] = useState<Record<string, string[]>>({});
-
   const handleUserCustomFilterChange = useCallback(
     (label: string, options: string[]) => (event: SelectChangeEvent<string[]>) => {
       const { value } = event.target;
       const nextValue = typeof value === 'string' ? value.split(',') : value;
-      setUserFilterFamily((prev) => {
-        // `prev[label]` is `undefined` only when the user hasn't touched this filter yet — an
-        // explicit `[]` (every option unchecked down to none) must stay `[]`, not snap back to
-        // "everything selected", so this checks presence rather than truthiness/length.
-        const previouslySelected = prev[label] !== undefined ? prev[label] : [ALL_OPTION, ...options];
-        const hadAll = previouslySelected.includes(ALL_OPTION);
-        const hasAll = nextValue.includes(ALL_OPTION);
 
-        let resolved: string[];
-        if (hasAll && !hadAll) {
-          // "ALL" was just checked — select every option.
-          resolved = [ALL_OPTION, ...options];
-        } else if (!hasAll && hadAll) {
-          // "ALL" was just unchecked — clear the whole filter.
-          resolved = [];
-        } else {
-          // An individual option was toggled — keep "ALL" in sync with full coverage.
-          const withoutAll = nextValue.filter((v) => v !== ALL_OPTION);
-          resolved = withoutAll.length === options.length ? [ALL_OPTION, ...withoutAll] : withoutAll;
-        }
-        return { ...prev, [label]: resolved };
-      });
+      // `user_filter_family[label]` is `undefined` only when the user hasn't touched this filter
+      // yet — an explicit `[]` (every option unchecked down to none) must stay `[]`, not snap back
+      // to "everything selected", so this checks presence rather than truthiness/length.
+      const previouslySelected =
+        user_filter_family[label] !== undefined ? user_filter_family[label] : [ALL_OPTION, ...options];
+      const hadAll = previouslySelected.includes(ALL_OPTION);
+      const hasAll = nextValue.includes(ALL_OPTION);
+
+      let resolved: string[];
+      if (hasAll && !hadAll) {
+        // "ALL" was just checked — select every option.
+        resolved = [ALL_OPTION, ...options];
+      } else if (!hasAll && hadAll) {
+        // "ALL" was just unchecked — clear the whole filter.
+        resolved = [];
+      } else {
+        // An individual option was toggled — keep "ALL" in sync with full coverage.
+        const withoutAll = nextValue.filter((v) => v !== ALL_OPTION);
+        resolved = withoutAll.length === options.length ? [ALL_OPTION, ...withoutAll] : withoutAll;
+      }
+
+      setUIState({ userFilterFamily: { ...user_filter_family, [label]: resolved } });
     },
-    []
+    [user_filter_family, setUIState]
   );
 
-  const handleClearUserCustomFilters = useCallback(() => setUserFilterFamily({}), []);
+  const handleClearUserCustomFilters = useCallback(
+    () => setUIState({ userFilterFamily: {} }),
+    [setUIState]
+  );
+
+  // Nothing has been picked yet ⇒ every dropdown is at its "ALL" default ⇒ the filter pipeline
+  // below is a no-op by construction, but skipping it entirely also means `filteredCourses` /
+  // `filteredCourseLearningSummary` stay reference-equal to the hook's original `courses` /
+  // `courseLearningSummary` — i.e. the "original values" the page starts from are never touched
+  // until the user actually interacts with a filter.
+  const hasActiveUserCustomFilter = Object.keys(user_filter_family).length > 0;
+
+  const filteredCourses = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCoursesByUserCustomFilters(courses, user_filter_family)
+        : courses,
+    [hasActiveUserCustomFilter, courses, user_filter_family]
+  );
+
+  const filteredCourseLearningSummary = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, filteredCourses, users)
+        : courseLearningSummary,
+    [hasActiveUserCustomFilter, courseLearningSummary, filteredCourses, users]
+  );
 
   // The raw label from the API (JOB_FAMILY / PSU / EMP_GROUP) is also the option value used for
   // filtering/selection — only its on-screen display goes through translation, via
@@ -152,22 +201,6 @@ const ManagerDashboard = () => {
   // console.log("###########managerdashboard courses",courses);
   // console.log("###########managerdashboard user_custom",user_custom);
 
-  // --- UI state (filters, pagination, sort) — kept in a module-level singleton via
-  // `useManagerDashboardUIState` (not plain `useState`) so it survives navigating to the Employee
-  // Detail Page and back, instead of resetting to defaults on that full page remount. -------------
-  const [
-    {
-      courseFilters,
-      currentCoursePage,
-      selectedAttemptFilter,
-      attemptSortOrder,
-      teamFilters,
-      teamCurrentPage,
-      courseBreakdownFilters,
-      courseBreakdownPage,
-    },
-    setUIState,
-  ] = useManagerDashboardUIState();
   const [selectedCourseStatus, setSelectedCourseStatus] = useState<CourseStatusSelection | null>(null);
 
   const setCourseFilters = useCallback((filters: CourseListFilters) => setUIState({ courseFilters: filters }), [setUIState]);
@@ -187,18 +220,21 @@ const ManagerDashboard = () => {
 
   // --- Derived lookups / analytics (memoized — the raw summary is the single source of truth,
   // everything else is computed from it rather than stored separately). ----------------------
+  // Built from filteredCourses/filteredCourseLearningSummary (not the hook's raw courses/
+  // courseLearningSummary) so the JOB_FAMILY/PSU/EMP_GROUP filters above flow through to every
+  // tab that reads them.
   const userById = useMemo(() => buildUserById(users), [users]);
-  const courseById = useMemo(() => buildCourseById(courses), [courses]);
+  const courseById = useMemo(() => buildCourseById(filteredCourses), [filteredCourses]);
 
   // High Quiz Attempt Count and Top Performers scope down to just the courses matching the
   // Course Type / Language / Course Name filters (null = no filters active = every course).
   const selectedCourseIds = useMemo(
-    () => getSelectedCourseIds(courses, courseFilters),
-    [courses, courseFilters]
+    () => getSelectedCourseIds(filteredCourses, courseFilters),
+    [filteredCourses, courseFilters]
   );
   const scopedCourseLearningSummary = useMemo(
-    () => filterSummaryByCourseIds(courseLearningSummary, selectedCourseIds),
-    [courseLearningSummary, selectedCourseIds]
+    () => filterSummaryByCourseIds(filteredCourseLearningSummary, selectedCourseIds),
+    [filteredCourseLearningSummary, selectedCourseIds]
   );
 
   const highAttemptUsers = useMemo(
@@ -226,10 +262,10 @@ const ManagerDashboard = () => {
     return getCourseUsersByStatus(
       selectedCourseStatus.courseId,
       selectedCourseStatus.status,
-      courseLearningSummary,
+      filteredCourseLearningSummary,
       userById
     );
-  }, [selectedCourseStatus, courseLearningSummary, userById]);
+  }, [selectedCourseStatus, filteredCourseLearningSummary, userById]);
 
   const handleTeamFiltersChange = useCallback(
     (nextFilters: CourseListFilters) => {
@@ -382,19 +418,26 @@ const ManagerDashboard = () => {
         /> */}
 
         {activeTab === 'dashboard' && (
-          <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-            <Grid item xs={12}>
-              Dash Board Analysis
-            </Grid>
-          </Grid>
+          <DashboardOverview
+            users={users}
+            courses={filteredCourses}
+            courseLearningSummary={filteredCourseLearningSummary}
+            userCustom={user_custom}
+            usersLoading={usersLoading}
+            usersError={usersError}
+            coursesLoading={coursesLoading}
+            coursesError={coursesError}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+          />
         )}
 
         {activeTab === 'team' && (
           <>
             <IndividualProgress
               users={users}
-              courses={courses}
-              courseLearningSummary={courseLearningSummary}
+              courses={filteredCourses}
+              courseLearningSummary={filteredCourseLearningSummary}
               usersLoading={usersLoading}
               usersError={usersError}
               coursesLoading={coursesLoading}
@@ -430,10 +473,10 @@ const ManagerDashboard = () => {
           <Grid container spacing={{ xs: 1.5, sm: 2 }}>
             <Grid item xs={12}>
               <CourseList
-                courses={courses}
+                courses={filteredCourses}
                 coursesLoading={coursesLoading || usersLoading}
                 coursesError={coursesError || usersError}
-                courseLearningSummary={courseLearningSummary}
+                courseLearningSummary={filteredCourseLearningSummary}
                 summaryLoading={summaryLoading}
                 summaryError={summaryError}
                 filters={courseFilters}

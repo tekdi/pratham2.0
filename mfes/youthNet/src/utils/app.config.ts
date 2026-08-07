@@ -204,6 +204,19 @@ export const DEFAULT_MANAGER_DASHBOARD_TAB: ManagerDashboardTabKey = 'dashboard'
 // with none of them has nothing to show there, so useManagerDashboardData drops them.
 export const MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS = ['JOB_FAMILY', 'PSU', 'EMP_GROUP'];
 
+// The same 3 labels, but as they appear on a Course object (composite search result) instead of
+// a user's customFields — used to match a course's declared audience against a user/filter's
+// JOB_FAMILY / PSU / EMP_GROUP values.
+export const MANAGER_DASHBOARD_CUSTOM_FIELD_COURSE_KEYS: Record<string, string> = {
+  JOB_FAMILY: 'jobFamily',
+  PSU: 'psu',
+  EMP_GROUP: 'groupMembership',
+};
+
+// Sentinel option shown at the top of each JOB_FAMILY/PSU/EMP_GROUP filter dropdown — checking it
+// selects every real option for that label in one go, unchecking it clears the whole filter.
+export const MANAGER_DASHBOARD_ALL_FILTER_OPTION = 'ALL';
+
 // Payload is not finalized yet on the backend side — passed through to `fetchCourses` as-is so
 // it stays easy to adjust without touching the service layer. Fetches both Mandatory and
 // Optional (non-mandatory) courses, and all live courses (no limit/offset — pagination and the

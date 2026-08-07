@@ -1,12 +1,19 @@
 import React from 'react';
-import { Avatar, Box, Paper, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Chip, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import { useTheme } from '@mui/material/styles';
+import { useTranslation } from 'next-i18next';
 import { EmployeeProfileCardProps } from '../../../utils/Interface';
 import { getUserInitials } from '../../../utils/managerDashboardHelpers';
 
-const EmployeeProfileCard: React.FC<EmployeeProfileCardProps> = ({ employeeName, metadata, email }) => {
+const EmployeeProfileCard: React.FC<EmployeeProfileCardProps> = ({
+  employeeName,
+  metadata,
+  email,
+  customFieldValues = [],
+}) => {
   const theme = useTheme<any>();
+  const { t } = useTranslation();
 
   return (
     <Paper
@@ -38,11 +45,34 @@ const EmployeeProfileCard: React.FC<EmployeeProfileCardProps> = ({ employeeName,
             {employeeName}
           </Typography>
           {email && (
-            <Stack direction="row" spacing={0.5} alignItems="center">
+            <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: customFieldValues.length > 0 ? 0.75 : 0 }}>
               <EmailOutlinedIcon sx={{ fontSize: 14, color: theme.palette.text.secondary }} />
               <Typography variant="body2" color="text.secondary" sx={{ fontSize: '13px', mb: 0 }}>
                 {email}
               </Typography>
+            </Stack>
+          )}
+          {customFieldValues.length > 0 && (
+            <Stack direction="row" flexWrap="wrap" gap={0.5}>
+              {customFieldValues.map((field) => (
+                <Tooltip
+                  key={field.label}
+                  title={t(`MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS.${field.label}`, { defaultValue: field.label })}
+                  arrow
+                >
+                  <Chip
+                    label={field.value}
+                    size="small"
+                    sx={{
+                      height: 20,
+                      fontSize: '11px',
+                      backgroundColor: theme.palette.warning['800'],
+                      color: theme.palette.text.secondary,
+                      '& .MuiChip-label': { px: 1 },
+                    }}
+                  />
+                </Tooltip>
+              ))}
             </Stack>
           )}
         </Box>

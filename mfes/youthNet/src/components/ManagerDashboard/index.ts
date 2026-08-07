@@ -17,6 +17,7 @@ export { default as SegmentedProgressBar } from './SegmentedProgressBar';
 export * from './CoursesList';
 export * from './CourseBreakdown';
 export * from './EmployeeDetail';
+export * from './Overview';
 
 // Export types
 export * from './types';

@@ -95,7 +95,16 @@ const loadManagerDashboardData = (): Promise<void> => {
       fetchedCourses_JOB_FAMILY = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, jobFamily : user_custom_family?.JOB_FAMILY} });
       fetchedCourses_PSU = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, psu : user_custom_family?.PSU} });
       fetchedCourses_EMP_GROUP = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, groupMembership : user_custom_family?.EMP_GROUP} });
-      fetchedCourses=[...fetchedCourses_JOB_FAMILY,...fetchedCourses_PSU,...fetchedCourses_EMP_GROUP];
+      // fetchedCourses=[...fetchedCourses_JOB_FAMILY,...fetchedCourses_PSU,...fetchedCourses_EMP_GROUP];
+      fetchedCourses = [
+        ...new Map(
+          [
+            ...fetchedCourses_JOB_FAMILY,
+            ...fetchedCourses_PSU,
+            ...fetchedCourses_EMP_GROUP,
+          ].map((course) => [course.identifier, course])
+        ).values(),
+      ];
       publish({ courses: fetchedCourses, coursesLoading: false, coursesError: false });
     } catch (error) {
       console.error('Error fetching courses:', error);

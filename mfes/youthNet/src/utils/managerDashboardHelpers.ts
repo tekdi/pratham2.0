@@ -11,7 +11,10 @@ import {
   CourseListFilters,
   CourseStatusCounts,
   CourseStatusKey,
+  CourseUserLearningMap,
   CourseUserLearningSummary,
+  CustomFieldChipValue,
+  CustomFieldValueCount,
   EmployeeCourseGroups,
   EmployeeCourseProgress,
   EmployeeProgressSummary,
@@ -20,6 +23,7 @@ import {
   IndividualProgressRow,
   ManagerDashboardTabKey,
   ManagerTeamUser,
+  MonthlyCertificateCount,
   NormalizedStatus,
   StatusConfigItem,
   StatusSummaryItem,
@@ -29,10 +33,13 @@ import {
   UserProgressCounts,
 } from './Interface';
 import {
+  ATTEMPT_FILTER_OPTIONS,
   COURSE_CARD_STATUS_CONFIG,
   EMPTY_COURSE_STATUS_COUNTS,
   HIGH_ATTEMPT_THRESHOLD,
   INDIVIDUAL_PROGRESS_STATUS_CONFIG,
+  MANAGER_DASHBOARD_ALL_FILTER_OPTION,
+  MANAGER_DASHBOARD_CUSTOM_FIELD_COURSE_KEYS,
   MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS,
   MANAGER_DASHBOARD_NAV_ITEMS,
   STATUS_NORMALIZATION_MAP,
@@ -98,6 +105,113 @@ export const getManagerDashboardCustomFieldValues = (
   return Object.fromEntries(
     MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => [label, Array.from(uniqueValuesByLabel[label])])
   );
+};
+
+// A single user's own values for one label (JOB_FAMILY / PSU / EMP_GROUP) — the per-user
+// counterpart to getManagerDashboardCustomFieldValues, which aggregates across every user.
+export const getUserCustomFieldValues = (user: ManagerTeamUser, label: string): string[] => {
+  const customFields = user.customFields as ManagerDashboardCustomField[] | undefined;
+  if (!Array.isArray(customFields)) return [];
+
+  return customFields
+    .filter((field) => field?.label === label)
+    .flatMap((field) => field.selectedValues ?? [])
+    .map((value) => (typeof value === 'string' ? value : value?.value))
+    .filter((value): value is string => Boolean(value));
+};
+
+// This user's own JOB_FAMILY/PSU/EMP_GROUP values, one entry per label they actually carry a
+// value for — for showing custom-field chips anywhere an employee is listed (Team tab rows,
+// Employee Detail Page profile). Labels the user has no value for are omitted entirely rather
+// than shown empty.
+export const getUserCustomFieldChipValues = (user: ManagerTeamUser): CustomFieldChipValue[] =>
+  MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => ({
+    label,
+    value: getUserCustomFieldValues(user, label).join(', '),
+  })).filter((entry) => entry.value.length > 0);
+
+// A course's declared audience for one label — courses carry these as plain string arrays
+// (jobFamily / psu / groupMembership), unlike a user's {label, selectedValues} customFields shape.
+export const getCourseCustomFieldValues = (course: Course, label: string): string[] => {
+  const key = MANAGER_DASHBOARD_CUSTOM_FIELD_COURSE_KEYS[label];
+  const values = key ? (course as Record<string, unknown>)[key] : undefined;
+  return Array.isArray(values) ? (values as string[]) : [];
+};
+
+// Real data disagrees on casing between a user's own customFields values (e.g. "TECHNOLOGY &
+// DIGITAL") and a course's declared audience (e.g. "Technology & Digital") — matching case-
+// sensitively would silently drop every course for every filter, so this compares case-insensitively.
+const hasOverlap = (values: string[], otherValues: string[]): boolean => {
+  if (values.length === 0 || otherValues.length === 0) return false;
+  const normalizedOther = new Set(otherValues.map((value) => value.trim().toLowerCase()));
+  return values.some((value) => normalizedOther.has(value.trim().toLowerCase()));
+};
+
+// A filter label only restricts results once the user has explicitly picked a subset — untouched
+// (`undefined`) or fully re-selected (includes the "ALL" sentinel) both mean "don't filter by
+// this label at all", per the Team/Courses filters' "no selection yet = show everything" default.
+// An explicit `[]` (every option unchecked) is a real, active filter — it matches nothing.
+const getActiveUserCustomFilters = (
+  userFilterFamily: Record<string, string[]>
+): { label: string; values: string[] }[] =>
+  MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => {
+    const selected = userFilterFamily[label];
+    if (selected === undefined || selected.includes(MANAGER_DASHBOARD_ALL_FILTER_OPTION)) return null;
+    return { label, values: selected };
+  }).filter((entry): entry is { label: string; values: string[] } => entry !== null);
+
+// Step A of the JOB_FAMILY/PSU/EMP_GROUP filtering pipeline — a course survives if its declared
+// audience (jobFamily/psu/groupMembership) overlaps the selected values for AT LEAST ONE actively-
+// filtered label (OR across labels, and OR within a label's values too).
+export const filterCoursesByUserCustomFilters = (
+  courses: Course[],
+  userFilterFamily: Record<string, string[]>
+): Course[] => {
+  const activeFilters = getActiveUserCustomFilters(userFilterFamily);
+  if (activeFilters.length === 0) return courses;
+
+  return courses.filter((course) =>
+    activeFilters.some(({ label, values }) => hasOverlap(values, getCourseCustomFieldValues(course, label)))
+  );
+};
+
+// Does this user belong to this course's declared audience — overlap between the user's own
+// JOB_FAMILY/PSU/EMP_GROUP values and the course's declared jobFamily/psu/groupMembership, across
+// all 3 categories (OR), regardless of what's currently active in the filter UI. A course with
+// none of the 3 arrays populated has no declared audience, so no user can "belong" to it. Shared
+// by the courseLearningSummary pruning below and the Employee Detail Page's own course list.
+export const isUserEligibleForCourse = (user: ManagerTeamUser, course: Course): boolean =>
+  MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.some((label) =>
+    hasOverlap(getUserCustomFieldValues(user, label), getCourseCustomFieldValues(course, label))
+  );
+
+// Steps B+C — restricts courseLearningSummary to the courses that survived
+// filterCoursesByUserCustomFilters, then within each of those, drops any user who isn't eligible
+// for that specific course (see isUserEligibleForCourse).
+export const filterCourseLearningSummaryForFilteredCourses = (
+  courseLearningSummary: CourseLearningSummaryResult,
+  filteredCourses: Course[],
+  users: ManagerTeamUser[]
+): CourseLearningSummaryResult => {
+  const filteredCourseById = buildCourseById(filteredCourses);
+  const userById = buildUserById(users);
+
+  const result: CourseLearningSummaryResult = {};
+
+  Object.entries(courseLearningSummary).forEach(([courseId, userSummaries]) => {
+    const course = filteredCourseById[courseId];
+    if (!course) return; // dropped by the course-level filter — drop its summary entirely too
+
+    const filteredUserSummaries: CourseUserLearningMap = {};
+    Object.entries(userSummaries).forEach(([userId, summary]) => {
+      const user = userById[userId];
+      if (user && isUserEligibleForCourse(user, course)) filteredUserSummaries[userId] = summary;
+    });
+
+    result[courseId] = filteredUserSummaries;
+  });
+
+  return result;
 };
 
 export const buildUserById = (users: ManagerTeamUser[]): UserById =>
@@ -520,14 +634,24 @@ export const getCourseLearnersByStatus = (
  * Builds one row per employee — visible even when they have no matching courses/progress data,
  * per the "employees remain visible while filters recalculate progress" requirement.
  */
+// Each user's mandatory/non-mandatory course ids are scoped to the courses THEY are actually
+// eligible for (see isUserEligibleForCourse) — a course outside a user's own JOB_FAMILY/PSU/
+// EMP_GROUP audience must not count toward their "not started" total just because they have no
+// summary entry for it. `courses` is the same (Course Type/Language/Course Name-)filtered list
+// every user's row scopes down from; eligibility narrows it further, per user.
 export const buildIndividualProgressRows = (
   users: ManagerTeamUser[],
-  mandatoryCourseIds: string[],
-  nonMandatoryCourseIds: string[],
+  courses: Course[],
   userCourseLearningMap: UserCourseLearningMap
 ): IndividualProgressRow[] =>
   users.map((user) => {
+    const eligibleCourses = courses.filter((course) => isUserEligibleForCourse(user, course));
+    const mandatoryCourseIds = eligibleCourses.filter(isMandatoryCourse).map((course) => course.identifier);
+    const nonMandatoryCourseIds = eligibleCourses
+      .filter((course) => !isMandatoryCourse(course))
+      .map((course) => course.identifier);
     const allCourseIds = [...mandatoryCourseIds, ...nonMandatoryCourseIds];
+
     return {
       userId: user.userId,
       userName: getUserDisplayName(user, user.userId),
@@ -539,6 +663,7 @@ export const buildIndividualProgressRows = (
         userCourseLearningMap
       ),
       flags: { highAttemptCount: getUserHighAttemptCount(user.userId, allCourseIds, userCourseLearningMap) },
+      customFieldValues: getUserCustomFieldChipValues(user),
     };
   });
 
@@ -554,22 +679,31 @@ export const getCourseStatusConfig = (status: NormalizedStatus): StatusConfigIte
  * A course with no record for this user normalizes to 'notStarted' via `normalizeLearningStatus`,
  * same missing-record behavior as the rest of the Manager Dashboard.
  */
+// Only courses this employee is actually eligible for (see isUserEligibleForCourse) — a course
+// whose declared jobFamily/psu/groupMembership audience doesn't include this employee never
+// appears on their Employee Detail Page, even if the summary happens to carry an entry for them.
 export const getEmployeeCourseProgress = (
   userId: string,
   courses: Course[],
-  courseLearningSummary: CourseLearningSummaryResult
-): EmployeeCourseProgress[] =>
-  courses.map((course) => {
-    const entry = courseLearningSummary[course.identifier]?.[userId];
-    return {
-      courseId: course.identifier,
-      courseName: getCourseDisplayName(course, course.identifier),
-      language: getCourseLanguageLabel(course),
-      isMandatory: isMandatoryCourse(course),
-      status: normalizeLearningStatus(entry?.status),
-      highestAttempt: entry?.highestAttempt ?? 0,
-    };
-  });
+  courseLearningSummary: CourseLearningSummaryResult,
+  user: ManagerTeamUser | undefined
+): EmployeeCourseProgress[] => {
+  if (!user) return [];
+
+  return courses
+    .filter((course) => isUserEligibleForCourse(user, course))
+    .map((course) => {
+      const entry = courseLearningSummary[course.identifier]?.[userId];
+      return {
+        courseId: course.identifier,
+        courseName: getCourseDisplayName(course, course.identifier),
+        language: getCourseLanguageLabel(course),
+        isMandatory: isMandatoryCourse(course),
+        status: normalizeLearningStatus(entry?.status),
+        highestAttempt: entry?.highestAttempt ?? 0,
+      };
+    });
+};
 
 /** Splits an employee's course entries into Mandatory / Non-Mandatory, preserving API order. */
 export const groupEmployeeCoursesByType = (employeeCourses: EmployeeCourseProgress[]): EmployeeCourseGroups => ({
@@ -615,4 +749,92 @@ export const getEmployeeProgressSummary = (employeeCourses: EmployeeCourseProgre
   });
 
   return summary;
+};
+
+// --- Dashboard Overview (Dashboard tab aggregate analytics) ------------------------------------
+
+/** Status counts summed across every course in `courses` — the Dashboard tab's team-wide status
+ * breakdown, as opposed to `getCourseStatusCounts`'s single-course view. */
+export const getAggregateStatusCounts = (
+  courses: Course[],
+  summary: CourseLearningSummaryResult
+): CourseStatusCounts =>
+  courses.reduce<CourseStatusCounts>((totals, course) => {
+    const counts = getCourseStatusCounts(course.identifier, summary);
+    (Object.keys(totals) as (keyof CourseStatusCounts)[]).forEach((key) => {
+      totals[key] += counts[key];
+    });
+    return totals;
+  }, { ...EMPTY_COURSE_STATUS_COUNTS });
+
+/** How many users carry each distinct value for one JOB_FAMILY/PSU/EMP_GROUP label — team
+ * composition for the Dashboard tab's distribution charts. Sorted by count desc. */
+export const getUserCustomFieldValueCounts = (
+  users: ManagerTeamUser[],
+  label: string
+): CustomFieldValueCount[] => {
+  const counts = new Map<string, number>();
+  users.forEach((user) => {
+    getUserCustomFieldValues(user, label).forEach((value) => {
+      counts.set(value, (counts.get(value) ?? 0) + 1);
+    });
+  });
+
+  return Array.from(counts.entries())
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+};
+
+/** Top N courses by total tracked enrollment — reuses `getCourseCardModels` rather than
+ * re-deriving course display data for a second time. */
+export const getTopCoursesByEnrollment = (
+  courses: Course[],
+  summary: CourseLearningSummaryResult,
+  limit = 6
+): CourseCardModel[] =>
+  getCourseCardModels(courses, summary)
+    .sort((a, b) => b.progress.total - a.progress.total || a.courseName.localeCompare(b.courseName))
+    .slice(0, limit);
+
+/** Count of high-attempt users per bucket (3 / 4 / 5+) — same buckets as the High Quiz Attempt
+ * section's own filter, aggregated into totals instead of a filterable list. */
+export const getHighAttemptLevelCounts = (
+  highAttemptUsers: HighAttemptUser[]
+): Record<HighAttemptFilter, number> =>
+  ATTEMPT_FILTER_OPTIONS.reduce(
+    (counts, filter) => ({
+      ...counts,
+      [filter]: filterHighAttemptUsersByAttempt(highAttemptUsers, filter).length,
+    }),
+    {} as Record<HighAttemptFilter, number>
+  );
+
+/** Certificates issued per calendar month (UTC), chronological — a trend the rest of the app
+ * doesn't otherwise surface even though `issuedOn` is already tracked per user-course entry. */
+export const getCertificatesIssuedByMonth = (
+  summary: CourseLearningSummaryResult
+): MonthlyCertificateCount[] => {
+  const counts = new Map<string, number>();
+
+  Object.values(summary).forEach((userMap) => {
+    Object.values(userMap).forEach((entry) => {
+      if (normalizeLearningStatus(entry?.status) !== 'certificateIssued' || !entry?.issuedOn) return;
+      const date = new Date(entry.issuedOn);
+      if (Number.isNaN(date.getTime())) return;
+      const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+      counts.set(monthKey, (counts.get(monthKey) ?? 0) + 1);
+    });
+  });
+
+  return Array.from(counts.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([monthKey, count]) => {
+      const [year, month] = monthKey.split('-').map(Number);
+      const label = new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString('en-US', {
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+      });
+      return { monthKey, label, count };
+    });
 };

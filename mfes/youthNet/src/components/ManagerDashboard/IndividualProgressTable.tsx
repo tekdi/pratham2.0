@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Avatar,
   Box,
+  Chip,
   Stack,
   Table,
   TableBody,
@@ -110,6 +111,26 @@ const IndividualProgressTable: React.FC<IndividualProgressTableProps> = ({
                           {row.userName}
                         </Typography>
                       </Tooltip>
+                      {row.customFieldValues.length > 0 && (
+                        <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                          {row.customFieldValues.map((field) => (
+                            <Tooltip key={field.label} title={`${t(`MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS.${field.label}`, { defaultValue: field.label })}: ${field.value}`} arrow>
+                              <Chip
+                                label={field.value}
+                                size="small"
+                                sx={{
+                                  height: 18,
+                                  fontSize: '10px',
+                                  maxWidth: 140,
+                                  backgroundColor: theme.palette.warning['800'],
+                                  color: theme.palette.text.secondary,
+                                  '& .MuiChip-label': { px: 0.75 },
+                                }}
+                              />
+                            </Tooltip>
+                          ))}
+                        </Stack>
+                      )}
                     </Box>
                   </Stack>
                 </TableCell>
