@@ -28,6 +28,9 @@ export interface ManagerDashboardUIState {
   teamCurrentPage: number;
   courseBreakdownFilters: CourseListFilters;
   courseBreakdownPage: number;
+  // The JOB_FAMILY/PSU/EMP_GROUP filter row at the top of the page — same persistence needs as
+  // every other filter here (survive the Employee Detail Page round-trip and a hard refresh).
+  userFilterFamily: Record<string, string[]>;
 }
 
 const INITIAL_STATE: ManagerDashboardUIState = {
@@ -39,6 +42,7 @@ const INITIAL_STATE: ManagerDashboardUIState = {
   teamCurrentPage: 1,
   courseBreakdownFilters: { ...DEFAULT_COURSE_LIST_FILTERS },
   courseBreakdownPage: 1,
+  userFilterFamily: {},
 };
 
 const STORAGE_KEY = 'managerDashboardUIState';

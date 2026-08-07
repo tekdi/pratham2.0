@@ -18,6 +18,7 @@ import {
   buildUserById,
   getEmployeeCourseProgress,
   getEmployeeProgressSummary,
+  getUserCustomFieldChipValues,
   getUserDisplayName,
   groupEmployeeCoursesByType, isManagerDashboardTabKey
 } from '../../../utils/managerDashboardHelpers';
@@ -52,8 +53,8 @@ const EmployeeDetailPage = () => {
   const employee = userId ? userById[userId] : undefined;
 
   const employeeCourses = useMemo(
-    () => (userId ? getEmployeeCourseProgress(userId, courses, courseLearningSummary) : []),
-    [userId, courses, courseLearningSummary]
+    () => (userId ? getEmployeeCourseProgress(userId, courses, courseLearningSummary, employee) : []),
+    [userId, courses, courseLearningSummary, employee]
   );
   const employeeCourseGroups = useMemo(() => groupEmployeeCoursesByType(employeeCourses), [employeeCourses]);
   const employeeProgressSummary = useMemo(() => getEmployeeProgressSummary(employeeCourses), [employeeCourses]);
@@ -85,10 +86,16 @@ const EmployeeDetailPage = () => {
     const employeeName = getUserDisplayName(employee, userId);
     const metadata = employee.designation || employee.role || '';
     const email = typeof employee.email === 'string' ? employee.email : undefined;
+    const customFieldValues = getUserCustomFieldChipValues(employee);
 
     body = (
       <>
-        <EmployeeProfileCard employeeName={employeeName} metadata={metadata} email={email} />
+        <EmployeeProfileCard
+          employeeName={employeeName}
+          metadata={metadata}
+          email={email}
+          customFieldValues={customFieldValues}
+        />
         <EmployeeSummaryCards summary={employeeProgressSummary} />
         <EmployeeCourseBreakdown groups={employeeCourseGroups} />
       </>

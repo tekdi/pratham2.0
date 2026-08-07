@@ -14,9 +14,11 @@ export { default as StatusLegend } from './StatusLegend';
 export { default as HighQuizAttemptSection } from './HighQuizAttemptSection';
 export { default as TopPerformersSection } from './TopPerformersSection';
 export { default as SegmentedProgressBar } from './SegmentedProgressBar';
+export { default as ManagerDashboardLoadingScreen } from './ManagerDashboardLoadingScreen';
 export * from './CoursesList';
 export * from './CourseBreakdown';
 export * from './EmployeeDetail';
+export * from './Overview';
 
 // Export types
 export * from './types';

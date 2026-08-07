@@ -1,10 +1,20 @@
 import React, { useMemo } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { CommonPagination } from '@shared-lib-v2/lib/Pagination/CommonPagination';
 import { CourseListProps } from '../../../utils/Interface';
-import { COURSES_PER_PAGE, EMPTY_COURSE_STATUS_COUNTS } from '../../../utils/app.config';
+import { COURSES_PER_PAGE, COURSE_STATUS_CHIP_CONFIG, EMPTY_COURSE_STATUS_COUNTS } from '../../../utils/app.config';
 import { filterCourses, getCourseStatusCounts, paginateCourses } from '../../../utils/managerDashboardHelpers';
 import NoDataFound from '../../common/NoDataFound';
 import CoursesFilterBar from './CoursesFilterBar';
@@ -37,6 +47,14 @@ const CourseList: React.FC<CourseListProps> = ({
 
   const isLoading = coursesLoading;
   const showEmpty = !isLoading && !coursesError && filteredCourses.length === 0;
+
+  const headCellSx = {
+    fontWeight: 500,
+    fontSize: '13px',
+    color: theme.palette.text.secondary,
+    borderBottom: `1px solid ${theme.palette.warning['800']}`,
+    whiteSpace: 'nowrap',
+  };
 
   return (
     <Box
@@ -83,27 +101,41 @@ const CourseList: React.FC<CourseListProps> = ({
               </Typography>
             </Box>
           )}
-          {/* Horizontally scrollable, like IndividualProgress's table, so the status chips never
+          {/* Horizontally scrollable, like IndividualProgress's table, so the status columns never
               wrap/crush on narrow screens — they scroll into view instead. */}
-          <Box sx={{ overflowX: 'auto', ...getThinScrollbarSx(theme) }}>
-            <Stack sx={{ minWidth: 900 }}>
-              {visibleCourses.map((course) => (
-                <CourseRow
-                  key={course.identifier}
-                  course={course}
-                  // Counts stay all-zero (not fabricated/misleading) while the summary is still
-                  // loading or failed — CourseRow/CourseStatusChip render zero-state chips, which
-                  // is honest, not "wrong data" per the no-silent-zero requirement for failures.
-                  statusCounts={
-                    summaryLoading
-                      ? EMPTY_COURSE_STATUS_COUNTS
-                      : getCourseStatusCounts(course.identifier, courseLearningSummary)
-                  }
-                  onStatusClick={onStatusClick}
-                />
-              ))}
-            </Stack>
-          </Box>
+          <TableContainer sx={{ overflowX: 'auto', ...getThinScrollbarSx(theme) }}>
+            <Table size="small" sx={{ minWidth: 900 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={headCellSx}>{t('MANAGER_OVERVIEW.COL_TYPE')}</TableCell>
+                  <TableCell sx={headCellSx}>{t('MANAGER_OVERVIEW.COL_COURSE_NAME')}</TableCell>
+                  <TableCell sx={headCellSx}>{t('MANAGER_OVERVIEW.COL_LANGUAGE')}</TableCell>
+                  {COURSE_STATUS_CHIP_CONFIG.map((statusConfig) => (
+                    <TableCell key={statusConfig.key} align="center" sx={headCellSx}>
+                      {t(statusConfig.labelKey)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visibleCourses.map((course) => (
+                  <CourseRow
+                    key={course.identifier}
+                    course={course}
+                    // Counts stay all-zero (not fabricated/misleading) while the summary is still
+                    // loading or failed — CourseRow/CourseStatusChip render zero-state chips, which
+                    // is honest, not "wrong data" per the no-silent-zero requirement for failures.
+                    statusCounts={
+                      summaryLoading
+                        ? EMPTY_COURSE_STATUS_COUNTS
+                        : getCourseStatusCounts(course.identifier, courseLearningSummary)
+                    }
+                    onStatusClick={onStatusClick}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
