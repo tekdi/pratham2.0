@@ -33,6 +33,7 @@ import {
   EMPTY_COURSE_STATUS_COUNTS,
   HIGH_ATTEMPT_THRESHOLD,
   INDIVIDUAL_PROGRESS_STATUS_CONFIG,
+  MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS,
   MANAGER_DASHBOARD_NAV_ITEMS,
   STATUS_NORMALIZATION_MAP,
 } from './app.config';
@@ -53,6 +54,51 @@ export const normalizeLearningStatus = (status: string | undefined | null): Norm
 
 export const isManagerDashboardTabKey = (value: unknown): value is ManagerDashboardTabKey =>
   MANAGER_DASHBOARD_NAV_ITEMS.some((item) => item.key === value);
+
+// The Team view groups/filters learners by job family, PSU, and group membership — a user with
+// none of those custom fields has nothing to show there.
+export const hasManagerDashboardCustomField = (user: ManagerTeamUser): boolean => {
+  const customFields = user.customFields as { label?: string }[] | undefined;
+  return (
+    Array.isArray(customFields) &&
+    customFields.some((field) => MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.includes(field?.label ?? ''))
+  );
+};
+
+type ManagerDashboardCustomField = {
+  label?: string;
+  selectedValues?: (string | { value?: string })[];
+};
+
+// Every distinct value seen across all users for each of JOB_FAMILY / PSU / EMP_GROUP — e.g. for
+// the Team view's filter dropdowns. `selectedValues` entries are either a plain string or a
+// `{ id, value }` option object depending on the custom field's `type`.
+export const getManagerDashboardCustomFieldValues = (
+  users: ManagerTeamUser[]
+): Record<string, string[]> => {
+  const uniqueValuesByLabel: Record<string, Set<string>> = Object.fromEntries(
+    MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => [label, new Set<string>()])
+  );
+
+  users.forEach((user) => {
+    const customFields = user.customFields as ManagerDashboardCustomField[] | undefined;
+    if (!Array.isArray(customFields)) return;
+
+    customFields.forEach((field) => {
+      const label = field?.label ?? '';
+      if (!MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.includes(label)) return;
+
+      (field.selectedValues ?? []).forEach((selectedValue) => {
+        const value = typeof selectedValue === 'string' ? selectedValue : selectedValue?.value;
+        if (value) uniqueValuesByLabel[label].add(value);
+      });
+    });
+  });
+
+  return Object.fromEntries(
+    MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => [label, Array.from(uniqueValuesByLabel[label])])
+  );
+};
 
 export const buildUserById = (users: ManagerTeamUser[]): UserById =>
   users.reduce<UserById>((acc, user) => {

@@ -21,6 +21,8 @@ export const eventDaysLimit: number = 7;
 export const toastAutoHideDuration: number = 5000; // 5 seconds
 export const idealTimeForSession: string = '120';
 export const timeZone: string = 'Asia/Kolkata';
+export const SIDEBAR_WIDTH_EXPANDED: number = 350;
+export const SIDEBAR_WIDTH_COLLAPSED: number = 80;
 // export const jotFormId = '250065095006449';
 
 export const dropoutReasons = [
@@ -197,6 +199,10 @@ export const MANAGER_DASHBOARD_NAV_ITEMS: ManagerDashboardNavItem[] = [
 ];
 
 export const DEFAULT_MANAGER_DASHBOARD_TAB: ManagerDashboardTabKey = 'dashboard';
+
+// Manager Dashboard's Team view groups/filters learners by these custom fields — a fetched user
+// with none of them has nothing to show there, so useManagerDashboardData drops them.
+export const MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS = ['JOB_FAMILY', 'PSU', 'EMP_GROUP'];
 
 // Payload is not finalized yet on the backend side — passed through to `fetchCourses` as-is so
 // it stays easy to adjust without touching the service layer. Fetches both Mandatory and

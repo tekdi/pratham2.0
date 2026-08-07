@@ -1,5 +1,19 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Box, Container, Grid } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  Container,
+  Divider,
+  FormControl,
+  Grid,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
 import { useRouter } from 'next/router';
 import {
   IndividualProgress,
@@ -39,6 +53,10 @@ import {
   sortHighAttemptUsers,
 } from '../../utils/managerDashboardHelpers';
 
+// Sentinel option shown at the top of each JOB_FAMILY/PSU/EMP_GROUP dropdown — checking it selects
+// every real option for that label in one go, unchecking it clears the whole filter.
+const ALL_OPTION = 'ALL';
+
 const ManagerDashboard = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -60,6 +78,7 @@ const ManagerDashboard = () => {
     users,
     usersLoading,
     usersError,
+    user_custom,
     courses,
     coursesLoading,
     coursesError,
@@ -67,6 +86,71 @@ const ManagerDashboard = () => {
     summaryLoading,
     summaryError,
   } = useManagerDashboardData();
+
+  console.log("##########namane courseLearningSummary",courseLearningSummary);
+  // Explicit picks per user_custom label (JOB_FAMILY / PSU / EMP_GROUP). A label with no entry
+  // here (or an empty one) means "nothing explicitly picked yet" — the dropdown then shows and
+  // filters by every option for that label, i.e. behaves as if ALL_OPTION plus every real option
+  // were selected.
+  const [user_filter_family, setUserFilterFamily] = useState<Record<string, string[]>>({});
+
+  const handleUserCustomFilterChange = useCallback(
+    (label: string, options: string[]) => (event: SelectChangeEvent<string[]>) => {
+      const { value } = event.target;
+      const nextValue = typeof value === 'string' ? value.split(',') : value;
+      setUserFilterFamily((prev) => {
+        // `prev[label]` is `undefined` only when the user hasn't touched this filter yet — an
+        // explicit `[]` (every option unchecked down to none) must stay `[]`, not snap back to
+        // "everything selected", so this checks presence rather than truthiness/length.
+        const previouslySelected = prev[label] !== undefined ? prev[label] : [ALL_OPTION, ...options];
+        const hadAll = previouslySelected.includes(ALL_OPTION);
+        const hasAll = nextValue.includes(ALL_OPTION);
+
+        let resolved: string[];
+        if (hasAll && !hadAll) {
+          // "ALL" was just checked — select every option.
+          resolved = [ALL_OPTION, ...options];
+        } else if (!hasAll && hadAll) {
+          // "ALL" was just unchecked — clear the whole filter.
+          resolved = [];
+        } else {
+          // An individual option was toggled — keep "ALL" in sync with full coverage.
+          const withoutAll = nextValue.filter((v) => v !== ALL_OPTION);
+          resolved = withoutAll.length === options.length ? [ALL_OPTION, ...withoutAll] : withoutAll;
+        }
+        return { ...prev, [label]: resolved };
+      });
+    },
+    []
+  );
+
+  const handleClearUserCustomFilters = useCallback(() => setUserFilterFamily({}), []);
+
+  // The raw label from the API (JOB_FAMILY / PSU / EMP_GROUP) is also the option value used for
+  // filtering/selection — only its on-screen display goes through translation, via
+  // MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS. Falls back to the raw label for anything not yet added
+  // there so a new custom field label never renders blank.
+  const getUserCustomFieldLabel = useCallback(
+    (label: string) => t(`MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS.${label}`, { defaultValue: label }),
+    [t]
+  );
+
+  // Only labels that actually have at least one value get a dropdown (e.g. PSU with no values
+  // never renders one). The count of *those* drives the grid split the dropdowns share evenly —
+  // 3 up → 4/4/4, 2 up → 6/6, 1 up → 12 — and how many chips each can show before "+N".
+  const userCustomFilterEntries = useMemo(
+    () => Object.entries(user_custom || {}).filter(([, options]) => options && options.length > 0),
+    [user_custom]
+  );
+  const userCustomFilterColumnSpan = userCustomFilterEntries.length
+    ? 12 / userCustomFilterEntries.length
+    : 12;
+  const userCustomFilterMaxVisibleChips =
+    userCustomFilterEntries.length <= 1 ? 4 : userCustomFilterEntries.length === 2 ? 2 : 1;
+
+  // console.log("###########managerdashboard user",users);
+  // console.log("###########managerdashboard courses",courses);
+  // console.log("###########managerdashboard user_custom",user_custom);
 
   // --- UI state (filters, pagination, sort) — kept in a module-level singleton via
   // `useManagerDashboardUIState` (not plain `useState`) so it survives navigating to the Employee
@@ -204,7 +288,78 @@ const ManagerDashboard = () => {
       </Box>
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
       <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
-        <DashboardHeader
+
+            {userCustomFilterEntries.length > 0 && (
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                <Grid container spacing={2} sx={{ flex: 1 }}>
+                  {userCustomFilterEntries.map(([label, options]) => {
+                    // Presence check, not truthiness — an explicitly emptied filter (`[]`) must
+                    // render with nothing checked, not fall back to "everything selected".
+                    const selected =
+                      user_filter_family[label] !== undefined
+                        ? user_filter_family[label]
+                        : [ALL_OPTION, ...options];
+                    const isAllSelected = selected.includes(ALL_OPTION);
+                    const visibleChips = isAllSelected ? [] : selected.slice(0, userCustomFilterMaxVisibleChips);
+                    const hiddenCount = isAllSelected ? 0 : selected.length - visibleChips.length;
+
+                    const fieldLabel = getUserCustomFieldLabel(label);
+
+                    return (
+                      <Grid item xs={userCustomFilterColumnSpan} key={label}>
+                        <FormControl size="small" fullWidth>
+                          <InputLabel id={`${label}-filter-label`}>{fieldLabel}</InputLabel>
+                          <Select
+                            labelId={`${label}-filter-label`}
+                            label={fieldLabel}
+                            multiple
+                            value={selected}
+                            onChange={handleUserCustomFilterChange(label, options)}
+                            sx={{ '& .MuiSelect-select': { display: 'flex', overflow: 'hidden' } }}
+                            renderValue={() =>
+                              isAllSelected ? (
+                                <Chip
+                                  size="small"
+                                  label={t('MANAGER_OVERVIEW.ALL_CUSTOM_FIELD', { label: fieldLabel })}
+                                />
+                              ) : (
+                                <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.5, overflow: 'hidden' }}>
+                                  {visibleChips.map((value) => (
+                                    <Chip key={value} size="small" label={value} />
+                                  ))}
+                                  {hiddenCount > 0 && <Chip size="small" label={`+${hiddenCount}`} />}
+                                </Box>
+                              )
+                            }
+                          >
+                            <MenuItem value={ALL_OPTION}>
+                              <Checkbox checked={isAllSelected} />
+                              <ListItemText primary="ALL" />
+                            </MenuItem>
+                            <Divider />
+                            {options.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                <Checkbox checked={selected.indexOf(option) > -1} />
+                                <ListItemText primary={option} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+                <Button
+                  size="small"
+                  onClick={handleClearUserCustomFilters}
+                  disabled={Object.keys(user_filter_family).length === 0}
+                >
+                  Clear
+                </Button>
+              </Box>
+            )}
+      
+        {/* <DashboardHeader
           title={
             activeTab === 'team'
               ? t('MANAGER_OVERVIEW.MY_TEAM_TITLE')
@@ -224,9 +379,54 @@ const ManagerDashboard = () => {
           lastUpdatedLabel={t('DASHBOARD_TABS.UPDATED_TODAY')}
           activeTab={activeTab}
           onTabChange={handleTabChange}
-        />
+        /> */}
 
         {activeTab === 'dashboard' && (
+          <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+            <Grid item xs={12}>
+              Dash Board Analysis
+            </Grid>
+          </Grid>
+        )}
+
+        {activeTab === 'team' && (
+          <>
+            <IndividualProgress
+              users={users}
+              courses={courses}
+              courseLearningSummary={courseLearningSummary}
+              usersLoading={usersLoading}
+              usersError={usersError}
+              coursesLoading={coursesLoading}
+              coursesError={coursesError}
+              summaryLoading={summaryLoading}
+              summaryError={summaryError}
+              filters={teamFilters}
+              currentPage={teamCurrentPage}
+              onFiltersChange={handleTeamFiltersChange}
+              onPageChange={setTeamCurrentPage}
+              onViewEmployee={handleViewEmployee}
+            />
+          </>
+        )}
+
+        {/*activeTab === 'courses' && (
+          <CourseBreakdownList
+            courses={courses}
+            coursesLoading={coursesLoading || usersLoading}
+            coursesError={coursesError || usersError}
+            courseLearningSummary={courseLearningSummary}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+            userById={userById}
+            filters={courseBreakdownFilters}
+            currentPage={courseBreakdownPage}
+            onFiltersChange={handleCourseBreakdownFiltersChange}
+            onPageChange={setCourseBreakdownPage}
+            onViewEmployee={handleViewEmployee}
+          />
+        )*/}
+        {activeTab === 'courses' && (
           <Grid container spacing={{ xs: 1.5, sm: 2 }}>
             <Grid item xs={12}>
               <CourseList
@@ -267,42 +467,6 @@ const ManagerDashboard = () => {
               />
             </Grid>
           </Grid>
-        )}
-
-        {activeTab === 'team' && (
-          <IndividualProgress
-            users={users}
-            courses={courses}
-            courseLearningSummary={courseLearningSummary}
-            usersLoading={usersLoading}
-            usersError={usersError}
-            coursesLoading={coursesLoading}
-            coursesError={coursesError}
-            summaryLoading={summaryLoading}
-            summaryError={summaryError}
-            filters={teamFilters}
-            currentPage={teamCurrentPage}
-            onFiltersChange={handleTeamFiltersChange}
-            onPageChange={setTeamCurrentPage}
-            onViewEmployee={handleViewEmployee}
-          />
-        )}
-
-        {activeTab === 'courses' && (
-          <CourseBreakdownList
-            courses={courses}
-            coursesLoading={coursesLoading || usersLoading}
-            coursesError={coursesError || usersError}
-            courseLearningSummary={courseLearningSummary}
-            summaryLoading={summaryLoading}
-            summaryError={summaryError}
-            userById={userById}
-            filters={courseBreakdownFilters}
-            currentPage={courseBreakdownPage}
-            onFiltersChange={handleCourseBreakdownFiltersChange}
-            onPageChange={setCourseBreakdownPage}
-            onViewEmployee={handleViewEmployee}
-          />
         )}
       </Container>
     </Box>

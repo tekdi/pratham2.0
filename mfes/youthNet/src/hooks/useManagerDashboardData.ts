@@ -11,11 +11,18 @@ import { fetchUserList } from '../services/ManageUser';
 import { getCourseLearningSummary } from '@shared-lib-v2/utils/CourseLearningSummaryService/courseLearningSummary';
 import { Course, CourseLearningSummaryResult, ManagerTeamUser } from '../utils/Interface';
 import { COURSE_CATALOGUE_FILTERS } from '../utils/app.config';
+import {
+  getManagerDashboardCustomFieldValues,
+  hasManagerDashboardCustomField,
+} from '../utils/managerDashboardHelpers';
 
 export interface ManagerDashboardData {
   users: ManagerTeamUser[];
   usersLoading: boolean;
   usersError: boolean;
+  // Unique JOB_FAMILY / PSU / EMP_GROUP values seen across `users`' custom fields, e.g.
+  // { JOB_FAMILY: ["TECHNOLOGY & DIGITAL", ...], PSU: [...], EMP_GROUP: [...] }.
+  user_custom: Record<string, string[]>;
   courses: Course[];
   coursesLoading: boolean;
   coursesError: boolean;
@@ -32,6 +39,7 @@ const INITIAL_STATE: ManagerDashboardData = {
   users: [],
   usersLoading: true,
   usersError: false,
+  user_custom: getManagerDashboardCustomFieldValues([]),
   courses: [],
   coursesLoading: true,
   coursesError: false,
@@ -59,22 +67,35 @@ const loadManagerDashboardData = (): Promise<void> => {
 
   inFlight = (async () => {
     let fetchedUsers: ManagerTeamUser[] = [];
+    let user_custom_family: any = [];
     try {
       const managerUserId = getCurrentManagerUserId();
       cachedManagerUserId = managerUserId;
       if (managerUserId) {
         const response = await fetchUserList({ filters: { emp_manager: managerUserId, role: 'Learner' } });
-        fetchedUsers = response?.getUserDetails || [];
+        fetchedUsers = (response?.getUserDetails || []).filter(hasManagerDashboardCustomField);
+        user_custom_family=getManagerDashboardCustomFieldValues(fetchedUsers);
       }
-      publish({ users: fetchedUsers, usersLoading: false, usersError: false });
+      publish({
+        users: fetchedUsers,
+        usersLoading: false,
+        usersError: false,
+        user_custom: user_custom_family,
+      });
     } catch (error) {
       console.error('Error fetching users:', error);
       publish({ usersLoading: false, usersError: true });
     }
 
+    let fetchedCourses_JOB_FAMILY: Course[] = [];
+    let fetchedCourses_PSU: Course[] = [];
+    let fetchedCourses_EMP_GROUP: Course[] = [];
     let fetchedCourses: Course[] = [];
     try {
-      fetchedCourses = await fetchCourses({ filters: COURSE_CATALOGUE_FILTERS });
+      fetchedCourses_JOB_FAMILY = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, jobFamily : user_custom_family?.JOB_FAMILY} });
+      fetchedCourses_PSU = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, psu : user_custom_family?.PSU} });
+      fetchedCourses_EMP_GROUP = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, groupMembership : user_custom_family?.EMP_GROUP} });
+      fetchedCourses=[...fetchedCourses_JOB_FAMILY,...fetchedCourses_PSU,...fetchedCourses_EMP_GROUP];
       publish({ courses: fetchedCourses, coursesLoading: false, coursesError: false });
     } catch (error) {
       console.error('Error fetching courses:', error);

@@ -1,6 +1,8 @@
 'use client';
 
 import BusinessIcon from '@mui/icons-material/Business';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import EditNoteIcon from '@mui/icons-material/EditNote';
@@ -16,7 +18,8 @@ import {
   Button,
   FormControl,
   IconButton,
-  MenuItem
+  MenuItem,
+  Tooltip
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -27,7 +30,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import config from '../../config.json';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import board from '../assets/images/Board.svg';
@@ -39,9 +42,84 @@ import { useDirection } from '../hooks/useDirection';
 import useStore from '../store/store';
 import { accessGranted } from '../utils/Helper';
 import { AcademicYear } from '../utils/Interfaces';
-import { accessControl, DEFAULT_MANAGER_DASHBOARD_TAB, MANAGER_DASHBOARD_NAV_ITEMS, TENANT_DATA, TENANT_TYPE } from '../utils/app.config';
+import {
+  accessControl,
+  DEFAULT_MANAGER_DASHBOARD_TAB,
+  MANAGER_DASHBOARD_NAV_ITEMS,
+  SIDEBAR_WIDTH_COLLAPSED,
+  SIDEBAR_WIDTH_EXPANDED,
+  TENANT_DATA,
+  TENANT_TYPE,
+} from '../utils/app.config';
 import { Role } from '../utils/app.constant';
 import { showToastMessage } from './Toastify';
+
+interface NavItemProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  collapsed: boolean;
+  isActive?: boolean;
+  color?: string;
+  activeColor?: string;
+  endIcon?: boolean;
+  sx?: Record<string, unknown>;
+  className?: string;
+}
+
+const NavItem: React.FC<NavItemProps> = ({
+  icon,
+  label,
+  onClick,
+  collapsed,
+  isActive = false,
+  color,
+  activeColor = '#2E1500',
+  endIcon = false,
+  sx = {},
+  className = 'fs-14',
+}) => {
+  const theme = useTheme<any>();
+  const button = (
+    <Button
+      className={className}
+      onClick={onClick}
+      startIcon={!endIcon ? icon : undefined}
+      endIcon={endIcon ? icon : undefined}
+      sx={{
+        gap: '10px',
+        width: '100%',
+        minWidth: 0,
+        display: 'flex',
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        background: isActive ? theme.palette.primary.main : 'transparent',
+        padding: collapsed
+          ? '12px !important'
+          : isActive
+          ? '16px 18px !important'
+          : '0px 18px !important',
+        color: isActive ? activeColor : color ?? theme.palette.warning.A200,
+        fontWeight: isActive ? '600' : 500,
+        '& .MuiButton-startIcon': collapsed ? { margin: 0 } : undefined,
+        '& .MuiButton-endIcon': collapsed ? { margin: 0 } : undefined,
+        '&:hover': {
+          background: isActive ? theme.palette.primary.main : 'transparent',
+        },
+        ...sx,
+      }}
+    >
+      {!collapsed && label}
+    </Button>
+  );
+
+  if (!collapsed) return button;
+
+  return (
+    <Tooltip title={label} placement="right">
+      <span style={{ display: 'block', width: '100%' }}>{button}</span>
+    </Tooltip>
+  );
+};
 
 interface DrawerProps {
   toggleDrawer?: (open: boolean) => () => void;
@@ -78,6 +156,32 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     (state: { setIsActiveYearSelected: any }) => state.setIsActiveYearSelected
   );
   const isActiveYear = store.isActiveYearSelected;
+  const isSidebarCollapsed = useStore(
+    (state: { isSidebarCollapsed: boolean }) => state.isSidebarCollapsed
+  );
+  const setIsSidebarCollapsed = useStore(
+    (state: { setIsSidebarCollapsed: (collapsed: boolean) => void }) =>
+      state.setIsSidebarCollapsed
+  );
+  // Collapsing to an icon-only rail only makes sense for the persistent desktop
+  // drawer — the mobile drawer is a temporary overlay and always shows full content.
+  const collapsed = isDesktop && isSidebarCollapsed;
+  const drawerWidth = collapsed
+    ? SIDEBAR_WIDTH_COLLAPSED
+    : SIDEBAR_WIDTH_EXPANDED;
+
+  // The page content's reserved margin (globals.css .ynet-app-shell) reads this
+  // CSS variable directly, rather than a React prop/state flowing down from
+  // _app.tsx — that would update the app-root component while this component's
+  // ssr:false/Suspense boundary is still hydrating, which makes React abort
+  // hydration. useLayoutEffect (not useEffect) avoids a one-frame flash of the
+  // old margin when toggling collapsed/expanded.
+  useLayoutEffect(() => {
+    document.documentElement.style.setProperty(
+      '--sidebar-margin',
+      `${drawerWidth + 1}px`
+    );
+  }, [drawerWidth]);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -289,18 +393,25 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           zIndex: '998 !important',
           left: isRTL ? '0px !important' : '0px !important',
 
-          width: isRTL ? '350px !important' : 'unset !important',
+          width: isRTL
+            ? `${drawerWidth}px !important`
+            : isDesktop
+            ? `${drawerWidth}px !important`
+            : 'unset !important',
+          transition: 'width 0.3s ease',
+          overflowX: 'hidden',
         },
       }}
     >
       <Box
         sx={{
-          padding: '16px 16px 12px 16px',
-          width: '350px',
+          padding: collapsed ? '16px 8px 12px 8px' : '16px 16px 12px 16px',
+          width: `${drawerWidth}px`,
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          transition: 'width 0.3s ease, padding 0.3s ease',
         }}
         role="presentation"
       >
@@ -308,16 +419,40 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'space-between',
+              justifyContent: collapsed ? 'center' : 'space-between',
               alignItems: 'center',
             }}
           >
-          <Box
-            className="fs-14 fw-500"
-            sx={{ color: theme.palette.warning['A200'] }}
-          >
-            {t('DASHBOARD.MENU')}
-          </Box>
+          {!collapsed && (
+            <Box
+              className="fs-14 fw-500"
+              sx={{ color: theme.palette.warning['A200'] }}
+            >
+              {t('DASHBOARD.MENU')}
+            </Box>
+          )}
+          {isDesktop && (
+            <Tooltip
+              title={collapsed ? 'Expand menu' : 'Collapse menu'}
+              placement="right"
+            >
+              <IconButton
+                aria-label={collapsed ? 'Expand menu' : 'Collapse menu'}
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                size="small"
+              >
+                {collapsed !== isRTL ? (
+                  <ChevronRightIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                ) : (
+                  <ChevronLeftIcon
+                    sx={{ color: theme.palette.warning['300'] }}
+                  />
+                )}
+              </IconButton>
+            </Tooltip>
+          )}
           {!isDesktop && (
             <Box>
               <IconButton onClick={closeDrawer}>
@@ -327,6 +462,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           )}
         </Box>
 
+        {!collapsed && (
         <Box
           sx={{
             display: 'flex',
@@ -406,131 +542,52 @@ const MenuDrawer: React.FC<DrawerProps> = ({
             </Box>
           )} */}
         </Box>
+        )}
 
         {isActiveYear && !tenantName && (
           <Box>
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isDashboard}
+              icon={<DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />}
               onClick={navigateToDashboard}
-            >
-              {t('DASHBOARD.DASHBOARD')}
-            </Button>
+              label={t('DASHBOARD.DASHBOARD')}
+              sx={{ marginTop: '25px' }}
+            />
           </Box>
         )}
 
         {tenantName === TENANT_DATA.YOUTHNET && (
           <Box>
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isDashboard}
+              icon={<DashboardOutlinedIcon sx={{ fontSize: '24px !important' }} />}
               onClick={navigateToYouthBoard}
-            >
-              {t('DASHBOARD.DASHBOARD')}
-            </Button>
+              label={t('DASHBOARD.DASHBOARD')}
+              sx={{ marginTop: '25px' }}
+            />
 
             {/* villages and youth */}
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isVillagesAndYouths
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isVillagesAndYouths
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isVillagesAndYouths
-                  ? '#2E1500'
-                  : theme.palette.warning.A200,
-                fontWeight: isVillagesAndYouths ? '600' : 500,
-                '&:hover': {
-                  background: isVillagesAndYouths
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={<GroupsIcon sx={{ fontSize: '24px !important' }} />}
+            <NavItem
+              collapsed={collapsed}
+              isActive={isVillagesAndYouths}
+              icon={<GroupsIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 router.push(`/villages`);
               }}
-            >
-              {typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
-                ? t('DASHBOARD.USERS_&_VILLAGES')
-                : t('DASHBOARD.VILLAGES_AND_YOUTH')}
-            </Button>
+              label={
+                typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD
+                  ? t('DASHBOARD.USERS_&_VILLAGES')
+                  : t('DASHBOARD.VILLAGES_AND_YOUTH')
+              }
+              sx={{ marginTop: '25px' }}
+            />
 
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isSurveys
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isSurveys
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isSurveys ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isSurveys ? '600' : 500,
-                '&:hover': {
-                  background: isSurveys
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
+            <NavItem
+              collapsed={collapsed}
+              isActive={isSurveys}
+              icon={
                 <Image
                   src={surveyForm}
                   alt="SurveyForm-Icon"
@@ -541,66 +598,24 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/surveys`);
               }}
-            >
-              {t('SURVEYS.SURVEYS')}
-            </Button>
+              label={t('SURVEYS.SURVEYS')}
+              sx={{ marginTop: '25px' }}
+            />
 
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isManualAssessments
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isManualAssessments
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isManualAssessments ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isManualAssessments ? '600' : 500,
-                '&:hover': {
-                  background: isManualAssessments
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <EditNoteIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isManualAssessments}
+              icon={<EditNoteIcon sx={{ fontSize: '24px !important' }} />}
               onClick={navigateToManualAssessments}
-            >
-              {t('ASSESSMENTS.MANUAL_ASSESSMENT')}
-            </Button>
+              label={t('ASSESSMENTS.MANUAL_ASSESSMENT')}
+              sx={{ marginTop: '25px' }}
+            />
 
             <Box sx={{ marginTop: '18px' }} className="joyride-step-12">
-              <Button
-                className="fs-14"
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  background: isSupportRequest
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                  gap: '10px',
-                  padding: isSupportRequest
-                    ? '16px 18px !important'
-                    : '0px 18px !important',
-                  color: isSupportRequest
-                    ? '#2E1500'
-                    : theme.palette.warning.A200,
-                  fontWeight: isSupportRequest ? '600' : 500,
-                  '&:hover': {
-                    background: isSupportRequest
-                      ? theme.palette.primary.main
-                      : 'transparent',
-                  },
-                  marginTop: '15px',
-                }}
-                startIcon={
+              <NavItem
+                collapsed={collapsed}
+                isActive={isSupportRequest}
+                icon={
                   <Image
                     src={support}
                     alt="support-icon"
@@ -611,9 +626,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/support-request`);
                 }}
-              >
-                {t('COMMON.SUPPORT_REQUEST')}
-              </Button>
+                label={t('COMMON.SUPPORT_REQUEST')}
+                sx={{ marginTop: '15px' }}
+              />
             </Box>
           </Box>
         )}
@@ -632,32 +647,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   ? MenuBookOutlinedIcon
                   : DashboardOutlinedIcon;
               return (
-                <Button
+                <NavItem
                   key={item.key}
-                  className="fs-14"
-                  sx={{
-                    gap: '10px',
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    background: isActive
-                      ? theme.palette.primary.main
-                      : 'transparent',
-                    padding: isActive
-                      ? '16px 18px !important'
-                      : '0px 18px !important',
-                    marginTop: '25px',
-                    color: isActive ? '#2E1500' : theme.palette.warning.A200,
-                    fontWeight: isActive ? '600' : 500,
-                    '&:hover': {
-                      background: isActive
-                        ? theme.palette.primary.main
-                        : 'transparent',
-                    },
-                  }}
-                  startIcon={
-                    <NavIcon sx={{ fontSize: '24px !important' }} />
-                  }
+                  collapsed={collapsed}
+                  isActive={isActive}
+                  icon={<NavIcon sx={{ fontSize: '24px !important' }} />}
                   onClick={() => {
                     closeDrawer();
                     router.push({
@@ -665,180 +659,75 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                       query: item.key === DEFAULT_MANAGER_DASHBOARD_TAB ? {} : { tab: item.key },
                     });
                   }}
-                >
-                  {t(item.menuLabelKey)}
-                </Button>
+                  label={t(item.menuLabelKey)}
+                  sx={{ marginTop: '25px' }}
+                />
               );
             })}
           </Box>
         )}
         {(tenantName === TENANT_DATA.SUMMER_CAMP || tenantType === TENANT_TYPE.VOLUNTEER_ONBOARDING) && (
           <Box>
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isIndividualVolunteerDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isIndividualVolunteerDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isIndividualVolunteerDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isIndividualVolunteerDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isIndividualVolunteerDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <PersonOutlineIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isIndividualVolunteerDashboard}
+              icon={<PersonOutlineIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 router.push('/individual-volunteer');
               }}
-            >
-              Individual Volunteer
-            </Button>
+              label="Individual Volunteer"
+              sx={{ marginTop: '25px' }}
+            />
 
-
-
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isOrganisationDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isOrganisationDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isOrganisationDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isOrganisationDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isOrganisationDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <BusinessIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isOrganisationDashboard}
+              icon={<BusinessIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 router.push('/organisation');
               }}
-            >
-              Organisation
-            </Button>
+              label="Organisation"
+              sx={{ marginTop: '25px' }}
+            />
 
-            <Button
-              className="fs-14"
-              sx={{
-                gap: '10px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isOrganisationVolunteerDashboard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                padding: isOrganisationVolunteerDashboard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                marginTop: '25px',
-                color: isOrganisationVolunteerDashboard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isOrganisationVolunteerDashboard ? '600' : 500,
-                '&:hover': {
-                  background: isOrganisationVolunteerDashboard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-              }}
-              startIcon={
-                <PersonAddIcon sx={{ fontSize: '24px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isOrganisationVolunteerDashboard}
+              icon={<PersonAddIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 router.push('/organisation-volunteer');
               }}
-            >
-              Via Organisation
-            </Button>
+              label="Via Organisation"
+              sx={{ marginTop: '25px' }}
+            />
           </Box>
         )}
         {!tenantName && (
           <Box sx={{ marginTop: '18px' }}>
-            <Button
-              className="fs-14 joyride-step-7"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isTeacherCenter
-                  ? theme.palette.primary.main
-                  : 'transparent',
-
-                padding: isTeacherCenter
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                color: isTeacherCenter ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isTeacherCenter ? '600' : 500,
-                '&:hover': {
-                  background: isTeacherCenter
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-                marginTop: '15px',
-                gap: '10px',
-              }}
-              startIcon={
-                <LocalLibraryOutlinedIcon
-                  sx={{ fontSize: '24px !important' }}
-                />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isTeacherCenter}
+              icon={<LocalLibraryOutlinedIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 router.push(`/centers`); // Check route
               }}
-            >
-              {accessGranted('showTeachingCenter', accessControl, userRole)
-                ? t('DASHBOARD.TEACHING_CENTERS')
-                : t('DASHBOARD.MY_TEACHING_CENTERS')}
-            </Button>
+              label={
+                accessGranted('showTeachingCenter', accessControl, userRole)
+                  ? t('DASHBOARD.TEACHING_CENTERS')
+                  : t('DASHBOARD.MY_TEACHING_CENTERS')
+              }
+              className="fs-14 joyride-step-7"
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
 
         {!tenantName && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-8">
-            <Button
-              className="fs-14"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isObservation
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                gap: '10px',
-                padding: isObservation
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                color: isObservation ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isObservation ? '600' : 500,
-                '&:hover': {
-                  background: isObservation
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-                marginTop: '15px',
-              }}
-              startIcon={
+            <NavItem
+              collapsed={collapsed}
+              isActive={isObservation}
+              icon={
                 <Image
                   src={surveyForm}
                   alt="SurveyForm-Icon"
@@ -847,37 +736,17 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 />
               }
               onClick={navigateToObservation}
-            >
-              {t('OBSERVATION.SURVEY_FORMS')}
-            </Button>
+              label={t('OBSERVATION.SURVEY_FORMS')}
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
         {isActiveYear && !tenantName && (
           <Box sx={{ marginTop: '18px' }}>
-            <Button
-              className="fs-14 joyride-step-9"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isCoursePlanner
-                  ? theme.palette.primary.main
-                  : 'transparent',
-
-                padding: isCoursePlanner
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                color: isCoursePlanner ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isCoursePlanner ? '600' : 500,
-                '&:hover': {
-                  background: isCoursePlanner
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-                marginTop: '15px',
-                gap: '10px',
-              }}
-              startIcon={
+            <NavItem
+              collapsed={collapsed}
+              isActive={isCoursePlanner}
+              icon={
                 <Image
                   src={checkBook}
                   alt="CheckBook Icon"
@@ -888,39 +757,20 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/curriculum-planner`);
               }}
-            >
-              {t('COURSE_PLANNER.COURSE_PLANNER')}
-            </Button>
+              label={t('COURSE_PLANNER.COURSE_PLANNER')}
+              className="fs-14 joyride-step-9"
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
         {!isEliminatedFromBuild('Assessments', 'feature') &&
           isActiveYear &&
           !tenantName && (
             <Box sx={{ marginTop: '18px' }}>
-              <Button
-                className="fs-14 joyride-step-10"
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  background: isAssessments
-                    ? theme.palette.primary.main
-                    : 'transparent',
-
-                  padding: isAssessments
-                    ? '16px 18px !important'
-                    : '0px 18px !important',
-                  color: isAssessments ? '#2E1500' : theme.palette.warning.A200,
-                  fontWeight: isAssessments ? '600' : 500,
-                  '&:hover': {
-                    background: isAssessments
-                      ? theme.palette.primary.main
-                      : 'transparent',
-                  },
-                  marginTop: '15px',
-                  gap: '10px',
-                }}
-                startIcon={
+              <NavItem
+                collapsed={collapsed}
+                isActive={isAssessments}
+                icon={
                   <Image
                     src={assessment}
                     alt="Assessment Icon"
@@ -931,74 +781,34 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 onClick={() => {
                   router.push(`/assessments`);
                 }}
-              >
-                {t('ASSESSMENTS.ASSESSMENTS')}
-              </Button>
+                label={t('ASSESSMENTS.ASSESSMENTS')}
+                className="fs-14 joyride-step-10"
+                sx={{ marginTop: '15px' }}
+              />
             </Box>
           )}
 
         {isActiveYear && !tenantName && (
           <Box sx={{ marginTop: '18px' }} className="joyride-step-11">
-            <Button
-              className="fs-14 joyride-step-8"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isBoard
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                gap: '10px',
-                padding: isBoard
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                color: isBoard ? '#2E1500' : theme.palette.warning.A200,
-                fontWeight: isBoard ? '600' : 500,
-                '&:hover': {
-                  background: isBoard
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-                marginTop: '15px',
-              }}
-              startIcon={
-                <Image src={board} alt="badge Icon" width={24} height={24} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              isActive={isBoard}
+              icon={<Image src={board} alt="badge Icon" width={24} height={24} />}
               onClick={() => {
                 router.push(`/board-enrollment`);
               }}
-            >
-              {t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
-            </Button>
+              label={t('BOARD_ENROLMENT.BOARD_ENROLLMENT')}
+              className="fs-14 joyride-step-8"
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
         {isActiveYear && !tenantName && (
           <Box sx={{ marginTop: '18px' }}>
-            <Button
-              className="fs-14"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: isSupportRequest
-                  ? theme.palette.primary.main
-                  : 'transparent',
-                gap: '10px',
-                padding: isSupportRequest
-                  ? '16px 18px !important'
-                  : '0px 18px !important',
-                color: isSupportRequest
-                  ? '#2E1500'
-                  : theme.palette.warning.A200,
-                fontWeight: isSupportRequest ? '600' : 500,
-                '&:hover': {
-                  background: isSupportRequest
-                    ? theme.palette.primary.main
-                    : 'transparent',
-                },
-                marginTop: '15px',
-              }}
-              startIcon={
+            <NavItem
+              collapsed={collapsed}
+              isActive={isSupportRequest}
+              icon={
                 <Image
                   src={support}
                   alt="support-icon"
@@ -1009,32 +819,18 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               onClick={() => {
                 router.push(`/support-request`);
               }}
-            >
-              {t('COMMON.SUPPORT_REQUEST')}
-            </Button>
+              label={t('COMMON.SUPPORT_REQUEST')}
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
         {isActiveYear && !tenantName && (
           <Box sx={{ marginTop: '18px' }}>
-            <Button
-              className="fs-14"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: 'transparent',
-                padding: '0px 18px !important',
-                gap: '10px',
-                color: theme.palette.secondary.main,
-                fontWeight: 500,
-                '&:hover': {
-                  background: 'transparent',
-                },
-                marginTop: '15px',
-              }}
-              endIcon={
-                <ErrorOutlineIcon sx={{ fontSize: '18px !important' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              icon={<ErrorOutlineIcon sx={{ fontSize: '18px !important' }} />}
+              endIcon
+              color={theme.palette.secondary.main}
               onClick={() => {
                 localStorage.removeItem('hasSeenTutorial');
                 setTimeout(() => {
@@ -1042,9 +838,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   router.push(`/`);
                 }, 0);
               }}
-            >
-              {t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
-            </Button>
+              label={t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
+              sx={{ marginTop: '15px' }}
+            />
           </Box>
         )}
         </Box>
@@ -1052,50 +848,20 @@ const MenuDrawer: React.FC<DrawerProps> = ({
         {/* Bottom Section - Fixed at bottom */}
         <Box sx={{ paddingBottom: '10px', borderTop: `1px solid ${theme.palette.warning['A100']}`, paddingTop: '10px' }}>
           {process.env.NEXT_PUBLIC_LEARNER_SBPLAYER && typeof window !== 'undefined' && localStorage.getItem('tenantName') !== TENANT_DATA.PRAGYANPATH && (
-            <Button
-              className="fs-14"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: 'transparent',
-                padding: '0px 18px !important',
-                gap: '10px',
-                color: 'black',
-                fontWeight: 500,
-                '&:hover': {
-                  background: 'transparent',
-                },
-                marginTop: '8px',
-              }}
-              startIcon={
-                <LinkIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              icon={<LinkIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />}
+              color="black"
               onClick={handleCopyRegistrationLink}
-            >
-              {t('COMMON.COPY_REGISTRATION_LINK')}
-            </Button>
+              label={t('COMMON.COPY_REGISTRATION_LINK')}
+              sx={{ marginTop: '8px' }}
+            />
           )}
           {isActiveYear && !tenantName && (
-            <Button
-              className="fs-14"
-              sx={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'flex-start',
-                background: 'transparent',
-                padding: '0px 18px !important',
-                gap: '10px',
-                color: '#FDBE16',
-                fontWeight: 500,
-                '&:hover': {
-                  background: 'transparent',
-                },
-                marginTop: '8px',
-              }}
-              startIcon={
-                <ErrorOutlineIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />
-              }
+            <NavItem
+              collapsed={collapsed}
+              icon={<ErrorOutlineIcon sx={{ fontSize: '18px !important', color: '#FDBE16' }} />}
+              color="#FDBE16"
               onClick={() => {
                 localStorage.removeItem('hasSeenTutorial');
                 setTimeout(() => {
@@ -1103,9 +869,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   router.push(`/`);
                 }, 0);
               }}
-            >
-              {t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
-            </Button>
+              label={t('GUIDE_TOUR.LEARN_HOW_TO_USE')}
+              sx={{ marginTop: '8px' }}
+            />
           )}
         </Box>
       </Box>

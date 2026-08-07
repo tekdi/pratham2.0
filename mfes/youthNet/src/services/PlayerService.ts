@@ -109,6 +109,10 @@ export const fetchCourses = async (filters: any = {}) => {
           'courseType',
           'language',
           'contentLanguage',
+          //custom field pragynapath
+          'groupMembership',
+          'jobFamily',
+          'psu'
         ],
       },
     };

@@ -1165,6 +1165,12 @@
     "SEARCH_COURSE_NAME": "Search course name",
     "SELECTED_COUNT": "{{count}} selected",
     "RESET": "Reset",
+    "ALL_CUSTOM_FIELD": "All {{label}}",
+    "CUSTOM_FIELD_LABELS": {
+      "JOB_FAMILY": "Job Family",
+      "PSU": "PSU",
+      "EMP_GROUP": "Group Membership"
+    },
     "STATUS_NOT_STARTED": "Not started",
     "STATUS_IN_PROGRESS": "In progress",
     "STATUS_COMPLETED": "Completed",
