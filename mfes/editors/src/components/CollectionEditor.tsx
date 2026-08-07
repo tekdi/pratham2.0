@@ -313,7 +313,7 @@ const CollectionEditor: React.FC = () => {
 
         script.id = 'collection-editor-js';
         script.src =
-          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.7/sunbird-collection-editor.js";
+          "https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.10/sunbird-collection-editor.js";
         script.async = true;
         script.onload = () => setAssetsLoaded(true);
         document.body.appendChild(script);
@@ -328,7 +328,7 @@ const CollectionEditor: React.FC = () => {
         link.id = 'collection-editor-css';
         link.rel = 'stylesheet';
         link.href =
-          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.7/styles.css';
+          'https://cdn.jsdelivr.net/npm/@tekdi/sunbird-collection-editor-web-component@6.1.0-beta.10/styles.css';
         document.head.appendChild(link);
       }
 
@@ -429,12 +429,16 @@ const CollectionEditor: React.FC = () => {
         if (urlString.includes('composite/v3/search') && options?.body) {
           try {
             const bodyData = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
-            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
-              const statusArray = bodyData.request.filters.status;
-              if (statusArray.includes('Failed')) {
-                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
-                options = { ...options, body: typeof options.body === 'string' ? JSON.stringify(bodyData) : bodyData };
-                args = [url, options];
+            //auto failed remove bug solve for thumbnail
+            if(bodyData?.request?.filters?.contentType!="Resource")
+            {
+              if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+                const statusArray = bodyData.request.filters.status;
+                if (statusArray.includes('Failed')) {
+                  bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                  options = { ...options, body: typeof options.body === 'string' ? JSON.stringify(bodyData) : bodyData };
+                  args = [url, options];
+                }
               }
             }
           } catch {
@@ -707,11 +711,15 @@ const CollectionEditor: React.FC = () => {
         if (urlString.includes('composite/v3/search') && body) {
           try {
             const bodyData = typeof body === 'string' ? JSON.parse(body) : body;
-            if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
-              const statusArray = bodyData.request.filters.status;
-              if (statusArray.includes('Failed')) {
-                bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
-                body = typeof body === 'string' ? JSON.stringify(bodyData) : bodyData;
+            //auto failed remove bug solve for thumbnail
+            if(bodyData?.request?.filters?.contentType!="Resource")
+            {
+              if (bodyData?.request?.filters?.status && Array.isArray(bodyData.request.filters.status)) {
+                const statusArray = bodyData.request.filters.status;
+                if (statusArray.includes('Failed')) {
+                  bodyData.request.filters.status = statusArray.filter((s: string) => s !== 'Failed');
+                  body = typeof body === 'string' ? JSON.stringify(bodyData) : bodyData;
+                }
               }
             }
           } catch {

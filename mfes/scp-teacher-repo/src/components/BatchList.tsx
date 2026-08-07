@@ -25,8 +25,16 @@ const BatchList: React.FC<BatchListProps> = ({
   theme,
   t,
 }) => {
-  
   const { isRTL } = useDirection();
+
+  const withBasePath = (path: string) => `${router.basePath}${path}`;
+
+  const handleBatchClick = (batch: Batch) => {
+    router.push(`/centers/${batch.cohortId}`);
+    localStorage.setItem('cohortId', batch.cohortId);
+    localStorage.setItem('batchName', batch.name.toLowerCase());
+  };
+
   return (
     <>
       <Box
@@ -52,12 +60,21 @@ const BatchList: React.FC<BatchListProps> = ({
           {batches.map((batch) => (
             <Grid item xs={12} sm={12} md={6} lg={4} key={batch.cohortId}>
               <Box
-                onClick={() => {
-                  router.push(`/centers/${batch.cohortId}`);
-                  localStorage.setItem('cohortId', batch.cohortId);
-                  localStorage.setItem('batchName', batch.name.toLowerCase());
+                component="a"
+                href={withBasePath(`/centers/${batch.cohortId}`)}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) {
+                    return;
+                  }
+                  e.preventDefault();
+                  handleBatchClick(batch);
                 }}
-                sx={{ cursor: 'pointer' }}
+                sx={{
+                  cursor: 'pointer',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  display: 'block',
+                }}
               >
                 <Box
                   sx={{

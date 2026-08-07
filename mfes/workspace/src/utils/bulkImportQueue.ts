@@ -29,16 +29,22 @@ import {
   POS_DOMAIN_NAME_TO_ID,
   POS_SUB_DOMAIN_NAME_TO_ID,
   POS_SUBJECT_NAME_TO_ID,
+  splitMultiValue,
+  EVALUATION_TYPE_LABEL_TO_VALUE,
 } from './frameworkConfig';
 import {
   createContentNode,
   getContentUploadUrl,
   uploadFileToPresignedUrl,
-  associateUploadedFile,
+  notifyContentUploaded,
+  associateYouTubeUrl,
   submitContentForReview,
+  publishContent,
   createQuestionSetNode,
-  createQuestion,
   updateQuestionSetHierarchy,
+  reviewQuestionSet,
+  publishQuestionSet,
+  retireQuestionSet,
   createCourseNode,
   updateCourseHierarchy,
   downloadGoogleDriveFile,
@@ -46,15 +52,16 @@ import {
   readContent,
   FILE_MIME_MAP,
   uploadAppIconFromDrive,
+  checkDriveFileAccessible,
 } from '../services/BulkImportService';
 import { patch } from '../services/RestClient';
 
 // ─── Multi-select helper ──────────────────────────────────────
-// Splits pipe-separated values from Excel into an array.
+// Splits pipe- or comma-separated values from Excel into an array.
 // Returns undefined if the value is blank.
 const toArray = (val: string | undefined): string[] | undefined => {
-  if (!val || String(val).trim() === '') return undefined;
-  return String(val).split('|').map((s) => s.trim()).filter(Boolean);
+  const parts = splitMultiValue(val);
+  return parts.length > 0 ? parts : undefined;
 };
 
 // Convert Excel 'true'/'false' strings (or actual booleans) → JavaScript boolean.
@@ -71,6 +78,13 @@ const toBool = (val: any, defaultVal = false): boolean => {
 const MAX_CONCURRENCY = 3;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 2_000;
+
+// File uploads stream large payloads (Drive download → presigned upload →
+// platform processing). Running several at once overloads the gateway and
+// produces 502s on big files, so they are limited to one at a time.
+// Lightweight metadata jobs still run at MAX_CONCURRENCY.
+const HEAVY_JOB_TYPES: ReadonlySet<string> = new Set(['upload_content_file']);
+const MAX_HEAVY_CONCURRENCY = 1;
 
 // ─── Event System ─────────────────────────────────────────────
 
@@ -115,6 +129,7 @@ export class BulkImportQueue {
           englishName: content.englishName || undefined,
           description: content.description,
           primaryCategory: content.primaryCategory,
+          resourceType: 'Learn',   // matches editor-created content; helps platform assign correct contentType
           framework: 'pos-framework' as const,
           mimeType: FILE_MIME_MAP[content.fileType] || 'application/pdf',
           // Multi-select fields use pipe-separated values in Excel → split into arrays
@@ -185,11 +200,33 @@ export class BulkImportQueue {
         retryCount: 0,
         maxRetries: MAX_RETRIES,
       });
+
+      // Job 4: Publish content (depends on review)
+      // Publishing triggers the platform processing pipeline:
+      //   • H5P / ZIP → creates streamingUrl
+      //   • Sets pkgVersion and transitions status to "Live"
+      // Without this step, H5P content has no streamingUrl and the player
+      // cannot render it, causing React hydration errors.
+      this.addJob({
+        id: `publish_content_${content.tempId}`,
+        type: 'publish_content',
+        tempId: content.tempId,
+        dependsOn: [reviewJobId],
+        payload: { _contentTempId: content.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
     });
 
     // ── QUESTION SET JOBS ──
     data.questionSets.forEach((qs) => {
       const createQsJobId = `create_qs_${qs.tempId}`;
+
+      const questionsForQs = data.questions.filter(
+        (q) => q.questionSetTempId === qs.tempId
+      );
+
       this.addJob({
         id: createQsJobId,
         type: 'create_questionset',
@@ -218,7 +255,10 @@ export class BulkImportQueue {
           gradeLevel: toArray(qs.gradeLevel),
           courseType: toArray(qs.courseType),
           assessmentType: qs.assessmentType || undefined,
-          evaluationType: qs.evaluationType || undefined,
+          // Excel shows friendly labels — convert to API value (online/offline/ai)
+          evaluationType: qs.evaluationType
+            ? EVALUATION_TYPE_LABEL_TO_VALUE[qs.evaluationType] || qs.evaluationType
+            : undefined,
           // QS create API requires boolean true/false for these fields
           showFeedback:  toBool(qs.showFeedback),
           showSolutions: toBool(qs.showSolutions),
@@ -236,66 +276,67 @@ export class BulkImportQueue {
 
       // NOTE: QS app icon upload skipped — QS uses a different API for icons (will be added later)
 
-      // Questions for this QS
-      const questionsForQs = data.questions.filter(
-        (q) => q.questionSetTempId === qs.tempId
-      );
+      // Tracks the last structural job for this QS — review must wait for it.
+      let lastStructuralJobId = createQsJobId;
 
       if (questionsForQs.length > 0) {
-        const createQuestionJobIds: string[] = [];
-
-        questionsForQs.forEach((q, qIdx) => {
-          const qJobId = `create_question_${qs.tempId}_${qIdx}`;
-          this.addJob({
-            id: qJobId,
-            type: 'create_question',
-            tempId: qs.tempId,
-            dependsOn: [createQsJobId],
-            payload: {
-              questionType: q.questionType,
-              questionText: q.questionText,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
-              maxScore: q.maxScore,
-              // bloomsLevel and difficultyLevel removed — invalid props per platform API
-              hint: q.hint,
-              solution: q.solution,
-              sectionName: q.sectionName || 'Section 1',
-              // Inherit taxonomy from parent QS so the question passes validation
-              _qsSubject:    qs.subject,
-              _qsMedium:     qs.medium,
-              _qsGradeLevel: qs.gradeLevel,
-              _qsLanguage:   qs.language,
-              _qsFramework:  qs.framework,
-              _qsTempId: qs.tempId,
-              _qIndex: qIdx,
-            },
-            status: 'queued',
-            retryCount: 0,
-            maxRetries: MAX_RETRIES,
-          });
-          createQuestionJobIds.push(qJobId);
-        });
-
-        // Hierarchy update after all questions created
+        // Sections AND questions are created inside this single atomic
+        // hierarchy update (editor-style). If any question is invalid the
+        // whole update fails, nothing is attached, and the queue retires
+        // the QS — so no incomplete QuestionSet is left on the platform.
         const hierarchyJobId = `hierarchy_qs_${qs.tempId}`;
+        lastStructuralJobId = hierarchyJobId;
         this.addJob({
           id: hierarchyJobId,
           type: 'update_questionset_hierarchy',
           tempId: qs.tempId,
-          dependsOn: createQuestionJobIds,
+          dependsOn: [createQsJobId],
           payload: {
             _qsTempId: qs.tempId,
             _qsName: qs.name,                    // needed for hierarchy root name
             _qsPrimaryCategory: qs.primaryCategory,
             questionCount: questionsForQs.length,
             questions: questionsForQs,
+            // Inherit taxonomy from parent QS so questions pass validation
+            _qsSubject:    qs.subject,
+            _qsMedium:     qs.medium,
+            _qsGradeLevel: qs.gradeLevel,
+            _qsLanguage:   qs.language,
+            _qsFramework:  qs.framework,
           },
           status: 'queued',
           retryCount: 0,
           maxRetries: MAX_RETRIES,
         });
       }
+
+      // Auto-publish: review → publish, mirroring the content pipeline.
+      // Publishing the QuestionSet also publishes the questions inside its
+      // hierarchy, so the questions need no separate publish jobs.
+      // Both run after the hierarchy update — reviewing an empty QS would
+      // leave its questions in Draft.
+      const reviewQsJobId = `review_qs_${qs.tempId}`;
+      this.addJob({
+        id: reviewQsJobId,
+        type: 'review_questionset',
+        tempId: qs.tempId,
+        dependsOn: [lastStructuralJobId],
+        payload: { _qsTempId: qs.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
+
+      this.addJob({
+        id: `publish_qs_${qs.tempId}`,
+        type: 'publish_questionset',
+        tempId: qs.tempId,
+        dependsOn: [reviewQsJobId],
+        payload: { _qsTempId: qs.tempId },
+        status: 'queued',
+        retryCount: 0,
+        maxRetries: MAX_RETRIES,
+      });
     });
 
     // ── COURSE JOBS ──
@@ -327,11 +368,13 @@ export class BulkImportQueue {
           const childRef = m.childRef;
           // If childRef is a tempId, find the last job for that entity
           if (childRef.startsWith('TEMP_CONTENT_')) {
-            return `review_content_${childRef}`;
+            return `publish_content_${childRef}`;
           }
           if (childRef.startsWith('TEMP_QS_')) {
-            const hasQuestions = data.questions.some((q) => q.questionSetTempId === childRef);
-            return hasQuestions ? `hierarchy_qs_${childRef}` : `create_qs_${childRef}`;
+            // Every QS now ends with a publish job (regardless of whether it has
+            // questions), so the course waits for the QS to reach "Live" — the
+            // same contract used for content above.
+            return `publish_qs_${childRef}`;
           }
           // Existing identifier or TEMP_EXISTING — already resolved, no dependency
           return null;
@@ -498,10 +541,24 @@ export class BulkImportQueue {
 
         this.emitProgress();
 
-        // Launch up to MAX_CONCURRENCY jobs
-        const toRun = readyJobs
-          .filter((j) => j.status === 'queued')
-          .slice(0, MAX_CONCURRENCY - this.activeCount);
+        // Launch up to MAX_CONCURRENCY jobs, with heavy (file upload) jobs
+        // additionally capped at MAX_HEAVY_CONCURRENCY to avoid gateway 502s
+        let heavyActive = jobsArray.filter(
+          (j) =>
+            HEAVY_JOB_TYPES.has(j.type) &&
+            (j.status === 'processing' || j.status === 'retrying')
+        ).length;
+
+        const toRun: QueueJob[] = [];
+        for (const j of readyJobs) {
+          if (j.status !== 'queued') continue;
+          if (toRun.length >= MAX_CONCURRENCY - this.activeCount) break;
+          if (HEAVY_JOB_TYPES.has(j.type)) {
+            if (heavyActive >= MAX_HEAVY_CONCURRENCY) continue;
+            heavyActive++;
+          }
+          toRun.push(j);
+        }
 
         if (toRun.length === 0 && this.activeCount === 0) {
           // Nothing running and nothing ready — check for stall
@@ -553,9 +610,27 @@ export class BulkImportQueue {
       job.error = err?.message || 'Unknown error';
       job.completedAt = Date.now();
       console.error(`Job ${job.id} failed:`, err);
+
+      // The hierarchy update creates sections + questions atomically. If it
+      // failed for good, retire the (empty) QuestionSet so the import never
+      // leaves a QS without its questions on the platform.
+      if (job.type === 'update_questionset_hierarchy') {
+        await this.retireQuestionSetOnFailure(job);
+      }
     }
 
     this.emitProgress();
+  }
+
+  private async retireQuestionSetOnFailure(job: QueueJob): Promise<void> {
+    const qsId = this.resolvedIds.get(job.payload._qsTempId);
+    if (!qsId) return;
+    try {
+      await retireQuestionSet(qsId);
+      job.error = `${job.error} — the QuestionSet was removed so it is not left without its questions`;
+    } catch (cleanupErr) {
+      console.error(`Failed to retire QuestionSet ${qsId} after hierarchy failure:`, cleanupErr);
+    }
   }
 
   private async runJobWithRetry(job: QueueJob): Promise<void> {
@@ -599,14 +674,20 @@ export class BulkImportQueue {
       case 'review_content':
         await this.handleReviewContent(job);
         break;
+      case 'publish_content':
+        await this.handlePublishContent(job);
+        break;
       case 'create_questionset':
         await this.handleCreateQuestionSet(job);
         break;
-      case 'create_question':
-        await this.handleCreateQuestion(job);
-        break;
       case 'update_questionset_hierarchy':
         await this.handleUpdateQsHierarchy(job);
+        break;
+      case 'review_questionset':
+        await this.handleReviewQuestionSet(job);
+        break;
+      case 'publish_questionset':
+        await this.handlePublishQuestionSet(job);
         break;
       case 'create_course':
         await this.handleCreateCourse(job);
@@ -623,6 +704,35 @@ export class BulkImportQueue {
 
   private async handleCreateContent(job: QueueJob): Promise<void> {
     const { _contentTempId, driveUrl, fileType, ...metadata } = job.payload;
+
+    // ── Pre-flight: verify Drive URL is accessible AND file type matches ──────
+    // YouTube URLs skip this check — the URL is set directly as artifactUrl.
+    // For all other file types:
+    //   1. Confirm the Drive link is reachable (not private/deleted)
+    //   2. Confirm the actual MIME type matches the declared fileType column
+    // Both checks run BEFORE createContentNode so no orphaned draft is created.
+    if (fileType !== 'youtube' && driveUrl) {
+      const { mimeType: actualMime } = await checkDriveFileAccessible(driveUrl);
+
+      // Validate actual MIME against declared fileType using the same allowlist
+      // used later in handleUploadContentFile (catches mismatch before node creation)
+      const allowedMimes = BulkImportQueue.ALLOWED_MIME_FOR_FILE_TYPE[fileType?.toLowerCase()] ?? [];
+      const actualBase   = (actualMime || '').split(';')[0].trim().toLowerCase();
+
+      if (
+        allowedMimes.length > 0 &&
+        actualBase &&
+        actualBase !== 'application/octet-stream' &&   // octet-stream is Drive's fallback — accept it
+        !allowedMimes.includes(actualBase)
+      ) {
+        throw new Error(
+          `File type mismatch: you declared "${fileType}" (expects ${allowedMimes[0]}) ` +
+          `but the Google Drive file is "${actualBase}". ` +
+          `Update the File Type column in the Content sheet to match the actual file, ` +
+          `or re-upload the correct file to Drive.`
+        );
+      }
+    }
 
     const identifier = await createContentNode({
       name:            metadata.name,
@@ -661,6 +771,7 @@ export class BulkImportQueue {
   private static readonly ALLOWED_MIME_FOR_FILE_TYPE: Record<string, string[]> = {
     pdf: ['application/pdf', 'application/octet-stream'],
     mp4: ['video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-m4v', 'application/octet-stream'],
+    mp3: ['audio/mp3', 'audio/mpeg', 'audio/mpeg3', 'audio/x-mpeg-3', 'application/octet-stream'],
     zip: [
       'application/zip',
       'application/x-zip',
@@ -708,9 +819,9 @@ export class BulkImportQueue {
 
     const mimeType = FILE_MIME_MAP[fileType] || 'application/pdf';
 
-    // ── YouTube: no file download — set artifactUrl directly ──────
+    // ── YouTube: store URL directly, no file download or processing ─
     if (fileType === 'youtube') {
-      await associateUploadedFile(contentId, driveUrl, mimeType);
+      await associateYouTubeUrl(contentId, driveUrl, mimeType);
       job.resolvedIdentifier = contentId;
       return;
     }
@@ -734,15 +845,17 @@ export class BulkImportQueue {
       );
     }
 
-    // Get pre-signed upload URL
+    // Get pre-signed upload URL and upload file to S3
     const { preSignedUrl } = await getContentUploadUrl(contentId, fileName);
-
-    // Upload to S3
     await uploadFileToPresignedUrl(preSignedUrl, buffer, mimeType);
 
-    // Associate the file with the content node
-    const fileUrl = preSignedUrl.split('?')[0]; // Strip query params to get the base S3 URL
-    await associateUploadedFile(contentId, fileUrl, mimeType);
+    // ── Notify the platform via the upload endpoint ───────────────
+    // POST /action/content/v3/upload/{contentId} with fileUrl triggers the
+    // platform's processing pipeline. For H5P/ZIP this extracts the archive,
+    // creates content/h5p/{id}-latest/ on S3, and sets streamingUrl.
+    // Simply PATCHing artifactUrl bypasses all of this processing.
+    const s3FileUrl = preSignedUrl.split('?')[0]; // base S3 URL (public, no auth params needed)
+    await notifyContentUploaded(contentId, s3FileUrl);
 
     job.resolvedIdentifier = contentId;
   }
@@ -753,6 +866,17 @@ export class BulkImportQueue {
     if (!contentId) throw new Error(`Content ID not resolved for ${_contentTempId}`);
 
     await submitContentForReview(contentId);
+    job.resolvedIdentifier = contentId;
+  }
+
+  private async handlePublishContent(job: QueueJob): Promise<void> {
+    const { _contentTempId } = job.payload;
+    const contentId = this.resolvedIds.get(_contentTempId);
+    if (!contentId) throw new Error(`Content ID not resolved for ${_contentTempId}`);
+
+    // Publish triggers the platform processing pipeline:
+    // H5P/ZIP → streamingUrl is generated, pkgVersion is set, status → "Live"
+    await publishContent(contentId);
     job.resolvedIdentifier = contentId;
   }
 
@@ -799,40 +923,40 @@ export class BulkImportQueue {
     this.rollbackRegistry.push({ type: 'questionset', identifier });
   }
 
-  private async handleCreateQuestion(job: QueueJob): Promise<void> {
+  private async handleUpdateQsHierarchy(job: QueueJob): Promise<void> {
     const {
-      _qsTempId, _qIndex,
-      questionType, questionText, options, correctAnswer, maxScore, hint, solution,
+      _qsTempId, _qsName, _qsPrimaryCategory, questionCount, questions,
       _qsSubject, _qsMedium, _qsGradeLevel, _qsLanguage, _qsFramework,
     } = job.payload;
     const qsId = this.resolvedIds.get(_qsTempId);
     if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
 
+    // Taxonomy inherited from the parent QS so questions pass platform
+    // validation. Multi-select cells hold comma/pipe-separated values.
     const taxonomy = {
-      subject:    _qsSubject    ? [_qsSubject]    : undefined,
-      medium:     _qsMedium     ? [_qsMedium]     : undefined,
-      gradeLevel: _qsGradeLevel ? [_qsGradeLevel] : undefined,
-      language:   _qsLanguage   ? [_qsLanguage]   : undefined,
+      subject:    toArray(_qsSubject),
+      medium:     toArray(_qsMedium),
+      gradeLevel: toArray(_qsGradeLevel),
+      language:   toArray(_qsLanguage),
       framework:  _qsFramework  || 'pos-framework',
     };
 
-    const questionBody = buildQuestionBody(questionType, questionText, options, correctAnswer, maxScore, hint, solution, qsId, taxonomy);
-
-    const questionId = await createQuestion(questionBody);
-
-    // Store in a special namespaced key: {qsTempId}_{qIndex} → questionId
-    this.resolvedIds.set(`${_qsTempId}_q${_qIndex}`, questionId);
-    job.resolvedIdentifier = questionId;
-  }
-
-  private async handleUpdateQsHierarchy(job: QueueJob): Promise<void> {
-    const { _qsTempId, _qsName, _qsPrimaryCategory, questionCount, questions } = job.payload;
-    const qsId = this.resolvedIds.get(_qsTempId);
-    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
-
     // ── 1. Group questions by section (preserve insertion order) ──
     // Each unique Section Name becomes one section node with a client-generated UUID.
-    const sectionMap = new Map<string, { name: string; sectionId: string; children: string[] }>();
+    // Questions are CREATED here as isNew hierarchy nodes (like the platform
+    // editor does): the question create API rejects visibility 'Parent', and
+    // visibility cannot be changed afterwards (restricted prop on update, and
+    // nodesModified cannot reach questions nested under sections).
+    const sectionMap = new Map<string, {
+      name: string;
+      sectionId: string;
+      description?: string;
+      instructions?: string;
+      children: string[];
+    }>();
+
+    /** client UUID → question node for nodesModified */
+    const questionNodes: Record<string, any> = {};
 
     for (let i = 0; i < questionCount; i++) {
       const q = questions[i];
@@ -846,10 +970,38 @@ export class BulkImportQueue {
         });
       }
 
-      const questionId = this.resolvedIds.get(`${_qsTempId}_q${i}`);
-      if (questionId) {
-        sectionMap.get(sectionName)!.children.push(questionId);
+      const section = sectionMap.get(sectionName)!;
+
+      // Take description/instructions from the first row of the section that
+      // has them filled (users typically fill only the section's first row)
+      if (!section.description && q.sectionDescription?.trim()) {
+        section.description = q.sectionDescription.trim();
       }
+      if (!section.instructions && q.sectionInstructions?.trim()) {
+        section.instructions = q.sectionInstructions.trim();
+      }
+
+      // Excel 'Public' → API 'Default' (independently discoverable);
+      // 'Parent' (the default) → belongs to this QS only
+      const visibility =
+        String(q.visibility || 'Parent').trim().toLowerCase() === 'public'
+          ? 'Default'
+          : 'Parent';
+
+      const questionUuid = uuidv4();
+      questionNodes[questionUuid] = {
+        isNew: true,
+        root: false,
+        objectType: 'Question',
+        metadata: {
+          ...buildQuestionBody(
+            q.questionType, q.questionText, q.options, q.correctAnswer,
+            q.maxScore, q.hint, q.solution, taxonomy, visibility
+          ),
+          code: questionUuid,
+        },
+      };
+      section.children.push(questionUuid);
     }
 
     const sections = Array.from(sectionMap.values());
@@ -872,6 +1024,8 @@ export class BulkImportQueue {
         objectType: 'QuestionSet',
         metadata: {
           name: sec.name,
+          ...(sec.description  && { description: sec.description }),
+          ...(sec.instructions && { instructions: sec.instructions }),
           mimeType: 'application/vnd.sunbird.questionset',
           primaryCategory: _qsPrimaryCategory || 'QuestionSet',
           visibility: 'Parent',
@@ -886,8 +1040,12 @@ export class BulkImportQueue {
       };
     });
 
+    // Question nodes (isNew) — created by the hierarchy service with the
+    // correct visibility in a single atomic request
+    Object.assign(nodesModified, questionNodes);
+
     // ── 3. hierarchy ──────────────────────────────────────────────
-    // QS root → [section UUIDs] → [question do_ identifiers]
+    // QS root → [section UUIDs] → [question UUIDs]
     const hierarchy: Record<string, any> = {
       [qsId]: {
         name: _qsName,
@@ -899,7 +1057,7 @@ export class BulkImportQueue {
     sections.forEach((sec) => {
       hierarchy[sec.sectionId] = {
         name: sec.name,
-        children: sec.children,   // already resolved do_ question identifiers
+        children: sec.children,   // client UUIDs of the isNew question nodes
         root: false,
       };
     });
@@ -948,7 +1106,15 @@ export class BulkImportQueue {
 
     // ── 1. Group children by unit (preserve insertion order with Map) ──
     // Each unique Unit Name becomes one unit node with a client-generated UUID.
-    const unitMap = new Map<string, { name: string; unitId: string; children: string[] }>();
+    // Unit-level description/icon are taken from the first row of each unit
+    // that supplies them, so users only need to fill them once per unit.
+    const unitMap = new Map<string, {
+      name: string;
+      unitId: string;
+      description?: string;
+      appIconUrl?: string;
+      children: string[];
+    }>();
 
     _childMappings
       .sort((a: any, b: any) => a.sequence - b.sequence)
@@ -963,17 +1129,49 @@ export class BulkImportQueue {
           });
         }
 
+        const unit = unitMap.get(unitName)!;
+
+        // First non-empty value wins — lets users fill these on any single row
+        if (!unit.description && mapping.unitDescription) {
+          unit.description = String(mapping.unitDescription).trim();
+        }
+        if (!unit.appIconUrl && mapping.unitAppIconUrl) {
+          unit.appIconUrl = String(mapping.unitAppIconUrl).trim();
+        }
+
         // Resolve child identifier (temp ID → resolved do_xxx, or direct do_xxx)
         const childId =
           this.resolvedIds.get(mapping.childRef) ||
           mapping.childRef;
 
         if (childId) {
-          unitMap.get(unitName)!.children.push(childId);
+          unit.children.push(childId);
         }
       });
 
     const units = Array.from(unitMap.values());
+
+    // ── 1b. Upload unit icons from Drive → permanent S3 URLs ──────
+    // Unit nodes don't exist yet (they're created inline by the hierarchy
+    // update), so there's no unit identifier to upload against. We use the
+    // parent course's upload endpoint instead — the returned S3 URL is just a
+    // storage location and is valid as any node's `appIcon`.
+    // A failed icon must not abort the whole course, so failures are logged
+    // and the unit is created without an icon.
+    const unitIconUrls = new Map<string, string>();
+
+    for (const unit of units) {
+      if (!unit.appIconUrl) continue;
+      try {
+        const uploadedUrl = await uploadAppIconFromDrive(courseId, unit.appIconUrl);
+        unitIconUrls.set(unit.unitId, uploadedUrl);
+      } catch (err: any) {
+        console.warn(
+          `[bulk-import] Unit icon upload failed for "${unit.name}" in ${_courseTempId}: ${err?.message}. `
+          + 'Unit will be created without an icon.'
+        );
+      }
+    }
 
     // ── 2. nodesModified ──────────────────────────────────────────
     const nodesModified: Record<string, any> = {
@@ -981,12 +1179,15 @@ export class BulkImportQueue {
     };
 
     units.forEach((unit) => {
+      const iconUrl = unitIconUrls.get(unit.unitId);
       nodesModified[unit.unitId] = {
         root: false,
         objectType: 'Collection',
         isNew: true,
         metadata: {
           name: unit.name,
+          ...(unit.description && { description: unit.description }),
+          ...(iconUrl        && { appIcon: iconUrl }),
           mimeType: 'application/vnd.ekstep.content-collection',
           primaryCategory: 'Course Unit',
           contentType: 'CourseUnit',
@@ -1013,6 +1214,28 @@ export class BulkImportQueue {
 
     await updateCourseHierarchy(courseId, nodesModified, hierarchy);
     job.resolvedIdentifier = courseId;
+  }
+
+  // ── QuestionSet review / publish handlers ──────────────────────
+
+  private async handleReviewQuestionSet(job: QueueJob): Promise<void> {
+    const { _qsTempId } = job.payload;
+    const qsId = this.resolvedIds.get(_qsTempId);
+    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
+
+    await reviewQuestionSet(qsId);
+    job.resolvedIdentifier = qsId;
+  }
+
+  private async handlePublishQuestionSet(job: QueueJob): Promise<void> {
+    const { _qsTempId } = job.payload;
+    const qsId = this.resolvedIds.get(_qsTempId);
+    if (!qsId) throw new Error(`QuestionSet ID not resolved for ${_qsTempId}`);
+
+    // Publishing the QS also publishes the questions in its hierarchy and
+    // transitions the QS to "Live" so the QuML player can load it.
+    await publishQuestionSet(qsId);
+    job.resolvedIdentifier = qsId;
   }
 
   // ─── Progress Snapshot ─────────────────────────────────────
@@ -1089,14 +1312,14 @@ function buildQuestionBody(
   maxScore: number | undefined,
   hint: string | undefined,
   solution: string | undefined,
-  qsId: string,
   taxonomy?: {
     subject?: string[];
     medium?: string[];
     gradeLevel?: string[];
     language?: string[];
     framework?: string;
-  }
+  },
+  visibility: 'Parent' | 'Default' = 'Parent'
 ): Record<string, any> {
   // Platform requires `name` — derive from question text (max 120 chars)
   const name = text.replace(/<[^>]*>/g, '').trim().slice(0, 120) || 'Question';
@@ -1104,6 +1327,20 @@ function buildQuestionBody(
   const meta = QUESTION_TYPE_META[type] ?? QUESTION_TYPE_META['Subjective'];
 
   const score = maxScore ?? 1;
+
+  // Questions are created as isNew nodes inside the QS hierarchy update,
+  // where visibility 'Parent' is accepted. (The standalone question create
+  // API rejects 'Parent', and visibility is a restricted prop on update —
+  // so creating within the hierarchy is the only way to honour it.)
+
+  // QuML solution blocks. The SAME array shape is used for the top-level
+  // `solutions` (what the player iterates) and `editorState.solutions` (what the
+  // question editor binds its rich-text solution field to). Keeping them in sync
+  // is what the Sunbird editor itself does; omitting editorState.solutions makes
+  // the editor fall back to the raw object and render "[object Object]".
+  const solutionBlocks = solution
+    ? [{ id: uuidv4(), type: 'html', value: `<p>${solution}</p>` }]
+    : undefined;
 
   // Body varies by type — each type has its own wrapper and interaction placeholder
   const buildBody = (): string => {
@@ -1124,7 +1361,7 @@ function buildQuestionBody(
     qType:            meta.qType,
     ...(meta.interactionTypes?.length && { interactionTypes: meta.interactionTypes }),
     ...(meta.templateId               && { templateId:       meta.templateId }),
-    visibility:       'Default',
+    visibility,  // 'Parent' = belongs to this QS only; 'Default' = independently discoverable ("Public")
     // Inherit taxonomy from parent QS for platform validation
     ...(taxonomy?.framework  && { framework:  taxonomy.framework }),
     ...(taxonomy?.subject    && { subject:    taxonomy.subject }),
@@ -1133,8 +1370,20 @@ function buildQuestionBody(
     ...(taxonomy?.language   && { language:   taxonomy.language }),
     body:      buildBody(),
     hints:     hint     ? [hint]     : undefined,
-    solutions: solution ? { hint: solution } : {},
+    // QuML 1.0 stores solutions as an array of {id, type, value} — an object
+    // (or empty {}) breaks graph node creation with a generic SERVER_ERROR
+    solutions: solutionBlocks,
     maxScore:  score,
+    // Mandatory at review time on this platform. Accepted here because
+    // questions are created through the QS hierarchy update (QuML 1.1
+    // schema) — the standalone question create API rejected this prop.
+    outcomeDeclaration: {
+      maxScore: {
+        cardinality: 'single',
+        type: 'integer',
+        defaultValue: score,
+      },
+    },
   };
 
   // ── MCQ ──────────────────────────────────────────────────────
@@ -1153,6 +1402,7 @@ function buildQuestionBody(
       editorState: {
         question: `<p>${text}</p>`,
         options:  items.map((o, i) => ({ value: { body: `<p>${o}</p>`, value: i } })),
+        ...(solutionBlocks && { solutions: solutionBlocks }),
       },
       interactions: {
         response1: {
@@ -1168,9 +1418,6 @@ function buildQuestionBody(
           correctResponse: { value: ci },
           mapping:         [{ value: ci, score }],
         },
-      },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
       },
     };
   }
@@ -1194,6 +1441,7 @@ function buildQuestionBody(
       editorState: {
         question: `<p>${text}</p>`,
         options:  items.map((o, i) => ({ value: { body: `<p>${o}</p>`, value: i } })),
+        ...(solutionBlocks && { solutions: solutionBlocks }),
       },
       interactions: {
         response1: {
@@ -1209,9 +1457,6 @@ function buildQuestionBody(
           correctResponse: { value: correctSeq },
           mapping,
         },
-      },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'ordered', type: 'integer', defaultValue: score },
       },
     };
   }
@@ -1246,6 +1491,7 @@ function buildQuestionBody(
       editorState: {
         question: `<p>${text}</p>`,
         options:  { left: editorLeft, right: editorRight },
+        ...(solutionBlocks && { solutions: solutionBlocks }),
       },
       interactions: {
         response1: {
@@ -1262,23 +1508,28 @@ function buildQuestionBody(
           mapping,
         },
       },
-      outcomeDeclaration: {
-        maxScore: { cardinality: 'multiple', type: 'integer', defaultValue: score },
-      },
     };
   }
 
   // ── Subjective ────────────────────────────────────────────────
-  // answer is required by the platform — use provided answer or '-' as placeholder
+  // answer is required by the platform — use provided answer or '-' as placeholder.
+  // Stored as HTML to match every other question type and what the editor expects;
+  // a bare string here is what made the editor render "[object Object]" once it
+  // fell back to the raw solutions object.
   const subjectiveAnswer = solution || correctAnswer || '-';
+  const subjectiveAnswerHtml = /^\s*</.test(subjectiveAnswer)
+    ? subjectiveAnswer                    // already HTML — leave as-is
+    : `<p>${subjectiveAnswer}</p>`;
+
   return {
     ...base,
-    answer: subjectiveAnswer,
-    editorState: { question: `<p>${text}</p>` },
-    responseDeclaration: {},
-    outcomeDeclaration: {
-      maxScore: { cardinality: 'single', type: 'integer', defaultValue: score },
+    answer: subjectiveAnswerHtml,
+    editorState: {
+      question: `<p>${text}</p>`,
+      answer:   subjectiveAnswerHtml,
+      ...(solutionBlocks && { solutions: solutionBlocks }),
     },
+    responseDeclaration: {},
   };
 }
 

@@ -233,7 +233,8 @@ const AssessmentDetails = () => {
   // Get parameters from URL search params
   const assessmentId = searchParams.get('assessmentId')
   const parentId = searchParams.get('parentId')
-  const userId = searchParams.get('userId') 
+  const userId = searchParams.get('userId')
+  const returnUrl = searchParams.get('returnUrl')
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion] = useState<ScoreDetail | null>(null);
   const [editScore, setEditScore] = useState<string>('');
@@ -749,6 +750,10 @@ console.log('assessmentStatusData>>>>>:', assessmentStatusData);
   }, [assessmentId, userId, foundChild, fetchOfflineAssessmentData]);
 
   const handleBack = () => {
+    if (returnUrl) {
+      router.push(returnUrl);
+      return;
+    }
     router.back();
   };
 

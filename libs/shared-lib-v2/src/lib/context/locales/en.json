@@ -147,7 +147,7 @@
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "Job family": "Job family",
-  "Job Family": "Job Family",
+    "Job Family": "Job Family",
 "Group Membership": "Group Membership",
     "PSU": "PSU",
     "UNAUTHORIZED": "You are not authorized to access this site",
@@ -191,10 +191,16 @@
       "FUTURE_WORK": "What do you want to become?",
       "ENROLL_IN_TO": "Enroll in to"
     },
+    "PROGRAM_SWITCH_MODAL": {
+      "REGISTERED_ON": "Registered on",
+      "OTHER_PROGRAMS_ENROLLED": "Other programs you are enrolled in",
+      "SHOW_ALL_PROGRAMS": "Show All Programs"
+    },
     "COMMON": {
       "L1_COURSES": "L1 Courses",
       "EXPLORE": "Explore",
       "SURVEYS": "Surveys",
+      "plp_surveys": "Surveys",
       "PROFILE": "Profile",
       "UNITS": "Units",
       "COURSES": "Courses",
@@ -221,12 +227,33 @@
       "EXPLORE_MORE_COURSES": "Explore More Courses",
       "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
-      "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app from {playStoreLink} to access your account also.",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app by tapping the \"Download Play Store\" button.",
+      "REGISTRATION_SUCCESSFUL_TITLE": "Registration successful",
+      "REGISTERED": "Registered",
+      "PLAY_STORE": "Play Store",
+      "PROGRAM_LABEL": "Program",
+      "STATUS_LABEL": "Status",
+      "COURSE_WELCOME_SUBTITLE": "Keep exploring — new courses are added regularly.",
 
       "FILTER_BY": "Filter by",
       "CLEAR_FILTER": "Clear Filter",
       "APPLY_FILTER": "Apply Filter",
-      "DONE": "Done"
+      "DONE": "Done",
+      "CONTENT_FILTERS": "Content Filters",
+      "CLEAR_ALL": "Clear All",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "Assessment Attempts",
+        "OF": "of",
+        "COMPLETED_LOWERCASE": "completed",
+        "ATTEMPT_LABEL": "Attempt",
+        "COMPLETED": "Completed",
+        "NOT_ATTEMPTED": "Not Attempted",
+        "LOCKED": "Locked",
+        "AFTER_ATTEMPT_PREFIX": "After Attempt",
+        "BEST_SCORE": "Best Score",
+        "LATEST": "Latest",
+        "LOAD_ERROR": "Unable to load assessment attempts right now."
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "Explore Additional Courses"
@@ -507,6 +534,7 @@
     "OUR_PROGRAMS_SUBTITLE": "Explore programs designed to support your learning journey.",
     "OUR_PROGRAMS_FOR_VOLUNTEERS": "Our Programs for Volunteers",
     "OUR_PROGRAMS_VOLUNTEERS_SUBTITLE": "Make a real difference — join one of our volunteer-driven programs.",
+    "EXPLORE_AND_REGISTER": "Explore & Register",
     "ABOUT_THE_PROGRAM": "About the Program",
     "READY_TO_JOIN": "Ready to join",
     "ENROL_NOW": "Enrol Now",
@@ -524,8 +552,32 @@
     "MAKE_A_DIFFERENCE": "Make a difference through our volunteer programs",
     "YES_CREATE_NEW_ACCOUNT": "Yes, Create New Account",
     "ENROLLED_TO_BELOW_PROGRAMS": "We can see that you are enrolled to below programs:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "You have already enrolled to the program:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "You have already enrolled to the programs:",
     "SURE_TO_ENROLL_INTO": "Are you sure you want to enroll into",
-    "YES": "Yes"
+    "YES": "Yes",
+    "ENROL_MODAL": {
+      "ENTER_MOBILE_NUMBER": "Enter Mobile Number",
+      "VERIFICATION_CODE_SUBTITLE": "We'll send a verification code",
+      "MOBILE_NUMBER_INSTRUCTIONS": "To begin your registration, please enter your mobile number. Don't have a mobile phone? You can enter your parent's or guardian's number instead.",
+      "OTP_INSTRUCTIONS": "We will send an OTP to this number for verification.",
+      "MOBILE_NUMBER_LABEL": "Mobile Number",
+      "SENDING": "Sending…",
+      "SEND_OTP": "Send OTP",
+      "AWESOME": "Awesome!",
+      "PHONE_VERIFIED_SUCCESS": "Your phone number has been successfully verified",
+      "GO_BACK": "Go back",
+      "INVALID_MOBILE_NUMBER": "Please enter a valid 10-digit mobile number",
+      "FAILED_TO_SEND_OTP": "Failed to send OTP. Please try again.",
+      "ENTER_COMPLETE_OTP": "Please enter the complete OTP",
+      "INVALID_OTP": "Invalid OTP. Please try again.",
+      "VERIFICATION_FAILED": "Verification failed. Please try again.",
+      "ENTER_VERIFICATION_CODE": "Enter Verification Code",
+      "VERIFY": "Verify",
+      "VERIFYING": "Verifying…",
+      "RESEND_CODE_IN": "Resend code in",
+      "RESEND_CODE": "Resend code"
+    }
   },
   "NAVAPATHAM": {
     "WELCOME_TO_NAVAPATHAM": "Welcome to NavaPatham!",
@@ -805,7 +857,7 @@
     "GUJARATI": "ગુજરાતી",
     "BENGALI": "বাংলা",
     "WHAT_IS_YOUR_PREFERRED_LANGUAGE": "What is your preferred language",
-    
+
     "DIVORCED/WIDOW": "Divorced/Widow",
     "GRADUATE": "Graduate",
     "POST_GRADUATE": "Post Graduate",
@@ -838,7 +890,7 @@
     "APPAREL": "apparel",
     "CONSTRUCTION": "construction",
     "GRAPHIC_DESIGN": "graphic design",
-    "TYPE_OF_PHONE_ACCESSIBLE ": "Type of Phone Accessible",
+    "TYPE_OF_PHONE_ACCESSIBLE": "Type of Phone Accessible",
     "FAMILY_MEMBER_DETAILS": "Family Member Details",
     "WHAT_IS_YOUR_PRIMARY_WORK": "What is your primary work?",
     "NOPHONE": "No Phone",
@@ -964,7 +1016,7 @@
   "VIEW_FILE": "View File",
   "FILE_PREVIEW": "File Preview",
 
-  
+
   "FILTER_KEY": {
     "GROUP_MEMBERSHIP": "groupMembership",
     "JOB_FAMILY": "jobFamily",
@@ -1112,7 +1164,23 @@
   "Facilitator-requisite": "Facilitator-requisite",
   "Prerequisite": "Prepare",
   "SECOND_CHANCE_DESCRIPTION": "<b>Did you have to stop your studies before completing Grade 10?</b>\nYou can continue your Education with Pratham’s Second Chance Program – a Second Chance to Complete Grade 10.\n\nPratham’s Second Chance Program supports young girls and women like you who want to continue their education and appear for Grade 10 Board/Open School examinations. Through accessible learning centres close to your home, supportive teachers, and flexible learning methods (including remote learning options), the program makes learning more accessible and achievable.\n\n<b>What the Program Offers:</b>\n• Foundation classes in Mathematics, English, Science, Language, and other subjects\n• Main Course focused on preparation for the Board-mandated curriculum.\n• Interactive and activity-based learning methods\n• Regular assessments and academic support\n• Life skills sessions focused on communication, confidence, decision-making, and critical thinking\n• Exposure to opportunities after Grade 10, including further education and skilling pathways\n\nThe Second Chance Program is currently operational in multiple states.\n\n<b>Register Your Interest:</b>\nFill in the Enrollment form to express your interest in joining the program. Our team will contact you and guide you through the next steps.\n\nIt is never too late to continue learning!"
-  
+
   , "CAMP_TO_CLUB_DESCRIPTION": "<b>Do you enjoy working with children and supporting their learning?</b>\nPratham's Children's Club Volunteer Program gives you an opportunity to engage with children in your community through fun, interactive, and activity-based learning.\n\nAs a volunteer, you will receive access to simple activities and resources that you can use with children in local Children's Clubs. You will also get access to learning opportunities for your own growth and self-development.\n\n<b>What You Will Get</b>\n• Easy-to-use activities and learning resources for Children's Clubs\n• Guidance and support from the Pratham team\n• Opportunities to build communication, leadership, and facilitation skills\n• Access to self-learning courses focused on life skills and new-age skills\n• Experience of working with children and supporting community learning\n\n<b>Who Can Join?</b>\nYoung people and community members who:\n• Are above 14 years of age\n• Enjoy working with children\n• Want to contribute to their community\n• Are interested in learning and personal growth\n\n<b>Register Your Interest</b>\nFill in the enrollment form to express your interest in becoming a Children's Club Volunteer.\nOur team will contact you and guide you through the next steps.\n\nSmall efforts can create a big impact in a child's learning journey."
-  , "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!"
+  , "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!",
+  "PROGRAMS":{
+    "Open School" : "Open School",
+    "open_school_discription" : "school",
+    "Summer Camp" : "Summer Camp",
+    "summer_camp_discription" : "Summer Camp",
+    "Pragyanpath" : "Pragyanpath",
+    "pragyanpath_discription" : "Get Ready for Work with Skills and Knowledge",
+    "Second Chance Program" : "Second Chance Program",
+    "second_chance_program_discription" : "Get Ready for Work with Skills and Knowledge",
+    "Vocational Training" : "Vocational Training",
+    "vocational_training_discription" : "Get vocational training to land an entry level job with 2 months of training",
+    "Camp to Club" : "Camp to Club",
+    "camp_to_club_discription" : "Camp to Club",
+    "Second Chance Program Pathways" : "Second Chance Program Pathways",
+    "second_chance_program_pathways_discription" : "Get a second chance to complete your 12th grade education"
+  }
 }

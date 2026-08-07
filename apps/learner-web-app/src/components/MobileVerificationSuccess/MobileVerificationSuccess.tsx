@@ -3,8 +3,11 @@
 import React from 'react';
 import { Box, Typography, Button, Paper } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { useTranslation } from '@shared-lib';
 
 const MobileVerificationSuccess = () => {
+  const { t } = useTranslation();
+
   return (
     <Box
       display="flex"
@@ -25,7 +28,7 @@ const MobileVerificationSuccess = () => {
           mb: 3,
         }}
       >
-        Awesome!
+        {t('LANDING.ENROL_MODAL.AWESOME')}
       </Typography>
       <Typography
         variant="h1"
@@ -39,7 +42,7 @@ const MobileVerificationSuccess = () => {
           mb: 3,
         }}
       >
-        Your phone number has been successfully verified{' '}
+        {t('LANDING.ENROL_MODAL.PHONE_VERIFIED_SUCCESS')}
       </Typography>
     </Box>
   );

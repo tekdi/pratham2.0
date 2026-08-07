@@ -209,6 +209,13 @@ const AutoCompleteMultiSelectWidget = ({
             //     : undefined
             // }
             required={required && selectedOptions.length === 0}
+            autoComplete="new-password"
+            inputProps={{
+              ...params.inputProps,
+              autoComplete: 'new-password',
+              autoCorrect: 'off',
+              spellCheck: false,
+            }}
           />
         )}
         ListboxProps={{

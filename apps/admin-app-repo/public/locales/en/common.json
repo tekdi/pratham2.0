@@ -94,6 +94,7 @@
     "NO_DISTRICTS": "No Districts",
     "ALL_STATES": "All States",
     "LOGOUT": "Log out",
+    "SWITCH_PROGRAM_ROLE": "Switch Access",
     "HI": "Hi, {{name}}",
     "MOBILE": "Mobile",
     "ALL_BLOCKS": "All Blocks",
@@ -367,9 +368,8 @@
     "DELETE_PLANNER": "Delete Planner",
     "CSV_TEMPLATE": "CSV Template",
     "NEW_TOPIC": "New Topic",
-      "DOWNLOAD_CSV": "Download Uploaded CSV",
+    "DOWNLOAD_CSV": "Download Uploaded CSV",
     "DURING_COURSE": "Learn"
-
   },
   "MASTER": {
     "STATE": "States",

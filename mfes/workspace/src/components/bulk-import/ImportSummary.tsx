@@ -27,9 +27,12 @@ const JOB_TYPE_LABELS: Record<string, string> = {
   create_content: 'Create Content',
   upload_content_file: 'Upload File',
   review_content: 'Submit for Review',
+  publish_content: 'Publish Content',
   create_questionset: 'Create Question Set',
   create_question: 'Create Question',
   update_questionset_hierarchy: 'Update QS Hierarchy',
+  review_questionset: 'Submit QS for Review',
+  publish_questionset: 'Publish Question Set',
   create_course: 'Create Course',
   update_course_hierarchy: 'Update Course Hierarchy',
 };

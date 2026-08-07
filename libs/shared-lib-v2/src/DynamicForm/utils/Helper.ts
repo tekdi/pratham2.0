@@ -127,7 +127,6 @@ export const calculateAgeFromDate = (dobString: any) => {
   if (!hasBirthdayPassedThisYear) {
     age--;
   }
-
   return age;
 };
 

@@ -5,13 +5,16 @@ import type { SurveyFormsEntryConfig } from '../types/surveyEntryConfig';
  * Resolves the next route after the user picks a survey from the list.
  *
  * - `self` / `none` → always direct fill (`/self`).
- * - Other context types → `hub` if host config says so, else manual ContextPicker.
+ * - hub config present → roster hub page.
+ * - `learner` contextType + userId in localStorage → direct fill with userId as contextId.
+ * - fallback → manual ContextPicker.
  */
 export function resolvePostSurveyListRoute(
   survey: Survey,
   entryConfig: SurveyFormsEntryConfig | null
 ): string {
   const id = survey.surveyId;
+
   if (!survey.contextType || survey.contextType === 'none' || survey.contextType === 'self') {
     return `/survey-fill/${id}/self`;
   }
@@ -20,6 +23,15 @@ export function resolvePostSurveyListRoute(
   if (mode === 'hub') {
     return `/survey-fill/${id}/hub`;
   }
+
+  if (survey.contextType === 'learner') {
+    const userId =
+      typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (userId) {
+      return `/survey-fill/${id}/${userId}`;
+    }
+  }
+
   return `/survey-fill/${id}`;
 }
 

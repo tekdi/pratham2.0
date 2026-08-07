@@ -353,6 +353,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     router.push('/manual-assessments');
   };
 
+  const withBasePath = (path: string) => `${router.basePath}${path}`;
+
   const isDashboard = [
     '/dashboard',
     '/',
@@ -525,7 +527,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                     },
                   }}
                 >
-                  {modifiedAcademicYearList?.map(({ id, session }) => (
+                  {modifiedAcademicYearList?.map(({ id, session }:any) => (
                     <MenuItem key={id} value={id}>
                       {session}
                     </MenuItem>

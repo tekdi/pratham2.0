@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { getTelemetryEvents } from '../../services/TelemetryService';
+import { getTelemetryEvents, getTelemetryEventsResume } from '../../services/TelemetryService';
 import { handleExitEvent } from '../utils/Helper';
 
 interface PlayerConfigProps {
@@ -26,6 +26,45 @@ const ContentPlayerV2 = ({
       const { type, detail } = event.data || {};
       const mimeType = playerConfig?.metadata?.mimeType || 'h5p';
       const identifier = playerConfig?.metadata?.identifier;
+      let contentType='';
+      switch (mimeType) {
+        case 'application/vnd.ekstep.h5p-archive':
+          contentType='h5p';
+          break;
+        case 'application/pdf':
+          contentType='pdf';
+          break;
+        case 'video/mp4':
+          contentType='mp4';
+          break;
+        case 'video/webm':    
+          contentType='webm';
+          break;
+        case 'video/youtube':
+          contentType='youtube';
+          break;
+        case 'video/x-youtube':
+          contentType='youtube';
+          break;
+        case 'application/vnd.ekstep.html-archive':
+          contentType='ecml';
+          break;
+        case 'application/epub':
+          contentType='epub';
+          break;
+        case 'audio/mp3':
+          contentType='mp3';
+          break;
+        case 'audio/wav':
+          contentType='wav';
+          break;
+        case 'audio/mpeg':
+          contentType='mpeg';
+          break;
+        default :
+          contentType='content';
+          break;
+      }
 
       const buildTelemetryEvent = (eid: string, edata: any) => ({
         eid,
@@ -45,29 +84,58 @@ const ContentPlayerV2 = ({
       });
 
       switch (type) {
+        case 'telemetry':
+          {
+            if(detail.eid=='START' || detail.eid=='END')
+            {
+              console.log("response#######",detail)
+              await getTelemetryEvents(detail, contentType, {
+                courseId,
+                unitId,
+                userId,
+                configFunctionality,
+              });
+            }
+            if(detail.eid=='PROGRESS' && detail?.edata?.resumeData!='' && contentType!='epub')
+            {
+              await getTelemetryEventsResume(detail, contentType, {
+                  courseId,
+                  unitId,
+                  userId,
+                  configFunctionality,
+                },
+                detail.edata.resumeData,
+                mimeType
+              );
+            }
+          }
+          break;
         case 'player:ready':
           console.log('[player:ready v2]', detail);
           break;
         case 'player:start': {
-          console.log('[player:start]', detail);
-          const temp_details = buildTelemetryEvent('START', {
-            type: mimeType,
-            mode: 'play',
-            pageid: '',
-            duration: detail?.duration || 0,
-          });
-          const temp_details_end = buildTelemetryEvent('END', {
-            type: mimeType,
-            mode: 'play',
-            pageid: '',
-            duration: detail?.duration || 0,
-            summary: [{ progress: 100 }],
-          });
-          try {
-            await getTelemetryEvents(temp_details, 'content', { courseId, unitId, userId, configFunctionality });
-            await getTelemetryEvents(temp_details_end, 'content', { courseId, unitId, userId, configFunctionality });
-          } catch (error) {
-            console.error('Error submitting start telemetry:', error);
+          if(mimeType=='application/vnd.ekstep.h5p-archive' || mimeType=='application/vnd.ekstep.html-archive')
+          {
+            console.log('[player:start]', detail);
+            const temp_details = buildTelemetryEvent('START', {
+              type: mimeType,
+              mode: 'play',
+              pageid: '',
+              duration: detail?.duration || 0,
+            });
+            const temp_details_end = buildTelemetryEvent('END', {
+              type: mimeType,
+              mode: 'play',
+              pageid: '',
+              duration: detail?.duration || 0,
+              summary: [{ progress: 100 }],
+            });
+            try {
+              await getTelemetryEvents(temp_details, contentType, { courseId, unitId, userId, configFunctionality });
+              await getTelemetryEvents(temp_details_end, contentType, { courseId, unitId, userId, configFunctionality });
+            } catch (error) {
+              console.error('Error submitting start telemetry:', error);
+            }
           }
           break;
         }
@@ -92,6 +160,10 @@ const ContentPlayerV2 = ({
           break;
         case 'player:close':
           console.log('[player:close]', detail);
+          // Notify parent learner page so it can redirect via activeLink (sbplayer runs in iframe).
+          if (window.parent !== window) {
+            window.parent.postMessage({ type: 'player:close' }, '*');
+          }
           handleExitEvent();
           break;
       }
