@@ -1,7 +1,6 @@
 import React from 'react';
-import { Box, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useTranslation } from 'next-i18next';
 import { CourseRowProps } from '../../../utils/Interface';
 import {
   getCourseDisplayName,
@@ -10,6 +9,7 @@ import {
 } from '../../../utils/managerDashboardHelpers';
 import { COURSE_STATUS_CHIP_CONFIG } from '../../../utils/app.config';
 import CourseStatusChip from './CourseStatusChip';
+import { useTranslation } from 'next-i18next';
 
 const CourseRow: React.FC<CourseRowProps> = ({ course, statusCounts, onStatusClick }) => {
   const theme = useTheme<any>();
@@ -18,23 +18,8 @@ const CourseRow: React.FC<CourseRowProps> = ({ course, statusCounts, onStatusCli
   const badge = getCourseTypeBadge(course.courseType);
 
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems="center"
-      spacing={1.5}
-      sx={{
-        py: 1.5,
-        borderBottom: `1px solid ${theme.palette.warning['800']}`,
-        '&:last-of-type': { borderBottom: 'none' },
-      }}
-    >
-      <Stack
-        direction="row"
-        spacing={1.5}
-        alignItems="center"
-        sx={{ minWidth: 220, flexShrink: 0 }}
-      >
+    <TableRow>
+      <TableCell sx={{ py: 1.5 }}>
         <Box
           sx={{
             width: 28,
@@ -45,13 +30,14 @@ const CourseRow: React.FC<CourseRowProps> = ({ course, statusCounts, onStatusCli
             justifyContent: 'center',
             fontSize: '11px',
             fontWeight: 700,
-            flexShrink: 0,
             color: theme.palette.text.secondary,
             backgroundColor: theme.palette.warning['800'],
           }}
         >
           {badge}
         </Box>
+      </TableCell>
+      <TableCell sx={{ py: 1.5, minWidth: 200 }}>
         <Tooltip title={courseName} arrow>
           <Typography
             variant="body1"
@@ -62,22 +48,17 @@ const CourseRow: React.FC<CourseRowProps> = ({ course, statusCounts, onStatusCli
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              maxWidth: 220,
+              maxWidth: 260,
             }}
           >
             {courseName}
           </Typography>
         </Tooltip>
-      </Stack>
-
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        sx={{ flexShrink: 0 }}
-      >
+      </TableCell>
+      <TableCell sx={{ py: 1.5 }}>
         <Box
           sx={{
+            display: 'inline-flex',
             px: 1,
             py: 0.4,
             borderRadius: '4px',
@@ -89,17 +70,18 @@ const CourseRow: React.FC<CourseRowProps> = ({ course, statusCounts, onStatusCli
         >
           {getCourseLanguageLabel(course)}
         </Box>
-        {COURSE_STATUS_CHIP_CONFIG.map((statusConfig) => (
+      </TableCell>
+      {COURSE_STATUS_CHIP_CONFIG.map((statusConfig) => (
+        <TableCell key={statusConfig.key} align="center" sx={{ py: 1.5 }}>
           <CourseStatusChip
-            key={statusConfig.key}
             label={t(statusConfig.labelKey)}
             count={statusCounts[statusConfig.key]}
             colorToken={statusConfig.colorToken}
             onClick={() => onStatusClick(course.identifier, statusConfig.key)}
           />
-        ))}
-      </Stack>
-    </Stack>
+        </TableCell>
+      ))}
+    </TableRow>
   );
 };
 
