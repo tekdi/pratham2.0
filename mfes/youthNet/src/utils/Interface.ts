@@ -146,6 +146,20 @@ export type SearchableMultiSelectOption = FilterPillOption;
 
 // --- Component prop types ---------------------------------------------------------------------
 
+// One of the 3 sequential data-loading steps behind the Manager Dashboard's initial load screen —
+// derived (not stored) from the loading/error booleans useManagerDashboardData already exposes;
+// see ManagerDashboardLoadingScreen for how 'pending' vs 'loading' is worked out.
+export type ManagerDashboardLoadStepStatus = 'pending' | 'loading' | 'done' | 'error';
+
+export interface ManagerDashboardLoadingScreenProps {
+  usersLoading: boolean;
+  usersError: boolean;
+  coursesLoading: boolean;
+  coursesError: boolean;
+  summaryLoading: boolean;
+  summaryError: boolean;
+}
+
 export interface DashboardHeaderProps {
   title: string;
   totalEmployees: number;

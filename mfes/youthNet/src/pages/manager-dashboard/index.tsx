@@ -27,6 +27,7 @@ import {
   TopPerformersSection,
   CourseBreakdownList,
   DashboardOverview,
+  ManagerDashboardLoadingScreen,
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -89,6 +90,7 @@ const ManagerDashboard = () => {
     courseLearningSummary,
     summaryLoading,
     summaryError,
+    hasLoaded,
   } = useManagerDashboardData();
 
   console.log("##########namane courseLearningSummary",courseLearningSummary);
@@ -325,6 +327,17 @@ const ManagerDashboard = () => {
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
       <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
 
+        {!hasLoaded ? (
+          <ManagerDashboardLoadingScreen
+            usersLoading={usersLoading}
+            usersError={usersError}
+            coursesLoading={coursesLoading}
+            coursesError={coursesError}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+          />
+        ) : (
+          <>
             {userCustomFilterEntries.length > 0 && (
               <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
                 <Grid container spacing={2} sx={{ flex: 1 }}>
@@ -510,6 +523,8 @@ const ManagerDashboard = () => {
               />
             </Grid>
           </Grid>
+        )}
+          </>
         )}
       </Container>
     </Box>
