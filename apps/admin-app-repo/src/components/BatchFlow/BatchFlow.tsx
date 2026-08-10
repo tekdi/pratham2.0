@@ -107,9 +107,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     existingValues?: { board?: string[]; medium?: string[]; grade?: string[] }
   ) => {
     let alterSchema = resolveFrameworkPlaceholders(
-      JSON.parse(JSON.stringify(BatchCreateSchema))
+      structuredClone(BatchCreateSchema)
     );
-    let alterUiSchema = JSON.parse(JSON.stringify(BatchCreateUISchema));
+    let alterUiSchema = structuredClone(BatchCreateUISchema);
 
     let requiredArray = alterSchema?.required || [];
     const mustRequired = ['name', 'board', 'medium', 'grade'];

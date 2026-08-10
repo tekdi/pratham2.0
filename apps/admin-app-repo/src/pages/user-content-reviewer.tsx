@@ -70,7 +70,7 @@ const ContentReviewer = () => {
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(() =>
-    resolveFrameworkPlaceholders(JSON.parse(JSON.stringify(ContentReviewerSearchSchema)))
+    resolveFrameworkPlaceholders(structuredClone(ContentReviewerSearchSchema))
   );
   const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);

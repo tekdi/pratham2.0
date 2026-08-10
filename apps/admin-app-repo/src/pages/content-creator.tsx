@@ -48,7 +48,7 @@ const ContentCreator = () => {
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
   const [schema, setSchema] = useState(() =>
-    resolveFrameworkPlaceholders(JSON.parse(JSON.stringify(ContentCreatorSearchSchema)))
+    resolveFrameworkPlaceholders(structuredClone(ContentCreatorSearchSchema))
   );
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
   const [addSchema, setAddSchema] = useState(null);
