@@ -163,7 +163,7 @@ const CoursePlanner = () => {
     const fetchTaxonomyResultsOne = async () => {
       try {
         // Define the URL for the API
-        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${frameworkId}`;
+        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
 
         // Use axios to fetch data from the API
         const response = await axios.get(url);
@@ -226,7 +226,7 @@ const CoursePlanner = () => {
 
         console.log(boardNew, mediumNew, gradeNew);
 
-        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${frameworkId}`;
+        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
 
         // Use axios to fetch data from the API
         const response = await axios.get(url);
