@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentReviewerSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -69,7 +69,9 @@ const ContentReviewer = () => {
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(ContentReviewerSearchSchema);
+  const [schema, setSchema] = useState(() =>
+    resolveFrameworkPlaceholders(JSON.parse(JSON.stringify(ContentReviewerSearchSchema)))
+  );
   const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);

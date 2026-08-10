@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status, TenantName, isSecondChanceTenant } from '@/utils/app.constant';
+import { CohortTypes, Status, TenantName, isSecondChanceTenant, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Tooltip, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -121,7 +121,7 @@ const Centers = () => {
       console.log('responseForm', responseForm);
 
       //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema;
+      let alterSchema = resolveFrameworkPlaceholders(responseForm?.schema);
       let requiredArray = alterSchema?.required;
       const mustRequired = [
         'name',

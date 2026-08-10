@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentCreatorSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -69,7 +69,9 @@ const ContentCreator = () => {
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(ContentCreatorSearchSchema);
+  const [schema, setSchema] = useState(() =>
+    resolveFrameworkPlaceholders(JSON.parse(JSON.stringify(ContentCreatorSearchSchema)))
+  );
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
