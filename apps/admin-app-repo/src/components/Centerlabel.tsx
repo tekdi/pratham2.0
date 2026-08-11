@@ -1,6 +1,6 @@
 import React from 'react';
 import { getCohortList } from '@/services/CohortService/cohortService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 
 const CenterLabel = ({ parentId }: any) => {
   const [centerLabel, setCenterLabel] = React.useState('-');

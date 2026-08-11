@@ -9,7 +9,7 @@ import { createUser } from '@/services/CreateUserService';
 import { sendEmailOnLearnerCreation } from '@/services/NotificationService';
 import { editEditUser } from '@/services/ProfileService';
 import useSubmittedButtonStore from '@/store/useSubmittedButtonStore';
-import { calculateAge, generateUsernameAndPassword } from '@/utils/Helper';
+import { calculateAge, generateUsernameAndPassword } from '@/utils/helper';
 import {
   FormContext,
   FormContextType,

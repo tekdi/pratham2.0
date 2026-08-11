@@ -8,7 +8,7 @@ import {
   SelectChangeEvent,
   Box,
 } from '@mui/material';
-import { findCommonAssociations, getAssociationsByName, getOptionsByCategory } from '@/utils/Helper';
+import { findCommonAssociations, getAssociationsByName, getOptionsByCategory } from '@/utils/helper';
 import useTenantConfig from "@/hooks/useTenantConfig";
 interface FrameworkCategoriesProps {
   initialBoard?: string;  

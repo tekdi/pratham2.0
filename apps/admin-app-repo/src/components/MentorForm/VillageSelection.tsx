@@ -17,7 +17,7 @@ import { Role } from '@/utils/app.constant';
 import {
   extractVillageIds,
   filterOutUserVillages,
-} from 'mfes/youthNet/src/utils/Helper';
+} from 'mfes/youthNet/src/utils/helper';
 
 const VillageSelection = ({
   blockId,

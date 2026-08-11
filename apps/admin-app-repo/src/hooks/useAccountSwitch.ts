@@ -7,7 +7,7 @@ import TenantService from '@/services/TenantService';
 import { useUserIdStore } from '@/store/useUserIdStore';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import useStore from '@/store/store';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import { Role, Storage, TenantName } from '@/utils/app.constant';
 import { AcademicYear } from '@/utils/Interfaces';
 

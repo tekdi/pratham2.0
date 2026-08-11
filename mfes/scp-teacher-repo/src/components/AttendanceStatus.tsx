@@ -5,7 +5,7 @@ import {
   CreateOutlined,
 } from '@mui/icons-material';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { formatToShowDateMonth, shortDateFormat } from '@/utils/Helper';
+import { formatToShowDateMonth, shortDateFormat } from '@/utils/helper';
 
 import { modifyAttendanceLimit } from '../../app.config';
 import useDeterminePathColor from '../hooks/useDeterminePathColor';

@@ -5,7 +5,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import Loader from "@/components/Loader";
 import { useTranslation } from "next-i18next";
 import { useQueryClient } from '@tanstack/react-query';
-import { preserveLocalStorage } from "@/utils/Helper";
+import { preserveLocalStorage } from "@/utils/helper";
 
 function Logout() {
   const router = useRouter();

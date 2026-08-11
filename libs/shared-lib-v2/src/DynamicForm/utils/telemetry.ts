@@ -1,5 +1,5 @@
 //@ts-nocheck
-import { generateUUID, getDeviceId } from './Helper';
+import { generateUUID, getDeviceId } from './helper';
 const hostURL = process.env.NEXT_PUBLIC_TELEMETRY_URL;
 let CsTelemetryModule;
 let EkTelemetry;

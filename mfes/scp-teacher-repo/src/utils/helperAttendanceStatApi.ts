@@ -1,6 +1,6 @@
 import { getLearnerAttendanceStatus } from '@/services/AttendanceService';
 import { getEventsForDay } from '@/services/EventService';
-import { formatSelectedDate } from './Helper';
+import { formatSelectedDate } from './helper';
 import { LearnerAttendanceProps } from './Interfaces';
 import { Role } from './app.constant';
 

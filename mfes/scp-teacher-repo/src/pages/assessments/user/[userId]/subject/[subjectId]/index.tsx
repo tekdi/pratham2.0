@@ -4,7 +4,7 @@ import { searchAssessment } from '@/services/AssesmentService';
 import { getUserDetails } from '@/services/ProfileService';
 import { Pagination } from '@/utils/app.constant';
 import { logEvent } from '@/utils/googleAnalytics';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import { IQuestion } from '@/utils/Interfaces';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';

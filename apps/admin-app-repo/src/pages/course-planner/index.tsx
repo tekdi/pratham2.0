@@ -11,7 +11,7 @@ import {
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import { useRouter } from "next/router";
 import { getFrameworkDetails } from "@/services/coursePlanner";
-import { getOptionsByCategory } from "@/utils/Helper";
+import { getOptionsByCategory } from "@/utils/helper";
 import coursePlannerStore from "@/store/coursePlannerStore";
 import taxonomyStore from "@/store/tanonomyStore";
 import Loader from "@/components/Loader";

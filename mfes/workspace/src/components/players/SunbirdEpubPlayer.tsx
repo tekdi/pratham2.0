@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import React, { useEffect, useRef, useState } from "react";
-import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/Helper";
+import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/helper";
 
 interface PlayerConfigProps {
   playerConfig: any;

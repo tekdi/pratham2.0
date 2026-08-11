@@ -16,7 +16,7 @@ import {
   capitalizeEachWord,
   filterMiniProfileFields,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 
 interface StudentsStatsListProps {
   name: string;

@@ -4,7 +4,7 @@ import ObservationCard from '@/components/ObservationCard';
 import SearchBar from '@/components/Searchbar';
 import { targetSolution } from '@/services/ObservationServices';
 import { Role, Telemetry } from '@/utils/app.constant';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import {
   Box,

@@ -27,7 +27,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toPascalCase } from '../../utils/Helper';
+import { toPascalCase } from '../../utils/helper';
 import Dropdown from '../../components/youthNet/DropDown';
 import { getStateBlockDistrictList } from '../../services/youthNet/Dashboard/VillageServices';
 import { DROPDOWN_NAME } from '../../components/youthNet/tempConfigs';

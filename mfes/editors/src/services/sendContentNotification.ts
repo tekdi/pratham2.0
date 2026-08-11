@@ -1,4 +1,4 @@
-import { formatDate } from "../utils/Helper";
+import { formatDate } from "../utils/helper";
 import { sendCredentialService } from "./NotificationService";
 import { getLocalStoredUserName } from "./LocalStorageService";
 import { getUserDetailsInfo } from "./userServices";
