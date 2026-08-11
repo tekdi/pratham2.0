@@ -45,7 +45,7 @@ import {
 import { fetchUserList } from '../../../services/youthNet/Dashboard/UserServices';
 import { AssessmentStatus, Role, Status } from '../../../utils/app.constant';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { toPascalCase } from '../../../utils/Helper';
+import { toPascalCase } from '../../../utils/helper';
 
 interface LearnerData {
   learnerId: string;

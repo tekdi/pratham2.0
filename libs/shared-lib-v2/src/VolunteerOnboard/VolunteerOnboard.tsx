@@ -20,7 +20,7 @@ import {
 import { FormContext } from '../DynamicForm/components/DynamicFormConstant';
 import { updateUserPLP } from '../DynamicForm/services/CreateUserService';
 import { showToastMessage } from '../DynamicForm/components/Toastify';
-import { fetchActiveAcademicYearId } from '../DynamicForm/utils/Helper';
+import { fetchActiveAcademicYearId } from '../DynamicForm/utils/helper';
 import { post } from '../DynamicForm/services/RestClient';
 import API_ENDPOINTS from '../DynamicForm/utils/API/APIEndpoints';
 import { readUserIdTrue } from '../DynamicForm/services/NotificationService';

@@ -28,7 +28,7 @@ import {
   getYouthDataByDate,
 } from '../services/youthNet/Dashboard/UserServices';
 import Loader from '../components/Loader';
-import { filterUsersByAge, getLoggedInUserRole } from '../utils/Helper';
+import { filterUsersByAge, getLoggedInUserRole } from '../utils/helper';
 import { Role, Status } from '../utils/app.constant';
 import { getCohortList } from '../services/GetCohortList';
 import { fetchCohortMemberList } from '../services/MyClassDetailsService';

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
-import { toPascalCase } from '../DynamicForm/utils/Helper';
+import { toPascalCase } from '../DynamicForm/utils/helper';
 
 interface CenterData {
   id: string;

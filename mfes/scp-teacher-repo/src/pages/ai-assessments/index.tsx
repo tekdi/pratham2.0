@@ -7,7 +7,7 @@ import SearchBar from '../../components/Searchbar';
 import { showToastMessage } from '../../components/Toastify';
 import NoDataFound from '../../components/common/NoDataFound';
 import { getOfflineAssessmentDetails } from '../../services/AssesmentService';
-import { getAssessmentType } from '../../utils/Helper';
+import { getAssessmentType } from '../../utils/helper';
 import { ICohort } from '../../utils/Interfaces';
 import withAccessControl from '../../utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';

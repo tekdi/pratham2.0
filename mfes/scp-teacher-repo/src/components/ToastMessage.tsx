@@ -2,7 +2,7 @@ import React from 'react';
 import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
 import { toastAutoHideDuration } from '../../app.config';
-import { generateRandomString } from '@/utils/Helper';
+import { generateRandomString } from '@/utils/helper';
 
 interface State extends SnackbarOrigin {
   openModal: boolean;

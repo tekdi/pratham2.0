@@ -27,7 +27,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { accessControl, getTenantProgramFilter } from '../../../app.config';
-import { toPascalCase } from '../../utils/Helper';
+import { toPascalCase } from '../../utils/helper';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();

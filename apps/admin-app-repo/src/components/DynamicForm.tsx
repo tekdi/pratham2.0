@@ -9,7 +9,7 @@ import CustomRadioWidget from "./form/CustomRadioWidget";
 import MultiSelectCheckboxes from "./form/MultiSelectCheckboxes";
 import MultiSelectDropdown from "./form/MultiSelectDropdown";
 const FormWithMaterialUI = withTheme(MaterialUITheme);
-import { getCurrentYearPattern } from "@/utils/Helper";
+import { getCurrentYearPattern } from "@/utils/helper";
 import CustomNumberWidget from './CustomNumberWidget';
 import CustomImageWidget from "./form/CustomImageWidget";
 import {DynamicFormProps} from '../utils/Interfaces'

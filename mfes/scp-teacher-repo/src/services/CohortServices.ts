@@ -3,7 +3,7 @@ import { CohortListParam, GetCohortSearchParams } from '@/utils/Interfaces';
 import { Role, Status } from '@/utils/app.constant';
 import { get, post } from './RestClient';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
-import { flresponsetotl } from '@/utils/Helper';
+import { flresponsetotl } from '@/utils/helper';
 
 const getUserRole = () => {
   if (typeof window !== 'undefined') {

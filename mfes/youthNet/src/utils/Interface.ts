@@ -2,6 +2,7 @@
 // than inlining them per-file.
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
+import type { Dayjs } from 'dayjs';
 // Re-exported so consumers only need to import from this one place, while the actual API
 // contract (shared with the backend team / usable by other mfes) is owned by the shared-lib
 // service. Imported (not just re-exported) so these names are also usable below in this file.
@@ -255,6 +256,10 @@ export interface TopPerformersSectionProps {
   loading: boolean;
   error: boolean;
   totalEmployees: number;
+  fromDate: Dayjs | null;
+  toDate: Dayjs | null;
+  onFromDateChange: (date: Dayjs | null) => void;
+  onToDateChange: (date: Dayjs | null) => void;
   onSeeAllClick: () => void;
 }
 

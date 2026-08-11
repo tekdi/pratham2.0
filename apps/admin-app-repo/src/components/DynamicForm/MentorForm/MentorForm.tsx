@@ -27,7 +27,7 @@ import {
   isVillageDifferent,
   isBlockSetDifferent,
   isStateDifferent,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 import {

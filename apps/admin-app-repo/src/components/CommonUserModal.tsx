@@ -16,7 +16,7 @@ import {
   firstLetterInUpperCase,
   generateUsernameAndPassword,
   getUserFullName,
-} from "@/utils/Helper";
+} from "@/utils/helper";
 import { FormData } from "@/utils/Interfaces";
 import {
   FormContext,
@@ -43,7 +43,7 @@ import { RJSFSchema } from "@rjsf/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next";
 import React, { useEffect, useState } from "react";
-import { transformArray } from "../utils/Helper";
+import { transformArray } from "../utils/helper";
 import AreaSelection from "./AreaSelection";
 import CustomModal from "./CustomModal";
 import SendCredentialModal from "./SendCredentialModal";

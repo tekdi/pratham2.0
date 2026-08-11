@@ -28,7 +28,7 @@ import {
   fetchCohortMemberList,
   getCohortList,
 } from '@/services/CohortService/cohortService';
-import { toPascalCase, transformLabel } from '@/utils/Helper';
+import { toPascalCase, transformLabel } from '@/utils/helper';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenterLabel from '@/components/Centerlabel';

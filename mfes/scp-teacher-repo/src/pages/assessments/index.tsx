@@ -11,7 +11,7 @@ import {
   getDoIdForAssessmentDetails,
 } from '@/services/AssesmentService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
-import { getAssessmentType, toPascalCase } from '@/utils/Helper';
+import { getAssessmentType, toPascalCase } from '@/utils/helper';
 import { ICohort } from '@/utils/Interfaces';
 import { AssessmentStatus, Role, Status } from '@/utils/app.constant';
 import withAccessControl from '@/utils/hoc/withAccessControl';

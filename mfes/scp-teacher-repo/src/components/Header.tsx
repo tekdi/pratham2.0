@@ -27,7 +27,7 @@ import {
   firstLetterInUpperCase,
   getInitials,
   getUserFullName,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import { getUserDetails } from '@/services/ProfileService';

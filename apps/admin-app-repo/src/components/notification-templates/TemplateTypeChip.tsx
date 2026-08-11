@@ -1,6 +1,6 @@
 import React from "react";
 import { Chip, Stack } from "@mui/material";
-import { firstLetterInUpperCase } from "@/utils/Helper";
+import { firstLetterInUpperCase } from "@/utils/helper";
 
 interface TemplateTypeChips {
     keys: string[];

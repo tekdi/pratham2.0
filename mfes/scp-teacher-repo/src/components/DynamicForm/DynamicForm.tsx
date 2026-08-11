@@ -20,7 +20,7 @@ import {
   calculateAgeFromDate,
   toPascalCase,
   transformLabel,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 
 const DynamicForm = ({
   schema,

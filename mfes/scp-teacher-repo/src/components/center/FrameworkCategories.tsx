@@ -4,7 +4,7 @@ import {
   findCommonAssociations,
   getAssociationsByName,
   getOptionsByCategory,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import {
   Box,
   FormControl,

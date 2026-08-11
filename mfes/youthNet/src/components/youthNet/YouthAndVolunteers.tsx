@@ -12,7 +12,7 @@ import RegistrationStatistics from './RegistrationStatistics';
 import {  getVillages, getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
 import { useTranslation } from 'next-i18next';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { categorizeUsers } from '../../utils/Helper';
+import { categorizeUsers } from '../../utils/helper';
 
 interface Props {
   selectOptions: { label: string; value: string }[];
