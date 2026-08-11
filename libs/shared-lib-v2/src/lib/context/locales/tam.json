@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "பள்ளி பயிற்சி இல்லை"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"பதிவை சமர்ப்பிக்கவும்",
+    "SUBMIT_POC_REQUEST":"POC கோரிக்கையை சமர்ப்பிக்கவும்",
+    "REGISTER_ORGANISATION":"நிறுவனத்தை பதிவு செய்யவும்",
     "L1_COURSES": "L1 படிப்புகள்",
     "EXPLORE": "ஆராயுங்கள்",
     "SURVEYS": "கணக்கெடுப்புகள்",
@@ -930,6 +933,9 @@
     "POCSO_POLICY": "POCSO கொள்கை",
     "NDA_POLICY": "NDA கொள்கை",
     "FRAUD_PROTECTION_POLICY": "மோசடி பாதுகாப்பு கொள்கை",
+    "PTM_PHONE_NUMBER": "PTM இன் தொலைபேசி எண்",
+    "PTM_MOBILE_PLACEHOLDER": "10-இலக்க எண்",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "நீங்கள் ஒரு கூட்டாளி நிறுவனத்துடன் தொடர்புடையீர்களா?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "மற்றும் இரகசியத்தை பராமரிக்க ஒப்புக்கொள்கிறேன்.",
     "AND_TO_COMPLY": "மற்றும் இணங்க ஒப்புக்கொள்கிறேன்.",
     "AND": "மற்றும்",
