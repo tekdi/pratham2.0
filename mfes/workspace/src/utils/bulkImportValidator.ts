@@ -58,8 +58,16 @@ const err = (
 // first content / QS / course row's framework field.
 
 const detectFramework = (data: ParsedImportData): FrameworkId => {
+  // IMPORTANT: content rows are NOT a framework signal. The parser tags every
+  // content row with 'pos-framework' unconditionally, because the Content sheet
+  // uses the POS column set for all users regardless of the collection framework.
+  // Consulting contents first therefore forced every workbook containing even a
+  // single content row to validate as POS — which made SCP QuestionSets/Courses
+  // fail with "Domain*/Sub Domain*/Target Age Group* is required".
+  //
+  // QuestionSets and Courses carry the framework actually detected from the
+  // workbook's LookupData sheet, so only those are authoritative here.
   return (
-    (data.contents[0]?.framework as FrameworkId) ||
     (data.questionSets[0]?.framework as FrameworkId) ||
     (data.courses[0]?.framework as FrameworkId) ||
     'pos-framework'

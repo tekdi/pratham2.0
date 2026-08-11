@@ -1077,8 +1077,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 <LinkIcon sx={{ fontSize: '18px !important', color:  '#FDBE16' }} />
               }
               onClick={handleCopyRegistrationLink}
-              component="a"
-              href={withBasePath('/registration-link')}
             >
         { t('COMMON.COPY_REGISTRATION_LINK')}
             </Button>)}

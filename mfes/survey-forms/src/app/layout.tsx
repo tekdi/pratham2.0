@@ -1,6 +1,7 @@
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MuiThemeProvider from '../theme/MuiThemeProvider';
+import ChunkReloadGuard from '@shared-lib-v2/lib/ChunkReloadGuard/ChunkReloadGuard';
 import './global.css';
 
 export const metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <ChunkReloadGuard />
         <MuiThemeProvider>{children}</MuiThemeProvider>
         <ToastContainer
           position="top-center"

@@ -73,7 +73,10 @@ export const getUserDetailsInfo = async (
  export const fetchCCTAList = async(board?: any, subject?: any) => {
     try{
         const filter: any = {
-            role: Role.CCTA
+            role: Role.CCTA,
+            // exclude reviewers archived/inactive in the current program (tenant),
+            // so they no longer receive content review notifications
+            tenantStatus: ['active']
         }
         if (board) {
           filter.board = [board];

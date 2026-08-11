@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { filterContent } from '@shared-lib-v2/utils/AuthService';
-import {
-  KeyboardArrowDown,
-  KeyboardArrowUp
+import { useTranslation } from '@shared-lib';
+import { 
+  KeyboardArrowDown, 
+  KeyboardArrowUp 
 } from '@mui/icons-material';
 import {
   Box,
@@ -64,6 +65,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
   framework,
   onFiltersChange,
 }) => {
+  const { t } = useTranslation();
   const [frameworkData, setFrameworkData] = useState<any>(null);
   const [categories, setCategories] = useState<FilterCategory[]>([]);
   const [selectedFilters, setSelectedFilters] = useState<FilterState>(() => {
@@ -665,7 +667,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             }}
           >
             <Typography variant="h2" sx={{ fontWeight: 500 }}>
-              Filter By {staticFilterCount > 0 && `(${staticFilterCount})`}
+              {t('LEARNER_APP.COURSE.FILTER_BY')} {staticFilterCount > 0 && `(${staticFilterCount})`}
             </Typography>
             {staticFilterCount > 0 && (
               <Button
@@ -678,7 +680,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
                 }}
                 onClick={clearAllFilters}
               >
-                Clear Filter
+                {t('LEARNER_APP.COURSE.CLEAR_FILTER')}
               </Button>
             )}
           </Box>
@@ -859,7 +861,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             }}
           >
             <Typography variant="h2" sx={{ fontWeight: 500 }}>
-              Filter By
+              {t('LEARNER_APP.COURSE.FILTER_BY')}
             </Typography>
           </Box>
           <StaticFilterFields
@@ -890,7 +892,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
           }}
         >
           <Typography variant="h2" sx={{ fontWeight: 500 }}>
-            Filter By
+            {t('LEARNER_APP.COURSE.FILTER_BY')}
           </Typography>
         </Box>
         <Box sx={{ width: '100%' }}>
@@ -932,7 +934,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             fontWeight: 500,
           }}
         >
-          Filter By {filterCount > 0 && `(${filterCount})`}
+          {t('LEARNER_APP.COURSE.FILTER_BY')} {filterCount > 0 && `(${filterCount})`}
         </Typography>
         {filterCount > 0 && (
           <Button
@@ -945,7 +947,7 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
             }}
             onClick={clearAllFilters}
           >
-            Clear Filter
+            {t('LEARNER_APP.COURSE.CLEAR_FILTER')}
           </Button>
         )}
       </Box>

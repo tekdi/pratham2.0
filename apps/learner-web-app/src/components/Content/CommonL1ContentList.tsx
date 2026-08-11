@@ -23,10 +23,10 @@ import { profileComplitionCheck } from '@learner/utils/API/userService';
 import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import InfoIcon from '@mui/icons-material/Info';
 import { TenantName } from '../../utils/app.constant';
 import CommonLearnerCourse from './CommonLearnerCourse';
-import AttemptAssessmentButton from '@learner/components/AttemptAssessmentButton/AttemptAssessmentButton';
+import AssessmentAttempts from '@learner/components/AssessmentAttempts/AssessmentAttempts';
+import RegistrationSuccessCard from '@learner/components/RegistrationSuccessCard/RegistrationSuccessCard';
 
 interface CommonL1ContentListProps {
   notab?: boolean;
@@ -41,6 +41,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isProfileCard, setIsProfileCard] = useState(false);
+  const [showAssessmentAttempts, setShowAssessmentAttempts] = useState(true);
   const storedConfig =
     typeof window !== 'undefined'
       ? JSON.parse(localStorage.getItem('uiConfig') || '{}')
@@ -120,99 +121,50 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       {isLogin && (
         <>
           {typeof window !== 'undefined' &&
-            (localStorage.getItem('userProgram') ===
+            localStorage.getItem('userProgram') ===
               TenantName.SECOND_CHANCE_PROGRAM ||
               localStorage.getItem('userProgram') ===
-                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
-              <Box
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS && (
+              <Grid
+                container
+                spacing={2}
+                alignItems="stretch"
                 sx={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: '#F5F6FA',
-                  p: { xs: 2, md: 4 },
-                  mb: 3,
-                  borderRadius: 2,
-                  gap: 1,
+                  mb: 0,
+                  px: { xs: 2, md: 4 },
+                  pt: { xs: 2, md: 3 },
+                  pb: { xs: 1, md: 1.5 },
                 }}
               >
-                <InfoIcon
-                  sx={{
-                    fontSize: { xs: '28px', md: '36px' },
-                    color: '#FDBE16',
-                    flexShrink: 0,
-                  }}
-                />
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1,
-                    maxWidth: '650px',
-                  }}
+                <Grid
+                  item
+                  xs={12}
+                  lg={showAssessmentAttempts ? 6 : 12}
+                  sx={{ display: 'flex' }}
                 >
-                  <Typography
-                    variant="h5"
+                  <RegistrationSuccessCard
+                    programName={TenantName.SECOND_CHANCE_PROGRAM.replace(
+                      ' Program',
+                      ''
+                    )}
+                    statusLabel={t('LEARNER_APP.COURSE.REGISTERED')}
+                  />
+                </Grid>
+                {!notab && (
+                  <Grid
+                    item
+                    xs={12}
+                    lg={6}
                     sx={{
-                      textAlign: 'center',
-                      color: '#1F1B13',
-                      fontWeight: 600,
-                      fontSize: { xs: '12px', md: '16px' },
-                      lineHeight: { xs: '18px', md: '24px' },
+                      display: showAssessmentAttempts ? 'flex' : 'none',
                     }}
                   >
-                    {localStorage.getItem('userProgram') ===
-                    TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS
-                      ? t(
-                          'LEARNER_APP.COURSE.SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE'
-                        )
-                      : t('LEARNER_APP.COURSE.SECOND_CHANCE_REGISTRATION_MESSAGE')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      textAlign: 'center',
-                      color: '#1F1B13',
-                      fontWeight: 400,
-                      fontSize: { xs: '11px', md: '14px' },
-                      lineHeight: { xs: '16px', md: '20px' },
-                    }}
-                  >
-                    {t('LEARNER_APP.COURSE.PLAYSTORE_DOWNLOAD_MESSAGE')
-                      .split('{playStoreLink}')
-                      .map((part, index, array) => {
-                        if (index === array.length - 1) {
-                          return (
-                            <React.Fragment key={index}>{part}</React.Fragment>
-                          );
-                        }
-                        return (
-                          <React.Fragment key={index}>
-                            {part}
-                            <Link
-                              href="https://play.google.com/store/apps/details?id=com.pratham.learning"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              sx={{
-                                //color: '#FDBE16',
-                                color: 'blue',
-                                textDecoration: 'underline',
-                                fontWeight: 500,
-                                '&:hover': {
-                               //   color: '#fdbe16',
-                                  textDecoration: 'underline',
-                                },
-                              }}
-                            >
-                              Play Store
-                            </Link>
-                          </React.Fragment>
-                        );
-                      })}
-                  </Typography>
-                </Box>
-              </Box>
+                    <AssessmentAttempts
+                      onVisibilityChange={setShowAssessmentAttempts}
+                    />
+                  </Grid>
+                )}
+              </Grid>
             )}
           {!notab && (
             <Box
@@ -221,19 +173,21 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 flexDirection: { xs: 'column', sm: 'row' },
                 alignItems: { xs: 'flex-start', sm: 'center' },
                 justifyContent: 'space-between',
-                py: '36px',
-                px: '34px',
-                bgcolor: '#fff',
-                gap: 2,
+
+                mx: { xs: 2, md: 4 },
+
+                mb: 2,
+                gap: 1,
               }}
             >
               <Typography
                 variant="body1"
                 component="h2"
                 sx={{
-                  fontWeight: 500,
+                  fontWeight: 600,
                   color: '#1F1B13',
                   textTransform: 'capitalize',
+                  fontSize: '14px',
                   mb: 0,
                 }}
               >
@@ -242,7 +196,12 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
                 </span>
                 {t('COMMON.WELCOME')}, {localStorage.getItem('firstName')}!
               </Typography>
-              <AttemptAssessmentButton />
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.secondary', fontSize: '12px' }}
+              >
+                {t('LEARNER_APP.COURSE.COURSE_WELCOME_SUBTITLE')}
+              </Typography>
             </Box>
           )}
           {!notab && <InProgressContent />}
