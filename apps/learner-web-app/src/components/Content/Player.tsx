@@ -455,6 +455,24 @@ const App = ({
     });
   };
 
+  const courseUnitDetailsConfig = {
+    ...(_config?.courseUnitDetails || {}),
+    getContentData: (item: any) => {
+      setIsShowMoreContent(
+        item.children.filter(
+          (item: any) => item.identifier !== identifier
+        )?.length > 0
+      );
+    },
+    _parentGrid: { pb: 2 },
+    default_img: '/images/image_ver.png',
+    _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
+    _card: {
+      isHideProgress: true,
+      ...(_config?.courseUnitDetails?._card || {}),
+    },
+  };
+
   return (
     <Grid
       container
@@ -662,23 +680,7 @@ const App = ({
                     px: { md: 1 },
                     height: 'calc(100vh - 185px)',
                   }}
-                  _config={{
-                    ...(_config?.courseUnitDetails || {}),
-                    getContentData: (item: any) => {
-                      setIsShowMoreContent(
-                        item.children.filter(
-                          (item: any) => item.identifier !== identifier
-                        )?.length > 0
-                      );
-                    },
-                    _parentGrid: { pb: 2 },
-                    default_img: '/images/image_ver.png',
-                    _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-                    _card: {
-                      isHideProgress: true,
-                      ...(_config?.courseUnitDetails?._card || {}),
-                    },
-                  }}
+                  _config={courseUnitDetailsConfig}
                 />
               </Box>
 
@@ -724,23 +726,7 @@ const App = ({
                   px: { md: 1 },
                   height: 'calc(100vh - 185px)',
                 }}
-                _config={{
-                  ...(_config?.courseUnitDetails || {}),
-                  getContentData: (item: any) => {
-                    setIsShowMoreContent(
-                      item.children.filter(
-                        (item: any) => item.identifier !== identifier
-                      )?.length > 0
-                    );
-                  },
-                  _parentGrid: { pb: 2 },
-                  default_img: '/images/image_ver.png',
-                  _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-                  _card: {
-                    isHideProgress: true,
-                    ...(_config?.courseUnitDetails?._card || {}),
-                  },
-                }}
+                _config={courseUnitDetailsConfig}
               />
             </>
           )}
