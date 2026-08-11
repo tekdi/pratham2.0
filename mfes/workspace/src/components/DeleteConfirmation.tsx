@@ -79,7 +79,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
 
       if (rowData?.identifier) {
         try {
-     await unpublishContent(rowData?.identifier, rowData?.lastPublishedBy);
+     await unpublishContent(rowData?.identifier);
           console.log(`Unpublished item with identifier - ${rowData?.identifier}`);
 
           await delay(2000);
