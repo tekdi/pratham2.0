@@ -8,7 +8,7 @@ import {
   ContentReviewerUISchema,
 } from '../constant/Forms/ContentReviewerSearch';
 
-import { RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, TextField, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -49,7 +49,9 @@ const ContentReviewer = () => {
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(ContentReviewerSearchSchema);
+  const [schema, setSchema] = useState(() =>
+    resolveFrameworkPlaceholders(structuredClone(ContentReviewerSearchSchema))
+  );
   const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);

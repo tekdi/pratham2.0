@@ -175,7 +175,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         if (medium && grade && board) {
           const url =
             process.env.NEXT_PUBLIC_MIDDLEWARE_URL +
-            `/api/framework/v1/read/${frameworkId}`;
+            `/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
           const boardData = await fetch(url).then((res) => res.json());
           const frameworks = boardData?.result?.framework;
 

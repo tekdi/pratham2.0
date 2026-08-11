@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentCreatorSearch';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 
-import { RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
+import { RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, TextField, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -47,7 +47,9 @@ const ContentCreator = () => {
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(ContentCreatorSearchSchema);
+  const [schema, setSchema] = useState(() =>
+    resolveFrameworkPlaceholders(structuredClone(ContentCreatorSearchSchema))
+  );
   const [uiSchema, setUiSchema] = useState(ContentCreatorUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);

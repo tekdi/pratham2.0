@@ -35,7 +35,7 @@ import { useEffect, useState } from 'react';
 import {
   accessControl,
   AttendanceAPILimit,
-  Program,
+  getTenantProgramFilter,
 } from '../../../app.config';
 
 const DEFAULT_STATUS_ORDER = {
@@ -162,7 +162,7 @@ const Assessments = () => {
       // const stateName = localStorage.getItem('stateName');
 
       const filters = {
-        program: Program,
+        program: getTenantProgramFilter(),
         board: [selectedBoard],
         //  state: selectedState,
         status: ['Live'],

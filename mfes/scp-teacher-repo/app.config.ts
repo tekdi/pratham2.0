@@ -74,6 +74,29 @@ export const DaysOfWeek = {
 
 export const Program = ['Second Chance'];
 
+// Composite-search "program" filters were hardcoded to SCP's ['Second Chance'],
+// so any other tenant (e.g. Second Chance Program Pathways) got SCP's content
+// filtered in. Resolve the tenant's own program name(s) from uiConfig
+// (set on tenant switch, see Header.tsx) and fall back to the static
+// Program constant only if that's unavailable.
+export const getTenantProgramFilter = (): string[] => {
+  if (typeof window === 'undefined') return Program;
+
+  try {
+    const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
+    if (Array.isArray(uiConfig?.program) && uiConfig.program.length > 0) {
+      return uiConfig.program.filter(
+        (program: any) => typeof program === 'string' && program.trim()
+      );
+    }
+  } catch {
+    // fall through to default
+  }
+
+  const tenantName = localStorage.getItem('tenantName');
+  return tenantName ? [tenantName] : Program;
+};
+
 export const getTenantId = (): string | null => {
   if (typeof window !== 'undefined') {
     return localStorage.getItem('tenantId');
