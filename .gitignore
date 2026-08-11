@@ -67,3 +67,6 @@ mfes/workspace/public/generic-editor/
 # but allow H5P dist
 !mfes/players/public/libs/content-player-v2/h5p-libs/**/dist/
 !mfes/players/public/libs/content-player-v2/h5p-libs/**/dist/**
+
+# translation script artifacts (generated exports and returned client sheet)
+translation/Outputs/

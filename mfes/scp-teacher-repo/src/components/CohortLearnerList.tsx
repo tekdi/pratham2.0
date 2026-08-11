@@ -1,9 +1,9 @@
 import LearnersListItem from '@/components/LearnersListItem';
 import { getMyCohortMemberList, getMyCohortMemberListLearner } from '@/services/MyClassDetailsService';
 import useStore from '@/store/store';
-import { Role, Status, limit } from '@/utils/app.constant';
+import { Role, Status, pagesLimit } from '@/utils/app.constant';
 import { toPascalCase } from '@/utils/Helper';
-import { Box, Grid } from '@mui/material';
+import { Box, Grid, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
@@ -12,6 +12,7 @@ import Loader from './Loader';
 import SearchBar from './Searchbar';
 import { showToastMessage } from './Toastify';
 import axios from 'axios';
+import CustomPagination from './CustomPagination';
 
 interface UserDataProps {
   name: string;
@@ -35,6 +36,9 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
   isLearnerAdded,
   isLearnerReassigned,
 }) => {
+  const theme = useTheme<any>();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const [loading, setLoading] = React.useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -48,15 +52,37 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
   const [isLearnerDeleted, setIsLearnerDeleted] =
     React.useState<boolean>(false);
 
+  const [page, setPage] = useState(1);
+  const [offset, setOffset] = useState(0);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  const [infinitePage, setInfinitePage] = useState(1);
+  const [infiniteData, setInfiniteData] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  const PAGINATION_CONFIG = {
+    ITEMS_PER_PAGE: pagesLimit,
+    INFINITE_SCROLL_INCREMENT: pagesLimit,
+  };
+
   const { t } = useTranslation();
 
   useEffect(() => {
     const getCohortMemberList = async () => {
-      setLoading(true);
+      if (!isMobile) {
+        setLoading(true);
+      }
       try {
         if (cohortId) {
-          const page = 0;
-          const filters = { cohortId: cohortId , status: [Status.ACTIVE, Status.DROPOUT]};
+          const limit = pagesLimit;
+          const page = offset;
+          const filters: { cohortId: string; status: string[]; name?: string } = {
+            cohortId: cohortId,
+            status: [Status.ACTIVE, Status.DROPOUT],
+          };
+          if (searchTerm.trim()) {
+            filters.name = searchTerm.trim();
+          }
           const response = await getMyCohortMemberListLearner({
             limit,
             page,
@@ -85,13 +111,25 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                 customField: user?.customField,
               };
             });
-            setCohortLearnerCount(userDetails.length);
-            setUserData(userDetails);
-            setFilteredData(userDetails);
+
+            if (isMobile) {
+              setInfiniteData([...infiniteData, ...userDetails]);
+              setFilteredData([...infiniteData, ...userDetails]);
+              setUserData([...infiniteData, ...userDetails]);
+            } else {
+              setUserData(userDetails);
+              setFilteredData(userDetails);
+              setInfiniteData(userDetails);
+            }
+
+            setTotalCount(response?.result?.totalCount || 0);
+            setCohortLearnerCount(response?.result?.totalCount || 0);
           } else {
             setUserData([]);
-            setCohortLearnerCount(0);
             setFilteredData([]);
+            setInfiniteData([]);
+            setTotalCount(0);
+            setCohortLearnerCount(0);
           }
         }
       } catch (error) {
@@ -112,46 +150,44 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
     isLearnerAdded,
     isLearnerDeleted,
     isLearnerReassigned,
+    page,
+    infinitePage,
+    searchTerm,
   ]);
 
-  // Reapply search filter when userData changes
-  useEffect(() => {
-    if (userData) {
-      const query = searchTerm.toLowerCase().trim();
-      if (!query) {
-        setFilteredData(userData);
-      } else {
-        const filtered = userData.filter(
-          (data) =>
-            data?.name?.toLowerCase()?.includes(query) ||
-            data?.enrollmentNumber?.toLowerCase()?.includes(query)
-        );
-        setFilteredData(filtered);
-      }
+  const fetchMoreData = () => {
+    if (infiniteData && totalCount && infiniteData.length >= totalCount) {
+      setHasMore(false);
+      return;
     }
-  }, [userData, searchTerm]);
+    setOffset((prev) => {
+      if (totalCount && prev + PAGINATION_CONFIG.ITEMS_PER_PAGE <= totalCount) {
+        return prev + PAGINATION_CONFIG.ITEMS_PER_PAGE;
+      }
+      return prev;
+    });
+    setInfinitePage((prev) => prev + 1);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    if (!isMobile) {
+      setPage(newPage);
+    }
+    setOffset((newPage - 1) * PAGINATION_CONFIG.ITEMS_PER_PAGE);
+  };
 
   const handleLearnerDelete = () => {
     setIsLearnerDeleted(true);
   };
-    const handleSearch = (searchTerm: string) => {
-    setSearchTerm(searchTerm);
-    const query = searchTerm.toLowerCase().trim();
 
-    if (!query) {
-      // If search is empty, show all data
-      setFilteredData(userData);
-      return;
-    }
-
-    const filtered = userData?.filter(
-      (data) =>
-        data?.name?.toLowerCase()?.includes(query) ||
-        data?.enrollmentNumber?.toLowerCase()?.includes(query)
-    );
-    setFilteredData(filtered);
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setPage(1);
+    setOffset(0);
+    setInfinitePage(1);
+    setInfiniteData([]);
+    setHasMore(true);
   };
-  const theme = useTheme<any>();
 
   const [myCenterList, setMyCenterList] = useState<any[]>([]);
   const [myCenterIds, setMyCenterIds] = useState<any>([]);
@@ -259,7 +295,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       ) : (
         <>
-          {userData?.length ? (
+          {userData?.length || searchTerm ? (
             <SearchBar
               onSearch={handleSearch}
               value={searchTerm}
@@ -279,7 +315,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
             }}
           >
             <Grid container>
-              {filteredData?.map((data: any) => {
+              {(isMobile ? infiniteData : filteredData)?.map((data: any) => {
                 return (
                   <Grid xs={12} sm={12} md={6} lg={4} key={data.userId}>
                     <LearnersListItem
@@ -302,8 +338,29 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                   </Grid>
                 );
               })}
-              {!filteredData?.length && <NoDataFound />}
+              {(isMobile ? !infiniteData.length : !filteredData?.length) && (
+                <NoDataFound />
+              )}
             </Grid>
+            <Box
+              sx={{
+                mt: 2,
+                display: 'flex',
+                justifyContent: 'end',
+              }}
+            >
+              <CustomPagination
+                count={Math.ceil(totalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE)}
+                page={page}
+                onPageChange={handlePageChange}
+                fetchMoreData={fetchMoreData}
+                hasMore={hasMore}
+                TotalCount={totalCount}
+                items={infiniteData.map((user) => (
+                  <Box key={user.userId}></Box>
+                ))}
+              />
+            </Box>
           </Box>
         </>
       )}

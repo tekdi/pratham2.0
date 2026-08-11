@@ -77,6 +77,24 @@ const styleDataCell = (cell: ExcelJS.Cell, required: boolean) => {
   };
 };
 
+// ─── Compute LookupData ranges WITHOUT creating the sheet ─────
+// The Excel range for each lookup list depends only on the column order and
+// the number of values, both known up-front. Computing this separately lets us
+// wire dropdowns into the data sheets while still adding the LookupData sheet
+// last, so the workbook's tab order is Instructions → data sheets → Examples → LookupData.
+const computeLookupRanges = (
+  fw: FrameworkId,
+  templateType: 'all' | 'content' | 'questionset' = 'all'
+): Record<keyof typeof LOOKUP, string> => {
+  const rangeMap: Partial<Record<keyof typeof LOOKUP, string>> = {};
+  getLookupColumns(fw, templateType).forEach((lc, colIdx) => {
+    const values = LOOKUP[lc.lookupKey] as readonly string[];
+    const letter = colLetter(colIdx + 1);
+    rangeMap[lc.lookupKey] = `LookupData!$${letter}$2:$${letter}$${values.length + 1}`;
+  });
+  return rangeMap as Record<keyof typeof LOOKUP, string>;
+};
+
 // ─── Build LookupData sheet and return column → range map ─────
 const buildLookupSheet = (
   workbook: ExcelJS.Workbook,
@@ -159,11 +177,13 @@ const applyDropdown = (
 };
 
 // ─── Build a generic entity sheet ────────────────────────────
+// NOTE: Data sheets are intentionally left EMPTY (headers + dropdowns only).
+// Sample rows live on the separate "Examples" sheet, which the parser ignores,
+// so users can never accidentally import the sample records.
 const buildEntitySheet = (
   workbook: ExcelJS.Workbook,
   sheetName: string,
   columns: ColumnDef[],
-  sampleRows: (string | number)[][],
   rangeMap: Record<string, string>
 ) => {
   const ws = workbook.addWorksheet(sheetName);
@@ -186,17 +206,6 @@ const buildEntitySheet = (
     styleHeader(cell, col.required);
   });
 
-  // ── Sample data rows ─────────────────────────────────────────
-  sampleRows.forEach((rowData, ri) => {
-    const exRow = ws.getRow(ri + 2);
-    exRow.height = 20;
-    rowData.forEach((val, ci) => {
-      const cell = exRow.getCell(ci + 1);
-      cell.value = val;
-      styleDataCell(cell, columns[ci]?.required ?? false);
-    });
-  });
-
   // ── Dropdowns for all data rows ──────────────────────────────
   columns.forEach((col, i) => {
     if (!col.lookupKey) return;
@@ -210,6 +219,89 @@ const buildEntitySheet = (
       col.multiSelect === true,
       sampleVals
     );
+  });
+
+  return ws;
+};
+
+// ─── Build the "Examples" reference sheet ────────────────────
+// Holds the sample rows for every data sheet in the workbook.
+// The importer only reads sheets named exactly 'Content', 'QuestionSets',
+// 'Questions', 'Courses', 'CourseChildrenMapping' and 'ExistingContentMapping',
+// so nothing on this sheet is ever imported. Users can copy a row from here
+// into the matching data sheet and edit it.
+
+interface ExampleBlock {
+  sheetName: string;
+  columns: ColumnDef[];
+  sampleRows: (string | number)[][];
+}
+
+const EXAMPLE_SHEET_NAME = 'Examples';
+const BANNER_BG = 'FFB71C1C';   // deep red — "not imported" warning
+
+const buildExamplesSheet = (
+  workbook: ExcelJS.Workbook,
+  blocks: ExampleBlock[]
+) => {
+  const ws = workbook.addWorksheet(EXAMPLE_SHEET_NAME);
+
+  // Widest block determines how many columns we style for the banner
+  const maxCols = blocks.reduce((m, b) => Math.max(m, b.columns.length), 1);
+
+  // ── Banner ───────────────────────────────────────────────────
+  ws.mergeCells(1, 1, 1, maxCols);
+  const banner = ws.getCell('A1');
+  banner.value =
+    'EXAMPLES ONLY — THIS SHEET IS NEVER IMPORTED. '
+    + 'Copy a row into the matching data sheet and replace it with your own values.';
+  banner.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+  banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BANNER_BG } };
+  banner.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+  ws.getRow(1).height = 30;
+
+  // Column widths from the widest block
+  for (let i = 1; i <= maxCols; i++) {
+    ws.getColumn(i).width = 26;
+  }
+
+  // ── One block per data sheet ─────────────────────────────────
+  let row = 3;   // leave row 2 blank under the banner
+
+  blocks.forEach((block) => {
+    // Block title — e.g. "Content — example rows"
+    ws.mergeCells(row, 1, row, Math.max(block.columns.length, 1));
+    const titleCell = ws.getCell(row, 1);
+    titleCell.value = `${block.sheetName} — example rows`;
+    titleCell.font = { bold: true, size: 12, color: { argb: HEADER_FG } };
+    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
+    titleCell.alignment = { vertical: 'middle', horizontal: 'left' };
+    ws.getRow(row).height = 24;
+    row++;
+
+    // Header row (same headers as the real sheet, so columns line up on paste)
+    const hdr = ws.getRow(row);
+    hdr.height = 28;
+    block.columns.forEach((col, i) => {
+      const cell = hdr.getCell(i + 1);
+      cell.value = col.header;
+      styleHeader(cell, col.required);
+    });
+    row++;
+
+    // Sample rows
+    block.sampleRows.forEach((rowData) => {
+      const exRow = ws.getRow(row);
+      exRow.height = 20;
+      rowData.forEach((val, ci) => {
+        const cell = exRow.getCell(ci + 1);
+        cell.value = val;
+        styleDataCell(cell, block.columns[ci]?.required ?? false);
+      });
+      row++;
+    });
+
+    row += 2;   // spacer between blocks
   });
 
   return ws;
@@ -520,10 +612,29 @@ const getQuestionsample = (): (string | number)[][] => [
   ],
 ];
 
+// CourseChildrenMapping columns (7): CourseTempID, UnitName, UnitDescription,
+//   UnitIconDriveURL, ChildRef, ChildType, Sequence
+// Unit Description and Unit Icon Drive URL are unit-level: fill them on the
+// FIRST row of each unit and leave blank on the remaining rows of that unit.
 const getCourseMappingsSample = (): (string | number)[][] => [
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_CONTENT_1', 'content',     1],
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_QS_1',      'questionset', 2],
-  ['TEMP_COURSE_1', 'Unit 2: Assessment',    'TEMP_QS_2',      'questionset', 1],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    'Foundational concepts to get started',                              // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_CONTENT_1', 'content', 1,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    '',   // blank — unit metadata already set on the first row of this unit
+    '',
+    'TEMP_QS_1', 'questionset', 2,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 2: Assessment',
+    'End-of-course assessment',                                          // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_QS_2', 'questionset', 1,
+  ],
 ];
 
 // ExistingContentMapping columns (6): TempID, ExistingIdentifier, EntityType,
@@ -557,9 +668,17 @@ const buildInstructionsSheet = (workbook: ExcelJS.Workbook, fw: FrameworkId) => 
     ['QuestionSets',          'Create question set containers with metadata.'],
     ['Questions',             'Add MCQ / Arrange / Match / Subjective questions linked to a QuestionSet.'],
     ['Courses',               'Create course containers.'],
-    ['CourseChildrenMapping', 'Map content and question sets into course units.'],
+    ['CourseChildrenMapping', 'Map content and question sets into course units. Also sets each unit\'s description and icon.'],
     ['ExistingContentMapping','Reference existing platform items (do_xxx) using a Temp ID.'],
+    ['Examples',              'Sample rows for every sheet. NOT imported — copy a row into the sheet above and edit it.'],
     ['LookupData',            'Reference sheet — all valid dropdown values. Do NOT edit this sheet.'],
+    ['', ''],
+    ['HOW TO FILL THIS TEMPLATE', ''],
+    ['1. Open the Examples sheet', 'See a filled-in sample row for each sheet.'],
+    ['2. Copy a sample row',       'Copy the row and paste it into the matching data sheet (row 2 onward).'],
+    ['3. Replace with your data',  'Overwrite every value with your own. Do not leave sample values in place.'],
+    ['4. Delete unused rows',      'Only rows you actually filled in are imported. Blank rows are skipped.'],
+    ['Note',                       'Data sheets ship EMPTY on purpose so sample records can never be imported by mistake.'],
     ['', ''],
     ['TEMP ID FORMAT', ''],
     ['Content',         'TEMP_CONTENT_1, TEMP_CONTENT_2, ...'],
@@ -627,71 +746,75 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     workbook.creator = 'Pratham Bulk Import';
     workbook.created = new Date();
 
-    // ── 1. Build LookupData sheet FIRST (needed for range references)
-    const rangeMap = buildLookupSheet(workbook, fw, templateType);
+    // ── 1. Compute lookup ranges up-front (does NOT create the sheet yet).
+    //       The LookupData sheet itself is added last so tab order reads:
+    //       Instructions → data sheets → Examples → LookupData.
+    const rangeMap = computeLookupRanges(fw, templateType);
 
-    // ── 2. Instructions sheet
+    // ── 2. Instructions sheet (first tab the user sees)
     buildInstructionsSheet(workbook, fw);
 
     // ── 3. Get framework-specific column definitions
     const cols = getFrameworkColumns(fw);
 
-    // ── 4–9. Conditionally add sheets based on templateType ────────
+    // ── 4–9. Decide which data sheets this template contains ───────
+    // Each entry pairs the sheet with its sample rows. The data sheet itself is
+    // created EMPTY; the samples go on the separate 'Examples' sheet only.
+    const blocks: ExampleBlock[] = [];
+
     if (templateType === 'all' || templateType === 'content') {
-      buildEntitySheet(
-        workbook, 'Content', cols.contentColumns,
-        fw === 'scp-framework' ? getScpContentSample() : getPosContentSample(),
-        rangeMap
-      );
+      blocks.push({
+        sheetName: 'Content',
+        columns: cols.contentColumns,
+        sampleRows: fw === 'scp-framework' ? getScpContentSample() : getPosContentSample(),
+      });
     }
 
     if (templateType === 'all' || templateType === 'questionset') {
-      buildEntitySheet(
-        workbook, 'QuestionSets', cols.qsColumns,
-        fw === 'scp-framework' ? getScpQsSample() : getPosQsSample(),
-        rangeMap
-      );
-      buildEntitySheet(
-        workbook, 'Questions', cols.questionColumns,
-        getQuestionsample(),
-        rangeMap
-      );
+      blocks.push({
+        sheetName: 'QuestionSets',
+        columns: cols.qsColumns,
+        sampleRows: fw === 'scp-framework' ? getScpQsSample() : getPosQsSample(),
+      });
+      blocks.push({
+        sheetName: 'Questions',
+        columns: cols.questionColumns,
+        sampleRows: getQuestionsample(),
+      });
     }
 
     if (templateType === 'all') {
-      buildEntitySheet(
-        workbook, 'Courses', cols.courseColumns,
-        fw === 'scp-framework' ? getScpCoursesSample() : getPosCoursesSample(),
-        rangeMap
-      );
-      buildEntitySheet(
-        workbook, 'CourseChildrenMapping', cols.mappingColumns,
-        getCourseMappingsSample(),
-        rangeMap
-      );
-      buildEntitySheet(
-        workbook, 'ExistingContentMapping', cols.existingColumns,
-        getExistingMappingsSample(),
-        rangeMap
-      );
+      blocks.push({
+        sheetName: 'Courses',
+        columns: cols.courseColumns,
+        sampleRows: fw === 'scp-framework' ? getScpCoursesSample() : getPosCoursesSample(),
+      });
+      blocks.push({
+        sheetName: 'CourseChildrenMapping',
+        columns: cols.mappingColumns,
+        sampleRows: getCourseMappingsSample(),
+      });
+      blocks.push({
+        sheetName: 'ExistingContentMapping',
+        columns: cols.existingColumns,
+        sampleRows: getExistingMappingsSample(),
+      });
     }
 
-    // ── Reorder sheets: Instructions first, _MSConfig last ─────────
-    const desiredOrder = [
-      'Instructions',
-      'Content',
-      'QuestionSets',
-      'Questions',
-      'Courses',
-      'CourseChildrenMapping',
-      'ExistingContentMapping',
-      'LookupData',
-    ];
-    workbook.worksheets.sort((a, b) =>
-      desiredOrder.indexOf(a.name) - desiredOrder.indexOf(b.name)
-    );
+    // Create each data sheet — headers + dropdowns only, no sample rows
+    blocks.forEach((b) => {
+      buildEntitySheet(workbook, b.sheetName, b.columns, rangeMap);
+    });
 
-    // ── 11. Write xlsx buffer ──────────────────────────────────────
+    // ── 10. Examples sheet — all sample rows live here, never imported ──
+    buildExamplesSheet(workbook, blocks);
+
+    // ── 11. LookupData sheet LAST so it sits at the end of the tab strip.
+    //        (Sheets are written in creation order; ExcelJS's `worksheets`
+    //        getter returns a copy, so sorting it after the fact is a no-op.)
+    buildLookupSheet(workbook, fw, templateType);
+
+    // ── 12. Write xlsx buffer ──────────────────────────────────────
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
 
     const fwLabel = fw === 'scp-framework' ? 'SCP' : 'POS';

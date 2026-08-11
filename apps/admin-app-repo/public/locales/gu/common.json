@@ -94,6 +94,7 @@
     "NO_DISTRICTS": "કોઈ જિલ્લો નથી",
     "ALL_STATES": "તમામ રાજ્યો",
     "LOGOUT": "લૉગ આઉટ કરો",
+    "SWITCH_PROGRAM_ROLE": "એક્સેસ બદલો",
     "HI": "નમસ્તે, {{name}}",
     "MOBILE": "મોબાઈલ",
     "ALL_BLOCKS": "બધા બ્લોક્સ",
@@ -133,9 +134,9 @@
     "CONTINUE": "ચાલુ રાખો",
     "DESCRIPTION": "વર્ણન",
     "ALREADY_EXIST": "કેન્દ્રનું નામ પહેલેથી જ અસ્તિત્વમાં છે. કૃપા કરીને બીજું નામ આપો",
-    "PAGE_NOT_FOUND": "પૃષ્ઠ મળ્યું નથી",
+    "PAGE_NOT_FOUND": "પેજ મળ્યું નથી",
     "ACCESS_DENIED": "ઍક્સેસ નકારી",
-    "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "તમારી પાસે આ પૃષ્ઠની ઍક્સેસ નથી",
+    "YOU_DONT_HAVE_PERMISSION_TO_ACCESS_THIS_PAGE": "તમારી પાસે આ પેજની ઍક્સેસ નથી",
     "RETURN_TO_LOGIN": "લોગિન પર પાછા ફરો",
     "COHORT_CODE_EXISTS": "કોડ પહેલેથી જ અસ્તિત્વમાં છે",
     "NO_MENTOR_FOUND": "કોઈ માર્ગદર્શક મળ્યો નથી",
@@ -169,7 +170,12 @@
     "MOVED_TO_DIFFERENT_ROLE": "અલગ ભૂમિકામાં ખસેડાયા",
     "NO_MOBILIZER_FOUND": "કોઈ માર્ગદર્શક મળ્યો નથી",
     "MAP": "નકશો",
-    "NEXT": "આગળ"
+    "NEXT": "આગળ",
+    "USER_BATCHES": "{{name}} નીચેના બેચનો છે.",
+    "DELETE_FROM_BATCH_WARNING": "શું તમે ઉપરોક્ત કેન્દ્રના બેચમાંથી વપરાશકર્તાને ડિલીટ કરવા  માંગો છો?",
+    "SAVE": "સેવ કરો",
+    "SAVING": "સેવ થઈ રહ્યું છે....",
+    "MAP_NEW": "નવું મેપ કરો"
   },
   "LOGIN_PAGE": {
     "USERNAME": "ઉપયોગકર્તાનું નામ",
@@ -182,6 +188,7 @@
     "REMEMBER_ME": "મને યાદ રાખો",
     "CONFIRM_PASSWORD": "પાસવર્ડની પુષ્ટિ કરો",
     "RESET_PASSWORD": "પાસવર્ડ રીસેટ કરો",
+    "SET_PASSWORD": "પાસવર્ડ સેટ કરો",
     "CREATE_NEW": "નવો, મજબૂત પાસવર્ડ બનાવો જેનો તમે અન્ય વેબસાઇટ્સ માટે ઉપયોગ કરતા નથી",
     "NOT_MATCH": "પાસવર્ડ મેળ ખાતા નથી",
     "CHARACTERS_LONG": "પાસવર્ડ ઓછામાં ઓછા 8 અક્ષર લાંબા હોવા જોઈએ",
@@ -264,7 +271,7 @@
     "BATCHES_SELECTED": "બેચ પસંદ કર્યા",
     "CENTERS": "કેન્દ્રો",
     "RE_ASSIGN_facilitator": "ફેસિલિટેટરને ફરીથી સોંપો",
-    "ASSIGN_BATCHES_FINISH": "તમે આને પછીથી તમારી પોતાની ગતિએ પૂર્ણ કરી શકો છો. જોકે, બેચ ફક્ત ત્યારે જ સોંપવામાં આવશે જ્યારે તમે ‘ફિનિશ અને અસાઇન’ પર ક્લિક કરશો.",
+    "ASSIGN_BATCHES_FINISH": "તમે આ પ્રક્રિયા તમારી અનુકૂળતા મુજબ પછીથી પણ પૂર્ણ કરી શકો છો. જો કે, જ્યાં સુધી તમે ‘Finish & Assign’  પર ક્લિક નહીં કરો, ત્યાં સુધી બેચ અસાઇન કરવામાં આવશે નહીં.",
     "ASSIGN_BATCHES_FROM_VILLAGES": "કેન્દ્રમાંથી બેચ સોંપો",
     "BACK_TO_FORM": "ફોર્મ પર પાછા",
     "SEARCH_BATCHES": "બેચ શોધો.."
@@ -317,12 +324,12 @@
     "ADMIN_UPDATED_SUCCESSFULLY": "એડમિન સફળતાપૂર્વક અપડેટ કરવામાં આવ્યું છે!"
   },
   "COHORTS": {
-    "SEARCHBAR_PLACEHOLDER": "સમૂહ ને શોધો"
+    "SEARCHBAR_PLACEHOLDER": "સેંટર શોધો"
   },
   "COURSE_PLANNER": {
-    "LEARNERS_PREREQISITE": "શીખનારાઓની પૂર્વજરૂરીયાતો",
+    "LEARNERS_PREREQISITE": "લનર્સ તૈયારી કરે છે",
     "NO_DATA_PRE": "લર્નર્સ પૂર્વ-જરૂરીયાતો માટે કોઈ ડેટા ઉપલબ્ધ નથી",
-    "LEARNERS_POSTREQISITE": "શીખનારાઓ પોસ્ટ-જરૂરીયાતો",
+    "LEARNERS_POSTREQISITE": "લર્નર્સ-જરૂરીયાતો",
     "NO_DATA_POST": "લર્નર્સ પોસ્ટ-જરૂરિયાતો માટે કોઈ ડેટા ઉપલબ્ધ નથી",
     "FACILITATORS": "ફેસિલિટેટર્સ આવશ્યકતાઓ",
     "NO_DATA": "ફેસિલિટેટર્સ આવશ્યકતાઓ માટે કોઈ ડેટા ઉપલબ્ધ નથી",
@@ -519,7 +526,7 @@
     "EDUCATIONAL_INSTITUTE": "શૈક્ષણિક સંસ્થા",
     "UNEMPLOYED_OR_DOMESTIC_WORK": "બેરોજગાર અથવા ઘરેલું કામ",
     "SELF_PLACED": "સ્વસ્થાપિત",
-    "TRANSGENDER": "ટ્રાન્સજેન્ડર",
+    "TRANSGENDER": "અન્ય",
     "HINDI": "હિન્દી",
     "MARATHI": "મરાઠી",
     "URDU": "ઉર્દૂ",
@@ -552,7 +559,10 @@
     "CONFIRM_TO_ACTIVATE": "શું તમે ખરેખર આ વપરાશકર્તાને ફરીથી સક્રિય કરવા માંગો છો?",
     "WORKING_LOCATION": "કાર્યસ્થળ",
     "CATCHMENT_AREA": "કેચમેન્ટ એરિયા",
-    "TYPE_OF_BATCH": "બેચનો પ્રકાર"
+    "TYPE_OF_BATCH": "બેચનો પ્રકાર",
+    "BELONG_TO_MULTIPLE_CENTERS": "નીચેના કેન્દ્રોથી સંબંધિત",
+    "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "શું તમે બધા કેન્દ્રોમાંથી વપરાશકર્તાને ડિલીટ કરવા  માંગો છો?",
+    "DO_YOU_WANT_TO_DELETE_FROM_LOCATION": "શું તમે બધા લોકેશનમાથી વપરાશકર્તાને ડિલીટ કરવા  માંગો છો?"
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "અમાન્ય ઇનપુટ.",
@@ -703,7 +713,7 @@
     "FINISH_ASSIGN": "સમાપ્ત કરો અને સોંપો",
     "VILLAGES_SELECTED": "ગામો પસંદ કર્યા",
     "DISTRICTS": "જિલ્લાઓ",
-    "ASSIGN_VILLAGES_FINISH": "તમે આને પછીથી તમારી પોતાની ગતિએ પૂર્ણ કરી શકો છો. જોકે, ગામો ફક્ત ત્યારે જ સોંપવામાં આવશે જ્યારે તમે ‘સમાપ્ત’ પર ક્લિક કરશો.",
+    "ASSIGN_VILLAGES_FINISH": "તમે આ પ્રક્રિયા તમારી અનુકૂળતા મુજબ પછીથી પણ પૂર્ણ કરી શકો છો. જો કે, જ્યાં સુધી તમે ‘Finish & Assign’ પર ક્લિક નહીં કરો, ત્યાં સુધી બેચ અસાઇન કરવામાં આવશે નહીં.",
     "ASSIGN_VILLAGES_FROM_BLOCKS": "બ્લોકમાંથી ગામડાઓ સોંપો",
     "BACK_TO_FORM": "ફોર્મ પર પાછા જાઓ",
     "SEARCH_VILLAGES": "ગામ શોધો..",
@@ -722,7 +732,7 @@
   "MALE": "પુરુષ",
   "FEMALE": "સ્ત્રી",
   "TRANSGENDER": "ટ્રાન્સજેન્ડર",
-  "dob": "dob",
+  "dob": "જન્મ તારીખ",
   "email": "ઈમેલ",
   "UNIT_NAME": "યુનિટનું નામ",
   "TYPE_OF_CENTER": "કેન્દ્રનો પ્રકાર",
@@ -779,9 +789,9 @@
     "SEARCHBAR_PLACEHOLDER": "કન્ટેન્ટ સમીક્ષક શોધો..",
     "NEW_CONTENT_REVIEWER": "નવો સામગ્રી સમીક્ષક",
     "FIRST_SELECT_REQUIRED_FIELDS": "પહેલા જરૂરી ક્ષેત્રો પસંદ કરો",
-    "CONTENT_REVIEWER_CREATED_SUCCESSFULLY": "સામગ્રી સમીક્ષક સફળતાપૂર્વક બનાવવામાં આવ્યો છે!",
-    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "સામગ્રી સમીક્ષક બનાવવામાં આવ્યો છે, ઓળખપત્રો ટૂંક સમયમાં મોકલવામાં આવશે",
-    "CONTENT_REVIEWER_UPDATED_SUCCESSFULLY": "સામગ્રી સમીક્ષક સફળતાપૂર્વક અપડેટ કરવામાં આવ્યો છે!",
+    "CONTENT_REVIEWER_CREATED_SUCCESSFULLY": "કન્ટેન્ટ રિવ્યુઅર સફળતાપૂર્વક બનાવવામાં આવ્યા છે!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "કન્ટેન્ટ રિવ્યુઅર (સામગ્રી સમીક્ષક) બનાવવામાં આવ્યા છે, લોગિન વિગતો (ક્રેડેન્શિયલ્સ) ટૂંક સમયમાં મોકલવામાં આવશે",
+    "CONTENT_REVIEWER_UPDATED_SUCCESSFULLY": "કન્ટેન્ટ રિવ્યુઅર સફળતાપૂર્વક અપડેટ કરવામાં આવ્યા છે!",
     "EDIT_CONTENT_REVIEWER": "સામગ્રી સમીક્ષક સંપાદિત કરો",
     "NOT_ABLE_UPDATE_CONTENT_REVIEWER": "સામગ્રી સમીક્ષકને અપડેટ કરવામાં અસમર્થ",
     "NOT_ABLE_CREATE_CONTENT_REVIEWER": "કન્ટેન્ટ રિવ્યૂઅર બનાવી શકતા નથી",
@@ -810,7 +820,7 @@
     "NOT_ABLE_UPDATE_MENTOR": "માર્ગદર્શક અપડેટ કરી શકતા નથી",
     "NOT_ABLE_CREATE_MENTOR": "માર્ગદર્શક બનાવી શકતા નથી",
     "UPDATE_MENTOR": "માર્ગદર્શક અપડેટ કરો",
-    "RE_ASSIGN_MENTOR": "માર્ગદર્શકને ફરીથી સોંપો"
+    "RE_ASSIGN_MENTOR": "મેંટરને ફરીથી સોંપો"
   },
   "GOOGLE MAP_LINK": "ગુગલ મેપ લિંક",
   "District": "જિલ્લો",
@@ -820,7 +830,7 @@
   "DISTRICTS": "જિલ્લો",
   "DISTRICT": "જિલ્લો",
   "CENTER:": "કેન્દ્ર:",
-  "SKILLING_CENTER_IMAGE": "સ્કલિંગ સેન્ટરની છબી",
+  "SKILLING_CENTER_IMAGE": "સ્કલિંગ સેન્ટરની ઇમેજ",
   "INDUSTRY": "ઉદ્યોગ",
   "ADDRESS": "સરનામું",
   "DOB": "જન્મ તારીખ",
@@ -874,6 +884,7 @@
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોક માટે ગામો પસંદ કરો. {{blocks}} અને {{count}} વધુ બ્લોક(ઓ) માં ગામો ખૂટે છે.",
     "WORKING_LOCATION_REQUIRED_MISSING_VILLAGES_SINGLE": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોક માટે ગામો પસંદ કરો. {{blocks}} માં ગામો ખૂટે છે.",
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "કાર્યસ્થળ જરૂરી છે. કૃપા કરીને બધા બ્લોકમાંથી ઓછામાં ઓછું એક ગામ પસંદ કરો.",
-    "MOBILIZER_NAME": "માર્ગદર્શકનું નામ"
+    "MOBILIZER_NAME": "માર્ગદર્શકનું નામ",
+    "EDIT_MOBILIZER": "મોબિલાઇઝર એડિટ કરો"
   }
 }

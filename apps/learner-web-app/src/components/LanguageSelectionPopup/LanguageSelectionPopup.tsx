@@ -50,7 +50,8 @@ const LanguageSelectionPopup: React.FC<LanguageSelectionPopupProps> = ({
 
     if (!hasMultipleLanguages) {
       const code = PLP_LANGUAGE_OPTIONS[0]?.code;
-      if (code) {
+      const alreadySelected = localStorage.getItem('lang');
+      if (code && !alreadySelected) {
         persistLanguage(code);
       }
       return;

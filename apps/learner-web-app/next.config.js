@@ -45,6 +45,23 @@ const nextConfig = {
     return config;
   },
 
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/((?!_next/static).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+        ],
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {

@@ -632,7 +632,7 @@ export const POS_QS_COLUMNS: ColumnDef[] = [
   { header: 'English Name',       apiField: 'englishName',     required: false, note: 'Title in English (englishName field)' },
   { header: 'Description*',       apiField: 'description',     required: true },
   { header: 'Primary Category*',  apiField: 'primaryCategory', required: true,  lookupKey: 'POS_PRIMARY_CATEGORIES_QS' },
-  { header: 'App Icon Drive URL', apiField: 'appIconUrl',      required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'App Icon Drive URL', apiField: 'appIconUrl',      required: false, note: 'Optional — Google Drive public share link for thumbnail (PNG/JPEG)' },
   { header: 'Program',            apiField: 'program',         required: false, lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Domain*',            apiField: 'domain',          required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — select one domain' },
   { header: 'Sub Domain*',        apiField: 'subDomain',       required: true,  lookupKey: 'POS_SUB_DOMAINS',      multiSelect: true, note: 'Comma or pipe-separated for multiple' },
@@ -657,7 +657,7 @@ export const POS_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Name*',              apiField: 'name',               required: true },
   { header: 'English Name',       apiField: 'englishName',        required: false, note: 'Title in English (englishName field)' },
   { header: 'Description',        apiField: 'description',        required: false },
-  { header: 'App Icon Drive URL*',apiField: 'appIconUrl',         required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'App Icon Drive URL', apiField: 'appIconUrl',         required: false, aliases: ['App Icon Drive URL*'], note: 'Optional — Google Drive public share link for thumbnail (PNG/JPEG)' },
   { header: 'Keywords',           apiField: 'keywords',           required: false, note: 'Comma-separated keywords' },
   { header: 'Program*',           apiField: 'program',            required: true,  lookupKey: 'POS_PROGRAMS',         multiSelect: true, note: 'Comma or pipe-separated for multiple' },
   { header: 'Domain*',            apiField: 'targetDomainIds',    required: true,  lookupKey: 'POS_DOMAINS',          note: 'Single value — sent as platform identifier' },
@@ -716,7 +716,7 @@ export const SCP_COURSE_COLUMNS: ColumnDef[] = [
   { header: 'Name*',                 apiField: 'name',            required: true },
   { header: 'English Name',          apiField: 'englishName',     required: false, note: 'Title in English (englishName field)' },
   { header: 'Description',           apiField: 'description',     required: false },
-  { header: 'App Icon Drive URL*',   apiField: 'appIconUrl',      required: true,  note: 'Google Drive public share link for thumbnail (PNG/JPEG)' },
+  { header: 'App Icon Drive URL',    apiField: 'appIconUrl',      required: false, aliases: ['App Icon Drive URL*'], note: 'Optional — Google Drive public share link for thumbnail (PNG/JPEG)' },
   { header: 'Keywords',              apiField: 'keywords',        required: false, note: 'Comma-separated keywords' },
   { header: 'Program*',              apiField: 'program',         required: true,  lookupKey: 'SCP_PROGRAMS',     note: 'Default: Second Chance' },
   { header: 'Board*',                apiField: 'board',           required: true,  lookupKey: 'SCP_BOARDS',       note: 'Single value — sent as platform identifier' },
@@ -747,11 +747,14 @@ export const QUESTION_COLUMNS: ColumnDef[] = [
 ];
 
 export const COURSE_MAPPING_COLUMNS: ColumnDef[] = [
-  { header: 'Course Temp ID*', apiField: 'courseTempId', required: true,  note: 'Must match a Temp ID from Courses sheet' },
-  { header: 'Unit Name*',      apiField: 'unitName',     required: true,  note: 'e.g. Unit 1: Introduction — groups children under a unit' },
-  { header: 'Child Ref*',      apiField: 'childRef',     required: true,  note: 'Temp ID (TEMP_CONTENT_1, TEMP_QS_1) OR real do_xxxx identifier' },
-  { header: 'Child Type*',     apiField: 'childType',    required: true,  lookupKey: 'CHILD_TYPES' },
-  { header: 'Sequence*',       apiField: 'sequence',     required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
+  { header: 'Course Temp ID*',      apiField: 'courseTempId',     required: true,  note: 'Must match a Temp ID from Courses sheet' },
+  { header: 'Unit Name*',           apiField: 'unitName',         required: true,  note: 'e.g. Unit 1: Introduction — groups children under a unit' },
+  // Unit-level metadata — fill on any one row of the unit; blank on the rest.
+  { header: 'Unit Description',     apiField: 'unitDescription',  required: false, note: 'Optional description for this unit (shown to learners). Fill on the first row of each unit.' },
+  { header: 'Unit Icon Drive URL',  apiField: 'unitAppIconUrl',   required: false, note: 'Optional Google Drive public share URL for the unit icon image. Fill on the first row of each unit.' },
+  { header: 'Child Ref*',           apiField: 'childRef',         required: true,  note: 'Temp ID (TEMP_CONTENT_1, TEMP_QS_1) OR real do_xxxx identifier' },
+  { header: 'Child Type*',          apiField: 'childType',        required: true,  lookupKey: 'CHILD_TYPES' },
+  { header: 'Sequence*',            apiField: 'sequence',         required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
 ];
 
 // ExistingContentMapping: reference existing platform content by its do_xxx identifier.
