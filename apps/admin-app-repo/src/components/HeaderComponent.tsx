@@ -24,7 +24,7 @@ import {
   getCenterList,
   getStateBlockDistrictList,
 } from "../services/MasterDataService";
-import { transformArray } from "../utils/Helper";
+import { transformArray } from "../utils/helper";
 import AreaSelection from "./AreaSelection";
 
 interface State {

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { sendCredentialService } from '@/services/NotificationService';
 import { TelemetryEventType } from '@/utils/app.constant';
-import { firstLetterInUpperCase, getUserFullName } from '@/utils/Helper';
+import { firstLetterInUpperCase, getUserFullName } from '@/utils/helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import axios from 'axios';
 import { debounce } from 'lodash';

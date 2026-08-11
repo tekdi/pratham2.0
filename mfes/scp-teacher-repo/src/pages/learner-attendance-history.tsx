@@ -12,7 +12,7 @@ import MonthCalender from '@/components/MonthCalender';
 import { showToastMessage } from '@/components/Toastify';
 import { getLearnerAttendanceStatus } from '@/services/AttendanceService';
 import { getEventsForDay } from '@/services/EventService';
-import { shortDateFormat } from '@/utils/Helper';
+import { shortDateFormat } from '@/utils/helper';
 import { LearnerAttendanceProps } from '@/utils/Interfaces';
 import { logEvent } from '@/utils/googleAnalytics';
 import withAccessControl from '@/utils/hoc/withAccessControl';

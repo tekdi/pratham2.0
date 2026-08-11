@@ -15,7 +15,7 @@ import {
   getCohortNameById,
   getOptionsByCategory,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { BoardEnrollmentData } from '@/utils/Interfaces';
 import { telemetryFactory } from '@/utils/telemetry';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';

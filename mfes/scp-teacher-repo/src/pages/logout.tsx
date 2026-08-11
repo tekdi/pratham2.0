@@ -6,7 +6,7 @@ import ReactGA from 'react-ga4';
 import { Telemetry } from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
 import useStore from '@/store/store';
-import { preserveLocalStorage } from '@/utils/Helper';
+import { preserveLocalStorage } from '@/utils/helper';
 const loginUrl = process.env.NEXT_PUBLIC_LOGIN_URL;
 
 function Logout() {

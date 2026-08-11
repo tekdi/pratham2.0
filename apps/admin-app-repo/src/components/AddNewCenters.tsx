@@ -15,7 +15,7 @@ import { RJSFSchema } from "@rjsf/utils";
 import { useQuery } from "@tanstack/react-query";
 import { i18n, useTranslation } from "next-i18next";
 import React, { useEffect, useState } from "react";
-import { transformArray } from "../utils/Helper";
+import { transformArray } from "../utils/helper";
 import AreaSelection from "./AreaSelection";
 import FrameworkCategories from "./FrameworkCategories";
 import { showToastMessage } from "./Toastify";

@@ -5,7 +5,7 @@ import {
   Typography,
 } from '@mui/material';
 import React from 'react';
-import { getDayMonthYearFormat, shortDateFormat } from '../utils/Helper';
+import { getDayMonthYearFormat, shortDateFormat } from '../utils/helper';
 import CloseIcon from '@mui/icons-material/Close';
 import Backdrop from '@mui/material/Backdrop';
 import { useTheme } from '@mui/material/styles';

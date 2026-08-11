@@ -1,4 +1,4 @@
-import { getDeviceId } from '@/utils/Helper';
+import { getDeviceId } from '@/utils/helper';
 import { PlayerConfig } from '@/utils/Interfaces';
 let userName = '';
 if (typeof window !== 'undefined' && window.localStorage) {

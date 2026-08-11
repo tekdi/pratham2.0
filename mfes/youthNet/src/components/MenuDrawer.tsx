@@ -40,7 +40,7 @@ import checkBook from '../assets/images/checkbook.svg';
 import surveyForm from '../assets/images/surveyForm.svg';
 import { useDirection } from '../hooks/useDirection';
 import useStore from '../store/store';
-import { accessGranted } from '../utils/Helper';
+import { accessGranted } from '../utils/helper';
 import { AcademicYear } from '../utils/Interfaces';
 import {
   accessControl,

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import ButtonFunctional from './ButtonComponent';
 
-import { getDayMonthYearFormat, shortDateFormat } from '../utils/Helper';
+import { getDayMonthYearFormat, shortDateFormat } from '../utils/helper';
 
 interface ModalProps {
   open: boolean;

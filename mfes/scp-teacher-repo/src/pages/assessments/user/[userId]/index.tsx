@@ -12,7 +12,7 @@ import {
   format2DigitDate,
   getAssessmentType,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';

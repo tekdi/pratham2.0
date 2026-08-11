@@ -17,7 +17,7 @@ import Dropdown from '../../components/youthNet/DropDown';
 import Loader from '../../components/Loader';
 import { getStateBlockDistrictList } from '../../services/youthNet/Dashboard/VillageServices';
 import { cohortHierarchy } from '../../utils/app.constant';
-import { getLoggedInUserRole } from '../../utils/Helper';
+import { getLoggedInUserRole } from '../../utils/helper';
 
 const Survey = () => {
   const { t } = useTranslation();

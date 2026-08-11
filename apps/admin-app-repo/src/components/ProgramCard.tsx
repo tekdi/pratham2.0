@@ -23,7 +23,7 @@ import {
   convertImageToDataURL,
   mapFields,
   firstLetterInUpperCase,
-} from "@/utils/Helper";
+} from "@/utils/helper";
 
 import {
   deleteProgram,

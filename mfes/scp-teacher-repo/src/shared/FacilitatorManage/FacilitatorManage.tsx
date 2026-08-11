@@ -42,7 +42,7 @@ import AddIcon from '@mui/icons-material/Add';
 import apartment from '../../public/images/apartment.svg';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import FacilitatorForm from '@/components/DynamicForm/FacilitatorForm/FacilitatorForm';
-import { fetchUserData } from '@/utils/Helper';
+import { fetchUserData } from '@/utils/helper';
 
 const FacilitatorManage = ({
   open,
