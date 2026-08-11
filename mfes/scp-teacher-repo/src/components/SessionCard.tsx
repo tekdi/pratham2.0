@@ -1,6 +1,6 @@
 import { CustomField, SessionsCardProps } from '@/utils/Interfaces';
 import { Box, Snackbar, Typography } from '@mui/material';
-import { convertUTCToIST, getBMG, toPascalCase } from '@/utils/Helper';
+import { convertUTCToIST, getBMG, toPascalCase } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';

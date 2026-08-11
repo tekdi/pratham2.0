@@ -7,7 +7,7 @@ import {
   getAssociationsByCodeNew,
   getOptionsByCategory,
   normalizeData,
-} from "@/utils/Helper";
+} from "@/utils/helper";
 import { TelemetryEventType } from "@/utils/app.constant";
 import { telemetryFactory } from "@/utils/telemetry";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";

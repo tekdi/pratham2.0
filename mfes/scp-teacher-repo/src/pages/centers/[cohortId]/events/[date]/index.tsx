@@ -11,7 +11,7 @@ import {
   shortDateFormat,
   sortSessionsByTime,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import { Box, Grid, Typography } from '@mui/material';

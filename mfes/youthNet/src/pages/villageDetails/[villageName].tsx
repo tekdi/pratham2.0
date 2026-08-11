@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react';
 import { fetchUserList } from '../../services/youthNet/Dashboard/UserServices';
 import { Role, Status } from '../../utils/app.constant';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import { categorizeUsers, getLoggedInUserRole } from '../../utils/Helper';
+import { categorizeUsers, getLoggedInUserRole } from '../../utils/helper';
 import { cohortHierarchy } from '@/utils/app.constant';
 
 const VillageDetails = () => {

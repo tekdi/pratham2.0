@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import SearchBar from './Searchbar';
 import SimpleModal from './SimpleModal';
 import { showToastMessage } from './Toastify';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import NoDataFound from './common/NoDataFound';
 import { useQueryClient } from '@tanstack/react-query';
 

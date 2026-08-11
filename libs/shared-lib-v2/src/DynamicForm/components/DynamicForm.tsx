@@ -35,7 +35,7 @@ import {
   calculateAgeFromDate,
   toPascalCase,
   transformLabel,
-} from '../utils/Helper';
+} from '../utils/helper';
 import { CustomObjectFieldTemplate } from './FormTemplate/ObjectFieldTemplate';
 import { useTranslation } from '../../lib/context/LanguageContext';
 import SecurityIcon from '@mui/icons-material/Security';

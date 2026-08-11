@@ -5,7 +5,7 @@ import {
   deepClone,
   getDayMonthYearFormat,
   shortDateFormat,
-} from '../utils/Helper';
+} from '../utils/helper';
 
 import { Telemetry } from '@/utils/app.constant';
 import { telemetryFactory } from '@/utils/telemetry';

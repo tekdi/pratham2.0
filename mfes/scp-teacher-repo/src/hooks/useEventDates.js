@@ -5,7 +5,7 @@ import {
   getAfterDate,
   getBeforeDate,
   convertToIST,
-} from '../utils/Helper';
+} from '../utils/helper';
 import { dashboardDaysLimit } from '../../app.config';
 
 const useEventDates = (

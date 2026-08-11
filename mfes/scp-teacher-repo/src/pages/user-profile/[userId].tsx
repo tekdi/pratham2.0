@@ -10,7 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Profile from '@/components/Profile';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { GetStaticPaths } from 'next';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import useStore from '@/store/store';
 import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
 import FacilitatorManage from '@/shared/FacilitatorManage/FacilitatorManage';

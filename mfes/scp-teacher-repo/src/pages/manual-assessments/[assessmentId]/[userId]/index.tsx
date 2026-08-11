@@ -50,7 +50,7 @@ import AnswerSheet, {
   AssessmentTrackingData,
 } from '../../../../components/assessment/AnswerSheet';
 import MinimizeIcon from '@mui/icons-material/Minimize';
-import { toPascalCase } from '../../../../utils/Helper';
+import { toPascalCase } from '../../../../utils/helper';
 import UploadFiles from '../../../../components/UploadFiles/UploadFiles';
 import CloseIcon from '@mui/icons-material/Close';
 import QuestionMarksManualUpdate from '../../../../components/assessment/QuestionMarksManualUpdate';

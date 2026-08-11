@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
-import { ATTENDANCE_ENUM, formatDate } from '../utils/Helper';
+import { ATTENDANCE_ENUM, formatDate } from '../utils/helper';
 //components
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';

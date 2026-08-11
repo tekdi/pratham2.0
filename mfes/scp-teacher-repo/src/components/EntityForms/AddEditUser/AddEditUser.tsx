@@ -10,7 +10,7 @@ import {
   getReassignPayload,
   getUserFullName,
   isUnderEighteen,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import {
   notificationCallback,

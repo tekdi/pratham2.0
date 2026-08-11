@@ -4,7 +4,7 @@ import {
   AttendancePercentageProps,
   CohortMemberList,
 } from '../utils/Interfaces';
-import { getLatestEntries, shortDateFormat } from './Helper';
+import { getLatestEntries, shortDateFormat } from './helper';
 import { Status } from './app.constant';
 
 const getTotalStudentCount = async (

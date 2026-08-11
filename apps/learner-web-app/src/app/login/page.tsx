@@ -14,7 +14,7 @@ import { useTranslation } from '@shared-lib';
 import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import Loader from '@learner/components/Loader/Loader';
-import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/Helper';
+import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/helper';
 import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import Image from 'next/image';
