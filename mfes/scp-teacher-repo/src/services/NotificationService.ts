@@ -1,6 +1,6 @@
 import { SendCredentialsRequest } from '@/utils/Interfaces';
 import { post, get } from './RestClient';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import axios from 'axios';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 

@@ -28,7 +28,7 @@ import {
   getPosFrameworkList,
   getMediaFilterList,
 } from '../../../../services/ContentService';
-import { timeAgo } from '@workspace/utils/Helper';
+import { timeAgo } from '@workspace/utils/helper';
 import Loader from '@workspace/components/Loader';
 import NoDataFound from '@workspace/components/NoDataFound';
 import { MIME_TYPE } from '@workspace/utils/app.config';
@@ -70,7 +70,7 @@ const columns = [
     dataType: DataType.String,
     width: '200px',
   },
-  { key: 'status', title: 'STATUS', dataType: DataType.String, width: '100px' },
+  { key: 'status', title: 'STATUS', dataType: DataType.String, width: '140px' },
   {
     key: 'lastUpdatedOn',
     title: 'LAST MODIFIED',
@@ -196,6 +196,7 @@ const AllContentsPage = () => {
           'Live',
           'Unlisted',
           'FlagReview',
+          'Retired',
         ];
 
         switch (statusBy) {
@@ -209,6 +210,7 @@ const AllContentsPage = () => {
               'Live',
               'Unlisted',
               'FlagReview',
+              'Retired',
             ];
             break;
           case 'Live':
@@ -221,7 +223,11 @@ const AllContentsPage = () => {
             status = ['Draft'];
             break;
           case 'Unlisted':
+          case 'Unpublished':
             status = ['Unlisted'];
+            break;
+          case 'Deleted':
+            status = ['Retired'];
             break;
           case 'FlagReview':
             status = ['FlagReview'];
@@ -235,6 +241,7 @@ const AllContentsPage = () => {
               'Live',
               'Unlisted',
               'FlagReview',
+              'Retired',
             ];
         }
 

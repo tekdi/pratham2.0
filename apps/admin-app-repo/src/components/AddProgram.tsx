@@ -11,7 +11,7 @@ import { RJSFSchema } from "@rjsf/utils";
 import { useTranslation } from "next-i18next";
 import React, { useEffect, useState } from "react";
 import SimpleModal from "./SimpleModal";
-import { dataURLToBlob, getFilenameFromDataURL } from "@/utils/Helper";
+import { dataURLToBlob, getFilenameFromDataURL } from "@/utils/helper";
 import { showToastMessage } from "./Toastify";
 import { getFormRead } from "@/services/CreateUserService";
 import path from "path";

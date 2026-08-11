@@ -18,7 +18,7 @@ import {
   createOrUpdateOption,
   updateCohort,
 } from "@/services/MasterDataService";
-import { transformLabel } from "@/utils/Helper";
+import { transformLabel } from "@/utils/helper";
 import { showToastMessage } from "@/components/Toastify";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import { AddBlockModal } from "@/components/AddBlockModal";

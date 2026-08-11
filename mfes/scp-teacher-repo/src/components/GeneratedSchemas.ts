@@ -6,7 +6,7 @@ import {
   getCurrentYearPattern,
   getEmailPattern,
   getLastDayDate,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 
 export const customFields = {
   NumberInputField: NumberInputField,

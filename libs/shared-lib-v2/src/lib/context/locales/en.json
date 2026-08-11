@@ -549,6 +549,7 @@
     "WRITE_TO_US": "Write to us at",
     "NOT_ENROLLED_IN_PROGRAM": "You are not registered in",
     "YOU_CAN_ENROLL": "You can enroll into this program.",
+    "ALREADY_HAS_ROLE_IN_PROGRAM": "You already have the {role} role in {program}, so you cannot enroll into this program.",
     "ARE_YOU_HERE_TO_LEARN": "Are you here to learn?",
     "REGISTER_FOR_LEARNING": "Register for the one that suits your learning aspiration",
     "ARE_YOU_HERE_TO_VOLUNTEER": "Are you here to volunteer?",

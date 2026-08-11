@@ -14,7 +14,7 @@ import { VILLAGE_DATA } from '../../components/youthNet/tempConfigs';
 import VillageDetailCard from '../../components/youthNet/VillageDetailCard';
 import Frame2 from '../../assets/images/SurveyFrame2.png';
 import Profile from '../../components/youthNet/Profile';
-import { filterSchema, getAge, toPascalCase } from '../../utils/Helper';
+import { filterSchema, getAge, toPascalCase } from '../../utils/helper';
 import { useRouter } from 'next/router';
 import {
   getUserDetails,

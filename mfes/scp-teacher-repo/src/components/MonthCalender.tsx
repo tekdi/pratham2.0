@@ -7,7 +7,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { shortDateFormat } from '@/utils/Helper';
+import { shortDateFormat } from '@/utils/helper';
 import useDeterminePathColor from '../hooks/useDeterminePathColor';
 import useStore from '../store/store';
 import CalendarMonthRoundedIcon from '@mui/icons-material/CalendarMonthRounded';

@@ -1,5 +1,5 @@
 import { attendanceStatusList } from '@/services/AttendanceService';
-import { shortDateFormat } from '@/utils/Helper';
+import { shortDateFormat } from '@/utils/helper';
 import { AttendanceStatusListProps, DropoutMember } from '@/utils/Interfaces';
 import { Status, cohortPrivileges } from '@/utils/app.constant';
 import { AttendanceAPILimit } from '../../app.config';

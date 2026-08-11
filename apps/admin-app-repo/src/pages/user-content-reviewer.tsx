@@ -41,7 +41,7 @@ import TenantService from '@/services/TenantService';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import restoreIcon from '../../public/images/restore_user.svg';
 import { showToastMessage } from '@/components/Toastify';

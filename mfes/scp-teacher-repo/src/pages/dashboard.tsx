@@ -19,7 +19,7 @@ import {
   shortDateFormat,
   sortSessions,
   toPascalCase,
-} from '../utils/Helper';
+} from '../utils/helper';
 import {
   AttendancePercentageProps,
   CohortAttendancePercentParam,
@@ -80,7 +80,7 @@ import CentralizedModal from '@/components/CentralizedModal';
 import { getCohortDetails, getCohortList } from '@/services/CohortServices';
 import { getUserDetails } from '@/services/ProfileService';
 import taxonomyStore from '@/store/taxonomyStore';
-import { updateStoreFromCohorts } from '@/utils/Helper';
+import { updateStoreFromCohorts } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDirection } from '../hooks/useDirection';
