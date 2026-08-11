@@ -1,4 +1,5 @@
 import CommonUserModal from '@/components/CommonUserModal';
+import Loader from '@/components/Loader';
 import {
   FormContextType,
   Role,
@@ -18,10 +19,13 @@ import {
 } from '@/utils/Helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import useSubmittedButtonStore from '@/utils/useSharedState';
+import { useAccountSwitch } from '@/hooks/useAccountSwitch';
+import { showToastMessage } from '@/components/Toastify';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MailIcon from '@mui/icons-material/Mail';
 import PhoneIcon from '@mui/icons-material/Phone';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import {
   Avatar,
   Box,
@@ -33,6 +37,10 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import { ArrowDropDownIcon } from '@mui/x-date-pickers';
+import SwitchAccountDialog, {
+  TenantData,
+  getVisibleTenants,
+} from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
 const Profile = () => {
   const [anchorEl4, setAnchorEl4] = React.useState<null | HTMLElement>(null);
@@ -48,12 +56,15 @@ const Profile = () => {
   );
 
   const [submitValue, setSubmitValue] = React.useState<boolean>(false);
+  const [switchAccountOpen, setSwitchAccountOpen] = React.useState(false);
+  const [switching, setSwitching] = React.useState(false);
 
   const { t } = useTranslation();
   const setAdminInformation = useSubmittedButtonStore(
     (state: any) => state.setAdminInformation
   );
   const router = useRouter();
+  const { performAccountSwitch } = useAccountSwitch();
 
   const handleClick4 = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl4(event.currentTarget);
@@ -228,6 +239,65 @@ const Profile = () => {
     router.push('/edit-password'); // Then navigate to the edit password page
   };
 
+  const tenantData: TenantData[] = adminInfo?.tenantData ?? [];
+  const visibleTenants = getVisibleTenants(
+    tenantData,
+    typeof window !== 'undefined' ? window.location.host : ''
+  );
+  const totalAccountCombinations = visibleTenants.reduce(
+    (count: number, tenant: TenantData) => count + (tenant.roles?.length ?? 0),
+    0
+  );
+  const canSwitchAccount = totalAccountCombinations > 1;
+
+  const handleOpenSwitchAccount = () => {
+    handleClose4();
+    setSwitchAccountOpen(true);
+  };
+
+  const handleSwitchAccountConfirm = async (
+    tenantId: string,
+    tenantName: string,
+    tenantType: string,
+    roleId: string,
+    roleName: string
+  ) => {
+    const currentTenantId = localStorage.getItem('tenantId');
+    const currentRoleId = localStorage.getItem('roleId');
+
+    // No-op if the selection matches the currently active Program/Role
+    if (tenantId === currentTenantId && roleId === currentRoleId) {
+      return;
+    }
+
+    setSwitching(true);
+    try {
+      await performAccountSwitch({
+        tenantId,
+        tenantName,
+        tenantType,
+        roleId,
+        roleName,
+        userResponse: adminInfo,
+      });
+
+      const admin = localStorage.getItem('adminInfo');
+      if (admin && admin !== 'undefined') {
+        setAdminInfo(JSON.parse(admin));
+      }
+    } catch (error) {
+      console.log(error);
+      showToastMessage(
+        t('COMMON.SOMETHING_WENT_WRONG', {
+          defaultValue: 'Something went wrong. Please try again.',
+        }),
+        'error'
+      );
+    } finally {
+      setSwitching(false);
+    }
+  };
+
   return (
     <>
       <Button
@@ -396,50 +466,100 @@ const Profile = () => {
           <Box
             sx={{
               px: '20px',
+              py: '20px',
               display: 'flex',
-              gap: '10px',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              '@media (max-width: 434px)': {
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
+              flexDirection: 'column',
+              gap: '16px',
             }}
           >
-            <Button
-              fullWidth
-              variant="outlined"
-              color="primary"
-              onClick={handleEditPassword}
+            <Box
               sx={{
-                fontSize: '16px',
-                backgroundColor: 'white',
-                border: '0.6px solid #1E1B16',
-                my: '20px',
-                width: '408px',
-                '@media (max-width: 434px)': { width: '100%' },
+                display: 'flex',
+                gap: '16px',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                '@media (max-width: 434px)': {
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
               }}
-              endIcon={<EditIcon />}
             >
-              {typeof window !== 'undefined' && localStorage.getItem('temporaryPassword') === 'true' ? t('LOGIN_PAGE.SET_PASSWORD') : t('LOGIN_PAGE.RESET_PASSWORD')}
-            </Button>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              onClick={handleLogout}
-              sx={{
-                fontSize: '16px',
-                backgroundColor: '#FDBE16',
-                border: '0.6px solid #1E1B16',
-                my: '20px',
-                '@media (max-width: 434px)': { my: '0px', mb: '20px' },
-              }}
-              endIcon={<LogoutIcon />}
-            >
-              {t('COMMON.LOGOUT')}
-            </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="primary"
+                onClick={handleEditPassword}
+                sx={{
+                  fontSize: '16px',
+                  backgroundColor: 'white',
+                  border: '0.6px solid #1E1B16',
+                  flex: 1,
+                  width: canSwitchAccount ? '100%' : '408px',
+                  '@media (max-width: 434px)': { width: '100%' },
+                }}
+                endIcon={<EditIcon />}
+              >
+                {typeof window !== 'undefined' &&
+                localStorage.getItem('temporaryPassword') === 'true'
+                  ? t('LOGIN_PAGE.SET_PASSWORD')
+                  : t('LOGIN_PAGE.RESET_PASSWORD')}
+              </Button>
+              {canSwitchAccount ? (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleOpenSwitchAccount}
+                  sx={{
+                    fontSize: '16px',
+                    backgroundColor: 'white',
+                    border: '0.6px solid #1E1B16',
+                    flex: 1,
+                    minWidth: '172px',
+                    width: '100%',
+                    '@media (max-width: 434px)': { width: '100%' },
+                  }}
+                  disabled={switching}
+                  endIcon={<SwapHorizIcon />}
+                >
+                  {t('COMMON.SWITCH_PROGRAM_ROLE')}
+                </Button>
+              ) : (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  onClick={handleLogout}
+                  sx={{
+                    fontSize: '16px',
+                    backgroundColor: '#FDBE16',
+                    border: '0.6px solid #1E1B16',
+                    flex: 1,
+                  }}
+                  endIcon={<LogoutIcon />}
+                >
+                  {t('COMMON.LOGOUT')}
+                </Button>
+              )}
+            </Box>
+            {canSwitchAccount && (
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                onClick={handleLogout}
+                sx={{
+                  fontSize: '16px',
+                  backgroundColor: '#FDBE16',
+                  border: '0.6px solid #1E1B16',
+                  width: '100%',
+                }}
+                endIcon={<LogoutIcon />}
+              >
+                {t('COMMON.LOGOUT')}
+              </Button>
+            )}
           </Box>
         </Box>
       </Menu>
@@ -453,6 +573,25 @@ const Profile = () => {
           onSubmit={handleModalSubmit}
           userType={userType}
         />
+      )}
+      {switchAccountOpen && (
+        <SwitchAccountDialog
+          open={switchAccountOpen}
+          onClose={() => setSwitchAccountOpen(false)}
+          callbackFunction={handleSwitchAccountConfirm}
+          authResponse={tenantData}
+          currentTenantId={
+            (typeof window !== 'undefined' && localStorage.getItem('tenantId')) ||
+            undefined
+          }
+          currentRoleId={
+            (typeof window !== 'undefined' && localStorage.getItem('roleId')) ||
+            undefined
+          }
+        />
+      )}
+      {switching && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       )}
     </>
   );

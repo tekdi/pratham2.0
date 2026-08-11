@@ -227,13 +227,32 @@
       "EXPLORE_MORE_COURSES": "વધુ અભ્યાસક્રમો એક્સ્પ્લોર કરો",
       "EXPLORE_ADDITIONAL_RESOURCES": "વધારાના સંસાધનો અને સામગ્રી એક્સ્પ્લોર  કરો",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "સેકન્ડ ચાંસ કાર્યક્રમ માટે નોંધણી કરાવવા બદલ આભાર. અમારી ટીમ ટૂંક સમયમાં તમારો સંપર્ક કરશે. ત્યાં સુધી, તમે ઉપલબ્ધ કોર્સ કરી શકો છો.",
-      "PLAYSTORE_DOWNLOAD_MESSAGE": "તમે તમારા એકાઉન્ટને ઍક્સેસ કરવા માટે {playStoreLink} પરથી એપ્લિકેશન ડાઉનલોડ કરી શકો છો.",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "તમે \"ડાઉનલોડ પ્લે સ્ટોર\" બટન પર ટેપ કરીને એપ ડાઉનલોડ કરી શકો છો.",
+      "REGISTRATION_SUCCESSFUL_TITLE": "નોંધણી સફળ",
+      "REGISTERED": "નોંધાયેલ",
+      "PLAY_STORE": "પ્લે સ્ટોર",
+      "PROGRAM_LABEL": "કાર્યક્રમ",
+      "STATUS_LABEL": "સ્થિતિ",
+      "COURSE_WELCOME_SUBTITLE": "શોધ ચાલુ રાખો — નવા કોર્સ નિયમિતપણે ઉમેરવામાં આવે છે.",
       "FILTER_BY": "દ્વારા ફિલ્ટર કરો",
       "CLEAR_FILTER": "ફિલ્ટર સાફ કરો",
       "APPLY_FILTER": "ફિલ્ટર લાગુ કરો",
       "DONE": "પૂર્ણ",
       "CONTENT_FILTERS": "સામગ્રી ફિલ્ટર",
-      "CLEAR_ALL": "બધું સાફ કરો"
+      "CLEAR_ALL": "બધું સાફ કરો",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "મૂલ્યાંકન પ્રયાસો",
+        "OF": "માંથી",
+        "COMPLETED_LOWERCASE": "પૂર્ણ",
+        "ATTEMPT_LABEL": "પ્રયાસ",
+        "COMPLETED": "પૂર્ણ",
+        "NOT_ATTEMPTED": "પ્રયાસ કરેલ નથી",
+        "LOCKED": "લોક",
+        "AFTER_ATTEMPT_PREFIX": "પ્રયાસ પછી",
+        "BEST_SCORE": "શ્રેષ્ઠ સ્કોર",
+        "LATEST": "નવીનતમ",
+        "LOAD_ERROR": "હાલમાં મૂલ્યાંકન પ્રયાસો લોડ કરી શકાયા નથી."
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "બીજા કોર્સ શોધો"

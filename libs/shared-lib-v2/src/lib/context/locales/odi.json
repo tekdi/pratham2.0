@@ -227,13 +227,32 @@
       "EXPLORE_MORE_COURSES": "ଅଧିକ ପାଠ୍ୟକ୍ରମ ଏକ୍ସପ୍ଲୋର୍ କରନ୍ତୁ",
       "EXPLORE_ADDITIONAL_RESOURCES": "ଆଡ଼ିସ୍ନାଲ ଋଷିର୍ସ  ଏବଂ ବିଷୟବସ୍ତୁ  ଏକ୍ସପ୍ଲୋର୍ କରନ୍ତୁ",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "ସେକେଣ୍ଡ ଚାନ୍ସ ପ୍ରୋଗ୍ରାମରେ  ପଞ୍ଜିକରଣ କରିଥିବା  ପାଇଁ ଧନ୍ୟବାଦ। ଆମର ଟିମ ଖୁବ୍ ଶୀଘ୍ର ଆପଣଙ୍କ ସହିତ ଯୋଗାଯୋଗ କରିବ। ସେପର୍ଯ୍ୟନ୍ତ, ଆପଣ ଉପଲବ୍ଧ ପାଠ୍ୟକ୍ରମଗୁଡ଼ିକ ଅନୁସନ୍ଧାନ କରିପାରିବେ।",
-      "PLAYSTORE_DOWNLOAD_MESSAGE": "ଆପଣ ଆପଣଙ୍କର ଆକାଉଣ୍ଟକୁ ଆକ୍ସେସ୍ କରିବା ପାଇଁ {ପ୍ଲେ ଷ୍ଟୋରରୁ } ଆପ୍ ଡାଉନଲୋଡ୍ କରିପାରିବେ।",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "\"ଡାଉନଲୋଡ୍ ପ୍ଲେ ଷ୍ଟୋର୍\" ବଟନ୍ କ୍ଲିକ୍ କରି ଆପଣ ଆପ୍ ଡାଉନଲୋଡ୍ କରିପାରିବେ।",
+      "REGISTRATION_SUCCESSFUL_TITLE": "ପଞ୍ଜିକରଣ ସଫଳ ହୋଇଛି",
+      "REGISTERED": "ପଞ୍ଜିକୃତ",
+      "PLAY_STORE": "ପ୍ଲେ ଷ୍ଟୋର୍",
+      "PROGRAM_LABEL": "ପ୍ରୋଗ୍ରାମ",
+      "STATUS_LABEL": "ସ୍ଥିତି",
+      "COURSE_WELCOME_SUBTITLE": "ଅନୁସନ୍ଧାନ ଜାରି ରଖନ୍ତୁ — ନୂତନ ପାଠ୍ୟକ୍ରମ ନିୟମିତ ଭାବେ ଯୋଡ଼ାଯାଏ।",
       "FILTER_BY": "ଫିଲ୍ଟର  କରନ୍ତୁ",
       "CLEAR_FILTER": "ଫିଲ୍ଟର କ୍ଲିୟର କରନ୍ତୁ",
       "APPLY_FILTER": "ଫିଲ୍ଟର ଲଗାନ୍ତୁ",
       "DONE": "ସମ୍ପୂର୍ଣ୍ଣ",
       "CONTENT_FILTERS": "ବିଷୟବସ୍ତୁ ଫିଲ୍ଟର",
-      "CLEAR_ALL": "ସବୁ ଖାଲି କରନ୍ତୁ"
+      "CLEAR_ALL": "ସବୁ ଖାଲି କରନ୍ତୁ",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "ମୂଲ୍ୟାଙ୍କନ ପ୍ରୟାସ",
+        "OF": "ମଧ୍ୟରୁ",
+        "COMPLETED_LOWERCASE": "ସମ୍ପୂର୍ଣ୍ଣ",
+        "ATTEMPT_LABEL": "ପ୍ରୟାସ",
+        "COMPLETED": "ସମ୍ପୂର୍ଣ୍ଣ",
+        "NOT_ATTEMPTED": "ପ୍ରୟାସ କରାଯାଇ ନାହିଁ",
+        "LOCKED": "ଲକ୍",
+        "AFTER_ATTEMPT_PREFIX": "ପ୍ରୟାସ ପରେ",
+        "BEST_SCORE": "ସର୍ବୋତ୍ତମ ସ୍କୋର",
+        "LATEST": "ସର୍ବଶେଷ",
+        "LOAD_ERROR": "ବର୍ତ୍ତମାନ ମୂଲ୍ୟାଙ୍କନ ପ୍ରୟାସଗୁଡ଼ିକ ଲୋଡ୍ ହୋଇପାରିଲା ନାହିଁ।"
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "ଆଡିସ୍ନାଲ  କୋର୍ସଗୁଡିକୁ ଏକ୍ସପ୍ଲୋର କରନ୍ତୁ"

@@ -274,6 +274,8 @@ export type JobType =
   | 'create_questionset'
   | 'create_question'
   | 'update_questionset_hierarchy'
+  | 'review_questionset'
+  | 'publish_questionset'
   | 'create_course'
   | 'update_course_hierarchy';
 
