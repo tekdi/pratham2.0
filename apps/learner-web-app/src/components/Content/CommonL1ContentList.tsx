@@ -122,7 +122,9 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
         <>
           {typeof window !== 'undefined' &&
             localStorage.getItem('userProgram') ===
-              TenantName.SECOND_CHANCE_PROGRAM && (
+              TenantName.SECOND_CHANCE_PROGRAM ||
+              localStorage.getItem('userProgram') ===
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS && (
               <Grid
                 container
                 spacing={2}

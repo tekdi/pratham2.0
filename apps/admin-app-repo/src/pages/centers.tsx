@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status, TenantName } from '@/utils/app.constant';
+import { CohortTypes, Status, TenantName, isSecondChanceTenant, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Tooltip, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -121,7 +121,7 @@ const Centers = () => {
       console.log('responseForm', responseForm);
 
       //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema;
+      let alterSchema = resolveFrameworkPlaceholders(responseForm?.schema);
       let requiredArray = alterSchema?.required;
       const mustRequired = [
         'name',
@@ -131,7 +131,7 @@ const Centers = () => {
         'village',
         // 'catchment_area',
       ];
-      if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
+      if (isSecondChanceTenant(storedProgram)) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
       // Merge only missing items from required2 into required1
@@ -449,7 +449,7 @@ const Centers = () => {
     },
   ];
 
-  if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
+  if (isSecondChanceTenant(storedProgram)) {
     columns.push(...extraColumnsForSCP);
   }
   if (storedProgram === TenantName.YOUTHNET) {
@@ -512,7 +512,7 @@ const Centers = () => {
       },
       show: (row) =>
         row.status !== 'archived' &&
-        storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
+        isSecondChanceTenant(storedProgram),
     },
     {
       icon: (

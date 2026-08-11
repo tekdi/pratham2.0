@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status } from '@/utils/app.constant';
+import { CohortTypes, Status, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
@@ -106,8 +106,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     isEditMode: boolean,
     existingValues?: { board?: string[]; medium?: string[]; grade?: string[] }
   ) => {
-    let alterSchema = JSON.parse(JSON.stringify(BatchCreateSchema));
-    let alterUiSchema = JSON.parse(JSON.stringify(BatchCreateUISchema));
+    let alterSchema = resolveFrameworkPlaceholders(
+      structuredClone(BatchCreateSchema)
+    );
+    let alterUiSchema = structuredClone(BatchCreateUISchema);
 
     let requiredArray = alterSchema?.required || [];
     const mustRequired = ['name', 'board', 'medium', 'grade'];

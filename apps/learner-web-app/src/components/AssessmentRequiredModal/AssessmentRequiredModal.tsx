@@ -3,6 +3,7 @@ import { Box, Button, Divider, Modal, Typography } from '@mui/material';
 import Image from 'next/image';
 import tada from '../../../public/images/tada.gif';
 import { useTranslation } from '@shared-lib';
+import { TenantName } from '@learner/utils/app.constant';
 
 interface AssessmentRequiredModalProps {
   open: boolean;
@@ -91,12 +92,21 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
                 mb: 2,
               }}
             >
-             {`${t('LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT')}`}
-<br />
-{localStorage.getItem('isForNavaPatham') === 'true'
-  ? t('NAVAPATHAM.NAVAPATHAM')
-  : localStorage.getItem('userProgram')
-}.
+              {`${
+                localStorage.getItem('userProgram') ===
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS
+                  ? t(
+                      'LEARNER_APP.REGISTRATION_FLOW.SCP_PATHWAYS_YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT'
+                    )
+                  : t(
+                      'LEARNER_APP.REGISTRATION_FLOW.YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT'
+                    )
+              }`}
+              <br />
+              {localStorage.getItem('isForNavaPatham') === 'true'
+                ? t('NAVAPATHAM.NAVAPATHAM')
+                : localStorage.getItem('userProgram')}
+              .
             </Typography>
           )}
 
@@ -117,7 +127,11 @@ const AssessmentRequiredModal: React.FC<AssessmentRequiredModalProps> = ({
           <Button variant="outlined" color="secondary" onClick={onClose}>
             {t('COMMON.CLOSE')}
           </Button>
-          <Button variant="contained" color="primary" onClick={onStartAssessment}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={onStartAssessment}
+          >
             {t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
           </Button>
         </Box>

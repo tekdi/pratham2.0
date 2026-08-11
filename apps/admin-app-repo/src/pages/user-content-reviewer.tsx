@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/ContentReviewerSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -69,7 +69,9 @@ const ContentReviewer = () => {
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(ContentReviewerSearchSchema);
+  const [schema, setSchema] = useState(() =>
+    resolveFrameworkPlaceholders(structuredClone(ContentReviewerSearchSchema))
+  );
   const [uiSchema, setUiSchema] = useState(ContentReviewerUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
@@ -105,6 +107,10 @@ const ContentReviewer = () => {
       : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+  const selectedTenantData = getSelectedTenantData(
+    storedUserData?.tenantData,
+    localStorage.getItem('tenantId')
+  );
 
   console.log(
     '########### type Content Reviewer process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
@@ -359,10 +365,10 @@ const ContentReviewer = () => {
     },
   ];
   if (
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
   ) {
     columns = [...columns, ...scpCustomColumns];
-  } else if (storedUserData.tenantData[0].tenantName === TenantName.YOUTHNET) {
+  } else if (selectedTenantData?.tenantName === TenantName.YOUTHNET) {
     columns = [...columns, ...youthnetCustomColumns];
   }
 
@@ -543,7 +549,7 @@ const ContentReviewer = () => {
   const failureCreateMessage =
     'CONTENT_REVIEWERS.NOT_ABLE_CREATE_CONTENT_REVIEWER';
   const notificationKey =
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
       ? 'onScpContentReviewerCreate'
       : 'onYouthnetContentReviewerCreate';
   const notificationMessage =
