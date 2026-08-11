@@ -24,7 +24,7 @@ import {
   isBlockDifferent,
   isCenterDifferent,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
 import {

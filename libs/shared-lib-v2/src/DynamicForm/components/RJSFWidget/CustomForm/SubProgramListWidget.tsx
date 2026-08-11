@@ -15,7 +15,7 @@ import {
 import axios from 'axios';
 import API_ENDPOINTS from '../../../utils/API/APIEndpoints';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
-import { fetchActiveAcademicYearId } from '../../../utils/Helper';
+import { fetchActiveAcademicYearId } from '../../../utils/helper';
 import { readUserIdTrue } from '../../../services/NotificationService';
 
 interface Cohort {

@@ -13,6 +13,7 @@ import {
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
+import { naturalSortOptions } from '../../utils/helper';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -37,7 +38,7 @@ const AutoCompleteMultiSelectWidget = ({
 
   // Convert enumOptions to the format expected by Autocomplete
   const optionsList = useMemo(() => {
-    return enumOptions
+    const mappedOptions = enumOptions
       .filter((option) => option.value !== 'Select')
       .map((option) => {
         const translatedLabel = t(`FORM.${option.label}`, {
@@ -50,8 +51,8 @@ const AutoCompleteMultiSelectWidget = ({
           value: option.value,
           label: capitalizedLabel,
         };
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
+      });
+    return naturalSortOptions(mappedOptions);
   }, [enumOptions, t]);
 
   // Get selected options based on current values

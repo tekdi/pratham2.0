@@ -29,7 +29,7 @@ import {
   MasterVillageSchema,
   MasterVillageUISchema,
 } from '../constant/Forms/MasterVillageSearch';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 //import { DynamicForm } from '@shared-lib';

@@ -27,7 +27,7 @@ import {
 import { FormContext } from '@/components/DynamicForm/DynamicFormConstant';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
-import { fetchUserData } from '@/utils/Helper';
+import { fetchUserData } from '@/utils/helper';
 import { getUserDetails } from '@/services/ProfileService';
 
 const LearnerManage = ({

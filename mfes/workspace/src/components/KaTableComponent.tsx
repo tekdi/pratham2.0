@@ -435,6 +435,30 @@ const KaTableComponent: React.FC<CustomTableProps> = ({
                     </Typography>
                   );
                 }
+                if (props.rowData.status === 'Unlisted') {
+                  return (
+                    <Typography
+                      className="one-line-text"
+                      sx={{ fontSize: '14px', fontWeight: 500 }}
+                      variant="body2"
+                      color={'#635E57'}
+                    >
+                      Unpublished
+                    </Typography>
+                  );
+                }
+                if (props.rowData.status === 'Retired') {
+                  return (
+                    <Typography
+                      className="one-line-text"
+                      sx={{ fontSize: '14px', fontWeight: 500 }}
+                      variant="body2"
+                      color={'#8C1D18'}
+                    >
+                      Deleted
+                    </Typography>
+                  );
+                }
               } else if (props.column.key === 'create-by') {
                 if (props?.rowData?.creator || props?.rowData?.author)
                   return (

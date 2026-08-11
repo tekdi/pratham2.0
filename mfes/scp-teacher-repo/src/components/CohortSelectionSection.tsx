@@ -14,7 +14,7 @@ import { getCohortList } from '@/services/CohortServices';
 import { getUserDetails } from '@/services/ProfileService';
 import manageUserStore from '@/store/manageUserStore';
 import useStore from '@/store/store';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import { CustomField, ICohort } from '@/utils/Interfaces';
 import {
   CenterType,

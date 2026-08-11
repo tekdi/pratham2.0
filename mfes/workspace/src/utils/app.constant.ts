@@ -27,7 +27,7 @@ export enum ContentStatus {
   REJECTED="Rejected"
 }
 export const SortOptions = ["Modified On", "Created On"];
-export const StatusOptions = ["Live", "Review" ,  "Draft", "All"];
+export const StatusOptions = ["Live", "Review" ,  "Draft", "Unpublished", "Deleted", "All"];
 
 
 export const LIMIT = 10;

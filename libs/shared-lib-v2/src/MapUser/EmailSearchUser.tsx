@@ -11,7 +11,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { post } from '../DynamicForm/services/RestClient';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
-import { transformLabel } from '../DynamicForm/utils/Helper';
+import { transformLabel } from '../DynamicForm/utils/helper';
 import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 

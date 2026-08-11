@@ -1,5 +1,5 @@
 import reassignLearnerStore from '@/store/reassignLearnerStore';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import {

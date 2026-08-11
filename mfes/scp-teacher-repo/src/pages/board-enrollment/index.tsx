@@ -11,7 +11,7 @@ import {
   debounce,
   handleKeyDown,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { BoardEnrollmentStageCounts, ICohort, user } from '@/utils/Interfaces';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import EastIcon from '@mui/icons-material/East';

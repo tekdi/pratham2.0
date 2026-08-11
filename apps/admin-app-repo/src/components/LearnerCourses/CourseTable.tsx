@@ -26,7 +26,7 @@ import { getUserDetailsInfo } from '@/services/UserList';
 import TenantService from '@/services/TenantService';
 import { showToastMessage } from '../Toastify';
 import CustomModal from '../CustomModal';
-import { firstLetterInUpperCase, formatDate } from '@/utils/Helper';
+import { firstLetterInUpperCase, formatDate } from '@/utils/helper';
 import { Numbers, Status } from '@/utils/app.constant';
 import { TEMPLATE_ID } from '../../../app.config';
 

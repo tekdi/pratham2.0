@@ -20,7 +20,7 @@ import {
   filterMiniProfileFields,
   shortDateFormat,
   toPascalCase,
-} from '../utils/Helper';
+} from '../utils/helper';
 import DropoutLabel from './DropoutLabel';
 import LearnerModal from './LearnerModal';
 import Loader from './Loader';

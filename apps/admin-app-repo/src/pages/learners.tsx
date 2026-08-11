@@ -53,7 +53,7 @@ import {
   fetchUserData,
   formatDateToDDMMYYYY,
   transformLabel,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';

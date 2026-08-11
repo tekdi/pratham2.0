@@ -5,7 +5,7 @@ import { VillageNewRegistrationProps } from '../../utils/Interfaces';
 import { useRouter } from 'next/router';
 import { cohortHierarchy } from '@/utils/app.constant';
 import { YOUTHNET_USER_ROLE } from './tempConfigs';
-import { getLoggedInUserRole } from '../../utils/Helper';
+import { getLoggedInUserRole } from '../../utils/helper';
 
 const VillageNewRegistration: React.FC<VillageNewRegistrationProps> = ({
   locations,

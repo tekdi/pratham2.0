@@ -1,4 +1,4 @@
-import { preserveLocalStorage } from '@/utils/Helper';
+import { preserveLocalStorage } from '@/utils/helper';
 import WarningIcon from '@mui/icons-material/Warning';
 import { Link, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
