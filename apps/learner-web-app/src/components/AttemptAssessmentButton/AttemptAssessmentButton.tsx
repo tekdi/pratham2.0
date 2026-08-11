@@ -9,6 +9,14 @@ import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
 import { TenantName } from '@learner/utils/app.constant';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
 const AttemptAssessmentButton: React.FC = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
@@ -120,6 +128,31 @@ const AttemptAssessmentButton: React.FC = () => {
     }
   };
 
+  const handleUnavailableModalClose = () => {
+    setShowUnavailableModal(false);
+
+    // Android app: hand control back to the native view instead of staying
+    // on the web page, matching the pattern used elsewhere in the Saral flow.
+    const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+    if (isAndroid && window.ReactNativeWebView) {
+      let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+      if (!refreshToken) {
+        refreshToken = localStorage.getItem('refreshToken');
+      }
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: 'ENROLL_PROGRAM_EVENT',
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken,
+          },
+        })
+      );
+    }
+  };
+
   if (!showButton) {
     return null;
   }
@@ -148,10 +181,10 @@ const AttemptAssessmentButton: React.FC = () => {
 
       <SimpleModal
         open={showUnavailableModal}
-        onClose={() => setShowUnavailableModal(false)}
+        onClose={handleUnavailableModalClose}
         showFooter={true}
         primaryText={t('COMMON.OK')}
-        primaryActionHandler={() => setShowUnavailableModal(false)}
+        primaryActionHandler={handleUnavailableModalClose}
         modalTitle={t('LEARNER_APP.REGISTRATION_FLOW.COME_BACK_LATER')}
       >
         <Box p="10px">

@@ -467,7 +467,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
   }, [catchmentBlocksForDisplay]);
 
   // Maximum villages that can be selected
-  const MAX_VILLAGES = 50;
+  const MAX_VILLAGES = 80;
 
   // Calculate selected villages count
   const selectedVillagesCount = useMemo(() => {

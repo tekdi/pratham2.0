@@ -29,6 +29,16 @@ export const mapUserData = (userData: any) => {
       userData.customFields
         .find((f: any) => f.label === label)
         ?.selectedValues.map((v: any) => v?.id?.toString() || v?.value?.toString()) || '';
+    const getSelectedValueString = (label: any): string => {
+      const selected = userData.customFields.find(
+        (f: any) => f.label === label
+      )?.selectedValues?.[0];
+      return (
+        selected?.value?.toString() ||
+        (typeof selected === 'string' ? selected : '') ||
+        ''
+      );
+    };
 
     const getSingleSelectedValue = (label: any) => {
       const selected = userData.customFields.find(
@@ -92,7 +102,7 @@ export const mapUserData = (userData: any) => {
       ), // string
 
       preferred_mode_of_learning:
-        getSelectedValue('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || [],
+        getSelectedValueString('WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING') || "",
       what_is_your_preferred_language: getSelectedValue('WHAT_IS_YOUR_PREFERRED_LANGUAGE') || []
     };
     if (userData.middleName) {
@@ -126,6 +136,7 @@ result.number_of_children_in_your_group = getSingleTextValue('NUMBER_OF_CHILDREN
           'PARENT_GUARDIAN_PHONE_NO'
         ) || '';
     }
+    console.log("result===>", result);
     return result;
   } catch (error) {
     console.log(error);
@@ -165,6 +176,8 @@ export const getMissingFields = (schema: any, userData: any) => {
       'district',
       'block',
       'village',
+      // middle name is optional, filled or not it should never mark the profile incomplete
+      'middleName',
     ];
 
     fieldsToRemove.forEach((field) => {
