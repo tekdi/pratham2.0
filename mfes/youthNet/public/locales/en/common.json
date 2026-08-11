@@ -1233,6 +1233,8 @@
     "SEE_ALL_EMPLOYEES": "See all {{count}} employees",
     "CERTIFICATES_ISSUED": "{{count}} certificates issued",
     "NO_TOP_PERFORMERS": "No certificates issued yet",
+    "FROM_DATE": "From date",
+    "TO_DATE": "To date",
     "STATUS_SUMMARY_CERT": "{{count}} cert",
     "STATUS_SUMMARY_COMPLETED": "{{count}} completed",
     "STATUS_SUMMARY_IN_PROGRESS": "{{count}} in progress",
