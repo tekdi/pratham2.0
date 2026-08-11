@@ -9,7 +9,7 @@ import {
   sortSessions,
   sortSessionsByTime,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import {
   Button,
   Grid,

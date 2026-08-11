@@ -1,4 +1,4 @@
-import { getDayAndMonthName, getTodayDate } from '@/utils/Helper';
+import { getDayAndMonthName, getTodayDate } from '@/utils/helper';
 import {
   Box,
   Button,

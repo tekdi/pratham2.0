@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 import { DataPoint, sampleData } from './tempConfigs';
 import {   getVillages, getYouthDataByDate } from '../../services/youthNet/Dashboard/UserServices';
-import { countUsersByFilter } from '../../utils/Helper';
+import { countUsersByFilter } from '../../utils/helper';
 import { DateFilter } from '../../utils/app.constant';
 interface Props {
   userId: string;

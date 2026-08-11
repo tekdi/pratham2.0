@@ -13,7 +13,7 @@ import {
   handleKeyDown,
   sortAttendanceNumber,
   toPascalCase,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { CohortAttendancePercentParam, ICohort } from '@/utils/Interfaces';
 import {
   Box,

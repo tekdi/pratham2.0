@@ -22,7 +22,7 @@ import {
   Select,
 } from '@mui/material';
 import { Footer } from './Footer';
-import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/Helper';
+import { getDeviceIdUUID } from '@shared-lib-v2/DynamicForm/utils/helper';
 import { validate as uuidValidate } from 'uuid';
 import { useGlobalData } from '../Provider/GlobalProvider';
 import AccessibilityOptions from '../AccessibilityOptions/AccessibilityOptions';

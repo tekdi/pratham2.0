@@ -1,7 +1,7 @@
 import { MenuItem, FormControl, Select, InputLabel } from '@mui/material';
 import { useEffect, useState } from 'react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 
 interface DropdownProps {
   name?: string;

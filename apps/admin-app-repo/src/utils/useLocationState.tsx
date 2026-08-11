@@ -1,6 +1,6 @@
 import { formatedBlocks, formatedDistricts } from "@/services/formatedCohorts";
 import { cohortMemberList } from "@/services/UserList";
-import { firstLetterInUpperCase } from "@/utils/Helper";
+import { firstLetterInUpperCase } from "@/utils/helper";
 import { useMediaQuery } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "next-i18next";

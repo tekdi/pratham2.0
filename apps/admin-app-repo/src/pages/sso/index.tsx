@@ -26,7 +26,7 @@ import { useUserIdStore } from '@/store/useUserIdStore';
 import { Storage } from '@/utils/app.constant';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import TenantService from '@/services/TenantService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import useStore from '@/store/store';
 
 interface SSOAuthParams {

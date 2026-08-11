@@ -21,7 +21,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import {
   debounce,
   // getOptionsByCategory
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import {
   // getFrameworkDetails,
   getPrimaryCategory,

@@ -28,7 +28,7 @@ import {
   getPosFrameworkList,
   getMediaFilterList,
 } from '../../../../services/ContentService';
-import { timeAgo } from '@workspace/utils/Helper';
+import { timeAgo } from '@workspace/utils/helper';
 import Loader from '@workspace/components/Loader';
 import NoDataFound from '@workspace/components/NoDataFound';
 import { MIME_TYPE } from '@workspace/utils/app.config';

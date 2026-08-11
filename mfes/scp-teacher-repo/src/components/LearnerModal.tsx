@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Grid, Modal, Typography } from '@mui/material';
 
 import { modalStyles } from '@/styles/modalStyles';
-import { toPascalCase, translateString } from '@/utils/Helper';
+import { toPascalCase, translateString } from '@/utils/helper';
 import CloseSharpIcon from '@mui/icons-material/CloseSharp';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';

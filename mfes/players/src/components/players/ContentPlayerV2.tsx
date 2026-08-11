@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getTelemetryEvents, getTelemetryEventsResume } from '../../services/TelemetryService';
-import { handleExitEvent } from '../utils/Helper';
+import { handleExitEvent } from '../utils/helper';
 
 interface PlayerConfigProps {
   playerConfig: any;
