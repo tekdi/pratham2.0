@@ -81,7 +81,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
   // ── Step 1: Send OTP ──────────────────────────────────────────────
   const handleSendOTP = async () => {
     if (!/^[6-9]\d{9}$/.test(mobile)) {
-      setMobileError('Please enter a valid 10-digit mobile number');
+      setMobileError(t('LANDING.ENROL_MODAL.INVALID_MOBILE_NUMBER'));
       return;
     }
     setMobileError('');
@@ -95,10 +95,10 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
         setTimer(RESEND_SECONDS);
         setTimeout(() => otpRefs.current[0]?.focus(), 100);
       } else {
-        showToastMessage('Failed to send OTP. Please try again.', 'error');
+        showToastMessage(t('LANDING.ENROL_MODAL.FAILED_TO_SEND_OTP'), 'error');
       }
     } catch {
-      showToastMessage('Failed to send OTP. Please try again.', 'error');
+      showToastMessage(t('LANDING.ENROL_MODAL.FAILED_TO_SEND_OTP'), 'error');
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
   const handleVerify = async () => {
     const otpValue = otp.join('');
     if (otpValue.length < OTP_LENGTH) {
-      showToastMessage('Please enter the complete OTP', 'error');
+      showToastMessage(t('LANDING.ENROL_MODAL.ENTER_COMPLETE_OTP'), 'error');
       return;
     }
     setLoading(true);
@@ -152,10 +152,10 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
         }
         setStep('success');
       } else {
-        showToastMessage('Invalid OTP. Please try again.', 'error');
+        showToastMessage(t('LANDING.ENROL_MODAL.INVALID_OTP'), 'error');
       }
     } catch {
-      showToastMessage('Verification failed. Please try again.', 'error');
+      showToastMessage(t('LANDING.ENROL_MODAL.VERIFICATION_FAILED'), 'error');
     } finally {
       setLoading(false);
     }
@@ -203,7 +203,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 minWidth: 0,
               }}
             >
-              Go back
+              {t('LANDING.ENROL_MODAL.GO_BACK')}
             </Button>
           ) : (
             <Box />
@@ -252,12 +252,12 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
             <Typography
               sx={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '20px', mb: 0.5 }}
             >
-              Enter Mobile Number
+              {t('LANDING.ENROL_MODAL.ENTER_MOBILE_NUMBER')}
             </Typography>
             <Typography
               sx={{ fontFamily: 'Poppins', fontSize: '13px', color: '#555', mb: 2 }}
             >
-              We'll send a verification code
+              {t('LANDING.ENROL_MODAL.VERIFICATION_CODE_SUBTITLE')}
             </Typography>
 
             <Box
@@ -269,16 +269,14 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
               }}
             >
               <Typography sx={{ fontFamily: 'Poppins', fontSize: '12px', color: '#444', lineHeight: 1.6 }}>
-                To begin your registration, please enter your mobile number.
-                Don't have a mobile phone? You can enter your parent's or guardian's
-                number instead.
+                {t('LANDING.ENROL_MODAL.MOBILE_NUMBER_INSTRUCTIONS')}
                 <br />
-                We will send an OTP to this number for verification.
+                {t('LANDING.ENROL_MODAL.OTP_INSTRUCTIONS')}
               </Typography>
             </Box>
 
             <Typography sx={{ fontFamily: 'Poppins', fontWeight: 500, fontSize: '13px', mb: 0.5 }}>
-              Mobile Number
+              {t('LANDING.ENROL_MODAL.MOBILE_NUMBER_LABEL')}
             </Typography>
             <TextField
               fullWidth
@@ -332,7 +330,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 '&.Mui-disabled': { backgroundColor: '#FFE48A', color: '#1F1B13' },
               }}
             >
-              {loading ? 'Sending…' : 'Send OTP'}
+              {loading ? t('LANDING.ENROL_MODAL.SENDING') : t('LANDING.ENROL_MODAL.SEND_OTP')}
             </Button>
           </Box>
         )}
@@ -366,7 +364,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 '&:hover': { backgroundColor: '#f0b000' },
               }}
             >
-              Continue
+              {t('CONTINUE')}
             </Button>
           </Box>
         )}
@@ -428,7 +426,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
             <Typography
               sx={{ fontFamily: 'Poppins', fontWeight: 700, fontSize: '20px', mb: 0.5 }}
             >
-              Enter Verification Code
+              {t('LANDING.ENROL_MODAL.ENTER_VERIFICATION_CODE')}
             </Typography>
             <Typography sx={{ fontFamily: 'Poppins', fontSize: '13px', color: '#555', mb: 3 }}>
               {maskedMobile}
@@ -475,13 +473,13 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 '&.Mui-disabled': { backgroundColor: '#FFE48A', color: '#1F1B13' },
               }}
             >
-              {loading ? 'Verifying…' : 'Verify'}
+              {loading ? t('LANDING.ENROL_MODAL.VERIFYING') : t('LANDING.ENROL_MODAL.VERIFY')}
             </Button>
 
             <Box sx={{ textAlign: 'center' }}>
               {timer > 0 ? (
                 <Typography sx={{ fontFamily: 'Poppins', fontSize: '13px', color: '#888' }}>
-                  Resend code in {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
+                  {t('LANDING.ENROL_MODAL.RESEND_CODE_IN')} {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
                 </Typography>
               ) : (
                 <Button
@@ -495,7 +493,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                     p: 0,
                   }}
                 >
-                  Resend code
+                  {t('LANDING.ENROL_MODAL.RESEND_CODE')}
                 </Button>
               )}
             </Box>

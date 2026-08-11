@@ -68,6 +68,14 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
+  const [homeHref, setHomeHref] = useState('/home');
+
+  useEffect(() => {
+    const landingPage = localStorage.getItem('landingPage');
+    if (landingPage) {
+      setHomeHref(landingPage);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchEnrolledPrograms = async () => {
@@ -166,8 +174,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
                   cohortMemberStatus?: string;
                 }) =>
                   cohort?.type === 'BATCH' &&
-                  cohort?.cohortStatus === 'active' &&
-                  cohort?.cohortMemberStatus === 'active'
+                  cohort?.cohortStatus === 'active'
               )
             : false;
           if (hasBatch) {
@@ -365,23 +372,17 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
     }
   };
 
-  const handleShowAllPrograms = () => {
+  const handleShowAllPrograms = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     localStorage.removeItem('learnerCourseFilters');
     onClose();
     router.push('/programs');
   };
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
     onClose();
-    const landingPage =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('landingPage')
-        : null;
-    if (landingPage) {
-      router.push(landingPage);
-    } else {
-      router.push('/home');
-    }
+    router.push(homeHref);
   };
 
   const formatDate = (dateString?: string) => {
@@ -474,7 +475,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
                 fontSize: '14px',
               }}
             >
-              Registered on {formatDate(getRegistrationDate(currentProgram))}
+              {t('LEARNER_APP.PROGRAM_SWITCH_MODAL.REGISTERED_ON')} {formatDate(getRegistrationDate(currentProgram))}
             </Typography>
           )}
         </Box>
@@ -493,7 +494,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
                 color: '#1F1B13',
               }}
             >
-              Other programs you are enrolled in
+              {t('LEARNER_APP.PROGRAM_SWITCH_MODAL.OTHER_PROGRAMS_ENROLLED')}
             </Typography>
             <Box
               sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}
@@ -552,6 +553,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href={homeHref}
             onClick={handleHomeClick}
             startIcon={<HomeIcon />}
             sx={{
@@ -567,13 +570,15 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
               },
             }}
           >
-            Home
+            {t('LEARNER_APP.COMMON.HOME')}
           </Button>
           {(isAllProgramRegistred === 'no' ||
             (userProgram !== null && userProgram !== 'Pragyanpath')) && (
           <Button
             variant="outlined"
             fullWidth
+            component="a"
+            href="/programs"
             onClick={handleShowAllPrograms}
             sx={{
               borderColor: '#000',
@@ -588,7 +593,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
               },
             }}
           >
-            Show All Programs
+            {t('LEARNER_APP.PROGRAM_SWITCH_MODAL.SHOW_ALL_PROGRAMS')}
           </Button>
           )}
           <Button
@@ -625,9 +630,13 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
           onClose();
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}

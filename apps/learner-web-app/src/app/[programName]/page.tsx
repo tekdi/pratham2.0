@@ -218,7 +218,9 @@ export default function ProgramDetailPage() {
                 textTransform: 'uppercase',
               }}
             >
-              {program.name}
+              {/* {program.name} */}
+              {t(`PROGRAMS.${program.name}`)}
+
             </Typography>
           </Box>
         </Box>
@@ -254,7 +256,7 @@ export default function ProgramDetailPage() {
                     lineHeight: 1.4,
                   }}
                 >
-                  {`${t('LANDING.READY_TO_JOIN') || 'Ready to join'} ${program.name}?`}
+                  {`${t('LANDING.READY_TO_JOIN') || 'Ready to join'} ${t(`PROGRAMS.${program.name}`)}?`}
                 </Typography>
 
                 <Button

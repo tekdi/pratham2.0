@@ -140,56 +140,10 @@ export const Footer: React.FC = () => {
           zIndex: 1100,
           backgroundColor: '#f3f3f3',
           boxShadow: isExpanded ? '0 -2px 8px rgba(0, 0, 0, 0.08)' : 'none',
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            height: FOOTER_STRIP_HEIGHT,
-            px: { xs: 2, md: '56px' },
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            backgroundColor: '#f3f3f3',
-          }}
-        >
-          <ButtonBase
-            onClick={toggleFooter}
-            aria-expanded={isExpanded}
-            aria-controls="learner-footer-content"
-            aria-label={
-              isExpanded
-                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
-                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')
-            }
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              flexShrink: 0,
-              borderRadius: 1,
-              px: 1,
-              py: 0.5,
-              color: '#1F1B13',
-              '&:hover': {
-                backgroundColor: 'action.hover',
-              },
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {isExpanded
-                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
-                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')}
-            </Typography>
-            {isExpanded ? (
-              <KeyboardArrowUp fontSize="small" />
-            ) : (
-              <KeyboardArrowDown fontSize="small" />
-            )}
-          </ButtonBase>
-        </Box>
-
         <Collapse in={isExpanded}>
           <Box
             id="learner-footer-content"
@@ -310,6 +264,54 @@ export const Footer: React.FC = () => {
             
           </Box>
         </Collapse>
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            height: FOOTER_STRIP_HEIGHT,
+            px: { xs: 2, md: '56px' },
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: '#f3f3f3',
+          }}
+        >
+          <ButtonBase
+            onClick={toggleFooter}
+            aria-expanded={isExpanded}
+            aria-controls="learner-footer-content"
+            aria-label={
+              isExpanded
+                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
+                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')
+            }
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flexShrink: 0,
+              borderRadius: 1,
+              px: 1,
+              py: 0.5,
+              color: '#1F1B13',
+              '&:hover': {
+                backgroundColor: 'action.hover',
+              },
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 500 }}>
+              {isExpanded
+                ? t('LEARNER_APP.FOOTER.HIDE_FOOTER')
+                : t('LEARNER_APP.FOOTER.SHOW_FOOTER')}
+            </Typography>
+            {isExpanded ? (
+              <KeyboardArrowUp fontSize="small" />
+            ) : (
+              <KeyboardArrowDown fontSize="small" />
+            )}
+          </ButtonBase>
+        </Box>
       </Box>
     </>
   );

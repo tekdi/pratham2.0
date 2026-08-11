@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useSurveyStore } from '../../store/surveyFormStore';
-import { fetchSurveyList } from '../../utils/API/surveyService';
+import { fetchSurveyList, fetchSurveyResponseStatus } from '../../utils/API/surveyService';
 import { Survey } from '../../types/survey';
 import SurveyCard from '../../Components/SurveyCard/SurveyCard';
 import NoDataFound from '../../Components/NoDataFound/NoDataFound';
@@ -22,13 +22,18 @@ import { parseSurveyCategoriesFromLocalStorage } from '../../utils/Helper/helper
 import { readSurveyEntryConfig } from '../../utils/surveyEntryConfig';
 import { resolvePostSurveyListRoute } from '../../utils/resolveSurveyFillRoute';
 
-const SurveyListPage: React.FC = () => {
+interface SurveyListPageProps {
+  skipAcademicYear?: boolean;
+}
+
+const SurveyListPage: React.FC<SurveyListPageProps> = ({ skipAcademicYear = false }) => {
   const router = useRouter();
   const { list, setListLoading, setSurveys, setListError } = useSurveyStore();
   const [page, setPage] = useState(1);
   const [categories, setCategories] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<string>('');
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const [responseStatuses, setResponseStatuses] = useState<Record<string, 'none' | 'in_progress' | 'submitted'>>({});
   const limit = 20;
 
   useEffect(() => {
@@ -46,9 +51,23 @@ const SurveyListPage: React.FC = () => {
       try {
         const result = await fetchSurveyList(currentPage, limit, 'createdAt', 'DESC', {
           contextType,
+          skipAcademicYear,
         });
         if (result.params.status === 'successful') {
           setSurveys(result.result.data, result.result.meta);
+
+          if (skipAcademicYear) {
+            const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+            if (userId && result.result.data.length > 0) {
+              const entries = await Promise.all(
+                result.result.data.map(async (survey: Survey) => {
+                  const status = await fetchSurveyResponseStatus(survey.surveyId, userId, userId);
+                  return [survey.surveyId, status] as const;
+                })
+              );
+              setResponseStatuses(Object.fromEntries(entries));
+            }
+          }
         } else {
           setListError(result.params.errmsg || 'Failed to fetch surveys');
           toast.error(result.params.errmsg || 'Failed to fetch surveys');
@@ -60,7 +79,7 @@ const SurveyListPage: React.FC = () => {
         toast.error(msg);
       }
     },
-    [setListLoading, setSurveys, setListError]
+    [setListLoading, setSurveys, setListError, skipAcademicYear]
   );
 
   useEffect(() => {
@@ -74,6 +93,15 @@ const SurveyListPage: React.FC = () => {
   const handleSurveyClick = (survey: Survey) => {
     const entryConfig = readSurveyEntryConfig(survey.surveyId);
     router.push(resolvePostSurveyListRoute(survey, entryConfig));
+  };
+
+  const handleViewResponse = (survey: Survey) => {
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (userId) {
+      router.push(`/survey-fill/${survey.surveyId}/${userId}/view`);
+    } else {
+      router.push(resolvePostSurveyListRoute(survey, readSurveyEntryConfig(survey.surveyId)));
+    }
   };
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -122,48 +150,50 @@ const SurveyListPage: React.FC = () => {
           </Typography>
         ) : (
           <>
-            <Box
-              sx={{
-                mb: 2,
-                borderBottom: 1,
-                borderColor: 'divider',
-                backgroundColor: '#fff',
-                borderRadius: '12px 12px 0 0',
-              }}
-            >
-              <Tabs
-                value={activeTab}
-                onChange={handleTabChange}
-                variant="scrollable"
-                scrollButtons="auto"
+            {categories.length > 1 && (
+              <Box
                 sx={{
-                  '& .MuiTab-root': {
-                    textTransform: 'capitalize',
-                    fontWeight: 500,
-                    fontSize: '13px',
-                    minHeight: '42px',
-                    color: '#7C766F',
-                  },
-                  '& .Mui-selected': {
-                    color: '#0D599E !important',
-                    fontWeight: 600,
-                  },
-                  '& .MuiTabs-indicator': {
-                    backgroundColor: '#FDBE16',
-                    height: 3,
-                    borderRadius: '3px 3px 0 0',
-                  },
+                  mb: 2,
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  backgroundColor: '#fff',
+                  borderRadius: '12px 12px 0 0',
                 }}
               >
-                {categories.map((ctx) => (
-                  <Tab
-                    key={ctx}
-                    label={getContextLabel(ctx)}
-                    value={ctx}
-                  />
-                ))}
-              </Tabs>
-            </Box>
+                <Tabs
+                  value={activeTab}
+                  onChange={handleTabChange}
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  sx={{
+                    '& .MuiTab-root': {
+                      textTransform: 'capitalize',
+                      fontWeight: 500,
+                      fontSize: '13px',
+                      minHeight: '42px',
+                      color: '#7C766F',
+                    },
+                    '& .Mui-selected': {
+                      color: '#0D599E !important',
+                      fontWeight: 600,
+                    },
+                    '& .MuiTabs-indicator': {
+                      backgroundColor: '#FDBE16',
+                      height: 3,
+                      borderRadius: '3px 3px 0 0',
+                    },
+                  }}
+                >
+                  {categories.map((ctx) => (
+                    <Tab
+                      key={ctx}
+                      label={getContextLabel(ctx)}
+                      value={ctx}
+                    />
+                  ))}
+                </Tabs>
+              </Box>
+            )}
 
             {!list.surveys || list.surveys.length === 0 ? (
               <NoDataFound
@@ -186,6 +216,8 @@ const SurveyListPage: React.FC = () => {
                     key={survey.surveyId}
                     survey={survey}
                     onClick={handleSurveyClick}
+                    responseStatus={responseStatuses[survey.surveyId]}
+                    onViewResponse={skipAcademicYear ? handleViewResponse : undefined}
                   />
                 ))}
               </Box>

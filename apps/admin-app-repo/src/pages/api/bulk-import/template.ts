@@ -7,10 +7,14 @@
 // • Different metadata columns per framework
 // • All option columns have real Excel dropdown validations
 //   (data validation referencing LookupData sheet ranges)
+// • Outputs plain .xlsx — multi-select columns use comma-separated values
 // ============================================================
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import ExcelJS from 'exceljs';
+
+
+
 import {
   FrameworkId,
   ColumnDef,
@@ -73,13 +77,32 @@ const styleDataCell = (cell: ExcelJS.Cell, required: boolean) => {
   };
 };
 
+// ─── Compute LookupData ranges WITHOUT creating the sheet ─────
+// The Excel range for each lookup list depends only on the column order and
+// the number of values, both known up-front. Computing this separately lets us
+// wire dropdowns into the data sheets while still adding the LookupData sheet
+// last, so the workbook's tab order is Instructions → data sheets → Examples → LookupData.
+const computeLookupRanges = (
+  fw: FrameworkId,
+  templateType: 'all' | 'content' | 'questionset' = 'all'
+): Record<keyof typeof LOOKUP, string> => {
+  const rangeMap: Partial<Record<keyof typeof LOOKUP, string>> = {};
+  getLookupColumns(fw, templateType).forEach((lc, colIdx) => {
+    const values = LOOKUP[lc.lookupKey] as readonly string[];
+    const letter = colLetter(colIdx + 1);
+    rangeMap[lc.lookupKey] = `LookupData!$${letter}$2:$${letter}$${values.length + 1}`;
+  });
+  return rangeMap as Record<keyof typeof LOOKUP, string>;
+};
+
 // ─── Build LookupData sheet and return column → range map ─────
 const buildLookupSheet = (
   workbook: ExcelJS.Workbook,
-  fw: FrameworkId
+  fw: FrameworkId,
+  templateType: 'all' | 'content' | 'questionset' = 'all'
 ): Record<keyof typeof LOOKUP, string> => {
   const lookupSheet = workbook.addWorksheet('LookupData');
-  const lookupCols = getLookupColumns(fw);
+  const lookupCols = getLookupColumns(fw, templateType);
 
   // Set col widths
   lookupCols.forEach((_, i) => {
@@ -122,34 +145,45 @@ const buildLookupSheet = (
 };
 
 // ─── Apply data validation to a range of cells ───────────────
+// isMultiSelect = true → errorStyle 'warning' so user can still type pipe-separated values
 const applyDropdown = (
   ws: ExcelJS.Worksheet,
   colLtr: string,
   rangeFormula: string,
-  headerText: string
+  headerText: string,
+  isMultiSelect = false,
+  sampleValues: string[] = []
 ) => {
+  const exampleComma = sampleValues.slice(0, 2).join(',');
+
   for (let row = 2; row <= DATA_ROWS; row++) {
     ws.getCell(`${colLtr}${row}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: [rangeFormula],
-      showErrorMessage: true,
-      errorStyle: 'stop',
-      errorTitle: 'Invalid value',
-      error: `Please select a valid ${headerText} from the dropdown list.`,
+      showErrorMessage: isMultiSelect, // hide stop-error for multi-select; show warning only
+      errorStyle: isMultiSelect ? 'warning' : 'stop',
+      errorTitle: isMultiSelect ? 'Multiple values allowed' : 'Invalid value',
+      error: isMultiSelect
+        ? `Use comma "," to separate multiple values. E.g.: ${exampleComma || 'Value1,Value2'}`
+        : `Please select a valid ${headerText} from the dropdown list.`,
       showInputMessage: true,
-      promptTitle: headerText,
-      prompt: `Select from the list`,
+      promptTitle: isMultiSelect ? `${headerText} — Multi-select` : headerText,
+      prompt: isMultiSelect
+        ? `Select one value from the dropdown, OR type multiple values separated by comma.\nExample: ${exampleComma || 'Value1,Value2'}`
+        : `Select one value from the dropdown list`,
     };
   }
 };
 
 // ─── Build a generic entity sheet ────────────────────────────
+// NOTE: Data sheets are intentionally left EMPTY (headers + dropdowns only).
+// Sample rows live on the separate "Examples" sheet, which the parser ignores,
+// so users can never accidentally import the sample records.
 const buildEntitySheet = (
   workbook: ExcelJS.Workbook,
   sheetName: string,
   columns: ColumnDef[],
-  sampleRows: (string | number)[][],
   rangeMap: Record<string, string>
 ) => {
   const ws = workbook.addWorksheet(sheetName);
@@ -172,23 +206,102 @@ const buildEntitySheet = (
     styleHeader(cell, col.required);
   });
 
-  // ── Sample data rows ─────────────────────────────────────────
-  sampleRows.forEach((rowData, ri) => {
-    const exRow = ws.getRow(ri + 2);
-    exRow.height = 20;
-    rowData.forEach((val, ci) => {
-      const cell = exRow.getCell(ci + 1);
-      cell.value = val;
-      styleDataCell(cell, columns[ci]?.required ?? false);
-    });
-  });
-
   // ── Dropdowns for all data rows ──────────────────────────────
   columns.forEach((col, i) => {
     if (!col.lookupKey) return;
     const range = rangeMap[col.lookupKey];
     if (!range) return;
-    applyDropdown(ws, colLetter(i + 1), range, col.header.replace('*', '').trim());
+    // Pull sample values from LOOKUP for the input-message example
+    const sampleVals: string[] = col.lookupKey ? (LOOKUP[col.lookupKey] as readonly string[]).slice(0, 3) as string[] : [];
+    applyDropdown(
+      ws, colLetter(i + 1), range,
+      col.header.replace('*', '').trim(),
+      col.multiSelect === true,
+      sampleVals
+    );
+  });
+
+  return ws;
+};
+
+// ─── Build the "Examples" reference sheet ────────────────────
+// Holds the sample rows for every data sheet in the workbook.
+// The importer only reads sheets named exactly 'Content', 'QuestionSets',
+// 'Questions', 'Courses', 'CourseChildrenMapping' and 'ExistingContentMapping',
+// so nothing on this sheet is ever imported. Users can copy a row from here
+// into the matching data sheet and edit it.
+
+interface ExampleBlock {
+  sheetName: string;
+  columns: ColumnDef[];
+  sampleRows: (string | number)[][];
+}
+
+const EXAMPLE_SHEET_NAME = 'Examples';
+const BANNER_BG = 'FFB71C1C';   // deep red — "not imported" warning
+
+const buildExamplesSheet = (
+  workbook: ExcelJS.Workbook,
+  blocks: ExampleBlock[]
+) => {
+  const ws = workbook.addWorksheet(EXAMPLE_SHEET_NAME);
+
+  // Widest block determines how many columns we style for the banner
+  const maxCols = blocks.reduce((m, b) => Math.max(m, b.columns.length), 1);
+
+  // ── Banner ───────────────────────────────────────────────────
+  ws.mergeCells(1, 1, 1, maxCols);
+  const banner = ws.getCell('A1');
+  banner.value =
+    'EXAMPLES ONLY — THIS SHEET IS NEVER IMPORTED. '
+    + 'Copy a row into the matching data sheet and replace it with your own values.';
+  banner.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+  banner.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BANNER_BG } };
+  banner.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true };
+  ws.getRow(1).height = 30;
+
+  // Column widths from the widest block
+  for (let i = 1; i <= maxCols; i++) {
+    ws.getColumn(i).width = 26;
+  }
+
+  // ── One block per data sheet ─────────────────────────────────
+  let row = 3;   // leave row 2 blank under the banner
+
+  blocks.forEach((block) => {
+    // Block title — e.g. "Content — example rows"
+    ws.mergeCells(row, 1, row, Math.max(block.columns.length, 1));
+    const titleCell = ws.getCell(row, 1);
+    titleCell.value = `${block.sheetName} — example rows`;
+    titleCell.font = { bold: true, size: 12, color: { argb: HEADER_FG } };
+    titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_BG } };
+    titleCell.alignment = { vertical: 'middle', horizontal: 'left' };
+    ws.getRow(row).height = 24;
+    row++;
+
+    // Header row (same headers as the real sheet, so columns line up on paste)
+    const hdr = ws.getRow(row);
+    hdr.height = 28;
+    block.columns.forEach((col, i) => {
+      const cell = hdr.getCell(i + 1);
+      cell.value = col.header;
+      styleHeader(cell, col.required);
+    });
+    row++;
+
+    // Sample rows
+    block.sampleRows.forEach((rowData) => {
+      const exRow = ws.getRow(row);
+      exRow.height = 20;
+      rowData.forEach((val, ci) => {
+        const cell = exRow.getCell(ci + 1);
+        cell.value = val;
+        styleDataCell(cell, block.columns[ci]?.required ?? false);
+      });
+      row++;
+    });
+
+    row += 2;   // spacer between blocks
   });
 
   return ws;
@@ -275,7 +388,7 @@ const getPosQsSample = (): (string | number)[][] => [
     'Learners/Children',      // Primary User
     'English',                // Content Language
     'Pre Test',               // Assessment Type
-    'online',                 // Evaluation Type*
+    'Auto-Graded',                 // Evaluation Type*
     'true',                   // Show Feedback
     'false',                  // Show Solutions
   ],
@@ -294,7 +407,7 @@ const getPosQsSample = (): (string | number)[][] => [
     'Learners/Children',
     'English',
     'Post Test',
-    'online',
+    'Auto-Graded',
     'true',
     'true',
   ],
@@ -319,7 +432,7 @@ const getScpQsSample = (): (string | number)[][] => [
     'Main Course',                         // Course Type* (pipe-sep for multi)
     'Hindi',                               // Content Language
     'Pre Test',                            // Assessment Type
-    'online',                              // Evaluation Type*
+    'Auto-Graded',                              // Evaluation Type*
     'true',                                // Show Feedback
     'false',                               // Show Solutions
   ],
@@ -337,7 +450,7 @@ const getScpQsSample = (): (string | number)[][] => [
     'Main Course',
     'Hindi',
     'Unit Test',
-    'online',
+    'Auto-Graded',
     'true',
     'true',
   ],
@@ -392,9 +505,13 @@ const getScpCoursesSample = (): (string | number)[][] => [[
 ]];
 
 // ── Questions sample ──────────────────────────────────────────
-// Columns: QuestionSetTempID, SectionName, QuestionType, QuestionText,
+// Columns: QuestionSetTempID, SectionName, SectionDescription, SectionInstructions,
+//   QuestionType, Visibility, QuestionText,
 //   Options, CorrectAnswer, MaxScore, Hint, Solution
 // NOTE: Blooms Level and Difficulty removed — platform API rejects them.
+//
+// Visibility: Parent = question belongs to this QS only (not independently searchable)
+//             Public = question is publicly accessible / independently discoverable
 //
 // MCQ      Options: pipe-separated choices (A|B|C|D)
 //          CorrectAnswer: exact text of the correct option
@@ -409,7 +526,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 1: Basic Concepts',
+    'Questions testing basic science and math concepts', // Section Description
+    'Answer each question carefully. Select the best option.',  // Section Instructions
     'MCQ',
+    'Parent',   // Visibility — Parent: belongs to this QS only
     'Which planet in our solar system is known as the Red Planet?',
     'Venus|Mars|Jupiter|Saturn',
     'Mars',
@@ -420,7 +540,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 1: Basic Concepts',
+    '',   // Section Description (blank — only fill for the first question in a section)
+    '',   // Section Instructions (blank — only fill for the first question in a section)
     'MCQ',
+    'Parent',
     'What is the chemical symbol for water?',
     'HO|H2O|CO2|NaCl',
     'H2O',
@@ -431,7 +554,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 1: Basic Concepts',
+    '',
+    '',
     'MCQ',
+    'Parent',
     'Which of the following is a prime number?',
     '4|6|7|9',
     '7',
@@ -443,7 +569,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 2: Match the Following',
+    'Match each item on the left with the correct item on the right', // Section Description
+    'Draw a line from each word to its correct match.',               // Section Instructions
     'Match',
+    'Parent',
     'Match each animal with the sound it makes:',
     'Dog:Bark|Cat:Meow|Cow:Moo|Lion:Roar',
     'Dog:Bark|Cat:Meow|Cow:Moo|Lion:Roar',
@@ -455,7 +584,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 3: Arrange in Order',
+    'Put the items in the correct sequence', // Section Description
+    'Drag the items into the correct order.', // Section Instructions
     'Arrange',
+    'Parent',
     'Arrange the following stages of the water cycle in the correct order:',
     'Precipitation|Condensation|Evaporation|Collection',
     'Evaporation|Condensation|Precipitation|Collection',
@@ -467,7 +599,10 @@ const getQuestionsample = (): (string | number)[][] => [
   [
     'TEMP_QS_1',
     'Section 4: Short Answer',
+    'Write your own answer in complete sentences', // Section Description
+    'Think carefully and write 2-3 sentences.',    // Section Instructions
     'Subjective',
+    'Parent',
     'In your own words, explain why trees are important for the environment.',
     '',
     '',
@@ -477,10 +612,29 @@ const getQuestionsample = (): (string | number)[][] => [
   ],
 ];
 
+// CourseChildrenMapping columns (7): CourseTempID, UnitName, UnitDescription,
+//   UnitIconDriveURL, ChildRef, ChildType, Sequence
+// Unit Description and Unit Icon Drive URL are unit-level: fill them on the
+// FIRST row of each unit and leave blank on the remaining rows of that unit.
 const getCourseMappingsSample = (): (string | number)[][] => [
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_CONTENT_1', 'content',     1],
-  ['TEMP_COURSE_1', 'Unit 1: Introduction',  'TEMP_QS_1',      'questionset', 2],
-  ['TEMP_COURSE_1', 'Unit 2: Assessment',    'TEMP_QS_2',      'questionset', 1],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    'Foundational concepts to get started',                              // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_CONTENT_1', 'content', 1,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction',
+    '',   // blank — unit metadata already set on the first row of this unit
+    '',
+    'TEMP_QS_1', 'questionset', 2,
+  ],
+  [
+    'TEMP_COURSE_1', 'Unit 2: Assessment',
+    'End-of-course assessment',                                          // Unit Description
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_QS_2', 'questionset', 1,
+  ],
 ];
 
 // ExistingContentMapping columns (6): TempID, ExistingIdentifier, EntityType,
@@ -514,9 +668,17 @@ const buildInstructionsSheet = (workbook: ExcelJS.Workbook, fw: FrameworkId) => 
     ['QuestionSets',          'Create question set containers with metadata.'],
     ['Questions',             'Add MCQ / Arrange / Match / Subjective questions linked to a QuestionSet.'],
     ['Courses',               'Create course containers.'],
-    ['CourseChildrenMapping', 'Map content and question sets into course units.'],
+    ['CourseChildrenMapping', 'Map content and question sets into course units. Also sets each unit\'s description and icon.'],
     ['ExistingContentMapping','Reference existing platform items (do_xxx) using a Temp ID.'],
+    ['Examples',              'Sample rows for every sheet. NOT imported — copy a row into the sheet above and edit it.'],
     ['LookupData',            'Reference sheet — all valid dropdown values. Do NOT edit this sheet.'],
+    ['', ''],
+    ['HOW TO FILL THIS TEMPLATE', ''],
+    ['1. Open the Examples sheet', 'See a filled-in sample row for each sheet.'],
+    ['2. Copy a sample row',       'Copy the row and paste it into the matching data sheet (row 2 onward).'],
+    ['3. Replace with your data',  'Overwrite every value with your own. Do not leave sample values in place.'],
+    ['4. Delete unused rows',      'Only rows you actually filled in are imported. Blank rows are skipped.'],
+    ['Note',                       'Data sheets ship EMPTY on purpose so sample records can never be imported by mistake.'],
     ['', ''],
     ['TEMP ID FORMAT', ''],
     ['Content',         'TEMP_CONTENT_1, TEMP_CONTENT_2, ...'],
@@ -556,6 +718,21 @@ export const config = {
   },
 };
 
+
+
+// ─── Template type ─────────────────────────────────────────────
+// ?type=all       → all 8 sheets (default)
+// ?type=content   → Instructions + Content + LookupData
+// ?type=questionset → Instructions + QuestionSets + Questions + LookupData
+
+type TemplateType = 'all' | 'content' | 'questionset';
+
+const resolveTemplateType = (raw: unknown): TemplateType => {
+  if (raw === 'content') return 'content';
+  if (raw === 'questionset') return 'questionset';
+  return 'all';
+};
+
 // ─── Main handler ─────────────────────────────────────────────
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -563,91 +740,94 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const fw: FrameworkId =
       req.query.framework === 'scp-framework' ? 'scp-framework' : 'pos-framework';
 
+    const templateType = resolveTemplateType(req.query.type);
+
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Pratham Bulk Import';
     workbook.created = new Date();
 
-    // ── 1. Build LookupData sheet FIRST (needed for range references)
-    const rangeMap = buildLookupSheet(workbook, fw);
+    // ── 1. Compute lookup ranges up-front (does NOT create the sheet yet).
+    //       The LookupData sheet itself is added last so tab order reads:
+    //       Instructions → data sheets → Examples → LookupData.
+    const rangeMap = computeLookupRanges(fw, templateType);
 
-    // ── 2. Instructions sheet
+    // ── 2. Instructions sheet (first tab the user sees)
     buildInstructionsSheet(workbook, fw);
 
     // ── 3. Get framework-specific column definitions
     const cols = getFrameworkColumns(fw);
 
-    // ── 4. Content sheet
-    buildEntitySheet(
-      workbook, 'Content', cols.contentColumns,
-      fw === 'scp-framework' ? getScpContentSample() : getPosContentSample(),
-      rangeMap
-    );
+    // ── 4–9. Decide which data sheets this template contains ───────
+    // Each entry pairs the sheet with its sample rows. The data sheet itself is
+    // created EMPTY; the samples go on the separate 'Examples' sheet only.
+    const blocks: ExampleBlock[] = [];
 
-    // ── 5. QuestionSets sheet
-    buildEntitySheet(
-      workbook, 'QuestionSets', cols.qsColumns,
-      fw === 'scp-framework' ? getScpQsSample() : getPosQsSample(),
-      rangeMap
-    );
+    if (templateType === 'all' || templateType === 'content') {
+      blocks.push({
+        sheetName: 'Content',
+        columns: cols.contentColumns,
+        sampleRows: fw === 'scp-framework' ? getScpContentSample() : getPosContentSample(),
+      });
+    }
 
-    // ── 6. Questions sheet
-    buildEntitySheet(
-      workbook, 'Questions', cols.questionColumns,
-      getQuestionsample(),
-      rangeMap
-    );
+    if (templateType === 'all' || templateType === 'questionset') {
+      blocks.push({
+        sheetName: 'QuestionSets',
+        columns: cols.qsColumns,
+        sampleRows: fw === 'scp-framework' ? getScpQsSample() : getPosQsSample(),
+      });
+      blocks.push({
+        sheetName: 'Questions',
+        columns: cols.questionColumns,
+        sampleRows: getQuestionsample(),
+      });
+    }
 
-    // ── 7. Courses sheet
-    buildEntitySheet(
-      workbook, 'Courses', cols.courseColumns,
-      fw === 'scp-framework' ? getScpCoursesSample() : getPosCoursesSample(),
-      rangeMap
-    );
+    if (templateType === 'all') {
+      blocks.push({
+        sheetName: 'Courses',
+        columns: cols.courseColumns,
+        sampleRows: fw === 'scp-framework' ? getScpCoursesSample() : getPosCoursesSample(),
+      });
+      blocks.push({
+        sheetName: 'CourseChildrenMapping',
+        columns: cols.mappingColumns,
+        sampleRows: getCourseMappingsSample(),
+      });
+      blocks.push({
+        sheetName: 'ExistingContentMapping',
+        columns: cols.existingColumns,
+        sampleRows: getExistingMappingsSample(),
+      });
+    }
 
-    // ── 8. CourseChildrenMapping sheet
-    buildEntitySheet(
-      workbook, 'CourseChildrenMapping', cols.mappingColumns,
-      getCourseMappingsSample(),
-      rangeMap
-    );
+    // Create each data sheet — headers + dropdowns only, no sample rows
+    blocks.forEach((b) => {
+      buildEntitySheet(workbook, b.sheetName, b.columns, rangeMap);
+    });
 
-    // ── 9. ExistingContentMapping sheet
-    buildEntitySheet(
-      workbook, 'ExistingContentMapping', cols.existingColumns,
-      getExistingMappingsSample(),
-      rangeMap
-    );
+    // ── 10. Examples sheet — all sample rows live here, never imported ──
+    buildExamplesSheet(workbook, blocks);
 
-    // ── Reorder sheets: Instructions first ──────────────────────
-    const desiredOrder = [
-      'Instructions',
-      'Content',
-      'QuestionSets',
-      'Questions',
-      'Courses',
-      'CourseChildrenMapping',
-      'ExistingContentMapping',
-      'LookupData',
-    ];
-    workbook.worksheets.sort((a, b) =>
-      desiredOrder.indexOf(a.name) - desiredOrder.indexOf(b.name)
-    );
+    // ── 11. LookupData sheet LAST so it sits at the end of the tab strip.
+    //        (Sheets are written in creation order; ExcelJS's `worksheets`
+    //        getter returns a copy, so sorting it after the fact is a no-op.)
+    buildLookupSheet(workbook, fw, templateType);
 
-    // ── Serialize to buffer then send ────────────────────────────
-    // writeBuffer() is safer than write(res) with Next.js response objects.
-    const buffer = await workbook.xlsx.writeBuffer();
+    // ── 12. Write xlsx buffer ──────────────────────────────────────
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
 
     const fwLabel = fw === 'scp-framework' ? 'SCP' : 'POS';
-    const fileName = `Bulk_Import_Template_${fwLabel}.xlsx`;
+    const typeSuffix = templateType === 'content' ? '_Content' : templateType === 'questionset' ? '_QuestionSet' : '';
+    const fileName = `Bulk_Import_Template_${fwLabel}${typeSuffix}.xlsx`;
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader('Content-Length', buffer.byteLength);
-    // Prevent browser from caching the template — always serve a fresh copy
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.status(200).send(Buffer.from(buffer));
+    res.status(200).send(buffer);
   } catch (err: any) {
     console.error('[bulk-import/template] Error generating template:', err);
     res.status(500).json({ error: 'Failed to generate template', details: err?.message });

@@ -8,7 +8,7 @@ const useDeterminePathColor = () => {
   const theme = useTheme();
 
   const determinePathColor = (presentPercentage) => {
-    if (presentPercentage == 0) return theme.palette.warning['400'];
+    if (presentPercentage == 0) return theme.palette.error.main;
     if (presentPercentage < lowLearnerAttendanceLimit)
       return theme.palette.error.main;
     if (presentPercentage <= avgLearnerAttendanceLimit)

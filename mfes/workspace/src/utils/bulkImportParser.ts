@@ -23,6 +23,7 @@ import {
   getFrameworkColumns,
   buildHeaderToApiFieldMap,
   ColumnDef,
+  normalizeEvaluationType,
 } from './frameworkConfig';
 
 // ─── Sheet Names ──────────────────────────────────────────────
@@ -175,6 +176,8 @@ export const parseImportExcel = (file: File): Promise<ParsedImportData> => {
             maxAttempts: row.maxAttempts ? Number(row.maxAttempts) : undefined,
             showFeedback:  parseBool(row.showFeedback),
             showSolutions: parseBool(row.showSolutions),
+            // Older templates used raw API values (online/offline/ai) — normalize to labels
+            evaluationType: normalizeEvaluationType(row.evaluationType as string),
             framework: fw,
           } as QuestionSetRow)
         );

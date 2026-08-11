@@ -86,6 +86,8 @@ const EnrollProgramCarousel = ({
   // States for registration assessment gate
   const [assessmentPendingModal, setAssessmentPendingModal] = useState(false);
   const [pendingAssessmentIdentifier, setPendingAssessmentIdentifier] = useState<string | null>(null);
+  const [pendingAssessmentAction, setPendingAssessmentAction] = useState<'access' | 'enroll'>('access');
+  const [pendingProgramTenantId, setPendingProgramTenantId] = useState<string | null>(null);
   const [assessmentUnavailableModal, setAssessmentUnavailableModal] = useState(false);
 
   /**
@@ -103,7 +105,12 @@ const EnrollProgramCarousel = ({
     | 'assessmentPending'
     | 'assessmentUnavailable';
 
-  const checkRegistrationTestStatus = async (
+  /**
+   * Runs the gate assuming the tenant context in localStorage already points at the
+   * program being gated. Always call it through checkRegistrationTestStatus, which
+   * guarantees that.
+   */
+  const resolveRegistrationTestStatus = async (
     uiConfig: any,
     enrolledProgramName?: string,
     tenantDataDetails?: any
@@ -148,8 +155,7 @@ console.log('isRegistrationTestEnabled=====>', isRegistrationTestEnabled);
                   cohortMemberStatus?: string;
                 }) =>
                   cohort?.type === 'BATCH' &&
-                  cohort?.cohortStatus === 'active' &&
-                  cohort?.cohortMemberStatus === 'active'
+                  cohort?.cohortStatus === 'active'
               )
             : false;
           if (hasBatch) {
@@ -230,6 +236,47 @@ console.log('result=====>', result);
     } catch (error) {
       console.error('checkRegistrationTestStatus: getAssessmentStatus failed', error);
       return 'clear'; // On API failure, allow access gracefully
+    }
+  };
+
+  const checkRegistrationTestStatus = async (
+    uiConfig: any,
+    enrolledProgramName?: string,
+    tenantDataDetails?: any
+  ): Promise<RegistrationTestStatus> => {
+    // The batch / question-set lookups inside the gate are tenant-scoped: the axios
+    // interceptor stamps `tenantid` from localStorage on every request. The Android
+    // branch of handleAccessProgram delegates the actual program switch to native, so
+    // localStorage still points at whatever program the previous flow left behind (e.g.
+    // a program the user just enrolled into) — the active-batch lookup then queries the
+    // wrong tenant, finds no batch, and wrongly shows the "test unavailable" popup.
+    // Point the tenant context at the program being gated, then put it back.
+    const targetTenantId = tenantDataDetails?.tenantId;
+    const previousTenantId = localStorage.getItem('tenantId');
+    const previousAcademicYearId = localStorage.getItem('academicYearId');
+    // Callers that already switched the app into the target program (web path) keep
+    // their context; only a temporary override has to be undone.
+    const shouldRestoreTenantContext = Boolean(
+      targetTenantId && previousTenantId && previousTenantId !== targetTenantId
+    );
+
+    if (targetTenantId) {
+      localStorage.setItem('tenantId', targetTenantId);
+    }
+
+    try {
+      return await resolveRegistrationTestStatus(
+        uiConfig,
+        enrolledProgramName,
+        tenantDataDetails
+      );
+    } finally {
+      if (shouldRestoreTenantContext && previousTenantId) {
+        localStorage.setItem('tenantId', previousTenantId);
+        if (previousAcademicYearId) {
+          localStorage.setItem('academicYearId', previousAcademicYearId);
+        }
+      }
     }
   };
 
@@ -478,10 +525,13 @@ console.log('result=====>', result);
           tenantData
         );
         if (assessmentStatus === 'assessmentPending') {
+          setPendingAssessmentAction('access');
+          setPendingProgramTenantId(program.tenantId);
           setAssessmentPendingModal(true);
           return;
         }
         if (assessmentStatus === 'assessmentUnavailable') {
+          setPendingProgramTenantId(program.tenantId);
           return;
         } else {
        // Get refreshToken with fallback - check refreshTokenForAndroid first, then refreshToken
@@ -564,7 +614,8 @@ console.log('result=====>', result);
       );
       if (assessmentStatus === 'assessmentPending') {
         localStorage.setItem('registerationTestGiven', "No");
-
+        setPendingAssessmentAction('enroll');
+        setPendingProgramTenantId(program.tenantId);
         setAssessmentPendingModal(true);
       }
       // Redirect to landing page
@@ -1035,9 +1086,13 @@ console.log('result=====>', result);
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.START_ASSESSMENT')}
         primaryActionHandler={() => {
           setAssessmentPendingModal(false);
+          // Mark the registration test as addressed (parity with Close) so the
+          // ClientLayout route guard doesn't lock the user out of programs if they
+          // start the test and then abort it.
+          localStorage.setItem('registerationTestGiven', 'Yes');
           if (pendingAssessmentIdentifier) {
             setTimeout(() => {
-              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/programs')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
+              globalThis.location.href = `/player/${pendingAssessmentIdentifier}?previousPage=${encodeURIComponent('/scp-dashboard')}&exitLink=${encodeURIComponent('/reattempt-check')}`;
             }, 100);
           }
         }}
@@ -1066,18 +1121,15 @@ console.log('result=====>', result);
           }
           if (window.ReactNativeWebView) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'ENROLL_PROGRAM_EVENT', // Event type identifier
+              type: pendingAssessmentAction === 'access' ? 'ACCESS_PROGRAM_EVENT' : 'ENROLL_PROGRAM_EVENT',
               data: {
                 userId: localStorage.getItem('userId'),
-                tenantId: localStorage.getItem('tenantId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
                 token: localStorage.getItem('token'),
                 refreshToken: refreshToken,
-
-                // Add any data you want to send
               }
             }));
           }
-        // setSignupSuccessModal(false);
         }
         else
         {
@@ -1098,12 +1150,46 @@ console.log('result=====>', result);
         open={assessmentUnavailableModal}
         onClose={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
         showFooter={true}
         primaryText={t('LEARNER_APP.REGISTRATION_FLOW.BACK_TO_DASHBOARD')}
         primaryActionHandler={() => {
           setAssessmentUnavailableModal(false);
+          const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
+          if (isAndroid && window.ReactNativeWebView) {
+            let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+            if (!refreshToken || refreshToken === '') {
+              refreshToken = localStorage.getItem('refreshToken');
+            }
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'ENROLL_PROGRAM_EVENT',
+              data: {
+                userId: localStorage.getItem('userId'),
+                tenantId: pendingProgramTenantId || localStorage.getItem('tenantId'),
+                token: localStorage.getItem('token'),
+                refreshToken: refreshToken,
+              }
+            }));
+            return;
+          }
           router.push('/scp-dashboard');
         }}
       >

@@ -1011,15 +1011,20 @@ const LearnersListItem: React.FC<LearnerListProps> = ({
                 ),
                 name: isDropout ? 'unmark-drop-out' : 'mark-drop-out',
               },
-              {
-                label: t('COMMON.DELETE_USER_FROM_CENTER'),
-                icon: (
-                  <DeleteOutlineIcon
-                    sx={{ color: theme.palette.warning['300'] }}
-                  />
-                ),
-                name: 'delete-User',
-              },
+              // Instructor is not allowed to delete users
+              ...(loggedInUserRole !== Role.TEACHER
+                ? [
+                  {
+                    label: t('COMMON.DELETE_USER_FROM_CENTER'),
+                    icon: (
+                      <DeleteOutlineIcon
+                        sx={{ color: theme.palette.warning['300'] }}
+                      />
+                    ),
+                    name: 'delete-User',
+                  },
+                ]
+                : []),
             ].filter((option) => {
               // If isDropout is true, only show unmark-drop-out option
               if (isDropout) {
