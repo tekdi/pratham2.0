@@ -25,7 +25,7 @@ import { updateCohortMemberStatus } from '@/services/MyClassDetailsService';
 import { getUserDetails } from '@/services/ProfileService';
 import reassignLearnerStore from '@/store/reassignLearnerStore';
 import useStore from '@/store/store';
-import { capitalizeEachWord, filterMiniProfileFields } from '@/utils/Helper';
+import { capitalizeEachWord, filterMiniProfileFields } from '@/utils/helper';
 import { fetchAttendanceStats } from '@/utils/helperAttendanceStatApi';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';

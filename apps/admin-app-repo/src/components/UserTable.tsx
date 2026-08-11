@@ -51,7 +51,7 @@ import {
   firstLetterInUpperCase,
   getUserFullName,
   transformLabel,
-} from '../utils/Helper';
+} from '../utils/helper';
 import CommonUserModal from './CommonUserModal';
 import ReassignCenterModal from './ReassignCenterModal';
 import { showToastMessage } from './Toastify';

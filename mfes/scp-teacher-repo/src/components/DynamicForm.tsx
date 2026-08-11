@@ -1,5 +1,5 @@
 import useSubmittedButtonStore from '@/store/useSubmittedButtonStore';
-import { getCurrentYearPattern, getEmailPattern } from '@/utils/Helper';
+import { getCurrentYearPattern, getEmailPattern } from '@/utils/helper';
 import { IChangeEvent, withTheme } from '@rjsf/core';
 import { Theme as MaterialUITheme } from '@rjsf/mui';
 import { RJSFSchema, RegistryFieldsType, WidgetProps } from '@rjsf/utils';

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import React, { useEffect } from "react";
 import { useRef } from "react";
 import $ from "jquery";
-import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/Helper";
+import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/helper";
 interface PlayerConfigProps {
   playerConfig: any;
 }

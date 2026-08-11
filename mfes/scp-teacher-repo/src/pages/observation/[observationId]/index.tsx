@@ -26,7 +26,7 @@ import {
   Status,
   Telemetry,
 } from '@/utils/app.constant';
-import { formatDate, toPascalCase } from '@/utils/Helper';
+import { formatDate, toPascalCase } from '@/utils/helper';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import { GetStaticPaths } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';

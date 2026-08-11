@@ -3,7 +3,7 @@ import { QueryKeys } from "@/utils/app.constant";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { firstLetterInUpperCase } from "./../utils/Helper";
+import { firstLetterInUpperCase } from "./../utils/helper";
 
 const UserNameCell = ({ userId }: { userId: string }) => {
   const [userName, setUserName] = useState<string | null>(null);

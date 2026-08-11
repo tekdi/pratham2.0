@@ -1,5 +1,5 @@
 import { scheduleEventParam, CreateEvent, EditEvent } from '@/utils/Interfaces';
-import { getAfterDate, getBeforeDate } from '@/utils/Helper';
+import { getAfterDate, getBeforeDate } from '@/utils/helper';
 import { patch, post } from './RestClient';
 import API_ENDPOINTS from '@/utils/API/APIEndpoints';
 import { format, parseISO } from 'date-fns';

@@ -38,7 +38,7 @@ import {
   FormContext,
   FormContextType,
 } from '@/utils/app.constant';
-import { fetchUserData, getUserFullName, toPascalCase } from '@/utils/Helper';
+import { fetchUserData, getUserFullName, toPascalCase } from '@/utils/helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import AddIcon from '@mui/icons-material/Add';
 import ApartmentIcon from '@mui/icons-material/Apartment';

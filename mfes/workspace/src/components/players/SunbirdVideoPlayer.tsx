@@ -1,4 +1,4 @@
-import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/Helper";
+import { getTelemetryEvents, handleExitEvent } from "@workspace/utils/helper";
 import { Height } from "@mui/icons-material";
 import React, { useEffect, useRef } from "react";
 

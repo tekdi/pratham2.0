@@ -49,13 +49,13 @@ import {
   extractStateAndDistrictSchema,
   extractStateAndDistrictUiSchema,
   transformLabel,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import apartment from '../../public/images/apartment.svg';
-import { modifiedSchema } from 'mfes/youthNet/src/utils/Helper';
+import { modifiedSchema } from 'mfes/youthNet/src/utils/helper';
 import useStore from '@/store/store';
 import {
   pageActionBarSx,

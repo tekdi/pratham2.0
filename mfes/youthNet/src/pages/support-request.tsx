@@ -9,7 +9,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useEffect, useState } from 'react';
 import { jotFormId } from '../../app.config';
 import { useDirection } from '@/hooks/useDirection';
-import { getUserFullName, toPascalCase } from '@/utils/Helper';
+import { getUserFullName, toPascalCase } from '@/utils/helper';
 
 type QueryParams = {
   fullName: string;

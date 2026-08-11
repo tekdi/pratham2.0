@@ -1,7 +1,7 @@
 import HeaderComponent from "@/components/HeaderComponent";
 
 import { Numbers, Role, SORT, Status } from "@/utils/app.constant";
-import { transformLabel } from "@/utils/Helper";
+import { transformLabel } from "@/utils/helper";
 import {
   Box,
   Container,

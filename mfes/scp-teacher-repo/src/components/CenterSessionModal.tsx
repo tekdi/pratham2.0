@@ -1,5 +1,5 @@
 import { modalStyles } from '@/styles/modalStyles';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import { SessionsModalProps } from '@/utils/Interfaces';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CircleIcon from '@mui/icons-material/Circle';

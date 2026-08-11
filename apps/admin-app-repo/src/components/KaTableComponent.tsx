@@ -1,4 +1,4 @@
-import { firstLetterInUpperCase } from "@/utils/Helper";
+import { firstLetterInUpperCase } from "@/utils/helper";
 import { DataKey, DateFormat, Status } from "@/utils/app.constant";
 import {
   Checkbox,

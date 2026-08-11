@@ -41,7 +41,7 @@ import { showToastMessage } from "@/components/Toastify";
 import AddNewCenters from "@/components/AddNewCenters";
 import { getCenterTableData } from "@/data/tableColumns";
 import { Theme } from "@mui/system";
-import { firstLetterInUpperCase, mapFields, transformLabel } from "@/utils/Helper";
+import { firstLetterInUpperCase, mapFields, transformLabel } from "@/utils/helper";
 import SimpleModal from "@/components/SimpleModal";
 import { IChangeEvent } from "@rjsf/core";
 import { RJSFSchema } from "@rjsf/utils";

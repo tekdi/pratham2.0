@@ -20,10 +20,10 @@ import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCall
 
 import { useTranslation } from 'react-i18next';
 import { createUser } from 'mfes/youthNet/src/services/youthNet/Dashboard/UserServices';
-import { getUserFullName, toPascalCase } from '@/utils/Helper';
+import { getUserFullName, toPascalCase } from '@/utils/helper';
 import { sendCredentialService } from '@/services/NotificationService';
 import { showToastMessage } from '@/components/Toastify';
-import { filterSchema } from 'mfes/youthNet/src/utils/Helper';
+import { filterSchema } from 'mfes/youthNet/src/utils/helper';
 import useSubmittedButtonStore from 'mfes/youthNet/src/store/useSubmittedButtonStore';
 type FormSubmitFunctionType = (formData: any, payload: any) => Promise<void>;
 

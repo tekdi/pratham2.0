@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 // import axios from 'axios';
 import { CircularProgress, Box } from '@mui/material';
 import { handleTelemetryEventQuml } from '../../services/TelemetryService';
-import { handleExitEvent } from '../utils/Helper';
+import { handleExitEvent } from '../utils/helper';
 import { createAssessmentTracking } from '../../services/PlayerService';
 
 interface PlayerConfigProps {
