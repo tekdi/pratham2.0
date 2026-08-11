@@ -12,6 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -22,7 +23,6 @@ import type { StatusFilterValue } from '../../../../Components/teacher/TeacherFi
 import TeacherContextTable from '../../../../Components/teacher/TeacherContextTable';
 import TeacherEmptyState from '../../../../Components/teacher/TeacherEmptyState';
 import SurveyStatusSummary from '../../../../Components/teacher/SurveyStatusSummary';
-import PaginationBar from '../../../../Components/PaginationBar/PaginationBar';
 import {
   fetchSurveyById,
   fetchTeacherCentersWithBatches,
@@ -36,12 +36,22 @@ import type { TeacherContextRow } from '../../../../types/teacherSurvey';
 
 // A batch tops out around 300 learners — cheap to fetch in one call and filter/paginate client-side.
 const MAX_BATCH_ROSTER = 300;
-const PAGE_SIZE = 10;
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
+const DEFAULT_PAGE_SIZE = 10;
 
 interface LearnerWithStatus extends TeacherContextRow {
-  status: ContextResponseInfo['status'];
-  submittedAt: string | null;
+  status: 'submitted' | 'draft' | 'none';
+  entriesCount: number;
+  latestSubmittedAt: string | null;
+  // Tracked independently of `status` — a learner can be "Completed" (submittedCount > 0)
+  // and still have a separate draft entry in progress at the same time.
+  hasInProgress: boolean;
 }
+
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
 
 function PageSkeleton() {
   return (
@@ -61,7 +71,7 @@ function PageSkeleton() {
               <TableRow sx={{ backgroundColor: '#fafafa' }}>
                 <TableCell sx={{ fontWeight: 600 }}>Learner Name</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Survey Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Submission Date</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Latest Submitted Date</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -108,10 +118,13 @@ const TeacherContextHubPage: React.FC = () => {
   const [allLearnersLoading, setAllLearnersLoading] = useState(false);
   const [allLearnersError, setAllLearnersError] = useState<string | null>(null);
 
-  const [learnersPage, setLearnersPage] = useState(1);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('all');
+  const [monthFilter, setMonthFilter] = useState('All');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const batches = batchesByCenterId[centerId] ?? [];
 
@@ -188,8 +201,8 @@ const TeacherContextHubPage: React.FC = () => {
 
   // Reset to page 1 when batch, search, or status filter changes
   useEffect(() => {
-    setLearnersPage(1);
-  }, [batchId, debouncedSearch, statusFilter]);
+    setPage(0);
+  }, [batchId, debouncedSearch, statusFilter, monthFilter, sortOrder]);
 
   const loadBatchData = React.useCallback(() => {
     if (!survey || !batchId) {
@@ -208,9 +221,9 @@ const TeacherContextHubPage: React.FC = () => {
         const byContextId = new Map(responses.map((r) => [r.contextId, r]));
         const merged: LearnerWithStatus[] = roster.learners.map((l) => {
           const r = byContextId.get(l.id);
-          if (!r) return { ...l, status: 'none', submittedAt: null };
-          const status = r.status === 'submitted' || r.status === 'reviewed' ? 'submitted' : 'draft';
-          return { ...l, status, submittedAt: r.submittedAt };
+          if (!r) return { ...l, status: 'none' as const, entriesCount: 0, latestSubmittedAt: null, hasInProgress: false };
+          const status = r.submittedCount > 0 ? ('submitted' as const) : r.hasInProgress ? ('draft' as const) : ('none' as const);
+          return { ...l, status, entriesCount: r.submittedCount, latestSubmittedAt: r.latestSubmittedAt, hasInProgress: r.hasInProgress };
         });
         setAllLearners(merged);
       })
@@ -245,19 +258,35 @@ const TeacherContextHubPage: React.FC = () => {
       if (statusFilter === 'completed' && l.status !== 'submitted') return false;
       if (statusFilter === 'inProgress' && l.status !== 'draft') return false;
       if (statusFilter === 'notStarted' && l.status !== 'none') return false;
+      if (monthFilter !== 'All') {
+        if (!l.latestSubmittedAt) return false;
+        const monthIdx = new Date(l.latestSubmittedAt).getMonth();
+        if (MONTHS[monthIdx] !== monthFilter) return false;
+      }
       return true;
     });
-  }, [allLearners, debouncedSearch, statusFilter]);
+  }, [allLearners, debouncedSearch, statusFilter, monthFilter]);
+
+  const sortedLearners = useMemo(() => {
+    return [...filteredLearners].sort((a, b) => {
+      const av = a.latestSubmittedAt ? new Date(a.latestSubmittedAt).getTime() : -Infinity;
+      const bv = b.latestSubmittedAt ? new Date(b.latestSubmittedAt).getTime() : -Infinity;
+      if (av === bv) return 0;
+      if (av === -Infinity) return 1;
+      if (bv === -Infinity) return -1;
+      return sortOrder === 'asc' ? av - bv : bv - av;
+    });
+  }, [filteredLearners, sortOrder]);
 
   const pagedLearners = useMemo(
-    () => filteredLearners.slice((learnersPage - 1) * PAGE_SIZE, learnersPage * PAGE_SIZE),
-    [filteredLearners, learnersPage]
+    () => sortedLearners.slice(page * pageSize, page * pageSize + pageSize),
+    [sortedLearners, page, pageSize]
   );
 
   const responseInfoById = useMemo(() => {
     const map: Record<string, ContextResponseInfo> = {};
     allLearners.forEach((l) => {
-      map[l.id] = { status: l.status, submittedAt: l.submittedAt };
+      map[l.id] = { status: l.status, submittedAt: l.latestSubmittedAt };
     });
     return map;
   }, [allLearners]);
@@ -307,14 +336,10 @@ const TeacherContextHubPage: React.FC = () => {
       />
 
       <Box sx={{ p: 2 }}>
-        {!!batchId && (
-          <SurveyStatusSummary counts={statusCounts} loading={allLearnersLoading} />
-        )}
-
+        {/* Center/Batch narrow the population the tiles summarize, so they sit above the tiles. */}
         <TeacherFilterBar
-          search={search}
-          onSearchChange={handleSearchChange}
-          showSearch={!!batchId && centersLoaded}
+          search=""
+          onSearchChange={() => undefined}
           centersLoading={!centersLoaded}
           centers={centers}
           centerId={centerId}
@@ -322,6 +347,7 @@ const TeacherContextHubPage: React.FC = () => {
             setCenterId(id);
             setSearch('');
             setStatusFilter('all');
+            setMonthFilter('All');
             setAllLearners([]);
             setAllLearnersLoading(true);
             const firstBatch = (batchesByCenterId[id] ?? [])[0];
@@ -333,12 +359,27 @@ const TeacherContextHubPage: React.FC = () => {
             setBatchId(id);
             setSearch('');
             setStatusFilter('all');
+            setMonthFilter('All');
             setAllLearners([]);
             setAllLearnersLoading(true);
           }}
+        />
+
+        {!!batchId && (
+          <SurveyStatusSummary counts={statusCounts} loading={allLearnersLoading} />
+        )}
+
+        {/* Status/Month/Search/Sort only filter the table below, not the tiles above. */}
+        <TeacherFilterBar
+          search={search}
+          onSearchChange={handleSearchChange}
+          showSearch={!!batchId && centersLoaded}
           showStatusFilter={!!batchId && centersLoaded}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
+          showMonthFilter={!!batchId && centersLoaded}
+          monthFilter={monthFilter}
+          onMonthFilterChange={setMonthFilter}
         />
 
         <Box sx={{ maxWidth: '100%' }}>
@@ -361,7 +402,7 @@ const TeacherContextHubPage: React.FC = () => {
                 Retry
               </Button>
             </Box>
-          ) : filteredLearners.length === 0 ? (
+          ) : sortedLearners.length === 0 ? (
             <TeacherEmptyState
               message={
                 search.trim() || statusFilter !== 'all'
@@ -375,21 +416,29 @@ const TeacherContextHubPage: React.FC = () => {
                 rows={pagedLearners}
                 responseInfoById={responseInfoById}
                 expired={isExpired(survey?.endDate)}
+                surveyType={survey?.surveyType}
                 onRowAction={(row) =>
                   responseInfoById[row.id]?.status === 'submitted'
                     ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)
                     : router.push(`/survey-fill/${surveyId}/${row.id}?cohortId=${batchId}`)
                 }
+                onNewEntry={(row) => router.push(`/survey-fill/${surveyId}/${row.id}?cohortId=${batchId}`)}
+                onViewEntries={(row) => router.push(`/teacher-survey-fill/${surveyId}/hub/${row.id}/entries`)}
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
               />
-              {filteredLearners.length > PAGE_SIZE && (
-                <PaginationBar
-                  page={learnersPage}
-                  pageSize={PAGE_SIZE}
-                  total={filteredLearners.length}
-                  onPrev={() => setLearnersPage((p) => Math.max(1, p - 1))}
-                  onNext={() => setLearnersPage((p) => p + 1)}
-                />
-              )}
+              <TablePagination
+                component="div"
+                rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+                count={sortedLearners.length}
+                rowsPerPage={pageSize}
+                page={page}
+                onPageChange={(_event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setPageSize(parseInt(event.target.value, 10));
+                  setPage(0);
+                }}
+              />
             </>
           )}
         </Box>

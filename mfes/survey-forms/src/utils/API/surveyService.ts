@@ -366,15 +366,18 @@ export interface ContextResponseInfo {
 
 export interface CohortResponseRow {
   contextId: string;
-  status: 'in_progress' | 'submitted' | 'reviewed';
-  submittedAt: string | null;
+  submittedCount: number;
+  hasInProgress: boolean;
+  latestSubmittedAt: string | null;
 }
 
 /**
- * Every learner's current response status for a survey, scoped to one batch —
- * one row per learner who has responded (their latest status if resubmitted).
- * Learners with no row are "not started"; the caller derives that by diffing
- * this against the batch's full roster (survey service has no roster visibility).
+ * Every learner's submission counts for a survey, scoped to one batch — one
+ * row per learner who has at least one response row, with how many are
+ * SUBMITTED (0, 1, or many for multi-entry surveys) and whether an
+ * in-progress draft also exists. Learners with no row are "not started";
+ * the caller derives that by diffing this against the batch's full roster
+ * (survey service has no roster visibility).
  */
 export const fetchResponseListByCohort = async (
   surveyId: string,
@@ -382,6 +385,39 @@ export const fetchResponseListByCohort = async (
 ): Promise<CohortResponseRow[]> => {
   const response = await get(API_ENDPOINTS.RESPONSE_LIST_BY_COHORT(surveyId, cohortId));
   return (response.data as { result?: CohortResponseRow[] })?.result ?? [];
+};
+
+/**
+ * All SUBMITTED entries for one respondent+contextId on a multi-entry survey,
+ * newest first. Unlike fetchSubmittedResponse (which collapses to the single
+ * latest match), this returns every entry for the "View Entries" screen.
+ */
+export const fetchSurveyEntries = async (
+  surveyId: string,
+  contextId: string
+): Promise<SurveyResponse[]> => {
+  const resolvedContextId = contextId === 'self' ? '' : contextId;
+  const body: Record<string, unknown> = {
+    page: 1,
+    limit: 100,
+    sortBy: 'submittedAt',
+    sortOrder: 'DESC',
+    status: 'submitted',
+  };
+  if (resolvedContextId) body.contextIds = [resolvedContextId];
+  const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
+  return (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ?? [];
+};
+
+/**
+ * Fetches a single response by ID (used by the per-entry read-only view,
+ * where the entries list already knows the exact responseId to show).
+ */
+export const fetchResponseById = async (
+  responseId: string
+): Promise<SurveyResponse | null> => {
+  const response = await get(API_ENDPOINTS.RESPONSE_READ(responseId));
+  return (response.data as { result?: SurveyResponse })?.result ?? null;
 };
 
 /**

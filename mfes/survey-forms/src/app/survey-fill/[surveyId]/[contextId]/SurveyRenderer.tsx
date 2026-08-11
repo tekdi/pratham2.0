@@ -226,7 +226,8 @@ const SurveyRenderer: React.FC = () => {
       toast.error(result.params.errmsg || 'Failed to start response', { containerId: 'survey-renderer-toast' });
       return null;
     } catch (err: any) {
-      if (err?.response?.status === 409) {
+      const errmsg = err?.response?.data?.params?.errmsg;
+      if (err?.response?.status === 400 && errmsg === 'You have already submitted a response to this survey') {
         router.replace(`/survey-fill/${surveyId}/${contextId}/view`);
         return null;
       }

@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Suspense } from 'react';
-import { CircularProgress, Box } from '@mui/material';
-import FillRouteGuard from './FillRouteGuard';
+import React, { Suspense } from 'react';
+import { Box, CircularProgress } from '@mui/material';
+import EntriesListPage from './EntriesListPage';
 
 export default function Page() {
   return (
@@ -14,7 +13,7 @@ export default function Page() {
         </Box>
       }
     >
-      <FillRouteGuard />
+      <EntriesListPage />
     </Suspense>
   );
 }
