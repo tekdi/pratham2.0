@@ -34,6 +34,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { useManagerDashboardData } from '../../hooks/useManagerDashboardData';
 import { useManagerDashboardUIState } from '../../hooks/useManagerDashboardUIState';
+import { useTopPerformers } from '../../hooks/useTopPerformers';
 import {
   AttemptSortOrder,
   CourseListFilters,
@@ -53,7 +54,6 @@ import {
   getSelectedCourseIds,
   getCourseUsersByStatus,
   getHighQuizAttemptUsers,
-  getTopPerformers,
   getUniqueCourseCount,
   sortHighAttemptUsers,
 } from '../../utils/managerDashboardHelpers';
@@ -253,10 +253,15 @@ const ManagerDashboard = () => {
     [highAttemptUsers, selectedAttemptFilter, attemptSortOrder]
   );
 
-  const topPerformers = useMemo(
-    () => getTopPerformers(scopedCourseLearningSummary, userById, 5),
-    [scopedCourseLearningSummary, userById]
-  );
+  const {
+    performers: topPerformers,
+    loading: topPerformersLoading,
+    error: topPerformersError,
+    fromDate: topPerformersFromDate,
+    toDate: topPerformersToDate,
+    setFromDate: setTopPerformersFromDate,
+    setToDate: setTopPerformersToDate,
+  } = useTopPerformers(users, 5);
 
   const selectedStatusCourse = selectedCourseStatus ? courseById[selectedCourseStatus.courseId] : undefined;
   const selectedStatusUsers = useMemo(() => {
@@ -516,9 +521,13 @@ const ManagerDashboard = () => {
             <Grid item xs={12} md={6}>
               <TopPerformersSection
                 performers={topPerformers}
-                loading={summaryLoading}
-                error={summaryError}
+                loading={topPerformersLoading}
+                error={topPerformersError}
                 totalEmployees={users.length}
+                fromDate={topPerformersFromDate}
+                toDate={topPerformersToDate}
+                onFromDateChange={setTopPerformersFromDate}
+                onToDateChange={setTopPerformersToDate}
                 onSeeAllClick={handleSeeAllEmployees}
               />
             </Grid>

@@ -27,7 +27,6 @@ import {
   NormalizedStatus,
   StatusConfigItem,
   StatusSummaryItem,
-  TopPerformer,
   UserById,
   UserCourseLearningMap,
   UserProgressCounts,
@@ -373,42 +372,6 @@ export const sortHighAttemptUsers = (
   [...users].sort((a, b) =>
     order === 'desc' ? b.highestAttempt - a.highestAttempt : a.highestAttempt - b.highestAttempt
   );
-
-export const getCertificateCountByUser = (
-  summary: CourseLearningSummaryResult
-): Record<string, number> => {
-  const counts: Record<string, number> = {};
-  Object.values(summary).forEach((userMap) => {
-    Object.entries(userMap).forEach(([userId, entry]) => {
-      if (normalizeLearningStatus(entry?.status) === 'certificateIssued') {
-        counts[userId] = (counts[userId] ?? 0) + 1;
-      }
-    });
-  });
-  return counts;
-};
-
-export const getTopPerformers = (
-  summary: CourseLearningSummaryResult,
-  userById: UserById,
-  limit = 5
-): TopPerformer[] => {
-  const certificateCounts = getCertificateCountByUser(summary);
-
-  const performers: TopPerformer[] = Object.entries(certificateCounts)
-    .map(([userId, certificateCount]) => {
-      const user = userById[userId];
-      if (!user) return null;
-      return { userId, userName: getUserDisplayName(user, userId), certificateCount };
-    })
-    .filter((performer): performer is TopPerformer => Boolean(performer && performer.certificateCount > 0));
-
-  // Deterministic ordering: certificate count desc, then name asc on ties — so the list doesn't
-  // reshuffle between renders when counts are equal.
-  return [...performers]
-    .sort((a, b) => b.certificateCount - a.certificateCount || a.userName.localeCompare(b.userName))
-    .slice(0, limit);
-};
 
 export const filterCourses = (courses: Course[], filters: CourseListFilters): Course[] =>
   courses.filter((course) => {

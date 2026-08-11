@@ -3,6 +3,8 @@ import { Avatar, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TopPerformersSectionProps } from '../../utils/Interface';
 import { getUserInitials } from '../../utils/managerDashboardHelpers';
 import NoDataFound from '../common/NoDataFound';
@@ -12,6 +14,10 @@ const TopPerformersSection: React.FC<TopPerformersSectionProps> = ({
   loading,
   error,
   totalEmployees,
+  fromDate,
+  toDate,
+  onFromDateChange,
+  onToDateChange,
   onSeeAllClick,
 }) => {
   const theme = useTheme<any>();
@@ -67,6 +73,27 @@ const TopPerformersSection: React.FC<TopPerformersSectionProps> = ({
           {t('MANAGER_OVERVIEW.SEE_ALL_EMPLOYEES', { count: totalEmployees })}
         </Button>
       </Stack>
+
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+          <DatePicker
+            label={t('MANAGER_OVERVIEW.FROM_DATE', 'From date')}
+            value={fromDate}
+            onChange={onFromDateChange}
+            format="DD-MMM-YYYY"
+            maxDate={toDate ?? undefined}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+          <DatePicker
+            label={t('MANAGER_OVERVIEW.TO_DATE', 'To date')}
+            value={toDate}
+            onChange={onToDateChange}
+            format="DD-MMM-YYYY"
+            minDate={fromDate ?? undefined}
+            slotProps={{ textField: { size: 'small', fullWidth: true } }}
+          />
+        </Stack>
+      </LocalizationProvider>
 
       {loading ? (
         <Typography
