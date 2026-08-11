@@ -106,8 +106,11 @@ const App = ({
   let previousPage = null;
   let exitLink = null;
   let returnUrl = null;
-  // Recommended Content is scoped strictly to POS Content pages.
-  const isPosContent =
+  // Recommended Content is scoped strictly to POS Content pages. POS pages
+  // are always under /pos, and every recommended-content link explicitly
+  // carries isPOSContent=true so this doesn't have to be re-inferred from
+  // the URL shape when navigating between recommended items.
+  let isPosContent =
     typeof window !== 'undefined' && window.location.pathname.includes('/pos');
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
@@ -115,6 +118,7 @@ const App = ({
     previousPage = searchParams.get('previousPage');
     exitLink = searchParams.get('exitLink');
     returnUrl = searchParams.get('returnUrl');
+    isPosContent = isPosContent || searchParams.get('isPOSContent') === 'true';
   }
 
   // Intercept browser ← button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
@@ -678,20 +682,22 @@ const App = ({
                 />
               </Box>
 
-              {contentTabValue === 1 && (
-                <Box
-                  sx={{
-                    overflowY: 'auto',
-                    height: 'calc(100vh - 185px)',
-                  }}
-                >
-                  <RecommendedContent
-                    currentContentId={
-                      Array.isArray(identifier) ? identifier[0] : identifier
-                    }
-                  />
-                </Box>
-              )}
+              <Box
+                sx={{
+                  display: contentTabValue === 1 ? 'block' : 'none',
+                  overflowY: 'auto',
+                  height: 'calc(100vh - 185px)',
+                }}
+              >
+                <RecommendedContent
+                  currentContentId={
+                    Array.isArray(identifier) ? identifier[0] : identifier
+                  }
+                  courseId={Array.isArray(courseId) ? courseId[0] : courseId}
+                  unitId={Array.isArray(unitId) ? unitId[0] : unitId}
+                  contentBaseUrl={contentBaseUrl}
+                />
+              </Box>
             </>
           ) : (
             <>

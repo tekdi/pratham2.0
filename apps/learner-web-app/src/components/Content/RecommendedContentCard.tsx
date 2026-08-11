@@ -1,7 +1,7 @@
 'use client';
-import React from 'react';
-import { Avatar, Box, Button, Typography } from '@mui/material';
-import { ExpandableText, useTranslation } from '@shared-lib';
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Typography } from '@mui/material';
+import { useTranslation } from '@shared-lib';
 import { RecommendedContentItem } from '@learner/utils/Interface';
 
 const RecommendedContentCard = ({
@@ -12,43 +12,69 @@ const RecommendedContentCard = ({
   onOpen: (identifier: string) => void;
 }) => {
   const { t } = useTranslation();
+  const explanationRef = useRef<HTMLParagraphElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showToggle, setShowToggle] = useState(false);
 
   const metaText = [item?.language, item?.format, item?.subject]
     .filter(Boolean)
     .join(' · ');
 
+  useEffect(() => {
+    const el = explanationRef.current;
+    if (!el) return;
+    setShowToggle(el.scrollHeight > el.clientHeight + 1);
+  }, [item?.explanation]);
+
   return (
     <Box
       sx={{
-        border: '1px solid',
-        borderColor: 'customColors.secondary400',
+        backgroundColor: 'background.paper',
         borderRadius: '12px',
+        boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.12)',
         p: 2,
         mb: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1,
       }}
     >
-      <Box sx={{ display: 'flex', gap: 1.5 }}>
-        <Avatar
-          variant="rounded"
-          src={item?.posterImage}
-          alt={item?.name}
-          sx={{ width: 56, height: 56 }}
-        >
-          {item?.name?.charAt(0)}
-        </Avatar>
-        <Box sx={{ minWidth: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+        <Box
+          sx={{
+            flexShrink: 0,
+            width: 48,
+            height: 48,
+            borderRadius: '8px',
+            overflow: 'hidden',
+            backgroundColor: 'customColors.secondary300',
+            backgroundImage: item?.posterImage
+              ? `url(${item.posterImage})`
+              : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
           <Typography
-            variant="body4"
             component="h3"
-            sx={{ fontWeight: 600, color: 'text.primary' }}
+            sx={{
+              fontSize: '14px',
+              lineHeight: '20px',
+              fontWeight: 600,
+              color: 'text.primary',
+              m: 0,
+            }}
           >
             {item?.name}
           </Typography>
           {metaText && (
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography
+              sx={{
+                fontSize: '12px',
+                lineHeight: '16px',
+                fontWeight: 400,
+                color: 'text.secondary',
+                mt: 0.25,
+              }}
+            >
               {metaText}
             </Typography>
           )}
@@ -63,29 +89,78 @@ const RecommendedContentCard = ({
             borderColor: 'customColors.recommendationCardBorder',
             borderRadius: '8px',
             p: 1.5,
+            mt: 1.5,
           }}
         >
           <Typography
-            variant="body3"
-            sx={{ fontWeight: 600, mb: 0.5, color: 'text.primary' }}
+            sx={{
+              fontSize: '13px',
+              lineHeight: '18px',
+              fontWeight: 600,
+              mb: 0.5,
+              color: 'text.primary',
+            }}
           >
             {`\u{1F4A1} ${t('LEARNER_APP.PLAYER.RECOMMENDED_BECAUSE')}`}
           </Typography>
-          <ExpandableText
-            text={item.explanation}
-            maxWords={1000}
-            maxLines={3}
-          />
+          <Typography
+            ref={explanationRef}
+            sx={{
+              fontSize: '13px',
+              lineHeight: '18px',
+              fontWeight: 400,
+              color: 'text.primary',
+              ...(!isExpanded && {
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }),
+            }}
+          >
+            {item.explanation}
+          </Typography>
+          {showToggle && (
+            <Typography
+              component="button"
+              type="button"
+              onClick={() => setIsExpanded((prev) => !prev)}
+              sx={{
+                fontSize: '13px',
+                lineHeight: '18px',
+                mt: 0.5,
+                p: 0,
+                border: 0,
+                background: 'none',
+                color: 'secondary.main',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {isExpanded ? t('COMMON.READ_LESS') : t('COMMON.READ_MORE')}
+            </Typography>
+          )}
         </Box>
       )}
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+        <Typography
+          component="button"
+          type="button"
           onClick={() => onOpen(item.identifier)}
-          sx={{ textTransform: 'none', fontWeight: 600 }}
+          sx={{
+            fontSize: '13px',
+            lineHeight: '18px',
+            p: 0,
+            border: 0,
+            background: 'none',
+            color: 'secondary.main',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
         >
           {`${t('LEARNER_APP.PLAYER.OPEN')} →`}
-        </Button>
+        </Typography>
       </Box>
     </Box>
   );
