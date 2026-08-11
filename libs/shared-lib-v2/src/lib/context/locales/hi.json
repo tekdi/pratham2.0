@@ -227,13 +227,32 @@
       "EXPLORE_MORE_COURSES": "और भी कोर्स देखें",
       "EXPLORE_ADDITIONAL_RESOURCES": "अतिरिक्त संसाधन और सामग्री देखें",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "सेकंड चांस प्रोग्राम के लिए पंजीकरण करने के लिए धन्यवाद। हमारी टीम जल्द ही आपसे संपर्क करेगी। तब तक, आप उपलब्ध पाठ्यक्रमों के बारे में जानकारी प्राप्त कर सकते हैं।",
-      "PLAYSTORE_DOWNLOAD_MESSAGE": "आप अपने खाते तक पहुंचने के लिए {playStoreLink} से ऐप डाउनलोड कर सकते हैं।",
+      "PLAYSTORE_DOWNLOAD_MESSAGE": "आप \"डाउनलोड प्ले स्टोर\" बटन पर टैप करके ऐप डाउनलोड कर सकते हैं।",
+      "REGISTRATION_SUCCESSFUL_TITLE": "पंजीकरण सफल",
+      "REGISTERED": "पंजीकृत",
+      "PLAY_STORE": "प्ले स्टोर",
+      "PROGRAM_LABEL": "प्रोग्राम",
+      "STATUS_LABEL": "स्थिति",
+      "COURSE_WELCOME_SUBTITLE": "खोज जारी रखें — नए पाठ्यक्रम नियमित रूप से जोड़े जाते हैं।",
       "FILTER_BY": "के अनुसार फ़िल्टर करें",
       "CLEAR_FILTER": "फ़िल्टर साफ़ करें",
       "APPLY_FILTER": "फिल्टर लागू करें",
       "DONE": "पूरा हुआ",
       "CONTENT_FILTERS": "सामग्री फ़िल्टर",
-      "CLEAR_ALL": "सभी साफ़ करें"
+      "CLEAR_ALL": "सभी साफ़ करें",
+      "ASSESSMENT_ATTEMPTS": {
+        "TITLE": "मूल्यांकन प्रयास",
+        "OF": "में से",
+        "COMPLETED_LOWERCASE": "पूर्ण",
+        "ATTEMPT_LABEL": "प्रयास",
+        "COMPLETED": "पूर्ण",
+        "NOT_ATTEMPTED": "प्रयास नहीं किया",
+        "LOCKED": "लॉक",
+        "AFTER_ATTEMPT_PREFIX": "प्रयास के बाद",
+        "BEST_SCORE": "सर्वश्रेष्ठ स्कोर",
+        "LATEST": "नवीनतम",
+        "LOAD_ERROR": "अभी मूल्यांकन प्रयास लोड नहीं हो सके।"
+      }
     },
     "EXPLORE": {
       "EXPLORE_ADDITIONAL_COURSES": "अतिरिक्त पाठ्यक्रम देखें"
