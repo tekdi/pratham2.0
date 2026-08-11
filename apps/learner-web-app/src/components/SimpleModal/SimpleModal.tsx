@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   Modal,
   Typography,
   useMediaQuery,
@@ -28,6 +29,11 @@ interface SimpleModalProps {
   handleNext?: any;
   id?: string;
   footerText?: string;
+  /**
+   * Renders a close icon for modals that have no `modalTitle` (the title bar
+   * already provides one). Opt-in, so existing untitled modals are unchanged.
+   */
+  showCloseIcon?: boolean;
 }
 const SimpleModal: React.FC<SimpleModalProps> = ({
   open,
@@ -42,6 +48,7 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
   handleNext,
   id = '',
   footerText,
+  showCloseIcon = false,
 }) => {
   const theme = useTheme<any>();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -88,6 +95,19 @@ const SimpleModal: React.FC<SimpleModalProps> = ({
       aria-describedby="child-modal-description"
     >
       <Box sx={modalStyles}>
+        {/* Standalone close icon for untitled modals. Sits outside the
+            scrollable content so it stays pinned to the modal corner. */}
+        {showCloseIcon && !modalTitle && (
+          <IconButton
+            onClick={onClose}
+            aria-label="Close"
+            size="small"
+            sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}
+          >
+            <CloseSharpIcon fontSize="small" />
+          </IconButton>
+        )}
+
         {/* Header */}
         {modalTitle && (
           <>
