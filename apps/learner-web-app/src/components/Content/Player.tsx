@@ -15,6 +15,8 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  Tab,
+  Tabs,
   Typography,
   useMediaQuery,
   useTheme,
@@ -41,6 +43,10 @@ import { logEvent } from '@learner/utils/googleAnalytics';
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
+const RecommendedContent = dynamic(
+  () => import('@learner/components/Content/RecommendedContent'),
+  { ssr: false }
+);
 const App = ({
   userIdLocalstorageName,
   contentBaseUrl,
@@ -59,6 +65,7 @@ const App = ({
   const [item, setItem] = useState<{ [key: string]: any }>({});
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
+  const [contentTabValue, setContentTabValue] = useState(0);
   const [mimeType, setMemetype] = useState('');
   const [isVideo, setIsVideo] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -621,33 +628,63 @@ const App = ({
             {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
           </Typography>
 
-          <CourseUnitDetails
-            isShowLayout={false}
-            isHideInfoCard={true}
-            _box={{
-              pt: 1,
-              pb: 1,
-              px: { md: 1 },
-              height: 'calc(100vh - 185px)',
-            }}
-            _config={{
-              ...(_config?.courseUnitDetails || {}),
-              getContentData: (item: any) => {
-                setIsShowMoreContent(
-                  item.children.filter(
-                    (item: any) => item.identifier !== identifier
-                  )?.length > 0
-                );
-              },
-              _parentGrid: { pb: 2 },
-              default_img: '/images/image_ver.png',
-              _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-              _card: {
-                isHideProgress: true,
-                ...(_config?.courseUnitDetails?._card || {}),
-              },
-            }}
-          />
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+            <Tabs
+              value={contentTabValue}
+              onChange={(_e, newValue) => setContentTabValue(newValue)}
+              aria-label={t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+            >
+              <Tab label={t('LEARNER_APP.PLAYER.RELATED')} />
+              <Tab label={t('LEARNER_APP.PLAYER.RECOMMENDED')} />
+            </Tabs>
+          </Box>
+
+          <Box
+            sx={{ display: contentTabValue === 0 ? 'block' : 'none' }}
+          >
+            <CourseUnitDetails
+              isShowLayout={false}
+              isHideInfoCard={true}
+              _box={{
+                pt: 1,
+                pb: 1,
+                px: { md: 1 },
+                height: 'calc(100vh - 185px)',
+              }}
+              _config={{
+                ...(_config?.courseUnitDetails || {}),
+                getContentData: (item: any) => {
+                  setIsShowMoreContent(
+                    item.children.filter(
+                      (item: any) => item.identifier !== identifier
+                    )?.length > 0
+                  );
+                },
+                _parentGrid: { pb: 2 },
+                default_img: '/images/image_ver.png',
+                _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
+                _card: {
+                  isHideProgress: true,
+                  ...(_config?.courseUnitDetails?._card || {}),
+                },
+              }}
+            />
+          </Box>
+
+          {contentTabValue === 1 && (
+            <Box
+              sx={{
+                overflowY: 'auto',
+                height: 'calc(100vh - 185px)',
+              }}
+            >
+              <RecommendedContent
+                currentContentId={
+                  Array.isArray(identifier) ? identifier[0] : identifier
+                }
+              />
+            </Box>
+          )}
         </Box>
       </Grid>
 

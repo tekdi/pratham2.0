@@ -31,6 +31,8 @@ export const API_ENDPOINTS = {
 
 };
 
+export const RECOMMENDATIONS_ENDPOINT = `${baseurl}/recommendations`;
+
 export const COURSE_L2_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/save-user-salesforce`;
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
 

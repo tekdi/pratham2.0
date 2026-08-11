@@ -342,7 +342,13 @@
       "NO_MORE_DATA": "No more data available"
     },
     "PLAYER": {
-      "MORE_RELATED_RESOURCES": "More Related Resources"
+      "MORE_RELATED_RESOURCES": "More Related Resources",
+      "RELATED": "Related",
+      "RECOMMENDED": "Recommended",
+      "RECOMMENDED_BECAUSE": "Recommended because",
+      "RECOMMENDATION_EMPTY_STATE": "We couldn't find personalized recommendations yet.",
+      "RECOMMENDATION_ERROR": "We couldn't load recommendations right now. Please try again later.",
+      "OPEN": "Open"
     },
     "other_filters": "Other Filters",
     "USER_PROFILE_CARD": {
