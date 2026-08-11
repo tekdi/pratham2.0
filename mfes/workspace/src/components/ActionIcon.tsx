@@ -38,6 +38,10 @@ const ActionIcon: React.FC<ActionCellProps> = ({
     return null; // Don't render anything if delete should be hidden
   }
 
+  // Content creators cannot delete published (Live) content
+  const isDeleteDisabled =
+    rowData?.status === 'Live' && getLocalStoredUserRole() === Role.SCTA;
+
   // Deleted (Retired) content has no actions left
   if (rowData?.status === 'Retired') {
     return (
@@ -60,9 +64,16 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         alignItems: "center",
       }}
     >
-      <Tooltip title="Delete">
+      <Tooltip
+        title={
+          isDeleteDisabled
+            ? 'Published content cannot be deleted'
+            : 'Delete'
+        }
+      >
         <Box
           onClick={() => {
+            if (isDeleteDisabled) return;
             console.log(rowData);
             handleOpen('delete');
           }}
@@ -70,7 +81,8 @@ const ActionIcon: React.FC<ActionCellProps> = ({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            cursor: 'pointer',
+            cursor: isDeleteDisabled ? 'not-allowed' : 'pointer',
+            opacity: isDeleteDisabled ? 0.4 : 1,
             backgroundColor: '#F8EFE7',
             p: '10px',
           }}
