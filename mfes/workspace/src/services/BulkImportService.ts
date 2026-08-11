@@ -336,6 +336,44 @@ export const updateQuestionSetHierarchy = async (
 };
 
 /**
+ * Submit a QuestionSet for review
+ * POST /action/questionset/v2/review/{identifier}
+ *
+ * Must run AFTER the hierarchy update, otherwise the QuestionSet is reviewed
+ * while still empty and its questions never reach a reviewable state.
+ */
+export const reviewQuestionSet = async (questionSetId: string): Promise<void> => {
+  await post(`/action/questionset/v2/review/${questionSetId}`, {
+    request: {
+      questionset: {
+        lastUpdatedBy: getLocalStoredUserId(),
+      },
+    },
+  });
+};
+
+/**
+ * Publish a QuestionSet
+ * POST /action/questionset/v2/publish/{identifier}
+ *
+ * Publishing the QuestionSet also publishes the questions in its hierarchy —
+ * child questions (visibility 'Parent') are part of the QS package and do not
+ * need to be published individually. This transitions the QS to "Live" and
+ * generates the package the QuML player consumes.
+ *
+ * Bulk import runs as an admin operation, so we publish straight after review.
+ */
+export const publishQuestionSet = async (questionSetId: string): Promise<void> => {
+  await post(`/action/questionset/v2/publish/${questionSetId}`, {
+    request: {
+      questionset: {
+        lastPublishedBy: getLocalStoredUserId(),
+      },
+    },
+  });
+};
+
+/**
  * Retire (soft-delete) a QuestionSet — used to clean up when the hierarchy
  * update fails so no QuestionSet is left without its questions.
  * DELETE /action/questionset/v2/retire/{identifier}
