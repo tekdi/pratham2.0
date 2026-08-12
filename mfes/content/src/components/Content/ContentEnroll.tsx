@@ -42,13 +42,22 @@ const ContentDetails = (props: ContentDetailsProps) => {
     useState<ContentSearchResponse | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   let activeLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    returnUrl = searchParams.get('returnUrl');
     if (!activeLink) {
       activeLink = '';
     }
   }
+  // Back-navigation target can arrive as either param — carry it forward to the
+  // course page under the same name so its back button knows where to return to.
+  const backQuery = activeLink
+    ? `?activeLink=${encodeURIComponent(activeLink)}`
+    : returnUrl
+    ? `?returnUrl=${encodeURIComponent(returnUrl)}`
+    : '';
   const { t } = useTranslation();
   useEffect(() => {
     const fetchContentDetails = async () => {
@@ -104,9 +113,7 @@ if(!isThematicPath && !isPosPath && result?.program) {
                 router.replace(
                   `${
                     props?._config?.contentBaseUrl ?? '/content'
-                  }/${identifier}${
-                    activeLink ? `?activeLink=${activeLink}` : ''
-                  }`
+                  }/${identifier}${backQuery}`
                 );
               }
             } else {
@@ -117,9 +124,9 @@ if(!isThematicPath && !isPosPath && result?.program) {
           }
         } else {
           router.replace(
-            `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
-              activeLink ? `?activeLink=${activeLink}` : ''
-            }`
+            `${
+              props?._config?.contentBaseUrl ?? '/content'
+            }/${identifier}${backQuery}`
           );
         }
         setContentDetails(result as unknown as ContentSearchResponse);
@@ -134,7 +141,7 @@ if(!isThematicPath && !isPosPath && result?.program) {
     } else {
       setIsLoading(false);
     }
-  }, [identifier, activeLink, props, router]);
+  }, [identifier, activeLink, returnUrl, backQuery, props, router]);
 
   const handleClick = async () => {
     console.log("helloooooooo")
@@ -175,9 +182,9 @@ if(!isThematicPath && !isPosPath && result?.program) {
        
 
         router.replace(
-          `${props?._config?.contentBaseUrl ?? '/content'}/${identifier}${
-            activeLink ? `?activeLink=${activeLink}` : ''
-          }`
+          `${
+            props?._config?.contentBaseUrl ?? '/content'
+          }/${identifier}${backQuery}`
         );
       } else {
         router.replace(
