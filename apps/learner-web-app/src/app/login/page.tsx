@@ -318,6 +318,11 @@ const LoginPageContent = () => {
   const [notEnrolledModal, setNotEnrolledModal] = useState(false);
   const [notEnrolledProgramName, setNotEnrolledProgramName] = useState('');
   const [notEnrolledTenantId, setNotEnrolledTenantId] = useState('');
+  // Non-Learner roles the user already holds in the target program tenant
+  // (e.g. Instructor in Second Chance). Any role here blocks self-enrollment.
+  const [notEnrolledExistingRoles, setNotEnrolledExistingRoles] = useState<
+    string[]
+  >([]);
   const [enrollConfirmModal, setEnrollConfirmModal] = useState(false);
   const [enrollConfirmTargetName, setEnrollConfirmTargetName] = useState('');
   const [enrollConfirmTargetId, setEnrollConfirmTargetId] = useState('');
@@ -554,6 +559,19 @@ const LoginPageContent = () => {
               )
               .map((t: any) => t.tenantName as string);
             setEnrolledProgramNames(userProgramNames);
+
+            // A user who already holds a role in this tenant (Instructor,
+            // Teacher, Admin, ...) must not self-enroll into it as a Learner.
+            // Capture those roles so the Enrol Now handler can block the flow.
+            const existingRolesInTenant: string[] = (
+              userResponse?.tenantData || []
+            )
+              .filter((t: any) => t?.tenantId === programTenantId)
+              .flatMap((t: any) =>
+                (t?.roles || []).map((r: any) => r?.roleName).filter(Boolean)
+              );
+            setNotEnrolledExistingRoles(existingRolesInTenant);
+
             setNotEnrolledProgramName(programName);
             setNotEnrolledTenantId(programTenantId);
             setNotEnrolledModal(true);
@@ -1064,9 +1082,45 @@ const LoginPageContent = () => {
       <SimpleModal
         open={notEnrolledModal}
         onClose={() => { setNotEnrolledModal(false); router.push('/programs'); }}
+        showCloseIcon
         showFooter={true}
         primaryText={t('LANDING.ENROL_NOW') || 'Enrol Now'}
         primaryActionHandler={() => {
+          // Block self-enrollment when the user already holds a role in this
+          // tenant (e.g. an Instructor of Second Chance cannot enroll into
+          // Second Chance as a Learner). Enrolling into any tenant where they
+          // hold no role is still allowed.
+          if (notEnrolledExistingRoles.length > 0) {
+            const placeholderValues: Record<string, string> = {
+              '{role}': notEnrolledExistingRoles.join(', '),
+              '{program}': notEnrolledProgramName || 'this program',
+            };
+            // Split on the placeholders rather than replacing them, so the
+            // role and program can be emphasised while the rest of the
+            // sentence stays at the base weight. Splitting also keeps the
+            // locale free to order the two placeholders however it needs.
+            const message = (
+              <>
+                {t('LANDING.ALREADY_HAS_ROLE_IN_PROGRAM', {
+                  defaultValue:
+                    'You already have the {role} role in {program}, so you cannot enroll into this program.',
+                })
+                  .split(/(\{role\}|\{program\})/)
+                  .map((part, index) =>
+                    placeholderValues[part] ? (
+                      <Box component="span" key={index} fontWeight={600}>
+                        {placeholderValues[part]}
+                      </Box>
+                    ) : (
+                      part
+                    )
+                  )}
+              </>
+            );
+            showToastMessage(message, 'error', { fontWeight: 500 });
+            return;
+          }
+
           setNotEnrolledModal(false);
           const currentTenantId = localStorage.getItem('tenantId');
           localStorage.setItem('previousTenantId', currentTenantId || '');
