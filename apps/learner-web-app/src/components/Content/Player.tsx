@@ -617,10 +617,8 @@ const App = ({
       <Grid
         sx={{
           display:
-            isShowMoreContent &&
-            (isPosContent ||
-              !isPortrait ||
-              (isVideo && !isPortrait))
+            isPosContent ||
+            (isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)))
               ? 'flex'
               : 'none',
 
@@ -656,10 +654,21 @@ const App = ({
                   mt: 3,
                 }}
               >
-                {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+                {t(
+                  isShowMoreContent
+                    ? 'LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES'
+                    : 'LEARNER_APP.PLAYER.MORE_RECOMMENDED_CONTENT'
+                )}
               </Typography>
 
-              <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+              <Box
+                sx={{
+                  display: isShowMoreContent ? 'block' : 'none',
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  mb: 2,
+                }}
+              >
                 <Tabs
                   value={contentTabValue}
                   onChange={(_e, newValue) => setContentTabValue(newValue)}
@@ -670,7 +679,14 @@ const App = ({
                 </Tabs>
               </Box>
 
-              <Box sx={{ display: contentTabValue === 0 ? 'block' : 'none' }}>
+              <Box
+                sx={{
+                  display:
+                    isShowMoreContent && contentTabValue === 0
+                      ? 'block'
+                      : 'none',
+                }}
+              >
                 <CourseUnitDetails
                   isShowLayout={false}
                   isHideInfoCard={true}
@@ -686,7 +702,10 @@ const App = ({
 
               <Box
                 sx={{
-                  display: contentTabValue === 1 ? 'block' : 'none',
+                  display:
+                    !isShowMoreContent || contentTabValue === 1
+                      ? 'block'
+                      : 'none',
                   overflowY: 'auto',
                   height: 'calc(100vh - 185px)',
                 }}
