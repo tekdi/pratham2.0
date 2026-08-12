@@ -3,7 +3,7 @@
 // Pratham 2.0 — Workspace MFE
 // ============================================================
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useCallback, useSyncExternalStore } from 'react';
 import {
   Box,
   Stepper,
@@ -22,14 +22,7 @@ import ImportSummary from './ImportSummary';
 
 import { parseImportExcel } from '../../utils/bulkImportParser';
 import { validateImportData } from '../../utils/bulkImportValidator';
-import { BulkImportQueue } from '../../utils/bulkImportQueue';
-import {
-  ParsedImportData,
-  ValidationResult,
-  ImportProgress as ImportProgressType,
-  ImportSession,
-} from '../../types/bulkImport.types';
-import { v4 as uuidv4 } from 'uuid';
+import * as importSession from '../../utils/bulkImportSession';
 
 // ─── Steps ────────────────────────────────────────────────────
 
@@ -45,96 +38,53 @@ const STEPS = [
 // ─── Component ────────────────────────────────────────────────
 
 const BulkImportStepper: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [session, setSession] = useState<ImportSession>({
-    id: uuidv4(),
-    fileName: '',
-    uploadedAt: 0,
-    phase: 'idle',
-    parsedData: null,
-    validationResult: null,
-    progress: null,
-    resolvedIds: {},
-  });
+  // State lives in a module-level store, not in this component. Navigating away
+  // and back remounts the stepper but the import keeps running untouched, and
+  // this simply re-renders whatever the store currently holds.
+  const { activeStep, session, parseError } = useSyncExternalStore(
+    importSession.subscribe,
+    importSession.getSnapshot,
+    importSession.getServerSnapshot
+  );
 
-  const [parseError, setParseError] = useState<string | null>(null);
-  const queueRef = useRef<BulkImportQueue | null>(null);
+  const setActiveStep = importSession.setActiveStep;
 
   // ─── Step 1→2: File uploaded
   const handleFileAccepted = useCallback(async (file: File) => {
-    setParseError(null);
-    setSession((s) => ({
-      ...s,
-      fileName: file.name,
-      uploadedAt: Date.now(),
-      phase: 'parsing',
-    }));
+    importSession.setParseError(null);
+    importSession.setFileMeta(file.name);
 
     try {
       const parsedData = await parseImportExcel(file);
-      setSession((s) => ({ ...s, parsedData, phase: 'previewing' }));
-      setActiveStep(2);
+      importSession.setParsedData(parsedData);
+      importSession.setActiveStep(2);
     } catch (err: any) {
-      setParseError(err.message || 'Failed to parse Excel file');
-      setSession((s) => ({ ...s, phase: 'idle' }));
+      importSession.setParseError(err.message || 'Failed to parse Excel file');
+      importSession.setPhase('idle');
     }
   }, []);
 
   // ─── Step 2→3: Preview confirmed
   const handlePreviewConfirmed = useCallback(() => {
-    if (!session.parsedData) return;
-    const validationResult = validateImportData(session.parsedData);
-    setSession((s) => ({ ...s, validationResult, phase: 'validating' }));
-    setActiveStep(3);
-  }, [session.parsedData]);
+    const parsed = importSession.getSnapshot().session.parsedData;
+    if (!parsed) return;
+    importSession.setValidationResult(validateImportData(parsed));
+    importSession.setActiveStep(3);
+  }, []);
 
   // ─── Step 3→4: Start import
-  const handleStartImport = useCallback(async () => {
-    if (!session.parsedData) return;
-
-    const queue = new BulkImportQueue();
-    queue.buildJobs(session.parsedData);
-    queueRef.current = queue;
-
-    setSession((s) => ({ ...s, phase: 'importing' }));
-    setActiveStep(4);
-
-    queue.onProgress((progress) => {
-      setSession((s) => ({ ...s, progress }));
-    });
-
-    const finalProgress = await queue.run();
-
-    setSession((s) => ({
-      ...s,
-      phase: finalProgress.failedJobs > 0 && finalProgress.completedJobs > 0
-        ? 'partial'
-        : finalProgress.failedJobs > 0 ? 'failed' : 'completed',
-      progress: finalProgress,
-      resolvedIds: queue.getResolvedIds(),
-    }));
-
-    setActiveStep(5);
-  }, [session.parsedData]);
+  // The store owns the queue and the await, so the run is no longer tied to
+  // this component being mounted.
+  const handleStartImport = useCallback(() => {
+    void importSession.startImport();
+  }, []);
 
   const handleAbort = useCallback(() => {
-    queueRef.current?.abort();
+    importSession.abortImport();
   }, []);
 
   const handleReset = useCallback(() => {
-    setActiveStep(0);
-    setParseError(null);
-    queueRef.current = null;
-    setSession({
-      id: uuidv4(),
-      fileName: '',
-      uploadedAt: 0,
-      phase: 'idle',
-      parsedData: null,
-      validationResult: null,
-      progress: null,
-      resolvedIds: {},
-    });
+    importSession.resetSession();
   }, []);
 
   // ─── Render step content ───────────────────────────────────
