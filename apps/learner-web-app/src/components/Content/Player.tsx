@@ -121,6 +121,17 @@ const App = ({
     isPosContent = isPosContent || searchParams.get('isPOSContent') === 'true';
   }
 
+  // Env vars are always strings (including on the server), but guard against
+  // an actual boolean too — String(true) === 'true', String(false) !== 'true'.
+  const showRecommendations =
+    String(process.env.NEXT_PUBLIC_SHOW_RECOMMENDATIONS).trim().toLowerCase() ===
+    'true';
+  // The right-hand panel is worth showing whenever Related content exists,
+  // or (for POS pages) whenever recommendations are enabled — Recommended
+  // Content is always fetched, but its presence isn't known until it loads.
+  const showMoreContentPanel =
+    isShowMoreContent || (isPosContent && showRecommendations);
+
   // Intercept browser ← button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
   const effectiveExitLink = exitLink || returnUrl || activeLink;
   useEffect(() => {
@@ -492,14 +503,14 @@ const App = ({
           flex: { xs: 1, md: 15 },
           gap: 1,
           flexDirection: 'column',
-          width: isShowMoreContent ? 'initial' : '100%',
+          width: showMoreContentPanel ? 'initial' : '100%',
         }}
         item
         xs={12}
         sm={12}
-        md={isShowMoreContent ? 8 : 12}
-        lg={isShowMoreContent ? 8 : 12}
-        xl={isShowMoreContent ? 8 : 12}
+        md={showMoreContentPanel ? 8 : 12}
+        lg={showMoreContentPanel ? 8 : 12}
+        xl={showMoreContentPanel ? 8 : 12}
       >
         <Box
           sx={{
@@ -548,7 +559,7 @@ const App = ({
           )}
         </Box>
         <PlayerBox
-          isShowMoreContent={isShowMoreContent}
+          isShowMoreContent={showMoreContentPanel}
           userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
@@ -617,7 +628,7 @@ const App = ({
       <Grid
         sx={{
           display:
-            isPosContent ||
+            (isPosContent && showMoreContentPanel) ||
             (isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)))
               ? 'flex'
               : 'none',
@@ -627,9 +638,9 @@ const App = ({
         }}
         xs={12}
         sm={12}
-        md={isShowMoreContent ? 4 : 12}
-        lg={isShowMoreContent ? 4 : 12}
-        xl={isShowMoreContent ? 4 : 12}
+        md={showMoreContentPanel ? 4 : 12}
+        lg={showMoreContentPanel ? 4 : 12}
+        xl={showMoreContentPanel ? 4 : 12}
       >
         <Box
           sx={{
@@ -655,7 +666,7 @@ const App = ({
                 }}
               >
                 {t(
-                  isShowMoreContent
+                  isShowMoreContent || !showRecommendations
                     ? 'LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES'
                     : 'LEARNER_APP.PLAYER.MORE_RECOMMENDED_CONTENT'
                 )}
@@ -663,7 +674,10 @@ const App = ({
 
               <Box
                 sx={{
-                  display: isShowMoreContent ? 'block' : 'none',
+                  display:
+                    isShowMoreContent && showRecommendations
+                      ? 'block'
+                      : 'none',
                   borderBottom: 1,
                   borderColor: 'divider',
                   mb: 2,
@@ -682,7 +696,8 @@ const App = ({
               <Box
                 sx={{
                   display:
-                    isShowMoreContent && contentTabValue === 0
+                    isShowMoreContent &&
+                    (!showRecommendations || contentTabValue === 0)
                       ? 'block'
                       : 'none',
                 }}
@@ -702,8 +717,12 @@ const App = ({
 
               <Box
                 sx={{
+                  // RecommendedContent always stays mounted so its API call
+                  // fires regardless of the feature flag; only visibility is
+                  // gated on showRecommendations.
                   display:
-                    !isShowMoreContent || contentTabValue === 1
+                    showRecommendations &&
+                    (!isShowMoreContent || contentTabValue === 1)
                       ? 'block'
                       : 'none',
                   overflowY: 'auto',
