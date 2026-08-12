@@ -13,7 +13,7 @@ import {
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
-import { naturalSortOptions } from '../../utils/Helper';
+import { naturalSortOptions } from '../../utils/helper';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;

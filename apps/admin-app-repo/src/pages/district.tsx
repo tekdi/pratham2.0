@@ -28,7 +28,7 @@ import deleteIcon from '../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import UserNameCell from '@/components/UserNameCell';
 import { fetchStateOptions } from '@/services/MasterDataService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 
 //import { DynamicForm } from '@shared-lib';

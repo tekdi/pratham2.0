@@ -10,7 +10,7 @@ import {
   findCommonAssociations,
   getAssociationsByCodeNew,
   getOptionsByCategory,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import { CoursePlannerData, ICohort } from '@/utils/Interfaces';
 import { telemetryFactory } from '@/utils/telemetry';

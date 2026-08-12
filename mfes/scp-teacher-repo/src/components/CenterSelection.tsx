@@ -9,7 +9,7 @@ import {
 import { getCohortList } from '@/services/CohortServices';
 import { QueryKeys } from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 
 interface CenterDropdownProps {
   cohortId?: string;

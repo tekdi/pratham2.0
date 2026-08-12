@@ -20,8 +20,8 @@ import { cohortMemberList, getUserDetailsInfo } from "@/services/UserList";
 import { updateUser } from "@/services/CreateUserService";
 import { useLocationState } from "@/utils/useLocationState";
 import AreaSelection from "./AreaSelection";
-import { transformArray } from "../utils/Helper";
-import { firstLetterInUpperCase } from "./../utils/Helper";
+import { transformArray } from "../utils/helper";
+import { firstLetterInUpperCase } from "./../utils/helper";
 import useSubmittedButtonStore from "@/utils/useSharedState";
 import useNotification from "@/hooks/useNotification";
 

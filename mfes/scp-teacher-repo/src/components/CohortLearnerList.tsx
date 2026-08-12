@@ -2,7 +2,7 @@ import LearnersListItem from '@/components/LearnersListItem';
 import { getMyCohortMemberList, getMyCohortMemberListLearner } from '@/services/MyClassDetailsService';
 import useStore from '@/store/store';
 import { Role, Status, pagesLimit } from '@/utils/app.constant';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import { Box, Grid, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';

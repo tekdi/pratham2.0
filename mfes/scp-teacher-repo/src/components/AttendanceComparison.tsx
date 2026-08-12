@@ -24,7 +24,7 @@ import useStore from '../store/store';
 import { useTheme } from '@mui/material/styles';
 import { overallAttendanceInPercentageStatusList } from '@/services/AttendanceService';
 import { CenterType, Status, Telemetry, cohortPrivileges } from '@/utils/app.constant';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import NoDataFound from './common/NoDataFound';
 import { useDirection } from '../hooks/useDirection';
 import { AttendanceAPILimit } from '../../app.config';

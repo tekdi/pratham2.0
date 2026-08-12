@@ -13,7 +13,7 @@ import {
   FormContext,
   FormContextType,
 } from '@/utils/app.constant';
-import { accessGranted, toPascalCase } from '@/utils/Helper';
+import { accessGranted, toPascalCase } from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import { ArrowDropDown, Clear, Search } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';

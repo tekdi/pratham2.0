@@ -1,5 +1,5 @@
 import { Role } from "@/utils/app.constant";
-import { capitalizeFirstLetterOfEachWordInArray } from "@/utils/Helper";
+import { capitalizeFirstLetterOfEachWordInArray } from "@/utils/helper";
 import { Box, Grid, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";

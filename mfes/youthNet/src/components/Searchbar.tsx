@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import { debounce } from '../utils/Helper';
+import { debounce } from '../utils/helper';
 import { Telemetry } from '../utils/app.constant';
 import { telemetryFactory } from '../utils/telemetry';
 

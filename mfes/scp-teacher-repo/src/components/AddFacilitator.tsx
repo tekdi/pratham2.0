@@ -21,7 +21,7 @@ import { sendEmailOnFacilitatorCreation } from '@/services/NotificationService';
 import { editEditUser } from '@/services/ProfileService';
 import useSubmittedButtonStore from '@/store/useSubmittedButtonStore';
 import { modalStyles } from '@/styles/modalStyles';
-import { deepClone, generateUsernameAndPassword } from '@/utils/Helper';
+import { deepClone, generateUsernameAndPassword } from '@/utils/helper';
 import { Field } from '@/utils/Interfaces';
 import { telemetryFactory } from '@/utils/telemetry';
 import CloseIcon from '@mui/icons-material/Close';

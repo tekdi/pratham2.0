@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 
 import { CenterType } from '@/utils/app.constant';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { SessionModeProps } from '../utils/Interfaces';
