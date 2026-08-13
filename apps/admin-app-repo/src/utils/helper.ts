@@ -11,6 +11,7 @@ import { State } from './Interfaces';
 import { useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { getCohortList } from '@/services/GetCohortList';
+import { isActive } from './frameworkTaxonomy';
 
 interface Value {
   value: string;
@@ -291,11 +292,13 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   return (
     category?.terms
-      ?.filter((term: any) => term.status !== "Retired") // ✅ exclude retired
+      ?.filter((term: any) => isActive(term.status))
       .map((term: any) => ({
+        identifier: term.identifier,
         name: term.name,
         code: term.code,
         status: term.status,
+        index: term.index,
         associations: term.associations,
       })) || []
   );

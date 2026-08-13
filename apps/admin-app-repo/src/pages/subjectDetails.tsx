@@ -2,12 +2,11 @@ import Loader from "@/components/Loader";
 import coursePlannerStore from "@/store/coursePlannerStore";
 import taxonomyStore from "@/store/tanonomyStore";
 import {
-  filterAndMapAssociations,
-  findCommonAssociations,
-  getAssociationsByCodeNew,
-  getOptionsByCategory,
-  normalizeData,
-} from "@/utils/helper";
+  getDropdownCategories,
+  getValidTermsForCategory,
+  getValidSubjects,
+  SelectionEntry,
+} from "@/utils/frameworkTaxonomy";
 import { TelemetryEventType } from "@/utils/app.constant";
 import { telemetryFactory } from "@/utils/telemetry";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -25,55 +24,20 @@ import {
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import useTenantConfig from "@/hooks/useTenantConfig";
+import { useEffect, useMemo, useState } from "react";
 
-// Define Card interface
-interface Card {
-  id: number;
-  state: string;
-  boardsUploaded: number;
-  totalBoards: number;
-  boards: string[];
-  subjects: string[];
-}
-
-interface FoundCard {
-  id: string;
-  state: string;
-  boardsUploaded: number;
-  totalBoards: number;
-  details: string;
-  boards: string[];
-  subjects: string[];
-}
+const STORAGE_KEY = "coursePlannerSelections";
+const BOARD_CATEGORY_CODE = "board";
 
 const SubjectDetails = () => {
-  const tenantConfig = useTenantConfig();
   const router = useRouter();
   const { t } = useTranslation();
   const { boardDetails, boardName } = router.query as {
     boardDetails?: any;
     boardName?: any;
   };
-  const tStore = taxonomyStore();
   const store = coursePlannerStore();
   const [loading, setLoading] = useState(true);
-  const [subject, setSubject] = useState<string[]>([]);
-  const [boardAssociations, setBoardAssociations] = useState<any[]>([]);
-  const [medium, setMedium] = useState<any>([]);
-  const [mediumOptions, setMediumOptions] = useState<any[]>([]);
-  const [selectedmedium, setSelectedmedium] = useState<any>();
-  const [mediumAssociations, setMediumAssociations] = useState<any[]>([]);
-  const [gradeAssociations, setGradeAssociations] = useState<any[]>([]);
-  const [typeAssociations, setTypeAssociations] = useState<any[]>([]);
-  const [grade, setGrade] = useState<any>([]);
-  const [selectedgrade, setSelectedgrade] = useState<any>();
-  const [gradeOptions, setGradeOptions] = useState<any[]>([]);
-  const [typeOptions, setTypeOptions] = useState<any[]>([]);
-  const [newAssociations, setNewAssociations] = useState<any[]>([]);
-  const [type, setType] = useState<any>([]);
-  const [selectedtype, setSelectedtype] = useState<any>();
   const setTaxanomySubject = coursePlannerStore(
     (state) => state.setTaxanomySubject
   );
@@ -82,333 +46,192 @@ const SubjectDetails = () => {
   const setTaxonomyGrade = taxonomyStore((state) => state.setTaxonomyGrade);
   const setTaxonomyType = taxonomyStore((state) => state.setTaxonomyType);
   const setTaxonomySubject = taxonomyStore((state) => state.setTaxonomySubject);
-  const [framework, setFramework] = useState<any[]>([]);
-  const [selectedBoard, setSelectedBoard] = useState<any[]>([]);
-  const setStateassociations = coursePlannerStore(
-    (state) => state.setStateassociations
-  );
-  const setBoards = coursePlannerStore((state) => state.setBoards);
 
-  // Clear filters and subjects when board changes to prevent showing data from previous board
-  useEffect(() => {
-    if (boardDetails || boardName) {
-      // Clear all selections
-      setSelectedmedium("");
-      setSelectedgrade("");
-      setSelectedtype("");
-      setSubject([]);
-      setGrade([]);
-      setType([]);
-      
-      // Clear localStorage
-      localStorage.removeItem("selectedMedium");
-      localStorage.removeItem("selectedGrade");
-      localStorage.removeItem("selectedType");
-      localStorage.removeItem("overallCommonSubjects");
-      
-      // Clear taxonomy store
-      setTaxonomyMedium("");
-      setTaxonomyGrade("");
-      setTaxonomyType("");
+  const framework = store?.framedata;
+
+  // selections keyed by category.code -> term.code, for every dynamically rendered dropdown
+  const [selections, setSelections] = useState<Record<string, string>>({});
+
+  // Board is already resolved on this page via the route (chosen on the previous
+  // board-picker page), so it's excluded here in addition to the universally-special
+  // "subject" category that getDropdownCategories already excludes.
+  const dropdownCategories = useMemo(
+    () =>
+      getDropdownCategories(framework).filter(
+        (cat: any) => cat.code !== BOARD_CATEGORY_CODE
+      ),
+    [framework]
+  );
+
+  // All selections known so far, including the board (fed from the route, not a rendered dropdown)
+  const allEntries: SelectionEntry[] = useMemo(() => {
+    const entries: SelectionEntry[] = [];
+    if (boardDetails) {
+      entries.push({ categoryCode: BOARD_CATEGORY_CODE, termCode: boardDetails });
     }
+    Object.entries(selections).forEach(([categoryCode, termCode]) => {
+      if (termCode) entries.push({ categoryCode, termCode });
+    });
+    return entries;
+  }, [boardDetails, selections]);
+
+  const optionsByCategory = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    dropdownCategories.forEach((cat: any) => {
+      const entriesExcludingSelf = allEntries.filter(
+        (e) => e.categoryCode !== cat.code
+      );
+      map[cat.code] = getValidTermsForCategory(
+        framework,
+        entriesExcludingSelf,
+        cat.code
+      );
+    });
+    return map;
+  }, [framework, allEntries, dropdownCategories]);
+
+  const allCategoriesSelected =
+    dropdownCategories.length > 0 &&
+    dropdownCategories.every((cat: any) => !!selections[cat.code]);
+
+  const subject: string[] = useMemo(() => {
+    if (!framework || !allCategoriesSelected) return [];
+    const subjectTerms = getValidSubjects(framework, allEntries);
+    return subjectTerms.map((term: any) => term.name).sort();
+  }, [framework, allEntries, allCategoriesSelected]);
+
+  // Load persisted selections once framework/dropdownCategories are known,
+  // and reset selections whenever the board changes.
+  useEffect(() => {
+    if (!boardDetails && !boardName) return;
+    setSelections({});
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore storage errors
+    }
+    setTaxonomyMedium("");
+    setTaxonomyGrade("");
+    setTaxonomyType("");
   }, [boardDetails, boardName]);
 
   useEffect(() => {
-    const savedMedium = localStorage.getItem("selectedMedium") || "";
-    const savedGrade = localStorage.getItem("selectedGrade") || "";
-    const savedType = localStorage.getItem("selectedType") || "";
-    setSelectedmedium(savedMedium);
-    setSelectedgrade(savedGrade);
-    setSelectedtype(savedType);
-  }, []);
-
-  useEffect(() => {
-    const fetchTaxonomyResultsOne = async () => {
-      try {
-        const frameworks = store?.framedata;
-        const getBoards = await getOptionsByCategory(frameworks, "board");
-        const board = getBoards?.terms?.find(
-          (term: any) => term.code === boardDetails
-        );
-        setSelectedBoard(board);
-      } catch (error) {
-        console.error("Failed to fetch cohort search results:", error);
-      }
-    };
-
-    fetchTaxonomyResultsOne();
-  }, []);
-
-  useEffect(() => {
-    const subjects = localStorage.getItem("overallCommonSubjects");
-
-    if (subjects) {
-      try {
-        const parsedData = JSON.parse(subjects)?.sort();
-        console.log('parsedData', parsedData);
-        setSubject(parsedData);
-      } catch (error) {
-        console.error("Failed to parse subjects from localStorage:", error);
-      }
-    } else {
-      console.log("No subjects found in localStorage.");
-      setSubject([]);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchFrameworkDetails = async () => {
-      if (typeof boardDetails === "string") {
-        try {
-          const getMedium = await getOptionsByCategory(
-            store?.framedata,
-            "medium"
-          );
-
-          const normalizedBoards = normalizeData(store?.boards || []);
-          const boardAssociations = getAssociationsByCodeNew(
-            normalizedBoards,
-            boardName
-          );
-
-          setBoardAssociations(boardAssociations);
-
-          const commonMediumInBoard = getMedium
-            .filter((item1: { code: any }) =>
-              boardAssociations.some(
-                (item2: { code: any; category: string }) =>
-                  item2.code === item1.code && item2.category === "medium"
-              )
-            )
-            .map((item1: { name: any; code: any; associations: any }) => ({
-              name: item1.name,
-              code: item1.code,
-              associations: item1.associations,
-            }));
-
-          setMediumOptions(commonMediumInBoard);
-          setMedium(commonMediumInBoard);
-        } catch (err) {
-          console.error("Failed to fetch framework details");
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        console.error("Invalid boardId");
-        setLoading(false);
-      }
-    };
-
-    fetchFrameworkDetails();
-  }, [boardName]);
-
-  const fetchAndSetGradeData = (medium: any) => {
-    const getGrades = getOptionsByCategory(store?.framedata, "gradeLevel");
-    const mediumAssociations = getAssociationsByCodeNew(mediumOptions, medium);
-    setMediumAssociations(mediumAssociations);
-    localStorage.setItem(
-      "mediumAssociations",
-      JSON.stringify(mediumAssociations)
-    );
-    const commonGradeInBoard = filterAndMapAssociations(
-      "gradeLevel",
-      getGrades,
-      boardAssociations,
-      "code"
-    );
-    const commonGradeInMedium = filterAndMapAssociations(
-      "gradeLevel",
-      getGrades,
-      mediumAssociations,
-      "code"
-    );
-
-    const overAllCommonGrade = findCommonAssociations(
-      commonGradeInBoard,
-      commonGradeInMedium
-    );
-
-    setGrade(overAllCommonGrade);
-    setGradeOptions(overAllCommonGrade);
-  };
-
-  const fetchAndSetTypeData = (grade: any) => {
-    const gradeAssociations = getAssociationsByCodeNew(gradeOptions, grade);
-    setGradeAssociations(gradeAssociations);
-    localStorage.setItem(
-      "gradeAssociations",
-      JSON.stringify(gradeAssociations)
-    );
-
-    const type = getOptionsByCategory(store?.framedata, "courseType");
-
-    setTypeOptions(type);
-    setType(type);
-  };
-
-  const fetchAndSetSubData = async (type: any) => {
     try {
-      // const StateName = localStorage.getItem("selectedState");
-      const medium = selectedmedium;
-      const grade = selectedgrade;
-      const board = boardName;
-
-      if (medium && grade && board) {
-        const url = `/api/framework/v1/read/${tenantConfig?.COLLECTION_FRAMEWORK}`;
-        const boardData = await fetch(url).then((res) => res.json());
-        const frameworks = boardData?.result?.framework;
-
-        // const getStates = getOptionsByCategory(frameworks, "state");
-        // const matchState = getStates.find(
-        //   (item: any) =>
-        //     item?.name?.toLowerCase() === StateName?.toLocaleLowerCase()
-        // );
-
-        const getBoards = getOptionsByCategory(frameworks, "board");
-        const matchBoard = getBoards.find((item: any) => item.name === board);
-        const getMedium = getOptionsByCategory(frameworks, "medium");
-        const matchMedium = getMedium.find((item: any) => item.name === medium);
-
-        const getGrades = getOptionsByCategory(frameworks, "gradeLevel");
-        const matchGrade = getGrades.find((item: any) => item.name === grade);
-
-        const getCourseTypes = getOptionsByCategory(frameworks, "courseType");
-        const courseTypes = getCourseTypes?.map((type: any) => type.name);
-        // setCourseTypes(courseTypes);
-
-        const courseTypesAssociations = getCourseTypes?.map((type: any) => {
-          return {
-            code: type.code,
-            name: type.name,
-            associations: type.associations,
-          };
-        });
-
-        const courseSubjectLists = courseTypesAssociations.map(
-          (courseType: any) => {
-            const commonAssociations = matchGrade?.associations.filter(
-              (assoc: any) =>
-                // matchState?.associations.filter(
-                //   (item: any) => item.code === assoc.code
-                // )?.length &&
-                matchBoard?.associations.filter(
-                  (item: any) => item.code === assoc.code
-                )?.length &&
-                matchMedium?.associations.filter(
-                  (item: any) => item.code === assoc.code
-                )?.length
-              // &&
-              // matchGrade?.associations.filter(
-              //   (item: any) => item.code === assoc.code
-              // )?.length
-            );
-
-            const getSubjects = getOptionsByCategory(frameworks, "subject");
-            const subjectAssociations = commonAssociations?.filter(
-              (assoc: any) =>
-                getSubjects.map((item: any) => assoc.code === item?.code)
-            );
-console.log('subjectAssociations', subjectAssociations);
-const data=subjectAssociations?.filter(
-  (subject: any) => subject?.status !== "Retired"
-);
-console.log('data', data);
-            return {
-              courseTypeName: courseType?.name,
-              courseType: courseType?.code,
-              subjects: data?.map(
-                (subject: any) => subject?.name
-              ),
-            };
-          }
-        );
-        console.log('courseSubjectLists', courseSubjectLists);
-        const matchedCourse = courseSubjectLists.find(
-          (course: any) => course.courseTypeName === type
-        );
-
-        const matchingSubjects = matchedCourse
-          ? matchedCourse.subjects.sort()
-          : [];
-console.log('matchingSubjects', matchingSubjects);
-        setSubject(matchingSubjects);
-        localStorage.setItem(
-          "overallCommonSubjects",
-          JSON.stringify(matchingSubjects)
-        );
-        // setSubjectLists(courseSubjectLists);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.selections) setSelections(parsed.selections);
       }
-    } catch (error) {
-      console.error("Error fetching board data:", error);
+    } catch {
+      // ignore malformed storage
+    }
+    setLoading(false);
+  }, []);
+
+  const persistSelections = (next: Record<string, string>) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ selections: next }));
+    } catch {
+      // ignore storage errors
     }
   };
 
-  useEffect(() => {
-    if (selectedmedium && mediumOptions.length > 0 && boardAssociations.length > 0) {
-      fetchAndSetGradeData(selectedmedium);
-    }
-  }, [selectedmedium, mediumOptions, boardAssociations]);
+  const fireCategoryChangeTelemetry = (categoryCode: string) => {
+    const windowUrl = window.location.pathname;
+    const cleanedUrl = windowUrl.replace(/^\//, "");
+    const env = cleanedUrl.split("/")[0];
 
-  useEffect(() => {
-    if (selectedgrade && gradeOptions.length > 0) {
-      fetchAndSetTypeData(selectedgrade);
-    }
-  }, [selectedgrade, gradeOptions]);
+    telemetryFactory.interact({
+      context: {
+        env: env,
+        cdata: [],
+      },
+      edata: {
+        id: `change-${categoryCode}`,
+        type: TelemetryEventType.CLICK,
+        subtype: "",
+        pageid: cleanedUrl,
+      },
+    });
+  };
 
-  useEffect(() => {
-    if (!tenantConfig) return;
-    if (selectedtype && tenantConfig?.COLLECTION_FRAMEWORK) {
-      fetchAndSetSubData(selectedtype);
-    }
-  }, [tenantConfig, selectedtype]);
+  // Mirror selection changes into the legacy taxonomy store where applicable,
+  // so downstream pages (e.g. importCsv) that read medium/grade/type continue to work.
+  const syncTaxonomyStore = (categoryCode: string, termName: string) => {
+    if (categoryCode === "medium") setTaxonomyMedium(termName);
+    else if (categoryCode === "gradeLevel") setTaxonomyGrade(termName);
+    else if (categoryCode === "courseType") setTaxonomyType(termName);
+  };
 
-  // Clear subjects if any required filter is missing
-  // This ensures subjects are ONLY shown when all 3 filters are selected
-  useEffect(() => {
-    if (!selectedmedium || !selectedgrade || !selectedtype) {
-      setSubject([]);
-    }
-  }, [selectedmedium, selectedgrade, selectedtype]);
+  const handleCategoryChange = (categoryCode: string) => (event: any) => {
+    const termCode = event.target.value;
 
-  // Auto-select medium if only one option is available
-  useEffect(() => {
-    if (medium.length === 1 && (!selectedmedium || selectedmedium === "")) {
-      const autoSelectedMedium = medium[0].name;
-      setSelectedmedium(autoSelectedMedium);
-      setTaxonomyMedium(autoSelectedMedium);
-      localStorage.setItem("selectedMedium", autoSelectedMedium);
-    }
-  }, [medium, selectedmedium]);
+    setSelections((prev) => {
+      const next: Record<string, string> = { ...prev, [categoryCode]: termCode };
 
-  // Auto-select grade if only one option is available
-  useEffect(() => {
-    if (grade.length === 1 && (!selectedgrade || selectedgrade === "") && selectedmedium && selectedmedium !== "") {
-      const autoSelectedGrade = grade[0].name;
-      setSelectedgrade(autoSelectedGrade);
-      setTaxonomyGrade(autoSelectedGrade);
-      localStorage.setItem("selectedGrade", autoSelectedGrade);
-    }
-  }, [grade, selectedgrade, selectedmedium]);
+      const orderedCodes = dropdownCategories.map((c: any) => c.code);
+      const idx = orderedCodes.indexOf(categoryCode);
 
-  // Auto-select type if only one option is available
+      orderedCodes.slice(idx + 1).forEach((laterCode: string) => {
+        if (!next[laterCode]) return;
+        const entries: SelectionEntry[] = [];
+        if (boardDetails) {
+          entries.push({ categoryCode: BOARD_CATEGORY_CODE, termCode: boardDetails });
+        }
+        Object.entries(next).forEach(([c, term]) => {
+          if (term && c !== laterCode) entries.push({ categoryCode: c, termCode: term });
+        });
+        const stillValid = getValidTermsForCategory(framework, entries, laterCode).some(
+          (term: any) => term.code === next[laterCode]
+        );
+        if (!stillValid) {
+          next[laterCode] = "";
+          syncTaxonomyStore(laterCode, "");
+        }
+      });
+
+      persistSelections(next);
+      return next;
+    });
+
+    const selectedTerm = (optionsByCategory[categoryCode] || []).find(
+      (term: any) => term.code === termCode
+    );
+    syncTaxonomyStore(categoryCode, selectedTerm?.name || "");
+    fireCategoryChangeTelemetry(categoryCode);
+  };
+
+  // Auto-select any category whose currently valid option set has exactly one
+  // entry, regardless of category order — the valid set is already narrowed by
+  // whatever else is selected so far, so no extra ordering gate is needed.
   useEffect(() => {
-    if (type.length === 1 && (!selectedtype || selectedtype === "") && selectedgrade && selectedgrade !== "") {
-      const autoSelectedType = type[0].name;
-      setSelectedtype(autoSelectedType);
-      setTaxonomyType(autoSelectedType);
-      localStorage.setItem("selectedType", autoSelectedType);
-    }
-  }, [type, selectedtype, selectedgrade]);
+    dropdownCategories.forEach((cat: any) => {
+      const opts = optionsByCategory[cat.code] || [];
+
+      if (!selections[cat.code] && opts.length === 1) {
+        const term = opts[0];
+        setSelections((prev) => {
+          if (prev[cat.code] === term.code) return prev;
+          const next = { ...prev, [cat.code]: term.code };
+          persistSelections(next);
+          return next;
+        });
+        syncTaxonomyStore(cat.code, term.name);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [optionsByCategory, dropdownCategories]);
 
   if (loading) {
     return <Loader showBackdrop={true} loadingText="Loading" />;
   }
 
   const handleBackClick = () => {
-    localStorage.removeItem("selectedGrade");
-    localStorage.removeItem("selectedMedium");
-    localStorage.removeItem("selectedType");
-    localStorage.removeItem("overallCommonSubjects");
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore storage errors
+    }
     setTaxonomySubject("");
     setTaxonomyGrade("");
     setTaxonomyMedium("");
@@ -418,216 +241,66 @@ console.log('matchingSubjects', matchingSubjects);
     router.back();
   };
 
-  const handleCardClick = (subject: string) => {
-    setTaxonomySubject(subject);
-    router.push(`/importCsv?subject=${encodeURIComponent(subject)}`);
+  const handleCardClick = (subj: string) => {
+    setTaxonomySubject(subj);
+    router.push(`/importCsv?subject=${encodeURIComponent(subj)}`);
 
-    setTaxanomySubject(subject);
-  };
-
-  const handleMediumChange = (event: any) => {
-    localStorage.setItem("selectedMedium", event.target.value);
-    const medium = event.target.value;
-    setSelectedmedium(medium);
-    setTaxonomyMedium(medium);
-    
-    // Clear dependent selections when medium changes
-    setSelectedgrade("");
-    setSelectedtype("");
-    setSubject([]);
-    localStorage.removeItem("selectedGrade");
-    localStorage.removeItem("selectedType");
-    setTaxonomyGrade("");
-    setTaxonomyType("");
-
-    const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\//, "");
-    const env = cleanedUrl.split("/")[0];
-
-    const telemetryInteract = {
-      context: {
-        env: env,
-        cdata: [],
-      },
-      edata: {
-        id: "change-medium",
-
-        type: TelemetryEventType.CLICK,
-        subtype: "",
-        pageid: cleanedUrl,
-      },
-    };
-    telemetryFactory.interact(telemetryInteract);
-  };
-
-  const handleGradeChange = (event: any) => {
-    localStorage.setItem("selectedGrade", event.target.value);
-    const grade = event.target.value;
-    setTaxonomyGrade(grade);
-    setSelectedgrade(grade);
-    
-    // Clear dependent selection when grade changes
-    setSelectedtype("");
-    setSubject([]);
-    localStorage.removeItem("selectedType");
-    setTaxonomyType("");
-
-    const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\//, "");
-    const env = cleanedUrl.split("/")[0];
-
-    const telemetryInteract = {
-      context: {
-        env: env,
-        cdata: [],
-      },
-      edata: {
-        id: "grade_change",
-
-        type: TelemetryEventType.CLICK,
-        subtype: "",
-        pageid: cleanedUrl,
-      },
-    };
-    telemetryFactory.interact(telemetryInteract);
-  };
-
-  const handleTypeChange = (event: any) => {
-    localStorage.setItem("selectedType", event.target.value);
-    const type = event.target.value;
-    setTaxonomyType(type);
-    setSelectedtype(type);
-
-    const windowUrl = window.location.pathname;
-    const cleanedUrl = windowUrl.replace(/^\//, "");
-    const env = cleanedUrl.split("/")[0];
-
-    const telemetryInteract = {
-      context: {
-        env: env,
-        cdata: [],
-      },
-      edata: {
-        id: "change_type",
-
-        type: TelemetryEventType.CLICK,
-        subtype: "",
-        pageid: cleanedUrl,
-      },
-    };
-    telemetryFactory.interact(telemetryInteract);
+    setTaxanomySubject(subj);
   };
 
   const handleReset = () => {
-    setSelectedmedium("");
-    setSelectedgrade("");
-    setSelectedtype("");
-    setSubject([]);
-    localStorage.removeItem("selectedMedium");
-    localStorage.removeItem("selectedGrade");
-    localStorage.removeItem("selectedType");
-    localStorage.removeItem("overallCommonSubjects");
+    setSelections({});
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore storage errors
+    }
     setTaxonomyMedium("");
     setTaxonomyGrade("");
     setTaxonomyType("");
   };
 
+  const getCategoryLabel = (category: any) => {
+    const key = `COURSE_PLANNER.SELECT_${String(category.code).toUpperCase()}`;
+    return t(key, { defaultValue: `Select ${category.name}` });
+  };
+
   return (
     <Box>
       <Grid container spacing={2} sx={{ marginTop: "20px" }}>
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Select
-            value={selectedmedium || ""}
-            onChange={handleMediumChange}
-            displayEmpty
-            inputProps={{ "aria-label": "Medium" }}
-            sx={{
-              "& .MuiSelect-select": {
-                padding: "8px 16px",
-                textAlign: "left",
-              },
-              "& fieldset": {
-                border: "none",
-              },
-              border: "1px solid #3C3C3C",
-              borderRadius: "8px",
-              marginRight: "16px",
-              height: 40,
-              width: "100%",
-            }}
-          >
-            <MenuItem value="">
-              <Typography>{t("COURSE_PLANNER.SELECT_MEDIUM")}</Typography>
-            </MenuItem>
-            {medium.map((item: any) => (
-              <MenuItem key={item.name} value={item.name}>
-                {item.name}
+        {dropdownCategories.map((cat: any) => (
+          <Grid item xs={12} sm={3} md={3} lg={3} xl={3} key={cat.code}>
+            <Select
+              value={selections[cat.code] || ""}
+              onChange={handleCategoryChange(cat.code)}
+              displayEmpty
+              inputProps={{ "aria-label": cat.name }}
+              sx={{
+                "& .MuiSelect-select": {
+                  padding: "8px 16px",
+                  textAlign: "left",
+                },
+                "& fieldset": {
+                  border: "none",
+                },
+                border: "1px solid #3C3C3C",
+                borderRadius: "8px",
+                marginRight: "16px",
+                height: 40,
+                width: "100%",
+              }}
+            >
+              <MenuItem value="">
+                <Typography>{getCategoryLabel(cat)}</Typography>
               </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Select
-            value={selectedgrade || ""}
-            onChange={handleGradeChange}
-            displayEmpty
-            inputProps={{ "aria-label": "Grade" }}
-            sx={{
-              "& .MuiSelect-select": {
-                padding: "8px 16px",
-                textAlign: "left",
-              },
-              "& fieldset": {
-                border: "none",
-              },
-              border: "1px solid #3C3C3C",
-              borderRadius: "8px",
-              marginRight: "16px",
-              height: 40,
-              width: "100%",
-            }}
-          >
-            <MenuItem value="">
-              <Typography>{t("COURSE_PLANNER.SELECT_GRADE")}</Typography>
-            </MenuItem>
-            {grade.map((item: any) => (
-              <MenuItem key={item.name} value={item.name}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-
-        <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
-          <Select
-            value={selectedtype || ""}
-            onChange={handleTypeChange}
-            displayEmpty
-            inputProps={{ "aria-label": "Type" }}
-            sx={{
-              "& .MuiSelect-select": {
-                padding: "8px 16px",
-                textAlign: "left",
-              },
-              "& fieldset": {
-                border: "none",
-              },
-              border: "1px solid #3C3C3C",
-              borderRadius: "8px",
-              height: 40,
-              width: "100%",
-            }}
-          >
-            <MenuItem value="">
-              <Typography>{t("COURSE_PLANNER.SELECT_TYPE")}</Typography>
-            </MenuItem>
-            {type.map((item: any) => (
-              <MenuItem key={item.name} value={item.name}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
+              {(optionsByCategory[cat.code] || []).map((term: any) => (
+                <MenuItem key={term.code} value={term.code}>
+                  {term.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </Grid>
+        ))}
         <Grid item xs={12} sm={3} md={3} lg={3} xl={3}>
           <Button
             onClick={handleReset}
@@ -668,8 +341,8 @@ console.log('matchingSubjects', matchingSubjects);
 
       <Box sx={{ marginTop: "16px" }}>
         <Grid container spacing={2}>
-          {subject && subject.length > 1 ? (
-            subject?.map((subj: string, index: number) => (
+          {subject && subject.length > 0 ? (
+            subject.map((subj: string, index: number) => (
               <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                 <MuiCard
                   key={index}
