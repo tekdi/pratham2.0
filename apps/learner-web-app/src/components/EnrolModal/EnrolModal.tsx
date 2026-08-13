@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { sendOTP, verifyOTP } from '@learner/utils/API/OtPService';
 import { userCheck } from '@learner/utils/API/userService';
+import { setVerifiedMobile } from '@learner/utils/verifiedMobile';
 import { firstLetterInUpperCase } from '@learner/utils/helper';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { useRouter } from 'next/navigation';
@@ -343,12 +344,13 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
               fullWidth
               variant="contained"
               disableElevation
-              onClick={() => {
+              onClick={async () => {
                 if (hasExistingAccounts) {
                   setStep('account-exists');
                 } else {
+                  await setVerifiedMobile({ mobile });
                   handleClose();
-                  router.push(`/registration?tenantId=Pratham&enroll=${encodeURIComponent(programName)}&mobile=${encodeURIComponent(mobile)}`);
+                  router.push(`/registration?tenantId=Pratham&enroll=${encodeURIComponent(programName)}`);
                 }
               }}
               sx={{
@@ -398,9 +400,10 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 fullWidth
                 variant="contained"
                 disableElevation
-                onClick={() => {
+                onClick={async () => {
+                  await setVerifiedMobile({ mobile });
                   handleClose();
-                  router.push(`/registration?tenantId=Pratham&enroll=${encodeURIComponent(programName)}&mobile=${encodeURIComponent(mobile)}`);
+                  router.push(`/registration?tenantId=Pratham&enroll=${encodeURIComponent(programName)}`);
                 }}
                 sx={{
                   backgroundColor: '#FDBE16',

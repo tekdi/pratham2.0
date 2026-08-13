@@ -68,10 +68,19 @@ export default function Details(props: DetailsProps) {
   const [isCertificateRestricted, setIsCertificateRestricted] = useState(false);
   
   let activeLink = null;
+  let returnUrl = null;
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
+    returnUrl = searchParams.get('returnUrl');
   }
+  // The back-navigation target can arrive as either param — keep whichever one
+  // we were given, under its own name, when navigating within the course.
+  const backQuery = activeLink
+    ? `?activeLink=${encodeURIComponent(activeLink)}`
+    : returnUrl
+    ? `?returnUrl=${encodeURIComponent(returnUrl)}`
+    : '';
 
   // Check certificate restriction from uiconfig in localStorage
   useEffect(() => {
@@ -151,7 +160,7 @@ export default function Details(props: DetailsProps) {
               'mimeType',
               {
                 key: 'link',
-                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+                suffix: backQuery,
               },
             ],
           });
@@ -173,7 +182,7 @@ export default function Details(props: DetailsProps) {
               'mimeType',
               {
                 key: 'link',
-                suffix: activeLink ? `?activeLink=${activeLink}` : '',
+                suffix: backQuery,
               },
             ],
           });
@@ -217,9 +226,9 @@ export default function Details(props: DetailsProps) {
               ].includes(data?.result?.status)
             ) {
               router.replace(
-                `${props?._config?.contentBaseUrl ?? '/content'
-                }-details/${courseId}${activeLink ? `?activeLink=${activeLink}` : ''
-                }`
+                `${
+                  props?._config?.contentBaseUrl ?? '/content'
+                }-details/${courseId}${backQuery}`
               );
             } else {
               const userIdArray: string[] = Array.isArray(userId)
@@ -368,13 +377,31 @@ export default function Details(props: DetailsProps) {
     }
   };
 
+  // Course list route differs per tenant — Camp to Club / Pragyanpath use
+  // /courses-contents and are blocked from /content by the layout route guard.
+  const getCourseListPath = () => {
+    const base = props?._config?.contentBaseUrl ?? '';
+    if (base) return `${base}/content`;
+    const program =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('userProgram') ?? ''
+        : '';
+    return [TenantName.CAMP_TO_CLUB, TenantName.PRAGYANPATH].includes(
+      program as TenantName
+    )
+      ? '/courses-contents'
+      : '/content';
+  };
+
   const onBackClick = () => {
-    // If we're at course level (no unitId), go back to the activeLink or courses page
+    // If we're at course level (no unitId), go back to where we came from
+    // (activeLink or returnUrl) or the tenant's courses page
     if (!unitId) {
-      if (activeLink) {
-        router.push(activeLink);
+      const backTarget = activeLink || returnUrl;
+      if (backTarget) {
+        router.push(backTarget);
       } else {
-        router.push(`${props?._config?.contentBaseUrl ?? ''}/content`);
+        router.push(getCourseListPath());
       }
       return;
     }
@@ -385,9 +412,9 @@ export default function Details(props: DetailsProps) {
         router.push(breadCrumbs?.[breadCrumbs.length - 2]?.link);
       }
     } else {
-      // Fallback: go back to course level
+      // Fallback: go back to course level, keeping the back-navigation target
       router.push(
-        `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}${activeLink ? `?activeLink=${activeLink}` : ''}`
+        `${props?._config?.contentBaseUrl ?? '/content'}/${courseId}${backQuery}`
       );
     }
   };
