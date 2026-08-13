@@ -123,9 +123,19 @@ const App = ({
 
   // Env vars are always strings (including on the server), but guard against
   // an actual boolean too — String(true) === 'true', String(false) !== 'true'.
-  const showRecommendations =
+  const showRecommendationsEnvFlag =
     String(process.env.NEXT_PUBLIC_SHOW_RECOMMENDATIONS).trim().toLowerCase() ===
     'true';
+  // localStorage can override the env flag off, but never turn it on when the
+  // env flag is off; a missing key means "don't show" rather than defaulting on.
+  let showRecommendationsFromStorage = false;
+  if (typeof window !== 'undefined') {
+    showRecommendationsFromStorage =
+      localStorage.getItem('showRecommenededContent')?.trim().toLowerCase() ===
+      'true';
+  }
+  const showRecommendations =
+    showRecommendationsEnvFlag && showRecommendationsFromStorage;
   // The right-hand panel is worth showing whenever Related content exists,
   // or (for POS pages) whenever recommendations are enabled — Recommended
   // Content is always fetched, but its presence isn't known until it loads.
