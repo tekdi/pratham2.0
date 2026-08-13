@@ -291,18 +291,17 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
 
   return (
     <div>
+      {userData?.length || searchTerm ? (
+        <SearchBar
+          onSearch={handleSearch}
+          value={searchTerm}
+          placeholder={t('COMMON.SEARCH_STUDENT')}
+        />
+      ) : null}
       {loading ? (
         <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
       ) : (
         <>
-          {userData?.length || searchTerm ? (
-            <SearchBar
-              onSearch={handleSearch}
-              value={searchTerm}
-              placeholder={t('COMMON.SEARCH_STUDENT')}
-            />
-          ) : null}
-
           <Box
             sx={{
               '@media (min-width: 900px)': {
