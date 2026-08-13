@@ -14,6 +14,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import TeacherStatusChip from './TeacherStatusChip';
 import type { ContextResponseInfo } from '../../utils/API/surveyService';
+import { formatDDMMYYYY } from '../../utils/Helper/helper';
 
 interface Row {
   id: string;
@@ -101,7 +102,7 @@ const TeacherContextTable: React.FC<Props> = ({
             const status = info?.status;
             const isFillDisabled = !!(expired && (!status || status === 'none'));
             const submittedAt = info?.submittedAt
-              ? new Date(info.submittedAt).toLocaleDateString()
+              ? formatDDMMYYYY(info.submittedAt)
               : '—';
 
             return (

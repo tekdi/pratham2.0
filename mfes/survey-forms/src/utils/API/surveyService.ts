@@ -290,6 +290,40 @@ export const fetchTeacherCohortLearners = async (
   return { learners, totalCount };
 };
 
+// Real page size for internal pagination — not a cap on batch size. Requests keep
+// going until every learner the service itself reports (via totalCount) has been
+// fetched, so batches of any size are retrieved in full instead of silently truncated.
+const ROSTER_PAGE_SIZE = 100;
+// Backstop only — guards against an infinite loop if the service ever reports a
+// totalCount that pages never actually reach. Allows up to 5,000 learners.
+const ROSTER_MAX_PAGES = 50;
+
+/**
+ * Fetches every active learner in a cohort/batch, however many there are, by
+ * paging through fetchTeacherCohortLearners until the service's own totalCount
+ * is reached. Replaces the old approach of requesting one fixed-size page and
+ * assuming it was everyone.
+ */
+export const fetchAllTeacherCohortLearners = async (
+  cohortId: string
+): Promise<CohortLearnersResult> => {
+  let learners: TeacherContextRow[] = [];
+  let totalCount = 0;
+
+  for (let pageIndex = 0; pageIndex < ROSTER_MAX_PAGES; pageIndex++) {
+    const page = await fetchTeacherCohortLearners(cohortId, {
+      limit: ROSTER_PAGE_SIZE,
+      offset: pageIndex * ROSTER_PAGE_SIZE,
+    });
+    totalCount = page.totalCount;
+    if (page.learners.length === 0) break;
+    learners = learners.concat(page.learners);
+    if (learners.length >= totalCount) break;
+  }
+
+  return { learners, totalCount };
+};
+
 export const fetchInProgressResponse = async (
   surveyId: string,
   contextId: string,
@@ -407,6 +441,48 @@ export const fetchSurveyEntries = async (
   if (resolvedContextId) body.contextIds = [resolvedContextId];
   const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), body);
   return (response.data as { result?: { data?: SurveyResponse[] } })?.result?.data ?? [];
+};
+
+// Real page size for internal pagination — not a cap on how many entries can be
+// retrieved. Requests keep going until the reported total is reached.
+const ENTRY_LOOKUP_PAGE_SIZE = 100;
+// Safety backstop only, mirrors fetchAllTeacherCohortLearners — guards against an
+// infinite loop, not a real-world limit (allows up to 10,000 entries).
+const ENTRY_LOOKUP_MAX_PAGES = 100;
+
+/**
+ * Every SUBMITTED entry (across every learner in `contextIds`) for a survey —
+ * not aggregated, one row per entry with its own submittedAt. Used to check
+ * "does this learner have *any* entry in month X", since the per-learner
+ * aggregate (fetchResponseListByCohort) only tracks the latest submission date.
+ * Pages through the full result using the API's own total, same pattern as
+ * fetchAllTeacherCohortLearners — never assumes a fixed batch/entry count.
+ */
+export const fetchAllSubmittedEntriesForContexts = async (
+  surveyId: string,
+  contextIds: string[]
+): Promise<SurveyResponse[]> => {
+  if (contextIds.length === 0) return [];
+
+  let entries: SurveyResponse[] = [];
+  let total = 0;
+
+  for (let pageIndex = 0; pageIndex < ENTRY_LOOKUP_MAX_PAGES; pageIndex++) {
+    const response = await post(API_ENDPOINTS.RESPONSE_LIST(surveyId), {
+      page: pageIndex + 1,
+      limit: ENTRY_LOOKUP_PAGE_SIZE,
+      status: 'submitted',
+      contextIds,
+    });
+    const result = (response.data as { result?: { data?: SurveyResponse[]; meta?: { total?: number } } })?.result;
+    const rows = result?.data ?? [];
+    total = result?.meta?.total ?? rows.length;
+    if (rows.length === 0) break;
+    entries = entries.concat(rows);
+    if (entries.length >= total) break;
+  }
+
+  return entries;
 };
 
 /**

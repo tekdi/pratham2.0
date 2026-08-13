@@ -7,6 +7,7 @@ import BackHeader from '../../../../../../../Components/BackHeader/BackHeader';
 import ReadOnlyValue from '../../../../../../../Components/ResponseAnswer/ReadOnlyValue';
 import { fetchSurveyById, fetchResponseById } from '../../../../../../../utils/API/surveyService';
 import { isSectionVisible, isFieldVisible } from '../../../../../../../utils/conditionalLogic';
+import { formatDDMMYYYYWithTime } from '../../../../../../../utils/Helper/helper';
 import type { Survey, SurveyResponse } from '../../../../../../../types/survey';
 
 const EntryDetailPage: React.FC = () => {
@@ -78,7 +79,7 @@ const EntryDetailPage: React.FC = () => {
     <Box>
       <BackHeader
         title={survey.surveyTitle}
-        subtitle={response?.submittedAt ? `Submitted on ${new Date(response.submittedAt).toLocaleString()}` : undefined}
+        subtitle={response?.submittedAt ? `Submitted on ${formatDDMMYYYYWithTime(response.submittedAt)}` : undefined}
         onBack={() => router.back()}
       />
       <Box sx={{ p: 2 }}>
