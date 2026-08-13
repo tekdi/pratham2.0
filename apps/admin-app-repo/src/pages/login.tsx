@@ -1,6 +1,6 @@
 import { showToastMessage } from '@/components/Toastify';
 import { useAccountSwitch } from '@/hooks/useAccountSwitch';
-import { Role, TenantName } from '@/utils/app.constant';
+import { Role, TenantName, isSecondChanceTenant } from '@/utils/app.constant';
 import { logEvent } from '@/utils/googleAnalytics';
 import { telemetryFactory } from '@/utils/telemetry';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
