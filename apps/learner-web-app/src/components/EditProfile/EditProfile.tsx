@@ -175,7 +175,15 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.poc_id;
         delete responseFormForEnroll?.schema?.properties?.org_id;
         delete responseFormForEnroll?.schema?.properties?.what_do_you_want_to_become;
-        responseFormForEnroll?.schema?.required?.pop('batch');
+        // `batch` is dropped from properties above, so drop it from `required` too.
+        // Must be a filter, not `pop('batch')` — pop ignores its argument and
+        // removes the last required field instead (PS: hid what_program_are_you_part_of).
+        if (Array.isArray(responseFormForEnroll?.schema?.required)) {
+          responseFormForEnroll.schema.required =
+            responseFormForEnroll.schema.required.filter(
+              (f: string) => f !== 'batch'
+            );
+        }
         console.log('responseFormForEnroll', responseFormForEnroll?.schema);
 
         if (responseFormForEnroll?.schema?.properties && Array.isArray(responseFormForEnroll?.schema?.required)) {
@@ -217,7 +225,11 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseForm?.schema?.properties?.what_do_you_want_to_become;
 
 
-        responseForm?.schema?.required.pop('batch');
+        if (Array.isArray(responseForm?.schema?.required)) {
+          responseForm.schema.required = responseForm.schema.required.filter(
+            (f: string) => f !== 'batch'
+          );
+        }
         let userId = localStorage.getItem('userId');
         if (userId) {
           const useInfo = await getUserDetails(userId, true);
@@ -274,8 +286,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           {
             delete alterSchema.properties.own_phone_check;
             delete alterUISchema.own_phone_check;
-            if(alterSchema.required.includes('own_phone_check')){
-             alterSchema.required.pop('own_phone_check');
+            if(Array.isArray(alterSchema.required) && alterSchema.required.includes('own_phone_check')){
+             alterSchema.required = alterSchema.required.filter((f: string) => f !== 'own_phone_check');
             }
           }
           if(alterSchema.properties.own_phone_check && mappedData?.phone_type_accessible === 'nophone')
