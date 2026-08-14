@@ -811,6 +811,11 @@ const Centers = () => {
                   (field: any) => field.label === 'GRADE'
                 )?.selectedValues || []
               }
+              centerStreams={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'STREAM'
+                )?.selectedValues || []
+              }
               centerType={
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'TYPE_OF_CENTER'
