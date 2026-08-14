@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import TeacherContextHubPage from './TeacherContextHubPage';
 import * as surveyService from '../../../../utils/API/surveyService';
 
@@ -125,10 +125,10 @@ describe('TeacherContextHubPage — Month filter considers every entry, not just
     (surveyService.fetchResponseListByCohort as jest.Mock).mockResolvedValue([
       { contextId: 'learner-1', submittedCount: 2, hasInProgress: false, latestSubmittedAt: '2026-08-13T18:01:00.000Z' },
     ]);
-    // The full per-entry lookup reveals the learner ALSO has a July entry.
+    // The full per-entry lookup reveals the learner ALSO has a July entry, in this same batch.
     (surveyService.fetchAllSubmittedEntriesForContexts as jest.Mock).mockResolvedValue([
-      { responseId: 'r-2', contextId: 'learner-1', submittedAt: '2026-08-13T18:01:00.000Z' },
-      { responseId: 'r-1', contextId: 'learner-1', submittedAt: '2026-07-13T18:01:32.000Z' },
+      { responseId: 'r-2', contextId: 'learner-1', submittedAt: '2026-08-13T18:01:00.000Z', responseMetadata: { cohortId: 'batch-1' } },
+      { responseId: 'r-1', contextId: 'learner-1', submittedAt: '2026-07-13T18:01:32.000Z', responseMetadata: { cohortId: 'batch-1' } },
     ]);
   });
 
@@ -172,6 +172,53 @@ describe('TeacherContextHubPage — Month filter considers every entry, not just
   });
 });
 
+describe('TeacherContextHubPage — Month filter does not leak entries from a different batch', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockSearchParams = new URLSearchParams();
+    window.localStorage.setItem('userId', 'teacher-1');
+    (surveyService.fetchSurveyById as jest.Mock).mockResolvedValue({
+      params: { status: 'successful' },
+      result: { data: { surveyId: 'survey-1', surveyTitle: 'Board Result Entry', surveyType: 'single', endDate: null } },
+    });
+    (surveyService.fetchTeacherCentersWithBatches as jest.Mock).mockResolvedValue({
+      centers: [{ id: 'center-1', label: 'andaman center' }],
+      batchesByCenterId: { 'center-1': [{ id: 'batch-1', label: 'andaman second batch' }] },
+    });
+    (surveyService.fetchAllTeacherCohortLearners as jest.Mock).mockResolvedValue({
+      learners: [{ id: 'learner-1', label: 'TestUser Majage' }],
+      totalCount: 1,
+    });
+    // Aggregate (already correctly scoped to batch-1 server-side): this learner has
+    // NOT submitted anything in THIS batch — genuinely "Not Started".
+    (surveyService.fetchResponseListByCohort as jest.Mock).mockResolvedValue([
+      { contextId: 'learner-1', submittedCount: 0, hasInProgress: false, latestSubmittedAt: null },
+    ]);
+    // But the same learner ID has a July submission under a DIFFERENT batch
+    // (e.g. a reused/moved test account) — the raw entries lookup has no cohort
+    // filter of its own, so this must be filtered out client-side against batchId.
+    (surveyService.fetchAllSubmittedEntriesForContexts as jest.Mock).mockResolvedValue([
+      { responseId: 'r-other-batch', contextId: 'learner-1', submittedAt: '2026-07-01T10:00:00.000Z', responseMetadata: { cohortId: 'some-other-batch' } },
+    ]);
+  });
+
+  it('does not show a Not Started learner as matching July just because they submitted under a different batch', async () => {
+    render(<TeacherContextHubPage />);
+    await screen.findByText('TestUser Majage');
+
+    fireEvent.mouseDown(screen.getByLabelText('Month'));
+    fireEvent.click(screen.getByText('July'));
+
+    // Wait for a definitive settled marker (the empty state), not just the
+    // absence of the row — the loading spinner also hides the row transiently,
+    // which would make a bare "not in document" check pass for the wrong reason.
+    expect(await screen.findByText('No learners found in the selected batch.')).toBeInTheDocument();
+    expect(screen.queryByText('TestUser Majage')).not.toBeInTheDocument();
+    // The row is gone entirely — so no stray "01/07/2026" from that other-batch entry either.
+    expect(screen.queryByText('01/07/2026')).not.toBeInTheDocument();
+  });
+});
+
 describe('TeacherContextHubPage — filters survive back-navigation via the URL', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -192,7 +239,7 @@ describe('TeacherContextHubPage — filters survive back-navigation via the URL'
       { contextId: 'learner-1', submittedCount: 1, hasInProgress: false, latestSubmittedAt: '2026-08-13T18:01:00.000Z' },
     ]);
     (surveyService.fetchAllSubmittedEntriesForContexts as jest.Mock).mockResolvedValue([
-      { responseId: 'r-1', contextId: 'learner-1', submittedAt: '2026-07-13T18:01:32.000Z' },
+      { responseId: 'r-1', contextId: 'learner-1', submittedAt: '2026-07-13T18:01:32.000Z', responseMetadata: { cohortId: 'batch-1' } },
     ]);
   });
 
