@@ -52,6 +52,11 @@ const AutoCompleteMultiSelectWidget = ({
           label: capitalizedLabel,
         };
       });
+
+    // Sorts by the number embedded in each option's label (e.g. "Grade 1",
+    // "State 2", "Level 10") regardless of the surrounding words, so numeric
+    // ordering is correct across any dropdown/category. Options without a
+    // number keep their existing relative order.
     return naturalSortOptions(mappedOptions);
   }, [enumOptions, t]);
 
