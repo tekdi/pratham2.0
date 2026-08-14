@@ -70,8 +70,8 @@ const toAsciiDigits = (label: string): string =>
 // than by the text around the number. This is a generic number-extraction
 // utility; it has no knowledge of specific category words like "Grade".
 const extractNumber = (label: string): number | null => {
-  const match = toAsciiDigits(label).match(/\d+/);
-  return match ? parseInt(match[0], 10) : null;
+  const match = /\d+/.exec(toAsciiDigits(label));
+  return match ? Number.parseInt(match[0], 10) : null;
 };
 
 // Sorts a list of { label } style options by the number embedded in each
