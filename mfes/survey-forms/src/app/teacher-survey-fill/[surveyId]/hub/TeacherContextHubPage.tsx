@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,6 +12,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from '@mui/material';
@@ -22,25 +23,28 @@ import type { StatusFilterValue } from '../../../../Components/teacher/TeacherFi
 import TeacherContextTable from '../../../../Components/teacher/TeacherContextTable';
 import TeacherEmptyState from '../../../../Components/teacher/TeacherEmptyState';
 import SurveyStatusSummary from '../../../../Components/teacher/SurveyStatusSummary';
-import PaginationBar from '../../../../Components/PaginationBar/PaginationBar';
 import {
   fetchSurveyById,
   fetchTeacherCentersWithBatches,
-  fetchTeacherCohortLearners,
+  fetchAllTeacherCohortLearners,
   fetchResponseListByCohort,
+  fetchAllSubmittedEntriesForContexts,
 } from '../../../../utils/API/surveyService';
 import type { ContextResponseInfo } from '../../../../utils/API/surveyService';
 import type { Survey } from '../../../../types/survey';
-import { isExpired } from '../../../../utils/Helper/helper';
+import { isExpired, monthNameFromDate } from '../../../../utils/Helper/helper';
 import type { TeacherContextRow } from '../../../../types/teacherSurvey';
 
-// A batch tops out around 300 learners — cheap to fetch in one call and filter/paginate client-side.
-const MAX_BATCH_ROSTER = 300;
-const PAGE_SIZE = 10;
+const ROWS_PER_PAGE_OPTIONS = [10, 25, 50];
+const DEFAULT_PAGE_SIZE = 10;
 
 interface LearnerWithStatus extends TeacherContextRow {
-  status: ContextResponseInfo['status'];
-  submittedAt: string | null;
+  status: 'submitted' | 'draft' | 'none';
+  entriesCount: number;
+  latestSubmittedAt: string | null;
+  // Tracked independently of `status` — a learner can be "Completed" (submittedCount > 0)
+  // and still have a separate draft entry in progress at the same time.
+  hasInProgress: boolean;
 }
 
 function PageSkeleton() {
@@ -61,7 +65,7 @@ function PageSkeleton() {
               <TableRow sx={{ backgroundColor: '#fafafa' }}>
                 <TableCell sx={{ fontWeight: 600 }}>Learner Name</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Survey Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Submission Date</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Latest Submitted Date</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 600 }}>Action</TableCell>
               </TableRow>
             </TableHead>
@@ -108,10 +112,32 @@ const TeacherContextHubPage: React.FC = () => {
   const [allLearnersLoading, setAllLearnersLoading] = useState(false);
   const [allLearnersError, setAllLearnersError] = useState<string | null>(null);
 
-  const [learnersPage, setLearnersPage] = useState(1);
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>('all');
+  const [page, setPage] = useState(() => {
+    const p = parseInt(searchParams.get('page') ?? '', 10);
+    return Number.isInteger(p) && p >= 0 ? p : 0;
+  });
+  const [pageSize, setPageSize] = useState(() => {
+    const s = parseInt(searchParams.get('pageSize') ?? '', 10);
+    return ROWS_PER_PAGE_OPTIONS.includes(s) ? s : DEFAULT_PAGE_SIZE;
+  });
+  const initialSearch = searchParams.get('search') ?? '';
+  const [search, setSearch] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>(
+    (searchParams.get('status') as StatusFilterValue | null) ?? 'all'
+  );
+  const [monthFilter, setMonthFilter] = useState(searchParams.get('month') ?? 'All');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+    searchParams.get('sort') === 'asc' ? 'asc' : 'desc'
+  );
+
+  // Per-learner: their most recent entry date WITHIN monthFilter — null when
+  // monthFilter is 'All' (no restriction) or the lookup hasn't resolved yet. The
+  // per-learner aggregate only carries the true latest submission date, which isn't
+  // enough to answer "does this learner have an entry in July" (or "what date was
+  // it") for a learner whose true latest entry is in a different month, e.g. August.
+  const [monthMatchDates, setMonthMatchDates] = useState<Map<string, string> | null>(null);
+  const [monthMatchLoading, setMonthMatchLoading] = useState(false);
 
   const batches = batchesByCenterId[centerId] ?? [];
 
@@ -172,13 +198,22 @@ const TeacherContextHubPage: React.FC = () => {
     return () => { cancelled = true; };
   }, [surveyId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Sync centerId/batchId into URL so back-navigation restores them
+  // Sync every filter into the URL (not just centerId/batchId) so navigating away
+  // (e.g. to View Entries) and back restores the exact same view instead of
+  // resetting to defaults — the hub component fully unmounts on that navigation,
+  // so anything not in the URL would otherwise be lost.
   useEffect(() => {
     const p = new URLSearchParams();
     if (centerId) p.set('centerId', centerId);
     if (batchId) p.set('batchId', batchId);
+    if (debouncedSearch) p.set('search', debouncedSearch);
+    if (statusFilter !== 'all') p.set('status', statusFilter);
+    if (monthFilter !== 'All') p.set('month', monthFilter);
+    if (sortOrder !== 'desc') p.set('sort', sortOrder);
+    if (page > 0) p.set('page', String(page));
+    if (pageSize !== DEFAULT_PAGE_SIZE) p.set('pageSize', String(pageSize));
     router.replace(`?${p.toString()}`, { scroll: false } as Parameters<typeof router.replace>[1]);
-  }, [centerId, batchId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [centerId, batchId, debouncedSearch, statusFilter, monthFilter, sortOrder, page, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Debounce search input — 400ms delay before firing API
   useEffect(() => {
@@ -186,10 +221,16 @@ const TeacherContextHubPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reset to page 1 when batch, search, or status filter changes
+  // Reset to page 1 when batch, search, or status filter changes — but not on the
+  // very first run, since that would clobber a page number just restored from the URL.
+  const isInitialPageResetRender = useRef(true);
   useEffect(() => {
-    setLearnersPage(1);
-  }, [batchId, debouncedSearch, statusFilter]);
+    if (isInitialPageResetRender.current) {
+      isInitialPageResetRender.current = false;
+      return;
+    }
+    setPage(0);
+  }, [batchId, debouncedSearch, statusFilter, monthFilter, sortOrder]);
 
   const loadBatchData = React.useCallback(() => {
     if (!survey || !batchId) {
@@ -200,7 +241,7 @@ const TeacherContextHubPage: React.FC = () => {
     setAllLearnersLoading(true);
     setAllLearnersError(null);
     Promise.all([
-      fetchTeacherCohortLearners(batchId, { limit: MAX_BATCH_ROSTER, offset: 0 }),
+      fetchAllTeacherCohortLearners(batchId),
       fetchResponseListByCohort(survey.surveyId, batchId),
     ])
       .then(([roster, responses]) => {
@@ -208,9 +249,9 @@ const TeacherContextHubPage: React.FC = () => {
         const byContextId = new Map(responses.map((r) => [r.contextId, r]));
         const merged: LearnerWithStatus[] = roster.learners.map((l) => {
           const r = byContextId.get(l.id);
-          if (!r) return { ...l, status: 'none', submittedAt: null };
-          const status = r.status === 'submitted' || r.status === 'reviewed' ? 'submitted' : 'draft';
-          return { ...l, status, submittedAt: r.submittedAt };
+          if (!r) return { ...l, status: 'none' as const, entriesCount: 0, latestSubmittedAt: null, hasInProgress: false };
+          const status = r.submittedCount > 0 ? ('submitted' as const) : r.hasInProgress ? ('draft' as const) : ('none' as const);
+          return { ...l, status, entriesCount: r.submittedCount, latestSubmittedAt: r.latestSubmittedAt, hasInProgress: r.hasInProgress };
         });
         setAllLearners(merged);
       })
@@ -224,6 +265,44 @@ const TeacherContextHubPage: React.FC = () => {
   }, [survey, batchId]);
 
   useEffect(() => loadBatchData(), [loadBatchData]);
+
+  // Resolve each learner's most recent entry date WITHIN monthFilter by checking
+  // every submitted entry, not just the latest one — only runs when a specific
+  // month is selected.
+  useEffect(() => {
+    if (monthFilter === 'All' || !survey || allLearners.length === 0) {
+      setMonthMatchDates(null);
+      return;
+    }
+    let cancelled = false;
+    setMonthMatchLoading(true);
+    fetchAllSubmittedEntriesForContexts(survey.surveyId, allLearners.map((l) => l.id))
+      .then((entries) => {
+        if (cancelled) return;
+        const dates = new Map<string, string>();
+        entries.forEach((e) => {
+          if (!e.contextId || !e.submittedAt) return;
+          // fetchAllSubmittedEntriesForContexts has no cohort filter of its own (unlike
+          // fetchResponseListByCohort, which the aggregate already scopes server-side) —
+          // without this check, a learner's entry from a DIFFERENT batch would leak into
+          // this batch's Month filter, contradicting their "Not Started" status here.
+          if (e.responseMetadata?.cohortId !== batchId) return;
+          if (monthNameFromDate(e.submittedAt) !== monthFilter) return;
+          const existing = dates.get(e.contextId);
+          if (!existing || new Date(e.submittedAt) > new Date(existing)) {
+            dates.set(e.contextId, e.submittedAt);
+          }
+        });
+        setMonthMatchDates(dates);
+      })
+      .catch(() => {
+        if (!cancelled) setMonthMatchDates(new Map());
+      })
+      .finally(() => {
+        if (!cancelled) setMonthMatchLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [monthFilter, survey, allLearners, batchId]);
 
   const statusCounts = useMemo(() => {
     if (!batchId) return null;
@@ -245,22 +324,47 @@ const TeacherContextHubPage: React.FC = () => {
       if (statusFilter === 'completed' && l.status !== 'submitted') return false;
       if (statusFilter === 'inProgress' && l.status !== 'draft') return false;
       if (statusFilter === 'notStarted' && l.status !== 'none') return false;
+      if (monthFilter !== 'All' && !monthMatchDates?.has(l.id)) return false;
       return true;
     });
-  }, [allLearners, debouncedSearch, statusFilter]);
+  }, [allLearners, debouncedSearch, statusFilter, monthFilter, monthMatchDates]);
+
+  // The date shown/sorted-by for each learner: their true latest entry normally,
+  // or — while a month filter is active — their most recent entry WITHIN that
+  // month, so the column stays consistent with what the filter is actually about.
+  const displayDatesById = useMemo(() => {
+    const map: Record<string, string | null> = {};
+    allLearners.forEach((l) => {
+      map[l.id] = monthFilter !== 'All' ? (monthMatchDates?.get(l.id) ?? null) : l.latestSubmittedAt;
+    });
+    return map;
+  }, [allLearners, monthFilter, monthMatchDates]);
+
+  const sortedLearners = useMemo(() => {
+    return [...filteredLearners].sort((a, b) => {
+      const aDate = displayDatesById[a.id];
+      const bDate = displayDatesById[b.id];
+      const av = aDate ? new Date(aDate).getTime() : -Infinity;
+      const bv = bDate ? new Date(bDate).getTime() : -Infinity;
+      if (av === bv) return 0;
+      if (av === -Infinity) return 1;
+      if (bv === -Infinity) return -1;
+      return sortOrder === 'asc' ? av - bv : bv - av;
+    });
+  }, [filteredLearners, sortOrder, displayDatesById]);
 
   const pagedLearners = useMemo(
-    () => filteredLearners.slice((learnersPage - 1) * PAGE_SIZE, learnersPage * PAGE_SIZE),
-    [filteredLearners, learnersPage]
+    () => sortedLearners.slice(page * pageSize, page * pageSize + pageSize),
+    [sortedLearners, page, pageSize]
   );
 
   const responseInfoById = useMemo(() => {
     const map: Record<string, ContextResponseInfo> = {};
     allLearners.forEach((l) => {
-      map[l.id] = { status: l.status, submittedAt: l.submittedAt };
+      map[l.id] = { status: l.status, submittedAt: displayDatesById[l.id] ?? null };
     });
     return map;
-  }, [allLearners]);
+  }, [allLearners, displayDatesById]);
 
   const handleSearchChange = (value: string) => {
     setSearch(value);
@@ -307,14 +411,10 @@ const TeacherContextHubPage: React.FC = () => {
       />
 
       <Box sx={{ p: 2 }}>
-        {!!batchId && (
-          <SurveyStatusSummary counts={statusCounts} loading={allLearnersLoading} />
-        )}
-
+        {/* Center/Batch narrow the population the tiles summarize, so they sit above the tiles. */}
         <TeacherFilterBar
-          search={search}
-          onSearchChange={handleSearchChange}
-          showSearch={!!batchId && centersLoaded}
+          search=""
+          onSearchChange={() => undefined}
           centersLoading={!centersLoaded}
           centers={centers}
           centerId={centerId}
@@ -322,6 +422,7 @@ const TeacherContextHubPage: React.FC = () => {
             setCenterId(id);
             setSearch('');
             setStatusFilter('all');
+            setMonthFilter('All');
             setAllLearners([]);
             setAllLearnersLoading(true);
             const firstBatch = (batchesByCenterId[id] ?? [])[0];
@@ -333,12 +434,27 @@ const TeacherContextHubPage: React.FC = () => {
             setBatchId(id);
             setSearch('');
             setStatusFilter('all');
+            setMonthFilter('All');
             setAllLearners([]);
             setAllLearnersLoading(true);
           }}
+        />
+
+        {!!batchId && (
+          <SurveyStatusSummary counts={statusCounts} loading={allLearnersLoading} />
+        )}
+
+        {/* Status/Month/Search/Sort only filter the table below, not the tiles above. */}
+        <TeacherFilterBar
+          search={search}
+          onSearchChange={handleSearchChange}
+          showSearch={!!batchId && centersLoaded}
           showStatusFilter={!!batchId && centersLoaded}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
+          showMonthFilter={!!batchId && centersLoaded}
+          monthFilter={monthFilter}
+          onMonthFilterChange={setMonthFilter}
         />
 
         <Box sx={{ maxWidth: '100%' }}>
@@ -346,7 +462,7 @@ const TeacherContextHubPage: React.FC = () => {
             <TeacherEmptyState message="No centers found for your account." />
           ) : !batchId ? (
             <TeacherEmptyState message="No batches found for this center." />
-          ) : allLearnersLoading ? (
+          ) : allLearnersLoading || monthMatchLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
               <CircularProgress sx={{ color: '#FDBE16' }} />
             </Box>
@@ -361,7 +477,7 @@ const TeacherContextHubPage: React.FC = () => {
                 Retry
               </Button>
             </Box>
-          ) : filteredLearners.length === 0 ? (
+          ) : sortedLearners.length === 0 ? (
             <TeacherEmptyState
               message={
                 search.trim() || statusFilter !== 'all'
@@ -375,21 +491,29 @@ const TeacherContextHubPage: React.FC = () => {
                 rows={pagedLearners}
                 responseInfoById={responseInfoById}
                 expired={isExpired(survey?.endDate)}
+                surveyType={survey?.surveyType}
                 onRowAction={(row) =>
                   responseInfoById[row.id]?.status === 'submitted'
                     ? router.push(`/survey-fill/${surveyId}/${row.id}/view`)
                     : router.push(`/survey-fill/${surveyId}/${row.id}?cohortId=${batchId}`)
                 }
+                onNewEntry={(row) => router.push(`/survey-fill/${surveyId}/${row.id}?cohortId=${batchId}`)}
+                onViewEntries={(row) => router.push(`/teacher-survey-fill/${surveyId}/hub/${row.id}/entries`)}
+                sortOrder={sortOrder}
+                onSortToggle={() => setSortOrder((o) => (o === 'asc' ? 'desc' : 'asc'))}
               />
-              {filteredLearners.length > PAGE_SIZE && (
-                <PaginationBar
-                  page={learnersPage}
-                  pageSize={PAGE_SIZE}
-                  total={filteredLearners.length}
-                  onPrev={() => setLearnersPage((p) => Math.max(1, p - 1))}
-                  onNext={() => setLearnersPage((p) => p + 1)}
-                />
-              )}
+              <TablePagination
+                component="div"
+                rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+                count={sortedLearners.length}
+                rowsPerPage={pageSize}
+                page={page}
+                onPageChange={(_event, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(event) => {
+                  setPageSize(parseInt(event.target.value, 10));
+                  setPage(0);
+                }}
+              />
             </>
           )}
         </Box>

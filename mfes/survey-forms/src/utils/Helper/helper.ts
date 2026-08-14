@@ -69,3 +69,28 @@ export function formatDateTime(dateString: string): string {
     hour12: true,
   });
 }
+
+/** Formats an ISO date string as "13/08/2026" (DD/MM/YYYY, zero-padded). */
+export function formatDDMMYYYY(dateString: string): string {
+  const date = new Date(dateString);
+  const dd = String(date.getDate()).padStart(2, '0');
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const yyyy = date.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+/** Formats an ISO date string as "13/08/2026, 6:01:32 PM" (DD/MM/YYYY + locale time). */
+export function formatDDMMYYYYWithTime(dateString: string): string {
+  const date = new Date(dateString);
+  return `${formatDDMMYYYY(dateString)}, ${date.toLocaleTimeString()}`;
+}
+
+export const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/** Full month name (e.g. "July") that an ISO date string falls in. */
+export function monthNameFromDate(dateString: string): string {
+  return MONTHS[new Date(dateString).getMonth()];
+}
