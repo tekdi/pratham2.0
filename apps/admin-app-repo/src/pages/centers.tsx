@@ -182,6 +182,7 @@ const Centers = () => {
         "board",
         "medium",
         "grade",
+        "stream",
         "name",
         "center_type",
         "address",
