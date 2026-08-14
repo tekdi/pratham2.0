@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { MONTHS } from '../../utils/Helper/helper';
 
 interface Option {
   id: string;
@@ -22,11 +23,6 @@ const STATUS_FILTER_OPTIONS: { id: StatusFilterValue; label: string }[] = [
   { id: 'completed', label: 'Completed' },
   { id: 'inProgress', label: 'In Progress' },
   { id: 'notStarted', label: 'Not Started' },
-];
-
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
 interface Props {
