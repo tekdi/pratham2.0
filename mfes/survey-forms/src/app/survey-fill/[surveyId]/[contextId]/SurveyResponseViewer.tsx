@@ -14,6 +14,7 @@ import BackHeader from '../../../../Components/BackHeader/BackHeader';
 import ReadOnlyValue from '../../../../Components/ResponseAnswer/ReadOnlyValue';
 import { fetchSurveyById, fetchSubmittedResponse } from '../../../../utils/API/surveyService';
 import { isSectionVisible, isFieldVisible } from '../../../../utils/conditionalLogic';
+import { formatDDMMYYYY } from '../../../../utils/Helper/helper';
 import type { Survey, SurveyResponse } from '../../../../types/survey';
 
 // ── Main viewer ───────────────────────────────────────────────────────────────
@@ -114,7 +115,7 @@ const SurveyResponseViewer: React.FC = () => {
     responseData[name ?? key] = val;
   });
   const submittedAt = response?.submittedAt
-    ? new Date(response.submittedAt).toLocaleDateString()
+    ? formatDDMMYYYY(response.submittedAt)
     : null;
 
   const sortedSections = [...(survey.sections || [])].sort(

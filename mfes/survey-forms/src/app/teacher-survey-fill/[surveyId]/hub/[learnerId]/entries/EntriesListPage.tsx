@@ -6,6 +6,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useParams, useRouter } from 'next/navigation';
 import BackHeader from '../../../../../../Components/BackHeader/BackHeader';
 import { fetchSurveyById, fetchSurveyEntries } from '../../../../../../utils/API/surveyService';
+import { formatDDMMYYYYWithTime } from '../../../../../../utils/Helper/helper';
 import type { Survey, SurveyResponse } from '../../../../../../types/survey';
 
 const EntriesListPage: React.FC = () => {
@@ -98,7 +99,7 @@ const EntriesListPage: React.FC = () => {
                     Entry {entryNumber}
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#7C766F' }}>
-                    Submitted on {entry.submittedAt ? new Date(entry.submittedAt).toLocaleString() : '—'}
+                    Submitted on {entry.submittedAt ? formatDDMMYYYYWithTime(entry.submittedAt) : '—'}
                   </Typography>
                 </Box>
                 <ChevronRightIcon sx={{ color: '#94a3b8' }} />
