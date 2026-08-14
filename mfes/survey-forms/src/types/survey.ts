@@ -174,6 +174,9 @@ export interface ResponseMetadata {
   completedAt?: string;
   timeSpentSeconds?: number;
   deviceType?: string;
+  // Batch this response was filled against — set by the teacher-fill flow, read back
+  // to scope per-batch views (e.g. the hub's Month filter) to only this batch's entries.
+  cohortId?: string;
 }
 
 export interface PaginationMeta {
