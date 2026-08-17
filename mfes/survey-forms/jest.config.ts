@@ -7,4 +7,5 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/mfes/survey-forms',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };

@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { MONTHS } from '../../utils/Helper/helper';
 
 interface Option {
   id: string;
@@ -39,6 +40,9 @@ interface Props {
   statusFilter?: StatusFilterValue;
   onStatusFilterChange?: (status: StatusFilterValue) => void;
   totalLabel?: string;
+  showMonthFilter?: boolean;
+  monthFilter?: string;
+  onMonthFilterChange?: (month: string) => void;
 }
 
 const TeacherFilterBar: React.FC<Props> = ({
@@ -56,6 +60,9 @@ const TeacherFilterBar: React.FC<Props> = ({
   statusFilter = 'all',
   onStatusFilterChange,
   totalLabel,
+  showMonthFilter = false,
+  monthFilter = 'All',
+  onMonthFilterChange,
 }) => {
   return (
     <Box sx={{ display: 'flex', gap: 2, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -125,6 +132,26 @@ const TeacherFilterBar: React.FC<Props> = ({
             {STATUS_FILTER_OPTIONS.map((o) => (
               <MenuItem key={o.id} value={o.id}>
                 {o.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      {showMonthFilter && onMonthFilterChange && (
+        <FormControl size="small" sx={{ minWidth: 160 }}>
+          <InputLabel id="teacher-month-label">Month</InputLabel>
+          <Select
+            labelId="teacher-month-label"
+            label="Month"
+            value={monthFilter}
+            onChange={(e) => onMonthFilterChange(e.target.value as string)}
+            sx={{ borderRadius: '8px' }}
+          >
+            <MenuItem value="All">All</MenuItem>
+            {MONTHS.map((m) => (
+              <MenuItem key={m} value={m}>
+                {m}
               </MenuItem>
             ))}
           </Select>
