@@ -148,7 +148,13 @@ const RegisterUser = () => {
         delete responseForm?.schema?.properties.program;
         delete responseForm?.schema?.properties.batch;
         delete responseForm?.schema?.properties.center;
-        responseForm?.schema?.required.pop('batch');
+        // Filter, not `pop('batch')` — pop ignores its argument and would drop
+        // whichever required field the API happens to return last.
+        if (Array.isArray(responseForm?.schema?.required)) {
+          responseForm.schema.required = responseForm.schema.required.filter(
+            (f: string) => f !== 'batch'
+          );
+        }
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
         let requiredArray = alterSchema?.required;
