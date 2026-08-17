@@ -71,7 +71,7 @@ const EntriesListPage: React.FC = () => {
     <Box>
       <BackHeader
         title={`Previous entries — ${survey?.surveyTitle ?? ''}`}
-        onBack={() => router.push(`/teacher-survey-fill/${surveyId}/hub`)}
+        onBack={() => router.back()}
       />
       <Box sx={{ p: 2 }}>
         <Typography variant="body2" sx={{ color: '#7C766F', mb: 2 }}>

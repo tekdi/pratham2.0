@@ -1,12 +1,13 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import EntriesListPage from './EntriesListPage';
 import * as surveyService from '../../../../../../utils/API/surveyService';
 
 const mockPush = jest.fn();
+const mockBack = jest.fn();
 jest.mock('next/navigation', () => ({
   useParams: () => ({ surveyId: 'survey-1', learnerId: 'learner-1' }),
-  useRouter: () => ({ push: mockPush, back: jest.fn() }),
+  useRouter: () => ({ push: mockPush, back: mockBack }),
 }));
 jest.mock('../../../../../../utils/API/surveyService');
 
@@ -36,5 +37,21 @@ describe('EntriesListPage', () => {
     const firstRow = await screen.findByText('Entry 3');
     firstRow.click();
     expect(mockPush).toHaveBeenCalledWith('/teacher-survey-fill/survey-1/hub/learner-1/entries/r-3');
+  });
+
+  it('uses real browser back navigation instead of rebuilding the hub URL, so filters/sort/page survive going back', async () => {
+    // A hardcoded router.push to a bare "/hub" URL would drop every query param
+    // (search, status, month, sort, page, centerId, batchId) the hub had synced into
+    // the URL, silently resetting filters and corrupting the history stack when mixed
+    // with real back navigation elsewhere (Fill form, entry detail). router.back()
+    // always returns to whatever the actual previous URL was, filters included.
+    render(<EntriesListPage />);
+    await screen.findByText('Entry 3');
+
+    const backButton = screen.getByTestId('ArrowBackIcon').closest('button');
+    fireEvent.click(backButton as HTMLElement);
+
+    expect(mockBack).toHaveBeenCalledTimes(1);
+    expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/hub'));
   });
 });

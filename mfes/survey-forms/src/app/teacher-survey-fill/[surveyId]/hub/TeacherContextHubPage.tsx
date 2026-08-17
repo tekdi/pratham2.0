@@ -282,6 +282,11 @@ const TeacherContextHubPage: React.FC = () => {
         const dates = new Map<string, string>();
         entries.forEach((e) => {
           if (!e.contextId || !e.submittedAt) return;
+          // fetchAllSubmittedEntriesForContexts has no cohort filter of its own (unlike
+          // fetchResponseListByCohort, which the aggregate already scopes server-side) —
+          // without this check, a learner's entry from a DIFFERENT batch would leak into
+          // this batch's Month filter, contradicting their "Not Started" status here.
+          if (e.responseMetadata?.cohortId !== batchId) return;
           if (monthNameFromDate(e.submittedAt) !== monthFilter) return;
           const existing = dates.get(e.contextId);
           if (!existing || new Date(e.submittedAt) > new Date(existing)) {
@@ -297,7 +302,7 @@ const TeacherContextHubPage: React.FC = () => {
         if (!cancelled) setMonthMatchLoading(false);
       });
     return () => { cancelled = true; };
-  }, [monthFilter, survey, allLearners]);
+  }, [monthFilter, survey, allLearners, batchId]);
 
   const statusCounts = useMemo(() => {
     if (!batchId) return null;
