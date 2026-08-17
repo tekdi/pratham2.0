@@ -82,6 +82,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   const [totalCount, setTotalCount] = useState(0);
 
   const { t } = useTranslation();
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
+  const isPathwaysProgram =
+    storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
   const initialFormData =
     typeof window !== 'undefined' && localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
@@ -113,6 +119,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
 
     let requiredArray = alterSchema?.required || [];
     const mustRequired = ['name', 'board', 'medium', 'grade'];
+    if (alterSchema?.properties?.stream) {
+      mustRequired.push('stream');
+    }
     mustRequired.forEach((item) => {
       if (!requiredArray.includes(item)) {
         requiredArray.push(item);
@@ -345,6 +354,20 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
             ?.selectedValues?.join(', ')
         ) || '-',
     },
+    ...(isPathwaysProgram
+      ? [
+          {
+            key: 'stream',
+            label: 'Stream',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'STREAM')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+        ]
+      : []),
     {
       key: 'status',
       label: 'Status',
