@@ -19,6 +19,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { BulkImportQueue } from './bulkImportQueue';
+import { sendBulkImportNotification } from '../services/sendBulkImportNotification';
 import {
   ImportSession,
   ParsedImportData,
@@ -172,6 +173,12 @@ export const startImport = async (): Promise<void> => {
       session: { ...state.session, phase: 'failed' },
     });
   }
+
+  // Email the report to the logged-in user. Deliberately not awaited and
+  // never allowed to throw — the import outcome is already final at this
+  // point and must not depend on mail delivery. Runs for success, partial
+  // and failed alike, since the failure report is the useful one.
+  void sendBulkImportNotification(state.session);
 };
 
 export const abortImport = () => {
