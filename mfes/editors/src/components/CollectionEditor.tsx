@@ -803,17 +803,19 @@ const CollectionEditor: React.FC = () => {
             if (event.detail?.action === 'submitContent') {
               console.log('collection');
 
-              sendReviewNotification({
-                contentId: identifier,
-                creator: getLocalStoredUserName(),
-              })
-                .then(() => {
-                  window.history.back();
-                })
-                .catch((error) => {
-                  console.error('Error in sendReviewNotification:', error);
-                });
-            } 
+              // Disabled: was emailing every CCTA reviewer matching this content's board/subject ("onContentReview") when content was submitted for review
+              // sendReviewNotification({
+              //   contentId: identifier,
+              //   creator: getLocalStoredUserName(),
+              // })
+              //   .then(() => {
+              //     window.history.back();
+              //   })
+              //   .catch((error) => {
+              //     console.error('Error in sendReviewNotification:', error);
+              //   });
+              window.history.back();
+            }
             else if( event.detail?.action === "publishContent")
               
             {

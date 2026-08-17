@@ -48,6 +48,7 @@ import {
   getTenantInfo,
   getTenantIdByName,
 } from '@learner/utils/API/ProgramService';
+import { getVerifiedMobile, clearVerifiedMobile } from '@learner/utils/verifiedMobile';
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 
@@ -69,7 +70,23 @@ const RegisterationFlow = () => {
   const [invalidLinkModal, setInvalidLinkModal] = useState(false);
   const tenantId = searchParams.get('tenantId');
   const enroll = searchParams.get('enroll');
-  const mobileFromQuery = searchParams.get('mobile') || '';
+  // Verified mobile never travels in the URL — it's handed off from EnrolModal via
+  // encrypted sessionStorage after OTP verification. Absent on direct access or a
+  // hard refresh (decryption key lives only in memory), which correctly falls back
+  // to an empty, editable mobile field.
+  const [mobileFromQuery, setMobileFromQuery] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    getVerifiedMobile().then((verified) => {
+      if (isMounted && verified?.mobile) {
+        setMobileFromQuery(verified.mobile);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   const [fetchedTenantId, setFetchedTenantId] = useState<string | null>(null);
   const [fetchedEnroll, setFetchedEnroll] = useState<string | null>(null);
 
@@ -231,7 +248,13 @@ const RegisterationFlow = () => {
         delete responseForm?.schema?.properties.center;
         delete responseForm?.schema?.properties.privacy_consent;
         delete responseForm?.schema?.properties.parent_guardian_consent;
-        responseForm?.schema?.required.pop('batch');
+        // Filter, not `pop('batch')` — pop ignores its argument and would drop
+        // whichever required field the API happens to return last.
+        if (Array.isArray(responseForm?.schema?.required)) {
+          responseForm.schema.required = responseForm.schema.required.filter(
+            (f: string) => f !== 'batch'
+          );
+        }
         //unit name is missing from required so handled from frotnend
         let alterSchema = responseForm?.schema;
         let requiredArray = alterSchema?.required;
@@ -544,6 +567,7 @@ const RegisterationFlow = () => {
           }
           
           localStorage.removeItem('formData');
+          clearVerifiedMobile();
 
           //sent username and password
           sendMessage({

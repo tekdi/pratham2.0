@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
   RESPONSE_LIST: (surveyId: string) => `/api/v1/responses/list/${surveyId}`,
   RESPONSE_UPDATE: (responseId: string) =>
     `/api/v1/responses/update/${responseId}`,
+  RESPONSE_READ: (responseId: string) => `/api/v1/responses/read/${responseId}`,
   RESPONSE_SUBMIT: (responseId: string) =>
     `/api/v1/responses/submit/${responseId}`,
   RESPONSE_STATS: (surveyId: string, cohortId: string) =>
