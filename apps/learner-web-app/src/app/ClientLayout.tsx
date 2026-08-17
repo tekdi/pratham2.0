@@ -45,7 +45,15 @@ export default function ClientLayout({
         pathname === '/logout' ||
         pathname === '/login' ||
         pathname === '/sso' ||
-        pathname === '/registration';
+        pathname === '/registration' ||
+        // A stale registerationTestGiven flag injected by the Android app would otherwise
+        // silently kick the profile WebView to /programs. Gated on `screen` + isAndroidApp,
+        // so the web guard keeps its current strength.
+        (pathname === '/profile-complition' &&
+          localStorage.getItem('isAndroidApp') === 'yes' &&
+          ['edit', 'complete'].includes(
+            new URLSearchParams(window.location.search).get('screen') || ''
+          ));
 
       if (isAllowedRoute) {
         return;
