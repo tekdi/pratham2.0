@@ -72,7 +72,7 @@ export const getValidTermsForCategory = (
 
   const intersection = nonEmptySets.reduce((acc, set) => {
     return new Set([...acc].filter((code) => set.has(code)));
-  });
+  }, nonEmptySets[0]);
 
   return activeTargetTerms.filter((term: any) => intersection.has(term.code));
 };

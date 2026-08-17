@@ -97,7 +97,7 @@ const SubjectDetails = () => {
   const subject: string[] = useMemo(() => {
     if (!framework || !allCategoriesSelected) return [];
     const subjectTerms = getValidSubjects(framework, allEntries);
-    return subjectTerms.map((term: any) => term.name).sort();
+    return subjectTerms.map((term: any) => term.name).sort((a, b) => a.localeCompare(b));
   }, [framework, allEntries, allCategoriesSelected]);
 
   // Load persisted selections once framework/dropdownCategories are known,
