@@ -163,33 +163,42 @@ const SubjectDetails = () => {
     else if (categoryCode === "courseType") setTaxonomyType(termName);
   };
 
+  const buildEntriesExcluding = (selections: Record<string, string>, excludeCode: string) => {
+    const entries: SelectionEntry[] = [];
+    if (boardDetails) {
+      entries.push({ categoryCode: BOARD_CATEGORY_CODE, termCode: boardDetails });
+    }
+    Object.entries(selections).forEach(([c, term]) => {
+      if (term && c !== excludeCode) entries.push({ categoryCode: c, termCode: term });
+    });
+    return entries;
+  };
+
+  const invalidateStaleLaterSelections = (
+    next: Record<string, string>,
+    categoryCode: string
+  ) => {
+    const orderedCodes = dropdownCategories.map((c: any) => c.code);
+    const idx = orderedCodes.indexOf(categoryCode);
+
+    orderedCodes.slice(idx + 1).forEach((laterCode: string) => {
+      if (!next[laterCode]) return;
+      const entries = buildEntriesExcluding(next, laterCode);
+      const validTerms = getValidTermsForCategory(framework, entries, laterCode);
+      const stillValid = validTerms.some((term: any) => term.code === next[laterCode]);
+      if (!stillValid) {
+        next[laterCode] = "";
+        syncTaxonomyStore(laterCode, "");
+      }
+    });
+  };
+
   const handleCategoryChange = (categoryCode: string) => (event: any) => {
     const termCode = event.target.value;
 
     setSelections((prev) => {
       const next: Record<string, string> = { ...prev, [categoryCode]: termCode };
-
-      const orderedCodes = dropdownCategories.map((c: any) => c.code);
-      const idx = orderedCodes.indexOf(categoryCode);
-
-      orderedCodes.slice(idx + 1).forEach((laterCode: string) => {
-        if (!next[laterCode]) return;
-        const entries: SelectionEntry[] = [];
-        if (boardDetails) {
-          entries.push({ categoryCode: BOARD_CATEGORY_CODE, termCode: boardDetails });
-        }
-        Object.entries(next).forEach(([c, term]) => {
-          if (term && c !== laterCode) entries.push({ categoryCode: c, termCode: term });
-        });
-        const stillValid = getValidTermsForCategory(framework, entries, laterCode).some(
-          (term: any) => term.code === next[laterCode]
-        );
-        if (!stillValid) {
-          next[laterCode] = "";
-          syncTaxonomyStore(laterCode, "");
-        }
-      });
-
+      invalidateStaleLaterSelections(next, categoryCode);
       persistSelections(next);
       return next;
     });
