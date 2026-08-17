@@ -3,6 +3,7 @@ import {
   getLocalStoredUserRole,
 } from './LocalStorageService';
 import { delApi, get, post, patch } from './RestClient';
+import TenantService from './TenantService';
 import { MIME_TYPE } from '@workspace/utils/app.config';
 import { v4 as uuidv4 } from 'uuid';
 import { PrimaryCategoryValue, Role } from '@workspace/utils/app.constant';
@@ -605,19 +606,22 @@ export const getPosFrameworkList = async (): Promise<any> => {
   }
 };
 
-export const unpublishContent = async (identifier: string, userId: string) => {
-  const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const unpublishContent = async (identifier: string) => {
+  const baseurl = process.env.NEXT_PUBLIC_BASE_URL;
   const apiURL = `${baseurl}/collection/v4/unlisted/publish/${identifier}`;
   const reqBody = {
     request: {
       content: {
-        lastPublishedBy: userId,
+        lastPublishedBy: getLocalStoredUserId(),
       },
     },
   };
 
   try {
-    const response = await post(apiURL, reqBody);
+    const tenantConfig = await TenantService.getTenantConfig();
+    const response = await post(apiURL, reqBody, {
+      'X-Channel-Id': tenantConfig?.CHANNEL_ID,
+    });
     return response?.data;
   } catch (error) {
     console.error('Error unpublishing content:', error);

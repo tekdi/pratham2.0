@@ -7,11 +7,22 @@ const options = {
   autoClose: 2000,
 };
 
-export const showToastMessage = (message, type = "success") => {
+// `styleOverrides` lets a single call tweak its own appearance (e.g. a bolder
+// font) without changing every toast in the app. Background colour stays
+// owned by the type below and is not overridable.
+export const showToastMessage = (message, type = "success", styleOverrides = {}) => {
   const commonOptions = {
     ...options,
     style: {
       color: "#fff",
+      // The icon SVG is filled with var(--toastify-icon-color-<type>), which
+      // defaults to the theme colour and is unreadable on our coloured
+      // backgrounds. Force it white to match the text.
+      "--toastify-icon-color-error": "#fff",
+      "--toastify-icon-color-success": "#fff",
+      "--toastify-icon-color-info": "#fff",
+      "--toastify-icon-color-warning": "#fff",
+      ...styleOverrides,
     },
   };
 

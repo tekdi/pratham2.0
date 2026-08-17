@@ -2,7 +2,7 @@ import KaTableComponent from '@workspace/components/KaTableComponent';
 import Loader from '@workspace/components/Loader';
 import PaginationComponent from '@workspace/components/PaginationComponent';
 import WorkspaceText from '@workspace/components/WorkspaceText';
-import { timeAgo } from '@workspace/utils/Helper';
+import { timeAgo } from '@workspace/utils/helper';
 import { LIMIT } from '@workspace/utils/app.constant';
 import useSharedStore from '../../../../../../shared-store';
 import { Box, Typography, useTheme } from '@mui/material';

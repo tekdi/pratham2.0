@@ -6,7 +6,7 @@ import {
 } from '@/services/CoursePlannerService';
 import { editEvent } from '@/services/EventService';
 import { fetchBulkContents } from '@/services/PlayerService';
-import { convertUTCToIST, getBMG, getDayMonthYearFormat } from '@/utils/Helper';
+import { convertUTCToIST, getBMG, getDayMonthYearFormat } from '@/utils/helper';
 import { EventStatus } from '@/utils/app.constant';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';

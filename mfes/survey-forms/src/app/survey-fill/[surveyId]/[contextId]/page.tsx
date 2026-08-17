@@ -3,7 +3,7 @@
 import React from 'react';
 import { Suspense } from 'react';
 import { CircularProgress, Box } from '@mui/material';
-import SurveyRenderer from './SurveyRenderer';
+import FillRouteGuard from './FillRouteGuard';
 
 export default function Page() {
   return (
@@ -14,7 +14,7 @@ export default function Page() {
         </Box>
       }
     >
-      <SurveyRenderer />
+      <FillRouteGuard />
     </Suspense>
   );
 }

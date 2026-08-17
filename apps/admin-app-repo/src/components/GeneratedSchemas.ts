@@ -2,7 +2,7 @@ import { UiSchema } from "@rjsf/utils";
 import { JSONSchema7 } from "json-schema";
 import NumberInputField from "./form/NumberInputField";
 import { FormData, Field, FieldOption } from "@/utils/Interfaces";
-import { getCurrentYearPattern, getLastDayDate } from "@/utils/Helper";
+import { getCurrentYearPattern, getLastDayDate } from "@/utils/helper";
 export const customFields = {
   NumberInputField: NumberInputField,
 };

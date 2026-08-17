@@ -4,7 +4,7 @@ import * as React from 'react';
 import useNotification from '@/hooks/useNotification';
 import { createEvent, editEvent } from '@/services/EventService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
-import { getOptionsByCategory } from '@/utils/Helper';
+import { getOptionsByCategory } from '@/utils/helper';
 import { CreateEvent, PlannedModalProps } from '@/utils/Interfaces';
 import {
   CenterType,

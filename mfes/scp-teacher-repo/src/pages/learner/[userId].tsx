@@ -29,7 +29,7 @@ import {
   mapFieldIdToValue,
   toPascalCase,
   translateString,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import {
   AssessmentReportProp,

@@ -1,7 +1,7 @@
 'use client';
 
 import useStore from '@/store/store';
-import { accessGranted } from '@/utils/Helper';
+import { accessGranted } from '@/utils/helper';
 import { AcademicYear } from '@/utils/Interfaces';
 import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';

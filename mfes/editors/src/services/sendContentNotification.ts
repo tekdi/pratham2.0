@@ -1,4 +1,4 @@
-import { formatDate } from "../utils/Helper";
+import { formatDate } from "../utils/helper";
 import { sendCredentialService } from "./NotificationService";
 import { getLocalStoredUserName } from "./LocalStorageService";
 import { getUserDetailsInfo } from "./userServices";
@@ -53,13 +53,14 @@ export const sendContentNotification = async (
         replacements["{reviwerComment}"] = editorType === Editor.CONTENT ? comment : contentDetails?.rejectComment;
       }
   
-      await sendCredentialService({
-        isQueue,
-        context,
-        key,
-        replacements,
-        email: { receipients: [response?.userData?.email] },
-      });
+      // Disabled: was emailing the content creator ("onContentPublish"/"onContentReject") when a reviewer published or rejected their submission
+      // await sendCredentialService({
+      //   isQueue,
+      //   context,
+      //   key,
+      //   replacements,
+      //   email: { receipients: [response?.userData?.email] },
+      // });
   
       const previousPage = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('previousPage') : null;
       if (previousPage && previousPage.startsWith('/')) {

@@ -65,7 +65,7 @@ import {
   getLoggedInUserRole,
   getVillageUserCounts,
   filterSchema,
-} from '../../utils/Helper';
+} from '../../utils/helper';
 import { fetchUserList, updateUserTenantStatus } from '../../services/youthNet/Dashboard/UserServices';
 import {
   cohortHierarchy,

@@ -1,4 +1,4 @@
-import { getTelemetryEvents } from "@workspace/utils/Helper";
+import { getTelemetryEvents } from "@workspace/utils/helper";
 import React, { useRef, useEffect } from "react";
 
 interface PlayerProps {

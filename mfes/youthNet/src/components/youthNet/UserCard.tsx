@@ -10,13 +10,13 @@ import {
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTheme } from '@mui/material/styles';
-import { getAge, getAgeInMonths } from '../../utils/Helper';
+import { getAge, getAgeInMonths } from '../../utils/helper';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'next-i18next';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import { VolunteerField } from '../../utils/app.constant';
-import { toPascalCase } from '@/utils/Helper';
+import { toPascalCase } from '@/utils/helper';
 type UserCardProps = {
   name: string;
   firstName?: string;

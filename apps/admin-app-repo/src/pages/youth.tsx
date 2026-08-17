@@ -35,7 +35,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { editEditUser, updateUserTenantStatus } from '@/services/UserService';
-import { transformLabel } from '@/utils/Helper';
+import { transformLabel } from '@/utils/helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';

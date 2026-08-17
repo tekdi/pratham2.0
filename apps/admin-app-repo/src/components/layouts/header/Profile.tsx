@@ -16,7 +16,7 @@ import {
   firstLetterInUpperCase,
   getInitials,
   getUserFullName,
-} from '@/utils/Helper';
+} from '@/utils/helper';
 import { telemetryFactory } from '@/utils/telemetry';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import { useAccountSwitch } from '@/hooks/useAccountSwitch';

@@ -13,6 +13,88 @@ import {
   UpdateCustomField,
 } from '../utils/Interfaces';
 import { format, parseISO } from 'date-fns';
+
+// Natural sort comparator: sorts strings with embedded numbers in human
+// numeric order (e.g. "grade_2" before "grade_10") instead of plain
+// lexicographic order. Falls back to alphabetical ordering for non-numeric
+// strings, so it's safe as a generic replacement for a plain localeCompare sort.
+export const naturalCompare = (a: string, b: string): number =>
+  a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+// Starting ("zero") code point of every Unicode decimal-digit (Nd) block in
+// common use across this app's supported languages (Devanagari, Bengali,
+// Gurmukhi, Gujarati, Oriya, Tamil, Telugu, Kannada, Malayalam, Arabic-Indic,
+// Extended Arabic-Indic/Persian, Thai, Lao, Tibetan, Myanmar, Khmer,
+// fullwidth). Unicode guarantees each Nd block is 10 consecutive code points
+// for digits 0-9, so a digit's value is simply its offset from its block's
+// start - this is generic Unicode digit data, not tied to any one language.
+const DIGIT_BLOCK_STARTS = [
+  0x0030, // ASCII
+  0x0660, // Arabic-Indic
+  0x06f0, // Extended Arabic-Indic (Persian/Urdu)
+  0x0966, // Devanagari (Hindi, Marathi, Nepali)
+  0x09e6, // Bengali
+  0x0a66, // Gurmukhi
+  0x0ae6, // Gujarati
+  0x0b66, // Oriya
+  0x0be6, // Tamil
+  0x0c66, // Telugu
+  0x0ce6, // Kannada
+  0x0d66, // Malayalam
+  0x0e50, // Thai
+  0x0ed0, // Lao
+  0x0f20, // Tibetan
+  0x1040, // Myanmar
+  0x17e0, // Khmer
+  0xff10, // Fullwidth
+];
+
+const digitValue = (ch: string): number | null => {
+  const codePoint = ch.codePointAt(0) ?? -1;
+  for (const start of DIGIT_BLOCK_STARTS) {
+    const offset = codePoint - start;
+    if (offset >= 0 && offset <= 9) return offset;
+  }
+  return null;
+};
+
+const toAsciiDigits = (label: string): string =>
+  label.replace(/\p{Nd}/gu, (ch) => {
+    const value = digitValue(ch);
+    return value === null ? ch : String(value);
+  });
+
+// Extracts the first number embedded anywhere in a label - regardless of
+// surrounding words ("Grade 1", "State 2", "Level 10", ...) or the script its
+// digits are written in - so labels can be compared by numeric value rather
+// than by the text around the number. This is a generic number-extraction
+// utility; it has no knowledge of specific category words like "Grade".
+const extractNumber = (label: string): number | null => {
+  const match = /\d+/.exec(toAsciiDigits(label));
+  return match ? Number.parseInt(match[0], 10) : null;
+};
+
+// Sorts a list of { label } style options by the number embedded in each
+// label (e.g. "Grade 1", "State 2", "Level 10", "Class 3", "Option 11" all
+// sort purely by their number: 1, 2, 3, 10, 11 - independent of the words
+// around the number). Labels with no number are left in their existing
+// relative order (a stable no-op comparison), and comparisons involving one
+// numeric and one non-numeric label are also left unchanged, so any category
+// mixing numbered and non-numbered options keeps its original ordering for
+// the non-numbered ones. Works automatically for any dropdown/category -
+// there is no hardcoded list of words to detect.
+export const naturalSortOptions = <T extends { label: string }>(
+  optionsList: T[]
+): T[] =>
+  [...optionsList].sort((a, b) => {
+    const numA = extractNumber(a.label);
+    const numB = extractNumber(b.label);
+
+    if (numA !== null && numB !== null) {
+      return numA - numB;
+    }
+    return 0;
+  });
 import manageUserStore from '../store/manageUserStore';
 import {
   AssessmentType,
