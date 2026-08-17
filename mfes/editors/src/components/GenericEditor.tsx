@@ -190,10 +190,11 @@ const GenericEditor: React.FC = () => {
                     console.log("Review Event triggered inside iframe!", event);
                     console.log("window", window);
                     console.log("window parent", window?.parent);
-                    sendReviewNotification({
-                      contentId: window?.parent?.context?.contentId,
-                      creator: getLocalStoredUserName(),
-                    });
+                    // Disabled: was emailing every CCTA reviewer matching this content's board/subject ("onContentReview") when content was submitted for review
+                    // sendReviewNotification({
+                    //   contentId: window?.parent?.context?.contentId,
+                    //   creator: getLocalStoredUserName(),
+                    // });
                   }
                 );
               }

@@ -79,6 +79,11 @@ const MAX_CONCURRENCY = 3;
 const MAX_RETRIES = 3;
 const RETRY_BASE_DELAY_MS = 2_000;
 
+// Upper bound on the exponential backoff. Browsers throttle timers in
+// background tabs (roughly one per minute), so an uncapped backoff makes a
+// backgrounded import look frozen. Capping keeps the worst-case wait short.
+const RETRY_MAX_DELAY_MS = 15_000;
+
 // File uploads stream large payloads (Drive download → presigned upload →
 // platform processing). Running several at once overloads the gateway and
 // produces 502s on big files, so they are limited to one at a time.
@@ -641,7 +646,10 @@ export class BulkImportQueue {
         job.status = 'retrying';
         job.retryCount = attempt;
         this.emitProgress();
-        const delay = RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+        const delay = Math.min(
+          RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1),
+          RETRY_MAX_DELAY_MS
+        );
         await sleep(delay);
       }
 
