@@ -292,7 +292,7 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   return (
     category?.terms
-      ?.filter((term: any) => isActive(term.status))
+      ?.filter((term: any) => term.status !== 'Retired') // ✅ exclude retired
       .map((term: any) => ({
         identifier: term.identifier,
         name: term.name,
