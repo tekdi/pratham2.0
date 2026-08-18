@@ -1,17 +1,14 @@
+import { getCohortList } from '@/services/GetCohortList';
+import axios from 'axios';
 import FingerprintJS from 'fingerprintjs2';
 import { getUserDetailsInfo } from '../services/UserList';
 import {
-  Role,
   FormContextType,
   FormValues,
   InputTypes,
-  Storage,
+  Storage
 } from './app.constant';
 import { State } from './Interfaces';
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { getCohortList } from '@/services/GetCohortList';
-import { isActive } from './frameworkTaxonomy';
 
 interface Value {
   value: string;
