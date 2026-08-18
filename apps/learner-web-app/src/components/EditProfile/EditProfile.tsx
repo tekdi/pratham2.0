@@ -42,6 +42,14 @@ import Header from '../Header/Header';
 //volunteer onboarding
 import VolunteerOnboard from '@shared-lib-v2/VolunteerOnboard/VolunteerOnboard';
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
 type UserAccount = {
   name: string;
   username: string;
@@ -58,6 +66,40 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   const directEnroll = searchParams.get('directEnroll');
   const [isSubmitting, setIsSubmitting] = useState(false);
   console.log('directEnroll', directEnroll);
+
+  // The Android app opens this component in a WebView as /profile-complition?screen=edit|complete
+  // and supplies its own toolbar. Requiring `screen` means no existing web route into this
+  // component (profile menu, complete-profile banner, enrollment page) can reach the branches below.
+  const screen = searchParams.get('screen');
+  const closeToNative =
+    !enrolledProgram &&
+    (screen === 'edit' || screen === 'complete') &&
+    typeof window !== 'undefined' &&
+    localStorage.getItem('isAndroidApp') === 'yes';
+
+  // Where web would navigate to landingPage, the app instead hands control back to native,
+  // which tears down the WebView. Same payload as ENROLL_PROGRAM_EVENT plus `screen`, so native
+  // knows which flow finished and where to return the learner.
+  const postProfileEventToNative = () => {
+    let refreshToken = localStorage.getItem('refreshTokenForAndroid');
+    if (!refreshToken || refreshToken === '') {
+      refreshToken = localStorage.getItem('refreshToken');
+    }
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: 'EDIT_PROFILE_EVENT',
+          data: {
+            userId: localStorage.getItem('userId'),
+            tenantId: localStorage.getItem('tenantId'),
+            token: localStorage.getItem('token'),
+            refreshToken: refreshToken,
+            screen: screen,
+          },
+        })
+      );
+    }
+  };
 
   // Helper function to get program name (Navapatham if isForNavaPatham is true, otherwise userProgram)
   const getProgramName = () => {
@@ -108,7 +150,9 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
   useEffect(() => {
     // const token = localStorage.getItem('token');
     if (!checkAuth()) {
-      router.push('/login');
+      // router.push('/login') would load the whole web login into the app's WebView.
+      if (closeToNative) postProfileEventToNative();
+      else router.push('/login');
     }
   }, []);
 
@@ -577,6 +621,58 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
       customFields[programFieldIndex].selectedValues = [];
     }
 
+    // The family member fields are mutually exclusive, so switching the selection must clear
+    // the previous one. DynamicForm drops the deselected fields from its schema, which means
+    // they never reach customFields and the old value survives on the server (a learner who
+    // saved a spouse name and then switched to mother showed both). Send them as empty.
+    const familyMemberFieldNames = [
+      'father_name',
+      'mother_name',
+      'spouse_name',
+    ];
+    const familyFieldId = (fieldName: string) =>
+      responseFormData?.schema?.properties?.[fieldName]?.fieldId;
+
+    // Only touch these when the form actually asks for a family member, otherwise a tenant
+    // whose form omits the selector would have its stored names wiped.
+    const familySelectorFieldId = familyFieldId('family_member_details');
+    const formHasFamilySelector =
+      Boolean(familySelectorFieldId) &&
+      customFields.some(
+        (field: any) => field?.fieldId === familySelectorFieldId
+      );
+
+    if (formHasFamilySelector) {
+      // Match the selector against the field it controls without assuming the option's
+      // exact casing or wording - just that it contains 'father' / 'mother' / 'spouse'.
+      const selectedRaw = String(formData?.family_member_details ?? '')
+        .trim()
+        .toLowerCase();
+      const selectedFieldName = familyMemberFieldNames.find((fieldName) =>
+        selectedRaw.includes(fieldName.replace('_name', ''))
+      );
+
+      familyMemberFieldNames.forEach((fieldName) => {
+        if (fieldName === selectedFieldName) return;
+
+        const fieldId = familyFieldId(fieldName);
+        if (!fieldId) return;
+
+        const existingIndex = customFields.findIndex(
+          (field: any) => field?.fieldId === fieldId
+        );
+
+        if (existingIndex !== -1) {
+          // Present in the payload but not the selected member - blank it.
+          customFields[existingIndex].value = '';
+        } else if (selectedFieldName) {
+          // Dropped from the schema when deselected, so send it explicitly as empty.
+          customFields.push({ fieldId, value: '' });
+        }
+      });
+
+    }
+
     const parentPhoneField = customFields.find(
       (field: any) => field.value === formData.parent_phone
     );
@@ -605,13 +701,22 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
           showToastMessage('Profile Updated succeessfully', 'success');
           const landingPage = localStorage.getItem('landingPage') || '';
 
-          if (landingPage) {
+          // In app mode native closes the WebView instead — see the closeToNative block below.
+          if (landingPage && !closeToNative) {
             window.location.href = landingPage;
           }
         }
 
         if (formData?.what_is_your_preferred_language && localStorage.getItem('registerationTestGiven') !== "Yes") {
           localStorage.setItem('preferred_language', formData.what_is_your_preferred_language);
+        }
+
+        // Covers both edit and complete modes: native tears down the WebView, so the
+        // completeProfile branch's router.push(landingPage) below is never reached in app mode.
+        if (closeToNative) {
+          postProfileEventToNative();
+          setIsSubmitting(false);
+          return;
         }
 
         if (enrolledProgram) {
@@ -682,7 +787,7 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         <>
           {directEnroll == 'true' && <Header isShowLogout={true} />}
 
-          {directEnroll != 'true' && (<Box
+          {directEnroll != 'true' && !closeToNative && (<Box
             sx={{
               //   p: 2,
               mt: 2,
