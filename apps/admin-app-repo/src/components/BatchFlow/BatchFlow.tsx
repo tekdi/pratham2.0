@@ -128,13 +128,6 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       stream?: string[];
     }
   ) => {
-    const storedProgram =
-      typeof window !== 'undefined'
-        ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
-        : null;
-    const isPathwaysProgram =
-      storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
-
     let alterSchema = resolveFrameworkPlaceholders(
       structuredClone(
         isPathwaysProgram ? PathwaysBatchCreateSchema : BatchCreateSchema
@@ -145,7 +138,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     );
 
     let requiredArray = alterSchema?.required || [];
-    const mustRequired = ['name', 'board', 'medium', 'grade', 'stream'];
+    const mustRequired = ['name', 'board', 'medium', 'grade'];
+    if (alterSchema?.properties?.stream) {
+      mustRequired.push('stream');
+    }
     mustRequired.forEach((item) => {
       if (!requiredArray.includes(item)) {
         requiredArray.push(item);
