@@ -30,11 +30,17 @@
 //   {courseCount}       Course rows
 //   {failureSummary}    HTML <ul> of failures (or "None")
 //   {appUrl}            Link back to the bulk import screen
+//   {reportUrl}         Direct .xlsx download URL ('' if upload failed)
+//   {reportLink}        Ready-made <a> block, empty when there is no report
+//
+// The notification API has no attachment field, so the report is uploaded to
+// cloud storage and linked rather than attached.
 // ============================================================
 
 import { sendCredentialService } from './NotificationService';
 import { getLocalStoredUserId, getLocalStoredUserName } from './LocalStorageService';
 import { getUserDetailsInfo } from './userServices';
+import { uploadImportReport } from '../utils/bulkImportReport';
 import { ImportSession } from '../types/bulkImport.types';
 
 const CONTEXT = process.env.NEXT_PUBLIC_BULK_IMPORT_NOTIFICATION_CONTEXT || 'CMS';
@@ -115,6 +121,11 @@ export const sendBulkImportNotification = async (
 
     const data = session.parsedData;
 
+    // The notification contract has no attachment field, so the .xlsx report is
+    // uploaded to cloud storage and linked instead. A failed upload must not
+    // block the email — the inline {failureSummary} still carries the detail.
+    const reportUrl = await uploadImportReport(session, getLocalStoredUserId() || '');
+
     const replacements: Record<string, string> = {
       '{userName}': getLocalStoredUserName() || 'there',
       '{fileName}': session.fileName || '—',
@@ -131,6 +142,13 @@ export const sendBulkImportNotification = async (
       '{failureSummary}': buildFailureSummary(session),
       '{appUrl}': typeof window !== 'undefined'
         ? `${window.location.origin}${window.location.pathname}`
+        : '',
+      // Direct download link to the full .xlsx report
+      '{reportUrl}': reportUrl || '',
+      // Ready-made anchor so the template can drop in one placeholder, and the
+      // whole block disappears cleanly when no report could be produced.
+      '{reportLink}': reportUrl
+        ? `<p><a href="${reportUrl}">Download the full report (.xlsx)</a></p>`
         : '',
     };
 
