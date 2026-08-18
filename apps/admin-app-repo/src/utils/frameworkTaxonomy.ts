@@ -3,9 +3,9 @@
 // it only operates on framework.categories[].terms[].associations[] as data.
 
 export const SUBJECT_CATEGORY_CODE = "subject";
-const ACTIVE_STATUS = "Live";
+const RETIRED_STATUS = "Retired";
 
-export const isActive = (status?: string) => status === ACTIVE_STATUS;
+export const isActive = (status?: string) => status !== RETIRED_STATUS;
 
 export interface SelectionEntry {
   categoryCode: string;
@@ -70,9 +70,10 @@ export const getValidTermsForCategory = (
   const nonEmptySets = perSelectionCodeSets.filter((s) => s.size > 0);
   if (nonEmptySets.length === 0) return [];
 
-  const intersection = nonEmptySets.reduce((acc, set) => {
+  const [firstSet, ...restSets] = nonEmptySets;
+  const intersection = restSets.reduce((acc, set) => {
     return new Set([...acc].filter((code) => set.has(code)));
-  }, nonEmptySets[0]);
+  }, firstSet as Set<string>);
 
   return activeTargetTerms.filter((term: any) => intersection.has(term.code));
 };
