@@ -1090,9 +1090,11 @@
     "ALL_LANGUAGES": "सर्व भाषा",
     "ALL_COURSE_NAMES": "सर्व अभ्यासक्रम नावे",
     "SEARCH_COURSE_NAME": "अभ्यासक्रमाचे नाव शोधा",
+    "SEARCH_EMPLOYEE_NAME": "कर्मचाऱ्याचे नाव शोधा",
     "SELECTED_COUNT": "{{count}} निवडले",
     "RESET": "रीसेट",
     "ALL_CUSTOM_FIELD": "सर्व {{label}}",
+    "RESET_CUSTOM_FIELD": "{{label}} फिल्टर रीसेट करा",
     "CUSTOM_FIELD_LABELS": {
       "JOB_FAMILY": "जॉब फॅमिली",
       "PSU": "PSU",

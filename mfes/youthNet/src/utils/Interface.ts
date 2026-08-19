@@ -347,8 +347,12 @@ export interface IndividualProgressProps {
   summaryError: boolean;
   filters: CourseListFilters;
   currentPage: number;
+  // Free-text employee name search, next to the Course Name filter — matches against each row's
+  // display name, case-insensitively, independent of the Course Type/Language/Course Name filters.
+  searchTerm: string;
   onFiltersChange: (filters: CourseListFilters) => void;
   onPageChange: (page: number) => void;
+  onSearchTermChange: (term: string) => void;
   onViewEmployee: (userId: string) => void;
 }
 

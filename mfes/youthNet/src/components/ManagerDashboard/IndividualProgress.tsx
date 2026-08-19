@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import React, { useEffect, useMemo } from 'react';
+import { Box, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { IndividualProgressProps } from '../../utils/Interface';
@@ -8,6 +9,7 @@ import {
   buildIndividualProgressRows,
   buildUserCourseLearningMap,
   filterCourses,
+  filterIndividualProgressRowsBySearchTerm,
   paginateUsers,
 } from '../../utils/managerDashboardHelpers';
 import CoursesFilterBar from './CoursesList/CoursesFilterBar';
@@ -29,8 +31,10 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
   summaryError,
   filters,
   currentPage,
+  searchTerm,
   onFiltersChange,
   onPageChange,
+  onSearchTermChange,
   onViewEmployee,
 }) => {
   const theme = useTheme<any>();
@@ -52,10 +56,27 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
     [users, filteredCourses, userCourseLearningMap]
   );
 
-  const { visibleItems: visibleRows, totalPages } = useMemo(
-    () => paginateUsers(individualProgressRows, currentPage, EMPLOYEES_PER_PAGE),
-    [individualProgressRows, currentPage]
+  // The name search box DOES remove non-matching employees from the table (unlike the Course
+  // Type/Language/Course Name filters above, which only narrow which courses count).
+  const searchedRows = useMemo(
+    () => filterIndividualProgressRowsBySearchTerm(individualProgressRows, searchTerm),
+    [individualProgressRows, searchTerm]
   );
+
+  const { visibleItems: visibleRows, totalPages } = useMemo(
+    () => paginateUsers(searchedRows, currentPage, EMPLOYEES_PER_PAGE),
+    [searchedRows, currentPage]
+  );
+
+  // Narrowing a filter (the top-of-page Job Family/PSU/Group Membership row, or this search box)
+  // can shrink the result set enough that the page you were on no longer exists — e.g. sitting on
+  // page 4 of a larger list, then a filter change leaves only 2 pages, renders a blank page instead
+  // of silently clamping back. Snap back to the last real page (or page 1 if now empty) whenever
+  // that happens, rather than requiring every filter's own change handler to know about every other
+  // filter that could also affect the row count.
+  useEffect(() => {
+    if (currentPage > totalPages) onPageChange(Math.max(1, totalPages));
+  }, [currentPage, totalPages, onPageChange]);
 
   const isLoading = usersLoading || coursesLoading;
   const hasError = usersError || coursesError;
@@ -88,7 +109,23 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
           </Typography>
         </Box>
 
-        <CoursesFilterBar courses={courses} filters={filters} onFiltersChange={onFiltersChange} />
+        <Stack direction="row" gap={1} alignItems="center" flexWrap="wrap" rowGap={1}>
+          <CoursesFilterBar courses={courses} filters={filters} onFiltersChange={onFiltersChange} />
+          <TextField
+            size="small"
+            placeholder={t('MANAGER_OVERVIEW.SEARCH_EMPLOYEE_NAME')}
+            value={searchTerm}
+            onChange={(event) => onSearchTermChange(event.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: theme.palette.text.secondary }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ minWidth: 220 }}
+          />
+        </Stack>
       </Stack>
 
       {summaryError && !isLoading && !hasError && (
@@ -105,7 +142,7 @@ const IndividualProgress: React.FC<IndividualProgressProps> = ({
         error={hasError}
         currentPage={currentPage}
         totalPages={totalPages}
-        totalEmployees={individualProgressRows.length}
+        totalEmployees={searchedRows.length}
         onPageChange={onPageChange}
         onViewEmployee={onViewEmployee}
       />

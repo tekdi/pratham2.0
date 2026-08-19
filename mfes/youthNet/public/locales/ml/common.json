@@ -596,9 +596,11 @@
     "ALL_LANGUAGES": "എല്ലാ ഭാഷകളും",
     "ALL_COURSE_NAMES": "എല്ലാ കോഴ്‌സ് പേരുകളും",
     "SEARCH_COURSE_NAME": "കോഴ്‌സ് പേര് തിരയുക",
+    "SEARCH_EMPLOYEE_NAME": "ജീവനക്കാരന്റെ പേര് തിരയുക",
     "SELECTED_COUNT": "{{count}} തിരഞ്ഞെടുത്തു",
     "RESET": "റീസെറ്റ്",
     "ALL_CUSTOM_FIELD": "എല്ലാ {{label}}",
+    "RESET_CUSTOM_FIELD": "{{label}} ഫിൽട്ടർ പുനഃസജ്ജമാക്കുക",
     "CUSTOM_FIELD_LABELS": {
       "JOB_FAMILY": "ജോബ് ഫാമിലി",
       "PSU": "PSU",

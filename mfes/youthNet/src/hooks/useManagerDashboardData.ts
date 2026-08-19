@@ -14,6 +14,7 @@ import { COURSE_CATALOGUE_FILTERS } from '../utils/app.config';
 import {
   getManagerDashboardCustomFieldValues,
   hasManagerDashboardCustomField,
+  pruneIneligibleNotStartedEntries,
 } from '../utils/managerDashboardHelpers';
 
 export interface ManagerDashboardData {
@@ -120,7 +121,11 @@ const loadManagerDashboardData = (): Promise<void> => {
 
     try {
       const response = await getCourseLearningSummary({ courseId: courseIds, userId: userIds });
-      publish({ courseLearningSummary: response.result, summaryLoading: false, summaryError: false, hasLoaded: true });
+      // The API returns one row per (user, course) pair regardless of relevance — strip
+      // 'not_started' placeholder noise for pairs the user was never eligible for in the first
+      // place, once here at load time, rather than re-deriving it on every filter change.
+      const prunedSummary = pruneIneligibleNotStartedEntries(response.result, fetchedCourses, fetchedUsers);
+      publish({ courseLearningSummary: prunedSummary, summaryLoading: false, summaryError: false, hasLoaded: true });
     } catch (error) {
       console.error('Error fetching course learning summary:', error);
       publish({ summaryLoading: false, summaryError: true, hasLoaded: true });

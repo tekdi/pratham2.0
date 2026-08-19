@@ -89,8 +89,11 @@ const DashboardOverview: React.FC<DashboardOverviewProps> = ({
     [users, userCustom, t]
   );
 
+  // Exact percentage, not rounded to a whole number — e.g. 34.72%, not 35%.
   const certificateRate =
-    aggregateCounts.total > 0 ? Math.round((aggregateCounts.certificateIssued / aggregateCounts.total) * 100) : 0;
+    aggregateCounts.total > 0
+      ? ((aggregateCounts.certificateIssued / aggregateCounts.total) * 100).toFixed(2)
+      : '0.00';
 
   if (loading) {
     return (
