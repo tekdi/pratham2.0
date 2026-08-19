@@ -26,6 +26,9 @@ export interface ManagerDashboardUIState {
   attemptSortOrder: AttemptSortOrder;
   teamFilters: CourseListFilters;
   teamCurrentPage: number;
+  // My Team's "search by employee name" box, next to the Course Name filter — same persistence
+  // needs as teamFilters/teamCurrentPage (survive the Employee Detail Page round-trip).
+  teamSearchTerm: string;
   courseBreakdownFilters: CourseListFilters;
   courseBreakdownPage: number;
   // The JOB_FAMILY/PSU/EMP_GROUP filter row at the top of the page — same persistence needs as
@@ -40,6 +43,7 @@ const INITIAL_STATE: ManagerDashboardUIState = {
   attemptSortOrder: 'desc',
   teamFilters: { ...DEFAULT_COURSE_LIST_FILTERS },
   teamCurrentPage: 1,
+  teamSearchTerm: '',
   courseBreakdownFilters: { ...DEFAULT_COURSE_LIST_FILTERS },
   courseBreakdownPage: 1,
   userFilterFamily: {},

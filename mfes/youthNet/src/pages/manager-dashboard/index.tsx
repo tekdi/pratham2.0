@@ -5,15 +5,16 @@ import {
   Checkbox,
   Chip,
   Container,
-  Divider,
   FormControl,
   Grid,
+  IconButton,
   InputLabel,
   ListItemText,
   MenuItem,
   Select,
   SelectChangeEvent,
 } from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
 import { useRouter } from 'next/router';
 import {
   IndividualProgress,
@@ -42,7 +43,6 @@ import {
   CourseStatusSelection,
   HighAttemptFilter,
 } from '../../utils/Interface';
-import { MANAGER_DASHBOARD_ALL_FILTER_OPTION } from '../../utils/app.config';
 import {
   buildCourseById,
   buildUserById,
@@ -50,6 +50,8 @@ import {
   filterCoursesByUserCustomFilters,
   filterHighAttemptUsersByAttempt,
   filterSummaryByCourseIds,
+  filterUsersByCustomFilters,
+  getActiveUserCustomFilters,
   getCourseEntryCount,
   getSelectedCourseIds,
   getCourseUsersByStatus,
@@ -57,10 +59,6 @@ import {
   getUniqueCourseCount,
   sortHighAttemptUsers,
 } from '../../utils/managerDashboardHelpers';
-
-// Sentinel option shown at the top of each JOB_FAMILY/PSU/EMP_GROUP dropdown — checking it selects
-// every real option for that label in one go, unchecking it clears the whole filter.
-const ALL_OPTION = MANAGER_DASHBOARD_ALL_FILTER_OPTION;
 
 const ManagerDashboard = () => {
   const { t } = useTranslation();
@@ -93,7 +91,10 @@ const ManagerDashboard = () => {
     hasLoaded,
   } = useManagerDashboardData();
 
-  console.log("##########namane courseLearningSummary",courseLearningSummary);
+  console.log("##########manager dashboard users",users);
+  console.log("##########manager dashboard user_custom",user_custom);
+  console.log("##########manager dashboard courses",courses);
+  console.log("##########manager dashboard courseLearningSummary",courseLearningSummary);
 
   // --- UI state (filters, pagination, sort) — kept in a module-level singleton via
   // `useManagerDashboardUIState` (not plain `useState`) so it survives navigating to the Employee
@@ -107,6 +108,7 @@ const ManagerDashboard = () => {
       attemptSortOrder,
       teamFilters,
       teamCurrentPage,
+      teamSearchTerm,
       courseBreakdownFilters,
       courseBreakdownPage,
       userFilterFamily: user_filter_family,
@@ -114,36 +116,14 @@ const ManagerDashboard = () => {
     setUIState,
   ] = useManagerDashboardUIState();
 
-  // Explicit picks per user_custom label (JOB_FAMILY / PSU / EMP_GROUP). A label with no entry
-  // here (or an empty one) means "nothing explicitly picked yet" — the dropdown then shows and
-  // filters by every option for that label, i.e. behaves as if ALL_OPTION plus every real option
-  // were selected.
+  // Explicit picks per user_custom label (JOB_FAMILY / PSU / EMP_GROUP). No "ALL" sentinel — the
+  // dropdown's own checkboxes are the real options, and a label with no entry here means "nothing
+  // explicitly picked yet", which the render/filter logic below treats the same as every option
+  // being checked (see the default fallback to the full `options` list).
   const handleUserCustomFilterChange = useCallback(
-    (label: string, options: string[]) => (event: SelectChangeEvent<string[]>) => {
+    (label: string) => (event: SelectChangeEvent<string[]>) => {
       const { value } = event.target;
-      const nextValue = typeof value === 'string' ? value.split(',') : value;
-
-      // `user_filter_family[label]` is `undefined` only when the user hasn't touched this filter
-      // yet — an explicit `[]` (every option unchecked down to none) must stay `[]`, not snap back
-      // to "everything selected", so this checks presence rather than truthiness/length.
-      const previouslySelected =
-        user_filter_family[label] !== undefined ? user_filter_family[label] : [ALL_OPTION, ...options];
-      const hadAll = previouslySelected.includes(ALL_OPTION);
-      const hasAll = nextValue.includes(ALL_OPTION);
-
-      let resolved: string[];
-      if (hasAll && !hadAll) {
-        // "ALL" was just checked — select every option.
-        resolved = [ALL_OPTION, ...options];
-      } else if (!hasAll && hadAll) {
-        // "ALL" was just unchecked — clear the whole filter.
-        resolved = [];
-      } else {
-        // An individual option was toggled — keep "ALL" in sync with full coverage.
-        const withoutAll = nextValue.filter((v) => v !== ALL_OPTION);
-        resolved = withoutAll.length === options.length ? [ALL_OPTION, ...withoutAll] : withoutAll;
-      }
-
+      const resolved = typeof value === 'string' ? value.split(',') : value;
       setUIState({ userFilterFamily: { ...user_filter_family, [label]: resolved } });
     },
     [user_filter_family, setUIState]
@@ -154,27 +134,75 @@ const ManagerDashboard = () => {
     [setUIState]
   );
 
-  // Nothing has been picked yet ⇒ every dropdown is at its "ALL" default ⇒ the filter pipeline
-  // below is a no-op by construction, but skipping it entirely also means `filteredCourses` /
-  // `filteredCourseLearningSummary` stay reference-equal to the hook's original `courses` /
-  // `courseLearningSummary` — i.e. the "original values" the page starts from are never touched
-  // until the user actually interacts with a filter.
-  const hasActiveUserCustomFilter = Object.keys(user_filter_family).length > 0;
+  // Resets ONE label back to genuinely untouched (removes its key entirely, rather than setting it
+  // to `[]` or the full option list) — the only way to undo a single-option label's pick (e.g.
+  // Group Membership with just "None"), since re-checking its one box can never distinguish itself
+  // from the untouched default the way a multi-option label's full re-check can. Without this, a
+  // single-option label picked once stays an invisible, permanent restriction until the page-wide
+  // Clear wipes every other filter along with it too.
+  const handleResetUserCustomFilter = useCallback(
+    (label: string) => {
+      const nextUserFilterFamily = { ...user_filter_family };
+      delete nextUserFilterFamily[label];
+      setUIState({ userFilterFamily: nextUserFilterFamily });
+    },
+    [user_filter_family, setUIState]
+  );
 
+  // Whether any label actually restricts results right now — untouched or re-checked back up to
+  // every real option both mean "no restriction", per `getActiveUserCustomFilters`. Checking
+  // `Object.keys(user_filter_family).length` instead would stay "active" forever after the first
+  // interaction, even once every dropdown is fully re-checked — that reapplies the per-user
+  // course-eligibility narrowing in `filterCourseLearningSummaryForFilteredCourses` for no reason
+  // and silently drops enrollments that should still count.
+  const hasActiveUserCustomFilter = getActiveUserCustomFilters(user_filter_family, user_custom).length > 0;
+
+  // Step A for the Dashboard/Courses tabs — a course survives only if ITS OWN declared audience
+  // overlaps the values actually picked in the top filters (see filterCoursesByUserCustomFilters).
   const filteredCourses = useMemo(
     () =>
       hasActiveUserCustomFilter
-        ? filterCoursesByUserCustomFilters(courses, user_filter_family)
+        ? filterCoursesByUserCustomFilters(courses, user_filter_family, user_custom)
         : courses,
-    [hasActiveUserCustomFilter, courses, user_filter_family]
+    [hasActiveUserCustomFilter, courses, user_filter_family, user_custom]
   );
 
+  // The Dashboard tab's employee-count/distribution stats and the My Team tab's roster read from
+  // `users` directly (not from filteredCourseLearningSummary), so they need their own narrowing by
+  // the same top-of-page filters — otherwise only the course-derived numbers move when a filter
+  // changes and "Total Employees" / My Team's list stay stuck on the full team.
+  const filteredUsers = useMemo(
+    () =>
+      hasActiveUserCustomFilter ? filterUsersByCustomFilters(users, user_filter_family, user_custom) : users,
+    [hasActiveUserCustomFilter, users, user_filter_family, user_custom]
+  );
+
+  // Dashboard + Courses tab summary — scoped to `filteredCourses` (courses whose OWN tags match
+  // the selected filter values) AND `filteredUsers` (not the full org-wide roster), so a course's
+  // status breakdown (e.g. "Not started: 54") only counts the same filtered employees "Total
+  // Employees" already reflects, instead of quietly including people outside the current filter.
   const filteredCourseLearningSummary = useMemo(
     () =>
       hasActiveUserCustomFilter
-        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, filteredCourses, users)
+        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, filteredCourses, filteredUsers)
         : courseLearningSummary,
-    [hasActiveUserCustomFilter, courseLearningSummary, filteredCourses, users]
+    [hasActiveUserCustomFilter, courseLearningSummary, filteredCourses, filteredUsers]
+  );
+
+  // My Team tab summary — deliberately scoped to the FULL, unfiltered `courses` (not
+  // `filteredCourses`) alongside `filteredUsers`: once an employee matches the top filter, the
+  // courses that count toward THEIR progress are whichever ones THEY are personally eligible for
+  // (their own JOB_FAMILY/PSU/EMP_GROUP values against each course's declared audience, see
+  // isUserEligibleForCourse) — not narrowed a second time down to only courses that also happen to
+  // match the exact values picked in the filter. A course tagged only with a Group Membership the
+  // employee genuinely holds, even if Group Membership isn't what's currently selected, still
+  // belongs on their own row.
+  const teamCourseLearningSummary = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, courses, filteredUsers)
+        : courseLearningSummary,
+    [hasActiveUserCustomFilter, courseLearningSummary, courses, filteredUsers]
   );
 
   // The raw label from the API (JOB_FAMILY / PSU / EMP_GROUP) is also the option value used for
@@ -214,6 +242,7 @@ const ManagerDashboard = () => {
   const setAttemptSortOrder = useCallback((order: AttemptSortOrder) => setUIState({ attemptSortOrder: order }), [setUIState]);
   const setTeamFilters = useCallback((filters: CourseListFilters) => setUIState({ teamFilters: filters }), [setUIState]);
   const setTeamCurrentPage = useCallback((page: number) => setUIState({ teamCurrentPage: page }), [setUIState]);
+  const setTeamSearchTerm = useCallback((term: string) => setUIState({ teamSearchTerm: term }), [setUIState]);
   const setCourseBreakdownFilters = useCallback(
     (filters: CourseListFilters) => setUIState({ courseBreakdownFilters: filters }),
     [setUIState]
@@ -282,6 +311,14 @@ const ManagerDashboard = () => {
     [setTeamFilters, setTeamCurrentPage]
   );
 
+  const handleTeamSearchTermChange = useCallback(
+    (term: string) => {
+      setTeamSearchTerm(term);
+      setTeamCurrentPage(1);
+    },
+    [setTeamSearchTerm, setTeamCurrentPage]
+  );
+
   const handleCourseBreakdownFiltersChange = useCallback(
     (nextFilters: CourseListFilters) => {
       setCourseBreakdownFilters(nextFilters);
@@ -348,57 +385,73 @@ const ManagerDashboard = () => {
                 <Grid container spacing={2} sx={{ flex: 1 }}>
                   {userCustomFilterEntries.map(([label, options]) => {
                     // Presence check, not truthiness — an explicitly emptied filter (`[]`) must
-                    // render with nothing checked, not fall back to "everything selected".
-                    const selected =
-                      user_filter_family[label] !== undefined
-                        ? user_filter_family[label]
-                        : [ALL_OPTION, ...options];
-                    const isAllSelected = selected.includes(ALL_OPTION);
+                    // render with nothing checked, not fall back to "everything selected". No
+                    // "ALL" sentinel: the untouched default is just every real option selected.
+                    const isTouched = user_filter_family[label] !== undefined;
+                    const selected = isTouched ? user_filter_family[label] : options;
+                    // Mirrors getActiveUserCustomFilters's own "does this label restrict anything"
+                    // check exactly (untouched, or re-selected back to every option, regardless of
+                    // how many options exist) — so the cosmetic chip is always consistent with what
+                    // actually is/isn't restricting results. An explicitly emptied label still
+                    // shows its real (blank) state, since that's a genuine active choice.
+                    const isAllSelected = !isTouched || selected.length >= options.length;
                     const visibleChips = isAllSelected ? [] : selected.slice(0, userCustomFilterMaxVisibleChips);
                     const hiddenCount = isAllSelected ? 0 : selected.length - visibleChips.length;
 
                     const fieldLabel = getUserCustomFieldLabel(label);
 
+                    // Only shown once this specific label carries explicit state — makes an
+                    // otherwise-easy-to-miss "touched" filter discoverable at a glance (on top of
+                    // the chip above now always showing its real value instead of "All X"), and
+                    // lets it be undone on its own instead of via the page-wide Clear.
+                    const isActiveFilter = isTouched && !isAllSelected;
+
                     return (
                       <Grid item xs={userCustomFilterColumnSpan} key={label}>
-                        <FormControl size="small" fullWidth>
-                          <InputLabel id={`${label}-filter-label`}>{fieldLabel}</InputLabel>
-                          <Select
-                            labelId={`${label}-filter-label`}
-                            label={fieldLabel}
-                            multiple
-                            value={selected}
-                            onChange={handleUserCustomFilterChange(label, options)}
-                            sx={{ '& .MuiSelect-select': { display: 'flex', overflow: 'hidden' } }}
-                            renderValue={() =>
-                              isAllSelected ? (
-                                <Chip
-                                  size="small"
-                                  label={t('MANAGER_OVERVIEW.ALL_CUSTOM_FIELD', { label: fieldLabel })}
-                                />
-                              ) : (
-                                <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.5, overflow: 'hidden' }}>
-                                  {visibleChips.map((value) => (
-                                    <Chip key={value} size="small" label={value} />
-                                  ))}
-                                  {hiddenCount > 0 && <Chip size="small" label={`+${hiddenCount}`} />}
-                                </Box>
-                              )
-                            }
-                          >
-                            <MenuItem value={ALL_OPTION}>
-                              <Checkbox checked={isAllSelected} />
-                              <ListItemText primary="ALL" />
-                            </MenuItem>
-                            <Divider />
-                            {options.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                <Checkbox checked={selected.indexOf(option) > -1} />
-                                <ListItemText primary={option} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <FormControl size="small" fullWidth>
+                            <InputLabel id={`${label}-filter-label`}>{fieldLabel}</InputLabel>
+                            <Select
+                              labelId={`${label}-filter-label`}
+                              label={fieldLabel}
+                              multiple
+                              value={selected}
+                              onChange={handleUserCustomFilterChange(label)}
+                              sx={{ '& .MuiSelect-select': { display: 'flex', overflow: 'hidden' } }}
+                              renderValue={() =>
+                                isAllSelected ? (
+                                  <Chip
+                                    size="small"
+                                    label={t('MANAGER_OVERVIEW.ALL_CUSTOM_FIELD', { label: fieldLabel })}
+                                  />
+                                ) : (
+                                  <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.5, overflow: 'hidden' }}>
+                                    {visibleChips.map((value) => (
+                                      <Chip key={value} size="small" label={value} />
+                                    ))}
+                                    {hiddenCount > 0 && <Chip size="small" label={`+${hiddenCount}`} />}
+                                  </Box>
+                                )
+                              }
+                            >
+                              {options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  <Checkbox checked={selected.indexOf(option) > -1} />
+                                  <ListItemText primary={option} />
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          {isActiveFilter && (
+                            <IconButton
+                              size="small"
+                              onClick={() => handleResetUserCustomFilter(label)}
+                              aria-label={t('MANAGER_OVERVIEW.RESET_CUSTOM_FIELD', { label: fieldLabel })}
+                            >
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
                       </Grid>
                     );
                   })}
@@ -437,7 +490,7 @@ const ManagerDashboard = () => {
 
         {activeTab === 'dashboard' && (
           <DashboardOverview
-            users={users}
+            users={filteredUsers}
             courses={filteredCourses}
             courseLearningSummary={filteredCourseLearningSummary}
             userCustom={user_custom}
@@ -453,9 +506,9 @@ const ManagerDashboard = () => {
         {activeTab === 'team' && (
           <>
             <IndividualProgress
-              users={users}
-              courses={filteredCourses}
-              courseLearningSummary={filteredCourseLearningSummary}
+              users={filteredUsers}
+              courses={courses}
+              courseLearningSummary={teamCourseLearningSummary}
               usersLoading={usersLoading}
               usersError={usersError}
               coursesLoading={coursesLoading}
@@ -464,8 +517,10 @@ const ManagerDashboard = () => {
               summaryError={summaryError}
               filters={teamFilters}
               currentPage={teamCurrentPage}
+              searchTerm={teamSearchTerm}
               onFiltersChange={handleTeamFiltersChange}
               onPageChange={setTeamCurrentPage}
+              onSearchTermChange={handleTeamSearchTermChange}
               onViewEmployee={handleViewEmployee}
             />
           </>

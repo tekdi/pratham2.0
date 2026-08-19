@@ -759,9 +759,11 @@
     "ALL_LANGUAGES": "تمام زبانیں",
     "ALL_COURSE_NAMES": "تمام کورس کے نام",
     "SEARCH_COURSE_NAME": "کورس کا نام تلاش کریں",
+    "SEARCH_EMPLOYEE_NAME": "ملازم کا نام تلاش کریں",
     "SELECTED_COUNT": "{{count}} منتخب",
     "RESET": "ری سیٹ",
     "ALL_CUSTOM_FIELD": "تمام {{label}}",
+    "RESET_CUSTOM_FIELD": "{{label}} فلٹر ری سیٹ کریں",
     "CUSTOM_FIELD_LABELS": {
       "JOB_FAMILY": "جاب فیملی",
       "PSU": "PSU",

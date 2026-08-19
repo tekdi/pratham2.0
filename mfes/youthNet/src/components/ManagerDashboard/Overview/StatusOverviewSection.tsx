@@ -40,7 +40,7 @@ const StatusOverviewSection: React.FC<StatusOverviewSectionProps> = ({ counts })
               {t(summary.labelKey)}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '13px' }}>
-              {summary.count} ({getProgressSegmentPercentage(summary.count, counts.total).toFixed(0)}%)
+              {summary.count} ({getProgressSegmentPercentage(summary.count, counts.total).toFixed(2)}%)
             </Typography>
           </Stack>
         ))}

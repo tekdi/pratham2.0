@@ -1072,9 +1072,11 @@
     "ALL_LANGUAGES": "ସମସ୍ତ ଭାଷା",
     "ALL_COURSE_NAMES": "ସମସ୍ତ କୋର୍ସ ନାମ",
     "SEARCH_COURSE_NAME": "କୋର୍ସ ନାମ ଖୋଜନ୍ତୁ",
+    "SEARCH_EMPLOYEE_NAME": "କର୍ମଚାରୀ ନାମ ଖୋଜନ୍ତୁ",
     "SELECTED_COUNT": "{{count}} ଚୟନିତ",
     "RESET": "ରିସେଟ୍",
     "ALL_CUSTOM_FIELD": "ସମସ୍ତ {{label}}",
+    "RESET_CUSTOM_FIELD": "{{label}} ଫିଲ୍ଟର ପୁନଃସେଟ୍ କରନ୍ତୁ",
     "CUSTOM_FIELD_LABELS": {
       "JOB_FAMILY": "ଜବ୍ ଫାମିଲି",
       "PSU": "PSU",
