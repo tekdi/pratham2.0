@@ -177,7 +177,6 @@ export const getMissingFields = (schema: any, userData: any) => {
       'block',
       'village',
       // middle name is optional, filled or not it should never mark the profile incomplete
-      'middleName',
     ];
 
     fieldsToRemove.forEach((field) => {
