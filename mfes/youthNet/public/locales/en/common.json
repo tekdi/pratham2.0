@@ -1163,9 +1163,11 @@
     "ALL_LANGUAGES": "All languages",
     "ALL_COURSE_NAMES": "All course names",
     "SEARCH_COURSE_NAME": "Search course name",
+    "SEARCH_EMPLOYEE_NAME": "Search employee name",
     "SELECTED_COUNT": "{{count}} selected",
     "RESET": "Reset",
     "ALL_CUSTOM_FIELD": "All {{label}}",
+    "RESET_CUSTOM_FIELD": "Reset {{label}} filter",
     "CUSTOM_FIELD_LABELS": {
       "JOB_FAMILY": "Job Family",
       "PSU": "PSU",

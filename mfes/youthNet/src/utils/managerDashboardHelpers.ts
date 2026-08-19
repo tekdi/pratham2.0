@@ -37,7 +37,6 @@ import {
   EMPTY_COURSE_STATUS_COUNTS,
   HIGH_ATTEMPT_THRESHOLD,
   INDIVIDUAL_PROGRESS_STATUS_CONFIG,
-  MANAGER_DASHBOARD_ALL_FILTER_OPTION,
   MANAGER_DASHBOARD_CUSTOM_FIELD_COURSE_KEYS,
   MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS,
   MANAGER_DASHBOARD_NAV_ITEMS,
@@ -139,38 +138,80 @@ export const getCourseCustomFieldValues = (course: Course, label: string): strin
 
 // Real data disagrees on casing between a user's own customFields values (e.g. "TECHNOLOGY &
 // DIGITAL") and a course's declared audience (e.g. "Technology & Digital") — matching case-
-// sensitively would silently drop every course for every filter, so this compares case-insensitively.
+// sensitively would silently drop every course for every filter, so this compares case-
+// insensitively. Deliberately exact otherwise: a dash is a real character, not noise — a user's
+// "COMMUNITY LEVEL DELIVERY" must NOT match a course's "Community-Level Delivery" (hyphenated), but
+// DOES match "Community Level Delivery" (same spacing, no hyphen) — these are treated as distinct
+// values, not variants of each other.
 const hasOverlap = (values: string[], otherValues: string[]): boolean => {
   if (values.length === 0 || otherValues.length === 0) return false;
   const normalizedOther = new Set(otherValues.map((value) => value.trim().toLowerCase()));
   return values.some((value) => normalizedOther.has(value.trim().toLowerCase()));
 };
 
-// A filter label only restricts results once the user has explicitly picked a subset — untouched
-// (`undefined`) or fully re-selected (includes the "ALL" sentinel) both mean "don't filter by
-// this label at all", per the Team/Courses filters' "no selection yet = show everything" default.
-// An explicit `[]` (every option unchecked) is a real, active filter — it matches nothing.
-const getActiveUserCustomFilters = (
-  userFilterFamily: Record<string, string[]>
+// No "ALL" sentinel — every option is a real value, and a label starts with all of them selected
+// (see the page's default fallback to the full `userCustom[label]` list). Untouched (`undefined`)
+// or re-selected back up to every option both mean "don't filter by this label at all" —
+// unconditionally, regardless of how many options the label has. Deliberate final call: a
+// single-option label (e.g. Group Membership with just "None") therefore can never be pinned to
+// that one value by checking its only box — toggling it off then back on must behave exactly like
+// a multi-option label reaching 100% again (a reset), since the two are otherwise indistinguishable
+// from the current state alone (no click-history is tracked), and a "checked" single-option label
+// would otherwise behave unpredictably differently depending on invisible history. A label
+// unchecked down to none IS still a real, active choice, and is kept as `values: []` rather than
+// dropped — combined via OR below, an empty label never falsely matches anything on its own, but
+// also never blocks another label's real match (see filterCoursesByUserCustomFilters).
+export const getActiveUserCustomFilters = (
+  userFilterFamily: Record<string, string[]>,
+  userCustom: Record<string, string[]>
 ): { label: string; values: string[] }[] =>
   MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS.map((label) => {
     const selected = userFilterFamily[label];
-    if (selected === undefined || selected.includes(MANAGER_DASHBOARD_ALL_FILTER_OPTION)) return null;
+    const allOptions = userCustom[label] ?? [];
+    if (selected === undefined || selected.length >= allOptions.length) return null;
     return { label, values: selected };
   }).filter((entry): entry is { label: string; values: string[] } => entry !== null);
 
 // Step A of the JOB_FAMILY/PSU/EMP_GROUP filtering pipeline — a course survives if its declared
-// audience (jobFamily/psu/groupMembership) overlaps the selected values for AT LEAST ONE actively-
-// filtered label (OR across labels, and OR within a label's values too).
+// audience (jobFamily/psu/groupMembership) overlaps the selected values on AT LEAST ONE
+// actively-filtered label (OR across labels, and OR within one label's own selected values too).
+//
+// OR, not AND: a course's declared audience is sparse by construction — it comes from 3 separate
+// catalogue fetches (one per label, see useManagerDashboardData), so a course commonly only
+// populates ONE of jobFamily/psu/groupMembership and leaves the other two empty. Requiring a course
+// to match EVERY actively-filtered label would wrongly drop a course that clearly matches the
+// selected Job Family just because it never declared a Group Membership at all — that's a data
+// gap, not evidence the course doesn't belong. OR also means an emptied label (see
+// getActiveUserCustomFilters) can never veto a course some other actively-filtered label matches —
+// it only contributes when every other active label also fails to match.
 export const filterCoursesByUserCustomFilters = (
   courses: Course[],
-  userFilterFamily: Record<string, string[]>
+  userFilterFamily: Record<string, string[]>,
+  userCustom: Record<string, string[]>
 ): Course[] => {
-  const activeFilters = getActiveUserCustomFilters(userFilterFamily);
+  const activeFilters = getActiveUserCustomFilters(userFilterFamily, userCustom);
   if (activeFilters.length === 0) return courses;
 
   return courses.filter((course) =>
     activeFilters.some(({ label, values }) => hasOverlap(values, getCourseCustomFieldValues(course, label)))
+  );
+};
+
+// Same OR-across-labels/OR-within-a-label semantics as filterCoursesByUserCustomFilters, applied
+// to `users` instead of `courses` — a user survives if their own JOB_FAMILY/PSU/EMP_GROUP values
+// overlap the selected values on AT LEAST ONE actively-filtered label. Drives the Dashboard tab's
+// employee-count/distribution stats and the My Team tab's roster so both actually narrow when the
+// top filters change, instead of only the course-derived numbers moving.
+export const filterUsersByCustomFilters = (
+  users: ManagerTeamUser[],
+  userFilterFamily: Record<string, string[]>,
+  userCustom: Record<string, string[]>
+): ManagerTeamUser[] => {
+  const activeFilters = getActiveUserCustomFilters(userFilterFamily, userCustom);
+  if (activeFilters.length === 0) return users;
+
+  return users.filter((user) =>
+    activeFilters.some(({ label, values }) => hasOverlap(values, getUserCustomFieldValues(user, label)))
   );
 };
 
@@ -205,6 +246,47 @@ export const filterCourseLearningSummaryForFilteredCourses = (
     Object.entries(userSummaries).forEach(([userId, summary]) => {
       const user = userById[userId];
       if (user && isUserEligibleForCourse(user, course)) filteredUserSummaries[userId] = summary;
+    });
+
+    result[courseId] = filteredUserSummaries;
+  });
+
+  return result;
+};
+
+// Source-level cleanup, applied once when courseLearningSummary is first loaded (see
+// useManagerDashboardData) — NOT a filter-time operation like the pair above, and unconditional of
+// whatever the top-of-page filters currently are. The courseLearningSummary API returns one row per
+// (user, course) pair regardless of relevance (see the "448 = users × courses" investigation), so a
+// huge share of 'not_started' rows are just placeholder noise for course/user combinations that
+// were never relevant to begin with — a user's "not started" status for a course entirely outside
+// every one of their own JOB_FAMILY/PSU/EMP_GROUP values isn't a real assignment. This drops exactly
+// those rows. Any OTHER status (in_progress/completed/certificateIssued) is left untouched
+// regardless of eligibility — genuine recorded progress stays even if it no longer perfectly
+// matches the user's current custom fields (e.g. after a reassignment).
+export const pruneIneligibleNotStartedEntries = (
+  courseLearningSummary: CourseLearningSummaryResult,
+  courses: Course[],
+  users: ManagerTeamUser[]
+): CourseLearningSummaryResult => {
+  const courseById = buildCourseById(courses);
+  const userById = buildUserById(users);
+
+  const result: CourseLearningSummaryResult = {};
+
+  Object.entries(courseLearningSummary).forEach(([courseId, userSummaries]) => {
+    const course = courseById[courseId];
+    const filteredUserSummaries: CourseUserLearningMap = {};
+
+    Object.entries(userSummaries).forEach(([userId, summary]) => {
+      if (normalizeLearningStatus(summary?.status) !== 'notStarted') {
+        filteredUserSummaries[userId] = summary;
+        return;
+      }
+      const user = userById[userId];
+      if (course && user && isUserEligibleForCourse(user, course)) {
+        filteredUserSummaries[userId] = summary;
+      }
     });
 
     result[courseId] = filteredUserSummaries;
@@ -461,9 +543,11 @@ export const getUserCourseLearningRecords = (
 };
 
 /**
- * Status distribution for one user across a given set of course ids. A course with no record at
- * all for this user (never started/enrolled) counts as `notStarted`, same as an explicit
- * `not_started` status — so the counts always sum to `courseIds.length`.
+ * Status distribution for one user across a given set of course ids. A course with NO record at
+ * all for this user in courseLearningSummary is skipped entirely — it doesn't count toward
+ * `notStarted` (or anything else) and isn't reflected in `total` — rather than being defaulted to
+ * `notStarted`, per the "don't show a course for a user courseLearningSummary has no entry for"
+ * requirement. `total` therefore reflects only the course ids that actually have a tracked record.
  */
 export const getUserCourseStatusCounts = (
   userId: string,
@@ -476,12 +560,14 @@ export const getUserCourseStatusCounts = (
     inProgress: 0,
     completed: 0,
     certificateIssued: 0,
-    total: courseIds.length,
+    total: 0,
   };
 
   courseIds.forEach((courseId) => {
     const entry = userMap?.[courseId];
-    counts[normalizeLearningStatus(entry?.status)] += 1;
+    if (!entry) return;
+    counts[normalizeLearningStatus(entry.status)] += 1;
+    counts.total += 1;
   });
 
   return counts;
@@ -630,6 +716,19 @@ export const buildIndividualProgressRows = (
     };
   });
 
+/** My Team's employee-name search box — case-insensitive substring match against each row's
+ * display name, independent of (and applied on top of) the Course Type/Language/Course Name
+ * filters. A blank/whitespace-only term is a no-op, same "nothing typed yet" default every other
+ * filter here uses. */
+export const filterIndividualProgressRowsBySearchTerm = (
+  rows: IndividualProgressRow[],
+  searchTerm: string
+): IndividualProgressRow[] => {
+  const normalizedTerm = searchTerm.trim().toLowerCase();
+  if (!normalizedTerm) return rows;
+  return rows.filter((row) => row.userName.toLowerCase().includes(normalizedTerm));
+};
+
 // --- Employee Detail Page -----------------------------------------------------------------------
 
 // Config lookup, shared with the Course Card labels/colors — status badges on the Employee Detail
@@ -639,8 +738,9 @@ export const getCourseStatusConfig = (status: NormalizedStatus): StatusConfigIte
 
 /**
  * One normalized progress entry per course entry (course+language variant) for a single employee.
- * A course with no record for this user normalizes to 'notStarted' via `normalizeLearningStatus`,
- * same missing-record behavior as the rest of the Manager Dashboard.
+ * A course with NO record for this user in courseLearningSummary is omitted entirely (not shown
+ * with a 'notStarted' status) — matches the "don't show a course on the Employee Detail Page if
+ * courseLearningSummary has no entry for this (course, user) pair" requirement.
  */
 // Only courses this employee is actually eligible for (see isUserEligibleForCourse) — a course
 // whose declared jobFamily/psu/groupMembership audience doesn't include this employee never
@@ -657,15 +757,17 @@ export const getEmployeeCourseProgress = (
     .filter((course) => isUserEligibleForCourse(user, course))
     .map((course) => {
       const entry = courseLearningSummary[course.identifier]?.[userId];
+      if (!entry) return null;
       return {
         courseId: course.identifier,
         courseName: getCourseDisplayName(course, course.identifier),
         language: getCourseLanguageLabel(course),
         isMandatory: isMandatoryCourse(course),
-        status: normalizeLearningStatus(entry?.status),
-        highestAttempt: entry?.highestAttempt ?? 0,
+        status: normalizeLearningStatus(entry.status),
+        highestAttempt: entry.highestAttempt ?? 0,
       };
-    });
+    })
+    .filter((entry): entry is EmployeeCourseProgress => entry !== null);
 };
 
 /** Splits an employee's course entries into Mandatory / Non-Mandatory, preserving API order. */
