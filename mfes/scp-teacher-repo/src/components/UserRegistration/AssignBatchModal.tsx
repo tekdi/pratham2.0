@@ -242,11 +242,13 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           const cohortData = cohortResponseData?.result ?? [];
 
           // Extract centers (cohorts with type COHORT or no parentId)
+          // Only centers where the logged-in user's membership is still active
           const centerDetails = cohortData.filter(
             (cohort: any) =>
               cohort?.type === 'COHORT' &&
               (cohort?.cohortStatus === 'active' ||
                 cohort?.status === 'active') &&
+              cohort?.cohortMemberStatus === 'active' &&
               !cohort?.parentId
           );
 
@@ -339,8 +341,14 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           };
 
           const batchDetails = extractBatches(cohortData);
+
+          // Only batches where the logged-in user's membership is still active
+          const activeMemberBatches = batchDetails?.filter(
+            (batch: any) => batch?.cohortMemberStatus === 'active'
+          );
+
           // Store all batches for later filtering by center
-          const allBatchOptions = batchDetails?.filter((batch: any) => batch.cohortMemberStatus==="active").map((batch: any) => ({
+          const allBatchOptions = activeMemberBatches?.map((batch: any) => ({
             label:
               capitalizeFirstChar(batch.name || batch.cohortName) ||
               t('USER_REGISTRATION.UNNAMED_BATCH'),
@@ -353,7 +361,7 @@ const AssignBatchModal: React.FC<AssignBatchModalProps> = ({
           // Extract all unique parentIds from batches
           const parentIds = Array.from(
             new Set(
-              batchDetails
+              activeMemberBatches
                 .map((batch: any) => batch.parentId)
                 .filter(
                   (id: any) =>

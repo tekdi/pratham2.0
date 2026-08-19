@@ -138,6 +138,11 @@ export const profileComplitionCheck = async (): Promise<any> => {
       console.log('result', result);
       delete result?.properties?.is_volunteer;
 
+      // Middle name is offered on the complete-profile form but is optional (PS-7215):
+      // leaving it blank must never keep the "Complete your profile" banner alive.
+      // Dropped here only, so getMissingFields still renders the field on the form.
+      delete result?.properties?.middleName;
+
       const isPropertiesEmpty =
         Object.keys(result?.properties || {}).length === 0;
       return isPropertiesEmpty;
