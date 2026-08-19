@@ -121,10 +121,10 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       {isLogin && (
         <>
           {typeof window !== 'undefined' &&
-            localStorage.getItem('userProgram') ===
+            (localStorage.getItem('userProgram') ===
               TenantName.SECOND_CHANCE_PROGRAM ||
               localStorage.getItem('userProgram') ===
-                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS && (
+                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
               <Grid
                 container
                 spacing={2}
