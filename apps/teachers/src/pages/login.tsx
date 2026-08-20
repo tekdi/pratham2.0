@@ -218,10 +218,17 @@ const LoginComponent = () => {
       if (
         tenant?.toLocaleLowerCase() ===
           TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() ===
+          TENANT_DATA?.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()
+        //add SUMMER_CAMP
+        || tenant?.toLocaleLowerCase() === TENANT_DATA?.SUMMER_CAMP?.toLowerCase()
       ) {
+
+    // console.log("########details",{tenantId,tenantName,tenantType,roleId,roleName})
+
         const userDetails = await getUserDetails(userId, true);
         console.log(userDetails);
 
@@ -273,14 +280,24 @@ const LoginComponent = () => {
 
           // Check for temporary password first
           
-          if (activeSessionId && tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase()) {
+          if (
+            activeSessionId &&
+            (tenant?.toLocaleLowerCase() ===
+              TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+              tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase())
+          ) {
            {
               router.push('/teacher');
             }
           } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
             router.push('/youth');
          
-          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
+          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.SUMMER_CAMP?.toLowerCase()) {
+            router.push('/youthnet/individual-volunteer');
+         
+          }
+          else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
             
             if (activeSessionId) {
               localStorage.setItem('academicYearId', activeSessionId);

@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status } from '@/utils/app.constant';
+import {
+  CohortTypes,
+  Status,
+  resolveFrameworkPlaceholders,
+  TenantName,
+} from '@/utils/app.constant';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
@@ -27,6 +32,10 @@ import {
   BatchCreateUISchema,
 } from '@/constant/Forms/BatchCreate';
 import {
+  PathwaysBatchCreateSchema,
+  PathwaysBatchCreateUISchema,
+} from '@/constant/Forms/PathwaysBatchCreate';
+import {
   fetchCohortMemberList,
   getCohortList,
 } from '@/services/CohortService/cohortService';
@@ -49,6 +58,7 @@ interface BatchFlowProps {
   centerBoards?: string[];
   centerMediums?: string[];
   centerGrades?: string[];
+  centerStreams?: string[];
   centerType?: string | null;
 }
 
@@ -57,6 +67,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   centerBoards = [],
   centerMediums = [],
   centerGrades = [],
+  centerStreams = [],
   centerType = null,
 }) => {
   const theme = useTheme<any>();
@@ -82,6 +93,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   const [totalCount, setTotalCount] = useState(0);
 
   const { t } = useTranslation();
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
+  const isPathwaysProgram =
+    storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
   const initialFormData =
     typeof window !== 'undefined' && localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
@@ -104,13 +121,27 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
 
   const buildSchemaAndUi = (
     isEditMode: boolean,
-    existingValues?: { board?: string[]; medium?: string[]; grade?: string[] }
+    existingValues?: {
+      board?: string[];
+      medium?: string[];
+      grade?: string[];
+      stream?: string[];
+    }
   ) => {
-    let alterSchema = JSON.parse(JSON.stringify(BatchCreateSchema));
-    let alterUiSchema = JSON.parse(JSON.stringify(BatchCreateUISchema));
+    let alterSchema = resolveFrameworkPlaceholders(
+      structuredClone(
+        isPathwaysProgram ? PathwaysBatchCreateSchema : BatchCreateSchema
+      )
+    );
+    let alterUiSchema = structuredClone(
+      isPathwaysProgram ? PathwaysBatchCreateUISchema : BatchCreateUISchema
+    );
 
     let requiredArray = alterSchema?.required || [];
     const mustRequired = ['name', 'board', 'medium', 'grade'];
+    if (alterSchema?.properties?.stream) {
+      mustRequired.push('stream');
+    }
     mustRequired.forEach((item) => {
       if (!requiredArray.includes(item)) {
         requiredArray.push(item);
@@ -127,9 +158,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     if (alterSchema?.properties?.grade) {
       alterSchema.properties.grade.maxSelection = 1;
     }
+    if (alterSchema?.properties?.stream) {
+      alterSchema.properties.stream.maxSelection = 1;
+    }
 
     const overrideEnum = (
-      fieldKey: 'board' | 'medium' | 'grade',
+      fieldKey: 'board' | 'medium' | 'grade' | 'stream',
       centerVals: string[]
     ) => {
       if (alterSchema?.properties?.[fieldKey]) {
@@ -151,6 +185,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     overrideEnum('board', centerBoards);
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
+    overrideEnum('stream', centerStreams);
 
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {
@@ -183,6 +218,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       if (centerGrades?.length === 1 && alterUiSchema?.grade) {
         alterUiSchema.grade['ui:disabled'] = true;
       }
+      if (centerStreams?.length === 1 && alterUiSchema?.stream) {
+        alterUiSchema.stream['ui:disabled'] = true;
+      }
     } else {
       if (alterUiSchema?.board?.['ui:disabled'])
         delete alterUiSchema.board['ui:disabled'];
@@ -190,6 +228,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         delete alterUiSchema.medium['ui:disabled'];
       if (alterUiSchema?.grade?.['ui:disabled'])
         delete alterUiSchema.grade['ui:disabled'];
+      if (alterUiSchema?.stream?.['ui:disabled'])
+        delete alterUiSchema.stream['ui:disabled'];
     }
 
     setAddSchema(alterSchema);
@@ -217,7 +257,14 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     );
     setPrefilledFormData(withParent);
     fetchData();
-  }, [initialParentId, centerType, centerBoards, centerMediums, centerGrades]);
+  }, [
+    initialParentId,
+    centerType,
+    centerBoards,
+    centerMediums,
+    centerGrades,
+    centerStreams,
+  ]);
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -343,6 +390,30 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
             ?.selectedValues?.join(', ')
         ) || '-',
     },
+    ...(isPathwaysProgram
+      ? [
+          {
+            key: 'stream',
+            label: 'Stream',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'STREAM')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+        ]
+      : []),
+    {
+      key: 'stream',
+      label: 'Stream',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'STREAM')
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
     {
       key: 'status',
       label: 'Status',
@@ -376,6 +447,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
               ?.selectedValues || [],
           grade:
             row?.customFields?.find((f: any) => f.label === 'GRADE')
+              ?.selectedValues || [],
+          stream:
+            row?.customFields?.find((f: any) => f.label === 'STREAM')
               ?.selectedValues || [],
         };
         buildSchemaAndUi(true, existingValues);
@@ -494,6 +568,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
                   prefillWithBMGS.medium = [centerMediums[0]];
                 if (centerGrades?.length === 1)
                   prefillWithBMGS.grade = [centerGrades[0]];
+                if (centerStreams?.length === 1)
+                  prefillWithBMGS.stream = [centerStreams[0]];
 
                 // Prefill batch_type for remote center
                 if (centerType === 'remote') {

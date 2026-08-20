@@ -108,10 +108,12 @@ function App({ Component, pageProps }: AppProps) {
         const userProgram = localStorage.getItem('userProgram');
         const tenantName = localStorage.getItem('tenantName');
         
-        const isAuthorized = 
+        const isAuthorized =
           userProgram?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          userProgram?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase() ||
           userProgram?.toLowerCase() === TENANT_DATA.PRATHAM_SCP?.toLowerCase() ||
           tenantName?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+          tenantName?.toLowerCase() === TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase() ||
           tenantName?.toLowerCase() === TENANT_DATA.PRATHAM_SCP?.toLowerCase();
 
         if (!isAuthorized) {

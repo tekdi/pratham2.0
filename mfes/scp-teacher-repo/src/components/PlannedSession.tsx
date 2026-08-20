@@ -175,7 +175,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         if (medium && grade && board) {
           const url =
             process.env.NEXT_PUBLIC_MIDDLEWARE_URL +
-            `/api/framework/v1/read/${frameworkId}`;
+            `/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
           const boardData = await fetch(url).then((res) => res.json());
           const frameworks = boardData?.result?.framework;
 
@@ -196,60 +196,46 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           const getGrades = getOptionsByCategory(frameworks, 'gradeLevel');
           const matchGrade = getGrades.find((item: any) => item.name === grade);
 
-          const getCourseTypes = getOptionsByCategory(frameworks, 'courseType');
-          const courseTypes = getCourseTypes?.map((type: any) => type.name);
-          setCourseTypes(courseTypes);
+          // Derive options for a target category from the SELECTED terms'
+          // own `associations`, not the category's full global term list.
+          // A selected term that declares no associations for the target
+          // category imposes no constraint on it (rather than nulling the
+          // result) — only terms that actually list that category are
+          // intersected together.
+          const getAssociationsByCategory = (term: any, category: string) =>
+            (term?.associations || []).filter(
+              (assoc: any) =>
+                assoc?.category === category && assoc?.status !== 'Retired'
+            );
 
-          const getSubjects = getOptionsByCategory(frameworks, 'subject');
-          const subjects = getSubjects?.map((type: any) => type.name);
-          console.log('subjects!!', getSubjects);
-          // setCourseTypes(courseTypes);
+          const getIntersectedOptions = (terms: any[], category: string) => {
+            const lists = terms
+              .map((term) => getAssociationsByCategory(term, category))
+              .filter((list) => list.length > 0);
+            if (!lists.length) return [];
+            return lists.reduce((acc, list) => {
+              const codes = new Set(list.map((item: any) => item.code));
+              return acc.filter((item: any) => codes.has(item.code));
+            }, lists[0]);
+          };
 
-          // const courseTypesAssociations = getCourseTypes?.map((type: any) => {
-          //   return {
-          //     code: type.code,
-          //     name: type.name,
-          //     associations: type.associations,
-          //   };
-          // });
-          // const subjectAssociations = getSubjects?.map((type: any) => {
-          //   return {
-          //     code: type.code,
-          //     name: type.name,
-          //     associations: type.associations,
-          //   };
-          // });
-
-          // const courseSubjectLists = getSubjects.map((subject: any) => {
-          const commonAssociations = getSubjects?.filter((subject: any) => subject?.status !== "Retired")?.filter(
-            (assoc: any) =>
-              // matchState?.associations.filter(
-              //   (item: any) => item.code === assoc.code
-              // )?.length &&
-              matchBoard?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length &&
-              matchMedium?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length &&
-              matchGrade?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length
+          const selectedTerms = [matchBoard, matchMedium, matchGrade].filter(
+            Boolean
           );
-          // const getSubjects = getOptionsByCategory(frameworks, 'subject');
-          // const subjectAssociations = commonAssociations?.filter(
-          //   (assoc: any) =>
-          //     getSubjects.map((item: any) => assoc.code === item?.code)
-          // );
-          console.log('commonAssociations', commonAssociations);
-          // return {
-          // courseTypeName: courseType?.name,
-          // courseType: courseType?.code,
-          const subjectList = commonAssociations?.map(
+
+          const courseTypeAssociations = getIntersectedOptions(
+            selectedTerms,
+            'courseType'
+          );
+          setCourseTypes(courseTypeAssociations.map((item: any) => item.name));
+
+          const subjectAssociations = getIntersectedOptions(
+            selectedTerms,
+            'subject'
+          );
+          const subjectList = subjectAssociations.map(
             (subject: any) => subject?.name
           );
-          // };
-          // });
           setSubjectLists(subjectList);
         }
       } catch (error) {
