@@ -367,6 +367,7 @@
     "USER_PROFILE_CARD": {
       "MY_PROFILE": "My Profile",
       "JOINED_ON": "Joined on",
+      "ENROLLMENT_ID": "Enrollment Id",
       "CONTACT_INFORMATION": "Contact Information",
       "EMAIL_ADDRESS": "Email Address",
       "PHONE_NUMBER": "Phone Number",
