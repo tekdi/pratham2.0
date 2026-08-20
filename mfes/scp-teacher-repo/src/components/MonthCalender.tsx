@@ -177,7 +177,30 @@ const MonthCalender: React.FC<CalendarWithAttendanceProps> = ({
       if (view !== 'month') return null;
       const dateString = shortDateFormat(date);
       const attendanceData = formattedAttendanceData?.[dateString];
-      if (!attendanceData) return null;
+      const attendanceDataExists =
+        attendanceData &&
+        Object.values(attendanceData).some(
+          (value) => value !== null && value !== undefined && value !== ''
+        );
+
+      // session is scheduled but attendance is not marked yet
+      if (!attendanceDataExists) {
+        if (!eventScheduled) return null;
+        return (
+          <div className="circularProgressBar">
+            <CircularProgressbar
+              value={100}
+              styles={buildStyles({
+                textColor: '#E6E6E6',
+                pathColor: '#E6E6E6',
+                trailColor: '#E6E6E6',
+                strokeLinecap: 'round',
+              })}
+              strokeWidth={20}
+            />
+          </div>
+        );
+      }
       const presentPercentage = attendanceData?.present_percentage || 0;
 
       const pathColor = determinePathColor(presentPercentage);
@@ -223,7 +246,11 @@ const MonthCalender: React.FC<CalendarWithAttendanceProps> = ({
         default:
           return null;
       }
-    } else if (eventScheduled) {
+    } else if (
+      eventScheduled &&
+      formattedAttendanceData === undefined &&
+      learnerAttendanceDate === undefined
+    ) {
       return (
         <div className="calender-icon">
           <CalendarMonthRoundedIcon

@@ -41,15 +41,31 @@ const AutoCompleteMultiSelectWidget = ({
     const mappedOptions = enumOptions
       .filter((option) => option.value !== 'Select')
       .map((option) => {
-        const translatedLabel = t(`FORM.${option.label}`, {
-          defaultValue: option.label,
-        });
-        const capitalizedLabel =
-          translatedLabel.charAt(0).toUpperCase() +
-          translatedLabel.slice(1).toLowerCase();
+        const rawLabel = String(option.label ?? '');
+        const translatedLabel = String(
+          t(`FORM.${rawLabel}`, {
+            defaultValue: rawLabel,
+          })
+        );
+
+        // With no translation the label is still the raw field key
+        // (STANDALONE_UPPER_PRIMARY), so turn it into words.
+        const isUntranslatedKey =
+          translatedLabel === rawLabel && rawLabel.includes('_');
+        const humanizedLabel = isUntranslatedKey
+          ? rawLabel.replace(/_/g, ' ').toLowerCase()
+          : translatedLabel;
+
+        // Only capitalize the first letter - lowercasing the rest turned
+        // acronyms into "Itc" / "Adp" and "...Initiative RII" into "rii".
+        const displayLabel =
+          humanizedLabel === humanizedLabel.toLowerCase()
+            ? humanizedLabel.charAt(0).toUpperCase() + humanizedLabel.slice(1)
+            : humanizedLabel;
+
         return {
           value: option.value,
-          label: capitalizedLabel,
+          label: displayLabel,
         };
       });
 
