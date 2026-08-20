@@ -867,7 +867,7 @@ console.log('######### updateUserResponse', updateUserResponse);
           {/* • Joined on June 16, 2024 */}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-          {t('LEARNER_APP.USER_PROFILE_CARD.ENROLLMENT_ID', { defaultValue: 'Enrollment Id' })} : {enrollmentId}
+          {t('LEARNER_APP.USER_PROFILE_CARD.ENROLLMENT_ID', { defaultValue: 'Enrollment Id' })} : {enrollmentId ?? "N/A"}
         </Typography>
         {/* {isPragyanpathLearner && (
           <Box>
