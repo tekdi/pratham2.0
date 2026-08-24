@@ -172,7 +172,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
   useEffect(() => {
     const handleBMGS = async () => {
       try {
-        if (medium && grade && board) {
+        if (medium || grade || board) {
           const url =
             process.env.NEXT_PUBLIC_MIDDLEWARE_URL +
             `/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
@@ -201,21 +201,35 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           // A selected term that declares no associations for the target
           // category imposes no constraint on it (rather than nulling the
           // result) — only terms that actually list that category are
-          // intersected together.
+          // intersected together. If NONE of the selected terms declare any
+          // association for the target category at all, the framework simply
+          // doesn't model that relationship for this selection — fall back to
+          // every active term of the category instead of leaving it empty.
           const getAssociationsByCategory = (term: any, category: string) =>
             (term?.associations || []).filter(
               (assoc: any) =>
                 assoc?.category === category && assoc?.status !== 'Retired'
             );
 
-          const getIntersectedOptions = (terms: any[], category: string) => {
+          const getIntersectedOptions = (
+            terms: any[],
+            category: string,
+            allTermsInCategory: any[]
+          ) => {
             const lists = terms
               .map((term) => getAssociationsByCategory(term, category))
               .filter((list) => list.length > 0);
-            if (!lists.length) return [];
+            if (!lists.length) return allTermsInCategory;
+            // Progressively narrow across every selected term that declares
+            // this category, but skip a term whose own list has zero overlap
+            // with what's already been narrowed down. One term with an
+            // incomplete/stale tagging (e.g. a medium missing a subject link
+            // every other medium has) shouldn't erase a valid association a
+            // different selected term (e.g. the board) already established.
             return lists.reduce((acc, list) => {
               const codes = new Set(list.map((item: any) => item.code));
-              return acc.filter((item: any) => codes.has(item.code));
+              const narrowed = acc.filter((item: any) => codes.has(item.code));
+              return narrowed.length > 0 ? narrowed : acc;
             }, lists[0]);
           };
 
@@ -223,20 +237,46 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             Boolean
           );
 
-          const courseTypeAssociations = getIntersectedOptions(
-            selectedTerms,
-            'courseType'
-          );
-          setCourseTypes(courseTypeAssociations.map((item: any) => item.name));
+          // Categories the mandatory board/medium/grade selectors resolve
+          // from directly — never treated as a *derived* dropdown themselves.
+          const MANDATORY_CATEGORIES = ['board', 'medium', 'gradeLevel'];
 
-          const subjectAssociations = getIntersectedOptions(
-            selectedTerms,
-            'subject'
+          // Discover every other category the framework itself defines
+          // (e.g. "subject", "courseType", or any category added later)
+          // instead of hardcoding which dropdowns should exist, then resolve
+          // each one's options the same way.
+          const derivedCategoryCodes = (frameworks?.categories || [])
+            .filter(
+              (category: any) =>
+                category?.status !== 'Retired' &&
+                !MANDATORY_CATEGORIES.includes(category?.code)
+            )
+            .map((category: any) => category.code);
+
+          const dynamicAssociationOptions: Record<string, any[]> = {};
+          derivedCategoryCodes.forEach((categoryCode: string) => {
+            const allTermsInCategory = getOptionsByCategory(
+              frameworks,
+              categoryCode
+            );
+            dynamicAssociationOptions[categoryCode] = getIntersectedOptions(
+              selectedTerms,
+              categoryCode,
+              allTermsInCategory
+            );
+          });
+
+          setCourseTypes(
+            (dynamicAssociationOptions['courseType'] || []).map(
+              (item: any) => item.name
+            )
           );
-          const subjectList = subjectAssociations.map(
-            (subject: any) => subject?.name
+
+          setSubjectLists(
+            (dynamicAssociationOptions['subject'] || []).map(
+              (subject: any) => subject?.name
+            )
           );
-          setSubjectLists(subjectList);
         }
       } catch (error) {
         console.error('Error fetching board data:', error);
@@ -1486,7 +1526,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                       ? block?.courseType
                       : editSession?.metadata?.courseType
                   }
-                  disabled={!medium || !grade || !board}
+                  disabled={!(medium || grade || board)}
                 >
                   {courseTypes?.map((courseType: string) => (
                     <MenuItem key={courseType} value={courseType}>
@@ -1523,7 +1563,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                           : editSession?.metadata?.subject ||
                             editSession?.subject
                       }
-                      disabled={!(medium && grade && board)}
+                      disabled={!(medium || grade || board)}
                     >
                       {(block?.subjectDropdown &&
                       block.subjectDropdown.length > 0
@@ -1615,7 +1655,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                       value={
                         block?.subject || editSession?.metadata?.subject || ''
                       }
-                      disabled={!(medium && grade && board)}
+                      disabled={!(medium || grade || board)}
                     >
                       {(block?.subjectDropdown &&
                       block.subjectDropdown.length > 0
