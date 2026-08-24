@@ -89,6 +89,26 @@ export const buildImportReportBase64 = (
 };
 
 /**
+ * Resolve the app's basePath at runtime.
+ *
+ * The workspace MFE is served under basePath '/mfe_workspace', so its API
+ * routes live at /mfe_workspace/api/... . A bare '/api/...' fetch resolves
+ * against the origin root and hits the HOST admin app instead, which does not
+ * have this route — that 404 is why the report link came back empty.
+ *
+ * Note this differs from check-drive-file / download-drive-file, which are
+ * deliberately un-prefixed because those routes DO exist in the admin app.
+ * upload-report lives only here, where the S3 credentials are configured.
+ */
+const getBasePath = (): string => {
+  if (typeof window === 'undefined') return '';
+  const fromNext = (window as any).__NEXT_DATA__?.basePath;
+  if (typeof fromNext === 'string') return fromNext;
+  // Fallback for cases where __NEXT_DATA__ is unavailable.
+  return window.location.pathname.startsWith('/mfe_workspace') ? '/mfe_workspace' : '';
+};
+
+/**
  * Upload the report and return its public URL.
  * Returns null on any failure — the email still goes out, just without a link.
  */
@@ -101,7 +121,7 @@ export const uploadImportReport = async (
     if (!report) return null;
 
     // Same-origin API route; axios is not needed and keeps this dependency-free.
-    const response = await fetch('/api/bulk-import/upload-report', {
+    const response = await fetch(`${getBasePath()}/api/bulk-import/upload-report`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...report, userId }),

@@ -123,11 +123,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
           },
         ]
       : []),
-    {
-      text: 'Bulk Import',
-      key: 'bulk-import',
-      icon: <UploadFileOutlinedIcon />,
-    },
+    // {
+    //   text: 'Bulk Import',
+    //   key: 'bulk-import',
+    //   icon: <UploadFileOutlinedIcon />,
+    // },
   ];
 
   const handleNavigation = (key: string) => {

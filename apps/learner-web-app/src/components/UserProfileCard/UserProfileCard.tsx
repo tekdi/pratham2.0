@@ -601,6 +601,7 @@ console.log('######### updateUserResponse', updateUserResponse);
     dob,
     mobile,
     username,
+    enrollmentId,
     customFields = [],
   } = userData as {
     firstName?: string;
@@ -610,6 +611,7 @@ console.log('######### updateUserResponse', updateUserResponse);
     mobile?: string | number;
     username?: string;
     email?: string;
+    enrollmentId?: string;
     customFields?: Array<Record<string, unknown>>;
   };
 
@@ -864,7 +866,10 @@ console.log('######### updateUserResponse', updateUserResponse);
           {username}
           {/* • Joined on June 16, 2024 */}
         </Typography>
-        {isPragyanpathLearner && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {t('LEARNER_APP.USER_PROFILE_CARD.ENROLLMENT_ID', { defaultValue: 'Enrollment Id' })} : {enrollmentId ?? "N/A"}
+        </Typography>
+        {/* {isPragyanpathLearner && (
           <Box>
             {!isVolunteerProgramLead ? (
               <Button

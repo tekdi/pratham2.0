@@ -51,6 +51,17 @@ const FAILURE_KEY = process.env.NEXT_PUBLIC_BULK_IMPORT_FAILURE_KEY || SUCCESS_K
 const MAX_FAILURES_LISTED = 20;
 
 /**
+ * Placeholder value meaning "render nothing here".
+ *
+ * The notification service leaves the RAW token in the output when a
+ * replacement value is an empty string — that is what produced literal
+ * "{reportLink}" text in delivered mail. An HTML comment is non-empty, so the
+ * substitution happens, and it renders as nothing in every mail client.
+ * Never map a placeholder to '' here.
+ */
+const EMPTY_HTML = '<!-- -->';
+
+/**
  * Resolve the logged-in user's email address.
  * Prefers the cached userData blob (no network); falls back to /user/read.
  */
@@ -142,14 +153,14 @@ export const sendBulkImportNotification = async (
       '{failureSummary}': buildFailureSummary(session),
       '{appUrl}': typeof window !== 'undefined'
         ? `${window.location.origin}${window.location.pathname}`
-        : '',
+        : '-',
       // Direct download link to the full .xlsx report
-      '{reportUrl}': reportUrl || '',
+      '{reportUrl}': reportUrl || '-',
       // Ready-made anchor so the template can drop in one placeholder, and the
       // whole block disappears cleanly when no report could be produced.
       '{reportLink}': reportUrl
         ? `<p><a href="${reportUrl}">Download the full report (.xlsx)</a></p>`
-        : '',
+        : EMPTY_HTML,
     };
 
     await sendCredentialService({
