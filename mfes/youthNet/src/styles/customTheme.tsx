@@ -157,6 +157,36 @@ const customTheme = extendTheme({
           custom6: '#9370DB', // MediumPurple
           custom7: '#2ac300', //parrotGreen
         },
+        //@ts-ignore
+        dashboardStatus: {
+          notStarted: '#9E9E9E',
+          inProgress: '#FFA000',
+          completed: '#2563EB',
+          certificateIssued: '#1A8825',
+          highAttempts: '#BA1A1A',
+        },
+        //@ts-ignore
+        // Explicit chip backgrounds — only set where a computed `${color}26` tint isn't the
+        // desired shade; CourseStatusChip falls back to the computed tint for any status
+        // without an entry here.
+        dashboardStatusBackground: {
+          completed: '#DBEAFE',
+        },
+        //@ts-ignore
+        // Attempt-count-specific text colors for the High Quiz Attempt section — darker/more
+        // alarming as the attempt count climbs. '5' covers the "5+" bucket too.
+        highAttemptLevelColors: {
+          '3': '#C97D0A',
+          '4': '#D9651A',
+          '5': '#A32D2D',
+        },
+        //@ts-ignore
+        // Mandatory / Non-mandatory course-type badge colors — Employee Detail Page's course
+        // rows (and anywhere else the same badge is needed) read from here instead of hardcoding.
+        courseTypeBadge: {
+          mandatory: { background: '#f1efe8', color: '#5f5e5a' },
+          nonMandatory: { background: '#faeeda', color: '#633806' },
+        },
       },
     },
     dark: {
@@ -201,6 +231,29 @@ const customTheme = extendTheme({
         action: {
           activeChannel: '#FFC107',
           selectedChannel: '#FF9800',
+        },
+        //@ts-ignore
+        dashboardStatus: {
+          notStarted: '#BDBDBD',
+          inProgress: '#FFB300',
+          completed: '#2563EB',
+          certificateIssued: '#82D494',
+          highAttempts: '#FF4C4C',
+        },
+        //@ts-ignore
+        dashboardStatusBackground: {
+          completed: '#DBEAFE',
+        },
+        //@ts-ignore
+        highAttemptLevelColors: {
+          '3': '#C97D0A',
+          '4': '#D9651A',
+          '5': '#A32D2D',
+        },
+        //@ts-ignore
+        courseTypeBadge: {
+          mandatory: { background: '#f1efe8', color: '#5f5e5a' },
+          nonMandatory: { background: '#faeeda', color: '#633806' },
         },
       },
     },
