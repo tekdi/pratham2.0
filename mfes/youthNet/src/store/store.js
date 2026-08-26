@@ -12,6 +12,8 @@ const useStore = create(
       userRole: '',
       pairs: [],
       isActiveYearSelected: '',
+      isSidebarCollapsed: false,
+      setIsSidebarCollapsed: (collapsed) => set(() => ({ isSidebarCollapsed: collapsed })),
       cohortFacilitatorsCount:0,
       setCohortFacilitatorsCount: (newValue) => set((state) => ({ cohortFacilitatorsCount: newValue })),
       cohortLearnerCount:0,
