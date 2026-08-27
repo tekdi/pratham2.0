@@ -601,6 +601,7 @@ console.log('######### updateUserResponse', updateUserResponse);
     dob,
     mobile,
     username,
+    enrollmentId,
     customFields = [],
   } = userData as {
     firstName?: string;
@@ -610,6 +611,7 @@ console.log('######### updateUserResponse', updateUserResponse);
     mobile?: string | number;
     username?: string;
     email?: string;
+    enrollmentId?: string;
     customFields?: Array<Record<string, unknown>>;
   };
 
@@ -694,7 +696,41 @@ console.log('######### updateUserResponse', updateUserResponse);
     return fields;
   };
 
-  const displayFields = getFieldsToDisplay();
+  // The family member fields are mutually exclusive, but a learner who switched their
+  // selection before the deselected names were cleared on save can still have a stale
+  // father/mother/spouse name stored. Show only the name matching the current selection, so
+  // existing records read correctly without waiting for the learner to save again.
+  const familyNameFields = ['father_name', 'mother_name', 'spouse_name'];
+
+  const withOnlySelectedFamilyName = (
+    fields: Array<{
+      name: string;
+      schema: Record<string, unknown>;
+      value: unknown;
+      rawValue: unknown;
+    }>
+  ) => {
+    const selector = fields.find((f) => f.name === 'family_member_details');
+    if (!selector) return fields;
+
+    // Match on the stored value and the formatted label, so this works whether the option is
+    // held as 'father' or displayed as 'Father'.
+    const selection = `${selector.rawValue ?? ''} ${selector.value ?? ''}`
+      .trim()
+      .toLowerCase();
+    const selectedField = familyNameFields.find((fieldName) =>
+      selection.includes(fieldName.replace('_name', ''))
+    );
+
+    // If the selection cannot be matched, show everything rather than hide real data.
+    if (!selectedField) return fields;
+
+    return fields.filter(
+      (f) => !familyNameFields.includes(f.name) || f.name === selectedField
+    );
+  };
+
+  const displayFields = withOnlySelectedFamilyName(getFieldsToDisplay());
 
   // Group fields into sections
   const contactFields = ['mobile', 'phone_type_accessible', 'own_phone_check', 'parent_phone', 'guardian_name', 'guardian_relation'];
@@ -829,6 +865,9 @@ console.log('######### updateUserResponse', updateUserResponse);
         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {username}
           {/* • Joined on June 16, 2024 */}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+          {t('LEARNER_APP.USER_PROFILE_CARD.ENROLLMENT_ID', { defaultValue: 'Enrollment Id' })} : {enrollmentId ?? "N/A"}
         </Typography>
         {/* {isPragyanpathLearner && (
           <Box>
