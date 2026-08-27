@@ -4,6 +4,7 @@ import ConfirmationModal from '@/components/ConfirmationModal';
 import Header from '@/components/Header';
 import HorizontalLinearStepper from '@/components/HorizontalLinearStepper';
 import { updateCohortMemberStatus } from '@/services/MyClassDetailsService';
+import { frameworkId } from '../../../../app.config';
 import boardEnrollmentStore from '@/store/boardEnrollmentStore';
 import manageUserStore from '@/store/manageUserStore';
 import useStore from '@/store/store';
@@ -225,7 +226,16 @@ const BoardEnrollmentDetail = () => {
       const externalsource = extractExternalSource(boardData);
       try {
         if (externalsource) {
-          const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL + externalsource;
+          // Backend form config may return a stale/default framework segment
+          // (e.g. "scp-framework"); always resolve it against the logged-in
+          // user's tenant framework, same as PlannedSession/FrameworkCategories.
+          const resolvedFramework =
+            localStorage.getItem('collectionFramework') || frameworkId;
+          const resolvedSource = externalsource.replace(
+            /[^/]+$/,
+            resolvedFramework
+          );
+          const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL + resolvedSource;
           const boards = await fetch(url).then((res) => res.json());
           const frameworks = boards?.result?.framework;
 
