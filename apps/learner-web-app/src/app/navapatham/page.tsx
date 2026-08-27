@@ -89,6 +89,9 @@ export default function NavaPathamPage() {
 
   useEffect(() => {
     localStorage.setItem('isForNavaPatham', 'true');
+    // Landing here starts a fresh registration, so drop any half-filled
+    // form data left behind by an abandoned attempt.
+    localStorage.removeItem('formData');
 
     const fetchTenantId = async () => {
       try {
