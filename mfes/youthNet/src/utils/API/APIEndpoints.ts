@@ -34,6 +34,7 @@ const API_ENDPOINTS = {
   userTenantStatus: (userId: string, tenantId: string) =>`${baseurl}/user-tenant/status?userId=${userId}&tenantId=${tenantId}`,
   userCertificateStatusSearch: `${baseurl}/tracking/user_certificate/status/search`,
   contentSearchStatus: `${baseurl}/tracking/content/search/status`,
+  courseStatusSearch: `${baseurl}/tracking/content/course/status`,
   contentCreate: `${baseurl}/tracking/content/create`,
   hierarchicalSearch: `${baseurl}/user/hierarchical-search`,
   cohortMemberBulkCreate: `${baseurl}/cohortmember/bulkCreate`,
