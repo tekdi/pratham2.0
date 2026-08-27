@@ -1,4 +1,16 @@
 import { Role } from './app.constant';
+import {
+  CourseListFilters,
+  CourseStatusChipConfig,
+  CourseStatusCounts,
+  CourseStatusKey,
+  FilterPillOption,
+  HighAttemptFilter,
+  ManagerDashboardNavItem,
+  ManagerDashboardTabKey,
+  NormalizedStatus,
+  StatusConfigItem,
+} from './Interface';
 
 export const AttendanceAPILimit: number = 300;
 export const lowLearnerAttendanceLimit: number = 32;
@@ -9,6 +21,8 @@ export const eventDaysLimit: number = 7;
 export const toastAutoHideDuration: number = 5000; // 5 seconds
 export const idealTimeForSession: string = '120';
 export const timeZone: string = 'Asia/Kolkata';
+export const SIDEBAR_WIDTH_EXPANDED: number = 350;
+export const SIDEBAR_WIDTH_COLLAPSED: number = 80;
 // export const jotFormId = '250065095006449';
 
 export const dropoutReasons = [
@@ -157,3 +171,153 @@ export const BOTTOM_DRAWER_CONSTANTS = {
   DELETE: 'Delete User',
   UNKNOWN_ACTION: 'Unknown Action',
 };
+
+// ---------------------------------------------------------------------------------------------
+// Manager Dashboard (Overview / Team / Courses tabs) — config & static data. Business logic
+// lives in utils/managerDashboardHelpers.ts; TypeScript types live in utils/Interface.ts; only
+// constant values belong here.
+// ---------------------------------------------------------------------------------------------
+
+// Single source of truth for the Manager Dashboard's side-menu items and header tabs so both
+// stay in sync automatically.
+export const MANAGER_DASHBOARD_NAV_ITEMS: ManagerDashboardNavItem[] = [
+  {
+    key: 'dashboard',
+    menuLabelKey: 'DASHBOARD.DASHBOARD',
+    tabLabelKey: 'DASHBOARD_TABS.OVERVIEW',
+  },
+  {
+    key: 'team',
+    menuLabelKey: 'DASHBOARD_TABS.MY_TEAM',
+    tabLabelKey: 'DASHBOARD_TABS.TEAM',
+  },
+  {
+    key: 'courses',
+    menuLabelKey: 'DASHBOARD_TABS.COURSES',
+    tabLabelKey: 'DASHBOARD_TABS.COURSES',
+  },
+];
+
+export const DEFAULT_MANAGER_DASHBOARD_TAB: ManagerDashboardTabKey = 'dashboard';
+
+// Manager Dashboard's Team view groups/filters learners by these custom fields — a fetched user
+// with none of them has nothing to show there, so useManagerDashboardData drops them.
+export const MANAGER_DASHBOARD_CUSTOM_FIELD_LABELS = ['JOB_FAMILY', 'PSU', 'EMP_GROUP'];
+
+// The same 3 labels, but as they appear on a Course object (composite search result) instead of
+// a user's customFields — used to match a course's declared audience against a user/filter's
+// JOB_FAMILY / PSU / EMP_GROUP values.
+export const MANAGER_DASHBOARD_CUSTOM_FIELD_COURSE_KEYS: Record<string, string> = {
+  JOB_FAMILY: 'jobFamily',
+  PSU: 'psu',
+  EMP_GROUP: 'groupMembership',
+};
+
+// Payload is not finalized yet on the backend side — passed through to `fetchCourses` as-is so
+// it stays easy to adjust without touching the service layer. Fetches both Mandatory and
+// Optional (non-mandatory) courses, and all live courses (no limit/offset — pagination and the
+// Course Type/Language/Course Name filters are handled entirely on the frontend).
+export const COURSE_CATALOGUE_FILTERS = {
+  primaryCategory: ['Course'],
+  courseType: ['Optional', 'Mandatory'],
+  status: ['live'],
+  channel: 'pragyanpath',
+};
+
+export const COURSES_PER_PAGE = 10;
+
+export const DEFAULT_COURSE_LIST_FILTERS: CourseListFilters = {
+  courseType: '',
+  language: '',
+  courseNames: [],
+};
+
+// Fixed rather than derived from the currently-loaded courses — Hindi should always be
+// selectable even before any Hindi course has been fetched/paged into view.
+export const COURSE_LANGUAGE_OPTIONS: FilterPillOption[] = [
+  { value: 'en', label: 'English' },
+  { value: 'hi', label: 'Hindi' },
+];
+
+// Single source of truth for the 5 status chips rendered per course row — add/remove/reorder a
+// status by editing this array only, no JSX duplication needed.
+export const COURSE_STATUS_CHIP_CONFIG: CourseStatusChipConfig[] = [
+  { key: 'notStarted', labelKey: 'MANAGER_OVERVIEW.STATUS_NOT_STARTED', colorToken: 'notStarted' },
+  { key: 'inProgress', labelKey: 'MANAGER_OVERVIEW.STATUS_IN_PROGRESS', colorToken: 'inProgress' },
+  { key: 'completed', labelKey: 'MANAGER_OVERVIEW.STATUS_COMPLETED', colorToken: 'completed' },
+  {
+    key: 'certificateIssued',
+    labelKey: 'MANAGER_OVERVIEW.STATUS_CERTIFICATE_ISSUED',
+    colorToken: 'certificateIssued',
+  },
+  { key: 'highAttempts', labelKey: 'MANAGER_OVERVIEW.STATUS_HIGH_ATTEMPTS', colorToken: 'highAttempts' },
+];
+
+// Same 5 keys as above, used by the Status Details Modal's title/subtitle text.
+export const COURSE_STATUS_LABEL_KEYS: Record<CourseStatusKey, string> = {
+  notStarted: 'MANAGER_OVERVIEW.STATUS_NOT_STARTED',
+  inProgress: 'MANAGER_OVERVIEW.STATUS_IN_PROGRESS',
+  completed: 'MANAGER_OVERVIEW.STATUS_COMPLETED',
+  certificateIssued: 'MANAGER_OVERVIEW.STATUS_CERTIFICATE_ISSUED',
+  highAttempts: 'MANAGER_OVERVIEW.STATUS_HIGH_ATTEMPTS',
+};
+
+export const EMPTY_COURSE_STATUS_COUNTS: CourseStatusCounts = {
+  notStarted: 0,
+  inProgress: 0,
+  completed: 0,
+  certificateIssued: 0,
+  highAttempts: 0,
+};
+
+// Backend status strings -> the 4 mutually-exclusive UI statuses. Unknown/missing values fall
+// back to 'notStarted' rather than throwing or silently dropping the learner from every count.
+// The real /tracking/content/course/status endpoint's actual status strings are
+// not_started / inprogress / completed / viewCertificate — not the underscored
+// not_started/in_progress/completed/certificate_issued guessed before the endpoint existed.
+// Both spellings are kept mapped here (single source of truth) so either shape normalizes
+// correctly everywhere in the dashboard.
+export const STATUS_NORMALIZATION_MAP: Record<string, NormalizedStatus> = {
+  not_started: 'notStarted',
+  in_progress: 'inProgress',
+  inprogress: 'inProgress',
+  completed: 'completed',
+  certificate_issued: 'certificateIssued',
+  viewCertificate: 'certificateIssued',
+};
+
+// A learner needs this many attempts (or more) on a course's assessment to be flagged as
+// "high attempts" — single source of truth, referenced by course-row counts, the High Quiz
+// Attempt section, and its 3/4/5+ filter.
+export const HIGH_ATTEMPT_THRESHOLD = 3;
+
+export const ATTEMPT_FILTER_OPTIONS: HighAttemptFilter[] = ['3', '4', '5+'];
+
+// --- My Team / Individual Progress ------------------------------------------------------------
+
+export const EMPLOYEES_PER_PAGE = 10;
+
+// The 4 status chips shown in a My Team progress-bar summary, in the fixed display order used by
+// the design (Certificate Issued -> Completed -> In Progress -> Not Started) — deliberately not
+// reusing `COURSE_STATUS_CHIP_CONFIG` since that's ordered/labeled for the Course List, includes
+// `highAttempts`, and uses full labels rather than the abbreviated ones shown per-employee here.
+export const INDIVIDUAL_PROGRESS_STATUS_CONFIG: StatusConfigItem[] = [
+  { key: 'certificateIssued', icon: '✓', labelKey: 'MANAGER_OVERVIEW.STATUS_SUMMARY_CERT', colorToken: 'certificateIssued' },
+  { key: 'completed', icon: '◆', labelKey: 'MANAGER_OVERVIEW.STATUS_SUMMARY_COMPLETED', colorToken: 'completed' },
+  { key: 'inProgress', icon: '▶', labelKey: 'MANAGER_OVERVIEW.STATUS_SUMMARY_IN_PROGRESS', colorToken: 'inProgress' },
+  { key: 'notStarted', icon: '○', labelKey: 'MANAGER_OVERVIEW.STATUS_SUMMARY_NOT_STARTED', colorToken: 'notStarted' },
+];
+
+export const HIGH_ATTEMPT_FLAG_ICON = '⚡';
+
+// --- Courses / Course Breakdown ----------------------------------------------------------------
+
+// Same 4 statuses/order/icons as `INDIVIDUAL_PROGRESS_STATUS_CONFIG`, but using the full
+// "Certificate Issued"/"Completed"/etc. labels (COURSE_STATUS_LABEL_KEYS) instead of My Team's
+// abbreviated "cert"/"completed" wording — the Course Card design spells statuses out in full.
+export const COURSE_CARD_STATUS_CONFIG: StatusConfigItem[] = [
+  { key: 'certificateIssued', icon: '✓', labelKey: 'MANAGER_OVERVIEW.STATUS_CERTIFICATE_ISSUED', colorToken: 'certificateIssued' },
+  { key: 'completed', icon: '◆', labelKey: 'MANAGER_OVERVIEW.STATUS_COMPLETED', colorToken: 'completed' },
+  { key: 'inProgress', icon: '▶', labelKey: 'MANAGER_OVERVIEW.STATUS_IN_PROGRESS', colorToken: 'inProgress' },
+  { key: 'notStarted', icon: '○', labelKey: 'MANAGER_OVERVIEW.STATUS_NOT_STARTED', colorToken: 'notStarted' },
+];

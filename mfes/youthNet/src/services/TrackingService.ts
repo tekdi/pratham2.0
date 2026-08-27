@@ -58,3 +58,41 @@ export const fetchUserCertificateStatus = async (userIds: string[], courseIds: s
   }
 };
 
+export interface TopPerformerCertificate {
+  userId: string;
+  courseId: string;
+  certificateId: string;
+  status: string;
+  issuedOn: string | null;
+  createdOn?: string;
+  updatedOn?: string;
+  completedOn?: string | null;
+  completionPercentage?: number | null;
+  progress?: number | null;
+}
+
+export interface TopPerformerCertificateEntry {
+  userId: string;
+  certificates: TopPerformerCertificate[];
+}
+
+export interface TopPerformerRequest {
+  userId: string[];
+  fromDate: string;
+  toDate: string;
+}
+
+export const fetchTopPerformerCertificates = async (
+  reqBody: TopPerformerRequest
+): Promise<TopPerformerCertificateEntry[]> => {
+  try {
+    const API_URL = `${API_ENDPOINTS.courseStatusSearch}`;
+    const data = { ...reqBody, type: 'topperformer' };
+    const response = await post(API_URL, data);
+    return response?.data?.data || [];
+  } catch (error) {
+    console.error('Error fetching top performer certificates:', error);
+    throw error;
+  }
+};
+
