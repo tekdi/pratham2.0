@@ -346,7 +346,32 @@ const RegisterationFlow = () => {
     fetchData();
   }, [language]);
 
-  // Set Telangana state (36) as default when isForNavaPatham is true
+  // Resolve the preferred-language option from the schema. The enum values come
+  // from the API and the labels are localised, so match on either one rather
+  // than hardcoding a value.
+  const resolvePreferredLanguage = (schema: any, aliases: string[]) => {
+    const property = schema?.properties?.what_is_your_preferred_language;
+    if (!property) return undefined;
+
+    const isArrayField = property.type === 'array';
+    const options = isArrayField ? property.items : property;
+    const values: any[] = options?.enum || [];
+    const labels: any[] = options?.enumNames || [];
+
+    const index = values.findIndex((value, i) =>
+      [value, labels[i]].some((candidate) =>
+        aliases.some(
+          (alias) =>
+            String(candidate ?? '').trim().toLowerCase() === alias.toLowerCase()
+        )
+      )
+    );
+    if (index === -1) return undefined;
+
+    return isArrayField ? [values[index]] : values[index];
+  };
+
+  // Set Telangana state (36) and Telugu language as defaults when isForNavaPatham is true
   useEffect(() => {
     if (addSchema && addUiSchema) {
       const isForNavaPatham =
@@ -354,18 +379,37 @@ const RegisterationFlow = () => {
           ? localStorage.getItem('isForNavaPatham') === 'true'
           : false;
 
-      // Only set default if isForNavaPatham is true and state is not already set (respect stored data)
-      if (isForNavaPatham && formData && formData.state === undefined) {
-        // Set Telangana state ID (36) as default
-        const updatedFormData = {
-          ...formData,
-          state: ['36'],
-        };
-        setFormData(updatedFormData);
+      if (isForNavaPatham && formData) {
+        // Only set defaults for fields that are not already set (respect stored data)
+        const defaults: Record<string, any> = {};
 
-        // Update localStorage to persist the default state
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('formData', JSON.stringify(updatedFormData));
+        if (formData.state === undefined) {
+          // Set Telangana state ID (36) as default
+          defaults.state = ['36'];
+        }
+
+        if (formData.what_is_your_preferred_language === undefined) {
+          const telugu = resolvePreferredLanguage(addSchema, [
+            'telugu',
+            'తెలుగు',
+            'tel',
+          ]);
+          if (telugu !== undefined) {
+            defaults.what_is_your_preferred_language = telugu;
+          }
+        }
+
+        if (Object.keys(defaults).length > 0) {
+          const updatedFormData = {
+            ...formData,
+            ...defaults,
+          };
+          setFormData(updatedFormData);
+
+          // Update localStorage to persist the defaults
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('formData', JSON.stringify(updatedFormData));
+          }
         }
       }
     }
@@ -421,8 +465,9 @@ const RegisterationFlow = () => {
 
           // Add helperText if it doesn't already exist
           if (!enhancedSchema[fieldKey]['ui:options'].helperText) {
-            enhancedSchema[fieldKey]['ui:options'].helperText =
-              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+            enhancedSchema[fieldKey]['ui:options'].helperText = t(
+              'NAVAPATHAM.TYPE_IN_ENGLISH'
+            );
           }
         }
       }
