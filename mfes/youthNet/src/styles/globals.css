@@ -1252,3 +1252,15 @@ mat-radio-group.mat-mdc-radio-group {
 .MuiLinearProgress-bar {
   background-color: var(--mui-palette-error-main) !important;
 }
+
+.ynet-app-shell {
+  padding: 0;
+  overflow-x: hidden;
+  transition: margin-left 0.3s ease;
+}
+
+@media (min-width: 900px) {
+  .ynet-app-shell {
+    margin-left: var(--sidebar-margin, 0px);
+  }
+}

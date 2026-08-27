@@ -289,16 +289,27 @@ const Learner = () => {
         `${transformLabel(row.firstName) || ''} ${transformLabel(row.middleName) || ''
           } ${transformLabel(row.lastName) || ''}`.trim(),
     },
+    {
+      keys: ['enrollmentId'],
+      label: 'Enrollment ID',
+      render: (row) => row.enrollmentId || '-',
+    },
+    {
+      keys: ['tenantJoinedAt'],
+      label: 'DOJ',
+      render: (row) =>
+        row.tenantJoinedAt ? formatDateToDDMMYYYY(row.tenantJoinedAt) : '-',
+    },
     // {
     //   keys: ['age'],
     //   label: 'Age',
     //   render: (row) => calculateAgeFromDate(row.dob) || '',
     // },
-    {
-      keys: ['dob'],
-      label: 'Date Of Birth',
-      render: (row) => formatDateToDDMMYYYY(row.dob) || '',
-    },
+    // {
+    //   keys: ['dob'],
+    //   label: 'Date Of Birth',
+    //   render: (row) => formatDateToDDMMYYYY(row.dob) || '',
+    // },
     {
       keys: ['guardian'],
       label: 'Guardian Details',
@@ -321,11 +332,11 @@ const Learner = () => {
       label: 'Gender',
       render: (row) => transformLabel(row.gender) || '',
     },
-    {
-      keys: ['mobile'],
-      label: 'Mobile',
-      render: (row) => transformLabel(row.mobile) || '',
-    },
+    // {
+    //   keys: ['mobile'],
+    //   label: 'Mobile',
+    //   render: (row) => transformLabel(row.mobile) || '',
+    // },
     {
       keys: ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE'],
       label: 'State, District, Block, Village',

@@ -54,31 +54,6 @@ export interface DashboardData {
   totalEmployees: number;
 }
 
-// Individual Progress types
-export interface EmployeeProgress {
-  id: string;
-  name: string;
-  role: string;
-  department: string;
-  mandatoryCourses: {
-    completed: number;
-    inProgress: number;
-    notStarted: number;
-    total: number;
-  };
-  nonMandatoryCourses: {
-    completed: number;
-    inProgress: number;
-    notStarted: number;
-    total: number;
-  };
-  // Course identifiers arrays
-  mandatoryInProgressIdentifiers?: string[];
-  optionalInProgressIdentifiers?: string[];
-  mandatoryCompletedIdentifiers?: string[];
-  optionalCompletedIdentifiers?: string[];
-}
-
 // API Response types
 export interface ApiResponse<T> {
   success: boolean;
