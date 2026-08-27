@@ -301,7 +301,9 @@ export const preserveLocalStorage = () => {
     'lang',
     'uiConfig',
     'userProgram',
-    'userProgramTenantId'
+    'userProgramTenantId',
+    // Kept so logout can send NavaPatham learners back to /navapatham
+    'isForNavaPatham'
   ];
 
   const valuesToKeep: { [key: string]: any } = {};
