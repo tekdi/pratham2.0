@@ -368,6 +368,22 @@ const ContentReviewer = () => {
     isSecondChanceTenant(selectedTenantData?.tenantName)
   ) {
     columns = [...columns, ...scpCustomColumns];
+    if (selectedTenantData?.tenantName === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) {
+      columns = [
+        ...columns,
+        {
+          key: 'STREAM',
+          label: 'Stream',
+          render: (row) => {
+            const stream =
+              row.customFields
+                .find((field) => field.label === 'STREAM')
+                ?.selectedValues.join(', ') || '-';
+            return `${stream}`;
+          },
+        },
+      ];
+    }
   } else if (selectedTenantData?.tenantName === TenantName.YOUTHNET) {
     columns = [...columns, ...youthnetCustomColumns];
   }

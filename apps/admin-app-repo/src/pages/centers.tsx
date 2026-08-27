@@ -452,6 +452,18 @@ const Centers = () => {
 
   if (isSecondChanceTenant(storedProgram)) {
     columns.push(...extraColumnsForSCP);
+    if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) {
+      columns.push({
+        key: 'stream',
+        label: 'Stream',
+        render: (row) =>
+          transformLabel(
+            row.customFields
+              .find((field) => field.label === 'STREAM')
+              ?.selectedValues?.join(', ')
+          ) || '-',
+      });
+    }
   }
   if (storedProgram === TenantName.YOUTHNET) {
     columns.push(...extraColumnsForYouthnet);
