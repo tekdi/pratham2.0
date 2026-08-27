@@ -13,15 +13,6 @@ const PROGRAM_NAME = TenantName.SECOND_CHANCE_PROGRAM;
 const HERO_IMAGE = '/images/nava-patham.jpg';
 const CONTACT_EMAIL = 'info@pratham.org';
 
-const PROGRAM_OFFERINGS = [
-  'Foundation classes in Mathematics, English, Science, Language, and other subjects',
-  'Main Course focused on preparation for the Board-mandated curriculum.',
-  'Interactive and activity-based learning methods',
-  'Regular assessments and academic support',
-  'Life skills sessions focused on communication, confidence, decision-making, and critical thinking',
-  'Exposure to opportunities after Grade 10, including further education and skilling pathways',
-];
-
 /* Yellow uppercase section label used for the hero badge and section headings */
 const SectionLabel = ({ children }: { children: React.ReactNode }) => (
   <Box
