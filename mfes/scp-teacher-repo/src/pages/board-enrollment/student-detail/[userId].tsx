@@ -231,10 +231,12 @@ const BoardEnrollmentDetail = () => {
           // user's tenant framework, same as PlannedSession/FrameworkCategories.
           const resolvedFramework =
             localStorage.getItem('collectionFramework') || frameworkId;
-          const resolvedSource = externalsource.replace(
-            /[^/]+$/,
-            resolvedFramework
-          );
+          const lastSlashIndex = externalsource.lastIndexOf('/');
+          const resolvedSource =
+            lastSlashIndex === externalsource.length - 1
+              ? externalsource
+              : externalsource.slice(0, lastSlashIndex + 1) +
+                resolvedFramework;
           const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL + resolvedSource;
           const boards = await fetch(url).then((res) => res.json());
           const frameworks = boards?.result?.framework;
