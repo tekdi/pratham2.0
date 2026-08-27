@@ -172,10 +172,10 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
   useEffect(() => {
     const handleBMGS = async () => {
       try {
-        if (medium && grade && board) {
+        if (medium || grade || board) {
           const url =
             process.env.NEXT_PUBLIC_MIDDLEWARE_URL +
-            `/api/framework/v1/read/${frameworkId}`;
+            `/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
           const boardData = await fetch(url).then((res) => res.json());
           const frameworks = boardData?.result?.framework;
 
@@ -196,61 +196,87 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           const getGrades = getOptionsByCategory(frameworks, 'gradeLevel');
           const matchGrade = getGrades.find((item: any) => item.name === grade);
 
-          const getCourseTypes = getOptionsByCategory(frameworks, 'courseType');
-          const courseTypes = getCourseTypes?.map((type: any) => type.name);
-          setCourseTypes(courseTypes);
+          // Derive options for a target category from the SELECTED terms'
+          // own `associations`, not the category's full global term list.
+          // A selected term that declares no associations for the target
+          // category imposes no constraint on it (rather than nulling the
+          // result) — only terms that actually list that category are
+          // intersected together. If NONE of the selected terms declare any
+          // association for the target category at all, the framework simply
+          // doesn't model that relationship for this selection — fall back to
+          // every active term of the category instead of leaving it empty.
+          const getAssociationsByCategory = (term: any, category: string) =>
+            (term?.associations || []).filter(
+              (assoc: any) =>
+                assoc?.category === category && assoc?.status !== 'Retired'
+            );
 
-          const getSubjects = getOptionsByCategory(frameworks, 'subject');
-          const subjects = getSubjects?.map((type: any) => type.name);
-          console.log('subjects!!', getSubjects);
-          // setCourseTypes(courseTypes);
+          const getIntersectedOptions = (
+            terms: any[],
+            category: string,
+            allTermsInCategory: any[]
+          ) => {
+            const lists = terms
+              .map((term) => getAssociationsByCategory(term, category))
+              .filter((list) => list.length > 0);
+            if (!lists.length) return allTermsInCategory;
+            // Progressively narrow across every selected term that declares
+            // this category, but skip a term whose own list has zero overlap
+            // with what's already been narrowed down. One term with an
+            // incomplete/stale tagging (e.g. a medium missing a subject link
+            // every other medium has) shouldn't erase a valid association a
+            // different selected term (e.g. the board) already established.
+            return lists.reduce((acc, list) => {
+              const codes = new Set(list.map((item: any) => item.code));
+              const narrowed = acc.filter((item: any) => codes.has(item.code));
+              return narrowed.length > 0 ? narrowed : acc;
+            }, lists[0]);
+          };
 
-          // const courseTypesAssociations = getCourseTypes?.map((type: any) => {
-          //   return {
-          //     code: type.code,
-          //     name: type.name,
-          //     associations: type.associations,
-          //   };
-          // });
-          // const subjectAssociations = getSubjects?.map((type: any) => {
-          //   return {
-          //     code: type.code,
-          //     name: type.name,
-          //     associations: type.associations,
-          //   };
-          // });
-
-          // const courseSubjectLists = getSubjects.map((subject: any) => {
-          const commonAssociations = getSubjects?.filter((subject: any) => subject?.status !== "Retired")?.filter(
-            (assoc: any) =>
-              // matchState?.associations.filter(
-              //   (item: any) => item.code === assoc.code
-              // )?.length &&
-              matchBoard?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length &&
-              matchMedium?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length &&
-              matchGrade?.associations.filter(
-                (item: any) => item.code === assoc.code
-              )?.length
+          const selectedTerms = [matchBoard, matchMedium, matchGrade].filter(
+            Boolean
           );
-          // const getSubjects = getOptionsByCategory(frameworks, 'subject');
-          // const subjectAssociations = commonAssociations?.filter(
-          //   (assoc: any) =>
-          //     getSubjects.map((item: any) => assoc.code === item?.code)
-          // );
-          console.log('commonAssociations', commonAssociations);
-          // return {
-          // courseTypeName: courseType?.name,
-          // courseType: courseType?.code,
-          const subjectList = commonAssociations?.map(
-            (subject: any) => subject?.name
+
+          // Categories the mandatory board/medium/grade selectors resolve
+          // from directly — never treated as a *derived* dropdown themselves.
+          const MANDATORY_CATEGORIES = ['board', 'medium', 'gradeLevel'];
+
+          // Discover every other category the framework itself defines
+          // (e.g. "subject", "courseType", or any category added later)
+          // instead of hardcoding which dropdowns should exist, then resolve
+          // each one's options the same way.
+          const derivedCategoryCodes = (frameworks?.categories || [])
+            .filter(
+              (category: any) =>
+                category?.status !== 'Retired' &&
+                !MANDATORY_CATEGORIES.includes(category?.code)
+            )
+            .map((category: any) => category.code);
+
+          const dynamicAssociationOptions: Record<string, any[]> = {};
+          derivedCategoryCodes.forEach((categoryCode: string) => {
+            const allTermsInCategory = getOptionsByCategory(
+              frameworks,
+              categoryCode
+            );
+            dynamicAssociationOptions[categoryCode] = getIntersectedOptions(
+              selectedTerms,
+              categoryCode,
+              allTermsInCategory
+            );
+          });
+
+          setCourseTypes(
+            (dynamicAssociationOptions['courseType'] || []).map(
+              (item: any) => item.name
+            )
           );
-          // };
-          // });
-          setSubjectLists(subjectList);
+
+          setSubjectLists(
+            (dynamicAssociationOptions['subject'] || []).map(
+              (subject: any) => subject?.name
+            )
+          );
         }
       } catch (error) {
         console.error('Error fetching board data:', error);
@@ -1500,7 +1526,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                       ? block?.courseType
                       : editSession?.metadata?.courseType
                   }
-                  disabled={!medium || !grade || !board}
+                  disabled={!(medium || grade || board)}
                 >
                   {courseTypes?.map((courseType: string) => (
                     <MenuItem key={courseType} value={courseType}>
@@ -1537,7 +1563,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                           : editSession?.metadata?.subject ||
                             editSession?.subject
                       }
-                      disabled={!(medium && grade && board)}
+                      disabled={!(medium || grade || board)}
                     >
                       {(block?.subjectDropdown &&
                       block.subjectDropdown.length > 0
@@ -1629,7 +1655,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                       value={
                         block?.subject || editSession?.metadata?.subject || ''
                       }
-                      disabled={!(medium && grade && board)}
+                      disabled={!(medium || grade || board)}
                     >
                       {(block?.subjectDropdown &&
                       block.subjectDropdown.length > 0

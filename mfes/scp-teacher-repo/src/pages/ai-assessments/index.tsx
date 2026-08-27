@@ -27,7 +27,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { accessControl, Program } from '../../../app.config';
+import { accessControl, getTenantProgramFilter } from '../../../app.config';
 
 const AssessmentList = () => {
   const theme = useTheme<any>();
@@ -117,7 +117,7 @@ const AssessmentList = () => {
       selectedBoard: string
     ) => {
       const filters = {
-        program: Program,
+        program: getTenantProgramFilter(),
         board: [selectedBoard],
         status: ['Live'],
         assessmentType: getAssessmentType(assessmentType),

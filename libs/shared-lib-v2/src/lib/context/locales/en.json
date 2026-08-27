@@ -22,6 +22,7 @@
   "BOARD": "Board",
   "MEDIUM": "Medium",
   "GRADE": "Grade",
+  "STREAM": "Stream",
   "REGULAR": "Regular",
   "REMOTE": "Remote",
   "SKILLING_CENTER_IMAGE": "Sklling Center Image",
@@ -230,6 +231,7 @@
       "EXPLORE_MORE_COURSES": "Explore More Courses",
       "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
+      "SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE": "Thank you for registering for the Second Chance Program Pathways. Our team will get in touch with you soon. Till then, you can explore the courses available.",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app by tapping the \"Download Play Store\" button.",
       "REGISTRATION_SUCCESSFUL_TITLE": "Registration successful",
       "REGISTERED": "Registered",
@@ -491,6 +493,7 @@
       "ATTEMPT_ASSESSMENT": "Attempt Assesment",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR": "You have successfully signed up for",
       "YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT": "Your journey towards Class 10 begins here. Let’s start with the Saral Test.",
+      "SCP_PATHWAYS_YOU_HAVE_SUCCESSFULLY_SIGNED_UP_FOR_ASSESSMENT":  "Your journey towards Class 11/12 begins here. Let’s start with the Saral Test.",
       "LEARNING_JOURNEY_FIRST_STEP": "Great job! You have taken the first step in your learning journey with Pratham",
       "ASSESSMENT_REQUIRED_MESSAGE": "Answer a few simple questions and move ahead.",
       "ASSESSMENT_UNAVAILABLE_MESSAGE": "The Saral test is currently unavailable in your selected language. We are working on it. Please try again later.",
@@ -826,6 +829,7 @@
     "BOARD": "Board",
     "MEDIUM": "Medium",
     "GRADE": "Grade",
+    "STREAM": "Stream",
     "USERNAME": "Username",
     "DESCRIPTION": "Description",
     "PROGRAM_NAME": "Program Name",
@@ -1179,6 +1183,7 @@
 
   , "CAMP_TO_CLUB_DESCRIPTION": "<b>Do you enjoy working with children and supporting their learning?</b>\nPratham's Children's Club Volunteer Program gives you an opportunity to engage with children in your community through fun, interactive, and activity-based learning.\n\nAs a volunteer, you will receive access to simple activities and resources that you can use with children in local Children's Clubs. You will also get access to learning opportunities for your own growth and self-development.\n\n<b>What You Will Get</b>\n• Easy-to-use activities and learning resources for Children's Clubs\n• Guidance and support from the Pratham team\n• Opportunities to build communication, leadership, and facilitation skills\n• Access to self-learning courses focused on life skills and new-age skills\n• Experience of working with children and supporting community learning\n\n<b>Who Can Join?</b>\nYoung people and community members who:\n• Are above 14 years of age\n• Enjoy working with children\n• Want to contribute to their community\n• Are interested in learning and personal growth\n\n<b>Register Your Interest</b>\nFill in the enrollment form to express your interest in becoming a Children's Club Volunteer.\nOur team will contact you and guide you through the next steps.\n\nSmall efforts can create a big impact in a child's learning journey."
   , "VOCATIONAL_TRAINING_DESCRIPTION": "<b>Looking to build skills for a job, career, or better opportunities?</b><br/>Pratham's Vocational Training & Skilling Program supports young people like you in building skills for employment, entrepreneurship, and further education. The program offers industry-relevant training, practical learning, career guidance, and placement support to help you prepare for the world of work.<br/><br/><b>What the Program Offers:</b><ul><li>Industry-relevant vocational training courses and certifications in domains such as:<ul style=\"list-style-type:circle\"><li><b>Care Economy:</b> Beauty, Apparel, Hospitality, Healthcare</li><li><b>STEM-aligned Trades:</b> Electrical, Automotive, Welding, Construction</li><li><b>Green Skills:</b> Solar Panel Repair, Plumbing, Drywall, and False Ceiling Repair</li><li><b>IT Enabled Services (ITeS):</b> Multi-functional Office Assistant, Graphic Design, Automotive Showroom Host</li><li><b>Travel & Tourism</b></li></ul></li><li>Basic English and computer literacy</li><li>Life skills focused on Communication, confidence, and workplace readiness skills</li><li>Guidance on careers and livelihood opportunities</li><li>Support for Jobs and entrepreneurship opportunities</li></ul><br/><b>Register Your Interest:</b><br/>Fill in the enrollment form to express your interest in joining the program. You will then be guided to enroll in and complete an online Level 1 introductory course in the trade you choose. Our team will contact you and guide you through the next steps.<br/><br/>Skills can open the door to new opportunities!",
+  "SECOND_CHANCE_PATHWAYS_DESCRIPTION": "<b>Did you have to stop your studies before completing Grade 10?</b>\nYou can continue your Education with Pratham’s Second Chance Program – a Second Chance to Complete Grade 10.\n\nPratham’s Second Chance Program supports young girls and women like you who want to continue their education and appear for Grade 10 Board/Open School examinations. Through accessible learning centres close to your home, supportive teachers, and flexible learning methods (including remote learning options), the program makes learning more accessible and achievable.\n\n<b>What the Program Offers:</b>\n• Foundation classes in Mathematics, English, Science, Language, and other subjects\n• Main Course focused on preparation for the Board-mandated curriculum.\n• Interactive and activity-based learning methods\n• Regular assessments and academic support\n• Life skills sessions focused on communication, confidence, decision-making, and critical thinking\n• Exposure to opportunities after Grade 10, including further education and skilling pathways\n\nThe Second Chance Program is currently operational in multiple states.\n\n<b>Register Your Interest:</b>\nFill in the Enrollment form to express your interest in joining the program. Our team will contact you and guide you through the next steps.\n\nIt is never too late to continue learning!",
   "PROGRAMS":{
     "Open School" : "Open School",
     "open_school_discription" : "school",

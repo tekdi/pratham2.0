@@ -196,7 +196,10 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
-  const handleCopyRegistrationLink = async () => {
+  const handleCopyRegistrationLink = async (
+    event?: React.MouseEvent<HTMLElement>
+  ) => {
+    event?.preventDefault();
     try {
       // Get the registration link from environment variable or construct it
       const registrationBase: string =
@@ -233,7 +236,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const navigateToSurveyMfe = () => {
     closeDrawer();
     const surveyMfeBase =
-      process.env.NEXT_PUBLIC_SURVEY_MFE_URL || 'http://localhost:3001';
+      process.env.NEXT_PUBLIC_SURVEY_MFE_URL ||
+      'http://localhost:4115/plp-surveys';
 
     // Same-origin check: if the survey MFE is on the same origin (production
     // behind Nginx), localStorage is already shared — no need to pass tokens

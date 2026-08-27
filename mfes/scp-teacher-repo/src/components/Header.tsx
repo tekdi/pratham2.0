@@ -112,7 +112,9 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
         router.push(`/youthboard/user-profile/${userId}`);
       } else if (
         tenant?.toLowerCase() ===
-        TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase()
+          TENANT_DATA.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+        tenant?.toLowerCase() ===
+          TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase()
       ) {
         router.push(`/user-profile/${userId}`);
       }
@@ -325,6 +327,8 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
       if (
         tenant?.toLocaleLowerCase() ===
           TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+        tenant?.toLocaleLowerCase() ===
+          TENANT_DATA?.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()
@@ -381,7 +385,13 @@ const Header: React.FC<HeaderProps> = ({ toggleDrawer, openDrawer }) => {
 
             // Route based on tenant and role
             // Using replace() to prevent back navigation to old program
-            if (activeSessionId && tenant?.toLocaleLowerCase() === TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase()) {
+            if (
+              activeSessionId &&
+              (tenant?.toLocaleLowerCase() ===
+                TENANT_DATA?.SECOND_CHANCE_PROGRAM?.toLowerCase() ||
+                tenant?.toLocaleLowerCase() ===
+                  TENANT_DATA?.SECOND_CHANCE_PROGRAM_PATHWAYS?.toLowerCase())
+            ) {
               window.location.replace('/scp-teacher-repo/dashboard');
             } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
               window.location.replace('/youthnet');
