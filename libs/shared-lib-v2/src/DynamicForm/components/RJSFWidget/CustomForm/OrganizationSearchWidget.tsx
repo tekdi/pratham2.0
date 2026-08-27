@@ -16,11 +16,8 @@ import {
   Paper,
   Popper,
   ClickAwayListener,
-  Grid,
   Select,
   MenuItem,
-  InputLabel,
-  Button,
   IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -84,17 +81,14 @@ const OrganizationSearchWidget = ({
   const [mappedPtmName, setMappedPtmName] = useState<string | null>(null);
   const [loadingPtm, setLoadingPtm] = useState<boolean>(false);
 
-  // State, District, Block filters
+  // State, District filters
   const [stateOptions, setStateOptions] = useState<LocationOption[]>([]);
   const [districtOptions, setDistrictOptions] = useState<LocationOption[]>([]);
-  const [blockOptions, setBlockOptions] = useState<LocationOption[]>([]);
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
-  const [selectedBlock, setSelectedBlock] = useState<string>('');
   const [loadingStates, setLoadingStates] = useState({
     state: false,
     district: false,
-    block: false,
   });
 
   // Get user role and state from localStorage
@@ -106,10 +100,9 @@ const OrganizationSearchWidget = ({
   const listRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const currentDataSearchQueryRef = useRef<string>('');
-  const previousFiltersRef = useRef<{ state: string; district: string; block: string; search: string }>({
+  const previousFiltersRef = useRef<{ state: string; district: string; search: string }>({
     state: '',
     district: '',
-    block: '',
     search: '',
   });
   const previousSearchQueryRef = useRef<string>('');
@@ -120,16 +113,13 @@ const OrganizationSearchWidget = ({
 
   // Fetch active academic year ID on mount
   useEffect(() => {
-    const loadAcademicYear = async () => {
-      if (typeof window !== 'undefined') {
-        const yearId = localStorage.getItem('temp_academicYearId') || '';
-        setAcademicYearId(yearId);
-      }
-    };
-    loadAcademicYear();
+    if (typeof window !== 'undefined') {
+      const yearId = localStorage.getItem('temp_academicYearId') || '';
+      setAcademicYearId(yearId);
+    }
   }, []);
 
-  // Load state options on mount
+  // Load state options on mount and apply default from onboarding_state
   useEffect(() => {
     const loadStateOptions = async () => {
       setLoadingStates((prev) => ({ ...prev, state: true }));
@@ -148,18 +138,16 @@ const OrganizationSearchWidget = ({
           })) || [];
         setStateOptions(states);
 
-        // Set default state from localStorage if available
-        if (stateId && !selectedState) {
-          const stateExists = states.some((state) => state.value === stateId);
-          if (stateExists) {
-            setSelectedState(stateId);
-          }
+        // Apply default state from onboarding_state after options are loaded
+        const parseLS = (key: string) => {
+          try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+        };
+        const stateVal = parseLS('onboarding_state');
+        if (stateVal?.id) {
+          setSelectedState(String(stateVal.id));
         }
       } catch (error) {
         console.error('Error loading states:', error);
-        if (stateId && !selectedState) {
-          setSelectedState(stateId);
-        }
       } finally {
         setLoadingStates((prev) => ({ ...prev, state: false }));
       }
@@ -204,41 +192,6 @@ const OrganizationSearchWidget = ({
     loadDistrictOptions();
   }, [selectedState, stateId, isCentralAdmin]);
 
-  // Load block options when district changes
-  useEffect(() => {
-    const loadBlockOptions = async () => {
-      if (!selectedDistrict) {
-        setBlockOptions([]);
-        setSelectedBlock('');
-        return;
-      }
-
-      setLoadingStates((prev) => ({ ...prev, block: true }));
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-          {
-            fieldName: 'block',
-            controllingfieldfk: [selectedDistrict],
-            sort: ['block_name', 'asc'],
-          }
-        );
-        const blocks =
-          response?.data?.result?.values?.map((item) => ({
-            value: item.value,
-            label: item.label,
-          })) || [];
-        setBlockOptions(blocks);
-      } catch (error) {
-        console.error('Error loading blocks:', error);
-        setBlockOptions([]);
-      } finally {
-        setLoadingStates((prev) => ({ ...prev, block: false }));
-      }
-    };
-    loadBlockOptions();
-  }, [selectedDistrict]);
-
   // Fetch organizations from API
   const fetchOrganizations = useCallback(
     async (searchTerm: string = '', currentOffset: number = 0, append: boolean = false) => {
@@ -278,9 +231,6 @@ const OrganizationSearchWidget = ({
         }
         if (selectedDistrict) {
           requestBody.filters.district = [selectedDistrict];
-        }
-        if (selectedBlock) {
-          requestBody.filters.block = [selectedBlock];
         }
 
         // Add search filter if search term exists
@@ -338,7 +288,6 @@ const OrganizationSearchWidget = ({
           previousFiltersRef.current = {
             state: selectedState || '',
             district: selectedDistrict || '',
-            block: selectedBlock || '',
             search: searchTerm || '',
           };
         }
@@ -361,7 +310,7 @@ const OrganizationSearchWidget = ({
         }
       }
     },
-    [academicYearId, selectedState, selectedDistrict, selectedBlock]
+    [academicYearId, selectedState, selectedDistrict]
   );
 
   // Format user name: firstName + middleName (if exists) + lastName
@@ -462,14 +411,12 @@ const OrganizationSearchWidget = ({
     const currentFilters = {
       state: selectedState || '',
       district: selectedDistrict || '',
-      block: selectedBlock || '',
       search: searchQuery || '',
     };
 
     const filtersChanged =
       previousFiltersRef.current.state !== currentFilters.state ||
       previousFiltersRef.current.district !== currentFilters.district ||
-      previousFiltersRef.current.block !== currentFilters.block ||
       previousFiltersRef.current.search !== currentFilters.search;
 
     // Only reset pagination when filters/search actually change
@@ -497,7 +444,7 @@ const OrganizationSearchWidget = ({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [searchQuery, selectedState, selectedDistrict, selectedBlock, academicYearId, open, fetchOrganizations, organizations.length]);
+  }, [searchQuery, selectedState, selectedDistrict, academicYearId, open, fetchOrganizations, organizations.length]);
 
   // Handle scroll pagination
   const handleScroll = useCallback(
@@ -509,7 +456,6 @@ const OrganizationSearchWidget = ({
       const filtersMatch =
         previousFiltersRef.current.state === (selectedState || '') &&
         previousFiltersRef.current.district === (selectedDistrict || '') &&
-        previousFiltersRef.current.block === (selectedBlock || '') &&
         previousFiltersRef.current.search === (searchQuery || '');
 
       // Only trigger pagination if:
@@ -529,7 +475,7 @@ const OrganizationSearchWidget = ({
         fetchOrganizations(searchQuery, offset, true);
       }
     },
-    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchOrganizations, selectedState, selectedDistrict, selectedBlock]
+    [hasMore, loading, loadingMore, searchQuery, offset, academicYearId, fetchOrganizations, selectedState, selectedDistrict]
   );
 
   // Clear selected organization when user types in search box
@@ -625,7 +571,6 @@ const OrganizationSearchWidget = ({
     const newState = event.target.value;
     setSelectedState(newState);
     setSelectedDistrict('');
-    setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
     // Clear mapped PTM when organization is cleared
@@ -641,22 +586,6 @@ const OrganizationSearchWidget = ({
   const handleDistrictChange = (event: any) => {
     const newDistrict = event.target.value;
     setSelectedDistrict(newDistrict);
-    setSelectedBlock('');
-    setSelectedOrganization(null);
-    onChange(undefined);
-    // Clear mapped PTM when organization is cleared
-    setMappedPtmName(null);
-    setSelectedPtmId(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('temp_ptm_id');
-      localStorage.removeItem('temp_org_id');
-    }
-  };
-
-  // Handle block change
-  const handleBlockChange = (event: any) => {
-    const newBlock = event.target.value;
-    setSelectedBlock(newBlock);
     setSelectedOrganization(null);
     onChange(undefined);
     // Clear mapped PTM when organization is cleared
@@ -681,7 +610,6 @@ const OrganizationSearchWidget = ({
 
     setSelectedState('');
     setSelectedDistrict('');
-    setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
     // Clear mapped PTM when organization is cleared
@@ -705,30 +633,6 @@ const OrganizationSearchWidget = ({
     currentDataSearchQueryRef.current = '';
 
     setSelectedDistrict('');
-    setSelectedBlock('');
-    setSelectedOrganization(null);
-    onChange(undefined);
-    // Clear mapped PTM when organization is cleared
-    setMappedPtmName(null);
-    setSelectedPtmId(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('temp_ptm_id');
-      localStorage.removeItem('temp_org_id');
-    }
-  };
-
-  // Handle clear block filter
-  const handleClearBlock = () => {
-    if (disabled || readonly || !selectedDistrict) return;
-
-    // Clear organization list and reset pagination
-    setOrganizations([]);
-    setOffset(0);
-    setHasMore(true);
-    setTotalCount(0);
-    currentDataSearchQueryRef.current = '';
-
-    setSelectedBlock('');
     setSelectedOrganization(null);
     onChange(undefined);
     // Clear mapped PTM when organization is cleared
@@ -752,13 +656,9 @@ const OrganizationSearchWidget = ({
     // For non-central admin with stateId, don't clear state (it's locked)
     if (!isCentralAdmin && stateId) {
       setSelectedDistrict('');
-      setSelectedBlock('');
-      // Don't update previousFiltersRef here - let useEffect detect the change
     } else {
       setSelectedState('');
       setSelectedDistrict('');
-      setSelectedBlock('');
-      // Don't update previousFiltersRef here - let useEffect detect the change
     }
     setSelectedOrganization(null);
     setSearchQuery('');
@@ -795,12 +695,28 @@ const OrganizationSearchWidget = ({
     return '';
   }, []);
 
+  const formatOrganizationDisplay = useCallback((org: any): string => {
+    const customFields = org.customFields || [];
+    const getFieldValue = (lbl: string): string | null => {
+      const field = customFields.find((f: any) => f.label === lbl);
+      return field?.selectedValues?.[0]?.value || null;
+    };
+    const parts = [org.label];
+    const type = getFieldValue('ORGANISATION_TYPE');
+    const district = getFieldValue('DISTRICT');
+    const block = getFieldValue('BLOCK');
+    if (type) parts.push(type);
+    if (district) parts.push(district);
+    if (block) parts.push(block);
+    return parts.join(' - ');
+  }, []);
+
   // Check if any filters are active
-  const hasActiveFilters = selectedState || selectedDistrict || selectedBlock;
+  const hasActiveFilters = selectedState || selectedDistrict;
 
   return (
     <Box>
-      <Typography
+      {/* <Typography
         variant="h1"
         sx={{
           fontWeight: 600,
@@ -809,8 +725,8 @@ const OrganizationSearchWidget = ({
         }}
       >
         {t('FORM.VERIFY_ORGANISATION', { defaultValue: 'Verify Organisation' })}
-      </Typography>
-      <Typography
+      </Typography> */}
+      {/* <Typography
         variant="body1"
         sx={{
           marginBottom: 2,
@@ -818,8 +734,8 @@ const OrganizationSearchWidget = ({
         }}
       >
         {t('FORM.COMPLETE_YOUR_REGISTRATION', { defaultValue: 'Complete your registration.' })}
-      </Typography>
-      <Typography
+      </Typography> */}
+      {/* <Typography
         variant="body1"
         sx={{
           marginBottom: 1,
@@ -827,151 +743,74 @@ const OrganizationSearchWidget = ({
         }}
       >
         {t('FORM.FIND_YOUR_REGISTRED_ORGANISATION', { defaultValue: 'Find your registered organisation and link yourself as a volunteer.' })}
-      </Typography>
+      </Typography> */}
 
-      {/* State, District, Block Filters */}
-      <Grid container spacing={2} sx={{ mb: 2 }}>
-        {/* State Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-state-label`}>
-                {t('FORM.STATE', { defaultValue: 'State' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-state-label`}
-                value={selectedState}
-                onChange={handleStateChange}
-                label={t('FORM.STATE', { defaultValue: 'State' })}
-                disabled={disabled || readonly || loadingStates.state || (!isCentralAdmin && stateId)}
-              >
-                {loadingStates.state ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  stateOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedState && !disabled && !readonly && (isCentralAdmin || !stateId) && (
-              <IconButton
-                size="small"
-                onClick={handleClearState}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear state"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
+      {/* District Filter */}
+      <Box sx={{ mb: 2 }}>
+        <Typography
+          sx={{
+            color: 'black',
+            marginBottom: 1,
+            fontWeight: 600,
+            fontSize: '1rem',
+            display: 'block',
+          }}
+        >
+          {t('FORM.DISTRICT_OPTIONAL', { defaultValue: 'District (optional)' })}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Select
+            fullWidth
+            displayEmpty
+            required={false}
+            value={selectedDistrict}
+            onChange={handleDistrictChange}
+            disabled={disabled || readonly || !selectedState || loadingStates.district}
+            inputProps={{ required: false }}
+            sx={{
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#e0e0e0',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#bdbdbd',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#bdbdbd',
+              },
+            }}
+          >
+            <MenuItem value="">
+              {t('FORM.ALL_DISTRICTS', { defaultValue: 'All districts' })}
+            </MenuItem>
+            {loadingStates.district ? (
+              <MenuItem disabled>
+                <CircularProgress size={20} />
+              </MenuItem>
+            ) : (
+              districtOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))
             )}
-          </Box>
-        </Grid>
-
-        {/* District Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-district-label`}>
-                {t('FORM.DISTRICT', { defaultValue: 'District' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-district-label`}
-                value={selectedDistrict}
-                onChange={handleDistrictChange}
-                label={t('FORM.DISTRICT', { defaultValue: 'District' })}
-                disabled={disabled || readonly || !selectedState || loadingStates.district}
-              >
-                {loadingStates.district ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  districtOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedDistrict && !disabled && !readonly && selectedState && (
-              <IconButton
-                size="small"
-                onClick={handleClearDistrict}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear district"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
-
-        {/* Block Dropdown */}
-        <Grid item xs={12} sm={12} md={4}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-            <FormControl fullWidth>
-              <InputLabel id={`${id}-block-label`}>
-                {t('FORM.BLOCK', { defaultValue: 'Block' })}
-              </InputLabel>
-              <Select
-                labelId={`${id}-block-label`}
-                value={selectedBlock}
-                onChange={handleBlockChange}
-                label={t('FORM.BLOCK', { defaultValue: 'Block' })}
-                disabled={disabled || readonly || !selectedDistrict || loadingStates.block}
-              >
-                {loadingStates.block ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={20} />
-                  </MenuItem>
-                ) : (
-                  blockOptions.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-            {selectedBlock && !disabled && !readonly && selectedDistrict && (
-              <IconButton
-                size="small"
-                onClick={handleClearBlock}
-                sx={{
-                  mt: 1,
-                  color: 'text.secondary',
-                  '&:hover': {
-                    color: 'error.main',
-                    backgroundColor: 'error.light',
-                  },
-                }}
-                aria-label="Clear block"
-              >
-                <ClearIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Grid>
-      </Grid>
+          </Select>
+          {selectedDistrict && !disabled && !readonly && (
+            <IconButton
+              size="small"
+              onClick={handleClearDistrict}
+              sx={{
+                color: 'text.secondary',
+                '&:hover': { color: 'error.main', backgroundColor: 'error.light' },
+              }}
+              aria-label="Clear district"
+            >
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      </Box>
 
       <FormControl
         fullWidth
@@ -1028,42 +867,74 @@ const OrganizationSearchWidget = ({
             cursor: disabled || readonly ? 'default' : 'pointer',
           }}
         >
-          <TextField
-            fullWidth
-            placeholder={t('FORM.SEARCH_AND_SELECT_ORGANISATION', { defaultValue: 'Search and select your organisation' })}
-            value={selectedOrganization ? selectedOrganization.label : ''}
-            InputProps={{
-              readOnly: true,
-              endAdornment: (
-                <InputAdornment position="end">
-                  {open ? (
-                    <KeyboardArrowUpIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
-                  ) : (
-                    <KeyboardArrowDownIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
-                  )}
-                </InputAdornment>
-              ),
-              sx: {
-                backgroundColor: '#f5f5f5',
+          {selectedOrganization ? (
+            <Box
+              sx={{
+                p: 2,
+                backgroundColor: '#fdf8f0',
+                border: '1px solid #e8d5b0',
+                borderRadius: '8px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 cursor: disabled || readonly ? 'default' : 'pointer',
-                borderRadius: '4px',
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#e0e0e0',
+              }}
+            >
+              <Box>
+                <Typography sx={{ fontSize: '0.75rem', color: '#b5813a', mb: 0.25, fontWeight: 500 }}>
+                  {t('FORM.ORGANISATION', { defaultValue: 'Organisation' })}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: '#1a1a1a', fontSize: '1rem', mb: 0.25 }}>
+                  {selectedOrganization.label}
+                </Typography>
+                {(() => {
+                  const cf = selectedOrganization.customFields || [];
+                  const get = (lbl: string) => cf.find((f: any) => f.label === lbl)?.selectedValues?.[0]?.value || '';
+                  const type = get('ORGANISATION_TYPE');
+                  const district = get('DISTRICT');
+                  const block = get('BLOCK');
+                  const sub = [type, [district, block].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
+                  return sub ? (
+                    <Typography sx={{ fontSize: '0.8125rem', color: '#757575' }}>{sub}</Typography>
+                  ) : null;
+                })()}
+              </Box>
+              {open ? (
+                <KeyboardArrowUpIcon sx={{ color: '#757575', fontSize: '1.25rem', flexShrink: 0 }} />
+              ) : (
+                <KeyboardArrowDownIcon sx={{ color: '#757575', fontSize: '1.25rem', flexShrink: 0 }} />
+              )}
+            </Box>
+          ) : (
+            <TextField
+              fullWidth
+              placeholder={t('FORM.SEARCH_AND_SELECT_ORGANISATION', { defaultValue: 'Search and select your organisation' })}
+              value=""
+              InputProps={{
+                readOnly: true,
+                endAdornment: (
+                  <InputAdornment position="end">
+                    {open ? (
+                      <KeyboardArrowUpIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
+                    ) : (
+                      <KeyboardArrowDownIcon sx={{ color: '#757575', fontSize: '1.25rem' }} />
+                    )}
+                  </InputAdornment>
+                ),
+                sx: {
+                  backgroundColor: '#f5f5f5',
+                  cursor: disabled || readonly ? 'default' : 'pointer',
+                  borderRadius: '4px',
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e0e0e0' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: disabled || readonly ? '#e0e0e0' : '#bdbdbd',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#bdbdbd' },
                 },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: disabled || readonly ? '#e0e0e0' : '#bdbdbd',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#bdbdbd',
-                },
-              },
-            }}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '4px',
-              },
-            }}
-          />
+              }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: '4px' } }}
+            />
+          )}
         </Box>
 
         {/* Dropdown Popper */}

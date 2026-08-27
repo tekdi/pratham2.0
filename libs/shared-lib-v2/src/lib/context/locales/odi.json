@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "ସ୍କୁଲ ନାହିଁ"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"ପଞ୍ଜୀକରଣ ଦାଖଲ କରନ୍ତୁ",
+    "SUBMIT_POC_REQUEST":"POC ଅନୁରୋଧ ଦାଖଲ କରନ୍ତୁ",
+    "REGISTER_ORGANISATION":"ସଂଗଠନ ପଞ୍ଜୀଭୁକ୍ତ କରନ୍ତୁ",
     "L1_COURSES": "L1 କୋର୍ସ ଗୁଡିକ",
     "EXPLORE": "ଏକ୍ସପ୍ଲୋର୍‍ କରନ୍ତୁ",
     "SURVEYS": "ସର୍ଭେ",
@@ -930,6 +933,9 @@
     "POCSO_POLICY": "POCSO ନୀତି",
     "NDA_POLICY": "NDA ନୀତି",
     "FRAUD_PROTECTION_POLICY": "ପ୍ରତାରଣା ସୁରକ୍ଷା ନୀତି",
+    "PTM_PHONE_NUMBER": "PTM ର ଫୋନ ନମ୍ବର",
+    "PTM_MOBILE_PLACEHOLDER": "10-ଅଙ୍କ ସଂଖ୍ୟା",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "ଆପଣ କ'ଣ ଏକ ଭାଗୀଦାର ସଂଗଠନ ସହ ଯୋଡ଼ାହୋଇଛନ୍ତି?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "ଏବଂ ଗୋପନୀୟତା ବଜାୟ ରଖିବାକୁ ସମ୍ମତ ଅଛି।",
     "AND_TO_COMPLY": "ଏବଂ ପାଳନ କରିବାକୁ ସମ୍ମତ ଅଛି।",
     "AND": "ଏବଂ",

@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "పాఠశాల విద్య లేదు"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"నమోదు సమర్పించండి",
+    "SUBMIT_POC_REQUEST":"POC అభ్యర్థన సమర్పించండి",
+    "REGISTER_ORGANISATION":"సంస్థను నమోదు చేయండి",
     "L1_COURSES": "ఎల్1 కోర్సులు",
     "EXPLORE": "అన్వేషించు",
     "SURVEYS": "సర్వేలు",
@@ -930,6 +933,9 @@
     "POCSO_POLICY": "POCSO పాలసీ",
     "NDA_POLICY": "NDA పాలసీ",
     "FRAUD_PROTECTION_POLICY": "మోసం రక్షణ పాలసీ",
+    "PTM_PHONE_NUMBER": "PTM ఫోన్ నంబర్",
+    "PTM_MOBILE_PLACEHOLDER": "10-అంకెల సంఖ్య",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "మీరు భాగస్వామ్య సంస్థతో అనుబంధించబడ్డారా?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "మరియు గోప్యతను నిర్వహించడానికి అంగీకరిస్తున్నాను.",
     "AND_TO_COMPLY": "మరియు అనుసరించడానికి అంగీకరిస్తున్నాను.",
     "AND": "మరియు",

@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "न शिकलेली"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"नोंदणी सबमिट करा",
+    "SUBMIT_POC_REQUEST":"POC विनंती सबमिट करा",
+    "REGISTER_ORGANISATION":"संस्था नोंदवा",
     "L1_COURSES": "L1 अभ्यासक्रम",
     "EXPLORE": "पडताळणी करा",
     "SURVEYS": "सर्वेक्षण",
@@ -930,6 +933,9 @@
     "POCSO_POLICY": "POCSO धोरण",
     "NDA_POLICY": "NDA धोरण",
     "FRAUD_PROTECTION_POLICY": "फसवणूक संरक्षण धोरण",
+    "PTM_PHONE_NUMBER": "PTM चा फोन नंबर",
+    "PTM_MOBILE_PLACEHOLDER": "10-अंकी क्रमांक",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "तुम्ही भागीदार संस्थेशी संबंधित आहात का?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "आणि गोपनीयता राखण्यासाठी सहमत आहे.",
     "AND_TO_COMPLY": "आणि पालन करण्यासाठी सहमत आहे.",
     "AND": "आणि",
