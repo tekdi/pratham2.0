@@ -96,14 +96,13 @@ const Header = ({ isShowLogout = false, isLogin = false }) => {
         onClick={(event) => {
           if (isShowLogout) {
             handleLogoutMenuOpen(event);
+          } else if (localStorage.getItem('isForNavaPatham') === 'true') {
+            // NavaPatham learners belong on their own landing page
+            router.push('/navapatham');
+          } else if (localStorage.getItem('landingPage')) {
+            router.push(localStorage.getItem('landingPage'));
           } else {
-            typeof window !== 'undefined' &&
-              localStorage.getItem('landingPage');
-            if (localStorage.getItem('landingPage')) {
-              router.push(localStorage.getItem('landingPage'));
-            } else {
-              router.push('/');
-            }
+            router.push('/');
           }
         }}
         style={{ cursor: 'pointer' }}
