@@ -1,4 +1,5 @@
 export const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
+export const recommendationUrl = process.env.NEXT_PUBLIC_RECOMMENDATIONS_URL;
 
 export const API_ENDPOINTS = {
   accountCreate: `${baseurl}/account/create`,
@@ -30,6 +31,8 @@ export const API_ENDPOINTS = {
   myCohorts: (userId: string | string[], children?: boolean, customField?: boolean) => `${baseurl}/cohort/mycohorts/${userId}?children=${children}&customField=${customField}`,
 
 };
+
+export const RECOMMENDATIONS_ENDPOINT = `${recommendationUrl}/recommendations`;
 
 export const COURSE_L2_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/save-user-salesforce`;
 export const COURSE_PLANNER_UPLOAD_ENDPOINTS = `${process.env.NEXT_PUBLIC_BASE_URL}/prathamservice/v1/course-planner/upload`;
