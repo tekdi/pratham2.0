@@ -28,6 +28,9 @@ import { useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "coursePlannerSelections";
 const BOARD_CATEGORY_CODE = "board";
+// Fixed display order for the dropdowns on this page: Medium, Grade, Stream, Course Type.
+// Any other category present in the framework data falls back after these, in its index order.
+const CATEGORY_DISPLAY_ORDER = ["medium", "gradeLevel", "stream", "courseType"];
 
 const SubjectDetails = () => {
   const router = useRouter();
@@ -55,13 +58,19 @@ const SubjectDetails = () => {
   // Board is already resolved on this page via the route (chosen on the previous
   // board-picker page), so it's excluded here in addition to the universally-special
   // "subject" category that getDropdownCategories already excludes.
-  const dropdownCategories = useMemo(
-    () =>
-      getDropdownCategories(framework).filter(
-        (cat: any) => cat.code !== BOARD_CATEGORY_CODE
-      ),
-    [framework]
-  );
+  const dropdownCategories = useMemo(() => {
+    const categories = getDropdownCategories(framework).filter(
+      (cat: any) => cat.code !== BOARD_CATEGORY_CODE
+    );
+    return [...categories].sort((a: any, b: any) => {
+      const aIdx = CATEGORY_DISPLAY_ORDER.indexOf(a.code);
+      const bIdx = CATEGORY_DISPLAY_ORDER.indexOf(b.code);
+      if (aIdx === -1 && bIdx === -1) return 0;
+      if (aIdx === -1) return 1;
+      if (bIdx === -1) return -1;
+      return aIdx - bIdx;
+    });
+  }, [framework]);
 
   // All selections known so far, including the board (fed from the route, not a rendered dropdown)
   const allEntries: SelectionEntry[] = useMemo(() => {
