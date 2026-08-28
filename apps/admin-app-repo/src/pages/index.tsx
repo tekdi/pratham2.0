@@ -32,34 +32,29 @@ const Home: React.FC = () => {
           storedUserData?.role === Role.CCTA
         ) {
           if (!isSecondChanceTenant(selectedTenantData?.tenantName)) {
-            window.location.href = '/workspace';
+            router.push('/workspace');
             // window.location.href = "/course-planner";
           } else {
-            // window.location.href = "/workspace";
-            window.location.href = '/course-planner';
+            router.push('/course-planner');
           }
         } else if (
           storedUserData?.role === Role.CENTRAL_ADMIN &&
           isSecondChanceTenant(selectedTenantData?.tenantName)
         ) {
-          // window.location.href = '/programs';
           router.push('/programs');
         } else if (
           storedUserData?.role === Role.ADMIN &&
           isSecondChanceTenant(selectedTenantData?.tenantName)
         ) {
-          // window.location.href = '/centers';
           router.push('/centers');
         } else if (
           (storedUserData?.role === Role.CENTRAL_ADMIN ||
             storedUserData?.role === Role.ADMIN) &&
           selectedTenantData?.tenantName == TenantName.YOUTHNET
         ) {
-          // window.location.href = '/mentor';
           router.push('/mentor');
         }
       } else {
-        // window.location.href = '/login';
         router.push('/login', undefined, { locale: 'en' });
       }
     }

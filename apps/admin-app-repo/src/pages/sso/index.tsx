@@ -382,10 +382,8 @@ const SSOContent = () => {
         ) {
           const { locale } = router;
           if (locale) {
-            window.location.href = '/learners';
             router.push('/learners', undefined, { locale: locale });
           } else {
-            window.location.href = '/learners';
             router.push('/learners');
           }
         }
@@ -394,7 +392,6 @@ const SSOContent = () => {
           userInfo?.userData?.role === Role.CENTRAL_ADMIN &&
           tenantData?.tenantName == TenantName.PRAGYANPATH
         ) {
-          window.location.href = '/youth';
           router.push('/youth');
         }
         // Handle SCTA/CCTA roles
@@ -407,20 +404,17 @@ const SSOContent = () => {
           const { locale } = router;
           if (isSecondChanceTenant(tenantData?.tenantName)) {
             // For Pragyanpath, CCTA goes to course-planner
-            window.location.href = '/course-planner';
             if (locale) {
               router.push('/course-planner', undefined, { locale: locale });
             } else router.push('/course-planner');
           } else if (tenantData?.tenantName == TenantName.PRAGYANPATH) {
-            window.location.href = '/faqs';
             router.push('/faqs');
           } else {
-            window.location.href = '/course-planner';
             if (locale) {
               router.push('/course-planner', undefined, { locale: locale });
             } else router.push('/course-planner');
           }
-        } 
+        }
         // Handle ADMIN and CENTRAL_ADMIN roles
         else {
           const { locale } = router;
@@ -429,23 +423,19 @@ const SSOContent = () => {
               userInfo?.userData?.role === Role.CENTRAL_ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/programs';
               router.push('/programs', undefined, { locale: locale });
             } else if (
               userInfo?.userData?.role === Role.ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/centers';
               router.push('/centers', undefined, { locale: locale });
             } else if (
               (userInfo?.userData?.role === Role.ADMIN ||
                 userInfo?.userData?.role === Role.CENTRAL_ADMIN) &&
               tenantData?.tenantName == TenantName.YOUTHNET
             ) {
-              window.location.href = '/user-leader';
               router.push('/user-leader', undefined, { locale: locale });
             } else {
-              window.location.href = '/faqs';
               router.push('/faqs', undefined, { locale: locale });
             }
           } else {
@@ -453,23 +443,19 @@ const SSOContent = () => {
               userInfo?.userData?.role === Role.CENTRAL_ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/programs';
               router.push('/programs');
             } else if (
               userInfo?.userData?.role === Role.ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/centers';
               router.push('/centers');
             } else if (
               (userInfo?.userData?.role === Role.ADMIN ||
                 userInfo?.userData?.role === Role.CENTRAL_ADMIN) &&
               tenantData?.tenantName == TenantName.YOUTHNET
             ) {
-              window.location.href = '/user-leader';
               router.push('/user-leader');
             } else {
-              window.location.href = '/faqs';
               router.push('/faqs');
             }
           }
@@ -493,13 +479,11 @@ const SSOContent = () => {
             roleName === Role.SCTA ||
             roleName === Role.CCTA
           ) {
-            window.location.href = '/workspace';
             router.push('/workspace');
           } else if (
             userInfo?.userData?.role === Role.ADMIN ||
             userInfo?.userData?.role === Role.CENTRAL_ADMIN
           ) {
-            window.location.href = '/user-leader';
             router.push('/user-leader');
           }
         } else {
@@ -529,10 +513,8 @@ const SSOContent = () => {
                   if (
                     !isSecondChanceTenant(tenantData?.tenantName)
                   ) {
-                    window.location.href = '/faqs';
                     router.push('/faqs');
                   } else {
-                    window.location.href = '/course-planner';
                     if (locale) {
                       router.push('/course-planner', undefined, { locale: locale });
                     } else router.push('/course-planner');
@@ -544,13 +526,11 @@ const SSOContent = () => {
                       userInfo?.userData?.role === Role.CENTRAL_ADMIN &&
                       isSecondChanceTenant(tenantData?.tenantName)
                     ) {
-                      window.location.href = '/programs';
                       router.push('/programs', undefined, { locale: locale });
                     } else if (
                       userInfo?.userData?.role === Role.ADMIN &&
                       isSecondChanceTenant(tenantData?.tenantName)
                     ) {
-                      window.location.href = '/centers';
                       router.push('/centers', undefined, { locale: locale });
                     }
                   } else {
@@ -558,13 +538,11 @@ const SSOContent = () => {
                       userInfo?.userData?.role === Role.CENTRAL_ADMIN &&
                       isSecondChanceTenant(tenantData?.tenantName)
                     ) {
-                      window.location.href = '/programs';
                       router.push('/programs');
                     } else if (
                       userInfo?.userData?.role === Role.ADMIN &&
                       isSecondChanceTenant(tenantData?.tenantName)
                     ) {
-                      window.location.href = '/centers';
                       router.push('/centers');
                     }
                   }
