@@ -158,7 +158,7 @@ if (typeof window !== 'undefined') {
       category: getIndustryValues(cohort, t) || 'General',
       address: getCustomFieldValue(cohort, 'ADDRESS') || 'Address not available',
       distance: '0 km',
-      mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '#',
+      mapsUrl: getCustomFieldValue(cohort, 'GOOGLE_MAP_LINK') || '',
       images: cohort.image || ['/images/default.png'],
       moreImages: cohort.image?.length > 3 ? cohort.image.length - 3 : 0,
     }));
@@ -406,26 +406,28 @@ marginTop={!viewAll ? '0px' : { xs: '40px', sm: '80px' }}
                 {center.address}
               </Typography>
 
-              <Link
-                href={center.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  color: '#0066CC',
-                  textDecoration: 'none',
-                  fontWeight: 500,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                        fontSize: { xs: '12px', sm: '14px' },
-                  '&:hover': {
-                    color: '#004C99',
-                  },
-                }}
-              >
-                      Open on Maps{' '}
-                      <LocationOnIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
-                  </Link>
+              {center.mapsUrl && (
+                <Link
+                  href={center.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: '#0066CC',
+                    textDecoration: 'none',
+                    fontWeight: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    fontSize: { xs: '12px', sm: '14px' },
+                    '&:hover': {
+                      color: '#004C99',
+                    },
+                  }}
+                >
+                  Open on Maps{' '}
+                  <LocationOnIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                </Link>
+              )}
                 </Box>
               </CardContent>
             </Card>

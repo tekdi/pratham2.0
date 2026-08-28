@@ -85,6 +85,9 @@ function CustomApp({ Component, pageProps }: AppProps) {
   );
 
   const router = useRouter();
+  // Sync/derived from router.pathname (available on the very first render, server and client
+  // alike) — unlike a zustand/useMediaQuery value, toggling this can't update the app root after
+  // MenuDrawer's ssr:false/Suspense boundary has already started hydrating.
   const isFullWidthPage = fullWidthPages.includes(router.pathname);
 
   useEffect(() => {
@@ -147,18 +150,19 @@ function CustomApp({ Component, pageProps }: AppProps) {
         <CssVarsProvider theme={customTheme}>
           <LanguageProvider>
             <Box
+              // ynet-app-shell (globals.css) reserves space for the persistent
+              // desktop sidebar via the --sidebar-margin CSS variable, which
+              // MenuDrawer sets imperatively on document.documentElement once it
+              // mounts (see MenuDrawer's useLayoutEffect) — deriving the *value*
+              // here instead, from zustand/useMediaQuery state, would update this
+              // app-root component while MenuDrawer's ssr:false/Suspense boundary
+              // is still hydrating, which makes React abort hydration. Full-width
+              // pages never render <Header>/<MenuDrawer>, so nothing would ever
+              // reset that variable on a client-side navigation to one of them —
+              // this class is left off explicitly instead of relying on that.
+              className={isFullWidthPage ? undefined : 'ynet-app-shell'}
               sx={{
-                padding: '0',
-                '@media (min-width: 900px)': {
-                  // width: '100%',
-                  marginLeft: !isFullWidthPage ? '351px' : '0',
-                },
-                '@media (min-width: 2000px)': {
-                  // width: '100%',
-                  marginLeft: !isFullWidthPage ? '351px' : '0',
-                },
                 background: theme.palette.warning['A400'],
-                overflowX: 'hidden',
               }}
             >
               <QueryClientProvider client={client}>

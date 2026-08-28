@@ -623,7 +623,17 @@
     "SECOND_CHANCE_PROGRAM": "سیکنڈ چانس پروگرام",
     "PARENT_GUARDIAN_PHONE_NO": "والدین/سرپرست کا فون نمبر",
     "COURSE_COMPLETION_CONGRATULATIONS": "کورس مکمل کرنے پر مبارکباد!",
-    "HURRAY": "واہ!"
+    "HURRAY": "واہ!",
+    "READY_TO_JOIN_NAVAPATHAM": "نواپتھم میں شامل ہونے کے لیے تیار ہیں؟",
+    "ENROL_NOW": "ابھی اندراج کریں",
+    "ALREADY_ENROLLED_LOGIN": "پہلے سے اندراج شدہ ہیں؟ لاگ ان کریں",
+    "ENROL_HINT": "نئے ہوں یا پہلے سے اندراج شدہ — صرف اپنا فون نمبر درج کریں۔ ہم آپ کی رہنمائی کریں گے۔",
+    "ABOUT_THE_PROGRAM": "پروگرام کے بارے میں",
+    "REGISTER_YOUR_INTEREST": "اپنی دلچسپی درج کریں:",
+    "REGISTER_YOUR_INTEREST_TEXT": "پروگرام میں شامل ہونے کی اپنی دلچسپی کے اظہار کے لیے اندراج فارم بھریں۔ ہماری ٹیم آپ سے رابطہ کرے گی اور اگلے مراحل میں آپ کی رہنمائی کرے گی۔",
+    "NEVER_TOO_LATE_TO_LEARN": "سیکھنا جاری رکھنے کے لیے کبھی دیر نہیں ہوتی!",
+    "CONTACT": "رابطہ",
+    "WRITE_TO_US_AT": "ہمیں لکھیں"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "صارف نام یا پاس ورڈ درست نہیں ہے۔",
