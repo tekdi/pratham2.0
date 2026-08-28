@@ -31,36 +31,30 @@ const Home: React.FC = () => {
             storedUserData?.tenantData[0]?.tenantName !=
             TenantName.SECOND_CHANCE_PROGRAM
           ) {
-            window.location.href = '/workspace';
-            // window.location.href = "/course-planner";
+            router.push('/workspace');
           } else {
-            // window.location.href = "/workspace";
-            window.location.href = '/course-planner';
+            router.push('/course-planner');
           }
         } else if (
           storedUserData?.role === Role.CENTRAL_ADMIN &&
           storedUserData?.tenantData[0]?.tenantName ==
             TenantName.SECOND_CHANCE_PROGRAM
         ) {
-          // window.location.href = '/programs';
           router.push('/programs');
         } else if (
           storedUserData?.role === Role.ADMIN &&
           storedUserData?.tenantData[0]?.tenantName ==
             TenantName.SECOND_CHANCE_PROGRAM
         ) {
-          // window.location.href = '/centers';
           router.push('/centers');
         } else if (
           (storedUserData?.role === Role.CENTRAL_ADMIN ||
             storedUserData?.role === Role.ADMIN) &&
           storedUserData?.tenantData[0]?.tenantName == TenantName.YOUTHNET
         ) {
-          // window.location.href = '/mentor';
           router.push('/mentor');
         }
       } else {
-        // window.location.href = '/login';
         router.push('/login', undefined, { locale: 'en' });
       }
     }
