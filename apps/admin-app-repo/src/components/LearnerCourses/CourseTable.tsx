@@ -21,7 +21,10 @@ import {
   issueCertificate,
   renderCertificate,
 } from '@/services/CertificateService/coursesCertificates';
-import { checkCriteriaForCertificate } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
+import {
+  checkCriteriaForCertificate,
+  getCertificateTemplateId,
+} from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { getUserDetailsInfo } from '@/services/UserList';
 import TenantService from '@/services/TenantService';
 import { showToastMessage } from '../Toastify';
@@ -129,11 +132,18 @@ const CourseTable: React.FC = () => {
     setAlertIssueModal(false);
   };
 
+  // The course's own template wins; otherwise the tenant template, then the
+  // configured default.
+  const getTemplateId = (rowData: any) =>
+    rowData?.certificateTemplate ||
+    localStorage.getItem('templtateId') ||
+    TEMPLATE_ID;
+
   const handleViewCertificate = async (rowData: any) => {
     try {
       const response = await renderCertificate({
         credentialId: rowData.certificateId,
-        templateId: localStorage.getItem('templtateId') || TEMPLATE_ID,
+        templateId: getTemplateId(rowData),
       });
       setCertificateHtml(response);
       setShowCertificate(true);
@@ -145,9 +155,12 @@ const CourseTable: React.FC = () => {
   };
   const onDownloadCertificate = async (rowData: any) => {
     try {
-      const htmlContent = certificateHtml || await renderCertificate({
+      // Always render for this row. Reusing `certificateHtml` would download
+      // whichever certificate was last *viewed* — a different learner, and now
+      // potentially a different template, than the row that was clicked.
+      const htmlContent = await renderCertificate({
         credentialId: rowData.certificateId,
-        templateId: localStorage.getItem('templtateId') || TEMPLATE_ID,
+        templateId: getTemplateId(rowData),
       });
 
       if (!htmlContent) throw new Error('No response from server');
@@ -289,10 +302,23 @@ const CourseTable: React.FC = () => {
           acc[course.identifier] = course.name;
           return acc;
         }, {});
+        // Courses that carry their own certificate template; absent entries fall
+        // back to the tenant template when the certificate is rendered.
+        const certificateTemplateMap = r?.content?.reduce?.(
+          (acc: any, course: any) => {
+            const template = getCertificateTemplateId(course.certificateTemplate);
+            if (template) {
+              acc[course.identifier] = template;
+            }
+            return acc;
+          },
+          {}
+        );
         console.log('courseMap', courseMap);
         const newData = data.map((item: any) => ({
           ...item,
           courseName: courseMap[item.courseId] || 'Unknown Course',
+          certificateTemplate: certificateTemplateMap?.[item.courseId],
           name: userMap[item.userId]?.name || 'Unknown Learner',
           firstName: userMap[item.userId]?.firstName || '',
           middleName: userMap[item.userId]?.middleName || '',
@@ -325,6 +351,7 @@ const CourseTable: React.FC = () => {
 
               name: course?.name,
               certificateId: course?.certificateId,
+              certificateTemplate: course?.certificateTemplate,
             };
           });
         const filteredData = finalResult.filter((item: any) =>

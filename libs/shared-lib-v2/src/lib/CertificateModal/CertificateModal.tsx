@@ -57,6 +57,9 @@ interface CommonCheckboxProps extends CheckboxProps {
 
 interface CertificateModalProps {
   certificateId?: string;
+  // Course-level template from the hierarchy response. Takes priority over the
+  // tenant-wide template in localStorage so a course can override it.
+  certificateTemplate?: string;
   open: any;
   setOpen: any;
 }
@@ -158,9 +161,12 @@ const CertificatePage: React.FC<{
 
 export const CertificateModal: React.FC<CertificateModalProps> = ({
   certificateId,
+  certificateTemplate,
   open,
   setOpen,
 }) => {
+  const getTemplateId = () =>
+    certificateTemplate || localStorage.getItem('templtateId') || '';
   const [certificateHtml, setCertificateHtml] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isIframeLoaded, setIsIframeLoaded] = useState(false);
@@ -183,7 +189,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       try {
         const response = await renderCertificate({
           credentialId: certificateId,
-          templateId: localStorage.getItem('templtateId') || '',
+          templateId: getTemplateId(),
         });
         setCertificateHtml(response);
       } catch (e) {
@@ -195,7 +201,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
     };
 
     fetchCertificate();
-  }, [certificateId, open]);
+  }, [certificateId, certificateTemplate, open]);
 
   useEffect(() => {
     const detectDeviceType = () => {
@@ -241,7 +247,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
       }
       const htmlContent = certificateHtml || await renderCertificate({
         credentialId: certificateId,
-        templateId: localStorage.getItem('templtateId') || '',
+        templateId: getTemplateId(),
       });
 
       if (!htmlContent) throw new Error('No response from server');
