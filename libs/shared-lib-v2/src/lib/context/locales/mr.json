@@ -366,6 +366,7 @@
     "USER_PROFILE_CARD": {
       "MY_PROFILE": "माझी प्रोफाइल",
       "JOINED_ON": "सदस्य झाले",
+      "ENROLLMENT_ID": "नावनोंदणी आयडी",
       "CONTACT_INFORMATION": "संपर्क माहिती",
       "EMAIL_ADDRESS": "ईमेल पत्ता",
       "PHONE_NUMBER": "दूरध्वनी क्रमांक",
@@ -622,7 +623,17 @@
     "SECOND_CHANCE_PROGRAM": "दुसरी संधी कार्यक्रम",
     "PARENT_GUARDIAN_PHONE_NO": "पालक पालक फोन नंबर",
     "COURSE_COMPLETION_CONGRATULATIONS": "अभ्यासक्रम पूर्ण केल्याबद्दल अभिनंदन!",
-    "HURRAY": "हुर्रे!"
+    "HURRAY": "हुर्रे!",
+    "READY_TO_JOIN_NAVAPATHAM": "नवपथम मध्ये सहभागी होण्यासाठी तयार आहात?",
+    "ENROL_NOW": "आता नोंदणी करा",
+    "ALREADY_ENROLLED_LOGIN": "आधीच नोंदणी केली आहे? लॉग इन करा",
+    "ENROL_HINT": "नवीन असाल किंवा आधीच नोंदणी केलेली असेल — फक्त तुमचा फोन नंबर टाका. आम्ही तुम्हाला मार्गदर्शन करू.",
+    "ABOUT_THE_PROGRAM": "कार्यक्रमाबद्दल",
+    "REGISTER_YOUR_INTEREST": "तुमची इच्छा नोंदवा:",
+    "REGISTER_YOUR_INTEREST_TEXT": "कार्यक्रमात सहभागी होण्याची तुमची इच्छा व्यक्त करण्यासाठी नोंदणी फॉर्म भरा. आमची टीम तुमच्याशी संपर्क साधेल आणि पुढील पायऱ्यांमध्ये मार्गदर्शन करेल.",
+    "NEVER_TOO_LATE_TO_LEARN": "शिकणे सुरू ठेवण्यासाठी कधीही उशीर झालेला नसतो!",
+    "CONTACT": "संपर्क",
+    "WRITE_TO_US_AT": "आम्हाला येथे लिहा"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "युजर नाव  किंवा पासवर्ड योग्य नाही",

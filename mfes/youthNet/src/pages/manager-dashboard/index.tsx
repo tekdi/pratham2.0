@@ -1,773 +1,365 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, Container, Typography, Grid } from '@mui/material';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
-  CourseCompletion,
-  CourseAllocation,
-  CourseAchievement,
-  TopPerformers,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  Container,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from '@mui/material';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useRouter } from 'next/router';
+import {
   IndividualProgress,
-  AchievementData,
-  User,
-  EmployeeProgress,
+  DashboardHeader,
+  ManagerDashboardTabKey,
+  DEFAULT_MANAGER_DASHBOARD_TAB,
+  isManagerDashboardTabKey,
+  CourseList,
+  CourseStatusModal,
+  HighQuizAttemptSection,
+  TopPerformersSection,
+  CourseBreakdownList,
+  DashboardOverview,
+  ManagerDashboardLoadingScreen,
 } from '../../components/ManagerDashboard';
 import Header from '../../components/Header';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import { fetchCourses, getCourseHierarchy } from '../../services/PlayerService';
-import { fetchUserCertificateStatus } from '../../services/TrackingService';
-import { fetchUserList } from '../../services/ManageUser';
-import { getAssessmentStatus } from '../../services/AssesmentService';
-
+import { useManagerDashboardData } from '../../hooks/useManagerDashboardData';
+import { useManagerDashboardUIState } from '../../hooks/useManagerDashboardUIState';
+import { useTopPerformers } from '../../hooks/useTopPerformers';
+import {
+  AttemptSortOrder,
+  CourseListFilters,
+  CourseStatusKey,
+  CourseStatusSelection,
+  HighAttemptFilter,
+} from '../../utils/Interface';
+import {
+  buildCourseById,
+  buildUserById,
+  filterCourseLearningSummaryForFilteredCourses,
+  filterCoursesByUserCustomFilters,
+  filterHighAttemptUsersByAttempt,
+  filterSummaryByCourseIds,
+  filterUsersByCustomFilters,
+  getActiveUserCustomFilters,
+  getCourseEntryCount,
+  getSelectedCourseIds,
+  getCourseUsersByStatus,
+  getHighQuizAttemptUsers,
+  getUniqueCourseCount,
+  sortHighAttemptUsers,
+} from '../../utils/managerDashboardHelpers';
 
 const ManagerDashboard = () => {
   const { t } = useTranslation();
-  // State for API data
-  const [mandatoryCertificateData, setMandatoryCertificateData] = useState<any[]>([]);
-  const [optionalCertificateData, setOptionalCertificateData] = useState<any[]>([]);
-  const [courseDataLoading, setCourseDataLoading] = useState(true);
-  console.log('mandatoryCertificateData', mandatoryCertificateData);
-  
-  // Store course identifiers for use in individual progress calculation
-  const [mandatoryIdentifiers, setMandatoryIdentifiers] = useState<string[]>([]);
-  const [optionalIdentifiers, setOptionalIdentifiers] = useState<string[]>([]);
-  const[employeeUserIds, setEmployeeUserIds] = useState<string[]>([]);
-const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
-  const [courseAllocationData, setCourseAllocationData] = useState({
-    mandatory: 0,
-    nonMandatory: 0,
-    total: 0,
-  });
+  const router = useRouter();
+  const activeTab: ManagerDashboardTabKey = isManagerDashboardTabKey(router.query.tab)
+    ? (router.query.tab as ManagerDashboardTabKey)
+    : DEFAULT_MANAGER_DASHBOARD_TAB;
 
-  const [courseAchievementData, setCourseAchievementData] = useState<{
-    mandatoryCourses: AchievementData;
-    nonMandatoryCourses: AchievementData;
-  }>({
-    mandatoryCourses: {
-      above40: 0,
-      between40and60: 0,
-      between60and90: 0,
-      below90: 0,
-    },
-    nonMandatoryCourses: {
-      above40: 0,
-      between40and60: 0,
-      between60and90: 0,
-      below90: 0,
-    },
-  });
-
-  const [topPerformersData, setTopPerformersData] = useState<{
-    usersData: { [key: string]: User[] };
-  }>({
-    usersData: {},
-  });
-  const [topPerformersLoading, setTopPerformersLoading] = useState(true);
-
-  const [individualProgressData, setIndividualProgressData] = useState<EmployeeProgress[]>([]);
-
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  
-  // Search state
-  const [searchQuery, setSearchQuery] = useState('');
-  
-  // Ref to track the latest request ID to prevent race conditions
-  const requestIdRef = useRef(0);
-  const isLoadingRef = useRef(false);
-
-  // Function to find top 5 performers from assessment data
-  const findTopPerformers = (assessmentData: any[]): string[] => {
-    console.log('assessmentData', assessmentData);
-    const userPerformance: { userId: string; avgPercentage: number }[] = [];
-    
-    assessmentData.forEach((user) => {
-      // Check if user has assessments array
-      if (user.userId && user.assessments && Array.isArray(user.assessments) && user.assessments.length > 0) {
-        // Calculate average percentage for this user across all assessments
-        const totalPercentage = user.assessments.reduce((sum: number, assessment: any) => {
-          return sum + (assessment.percentage || 0);
-        }, 0);
-        
-        const avgPercentage = totalPercentage / user.assessments.length;
-        
-        userPerformance.push({
-          userId: user.userId,
-          avgPercentage: avgPercentage
-        });
-      }
+  const handleTabChange = (tab: ManagerDashboardTabKey) => {
+    router.push({
+      pathname: '/manager-dashboard',
+      query: tab === DEFAULT_MANAGER_DASHBOARD_TAB ? {} : { tab },
     });
-    
-    // Sort by average percentage in descending order and get top 5
-    const top5Performers = userPerformance
-      .sort((a, b) => b.avgPercentage - a.avgPercentage)
-      .slice(0,5)
-      .map(performer => performer.userId);
-    
-    console.log('User Performance Data:', userPerformance);
-    console.log('Top 5 Performers (UserIds):', top5Performers);
-    
-    return top5Performers;
   };
 
-  // Function to extract structured data with courseId, unitIds, and contentIds
-  const extractStructuredCourseData = (courseId: string, hierarchyChildren: any[]) => {
-    const courseData = {
-      courseId: courseId,
-      units: [] as Array<{unitId: string, contentIds: string[]}>
-    };
-    
-    // Function to recursively find Practice Question Sets within children
-    const findPracticeQuestionSets = (children: any[]): string[] => {
-      const contentIds: string[] = [];
-      children?.forEach((child) => {
-        if (child.primaryCategory === "Practice Question Set") {
-          contentIds.push(child.identifier);
-        } else if (child.children && child.children.length > 0) {
-          // Recursively search deeper levels
-          const nestedContentIds = findPracticeQuestionSets(child.children);
-          contentIds.push(...nestedContentIds);
-        }
-      });
-      return contentIds;
-    };
-    
-    // Look for Course Units in the hierarchy
-    const processCourseUnits = (objects: any[]) => {
-      objects?.forEach((obj) => {
-        if (obj.primaryCategory === "Course Unit") {
-          // Found a Course Unit, get its contentIds
-          const contentIds = findPracticeQuestionSets(obj.children || []);
-          courseData.units.push({
-            unitId: obj.identifier,
-            contentIds: contentIds
-          });
-        } else if (obj.children && obj.children.length > 0) {
-          // Continue searching for Course Units in children
-          processCourseUnits(obj.children);
-        }
-      });
-    };
-    
-    processCourseUnits(hierarchyChildren);
-    return courseData;
-  };
+  // --- Overview data: users, courses, and the single learning-summary call — loaded once via the
+  // shared Manager Dashboard data hook and reused by every tab, and by the Employee Detail Page
+  // after navigating away from here. -------------------------------------------------------------
+  const {
+    users,
+    usersLoading,
+    usersError,
+    user_custom,
+    courses,
+    coursesLoading,
+    coursesError,
+    courseLearningSummary,
+    summaryLoading,
+    summaryError,
+    hasLoaded,
+  } = useManagerDashboardData();
 
-  // Extract completed course IDs without storing in state
-  useEffect(() => {
-    // If initial data fetch is still loading, wait
-    if (courseDataLoading) {
-      return;
-    }
-    
-    // Initialize with empty data if dependencies aren't ready yet
-    if (!employeeUserIds.length || !employeeDataResponse.length) {
-      // Initial fetch is complete but no employees, set empty data and stop loading
-      setTopPerformersData({
-        usersData: {
-          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-        }
-      });
-      setTopPerformersLoading(false);
-      return;
-    }
+  console.log("##########manager dashboard users",users);
+  console.log("##########manager dashboard user_custom",user_custom);
+  console.log("##########manager dashboard courses",courses);
+  console.log("##########manager dashboard courseLearningSummary",courseLearningSummary);
 
-    // If employees exist but no certificate data yet, set empty data and stop loading
-    if (mandatoryCertificateData.length === 0 && optionalCertificateData.length === 0) {
-      setTopPerformersData({
-        usersData: {
-          [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-        }
-      });
-      setTopPerformersLoading(false);
-      return;
-    }
+  // --- UI state (filters, pagination, sort) — kept in a module-level singleton via
+  // `useManagerDashboardUIState` (not plain `useState`) so it survives navigating to the Employee
+  // Detail Page and back, instead of resetting to defaults on that full page remount, and is
+  // mirrored to sessionStorage so a hard refresh doesn't lose it either. -------------------------
+  const [
+    {
+      courseFilters,
+      currentCoursePage,
+      selectedAttemptFilter,
+      attemptSortOrder,
+      teamFilters,
+      teamCurrentPage,
+      teamSearchTerm,
+      courseBreakdownFilters,
+      courseBreakdownPage,
+      userFilterFamily: user_filter_family,
+    },
+    setUIState,
+  ] = useManagerDashboardUIState();
 
-    // Check if arrays are not empty
-    if ((mandatoryCertificateData.length > 0 || optionalCertificateData.length > 0) && employeeUserIds.length > 0 && employeeDataResponse.length > 0) {
-      setTopPerformersLoading(true);
-      // Find completed course IDs from mandatory courses
-      const completedMandatoryCourseIds = mandatoryCertificateData
-        .filter(course => course.status === 'completed')
-        .map(course => course.courseId);
-      
-      // Find completed course IDs from optional courses  
-      const completedOptionalCourseIds = optionalCertificateData
-        .filter(course => course.status === 'completed')
-        .map(course => course.courseId);
-      
-      // Log the completed course IDs (since we're not storing them)
-      console.log('Completed Mandatory Course IDs:', completedMandatoryCourseIds);
-      console.log('Completed Optional Course IDs:', completedOptionalCourseIds);
-      console.log('All Completed Course IDs (with duplicates):', [...completedMandatoryCourseIds, ...completedOptionalCourseIds]);
+  // Explicit picks per user_custom label (JOB_FAMILY / PSU / EMP_GROUP). No "ALL" sentinel — the
+  // dropdown's own checkboxes are the real options, and a label with no entry here means "nothing
+  // explicitly picked yet", which the render/filter logic below treats the same as every option
+  // being checked (see the default fallback to the full `options` list).
+  const handleUserCustomFilterChange = useCallback(
+    (label: string) => (event: SelectChangeEvent<string[]>) => {
+      const { value } = event.target;
+      const resolved = typeof value === 'string' ? value.split(',') : value;
+      setUIState({ userFilterFamily: { ...user_filter_family, [label]: resolved } });
+    },
+    [user_filter_family, setUIState]
+  );
 
-      // Call getCourseHierarchy for each completed course ID and extract structured data
-      // Remove duplicate course IDs using Set and Array.from
-      const allCompletedCourseIds = Array.from(new Set([...completedMandatoryCourseIds, ...completedOptionalCourseIds]));
-      console.log('Unique Completed Course IDs (duplicates removed):', allCompletedCourseIds);
-      
-      // If no completed courses, set empty top performers data and return
-      if (allCompletedCourseIds.length === 0) {
-        console.log('No completed courses found, setting empty top performers data');
-        setTopPerformersData({
-          usersData: {
-            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-          }
-        });
-        setTopPerformersLoading(false);
-        return;
-      }
-      
-      // Collect structured course data from all completed courses
-      const getAllStructuredCourseData = async () => {
-        const allStructuredData: Array<{courseId: string, units: Array<{unitId: string, contentIds: string[]}> }> = [];
-        
-        const promises = allCompletedCourseIds.map(async (courseId) => {
-          try {
-            const hierarchyResponse = await getCourseHierarchy(courseId);
-            console.log(`Hierarchy response for course ${courseId}:`, hierarchyResponse?.children);
-            
-            // Extract structured data (courseId, unitIds, contentIds)
-            const structuredData = extractStructuredCourseData(courseId, hierarchyResponse?.children || []);
-            console.log(`Structured data for course ${courseId}:`, structuredData);
-            
-            return structuredData;
-          } catch (error) {
-            console.error(`Error fetching hierarchy for course ${courseId}:`, error);
-            return { courseId: courseId, units: [] };
-          }
-        });
-        
-        const allResults = await Promise.all(promises);
-        allStructuredData.push(...allResults);
-        
-        console.log('All structured course data from completed courses:', allStructuredData);
-        
-        // Extract all unit IDs from structured data
-        const allUnitIds = allStructuredData.flatMap(course => 
-          course.units.map(unit => unit.unitId)
-        );
-        
-        // Extract all content IDs from structured data
-        const allContentIds = allStructuredData.flatMap(course => 
-          course.units.flatMap(unit => unit.contentIds)
-        );
-        
-        console.log('All Unit IDs extracted:', allUnitIds);
-        console.log('All Content IDs extracted:', allContentIds);
-        
-        const assessmentdata = await getAssessmentStatus({
-          userId: employeeUserIds,
-          contentId: allContentIds,
-          courseId: allCompletedCourseIds,
-          unitId: allUnitIds,
-        });
-        
-        console.log('Assessment tracking data:', assessmentdata);
-        
-        // Find top 5 performers from assessment data
-        const topPerformerUserIds = findTopPerformers(assessmentdata?.data || assessmentdata || []);
-        console.log('topPerformerUserIds', topPerformerUserIds);
-        console.log('employeeDataResponse', employeeDataResponse);
-        
-        // Filter employee data by top performer user IDs
-        const topPerformerEmployees = employeeDataResponse.filter((employee: any) => 
-          topPerformerUserIds.includes(employee.userId)
-        );
-        
-        // Create TopPerformers data structure
-        const topPerformersDataStructure = {
-          usersData: {
-            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: topPerformerEmployees.map((employee: any) => ({
-              id: employee.userId,
-              name: employee.name || `${employee.firstName} ${employee.lastName}`.trim(),
-              role: 'Learner'
-            }))
-          }
-        };
-        
-        console.log('topPerformerEmployees', topPerformerEmployees);
-        console.log('topPerformersDataStructure', topPerformersDataStructure);
-        
-        // Set the top performers data
-        setTopPerformersData(topPerformersDataStructure);
-        setTopPerformersLoading(false);
-        
-        return { allStructuredData, topPerformerUserIds };
-      };
-      
-      // Call the function to get all structured course data and top performers
-      getAllStructuredCourseData().then((result) => {
-        console.log('Final Result:', result);
-        console.log('Top 5 Performer User IDs:', result?.topPerformerUserIds);
-      }).catch((error) => {
-        console.error('Error processing structured course data:', error);
-        setTopPerformersLoading(false);
-        // Set empty data on error
-        setTopPerformersData({
-          usersData: {
-            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-          }
-        });
-      });
+  const handleClearUserCustomFilters = useCallback(
+    () => setUIState({ userFilterFamily: {} }),
+    [setUIState]
+  );
 
-      
+  // Resets ONE label back to genuinely untouched (removes its key entirely, rather than setting it
+  // to `[]` or the full option list) — the only way to undo a single-option label's pick (e.g.
+  // Group Membership with just "None"), since re-checking its one box can never distinguish itself
+  // from the untouched default the way a multi-option label's full re-check can. Without this, a
+  // single-option label picked once stays an invisible, permanent restriction until the page-wide
+  // Clear wipes every other filter along with it too.
+  const handleResetUserCustomFilter = useCallback(
+    (label: string) => {
+      const nextUserFilterFamily = { ...user_filter_family };
+      delete nextUserFilterFamily[label];
+      setUIState({ userFilterFamily: nextUserFilterFamily });
+    },
+    [user_filter_family, setUIState]
+  );
 
-      
-    }
-  }, [mandatoryCertificateData, optionalCertificateData, employeeUserIds, employeeDataResponse, courseDataLoading, t]);
+  // Whether any label actually restricts results right now — untouched or re-checked back up to
+  // every real option both mean "no restriction", per `getActiveUserCustomFilters`. Checking
+  // `Object.keys(user_filter_family).length` instead would stay "active" forever after the first
+  // interaction, even once every dropdown is fully re-checked — that reapplies the per-user
+  // course-eligibility narrowing in `filterCourseLearningSummaryForFilteredCourses` for no reason
+  // and silently drops enrollments that should still count.
+  const hasActiveUserCustomFilter = getActiveUserCustomFilters(user_filter_family, user_custom).length > 0;
 
-  // Function to fetch individual progress data with pagination and search
-  const fetchIndividualProgressData = async (page = 1, search = '', mandatoryIds: string[] = [], optionalIds: string[] = []) => {
-    // Prevent multiple simultaneous requests
-    if (isLoadingRef.current) {
-      return;
-    }
-    
-    // Generate a unique request ID for this call
-    const currentRequestId = ++requestIdRef.current;
-    isLoadingRef.current = true;
-    
-    // Clear existing data immediately to prevent showing stale data
-    setIndividualProgressData([]);
-    
-    try {
-      const managerUserId = localStorage.getItem('managrUserId');
-      if (managerUserId) {
-        const offset = (page - 1) * itemsPerPage;
-        
-        // Build filters object
-        const filters: any = {
-          emp_manager: managerUserId,
-          role: "Learner",
-        };
-        
-        // Add name filter if search query exists
-        if (search.trim()) {
-          filters.name = search.trim();
-        }
-        
-        const apiResponse = await fetchUserList({
-          limit: itemsPerPage,
-          offset: offset,
-          filters: filters,
-        });
-        
-        // Check if this response is still the latest request
-        if (currentRequestId !== requestIdRef.current) {
-          console.log('Ignoring stale response for page:', page);
-          return;
-        }
-        
-        console.log('individualProgressData', apiResponse?.getUserDetails);
-        console.log('totalCount', apiResponse?.totalCount);
-        console.log('Current page:', page, 'Offset:', offset);
-        
-        // Handle empty array or undefined getUserDetails
-        const userDetails = apiResponse?.getUserDetails || [];
-        const currentEmployeeIds = userDetails.length > 0 
-          ? userDetails.map((item: any) => item.userId) 
-          : [];
-        
-        // Fetch certificate status for current employees if course identifiers are available
-        let userMandatoryCertificateStatus = { data: [] };
-        let userOptionalCertificateStatus = { data: [] };
-        // Use parameters if provided, otherwise fall back to state
-        const activeMandatoryIds = mandatoryIds.length > 0 ? mandatoryIds : mandatoryIdentifiers;
-        const activeOptionalIds = optionalIds.length > 0 ? optionalIds : optionalIdentifiers;
-        
-        console.log('activeMandatoryIds', activeMandatoryIds);
-        console.log('activeOptionalIds', activeOptionalIds);
-        console.log('currentEmployeeIds', currentEmployeeIds);
-        
-        if ((activeMandatoryIds.length > 0 || activeOptionalIds.length > 0 )&& currentEmployeeIds.length > 0) {
-          try {
-            [userMandatoryCertificateStatus, userOptionalCertificateStatus] = await Promise.all([
-              fetchUserCertificateStatus(currentEmployeeIds, activeMandatoryIds),
-              fetchUserCertificateStatus(currentEmployeeIds, activeOptionalIds)
-            ]);
-            
-            // Check again if this is still the latest request after certificate status fetch
-            if (currentRequestId !== requestIdRef.current) {
-              console.log('Ignoring stale certificate status response for page:', page);
-              return;
-            }
-            
-            console.log('Individual Progress - userMandatoryCertificateStatus', userMandatoryCertificateStatus);
-            console.log('Individual Progress - userOptionalCertificateStatus', userOptionalCertificateStatus);
-          } catch (error) {
-            console.error('Error fetching certificate status for individual progress:', error);
-          }
-        }
+  // Step A for the Dashboard/Courses tabs — a course survives only if ITS OWN declared audience
+  // overlaps the values actually picked in the top filters (see filterCoursesByUserCustomFilters).
+  const filteredCourses = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCoursesByUserCustomFilters(courses, user_filter_family, user_custom)
+        : courses,
+    [hasActiveUserCustomFilter, courses, user_filter_family, user_custom]
+  );
 
-        // Process certificate status data for easier lookup
-        const mandatoryStatusMap = new Map();
-        const optionalStatusMap = new Map();
-        // Process mandatory certificate status
-        userMandatoryCertificateStatus.data?.forEach((item: any) => {
-          if (!mandatoryStatusMap.has(item.userId)) {
-            mandatoryStatusMap.set(item.userId, {
-              completed: 0,
-              inProgress: 0,
-              notStarted: 0,
-              total: 0,
-              completedIdentifiers: [],
-              inProgressIdentifiers: [],
-              notStartedIdentifiers: []
-            });
-          }
-          
-          const userStats = mandatoryStatusMap.get(item.userId);
-          userStats.total++;
-          
-          if (item.status === "viewCertificate" || item.status === "completed") {
-            userStats.completed++;
-            userStats.completedIdentifiers.push(item.courseId);
-          } else if (item.status === "inprogress") {
-            userStats.inProgress++;
-            userStats.inProgressIdentifiers.push(item.courseId);
-          } else if (item.status === "enrolled") {
-            userStats.notStarted++;
-            userStats.notStartedIdentifiers.push(item.courseId);
-          }
-        });
+  // The Dashboard tab's employee-count/distribution stats and the My Team tab's roster read from
+  // `users` directly (not from filteredCourseLearningSummary), so they need their own narrowing by
+  // the same top-of-page filters — otherwise only the course-derived numbers move when a filter
+  // changes and "Total Employees" / My Team's list stay stuck on the full team.
+  const filteredUsers = useMemo(
+    () =>
+      hasActiveUserCustomFilter ? filterUsersByCustomFilters(users, user_filter_family, user_custom) : users,
+    [hasActiveUserCustomFilter, users, user_filter_family, user_custom]
+  );
 
-        // Process optional certificate status
-        userOptionalCertificateStatus.data?.forEach((item: any) => {
-          if (!optionalStatusMap.has(item.userId)) {
-            optionalStatusMap.set(item.userId, {
-              completed: 0,
-              inProgress: 0,
-              notStarted: 0,
-              total: 0,
-              completedIdentifiers: [],
-              inProgressIdentifiers: [],
-              notStartedIdentifiers: []
-            });
-          }
-          
-          const userStats = optionalStatusMap.get(item.userId);
-          userStats.total++;
-          
-          if (item.status === "viewCertificate" || item.status === "completed") {
-            userStats.completed++;
-            userStats.completedIdentifiers.push(item.courseId);
-          } else if (item.status === "inprogress") {
-            userStats.inProgress++;
-            userStats.inProgressIdentifiers.push(item.courseId);
-          } else if (item.status === "enrolled") {
-            userStats.notStarted++;
-            userStats.notStartedIdentifiers.push(item.courseId);
-          }
-        });
-        
-        // Final check before updating state
-        if (currentRequestId !== requestIdRef.current) {
-          console.log('Ignoring stale transformed data for page:', page);
-          return;
-        }
-        
-        // Transform API data to EmployeeProgress format with calculated progress
-        const transformedProgressData: EmployeeProgress[] = userDetails.length > 0 
-          ? userDetails.map((user: any) => {
-          const mandatoryStats = mandatoryStatusMap.get(user.userId) || { 
-            completed: 0, 
-            inProgress: 0, 
-            notStarted: 0, 
-            total: 0,
-            completedIdentifiers: [],
-            inProgressIdentifiers: [],
-            notStartedIdentifiers: []
-          };
-          const optionalStats = optionalStatusMap.get(user.userId) || { 
-            completed: 0, 
-            inProgress: 0, 
-            notStarted: 0, 
-            total: 0,
-            completedIdentifiers: [],
-            inProgressIdentifiers: [],
-            notStartedIdentifiers: []
-          };
-          
-          // Calculate not started courses = courses with "enrolled" status + courses not in API response
-          const mandatoryNotStarted = mandatoryStats.notStarted + Math.max(0, activeMandatoryIds.length - mandatoryStats.total);
-          const optionalNotStarted = optionalStats.notStarted + Math.max(0, activeOptionalIds.length - optionalStats.total);
-          
-          return {
-            id: user.userId,
-            name: user.name || `${user.firstName} ${user.lastName}`.trim(),
-            role: user.role,
-            department: '', // Remove department as requested
-            mandatoryCourses: {
-              completed: mandatoryStats.completed,
-              inProgress: mandatoryStats.inProgress, 
-              notStarted: mandatoryNotStarted,
-              total: activeMandatoryIds.length // Total available mandatory courses
-            },
-            nonMandatoryCourses: {
-              completed: optionalStats.completed,
-              inProgress: optionalStats.inProgress,
-              notStarted: optionalNotStarted, 
-              total: activeOptionalIds.length // Total available optional courses
-            },
-            // Add the requested course identifiers
-            mandatoryInProgressIdentifiers: mandatoryStats.inProgressIdentifiers || [],
-            optionalInProgressIdentifiers: optionalStats.inProgressIdentifiers || [],
-            mandatoryCompletedIdentifiers: mandatoryStats.completedIdentifiers || [],
-            optionalCompletedIdentifiers: optionalStats.completedIdentifiers || []
-          };
-        })
-          : [];
+  // Dashboard + Courses tab summary — scoped to `filteredCourses` (courses whose OWN tags match
+  // the selected filter values) AND `filteredUsers` (not the full org-wide roster), so a course's
+  // status breakdown (e.g. "Not started: 54") only counts the same filtered employees "Total
+  // Employees" already reflects, instead of quietly including people outside the current filter.
+  const filteredCourseLearningSummary = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, filteredCourses, filteredUsers)
+        : courseLearningSummary,
+    [hasActiveUserCustomFilter, courseLearningSummary, filteredCourses, filteredUsers]
+  );
 
-        
-        console.log('transformedProgressData with calculated progress', transformedProgressData);
-        setIndividualProgressData(transformedProgressData);
-        setTotalEmployees(apiResponse?.totalCount || 0);
-        setTotalPages(Math.ceil((apiResponse?.totalCount || 0) / itemsPerPage));
-      } else {
-        console.warn('No manager user ID found in localStorage');
-        setIndividualProgressData([]);
-        setTotalEmployees(0);
-        setTotalPages(0);
-      }
-    } catch (error) {
-      // Only update state if this is still the latest request
-      if (currentRequestId === requestIdRef.current) {
-        console.error('Error fetching individual progress data:', error);
-        setIndividualProgressData([]);
-        setTotalEmployees(0);
-        setTotalPages(0);
-      }
-    } finally {
-      // Only clear loading flag if this is still the latest request
-      if (currentRequestId === requestIdRef.current) {
-        isLoadingRef.current = false;
-      }
-    }
-  };
+  // My Team tab summary — deliberately scoped to the FULL, unfiltered `courses` (not
+  // `filteredCourses`) alongside `filteredUsers`: once an employee matches the top filter, the
+  // courses that count toward THEIR progress are whichever ones THEY are personally eligible for
+  // (their own JOB_FAMILY/PSU/EMP_GROUP values against each course's declared audience, see
+  // isUserEligibleForCourse) — not narrowed a second time down to only courses that also happen to
+  // match the exact values picked in the filter. A course tagged only with a Group Membership the
+  // employee genuinely holds, even if Group Membership isn't what's currently selected, still
+  // belongs on their own row.
+  const teamCourseLearningSummary = useMemo(
+    () =>
+      hasActiveUserCustomFilter
+        ? filterCourseLearningSummaryForFilteredCourses(courseLearningSummary, courses, filteredUsers)
+        : courseLearningSummary,
+    [hasActiveUserCustomFilter, courseLearningSummary, courses, filteredUsers]
+  );
 
-  // Handle page change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    fetchIndividualProgressData(page, searchQuery, mandatoryIdentifiers, optionalIdentifiers);
-  };
+  // The raw label from the API (JOB_FAMILY / PSU / EMP_GROUP) is also the option value used for
+  // filtering/selection — only its on-screen display goes through translation, via
+  // MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS. Falls back to the raw label for anything not yet added
+  // there so a new custom field label never renders blank.
+  const getUserCustomFieldLabel = useCallback(
+    (label: string) => t(`MANAGER_OVERVIEW.CUSTOM_FIELD_LABELS.${label}`, { defaultValue: label }),
+    [t]
+  );
 
-  // Handle search - reset to page 1 when search changes
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1); // Reset to first page
-    fetchIndividualProgressData(1, query, mandatoryIdentifiers, optionalIdentifiers); // Fetch with search and page 1
-  };
+  // Only labels that actually have at least one value get a dropdown (e.g. PSU with no values
+  // never renders one). The count of *those* drives the grid split the dropdowns share evenly —
+  // 3 up → 4/4/4, 2 up → 6/6, 1 up → 12 — and how many chips each can show before "+N".
+  const userCustomFilterEntries = useMemo(
+    () => Object.entries(user_custom || {}).filter(([, options]) => options && options.length > 0),
+    [user_custom]
+  );
+  const userCustomFilterColumnSpan = userCustomFilterEntries.length
+    ? 12 / userCustomFilterEntries.length
+    : 12;
+  const userCustomFilterMaxVisibleChips =
+    userCustomFilterEntries.length <= 1 ? 4 : userCustomFilterEntries.length === 2 ? 2 : 1;
 
-  // Fetch dashboard data on component mount
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      // Variables to store employee user IDs and course identifiers for use across try blocks
-      let employeeUserIds: string[] = [];
-      let mandatoryIds: string[] = [];
-      let optionalIds: string[] = [];
-    
+  // console.log("###########managerdashboard user",users);
+  // console.log("###########managerdashboard courses",courses);
+  // console.log("###########managerdashboard user_custom",user_custom);
 
-      const dummyCourseAchievementData = {
-        mandatoryCourses: {
-          above40: 15,
-          between40and60: 20,
-          between60and90: 12,
-          below90: 9,
-        },
-        nonMandatoryCourses: {
-          above40: 18,
-          between40and60: 22,
-          between60and90: 10,
-          below90: 6,
-        },
-      };
+  const [selectedCourseStatus, setSelectedCourseStatus] = useState<CourseStatusSelection | null>(null);
 
-      try {
-        const mandatoryCourses = await fetchCourses({
-          filters: {
-            primaryCategory: ["Course"],
-            courseType: ["Mandatory"],
-            status: ["live"],
-            channel: "pragyanpath",
-          },
-        });
+  const setCourseFilters = useCallback((filters: CourseListFilters) => setUIState({ courseFilters: filters }), [setUIState]);
+  const setCurrentCoursePage = useCallback((page: number) => setUIState({ currentCoursePage: page }), [setUIState]);
+  const setSelectedAttemptFilter = useCallback(
+    (filter: HighAttemptFilter) => setUIState({ selectedAttemptFilter: filter }),
+    [setUIState]
+  );
+  const setAttemptSortOrder = useCallback((order: AttemptSortOrder) => setUIState({ attemptSortOrder: order }), [setUIState]);
+  const setTeamFilters = useCallback((filters: CourseListFilters) => setUIState({ teamFilters: filters }), [setUIState]);
+  const setTeamCurrentPage = useCallback((page: number) => setUIState({ teamCurrentPage: page }), [setUIState]);
+  const setTeamSearchTerm = useCallback((term: string) => setUIState({ teamSearchTerm: term }), [setUIState]);
+  const setCourseBreakdownFilters = useCallback(
+    (filters: CourseListFilters) => setUIState({ courseBreakdownFilters: filters }),
+    [setUIState]
+  );
+  const setCourseBreakdownPage = useCallback((page: number) => setUIState({ courseBreakdownPage: page }), [setUIState]);
 
-        const optionalCourses = await fetchCourses({
-          filters: {
-            primaryCategory: ["Course"],
-            courseType: ["Optional"],
-            status: ["live"],
-            channel: "pragyanpath",
-          },
-        });
+  // --- Derived lookups / analytics (memoized — the raw summary is the single source of truth,
+  // everything else is computed from it rather than stored separately). ----------------------
+  // Built from filteredCourses/filteredCourseLearningSummary (not the hook's raw courses/
+  // courseLearningSummary) so the JOB_FAMILY/PSU/EMP_GROUP filters above flow through to every
+  // tab that reads them.
+  const userById = useMemo(() => buildUserById(users), [users]);
+  const courseById = useMemo(() => buildCourseById(filteredCourses), [filteredCourses]);
 
-        const CourseAllocationData = {
-          mandatory: mandatoryCourses.length,
-          nonMandatory: optionalCourses.length,
-          total: mandatoryCourses.length + optionalCourses.length,
-        };
+  // High Quiz Attempt Count and Top Performers scope down to just the courses matching the
+  // Course Type / Language / Course Name filters (null = no filters active = every course).
+  const selectedCourseIds = useMemo(
+    () => getSelectedCourseIds(filteredCourses, courseFilters),
+    [filteredCourses, courseFilters]
+  );
+  const scopedCourseLearningSummary = useMemo(
+    () => filterSummaryByCourseIds(filteredCourseLearningSummary, selectedCourseIds),
+    [filteredCourseLearningSummary, selectedCourseIds]
+  );
 
-        console.log('mandatoryCourses', mandatoryCourses);
-        mandatoryIds = mandatoryCourses.map((item: any) => item.identifier);
-        optionalIds = optionalCourses.map((item: any) => item.identifier);
-        
-        // Store identifiers in state for use in individual progress calculation
-        setMandatoryIdentifiers(mandatoryIds);
-        setOptionalIdentifiers(optionalIds);
-        
-        // Store course IDs in localStorage for use in employee-details page
-        localStorage.setItem('mandatoryCourseIds', JSON.stringify(mandatoryIds));
-        localStorage.setItem('optionalCourseIds', JSON.stringify(optionalIds));
-        const userId = localStorage.getItem('managrUserId');
-        let employeeDataResponse: any = [];
-        if(userId) {
-           employeeDataResponse = await fetchUserList({
-           
-            filters: {emp_manager:userId,
-              role: "Learner",
-            },
-          });
-          console.log('employeeDataResponse', employeeDataResponse);
-          
-          // Handle empty array or undefined getUserDetails
-          const employeeDetails = employeeDataResponse?.getUserDetails || [];
-          setEmployeeDataResponse(employeeDetails);
-          employeeUserIds = employeeDetails.length > 0 
-            ? employeeDetails.map((item: any) => item.userId) 
-            : [];
-          setEmployeeUserIds(employeeUserIds);
-        }
-        console.log('employeeUserIds', employeeUserIds);
-        // Check if tenantId is available before calling certificate status APIs
-        const tenantId = localStorage.getItem('tenantId');
-        let userMandatoryCertificateStatus = { data: [] };
-        let userOptionalCertificateStatus = { data: [] };
-        
-        if (tenantId) {
-          userMandatoryCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, mandatoryIds);
-          userOptionalCertificateStatus = await fetchUserCertificateStatus(employeeUserIds, optionalIds);
-          console.log('userMandatoryCertificateStatus', userMandatoryCertificateStatus);
-        } else {
-          console.warn('TenantId not found in localStorage, skipping certificate status API calls');
-        }
+  const highAttemptUsers = useMemo(
+    () => getHighQuizAttemptUsers(scopedCourseLearningSummary, userById, courseById),
+    [scopedCourseLearningSummary, userById, courseById]
+  );
 
-        const filteredMandatory = userMandatoryCertificateStatus.data
-          .map((item: any) => {
-            let finalStatus = null;
+  const filteredHighAttemptUsers = useMemo(
+    () =>
+      sortHighAttemptUsers(
+        filterHighAttemptUsersByAttempt(highAttemptUsers, selectedAttemptFilter),
+        attemptSortOrder
+      ),
+    [highAttemptUsers, selectedAttemptFilter, attemptSortOrder]
+  );
 
-            if (item.status === "viewCertificate" || item.status === "completed") {
-              finalStatus = "completed";
-            } else if (item.status === "inprogress") {
-              finalStatus = "inprogress";
-            }
+  const {
+    performers: topPerformers,
+    loading: topPerformersLoading,
+    error: topPerformersError,
+    fromDate: topPerformersFromDate,
+    toDate: topPerformersToDate,
+    setFromDate: setTopPerformersFromDate,
+    setToDate: setTopPerformersToDate,
+  } = useTopPerformers(users, 5);
 
-            return finalStatus
-              ? {
-                  userId: item.userId,
-                  courseId: item.courseId,
-                  status: finalStatus
-                }
-              : null;
-          })
-          .filter(Boolean);
+  const selectedStatusCourse = selectedCourseStatus ? courseById[selectedCourseStatus.courseId] : undefined;
+  const selectedStatusUsers = useMemo(() => {
+    if (!selectedCourseStatus) return [];
+    return getCourseUsersByStatus(
+      selectedCourseStatus.courseId,
+      selectedCourseStatus.status,
+      filteredCourseLearningSummary,
+      userById
+    );
+  }, [selectedCourseStatus, filteredCourseLearningSummary, userById]);
 
-        console.log('filteredMandatory', filteredMandatory);
+  const handleTeamFiltersChange = useCallback(
+    (nextFilters: CourseListFilters) => {
+      setTeamFilters(nextFilters);
+      setTeamCurrentPage(1);
+    },
+    [setTeamFilters, setTeamCurrentPage]
+  );
 
-        const filteredOptional = userOptionalCertificateStatus.data
-          .map((item: any) => {
-            let finalStatus = null;
+  const handleTeamSearchTermChange = useCallback(
+    (term: string) => {
+      setTeamSearchTerm(term);
+      setTeamCurrentPage(1);
+    },
+    [setTeamSearchTerm, setTeamCurrentPage]
+  );
 
-            if (item.status === "viewCertificate" || item.status === "completed") {
-              finalStatus = "completed";
-            } else if (item.status === "inprogress") {
-              finalStatus = "inprogress";
-            }
+  const handleCourseBreakdownFiltersChange = useCallback(
+    (nextFilters: CourseListFilters) => {
+      setCourseBreakdownFilters(nextFilters);
+      setCourseBreakdownPage(1);
+    },
+    [setCourseBreakdownFilters, setCourseBreakdownPage]
+  );
 
-            return finalStatus
-              ? {
-                  userId: item.userId,
-                  courseId: item.courseId,
-                  status: finalStatus
-                }
-              : null;
-          })
-          .filter(Boolean);
+  // Centralized navigation handler for every "view employee" entry point (My Team's View button,
+  // the High Quiz Attempt Count's View button, and both Course Status / Course Learners modal
+  // rows) — all route to the same Employee Detail Page by userId only. `activeTab` is passed as
+  // `from` so the Back button can return to whichever tab the click originated from.
+  const handleViewEmployee = useCallback(
+    (userId: string) => {
+      router.push({ pathname: '/manager-dashboard/team/[userId]', query: { userId, from: activeTab } });
+    },
+    [router, activeTab]
+  );
 
-        console.log('filteredOptional', filteredOptional);
+  const handleCourseFiltersChange = useCallback(
+    (filters: CourseListFilters) => {
+      setCourseFilters(filters);
+      setCurrentCoursePage(1);
+    },
+    [setCourseFilters, setCurrentCoursePage]
+  );
 
-        // Set the filtered data to state
-        setCourseAllocationData(CourseAllocationData);
-        setMandatoryCertificateData(filteredMandatory);
-        setOptionalCertificateData(filteredOptional);
-        setCourseDataLoading(false);
-        
-        // If no employees or no certificate data, set top performers to empty and stop loading
-        if (employeeUserIds.length === 0 || employeeDataResponse.length === 0 || 
-            (filteredMandatory.length === 0 && filteredOptional.length === 0)) {
-          setTopPerformersData({
-            usersData: {
-              [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-            }
-          });
-          setTopPerformersLoading(false);
-        }
-
-      } catch (error) {
-        console.error('Error fetching course data:', error);
-        setCourseDataLoading(false);
-        // On error, set top performers to empty and stop loading
-        setTopPerformersData({
-          usersData: {
-            [t('FIVE_HIGHEST_COURSE_COMPLETING_USERS')]: []
-          }
-        });
-        setTopPerformersLoading(false);
-      }
-
-
-      try {
-        // Fetch assessment/question sets data
-        const questionSets = await fetchCourses({
-          filters: {
-            status: ["Live"],
-            primaryCategory: ["Practice Question Set"],
-            channel: "pragyanpath",
-            program: ["Pragyanpath"],
-            courseType: ["Mandatory"]
-          },
-        });
-      const questionSetIdentifiers = questionSets.map((item: any) => item.identifier);
-      console.log('questionSets', questionSetIdentifiers);
-      
-        // Check if tenantId is available before calling assessment status API
-        const tenantId = localStorage.getItem('tenantId');
-        if ( employeeUserIds.length > 0) {
-          // TODO: Implement assessment status tracking
-          // const userDataAssessmentStatus = await getAssessmentStatus({
-          //   userId: employeeUserIds,
-          //   contentId: questionSetIdentifiers
-          // });
-          // console.log('userDataAssessmentStatus', userDataAssessmentStatus);
-        } else {
-          console.warn('TenantId not found in localStorage, skipping assessment status API call');
-        }
-      } catch (error) {
-        console.error('Error fetching course achievement data:', error);
-      }
-
-      // Set all data
-     // setCourseAchievementData(dummyCourseAchievementData);
-      
-      // Fetch individual progress data with pagination - pass the course identifiers
-      fetchIndividualProgressData(1, '', mandatoryIds || [], optionalIds || []);
-    };
-
-    fetchDashboardData();
+  const handleStatusClick = useCallback((courseId: string, status: CourseStatusKey) => {
+    setSelectedCourseStatus({ courseId, status });
   }, []);
+
+  const handleCloseStatusModal = useCallback(() => setSelectedCourseStatus(null), []);
+
+  // Course Status Modal rows and the High Quiz Attempt Count's View button both resolve a
+  // (userId, courseId) pair, but drill down to the same employee-level detail page — the courseId
+  // isn't needed there, so both forward to the single `handleViewEmployee` navigation handler.
+  const handleUserClick = useCallback((userId: string) => handleViewEmployee(userId), [handleViewEmployee]);
+
+  const handleHighAttemptViewClick = useCallback((userId: string) => handleViewEmployee(userId), [handleViewEmployee]);
+
+  const handleSeeAllEmployees = useCallback(() => handleTabChange('team'), [router]);
 
   return (
     <>
@@ -776,92 +368,239 @@ const [employeeDataResponse, setEmployeeDataResponse] = useState<any[]>([]);
       </Box>
     <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
       <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2 } }}>
-        {/* Header */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="h5" fontWeight={600} display="inline">
-            {t('TEAM_LEARNING_OVERVIEW')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" display="inline" sx={{ ml: { xs: 1, sm: 2 } }}>
-            {t('TOTAL_EMPLOYEES')} : {totalEmployees}
-          </Typography>
-        </Box>
 
-        {/* Dashboard Grid */}
-        <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-          {/* Course Completion */}
-          <Grid item xs={12} md={6}>
-            {courseDataLoading ? (
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    minHeight: '300px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    backgroundColor: 'white'
-                  }}
+        {!hasLoaded ? (
+          <ManagerDashboardLoadingScreen
+            usersLoading={usersLoading}
+            usersError={usersError}
+            coursesLoading={coursesLoading}
+            coursesError={coursesError}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+          />
+        ) : (
+          <>
+            {userCustomFilterEntries.length > 0 && (
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                <Grid container spacing={2} sx={{ flex: 1 }}>
+                  {userCustomFilterEntries.map(([label, options]) => {
+                    // Presence check, not truthiness — an explicitly emptied filter (`[]`) must
+                    // render with nothing checked, not fall back to "everything selected". No
+                    // "ALL" sentinel: the untouched default is just every real option selected.
+                    const isTouched = user_filter_family[label] !== undefined;
+                    const selected = isTouched ? user_filter_family[label] : options;
+                    // Mirrors getActiveUserCustomFilters's own "does this label restrict anything"
+                    // check exactly (untouched, or re-selected back to every option, regardless of
+                    // how many options exist) — so the cosmetic chip is always consistent with what
+                    // actually is/isn't restricting results. An explicitly emptied label still
+                    // shows its real (blank) state, since that's a genuine active choice.
+                    const isAllSelected = !isTouched || selected.length >= options.length;
+                    const visibleChips = isAllSelected ? [] : selected.slice(0, userCustomFilterMaxVisibleChips);
+                    const hiddenCount = isAllSelected ? 0 : selected.length - visibleChips.length;
+
+                    const fieldLabel = getUserCustomFieldLabel(label);
+
+                    // Only shown once this specific label carries explicit state — makes an
+                    // otherwise-easy-to-miss "touched" filter discoverable at a glance (on top of
+                    // the chip above now always showing its real value instead of "All X"), and
+                    // lets it be undone on its own instead of via the page-wide Clear.
+                    const isActiveFilter = isTouched && !isAllSelected;
+
+                    return (
+                      <Grid item xs={userCustomFilterColumnSpan} key={label}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <FormControl size="small" fullWidth>
+                            <InputLabel id={`${label}-filter-label`}>{fieldLabel}</InputLabel>
+                            <Select
+                              labelId={`${label}-filter-label`}
+                              label={fieldLabel}
+                              multiple
+                              value={selected}
+                              onChange={handleUserCustomFilterChange(label)}
+                              sx={{ '& .MuiSelect-select': { display: 'flex', overflow: 'hidden' } }}
+                              renderValue={() =>
+                                isAllSelected ? (
+                                  <Chip
+                                    size="small"
+                                    label={t('MANAGER_OVERVIEW.ALL_CUSTOM_FIELD', { label: fieldLabel })}
+                                  />
+                                ) : (
+                                  <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: 0.5, overflow: 'hidden' }}>
+                                    {visibleChips.map((value) => (
+                                      <Chip key={value} size="small" label={value} />
+                                    ))}
+                                    {hiddenCount > 0 && <Chip size="small" label={`+${hiddenCount}`} />}
+                                  </Box>
+                                )
+                              }
+                            >
+                              {options.map((option) => (
+                                <MenuItem key={option} value={option}>
+                                  <Checkbox checked={selected.indexOf(option) > -1} />
+                                  <ListItemText primary={option} />
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          {isActiveFilter && (
+                            <IconButton
+                              size="small"
+                              onClick={() => handleResetUserCustomFilter(label)}
+                              aria-label={t('MANAGER_OVERVIEW.RESET_CUSTOM_FIELD', { label: fieldLabel })}
+                            >
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+                <Button
+                  size="small"
+                  onClick={handleClearUserCustomFilters}
+                  disabled={Object.keys(user_filter_family).length === 0}
                 >
-                  <Typography variant="h6">{t('LOADING_COURSE_COMPLETION_DATA')}</Typography>
-                </Box>
-            ) : (
-              <CourseCompletion
-                mandatoryCourses={mandatoryCertificateData}
-                nonMandatoryCourses={optionalCertificateData}
-                userIds={employeeUserIds}
-                mandatoryCourseIds={mandatoryIdentifiers}
-                optionalCourseIds={optionalIdentifiers}
-              />
+                  Clear
+                </Button>
+              </Box>
             )}
-          </Grid>
+      
+        {/* <DashboardHeader
+          title={
+            activeTab === 'team'
+              ? t('MANAGER_OVERVIEW.MY_TEAM_TITLE')
+              : activeTab === 'courses'
+              ? t('MANAGER_OVERVIEW.COURSE_BREAKDOWN_TITLE')
+              : t('TEAM_LEARNING_OVERVIEW')
+          }
+          subtitle={
+            activeTab === 'courses'
+              ? t('MANAGER_OVERVIEW.COURSE_BREAKDOWN_SUBTITLE', {
+                  entries: getCourseEntryCount(courses),
+                  unique: getUniqueCourseCount(courses),
+                })
+              : undefined
+          }
+          totalEmployees={users.length}
+          lastUpdatedLabel={t('DASHBOARD_TABS.UPDATED_TODAY')}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        /> */}
 
-          {/* Course Allocation */}
-          <Grid item xs={12} md={6}>
-            {courseDataLoading ? (
-                <Box 
-                  sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    minHeight: '200px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <Typography variant="h6">{t('LOADING_COURSE_ALLOCATION_DATA')}</Typography>
-                </Box>
-            ) : (
-              <CourseAllocation
-                mandatory={courseAllocationData.mandatory}
-                nonMandatory={courseAllocationData.nonMandatory}
-                total={courseAllocationData.total}
+        {activeTab === 'dashboard' && (
+          <DashboardOverview
+            users={filteredUsers}
+            courses={filteredCourses}
+            courseLearningSummary={filteredCourseLearningSummary}
+            userCustom={user_custom}
+            usersLoading={usersLoading}
+            usersError={usersError}
+            coursesLoading={coursesLoading}
+            coursesError={coursesError}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+          />
+        )}
+
+        {activeTab === 'team' && (
+          <>
+            <IndividualProgress
+              users={filteredUsers}
+              courses={courses}
+              courseLearningSummary={teamCourseLearningSummary}
+              usersLoading={usersLoading}
+              usersError={usersError}
+              coursesLoading={coursesLoading}
+              coursesError={coursesError}
+              summaryLoading={summaryLoading}
+              summaryError={summaryError}
+              filters={teamFilters}
+              currentPage={teamCurrentPage}
+              searchTerm={teamSearchTerm}
+              onFiltersChange={handleTeamFiltersChange}
+              onPageChange={setTeamCurrentPage}
+              onSearchTermChange={handleTeamSearchTermChange}
+              onViewEmployee={handleViewEmployee}
+            />
+          </>
+        )}
+
+        {/*activeTab === 'courses' && (
+          <CourseBreakdownList
+            courses={courses}
+            coursesLoading={coursesLoading || usersLoading}
+            coursesError={coursesError || usersError}
+            courseLearningSummary={courseLearningSummary}
+            summaryLoading={summaryLoading}
+            summaryError={summaryError}
+            userById={userById}
+            filters={courseBreakdownFilters}
+            currentPage={courseBreakdownPage}
+            onFiltersChange={handleCourseBreakdownFiltersChange}
+            onPageChange={setCourseBreakdownPage}
+            onViewEmployee={handleViewEmployee}
+          />
+        )*/}
+        {activeTab === 'courses' && (
+          <Grid container spacing={{ xs: 1.5, sm: 2 }}>
+            <Grid item xs={12}>
+              <CourseList
+                courses={filteredCourses}
+                coursesLoading={coursesLoading || usersLoading}
+                coursesError={coursesError || usersError}
+                courseLearningSummary={filteredCourseLearningSummary}
+                summaryLoading={summaryLoading}
+                summaryError={summaryError}
+                filters={courseFilters}
+                currentPage={currentCoursePage}
+                onFiltersChange={handleCourseFiltersChange}
+                onPageChange={setCurrentCoursePage}
+                onStatusClick={handleStatusClick}
               />
-            )}
-          </Grid>
+            </Grid>
 
-          {/* Top Performers */}
-          <Grid item xs={12}>
-            <TopPerformers
-              usersData={topPerformersData.usersData}
-              isLoading={topPerformersLoading}
-            />
-          </Grid>
+            <Grid item xs={12} md={6}>
+              <HighQuizAttemptSection
+                users={filteredHighAttemptUsers}
+                loading={summaryLoading}
+                error={summaryError}
+                selectedFilter={selectedAttemptFilter}
+                onFilterChange={setSelectedAttemptFilter}
+                sortOrder={attemptSortOrder}
+                onSortOrderChange={setAttemptSortOrder}
+                onViewClick={handleHighAttemptViewClick}
+              />
+            </Grid>
 
-          {/* Individual Progress Table */}
-          <Grid item xs={12} sx={{ mt: 2, mb: 2 }}>
-            <IndividualProgress 
-              data={individualProgressData}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalEmployees={totalEmployees}
-              onPageChange={handlePageChange}
-              onSearch={handleSearch}
-            />
+            <Grid item xs={12} md={6}>
+              <TopPerformersSection
+                performers={topPerformers}
+                loading={topPerformersLoading}
+                error={topPerformersError}
+                totalEmployees={users.length}
+                fromDate={topPerformersFromDate}
+                toDate={topPerformersToDate}
+                onFromDateChange={setTopPerformersFromDate}
+                onToDateChange={setTopPerformersToDate}
+                onSeeAllClick={handleSeeAllEmployees}
+              />
+            </Grid>
           </Grid>
-        </Grid>
+        )}
+          </>
+        )}
       </Container>
     </Box>
+
+    <CourseStatusModal
+      open={Boolean(selectedCourseStatus)}
+      onClose={handleCloseStatusModal}
+      course={selectedStatusCourse}
+      status={selectedCourseStatus?.status}
+      users={selectedStatusUsers}
+      onUserClick={handleUserClick}
+    />
     </>
   );
 };
@@ -873,4 +612,3 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 export default ManagerDashboard;
-

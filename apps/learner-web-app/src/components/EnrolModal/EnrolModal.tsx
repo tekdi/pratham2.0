@@ -30,6 +30,10 @@ interface EnrolModalProps {
   onClose: () => void;
   programName: string;
   tenantId: string;
+  /* Label shown on the badge. Defaults to programName — pass this when the
+     program is branded differently on the page it was opened from. The
+     programName is still what gets sent as the enroll parameter. */
+  displayName?: string;
 }
 
 const OTP_LENGTH = 4;
@@ -40,6 +44,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
   onClose,
   programName,
   tenantId,
+  displayName,
 }) => {
   const router = useRouter();
   const { t } = useTranslation();
@@ -242,7 +247,7 @@ const EnrolModal: React.FC<EnrolModalProps> = ({
                 color: '#1F1B13',
               }}
             >
-              {programName}
+              {displayName || programName}
             </Typography>
           </Box>
         </Box>
