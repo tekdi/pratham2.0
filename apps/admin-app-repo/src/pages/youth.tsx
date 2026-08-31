@@ -177,6 +177,11 @@ const Youth = () => {
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
+      keys: ['enrollmentId'],
+      label: 'Enrollment ID',
+      render: (row: any) => transformLabel(row.enrollmentId) || '',
+    },
+    {
       key: 'status',
       label: 'Status',
       render: (row: any) => transformLabel(row.tenantStatus),
@@ -190,10 +195,15 @@ const Youth = () => {
       render: (row) => transformLabel(row.gender) || '',
     },
     {
-      keys: ['mobile'],
-      label: 'Mobile',
-      render: (row) => transformLabel(row.mobile) || '',
+      keys: ['tenantJoinedAt'],
+      label: 'DOJ',
+      render: (row) => transformLabel(row.tenantJoinedAt) || '',
     },
+    // {
+    //   keys: ['mobile'],
+    //   label: 'Mobile',
+    //   render: (row) => transformLabel(row.mobile) || '',
+    // },
     // {
     //   key: 'STATE',
     //   label: 'State',

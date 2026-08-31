@@ -619,6 +619,8 @@
     "UNIT_NAME": "Unit Name",
     "UNIT_CODE": "Unit Code",
     "ENROLLMENT_NUMBER": "Enrollment Number",
+    "ENROLLMENT_ID": "Enrollment ID",
+    "DATE_OF_JOINING": "Date of Joining",
     "BLOCK_NAME": "Block Name",
     "STUDENT_TYPE": "Type of Learner",
     "STATE_NAME": "State Name",
