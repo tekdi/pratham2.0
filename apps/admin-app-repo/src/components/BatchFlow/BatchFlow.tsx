@@ -162,6 +162,13 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       alterSchema.properties.stream.maxSelection = 1;
     }
 
+    // The board field's own framework fetch URL (tenant-resolved by
+    // resolveFrameworkPlaceholders above) is what the stream field's
+    // dependent lookup below needs, so grab it before `overrideEnum`
+    // strips `api` off of the board field.
+    const boardFrameworkFetchUrl =
+      alterSchema?.properties?.board?.api?.payload?.fetchUrl;
+
     const overrideEnum = (
       fieldKey: 'board' | 'medium' | 'grade' | 'stream',
       centerVals: string[]
@@ -185,7 +192,67 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     overrideEnum('board', centerBoards);
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
-    overrideEnum('stream', centerStreams);
+
+    // Stream is scoped to the center's own selected streams (same as the
+    // other fields above), but must also be filtered by whichever board is
+    // currently selected in the batch form - a center can be associated
+    // with several boards, each with its own streams via the framework's
+    // term associations, so a flat "all of the center's streams" list (as
+    // overrideEnum would produce) leaks streams from boards other than the
+    // one selected. Re-fetching via the board-dependent framework lookup
+    // (with the result restricted to this center's streams) keeps that
+    // filtering driven entirely by the framework's association data,
+    // rather than any hardcoded board/stream mapping.
+    if (alterSchema?.properties?.stream) {
+      const currentVals = Array.isArray(centerStreams) ? centerStreams : [];
+      const existing = existingValues?.stream || [];
+      const mergedStreams = Array.from(
+        new Set([...(currentVals || []), ...(existing || [])])
+      ).filter(Boolean);
+      if (mergedStreams.length && boardFrameworkFetchUrl) {
+        // Start empty - no board selected yet means no valid stream yet.
+        // The shared DynamicForm's own dependent-field handling (the same
+        // mechanism board->medium already relies on) fetches and fills
+        // this in once a board is selected, re-fetches it whenever the
+        // board changes, and clears any previously chosen stream when it
+        // no longer belongs to the newly selected board - all driven by
+        // `api.dependent` below, nothing bespoke needed here. On edit,
+        // it's populated from the prefilled board value the same way.
+        alterSchema.properties.stream.items = {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        };
+        alterSchema.properties.stream.api = {
+          url: '/api/dynamic-form/get-framework',
+          method: 'POST',
+          options: {
+            label: 'label',
+            value: 'value',
+            optionObj: 'options',
+          },
+          payload: {
+            code: 'board',
+            fetchUrl: boardFrameworkFetchUrl,
+            findcode: 'stream',
+            selectedvalue: '**',
+            allowedValues: mergedStreams,
+          },
+          callType: 'dependent',
+          dependent: 'board',
+        };
+      } else if (mergedStreams.length) {
+        // No framework URL to drive a live board-dependent lookup - fall
+        // back to the flat, center-scoped list rather than leaving the
+        // field with no options at all.
+        alterSchema.properties.stream.items = {
+          type: 'string',
+          enum: mergedStreams,
+          enumNames: mergedStreams,
+        };
+        delete alterSchema.properties.stream.api;
+      }
+    }
 
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {

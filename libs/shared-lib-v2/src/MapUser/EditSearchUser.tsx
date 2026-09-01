@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
-import { post } from '../DynamicForm/services/RestClient';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { transformLabel } from '../DynamicForm/utils/helper';
 import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
@@ -18,6 +17,10 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { useTranslation } from '../lib/context/LanguageContext';
 import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { readUserId, readUserIdTrue } from '../DynamicForm/services/NotificationService';
+import {
+  syncStreamsForBoardChange,
+  pruneStreamsForRemovedBoards,
+} from './boardStreamSync';
 interface EditSearchUserProps {
   onUserDetails: (userUpdatedDetails: any) => void;
   schema: any;
@@ -233,13 +236,32 @@ const EditSearchUser: React.FC<EditSearchUserProps> = ({
   );
   const [alteredSchema, setAlteredSchema] = useState<any>(schema);
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
+  const dynamicFormRef = useRef<any>(null);
+  const boardSyncTokenRef = useRef(0);
+
+  // Live board->stream sync: fires on every board change (individual
+  // toggle, "Select All", or removal alike, since they all funnel through
+  // the same board value change) and pushes the recomputed stream set
+  // straight into the mounted form via DynamicForm's imperative resetForm,
+  // so the Stream widget reflects the currently selected boards without
+  // waiting for submit.
+  const handleFormDataChange = (updatedFormData: any, changedField: string) => {
+    if (changedField !== 'board') return;
+    const token = ++boardSyncTokenRef.current;
+    syncStreamsForBoardChange(updatedFormData, alteredSchema, (nextStream) => {
+      if (boardSyncTokenRef.current !== token) return; // a newer board change superseded this one
+      dynamicFormRef.current?.resetForm({ ...updatedFormData, stream: nextStream });
+    });
+  };
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
-    // console.log(formData, 'formdata');
-    console.log('########## debug payload', payload);
-    console.log('########## debug formdata', formData);
-    setPrefilledFormData(formData);
-    onUserDetails(payload);
+    const { cleanedData: syncedFormData, transformedPayload: syncedPayload } =
+      await pruneStreamsForRemovedBoards(formData, payload, alteredSchema);
+    // console.log(syncedFormData, 'formdata');
+    console.log('########## debug payload', syncedPayload);
+    console.log('########## debug formdata', syncedFormData);
+    setPrefilledFormData(syncedFormData);
+    onUserDetails(syncedPayload);
   };
 
   return (
@@ -280,10 +302,12 @@ const EditSearchUser: React.FC<EditSearchUserProps> = ({
             }}
           >
             <DynamicForm
+              ref={dynamicFormRef}
               schema={alteredSchema}
               uiSchema={alteredUiSchema}
               FormSubmitFunction={FormSubmitFunction}
               prefilledFormData={prefilledFormData}
+              onFormDataChange={handleFormDataChange}
               hideSubmit={true}
               type={''}
             />
