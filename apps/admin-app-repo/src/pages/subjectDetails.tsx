@@ -2,6 +2,7 @@ import Loader from "@/components/Loader";
 import coursePlannerStore from "@/store/coursePlannerStore";
 import taxonomyStore from "@/store/tanonomyStore";
 import {
+  getActiveTerms,
   getDropdownCategories,
   getValidTermsForCategory,
   getValidSubjects,
@@ -28,6 +29,7 @@ import { useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "coursePlannerSelections";
 const BOARD_CATEGORY_CODE = "board";
+const COURSE_TYPE_CATEGORY_CODE = "courseType";
 
 const SubjectDetails = () => {
   const router = useRouter();
@@ -78,6 +80,12 @@ const SubjectDetails = () => {
   const optionsByCategory = useMemo(() => {
     const map: Record<string, any[]> = {};
     dropdownCategories.forEach((cat: any) => {
+      // Course Type should always show every option present in the API response,
+      // regardless of association with the currently selected data.
+      if (cat.code === COURSE_TYPE_CATEGORY_CODE) {
+        map[cat.code] = getActiveTerms(framework, cat.code);
+        return;
+      }
       const entriesExcludingSelf = allEntries.filter(
         (e) => e.categoryCode !== cat.code
       );
