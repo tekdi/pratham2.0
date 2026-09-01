@@ -13,7 +13,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #fff;
+      background: #000;
     }
     /* Clip wrapper — holds the scaled content without leaking layout overflow */
     #h5p-clip {
@@ -561,14 +561,18 @@
       var viewH = window.innerHeight;
       var scale = Math.min(viewW / naturalW, viewH / naturalH, 1);
 
-      if (scale < 0.995) {
+      // Center the (possibly scaled) content in the viewport instead of
+      // anchoring it top-left — otherwise whichever dimension isn't the
+      // binding constraint (e.g. width, when height is what forces the
+      // scale-down) is left as blank space on one side only.
+      var offsetX = Math.max(0, (viewW - naturalW * scale) / 2);
+      var offsetY = Math.max(0, (viewH - naturalH * scale) / 2);
+
+      if (scale < 0.995 || offsetX > 0.5 || offsetY > 0.5) {
         container.style.transformOrigin = 'top left';
-        container.style.transform = 'scale(' + scale + ')';
-        // Shrink the clip wrapper to the visual (scaled) height so no dead space
-        document.getElementById('h5p-clip').style.height = Math.ceil(naturalH * scale) + 'px';
+        container.style.transform = 'translate(' + offsetX + 'px, ' + offsetY + 'px) scale(' + scale + ')';
       } else {
         container.style.transform = '';
-        document.getElementById('h5p-clip').style.height = '';
       }
     }
 

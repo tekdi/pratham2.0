@@ -40,7 +40,14 @@ function Logout() {
       // Specify the keys you want to keep
       preserveLocalStorage();
     }
-    router.replace('/');
+
+    // NavaPatham learners belong back on their own landing page, not the
+    // generic one. isForNavaPatham survives preserveLocalStorage().
+    const isForNavaPatham =
+      typeof window !== 'undefined' &&
+      localStorage.getItem('isForNavaPatham') === 'true';
+
+    router.replace(isForNavaPatham ? '/navapatham' : '/');
   }, []);
 
   return <Loader isLoading={true} />;

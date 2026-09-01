@@ -553,8 +553,9 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
 
           // Add helperText if it doesn't already exist
           if (!enhancedSchema[fieldKey]['ui:options'].helperText) {
-            enhancedSchema[fieldKey]['ui:options'].helperText =
-              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+            enhancedSchema[fieldKey]['ui:options'].helperText = t(
+              'NAVAPATHAM.TYPE_IN_ENGLISH'
+            );
           }
         }
       }

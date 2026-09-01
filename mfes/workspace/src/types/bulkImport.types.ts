@@ -152,8 +152,19 @@ export interface CourseRow {
 export interface CourseChildMappingRow {
   /** TEMP_COURSE_1 */
   courseTempId: string;
-  /** Unit/Section name */
-  unitName: string;
+  /**
+   * @deprecated Legacy single-level unit name. Still parsed from older
+   * workbooks via the 'Unit Name*' alias; new files use unitLevel1-4.
+   */
+  unitName?: string;
+  /** Top-level unit. Required in practice — a child must live in some unit. */
+  unitLevel1?: string;
+  /** Sub-unit inside level 1 */
+  unitLevel2?: string;
+  /** Sub-unit inside level 2 */
+  unitLevel3?: string;
+  /** Sub-unit inside level 3 — the deepest the platform allows */
+  unitLevel4?: string;
   /**
    * Optional description for the unit itself (not the child content).
    * Only needs to be filled on one row per unit — the first non-empty
@@ -183,7 +194,12 @@ export interface ExistingContentMappingRow {
    * to the specified course unit without needing a CourseChildrenMapping row.
    */
   courseTempId?: string;
+  /** @deprecated Legacy single-level unit name — use unitLevel1-4. */
   unitName?: string;
+  unitLevel1?: string;
+  unitLevel2?: string;
+  unitLevel3?: string;
+  unitLevel4?: string;
   sequence?: number;
 }
 

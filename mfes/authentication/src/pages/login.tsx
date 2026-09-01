@@ -15,6 +15,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import appLogo from '../../public/images/appLogo.png';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
+import { applyLanguage, storeLanguage } from '@shared-lib-v2/utils/languageSync';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -155,14 +156,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const handleChange = (event: SelectChangeEvent) => {
     const newLocale = event.target.value;
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('preferredLanguage', newLocale);
-      localStorage.setItem('lang', newLocale);
+      storeLanguage(newLocale);
       setLanguage(event.target.value);
       ReactGA.event('select-language-login-page', {
         selectedLanguage: event.target.value,
       });
       setSelectedLanguage(newLocale);
-      router.push('/login', undefined, { locale: newLocale });
+      applyLanguage(i18n, newLocale, router.basePath);
     }
   };
 

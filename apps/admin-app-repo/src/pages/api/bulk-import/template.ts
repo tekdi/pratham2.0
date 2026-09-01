@@ -612,27 +612,48 @@ const getQuestionsample = (): (string | number)[][] => [
   ],
 ];
 
-// CourseChildrenMapping columns (7): CourseTempID, UnitName, UnitDescription,
-//   UnitIconDriveURL, ChildRef, ChildType, Sequence
-// Unit Description and Unit Icon Drive URL are unit-level: fill them on the
-// FIRST row of each unit and leave blank on the remaining rows of that unit.
+// CourseChildrenMapping columns (10): CourseTempID, UnitLevel1-4,
+//   UnitDescription, UnitIconDriveURL, ChildRef, ChildType, Sequence
+//
+// Units nest up to 4 levels. Fill Unit Level 1 for a top-level unit and add
+// deeper levels to nest; leave deeper levels blank to attach the child higher
+// up. Parent units are created automatically — no filler rows needed.
+// Unit Description / Unit Icon apply to the DEEPEST filled level on that row;
+// fill them on one row per unit and leave blank on the rest.
 const getCourseMappingsSample = (): (string | number)[][] => [
+  // Content directly under a top-level unit
   [
-    'TEMP_COURSE_1', 'Unit 1: Introduction',
-    'Foundational concepts to get started',                              // Unit Description
+    'TEMP_COURSE_1', 'Unit 1: Introduction', '', '', '',
+    'Foundational concepts to get started',                                // Unit Description
     'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
     'TEMP_CONTENT_1', 'content', 1,
   ],
+  // Sub-unit (level 2) inside Unit 1 — "Unit 1: Introduction" is reused, not duplicated
   [
-    'TEMP_COURSE_1', 'Unit 1: Introduction',
-    '',   // blank — unit metadata already set on the first row of this unit
+    'TEMP_COURSE_1', 'Unit 1: Introduction', 'Basics', '', '',
+    'Core building blocks',   // describes the level-2 unit "Basics"
     '',
     'TEMP_QS_1', 'questionset', 2,
   ],
+  // Level 3 nested inside "Basics"
   [
-    'TEMP_COURSE_1', 'Unit 2: Assessment',
-    'End-of-course assessment',                                          // Unit Description
-    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing', // Unit Icon Drive URL
+    'TEMP_COURSE_1', 'Unit 1: Introduction', 'Basics', 'Practice', '',
+    'Practice exercises',
+    '',
+    'TEMP_QS_2', 'questionset', 3,
+  ],
+  // Level 4 — the deepest the platform allows
+  [
+    'TEMP_COURSE_1', 'Unit 1: Introduction', 'Basics', 'Practice', 'Extra Drills',
+    'Optional additional practice',
+    '',
+    'TEMP_CONTENT_1', 'content', 4,
+  ],
+  // A second top-level unit
+  [
+    'TEMP_COURSE_1', 'Unit 2: Assessment', '', '', '',
+    'End-of-course assessment',
+    'https://drive.google.com/file/d/SAMPLE_UNIT_ICON_ID/view?usp=sharing',
     'TEMP_QS_2', 'questionset', 1,
   ],
 ];
@@ -643,9 +664,11 @@ const getCourseMappingsSample = (): (string | number)[][] => [
 // Leave Course Temp ID blank if only using as a reference.
 const getExistingMappingsSample = (): (string | number)[][] => [
   // Add existing content directly to a course unit (no CourseChildrenMapping needed)
-  ['TEMP_EXISTING_1', 'do_abc1234567890', 'content',     'TEMP_COURSE_1', 'Unit 1: Introduction', 3],
+  ['TEMP_EXISTING_1', 'do_abc1234567890', 'content',     'TEMP_COURSE_1', 'Unit 1: Introduction', '', '', '', 3],
+  // Existing content can target a nested sub-unit too
+  ['TEMP_EXISTING_2', 'do_xyz0987654321', 'questionset', 'TEMP_COURSE_1', 'Unit 1: Introduction', 'Basics', 'Practice', '', 4],
   // Reference only — used in CourseChildrenMapping or as a QS reference
-  ['TEMP_EXISTING_2', 'do_xyz0987654321', 'questionset', '', '', ''],
+  ['TEMP_EXISTING_3', 'do_pqr1122334455', 'questionset', '', '', '', '', '', ''],
 ];
 
 // ─── Instructions sheet ───────────────────────────────────────
@@ -668,7 +691,7 @@ const buildInstructionsSheet = (workbook: ExcelJS.Workbook, fw: FrameworkId) => 
     ['QuestionSets',          'Create question set containers with metadata.'],
     ['Questions',             'Add MCQ / Arrange / Match / Subjective questions linked to a QuestionSet.'],
     ['Courses',               'Create course containers.'],
-    ['CourseChildrenMapping', 'Map content and question sets into course units. Also sets each unit\'s description and icon.'],
+    ['CourseChildrenMapping', 'Map content and question sets into course units. Units nest up to 4 levels via Unit Level 1-4. Also sets each unit\'s description and icon.'],
     ['ExistingContentMapping','Reference existing platform items (do_xxx) using a Temp ID.'],
     ['Examples',              'Sample rows for every sheet. NOT imported — copy a row into the sheet above and edit it.'],
     ['LookupData',            'Reference sheet — all valid dropdown values. Do NOT edit this sheet.'],
@@ -679,6 +702,12 @@ const buildInstructionsSheet = (workbook: ExcelJS.Workbook, fw: FrameworkId) => 
     ['3. Replace with your data',  'Overwrite every value with your own. Do not leave sample values in place.'],
     ['4. Delete unused rows',      'Only rows you actually filled in are imported. Blank rows are skipped.'],
     ['Note',                       'Data sheets ship EMPTY on purpose so sample records can never be imported by mistake.'],
+    ['', ''],
+    ['NESTED COURSE UNITS', ''],
+    ['Unit Level 1-4',   'Units nest up to 4 levels. Fill Level 1 for a top-level unit; add deeper levels to nest.'],
+    ['Attach higher up', 'Leave deeper levels blank to attach the child to the last filled level.'],
+    ['Parents are automatic', 'Listing "Unit 1 / Basics" creates both — no separate row needed for the parent.'],
+    ['No gaps',          'Fill levels in order. Level 3 with Level 2 blank is rejected during validation.'],
     ['', ''],
     ['TEMP ID FORMAT', ''],
     ['Content',         'TEMP_CONTENT_1, TEMP_CONTENT_2, ...'],

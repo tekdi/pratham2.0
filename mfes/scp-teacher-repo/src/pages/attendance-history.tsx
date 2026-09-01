@@ -55,11 +55,12 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/router';
 import ReactGA from 'react-ga4';
-import { accessControl } from '../../app.config';
+import { accessControl, dashboardDaysLimit } from '../../app.config';
 import Header from '../components/Header';
 import Loader from '../components/Loader';
 import SortingModal from '../components/SortingModal';
 import { useDirection } from '../hooks/useDirection';
+import useEventDates from '../hooks/useEventDates';
 import { attendanceStatusList } from '../services/AttendanceService';
 
 const UserAttendanceHistory = () => {
@@ -570,6 +571,18 @@ const UserAttendanceHistory = () => {
     setSelectedDate(date);
   };
 
+   // dates of the visible month which have a scheduled session
+  const attendanceEventDates = useEventDates(
+    userId,
+    'userId',
+    dashboardDaysLimit,
+    selectedDate,
+    undefined,
+    undefined,
+    undefined,
+    classId
+  );
+
   // const getAllDatesInRange = (startDate: string, endDate: string): string[] => {
   //   const datesArray: string[] = [];
   //   const currentDate = new Date(startDate);
@@ -872,6 +885,7 @@ const UserAttendanceHistory = () => {
               formattedAttendanceData={percentageAttendance}
               onChange={handleActiveStartDateChange}
               onDateChange={handleSelectedDateChange}
+              eventData={attendanceEventDates}
             />
           </Box>
           <Box mt={2}>
