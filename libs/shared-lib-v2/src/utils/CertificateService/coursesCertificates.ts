@@ -23,6 +23,21 @@ export interface renderCertificateParam {
   credentialId?: string;
   templateId?: string;
 }
+
+// `certificateTemplate` comes straight from the content metadata, so it can be a
+// plain id, a single-element array (the usual shape for content fields), or an
+// object carrying the id. Anything else is treated as absent so the caller falls
+// back to the tenant template instead of sending a garbage id to the render API.
+export const getCertificateTemplateId = (
+  certificateTemplate: any
+): string | undefined => {
+  const value = Array.isArray(certificateTemplate)
+    ? certificateTemplate[0]
+    : certificateTemplate;
+  if (typeof value === 'string') return value.trim() || undefined;
+  const id = value?.identifier ?? value?.templateId;
+  return typeof id === 'string' ? id.trim() || undefined : undefined;
+};
 export const courseWiseLernerList = async ({
   limit,
   offset,
