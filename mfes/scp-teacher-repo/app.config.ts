@@ -120,6 +120,7 @@ export const RequisiteType = {
   PRE_REQUISITES: 'prerequisite',
   POST_REQUISITES: 'postrequisite',
   FACILITATOR_REQUISITE: 'facilitator-requisite',
+  DURING_COURSE: 'during',
 };
 
 export const COURSE_TYPE = {

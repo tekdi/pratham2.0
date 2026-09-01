@@ -405,16 +405,6 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         ]
       : []),
     {
-      key: 'stream',
-      label: 'Stream',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'STREAM')
-            ?.selectedValues?.join(', ')
-        ) || '-',
-    },
-    {
       key: 'status',
       label: 'Status',
       render: (row: any) => transformLabel(row?.status),
