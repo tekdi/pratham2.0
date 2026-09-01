@@ -29,6 +29,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
 import { useChunkErrorReload } from '@shared-lib-v2/hooks/useChunkErrorReload';
+import { useLanguageFromStorage } from '@shared-lib-v2/hooks/useLanguageFromStorage';
 import Notification from '../components/Notification';
 import AllowNotification from '../components/AllowNotification';
 
@@ -73,6 +74,7 @@ export function DarkTheme() {
 function CustomApp({ Component, pageProps }: AppProps) {
   useChunkErrorReload();
   const { i18n } = useTranslation(); // Get the i18n object to access the selected language
+  useLanguageFromStorage();
   const [client] = React.useState(
     new QueryClient({
       defaultOptions: {
