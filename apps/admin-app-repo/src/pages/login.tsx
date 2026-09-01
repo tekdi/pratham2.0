@@ -32,9 +32,10 @@ import Loader from '../components/Loader';
 import { getUserId, login } from '../services/LoginService';
 
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
+import { applyLanguage, storeLanguage } from '@shared-lib-v2/utils/languageSync';
 
 const LoginPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -256,13 +257,12 @@ const LoginPage = () => {
   const handleChange = (event: SelectChangeEvent) => {
     const newLocale = event.target.value;
     if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.setItem('preferredLanguage', newLocale);
-      localStorage.setItem('lang', newLocale);
+      storeLanguage(newLocale);
       setLanguage(newLocale);
       ReactGA.event('select-language-login-page', {
         selectedLanguage: newLocale,
       });
-      router.push('/login', undefined, { locale: newLocale });
+      applyLanguage(i18n, newLocale, router.basePath);
     }
   };
 

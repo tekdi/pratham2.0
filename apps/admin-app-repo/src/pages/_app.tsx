@@ -30,10 +30,12 @@ import TenantService from '@/services/TenantService';
 import MenuWrapper from '../config/MenuWrapper';
 import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
 import { useChunkErrorReload } from '@shared-lib-v2/hooks/useChunkErrorReload';
+import { useLanguageFromStorage } from '@shared-lib-v2/hooks/useLanguageFromStorage';
 import { PUBLIC_ROUTES } from '@/config/routesConfig';
 
 function App({ Component, pageProps }: AppProps) {
   useChunkErrorReload();
+  useLanguageFromStorage();
   const router = useRouter();
   const setIsArchived = useSubmittedButtonStore(
     (state: any) => state.setIsArchived
