@@ -91,23 +91,28 @@ export default function handler(req, res) {
                   );
                   // console.log('in filteredData', filteredData);
                   if (filteredData) {
-                    // Target category isn't necessarily a direct association of
-                    // the selected term(s) (e.g. stream is only associated with
-                    // medium, not board directly) - walk the association graph
-                    // instead of reading `associations[]` in isolation (a direct
-                    // association is just the first hop of that walk, so this
-                    // covers both cases), optionally restricting results to a
-                    // caller-supplied allowed set.
-                    const allowedFilter =
-                      Array.isArray(allowedValues) && allowedValues.length > 0
-                        ? allowedValues
-                        : null;
-                    options = findAssociatedTermNames(
-                      frameworkFilter,
-                      filteredData,
-                      findcode,
-                      allowedFilter
-                    ).map((name) => ({ label: name, value: name }));
+                    if (Array.isArray(allowedValues) && allowedValues.length > 0) {
+                      // Target category isn't necessarily a direct association of
+                      // the selected term(s) (e.g. stream is only associated with
+                      // medium, not board directly) - walk the association graph
+                      // instead of reading `associations[]` in isolation, and
+                      // restrict results to the caller-supplied allowed set.
+                      options = findAssociatedTermNames(
+                        frameworkFilter,
+                        filteredData,
+                        findcode,
+                        allowedValues
+                      ).map((name) => ({ label: name, value: name }));
+                    } else {
+                      options = filteredData?.flatMap((data) =>
+                        (data?.associations ?? []) // Ensure associations exist, default to empty array
+                          .filter((assoc) => assoc?.category === findcode)
+                          .map((assoc) => ({
+                            label: assoc.name,
+                            value: assoc.name,
+                          }))
+                      );
+                    }
                   }
                   // console.log('options', JSON.stringify(options));
                 } else if (selectedvalue != '') {

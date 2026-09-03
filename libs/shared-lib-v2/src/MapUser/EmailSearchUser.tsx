@@ -163,6 +163,9 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
           ...tempFormData,
           ...(type == 'instructor' ? { designation: 'facilitator' } : {}),
         });
+        prevBoardRef.current = Array.isArray(tempFormData?.board)
+          ? tempFormData.board
+          : [];
 
         // Extract user details
         const extractedUserId = user.userId;
@@ -254,6 +257,7 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     setValidationError(null);
     setCanProceed(true);
     setPrefilledFormData({});
+    prevBoardRef.current = [];
     if (onUserSelected) {
       onUserSelected('');
     }
@@ -296,15 +300,31 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
   const dynamicFormRef = useRef<any>(null);
   const boardSyncTokenRef = useRef(0);
+  // Tracks the board selection as of the last time we synced streams, so a
+  // board change can be detected directly (by diffing against this) rather
+  // than trusting DynamicForm's own single-field change detector, which
+  // only reports the first field (in object-key order) it finds changed in
+  // a given tick and can miss "board" when another field's value also
+  // shifted in the same update.
+  const prevBoardRef = useRef<string[]>([]);
 
-  // Live board->stream sync: fires on every board change (individual
-  // toggle, "Select All", or removal alike, since they all funnel through
-  // the same board value change) and pushes the recomputed stream set
-  // straight into the mounted form via DynamicForm's imperative resetForm,
-  // so the Stream widget reflects the currently selected boards without
-  // waiting for submit.
-  const handleFormDataChange = (updatedFormData: any, changedField: string) => {
-    if (changedField !== 'board') return;
+  // Live board->stream sync: fires on every form change, and whenever the
+  // board selection itself has actually moved (individual toggle, "Select
+  // All", or removal alike - they all funnel through the same board value)
+  // pushes the recomputed stream set straight into the mounted form via
+  // DynamicForm's imperative resetForm, so the Stream widget reflects the
+  // currently selected boards without waiting for submit.
+  const handleFormDataChange = (updatedFormData: any) => {
+    const boardValues = Array.isArray(updatedFormData?.board)
+      ? updatedFormData.board
+      : [];
+    const prevBoard = prevBoardRef.current;
+    const boardChanged =
+      boardValues.length !== prevBoard.length ||
+      !boardValues.every((b: string) => prevBoard.includes(b));
+    if (!boardChanged) return;
+    prevBoardRef.current = boardValues;
+
     const token = ++boardSyncTokenRef.current;
     syncStreamsForBoardChange(updatedFormData, alteredSchema, (nextStream) => {
       if (boardSyncTokenRef.current !== token) return; // a newer board change superseded this one
