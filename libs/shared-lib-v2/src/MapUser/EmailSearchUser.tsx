@@ -322,6 +322,11 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     const boardChanged =
       boardValues.length !== prevBoard.length ||
       !boardValues.every((b: string) => prevBoard.includes(b));
+    console.log('[EmailSearchUser] onFormDataChange fired', {
+      boardValues,
+      prevBoard,
+      boardChanged,
+    });
     if (!boardChanged) return;
     prevBoardRef.current = boardValues;
 

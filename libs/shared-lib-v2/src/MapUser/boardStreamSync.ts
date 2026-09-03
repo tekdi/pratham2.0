@@ -12,6 +12,10 @@ export const syncStreamsForBoardChange = async (
   applyStreamUpdate: (nextStreamValues: string[]) => void
 ) => {
   if (!schema?.properties?.board || !schema?.properties?.stream) {
+    console.warn(
+      '[boardStreamSync] skipped: schema has no board/stream property',
+      { hasBoard: !!schema?.properties?.board, hasStream: !!schema?.properties?.stream }
+    );
     return;
   }
 
@@ -22,6 +26,10 @@ export const syncStreamsForBoardChange = async (
   const boardFetchUrl = schema.properties.board?.api?.payload?.fetchUrl;
 
   if (!boardFetchUrl) {
+    console.warn(
+      '[boardStreamSync] skipped: schema.properties.board.api.payload.fetchUrl is missing',
+      schema.properties.board
+    );
     return;
   }
 
@@ -35,12 +43,14 @@ export const syncStreamsForBoardChange = async (
   try {
     const streamCategoryCode =
       schema.properties.stream?.api?.payload?.findcode || 'stream';
+    console.log('[boardStreamSync] fetching streams for boards', boardValues);
     const response = await post('/api/dynamic-form/get-framework', {
       code: 'board',
       fetchUrl: boardFetchUrl,
       selectedvalue: boardValues,
       findcode: streamCategoryCode,
     });
+    console.log('[boardStreamSync] get-framework response', response?.data);
     const associatedStreams: string[] = (response?.data?.options || []).map(
       (opt: any) => opt.value
     );
