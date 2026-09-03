@@ -1,5 +1,63 @@
 import { post } from '../DynamicForm/services/RestClient';
 
+// DynamicForm has its own generic "dependent field" cascade: whenever a
+// field named as another field's `api.dependent` changes, it clears that
+// field's value and re-fetches its enum via a plain (direct-associations-
+// only) lookup. If the schema also marks "stream" as dependent on "board",
+// that generic cascade fires in parallel with syncStreamsForBoardChange
+// below on every board change - and being a separate, independently-timed
+// fetch, whichever of the two resolves last wins, so the more complete
+// association-graph result here can get silently clobbered back down to
+// the narrower direct-only one depending on network timing. Since this
+// module's live sync + the submit-time prune already fully own "stream"'s
+// options and value, this strips just enough from a cloned copy of the
+// field's `api` config (`dependent`/`callType`) to opt "stream" out of
+// that generic cascade, while leaving `api.payload` (read elsewhere in
+// this module, e.g. for `findcode`) intact, and leaving every other field
+// - and every other DynamicForm consumer, since this only touches the
+// schema object these two forms hold locally - completely untouched.
+export const withStreamCascadeDisabled = (schema: any) => {
+  const streamApi = schema?.properties?.stream?.api;
+  if (!streamApi) {
+    return schema;
+  }
+  const { dependent, callType, ...restApi } = streamApi;
+  return {
+    ...schema,
+    properties: {
+      ...schema.properties,
+      stream: {
+        ...schema.properties.stream,
+        api: restApi,
+      },
+    },
+  };
+};
+
+// Low-level lookup shared by the two functions below: every stream
+// associated with `boardValues`, resolved via the framework's association
+// graph (so an indirect chain like board -> medium -> stream resolves too,
+// not just a direct board->stream association).
+const fetchStreamOptionsForBoards = async (
+  boardValues: string[],
+  schema: any
+): Promise<{ label: string; value: string }[]> => {
+  const boardFetchUrl = schema?.properties?.board?.api?.payload?.fetchUrl;
+  if (!boardValues.length || !boardFetchUrl) {
+    return [];
+  }
+  const streamCategoryCode =
+    schema.properties.stream?.api?.payload?.findcode || 'stream';
+  const response = await post('/api/dynamic-form/get-framework', {
+    code: 'board',
+    fetchUrl: boardFetchUrl,
+    selectedvalue: boardValues,
+    findcode: streamCategoryCode,
+    useAssociationGraph: true,
+  });
+  return response?.data?.options || [];
+};
+
 // Keeps the "stream" multi-select in sync with whatever boards are
 // currently selected - covers individual board add/remove and "Select All"
 // uniformly, since all three funnel through the same board value change.
@@ -9,7 +67,10 @@ import { post } from '../DynamicForm/services/RestClient';
 export const syncStreamsForBoardChange = async (
   formData: Record<string, any>,
   schema: any,
-  applyStreamUpdate: (nextStreamValues: string[]) => void
+  applyStreamUpdate: (
+    nextStreamValues: string[],
+    streamOptions: { label: string; value: string }[]
+  ) => void
 ) => {
   if (!schema?.properties?.board || !schema?.properties?.stream) {
     console.warn(
@@ -23,9 +84,8 @@ export const syncStreamsForBoardChange = async (
   const currentStreamValues = Array.isArray(formData?.stream)
     ? formData.stream
     : [];
-  const boardFetchUrl = schema.properties.board?.api?.payload?.fetchUrl;
 
-  if (!boardFetchUrl) {
+  if (!schema.properties.board?.api?.payload?.fetchUrl) {
     console.warn(
       '[boardStreamSync] skipped: schema.properties.board.api.payload.fetchUrl is missing',
       schema.properties.board
@@ -35,35 +95,56 @@ export const syncStreamsForBoardChange = async (
 
   if (!boardValues.length) {
     if (currentStreamValues.length) {
-      applyStreamUpdate([]);
+      applyStreamUpdate([], []);
     }
     return;
   }
 
   try {
-    const streamCategoryCode =
-      schema.properties.stream?.api?.payload?.findcode || 'stream';
     console.log('[boardStreamSync] fetching streams for boards', boardValues);
-    const response = await post('/api/dynamic-form/get-framework', {
-      code: 'board',
-      fetchUrl: boardFetchUrl,
-      selectedvalue: boardValues,
-      findcode: streamCategoryCode,
-    });
-    console.log('[boardStreamSync] get-framework response', response?.data);
-    const associatedStreams: string[] = (response?.data?.options || []).map(
-      (opt: any) => opt.value
-    );
+    const streamOptions = await fetchStreamOptionsForBoards(boardValues, schema);
+    console.log('[boardStreamSync] resolved stream options', streamOptions);
+    const associatedStreams: string[] = streamOptions.map((opt) => opt.value);
 
-    const isSameSet =
-      associatedStreams.length === currentStreamValues.length &&
-      associatedStreams.every((stream) => currentStreamValues.includes(stream));
-
-    if (!isSameSet) {
-      applyStreamUpdate(associatedStreams);
-    }
+    // Always push the fresh option list, even when the selected values
+    // happen to already match - the widget can only show/check values that
+    // are present in its own enum, and that enum needs to stay in sync with
+    // whichever boards are currently selected too (it may otherwise still
+    // be scoped to a previous, narrower board selection).
+    applyStreamUpdate(associatedStreams, streamOptions);
   } catch (error) {
     console.error('Error syncing streams with selected boards:', error);
+  }
+};
+
+// One-time initial-load companion to the live sync above: refreshes just
+// the Stream widget's available options (via the same association-graph
+// lookup) to match whichever board(s) are already selected when an edit
+// form opens, WITHOUT touching the already-saved stream value - the saved
+// selection is trusted as-is on load, only the option list it needs to
+// render against is brought up to date. Needed because this module also
+// takes "stream" out of DynamicForm's generic dependent-field cascade (see
+// withStreamCascadeDisabled) to avoid it racing the live sync above, which
+// means nothing else would populate Stream's options on initial load.
+export const refreshInitialStreamOptions = async (
+  formData: Record<string, any>,
+  schema: any,
+  applyOptions: (streamOptions: { label: string; value: string }[]) => void
+) => {
+  if (!schema?.properties?.board || !schema?.properties?.stream) {
+    return;
+  }
+  const boardValues = Array.isArray(formData?.board) ? formData.board : [];
+  if (!boardValues.length) {
+    return;
+  }
+  try {
+    const streamOptions = await fetchStreamOptionsForBoards(boardValues, schema);
+    if (streamOptions.length) {
+      applyOptions(streamOptions);
+    }
+  } catch (error) {
+    console.error('Error loading initial stream options:', error);
   }
 };
 

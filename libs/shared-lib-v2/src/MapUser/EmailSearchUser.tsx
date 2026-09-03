@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -20,6 +20,8 @@ import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/Dynam
 import {
   syncStreamsForBoardChange,
   pruneStreamsForRemovedBoards,
+  refreshInitialStreamOptions,
+  withStreamCascadeDisabled,
 } from './boardStreamSync';
 interface EmailSearchUserProps {
   onUserSelected?: (userId: string) => void;
@@ -296,7 +298,9 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
   const [prefilledFormData, setPrefilledFormData] = useState(
     prefilledState?.prefilledFormData || {}
   );
-  const [alteredSchema, setAlteredSchema] = useState<any>(schema);
+  const [alteredSchema, setAlteredSchema] = useState<any>(() =>
+    withStreamCascadeDisabled(schema)
+  );
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
   const dynamicFormRef = useRef<any>(null);
   const boardSyncTokenRef = useRef(0);
@@ -331,11 +335,31 @@ const EmailSearchUser: React.FC<EmailSearchUserProps> = ({
     prevBoardRef.current = boardValues;
 
     const token = ++boardSyncTokenRef.current;
-    syncStreamsForBoardChange(updatedFormData, alteredSchema, (nextStream) => {
+    syncStreamsForBoardChange(updatedFormData, alteredSchema, (nextStream, streamOptions) => {
       if (boardSyncTokenRef.current !== token) return; // a newer board change superseded this one
+      // The Stream widget can only show/check values present in its own
+      // enum, so refresh that enum before (or alongside) setting the value -
+      // otherwise a valid stream that isn't already in the dropdown's
+      // options silently fails to render as selected.
+      dynamicFormRef.current?.setFieldOptions('stream', streamOptions);
       dynamicFormRef.current?.resetForm({ ...updatedFormData, stream: nextStream });
     });
   };
+
+  // "stream" is deliberately taken out of DynamicForm's generic
+  // dependent-field cascade (see withStreamCascadeDisabled) so it can't
+  // race the live sync above, which also means nothing auto-populates its
+  // options on initial load anymore. This restores that: once the form has
+  // mounted with the found user's existing board/stream selection, refresh
+  // just the Stream widget's option list (not its value - the found
+  // selection is trusted as-is) so those streams render as checked.
+  useEffect(() => {
+    if (!isUserLoaded) return;
+    refreshInitialStreamOptions(prefilledFormData, alteredSchema, (streamOptions) => {
+      dynamicFormRef.current?.setFieldOptions('stream', streamOptions);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUserLoaded]);
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
     const { cleanedData: syncedFormData, transformedPayload: syncedPayload } =

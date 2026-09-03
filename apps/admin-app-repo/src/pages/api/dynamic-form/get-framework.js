@@ -49,7 +49,7 @@ function findAssociatedTermNames(framework, startTerms, targetCategory, allowedN
 export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      const { code, fetchUrl, selectedvalue, findcode, allowedValues } = req.body;
+      const { code, fetchUrl, selectedvalue, findcode, allowedValues, useAssociationGraph } = req.body;
 
       const axios = require('axios');
 
@@ -91,17 +91,22 @@ export default function handler(req, res) {
                   );
                   // console.log('in filteredData', filteredData);
                   if (filteredData) {
-                    if (Array.isArray(allowedValues) && allowedValues.length > 0) {
+                    const hasAllowedValues =
+                      Array.isArray(allowedValues) && allowedValues.length > 0;
+                    if (hasAllowedValues || useAssociationGraph) {
                       // Target category isn't necessarily a direct association of
                       // the selected term(s) (e.g. stream is only associated with
                       // medium, not board directly) - walk the association graph
-                      // instead of reading `associations[]` in isolation, and
-                      // restrict results to the caller-supplied allowed set.
+                      // instead of reading `associations[]` in isolation. Callers
+                      // opt into this explicitly (via allowedValues to restrict
+                      // the result, or useAssociationGraph to resolve indirect
+                      // relationships without restricting) so every other caller
+                      // of this endpoint keeps its existing direct-only behavior.
                       options = findAssociatedTermNames(
                         frameworkFilter,
                         filteredData,
                         findcode,
-                        allowedValues
+                        hasAllowedValues ? allowedValues : null
                       ).map((name) => ({ label: name, value: name }));
                     } else {
                       options = filteredData?.flatMap((data) =>
