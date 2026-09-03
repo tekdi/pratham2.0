@@ -266,8 +266,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             );
           });
 
+          // Course Type always shows every option present in the API
+          // response, regardless of association with the selected
+          // board/medium/grade.
           setCourseTypes(
-            (dynamicAssociationOptions['courseType'] || []).map(
+            getOptionsByCategory(frameworks, 'courseType').map(
               (item: any) => item.name
             )
           );
