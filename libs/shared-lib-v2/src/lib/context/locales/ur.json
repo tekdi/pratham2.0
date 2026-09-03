@@ -322,7 +322,9 @@
       "SUB_DESCRIPTION": "ہمارے ماہر سے ذاتی رہنمائی حاصل کرنے کے لیے اپنی دلچسپی دکھائیں!",
       "INTEREST_BUTTON": "مجھے دلچسپی ہے۔",
       "SUBMIT_BUTTON": "جمع کروائیں۔",
-      "OKAY_BUTTON": "ٹھیک ہے۔"
+      "OKAY_BUTTON": "ٹھیک ہے۔",
+      "CONFIRM_INTEREST_MESSAGE": "زبردست! ہم آپ کو لیول اپ کرنے میں مدد کرنے کے لیے پرجوش ہیں! کیا آپ واقعی دلچسپی رکھتے ہیں؟",
+      "CONFIRM_BUTTON": "تصدیق کریں"
     },
     "LEVEL_UP": {
       "TITLE": "بہت اچھا! ہم آپ کی مدد کرنے کے لیے پرجوش ہیں!",
@@ -998,7 +1000,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "میں اپنے طور پر والنٹیر کا کام کر رہا ہوں۔",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "اگر آپ آزادانہ طور پر والنٹیر کی خدمات انجام دے رہے ہیں تو اس اختیار کو منتخب کریں۔",
     "NO_ACTIVE_COHORTS_FOUND": "کوئی فعال گروہ نہیں ملا",
-    "ORGANISATION_TYPE": "تنظیم کی قسم"
+    "ORGANISATION_TYPE": "تنظیم کی قسم",
+    "RENTED": "کرائے پر",
+    "OWNED": "ملکیت",
+    "GOVERNMENT": "سرکاری",
+    "VIRTUAL": "ورچوئل",
+    "EXTENSION_CENTER": "توسیعی مرکز"
   },
   "ORGANISATION_NAME": "ادارے کا نام",
   "FORM_ERROR_MESSAGES": {

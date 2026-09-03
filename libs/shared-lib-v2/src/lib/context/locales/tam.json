@@ -322,7 +322,9 @@
       "SUB_DESCRIPTION": "எங்கள் நிபுணரிடமிருந்து தனிப்பயன் வழிகாட்டலைப் பெற உங்கள் ஆர்வத்தை தெரிவிக்கவும்!",
       "INTEREST_BUTTON": "நான் ஆர்வமாக உள்ளேன்",
       "SUBMIT_BUTTON": "சமர்ப்பி",
-      "OKAY_BUTTON": "சரி"
+      "OKAY_BUTTON": "சரி",
+      "CONFIRM_INTEREST_MESSAGE": "அருமை! உங்களை மேம்படுத்த உதவ நாங்கள் ஆர்வமாக உள்ளோம்! நீங்கள் உண்மையிலேயே ஆர்வமாக உள்ளீர்களா?",
+      "CONFIRM_BUTTON": "உறுதிப்படுத்து"
     },
     "LEVEL_UP": {
       "TITLE": "அருமை! உங்களை மேம்படுத்த உதவுவதில் நாங்கள் உற்சாகமாக உள்ளோம்!",
@@ -998,7 +1000,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "நான் தனியாக தன்னார்வமாக செயல்படுகிறேன்",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "நீங்கள் தனிப்பட்ட முறையில் தன்னார்வமாக செயல்படுகிறீர்கள் என்றால் இந்த விருப்பத்தைத் தேர்வு செய்க.",
     "NO_ACTIVE_COHORTS_FOUND": "செயலில் உள்ள cohort-கள் எதுவும் கிடைக்கவில்லை",
-    "ORGANISATION_TYPE": "நிறுவனத்தின் வகை"
+    "ORGANISATION_TYPE": "நிறுவனத்தின் வகை",
+    "RENTED": "வாடகைக்கு",
+    "OWNED": "சொந்தமானது",
+    "GOVERNMENT": "அரசு",
+    "VIRTUAL": "மெய்நிகர்",
+    "EXTENSION_CENTER": "விரிவாக்க மையம்"
   },
   "ORGANISATION_NAME": "நிறுவனத்தின் பெயர்",
   "FORM_ERROR_MESSAGES": {

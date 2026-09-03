@@ -322,7 +322,9 @@
       "SUB_DESCRIPTION": "ವೈಯಕ್ತಿಕ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ನಿಮ್ಮ ಆಸಕ್ತಿ ತೋರಿಸಿ!",
       "INTEREST_BUTTON": "ನನಗೆ ಆಸಕ್ತಿ ಇದೆ",
       "SUBMIT_BUTTON": "ಸಲ್ಲಿಸಿ",
-      "OKAY_BUTTON": "ಸರಿ"
+      "OKAY_BUTTON": "ಸರಿ",
+      "CONFIRM_INTEREST_MESSAGE": "ಅದ್ಭುತ! ನಿಮ್ಮನ್ನು ಮುಂದಿನ ಹಂತಕ್ಕೆ ಕೊಂಡೊಯ್ಯಲು ನಾವು ಉತ್ಸುಕರಾಗಿದ್ದೇವೆ! ನಿಮಗೆ ನಿಜವಾಗಿಯೂ ಆಸಕ್ತಿ ಇದೆಯೇ?",
+      "CONFIRM_BUTTON": "ದೃಢೀಕರಿಸಿ"
     },
     "LEVEL_UP": {
       "TITLE": "ಶುಭವಾಗಿದೆ! ನಾವು ನಿಮಗೆ ಸಹಾಯ ಮಾಡಲು ಉತ್ಸಾಹಿತರಾಗಿದ್ದೇವೆ!",
@@ -998,7 +1000,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "ನಾನು ಸ್ವಂತವಾಗಿ ಸ್ವಯಂಸೇವೆ ಮಾಡುತ್ತಿದ್ದೇನೆ",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "ನೀವು ಸ್ವತಂತ್ರವಾಗಿ ಸ್ವಯಂಸೇವೆ ಮಾಡುತ್ತಿದ್ದರೆ ಈ ಆಯ್ಕೆಯನ್ನು ಆರಿಸಿ.",
     "NO_ACTIVE_COHORTS_FOUND": "ಯಾವುದೇ ಸಕ್ರಿಯ ಕೊಹಾರ್ಟ್‌ಗಳು ಸಿಗಲಿಲ್ಲ",
-    "ORGANISATION_TYPE": "ಸಂಸ್ಥೆಯ ಪ್ರಕಾರ"
+    "ORGANISATION_TYPE": "ಸಂಸ್ಥೆಯ ಪ್ರಕಾರ",
+    "RENTED": "ಬಾಡಿಗೆ",
+    "OWNED": "ಸ್ವಂತ",
+    "GOVERNMENT": "ಸರ್ಕಾರಿ",
+    "VIRTUAL": "ವರ್ಚುವಲ್",
+    "EXTENSION_CENTER": "ವಿಸ್ತರಣಾ ಕೇಂದ್ರ"
   },
   "ORGANISATION_NAME": "ಸಂಸ್ಥೆಯ ಹೆಸರು",
   "FORM_ERROR_MESSAGES": {

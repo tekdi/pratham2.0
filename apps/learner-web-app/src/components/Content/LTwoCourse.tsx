@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import CommonModal from '@learner/components/Modal/CommonModal';
-import LevelUp from '@learner/components/LTwoContent/LevelUp';
-import ResponseRecorded from '@learner/components/LTwoContent/ResponseRecorded';
+import ConfirmationModal from '@learner/components/ConfirmationModal/ConfirmationModal';
 import { useTranslation } from '@shared-lib';
-import {
-  fetchUserCoursesWithContent,
-  createL2Course,
-} from '@learner/utils/API/contentService';
+import { fetchUserCoursesWithContent } from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
-import { getUserDetails } from '@learner/utils/API/userService';
+import { getUserDetails, updateUser } from '@learner/utils/API/userService';
+import { L2_INTEREST_FIELD_ID } from '@learner/utils/app.constant';
 
 export interface TopicProp {
   topic: string;
   courses?: any[];
 }
+
 const getCustomFieldValueFromArray = (customFields: any, label: string[]) => {
   const fieldValue = label.reduce((acc, curr) => {
     const field = customFields.find((f: any) => f.label === curr);
@@ -27,12 +24,9 @@ const getCustomFieldValueFromArray = (customFields: any, label: string[]) => {
 const LTwoCourse: React.FC = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [count, setCount] = useState(0);
   const [topics, setTopics] = useState<TopicProp[]>([]);
   const [userResponse, setUserResponse] = useState<any>(null);
-  const [selectedTopic, setSelectedTopic] = React.useState<
-    TopicProp | undefined
-  >(undefined);
+  const [isInterested, setIsInterested] = useState(false);
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -57,6 +51,13 @@ const LTwoCourse: React.FC = () => {
               ...(result.userData || {}),
               ...customFieldsJson,
             });
+            const interestField = result?.userData?.customFields?.find(
+              (field: any) => field?.fieldId === L2_INTEREST_FIELD_ID
+            );
+            const isAlreadyInterested = interestField?.selectedValues?.some(
+              (selected: any) => selected?.value === 'yes'
+            );
+            setIsInterested(Boolean(isAlreadyInterested));
             const courses = await fetchUserCoursesWithContent(userId, tenantId);
             setTopics(courses);
           } catch (error) {
@@ -69,94 +70,50 @@ const LTwoCourse: React.FC = () => {
     fetchTopics();
   }, []);
 
-  // Return null if there are no topics
-  if (topics.length === 0) {
+  // Return null if there are no topics, or the learner has already confirmed interest
+  if (topics.length === 0 || isInterested) {
     return null;
   }
 
   const handleInterestClick = () => {
     setIsModalOpen(true);
-
-    // if (userResponse) {
-    //   const { email, dob } = userResponse;
-    //   // @ts-ignore
-    //   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    //   const dobPattern = /^\d{4}-\d{2}-\d{2}$/;
-
-    //   if (!emailPattern.test(email) || !dobPattern.test(dob)) {
-    //     showToastMessage(
-    //       'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
-    //       'error'
-    //     );
-    //   } else {
-    //     setIsModalOpen(true);
-    //   }
-    // } else {
-    //   showToastMessage(
-    //     'Complete your profile with a valid email and DOB in YYYY-MM-DD format',
-    //     'error'
-    //   );
-    // }
   };
 
-  const handleSubmit = async () => {
-    try {
-      // Get user data
-      const userData = {
-        first_name: userResponse?.firstName ?? '',
-        middle_name: userResponse?.middleName ?? '',
-        last_name: userResponse?.lastName ?? '',
-        mother_name: userResponse?.MOTHER_NAME ?? '',
-        gender: userResponse?.gender ?? '',
-        email_address: userResponse?.email ?? '',
-        dob: userResponse?.dob ?? '',
-        enrollmentId: userResponse?.enrollmentId ?? '',
-        qualification:
-          userResponse?.HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE ??
-          '',
-        phone_number: userResponse?.mobile?.toString() ?? '',
-        state: userResponse?.STATE ?? '',
-        district: userResponse?.DISTRICT ?? '',
-        block: userResponse?.BLOCK ?? '',
-        village: userResponse?.VILLAGE ?? '',
-        blood_group: '',
-        userId: userResponse?.userId ?? '',
-        courseId: selectedTopic?.courses?.[0]?.courseId ?? '',
-        courseName: selectedTopic?.courses?.[0]?.name ?? '',
-        topicName: selectedTopic?.topic ?? '',
-      };
-
-      // Call createL2Course API
-      await createL2Course(userData);
-
-      setCount(1);
-      if (count == 1) {
-        setIsModalOpen(false);
-        setCount(0);
-      }
-    } catch (error: any) {
-      const response = error?.response;
-      console.error(
-        'Error in handleSubmit:',
-        response?.data?.message?.join('') ?? error
-      );
-      showToastMessage(t('LEARNER_APP.COMMON.REACHOUT_TO_MENTOR'), 'error');
-      // Handle error appropriately
+  const handleConfirmInterest = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      return;
     }
-  };
+    try {
+      const response = await updateUser(userId, {
+        userData: {
+          firstName: userResponse?.firstName ?? '',
+          lastName: userResponse?.lastName ?? '',
+          mobile: userResponse?.mobile ?? '',
+          dob: userResponse?.dob ?? '',
+          gender: userResponse?.gender ?? '',
+        },
+        customFields: [
+          {
+            fieldId: L2_INTEREST_FIELD_ID,
+            value: 'yes',
+          },
+        ],
+      });
 
-  const handleCloseResponse = () => {
-    setIsModalOpen(false);
-    setCount(0);
-  };
+      if (response?.data?.params?.err !== null) {
+        throw new Error(response?.data?.params?.errmsg ?? 'Failed to update interest');
+      }
 
-  const handleTopicChange = (event: TopicProp) => {
-    setSelectedTopic(event);
+      setIsInterested(true);
+    } catch (error) {
+      console.error('Error updating interest:', error);
+      showToastMessage(t('LEARNER_APP.COMMON.REACHOUT_TO_MENTOR'), 'error');
+    }
   };
 
   const handleClose = () => {
     setIsModalOpen(false);
-    setCount(0);
   };
 
   return (
@@ -223,29 +180,16 @@ const LTwoCourse: React.FC = () => {
         >
           {t('LEARNER_APP.L_TWO_COURSE.INTEREST_BUTTON')}
         </Button>
-        {count == 0 ? (
-          <CommonModal
-            handleSubmit={handleSubmit}
-            isOpen={isModalOpen}
-            onClose={handleClose}
-            submitText={t('LEARNER_APP.L_TWO_COURSE.SUBMIT_BUTTON')}
-          >
-            <LevelUp
-              handleTopicChange={handleTopicChange}
-              selectedTopic={selectedTopic?.topic ?? ''}
-              topics={topics}
-            />
-          </CommonModal>
-        ) : (
-          <CommonModal
-            handleSubmit={handleCloseResponse}
-            isOpen={isModalOpen}
-            onClose={handleClose}
-            submitText={t('LEARNER_APP.L_TWO_COURSE.OKAY_BUTTON')}
-          >
-            <ResponseRecorded />
-          </CommonModal>
-        )}
+        <ConfirmationModal
+          modalOpen={isModalOpen}
+          message={t('LEARNER_APP.L_TWO_COURSE.CONFIRM_INTEREST_MESSAGE')}
+          handleAction={handleConfirmInterest}
+          buttonNames={{
+            primary: t('LEARNER_APP.L_TWO_COURSE.CONFIRM_BUTTON'),
+            secondary: t('COMMON.CANCEL'),
+          }}
+          handleCloseModal={handleClose}
+        />
       </Box>
     </Box>
   );
