@@ -21,6 +21,15 @@ const getCustomFieldValueFromArray = (customFields: any, label: string[]) => {
   return JSON.parse(JSON.stringify(fieldValue));
 };
 
+// Java LocalDateTime has no timezone offset, so this reflects wall-clock time at the moment of the call.
+const getCurrentLocalDateTime = () => {
+  const now = new Date();
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(
+    now.getHours()
+  )}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+};
+
 const LTwoCourse: React.FC = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,10 +63,11 @@ const LTwoCourse: React.FC = () => {
             const interestField = result?.userData?.customFields?.find(
               (field: any) => field?.fieldId === L2_INTEREST_FIELD_ID
             );
-            const isAlreadyInterested = interestField?.selectedValues?.some(
-              (selected: any) => selected?.value === 'yes'
-            );
-            setIsInterested(Boolean(isAlreadyInterested));
+            const interestStatus =
+              interestField?.value?.status ??
+              interestField?.selectedValues?.[0]?.value?.status ??
+              interestField?.selectedValues?.[0]?.value;
+            setIsInterested(interestStatus === 'yes');
             const courses = await fetchUserCoursesWithContent(userId, tenantId);
             setTopics(courses);
           } catch (error) {
@@ -96,7 +106,10 @@ const LTwoCourse: React.FC = () => {
         customFields: [
           {
             fieldId: L2_INTEREST_FIELD_ID,
-            value: 'yes',
+            value: {
+              status: 'yes',
+              date: getCurrentLocalDateTime(),
+            },
           },
         ],
       });
