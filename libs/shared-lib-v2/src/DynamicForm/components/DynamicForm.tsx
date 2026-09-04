@@ -63,6 +63,7 @@ const DynamicForm = forwardRef(({
   id,
   mobileNumber="",
   valueSelectedChange=null,
+  onFormDataChange,
 }: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -856,6 +857,33 @@ const DynamicForm = forwardRef(({
       resetForm: (newFormData) => {
         setFormData(newFormData);
         handleChange({ formData: newFormData });
+      },
+      // Lets a caller push a fresh set of {label, value} choices into a
+      // field's own enum/enumNames, same shape the built-in dependent-field
+      // cascade above already writes into formSchema. Needed when a caller
+      // resolves a field's valid options itself (e.g. via an association
+      // graph walk the generic cascade doesn't do) - without this, a value
+      // set via resetForm that isn't already in the field's enum wouldn't
+      // render as selected, since the widget only shows/checks values that
+      // are present in its own enumOptions.
+      setFieldOptions: (fieldKey, fieldOptions) => {
+        setFormSchema((prevSchema) => {
+          const targetField = prevSchema.properties?.[fieldKey];
+          if (!targetField) return prevSchema;
+          const enumValues = (fieldOptions || []).map((opt) => opt.value);
+          const enumNames = (fieldOptions || []).map((opt) => opt.label);
+          const updatedField =
+            targetField.isMultiSelect === true
+              ? {
+                  ...targetField,
+                  items: { type: 'string', enum: enumValues, enumNames },
+                }
+              : { ...targetField, enum: enumValues, enumNames };
+          return {
+            ...prevSchema,
+            properties: { ...prevSchema.properties, [fieldKey]: updatedField },
+          };
+        });
       },
     }));
   useEffect(() => {
@@ -1840,6 +1868,9 @@ const DynamicForm = forwardRef(({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
+      if (changedField && onFormDataChange) {
+        onFormDataChange(formData, changedField);
+      }
 
       //submit new form data
       if(valueSelectedChange){
