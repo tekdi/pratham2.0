@@ -34,6 +34,9 @@ import { getUserId, login } from '../services/LoginService';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import { applyLanguage, storeLanguage } from '@shared-lib-v2/utils/languageSync';
 
+// Toggle back on to restore the login page's language selector.
+const SHOW_LANGUAGE_DROPDOWN = false;
+
 const LoginPage = () => {
   const { t, i18n } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -58,9 +61,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
-      const preferredLang = localStorage.getItem('preferredLanguage') || 'en';
-      setLanguage(preferredLang);
-      setLang(preferredLang);
+      // Login always starts on English (see SHOW_LANGUAGE_DROPDOWN above) —
+      // ignore any preference a user selected before the dropdown was hidden.
+      setLanguage('en');
+      setLang('en');
+      if (i18n.language !== 'en') i18n.changeLanguage('en');
       const storedUserData = localStorage.getItem('adminInfo');
 
       const token = localStorage.getItem('token');
@@ -407,28 +412,30 @@ const LoginPage = () => {
             >
               {t("LOGIN_PAGE.LOGIN")}
             </Typography> */}
-              <FormControl fullWidth margin="normal">
-                <Select
-                  className="SelectLanguages"
-                  value={language}
-                  onChange={handleChange}
-                  displayEmpty
-                  sx={{
-                    borderRadius: '0.5rem',
-                    color: theme.palette.warning.A200,
-                    width: '117px',
-                    height: '32px',
-                    marginBottom: '0rem',
-                    fontSize: '14px',
-                  }}
-                >
-                  {config.languages.map((lang) => (
-                    <MenuItem value={lang.code} key={lang.code}>
-                      {lang.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              {SHOW_LANGUAGE_DROPDOWN && (
+                <FormControl fullWidth margin="normal">
+                  <Select
+                    className="SelectLanguages"
+                    value={language}
+                    onChange={handleChange}
+                    displayEmpty
+                    sx={{
+                      borderRadius: '0.5rem',
+                      color: theme.palette.warning.A200,
+                      width: '117px',
+                      height: '32px',
+                      marginBottom: '0rem',
+                      fontSize: '14px',
+                    }}
+                  >
+                    {config.languages.map((lang) => (
+                      <MenuItem value={lang.code} key={lang.code}>
+                        {lang.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
               <TextField
                 fullWidth
                 id="username"
