@@ -741,9 +741,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const attendanceStripToDate = shortDateFormat(new Date());
 
   // Declared above getAttendanceStats because that effect depends on it.
+  // Scoped by batch, not by creator (PS-7307): a session belongs to the batch, so every
+  // facilitator with access must see it, not only whoever created it.
   const attendanceEventDates = useEventDates(
-    userId,
-    'userId',
+    classId,
+    'cohortId',
     dashboardDaysLimit,
     selectedDate,
     eventUpdated,
@@ -1011,7 +1013,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
               before: beforeDate,
             },
             cohortId: classId,
-            createdBy: userId,
             status: ['live'],
           };
 
@@ -1053,8 +1054,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
   ]);
 
   const eventDates = useEventDates(
-    userId,
-    'userId',
+    classId,
+    'cohortId',
     lastSevenDaysLimit,
     timeTableDate,
     eventUpdated,
