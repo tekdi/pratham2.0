@@ -183,10 +183,6 @@ const EnrollProfileCompletionInner = () => {
 
         try {
           const preferredLanguage = localStorage.getItem('preferred_language');
-          const programFilter =
-            tenantName === TenantName.SECOND_CHANCE_PROGRAM
-              ? [tenantName, 'Second Chance']
-              : [tenantName];
           const response = await ContentSearch({
             query: '',
             filters: {
@@ -194,7 +190,7 @@ const EnrollProfileCompletionInner = () => {
               primaryCategory: ['Practice Question Set'],
               assessmentType: 'Eligibility Test',
               ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
-              program: programFilter,
+              program: ['Second Chance'],
             },
             sort_by: {
               lastUpdatedOn: 'desc',
