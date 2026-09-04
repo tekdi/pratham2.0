@@ -109,17 +109,6 @@ if (!isEliminatedFromBuild('SessionCard', 'component')) {
 }
 
 interface DashboardProps {}
-// Hoisted so resetting to it does not create a new object on every render.
-const emptyAttendanceData = {
-  cohortMemberList: [],
-  presentCount: 0,
-  absentCount: 0,
-  numberOfCohortMembers: 0,
-  dropoutMemberList: [],
-  dropoutCount: 0,
-  bulkAttendanceStatus: '',
-};
-
 const Dashboard: React.FC<DashboardProps> = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -186,29 +175,26 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const [eventDeleted, setEventDeleted] = React.useState(false);
   const [eventUpdated, setEventUpdated] = React.useState(false);
   const setType = taxonomyStore((state) => state.setType);
-  // Batch-level (context 'cohort') and session-level (context 'event') attendance are
-  // separate records for the same day, fetched by two independent effects. They are held
-  // apart so that a slow reply from one can never overwrite the other.
-  const [cohortAttendanceData, setCohortAttendanceData] =
-    useState(emptyAttendanceData);
-  const [sessionAttendanceData, setSessionAttendanceData] =
-    useState(emptyAttendanceData);
+  const [attendanceData, setAttendanceData] = useState({
+    cohortMemberList: [],
+    presentCount: 0,
+    absentCount: 0,
+    numberOfCohortMembers: 0,
+    dropoutMemberList: [],
+    dropoutCount: 0,
+    bulkAttendanceStatus: '',
+  });
   const [isRemoteCohort, setIsRemoteCohort] = React.useState<boolean>(false);
   const [resetAttendanceModalOpen, setResetAttendanceModalOpen] =
     React.useState(false);
   const [resetAttendanceLoading, setResetAttendanceLoading] =
     React.useState(false);
+  const batchAttendanceSnapshotRef = React.useRef<typeof attendanceData | null>(
+    null
+  );
   const handleAttendanceDataUpdate = (data: any) => {
-    setCohortAttendanceData(data);
+    setAttendanceData(data);
   };
-  const handleSessionAttendanceDataUpdate = (data: any) => {
-    setSessionAttendanceData(data);
-  };
-  // Always the context that a save from the modal would write to, so the modal can never
-  // prefill itself, or title itself Mark/Modify, from the other one.
-  const attendanceData = selectedSession
-    ? sessionAttendanceData
-    : cohortAttendanceData;
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpenDrawer(newOpen);
@@ -460,7 +446,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
               );
             }
           } else {
-            setCohortAttendanceData(emptyAttendanceData);
+            setAttendanceData({
+              cohortMemberList: [],
+              presentCount: 0,
+              absentCount: 0,
+              numberOfCohortMembers: 0,
+              dropoutMemberList: [],
+              dropoutCount: 0,
+              bulkAttendanceStatus: '',
+            });
           }
           if (classId) {
             const cohortAttendancePercent = async () => {
@@ -584,10 +578,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
     ) {
       return;
     }
-    // Start from empty, not from whatever the previously opened session left behind, so
-    // the modal shows its loader rather than another session's marks.
-    setSessionAttendanceData(emptyAttendanceData);
-    let cancelled = false;
+    if (!batchAttendanceSnapshotRef.current) {
+      batchAttendanceSnapshotRef.current = { ...attendanceData };
+    }
     const fetchSessionAttendance = async () => {
       setSessionAttendanceLoading(true);
       try {
@@ -601,10 +594,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
           includeArchived: true,
         });
         const resp = response?.result?.userDetails;
-        if (!resp || cancelled) {
-          if (!cancelled) setSessionAttendanceLoading(false);
-          return;
-        }
+        if (!resp) return;
         const nameUserIdArray = resp
           ?.map((entry: any) => ({
             userId: entry.userId,
@@ -642,10 +632,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         );
         if (filteredEntries && selectedDate) {
           const wrappedUpdate = (data: any) => {
-            // A reply arriving after the modal moved on must be dropped, or it
-            // repopulates the modal with a previous session's marks.
-            if (cancelled) return;
-            handleSessionAttendanceDataUpdate(data);
+            handleAttendanceDataUpdate(data);
             setSessionAttendanceLoading(false);
           };
           fetchAttendanceDetails(
@@ -664,9 +651,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
       }
     };
     fetchSessionAttendance();
-    return () => {
-      cancelled = true;
-    };
   }, [open, selectedSession, classId, selectedDate]);
 
   const showDetailsHandle = (dayStr: string) => {
@@ -870,15 +854,16 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleClose = () => {
+    const hadSessionSelected = !!selectedSession;
     setOpen(false);
     setSessionsModalOpen(false);
     setSelectedSession(null);
     setSessionAttendanceLoading(false);
     setIsRemoteCohort(false);
-    // Clearing selectedSession switches attendanceData back to the batch record on its
-    // own, so there is no snapshot to restore. Restoring one used to make stale marks
-    // reappear after closing.
-    setSessionAttendanceData(emptyAttendanceData);
+    if (hadSessionSelected && batchAttendanceSnapshotRef.current) {
+      setAttendanceData(batchAttendanceSnapshotRef.current);
+      batchAttendanceSnapshotRef.current = null;
+    }
   };
 
   const handleSessionSelect = (session: DaySessionForAttendance) => {

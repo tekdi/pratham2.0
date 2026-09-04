@@ -189,27 +189,20 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
       (memberList as any[]).map((user: any) => [user.userId, user.attendance])
     );
 
-    const userAttendance = (
-      isToday
-        ? cohortMemberList?.map((user: any) => ({
+    const userAttendance = isToday
+      ? cohortMemberList?.map((user: any) => ({
+          userId: user.userId,
+          attendance: user.attendance,
+        }))
+      : cohortMemberList
+          ?.filter(
+            (user: any) =>
+              user.attendance !== originalAttendanceMap.get(user.userId)
+          )
+          .map((user: any) => ({
             userId: user.userId,
             attendance: user.attendance,
-          }))
-        : cohortMemberList
-            ?.filter(
-              (user: any) =>
-                user.attendance !== originalAttendanceMap.get(user.userId)
-            )
-            .map((user: any) => ({
-              userId: user.userId,
-              attendance: user.attendance,
-            }))
-    )?.filter(
-      // An unmarked learner carries attendance '', which is not a status the API can
-      // store; sending it would blank out an existing record.
-      (entry: any) =>
-        entry.attendance === 'present' || entry.attendance === 'absent'
-    );
+          }));
 
     if (userAttendance && userAttendance.length > 0) {
       const date = shortDateFormat(selectedDate);
@@ -580,9 +573,7 @@ const MarkBulkAttendance: React.FC<MarkBulkAttendanceProps> = ({
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
-                // Also blocked while the prefill is still loading, so nobody can edit
-                // against a baseline that has not arrived yet.
-                disabled={!isAllAttendanceMarked || prefillLoading}
+                disabled={isAllAttendanceMarked ? false : true}
                 onClick={attendanceUpdate}
               >
                 {presentCount == 0 && absentCount == 0
