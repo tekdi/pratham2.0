@@ -6,6 +6,11 @@
   "URDU": "ଉର୍ଦ୍ଦୁ",
   "UNIT_NAME": "ୟୁନିଟ୍ ର ନାମ",
   "TYPE_OF_CENTER": "ସେଣ୍ଟର ର ପ୍ରକାର",
+  "PREMISE_TYPE": "ପରିସର ପ୍ରକାର",
+  "PINCODE": "ପିନକୋଡ୍",
+  "COURSES": "କୋର୍ସ ଗୁଡ଼ିକ",
+  "START_DATE": "ଆରମ୍ଭ ତାରିଖ",
+  "END_DATE": "ସମାପ୍ତି ତାରିଖ",
   "GOOGLE MAP_LINK": "ଗୁଗୁଲ୍ ମ୍ୟାପ୍ ଲିଙ୍କ",
   "MY_MAIN_SUBJECTS": "ମୁଖ୍ୟ ବିଷୟ",
   "LIFE_SKILLS": "ଜୀବନ କୌଶଳ",
@@ -317,7 +322,9 @@
       "SUB_DESCRIPTION": "ଆମ ବିଶେଷଜ୍ଞଙ୍କ ଠାରୁ ବ୍ୟକ୍ତିଗତ ମାର୍ଗଦର୍ଶନ ପାଇବା ପାଇଁ ଆପଣଙ୍କ ଆଗ୍ରହ ପ୍ରକାଶ କରନ୍ତୁ",
       "INTEREST_BUTTON": "ମୁଁ  ଆଗ୍ରହ ଅଛି",
       "SUBMIT_BUTTON": "ସବମିଟ କରନ୍ତୁ",
-      "OKAY_BUTTON": "ଠିକ ଅଛି"
+      "OKAY_BUTTON": "ଠିକ ଅଛି",
+      "CONFIRM_INTEREST_MESSAGE": "ବହୁତ ଭଲ! ଆପଣଙ୍କୁ ଆହୁରି ଉନ୍ନତ କରିବାରେ ସାହାଯ୍ୟ କରିବାକୁ ଆମେ ଉତ୍ସାହିତ! ଆପଣ ପ୍ରକୃତରେ ଆଗ୍ରହୀ କି?",
+      "CONFIRM_BUTTON": "ନିଶ୍ଚିତ କରନ୍ତୁ"
     },
     "LEVEL_UP": {
       "TITLE": "ବହୁତ ଭଲ ! ଆପଣଙ୍କ ଉନ୍ନତି ଯାତ୍ରାରେ ସହଯୋଗ କରିବାକୁ ଆମେ ଆନନ୍ଦିତ!",
@@ -993,7 +1000,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "ମୁ ନିଜେ ସ୍ୱେଚ୍ଛାସେବା କରୁଛି",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "ଯଦି ଆପଣ ସ୍ୱାଧୀନ ଭାବେ ସ୍ୱେଚ୍ଛାସେବା କରୁଛନ୍ତି ତେବେ ଏହି ବିକଳ୍ପ ବାଛନ୍ତୁ।",
     "NO_ACTIVE_COHORTS_FOUND": "କୌଣସି ସକ୍ରିୟ କୋହର୍ଟ ମିଳିଲା ନାହିଁ",
-    "ORGANISATION_TYPE": "ସଂସ୍ଥାର ପ୍ରକାର"
+    "ORGANISATION_TYPE": "ସଂସ୍ଥାର ପ୍ରକାର",
+    "RENTED": "ଭଡ଼ାଟିଆ",
+    "OWNED": "ନିଜସ୍ୱ",
+    "GOVERNMENT": "ସରକାରୀ",
+    "VIRTUAL": "ଭର୍ଚୁଆଲ୍",
+    "EXTENSION_CENTER": "ବିସ୍ତାର କେନ୍ଦ୍ର"
   },
   "ORGANISATION_NAME": "ସଂସ୍ଥାର ନାମ",
   "FORM_ERROR_MESSAGES": {
