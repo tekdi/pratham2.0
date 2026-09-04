@@ -307,6 +307,15 @@ const DynamicForm = forwardRef(({
         }
       }
 
+      // Enforce alphabets-only value for Relation with Guardian (reject digits,
+      // special characters and whitespace regardless of the pattern returned by the backend)
+      if (schemaa.properties.guardian_relation) {
+        schemaa.properties.guardian_relation = {
+          ...schemaa.properties.guardian_relation,
+          pattern: '^[a-zA-Z]+$',
+        };
+      }
+
       // Store original mobile field configuration
       if (schemaa.properties.mobile && !originalMobileSchemaRef.current) {
         originalMobileSchemaRef.current = { ...schemaa.properties.mobile };
@@ -2045,6 +2054,8 @@ const DynamicForm = forwardRef(({
       'FORM_ERROR_MESSAGES.NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
     '^[a-zA-Z0-9.@]+$':
       'FORM_ERROR_MESSAGES.SPACE_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
+    '^[a-zA-Z]+$':
+      'FORM_ERROR_MESSAGES.NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
     '^[0-9]{10}$': 'FORM_ERROR_MESSAGES.ENTER_VALID_NUMBER',
     '^d{10}$':
       'FORM_ERROR_MESSAGES.CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED',
