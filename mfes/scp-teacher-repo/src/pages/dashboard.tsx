@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
-import { format, isAfter, isValid, parse, startOfDay } from 'date-fns';
+import { format, isAfter, isValid, parse, startOfDay, subDays } from 'date-fns';
 import React, { ComponentType, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import {
@@ -56,7 +56,10 @@ import {
   Telemetry,
   sessionType,
 } from '@/utils/app.constant';
-import { calculatePercentage } from '@/utils/attendanceStats';
+import {
+  calculatePercentage,
+  SessionIdsByDate,
+} from '@/utils/attendanceStats';
 import { logEvent } from '@/utils/googleAnalytics';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -713,6 +716,48 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   };
 
+  // WeekCalender renders a rolling window of the last dashboardDaysLimit days, which can
+  // span two months, so fetch scheduled sessions for that same window instead of the
+  // calendar month of the selected date.
+  const attendanceStripFromDate = shortDateFormat(
+    subDays(new Date(), dashboardDaysLimit - 1)
+  );
+  const attendanceStripToDate = shortDateFormat(new Date());
+
+  // Declared above getAttendanceStats because that effect depends on it.
+  // Scoped by batch, not by creator (PS-7307): a session belongs to the batch, so every
+  // facilitator with access must see it, not only whoever created it.
+  const attendanceEventDates = useEventDates(
+    classId,
+    'cohortId',
+    dashboardDaysLimit,
+    selectedDate,
+    eventUpdated,
+    eventDeleted,
+    undefined,
+    classId,
+    attendanceStripFromDate,
+    attendanceStripToDate
+  );
+
+  // Session ids per date, so attendance marked against a session rather than the batch
+  // can still be found. Keyed by yyyy-MM-dd, same as the calendar's lookup.
+  const sessionIdsByDate: SessionIdsByDate = React.useMemo(() => {
+    const map: SessionIdsByDate = {};
+    Object.keys(attendanceEventDates ?? {}).forEach((date) => {
+      const eventIds = (attendanceEventDates as any)?.[date]?.eventIds;
+      if (eventIds?.length) {
+        map[date] = eventIds;
+      }
+    });
+    return map;
+  }, [attendanceEventDates]);
+
+  // useEventDates hands back a fresh object on every fetch, so depend on the contents
+  // rather than the reference - otherwise getAttendanceStats re-runs its batch queries
+  // each time an identical set of sessions comes back.
+  const sessionIdsKey = JSON.stringify(sessionIdsByDate);
+
   useEffect(() => {
     const getAttendanceStats = async () => {
       if (classId !== '' && classId !== 'all') {
@@ -750,17 +795,32 @@ const Dashboard: React.FC<DashboardProps> = () => {
           },
           facets: ['attendanceDate'],
         };
-        const attendanceStats = await calculatePercentage(
-          cohortMemberRequest,
-          attendanceRequest,
-          selectedDate
-        );
-        setPercentageAttendanceData(attendanceStats);
-        setAttendanceStats(attendanceStats);
+        try {
+          const attendanceStats = await calculatePercentage(
+            cohortMemberRequest,
+            attendanceRequest,
+            selectedDate,
+            sessionIdsByDate
+          );
+          setPercentageAttendanceData(attendanceStats);
+          setAttendanceStats(attendanceStats);
+        } catch (error) {
+          // WeekCalender skips its whole drawing block while this is null, so a single
+          // failed request would leave the strip with no circles at all - not even the
+          // grey "session scheduled" markers. Fall back to an empty result instead.
+          console.error('Error fetching attendance stats:', error);
+          setPercentageAttendanceData({});
+          setAttendanceStats({});
+        }
       }
     };
     getAttendanceStats();
-  }, [classId && classId !== 'all', selectedDate, handleSaveHasRun]);
+  }, [
+    classId && classId !== 'all',
+    selectedDate,
+    handleSaveHasRun,
+    sessionIdsKey,
+  ]);
 
   const viewAttendanceHistory = () => {
     if (classId !== 'all') {
@@ -989,16 +1049,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
     classId
   );
 
-  const attendanceEventDates = useEventDates(
-    classId,
-    'cohortId',
-    dashboardDaysLimit,
-    selectedDate,
-    eventUpdated,
-    eventDeleted,
-    undefined,
-    classId
-  );
   useEffect(() => {
     console.log(eventDates);
   }, [eventDates]);
@@ -1215,15 +1265,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                           variant="h6"
                                           className="word-break"
                                         >
+                                          {/* Read the same source as the progress ring
+                                              above and the calendar strip. attendanceData
+                                              only ever holds batch-level attendance, so a
+                                              day marked through a session showed 0%. */}
                                           {t('DASHBOARD.PERCENT_ATTENDANCE', {
                                             percent_students:
-                                              attendanceData?.numberOfCohortMembers &&
-                                              attendanceData.numberOfCohortMembers !==
-                                                0
-                                                ? (
-                                                    (attendanceData.presentCount /
-                                                      attendanceData.numberOfCohortMembers) *
-                                                    100
+                                              currentAttendance?.totalcount
+                                                ? Number(
+                                                    currentAttendance.present_percentage
                                                   ).toFixed(2)
                                                 : '0',
                                           })}
@@ -1240,9 +1290,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                         >
                                           {t('DASHBOARD.PRESENT_STUDENTS', {
                                             present_students:
-                                              attendanceData.presentCount,
+                                              currentAttendance?.present_students ??
+                                              0,
                                             total_students:
-                                              attendanceData.numberOfCohortMembers,
+                                              currentAttendance?.totalcount ??
+                                              attendanceData?.numberOfCohortMembers ??
+                                              0,
                                           })}
                                         </Typography>
                                       </Box>
@@ -1302,16 +1355,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'notMarked' ||
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
+                                    // Same source as the ring and the strip; reading
+                                    // attendanceData here left Reset greyed out on days
+                                    // marked through a session.
                                     Number(
-                                      attendanceData?.numberOfCohortMembers &&
-                                        attendanceData.numberOfCohortMembers !==
-                                          0
-                                        ? (
-                                            (attendanceData.presentCount /
-                                              attendanceData.numberOfCohortMembers) *
-                                            100
-                                          ).toFixed(2)
-                                        : '0'
+                                      currentAttendance?.present_percentage ?? 0
                                     ) === 0
                                   }
                                 >
