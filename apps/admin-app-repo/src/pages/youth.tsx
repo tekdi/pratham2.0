@@ -35,7 +35,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { editEditUser, updateUserTenantStatus } from '@/services/UserService';
-import { transformLabel } from '@/utils/helper';
+import { transformLabel, formatDateToDDMMYYYY } from '@/utils/helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
@@ -179,7 +179,7 @@ const Youth = () => {
     {
       keys: ['enrollmentId'],
       label: 'Enrollment ID',
-      render: (row: any) => transformLabel(row.enrollmentId) || '',
+      render: (row) => row.enrollmentId || '-',
     },
     {
       key: 'status',
@@ -197,7 +197,8 @@ const Youth = () => {
     {
       keys: ['tenantJoinedAt'],
       label: 'DOJ',
-      render: (row) => transformLabel(row.tenantJoinedAt) || '',
+      render: (row) =>
+        row.tenantJoinedAt ? formatDateToDDMMYYYY(row.tenantJoinedAt) : '-',
     },
     // {
     //   keys: ['mobile'],
