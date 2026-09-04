@@ -66,6 +66,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   >([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
   const [tenantName, setTenantName] = useState<string>('');
+  const [isPathwaysProgram, setIsPathwaysProgram] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -80,7 +81,12 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedTenantName = localStorage.getItem('tenantName');
-      
+
+      setIsPathwaysProgram(
+        storedTenantName?.toLowerCase() ===
+          TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS.toLowerCase()
+      );
+
       // Always set tenantName to one of the three tenant types
       if (storedTenantName === TENANT_DATA.YOUTHNET) {
         setTenantName(TENANT_DATA.YOUTHNET);
@@ -821,47 +827,49 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               >
                 {t('ASSESSMENTS.ASSESSMENTS')}
               </Button>
-              <Button
-                className="fs-14 joyride-step-10"
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  background: isAiAssessment
-                    ? theme.palette.primary.main
-                    : 'transparent',
-
-                  padding: isAiAssessment
-                    ? '16px 18px !important'
-                    : '0px 18px !important',
-                  color: isAiAssessment
-                    ? '#2E1500'
-                    : theme.palette.warning.A200,
-                  fontWeight: isAiAssessment ? '600' : 500,
-                  '&:hover': {
+              {!isPathwaysProgram && (
+                <Button
+                  className="fs-14 joyride-step-10"
+                  sx={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'flex-start',
                     background: isAiAssessment
                       ? theme.palette.primary.main
                       : 'transparent',
-                  },
-                  marginTop: '15px',
-                  gap: '10px',
-                }}
-                startIcon={
-                  <Image
-                    src={aiAssessment}
-                    alt="Assessment Icon"
-                    width={24}
-                    height={24}
-                  />
-                }
-                onClick={() => {
-                  router.push(`/ai-assessments`);
-                }}
-                component="a"
-                href={withBasePath('/ai-assessments')}  
-              >
-                {t('ASSESSMENTS.AI_ASSESSMENT')}
-              </Button>
+
+                    padding: isAiAssessment
+                      ? '16px 18px !important'
+                      : '0px 18px !important',
+                    color: isAiAssessment
+                      ? '#2E1500'
+                      : theme.palette.warning.A200,
+                    fontWeight: isAiAssessment ? '600' : 500,
+                    '&:hover': {
+                      background: isAiAssessment
+                        ? theme.palette.primary.main
+                        : 'transparent',
+                    },
+                    marginTop: '15px',
+                    gap: '10px',
+                  }}
+                  startIcon={
+                    <Image
+                      src={aiAssessment}
+                      alt="Assessment Icon"
+                      width={24}
+                      height={24}
+                    />
+                  }
+                  onClick={() => {
+                    router.push(`/ai-assessments`);
+                  }}
+                  component="a"
+                  href={withBasePath('/ai-assessments')}
+                >
+                  {t('ASSESSMENTS.AI_ASSESSMENT')}
+                </Button>
+              )}
               <Button
                 // className="fs-14 joyride-step-10"
                 sx={{

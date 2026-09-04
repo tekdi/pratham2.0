@@ -24,6 +24,7 @@ import { usePathname } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { TenantName } from '../../utils/app.constant';
+import { useUserProgram } from '@learner/utils/hooks/useUserProgram';
 import CommonLearnerCourse from './CommonLearnerCourse';
 import AssessmentAttempts from '@learner/components/AssessmentAttempts/AssessmentAttempts';
 import RegistrationSuccessCard from '@learner/components/RegistrationSuccessCard/RegistrationSuccessCard';
@@ -37,6 +38,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab'); // '1', '2', etc. as a string
   const { t } = useTranslation();
+  const userProgram = useUserProgram();
   const [filter, setFilter] = useState<Record<string, any> | null>(null);
   const [isLogin, setIsLogin] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,7 +50,15 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       : {};
 
   useEffect(() => {
+    if (!userProgram) return;
+
     const fetchTenantInfo = async () => {
+      // Reset before refetching so a program switch that keeps this component
+      // mounted (e.g. two programs sharing the /scp-dashboard landing page)
+      // doesn't keep rendering the previous program's course filter/content
+      // while the new one loads.
+      setIsLoading(true);
+      setFilter(null);
       try {
         if (checkAuth()) {
           setIsLogin(true);
@@ -61,7 +71,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
         const res = await getTenantInfo();
         const youthnetContentFilter = res?.result.find(
           // (program: any) => program.name === TenantName.YOUTHNET
-          (program: any) => program.name === localStorage.getItem('userProgram')
+          (program: any) => program.name === userProgram
         );
 
         const storedChannelId = localStorage.getItem('channelId');
@@ -103,7 +113,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       }
     };
     fetchTenantInfo();
-  }, [pathname]);
+  }, [pathname, userProgram]);
 
   return (
     <Layout
@@ -120,11 +130,8 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
       )}
       {isLogin && (
         <>
-          {typeof window !== 'undefined' &&
-            (localStorage.getItem('userProgram') ===
-              TenantName.SECOND_CHANCE_PROGRAM ||
-              localStorage.getItem('userProgram') ===
-                TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
+          {(userProgram === TenantName.SECOND_CHANCE_PROGRAM ||
+            userProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) && (
               <Grid
                 container
                 spacing={2}
@@ -206,7 +213,7 @@ const MyComponent: React.FC<CommonL1ContentListProps> = ({ notab = false }) => {
           )}
           {!notab && <InProgressContent />}
 
-          {localStorage.getItem('userProgram') === TenantName.YOUTHNET && (
+          {userProgram === TenantName.YOUTHNET && (
             <Grid container>
               <Grid
                 item

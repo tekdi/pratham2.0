@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Box,
   TextField,
@@ -9,7 +9,6 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
-import { post } from '../DynamicForm/services/RestClient';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { transformLabel } from '../DynamicForm/utils/helper';
 import { API_ENDPOINTS } from '@shared-lib-v2/utils/API/EndUrls';
@@ -18,6 +17,12 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { useTranslation } from '../lib/context/LanguageContext';
 import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { readUserId, readUserIdTrue } from '../DynamicForm/services/NotificationService';
+import {
+  syncStreamsForBoardChange,
+  pruneStreamsForRemovedBoards,
+  refreshInitialStreamOptions,
+  withStreamCascadeDisabled,
+} from './boardStreamSync';
 interface EditSearchUserProps {
   onUserDetails: (userUpdatedDetails: any) => void;
   schema: any;
@@ -132,6 +137,9 @@ const EditSearchUser: React.FC<EditSearchUserProps> = ({
           ...tempFormData,
           ...(type == 'instructor' ? { designation: 'facilitator' } : {}),
         });
+        prevBoardRef.current = Array.isArray(tempFormData?.board)
+          ? tempFormData.board
+          : [];
 
         // Extract user details
         const extractedUserId = user.userId;
@@ -231,15 +239,77 @@ const EditSearchUser: React.FC<EditSearchUserProps> = ({
   const [prefilledFormData, setPrefilledFormData] = useState(
     {}
   );
-  const [alteredSchema, setAlteredSchema] = useState<any>(schema);
+  const [alteredSchema, setAlteredSchema] = useState<any>(() =>
+    withStreamCascadeDisabled(schema)
+  );
   const [alteredUiSchema, setAlteredUiSchema] = useState<any>(uiSchema);
+  const dynamicFormRef = useRef<any>(null);
+  const boardSyncTokenRef = useRef(0);
+  // Tracks the board selection as of the last time we synced streams, so a
+  // board change can be detected directly (by diffing against this) rather
+  // than trusting DynamicForm's own single-field change detector, which
+  // only reports the first field (in object-key order) it finds changed in
+  // a given tick and can miss "board" when another field's value also
+  // shifted in the same update.
+  const prevBoardRef = useRef<string[]>([]);
+
+  // Live board->stream sync: fires on every form change, and whenever the
+  // board selection itself has actually moved (individual toggle, "Select
+  // All", or removal alike - they all funnel through the same board value)
+  // pushes the recomputed stream set straight into the mounted form via
+  // DynamicForm's imperative resetForm, so the Stream widget reflects the
+  // currently selected boards without waiting for submit.
+  const handleFormDataChange = (updatedFormData: any) => {
+    const boardValues = Array.isArray(updatedFormData?.board)
+      ? updatedFormData.board
+      : [];
+    const prevBoard = prevBoardRef.current;
+    const boardChanged =
+      boardValues.length !== prevBoard.length ||
+      !boardValues.every((b: string) => prevBoard.includes(b));
+    console.log('[EditSearchUser] onFormDataChange fired', {
+      boardValues,
+      prevBoard,
+      boardChanged,
+    });
+    if (!boardChanged) return;
+    prevBoardRef.current = boardValues;
+
+    const token = ++boardSyncTokenRef.current;
+    syncStreamsForBoardChange(updatedFormData, alteredSchema, (nextStream, streamOptions) => {
+      if (boardSyncTokenRef.current !== token) return; // a newer board change superseded this one
+      // The Stream widget can only show/check values present in its own
+      // enum, so refresh that enum before (or alongside) setting the value -
+      // otherwise a valid stream that isn't already in the dropdown's
+      // options silently fails to render as selected.
+      dynamicFormRef.current?.setFieldOptions('stream', streamOptions);
+      dynamicFormRef.current?.resetForm({ ...updatedFormData, stream: nextStream });
+    });
+  };
+
+  // "stream" is deliberately taken out of DynamicForm's generic
+  // dependent-field cascade (see withStreamCascadeDisabled) so it can't
+  // race the live sync above, which also means nothing auto-populates its
+  // options on initial load anymore. This restores that: once the form has
+  // mounted with the already-saved board/stream selection, refresh just
+  // the Stream widget's option list (not its value - the saved selection
+  // is trusted as-is) so the saved streams render as checked.
+  useEffect(() => {
+    if (!isUserLoaded) return;
+    refreshInitialStreamOptions(prefilledFormData, alteredSchema, (streamOptions) => {
+      dynamicFormRef.current?.setFieldOptions('stream', streamOptions);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUserLoaded]);
 
   const FormSubmitFunction = async (formData: any, payload: any) => {
-    // console.log(formData, 'formdata');
-    console.log('########## debug payload', payload);
-    console.log('########## debug formdata', formData);
-    setPrefilledFormData(formData);
-    onUserDetails(payload);
+    const { cleanedData: syncedFormData, transformedPayload: syncedPayload } =
+      await pruneStreamsForRemovedBoards(formData, payload, alteredSchema);
+    // console.log(syncedFormData, 'formdata');
+    console.log('########## debug payload', syncedPayload);
+    console.log('########## debug formdata', syncedFormData);
+    setPrefilledFormData(syncedFormData);
+    onUserDetails(syncedPayload);
   };
 
   return (
@@ -280,10 +350,12 @@ const EditSearchUser: React.FC<EditSearchUserProps> = ({
             }}
           >
             <DynamicForm
+              ref={dynamicFormRef}
               schema={alteredSchema}
               uiSchema={alteredUiSchema}
               FormSubmitFunction={FormSubmitFunction}
               prefilledFormData={prefilledFormData}
+              onFormDataChange={handleFormDataChange}
               hideSubmit={true}
               type={''}
             />
