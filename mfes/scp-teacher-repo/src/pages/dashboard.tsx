@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
-import { format, isAfter, isValid, parse, startOfDay } from 'date-fns';
+import { format, isAfter, isValid, parse, startOfDay, subDays } from 'date-fns';
 import React, { ComponentType, useEffect, useState } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import {
@@ -56,7 +56,10 @@ import {
   Telemetry,
   sessionType,
 } from '@/utils/app.constant';
-import { calculatePercentage } from '@/utils/attendanceStats';
+import {
+  calculatePercentage,
+  SessionIdsByDate,
+} from '@/utils/attendanceStats';
 import { logEvent } from '@/utils/googleAnalytics';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -106,6 +109,17 @@ if (!isEliminatedFromBuild('SessionCard', 'component')) {
 }
 
 interface DashboardProps {}
+// Hoisted so resetting to it does not create a new object on every render.
+const emptyAttendanceData = {
+  cohortMemberList: [],
+  presentCount: 0,
+  absentCount: 0,
+  numberOfCohortMembers: 0,
+  dropoutMemberList: [],
+  dropoutCount: 0,
+  bulkAttendanceStatus: '',
+};
+
 const Dashboard: React.FC<DashboardProps> = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -172,26 +186,29 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const [eventDeleted, setEventDeleted] = React.useState(false);
   const [eventUpdated, setEventUpdated] = React.useState(false);
   const setType = taxonomyStore((state) => state.setType);
-  const [attendanceData, setAttendanceData] = useState({
-    cohortMemberList: [],
-    presentCount: 0,
-    absentCount: 0,
-    numberOfCohortMembers: 0,
-    dropoutMemberList: [],
-    dropoutCount: 0,
-    bulkAttendanceStatus: '',
-  });
+  // Batch-level (context 'cohort') and session-level (context 'event') attendance are
+  // separate records for the same day, fetched by two independent effects. They are held
+  // apart so that a slow reply from one can never overwrite the other.
+  const [cohortAttendanceData, setCohortAttendanceData] =
+    useState(emptyAttendanceData);
+  const [sessionAttendanceData, setSessionAttendanceData] =
+    useState(emptyAttendanceData);
   const [isRemoteCohort, setIsRemoteCohort] = React.useState<boolean>(false);
   const [resetAttendanceModalOpen, setResetAttendanceModalOpen] =
     React.useState(false);
   const [resetAttendanceLoading, setResetAttendanceLoading] =
     React.useState(false);
-  const batchAttendanceSnapshotRef = React.useRef<typeof attendanceData | null>(
-    null
-  );
   const handleAttendanceDataUpdate = (data: any) => {
-    setAttendanceData(data);
+    setCohortAttendanceData(data);
   };
+  const handleSessionAttendanceDataUpdate = (data: any) => {
+    setSessionAttendanceData(data);
+  };
+  // Always the context that a save from the modal would write to, so the modal can never
+  // prefill itself, or title itself Mark/Modify, from the other one.
+  const attendanceData = selectedSession
+    ? sessionAttendanceData
+    : cohortAttendanceData;
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpenDrawer(newOpen);
@@ -443,15 +460,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
               );
             }
           } else {
-            setAttendanceData({
-              cohortMemberList: [],
-              presentCount: 0,
-              absentCount: 0,
-              numberOfCohortMembers: 0,
-              dropoutMemberList: [],
-              dropoutCount: 0,
-              bulkAttendanceStatus: '',
-            });
+            setCohortAttendanceData(emptyAttendanceData);
           }
           if (classId) {
             const cohortAttendancePercent = async () => {
@@ -575,9 +584,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
     ) {
       return;
     }
-    if (!batchAttendanceSnapshotRef.current) {
-      batchAttendanceSnapshotRef.current = { ...attendanceData };
-    }
+    // Start from empty, not from whatever the previously opened session left behind, so
+    // the modal shows its loader rather than another session's marks.
+    setSessionAttendanceData(emptyAttendanceData);
+    let cancelled = false;
     const fetchSessionAttendance = async () => {
       setSessionAttendanceLoading(true);
       try {
@@ -591,7 +601,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
           includeArchived: true,
         });
         const resp = response?.result?.userDetails;
-        if (!resp) return;
+        if (!resp || cancelled) {
+          if (!cancelled) setSessionAttendanceLoading(false);
+          return;
+        }
         const nameUserIdArray = resp
           ?.map((entry: any) => ({
             userId: entry.userId,
@@ -629,7 +642,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
         );
         if (filteredEntries && selectedDate) {
           const wrappedUpdate = (data: any) => {
-            handleAttendanceDataUpdate(data);
+            // A reply arriving after the modal moved on must be dropped, or it
+            // repopulates the modal with a previous session's marks.
+            if (cancelled) return;
+            handleSessionAttendanceDataUpdate(data);
             setSessionAttendanceLoading(false);
           };
           fetchAttendanceDetails(
@@ -648,6 +664,9 @@ const Dashboard: React.FC<DashboardProps> = () => {
       }
     };
     fetchSessionAttendance();
+    return () => {
+      cancelled = true;
+    };
   }, [open, selectedSession, classId, selectedDate]);
 
   const showDetailsHandle = (dayStr: string) => {
@@ -713,6 +732,46 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   };
 
+  // WeekCalender renders a rolling window of the last dashboardDaysLimit days, which can
+  // span two months, so fetch scheduled sessions for that same window instead of the
+  // calendar month of the selected date.
+  const attendanceStripFromDate = shortDateFormat(
+    subDays(new Date(), dashboardDaysLimit - 1)
+  );
+  const attendanceStripToDate = shortDateFormat(new Date());
+
+  // Declared above getAttendanceStats because that effect depends on it.
+  const attendanceEventDates = useEventDates(
+    userId,
+    'userId',
+    dashboardDaysLimit,
+    selectedDate,
+    eventUpdated,
+    eventDeleted,
+    undefined,
+    classId,
+    attendanceStripFromDate,
+    attendanceStripToDate
+  );
+
+  // Session ids per date, so attendance marked against a session rather than the batch
+  // can still be found. Keyed by yyyy-MM-dd, same as the calendar's lookup.
+  const sessionIdsByDate: SessionIdsByDate = React.useMemo(() => {
+    const map: SessionIdsByDate = {};
+    Object.keys(attendanceEventDates ?? {}).forEach((date) => {
+      const eventIds = (attendanceEventDates as any)?.[date]?.eventIds;
+      if (eventIds?.length) {
+        map[date] = eventIds;
+      }
+    });
+    return map;
+  }, [attendanceEventDates]);
+
+  // useEventDates hands back a fresh object on every fetch, so depend on the contents
+  // rather than the reference - otherwise getAttendanceStats re-runs its batch queries
+  // each time an identical set of sessions comes back.
+  const sessionIdsKey = JSON.stringify(sessionIdsByDate);
+
   useEffect(() => {
     const getAttendanceStats = async () => {
       if (classId !== '' && classId !== 'all') {
@@ -750,17 +809,32 @@ const Dashboard: React.FC<DashboardProps> = () => {
           },
           facets: ['attendanceDate'],
         };
-        const attendanceStats = await calculatePercentage(
-          cohortMemberRequest,
-          attendanceRequest,
-          selectedDate
-        );
-        setPercentageAttendanceData(attendanceStats);
-        setAttendanceStats(attendanceStats);
+        try {
+          const attendanceStats = await calculatePercentage(
+            cohortMemberRequest,
+            attendanceRequest,
+            selectedDate,
+            sessionIdsByDate
+          );
+          setPercentageAttendanceData(attendanceStats);
+          setAttendanceStats(attendanceStats);
+        } catch (error) {
+          // WeekCalender skips its whole drawing block while this is null, so a single
+          // failed request would leave the strip with no circles at all - not even the
+          // grey "session scheduled" markers. Fall back to an empty result instead.
+          console.error('Error fetching attendance stats:', error);
+          setPercentageAttendanceData({});
+          setAttendanceStats({});
+        }
       }
     };
     getAttendanceStats();
-  }, [classId && classId !== 'all', selectedDate, handleSaveHasRun]);
+  }, [
+    classId && classId !== 'all',
+    selectedDate,
+    handleSaveHasRun,
+    sessionIdsKey,
+  ]);
 
   const viewAttendanceHistory = () => {
     if (classId !== 'all') {
@@ -794,16 +868,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
   };
 
   const handleClose = () => {
-    const hadSessionSelected = !!selectedSession;
     setOpen(false);
     setSessionsModalOpen(false);
     setSelectedSession(null);
     setSessionAttendanceLoading(false);
     setIsRemoteCohort(false);
-    if (hadSessionSelected && batchAttendanceSnapshotRef.current) {
-      setAttendanceData(batchAttendanceSnapshotRef.current);
-      batchAttendanceSnapshotRef.current = null;
-    }
+    // Clearing selectedSession switches attendanceData back to the batch record on its
+    // own, so there is no snapshot to restore. Restoring one used to make stale marks
+    // reappear after closing.
+    setSessionAttendanceData(emptyAttendanceData);
   };
 
   const handleSessionSelect = (session: DaySessionForAttendance) => {
@@ -990,16 +1063,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
     classId
   );
 
-  const attendanceEventDates = useEventDates(
-    userId,
-    'userId',
-    dashboardDaysLimit,
-    selectedDate,
-    eventUpdated,
-    eventDeleted,
-    undefined,
-    classId
-  );
   useEffect(() => {
     console.log(eventDates);
   }, [eventDates]);
@@ -1216,15 +1279,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                           variant="h6"
                                           className="word-break"
                                         >
+                                          {/* Read the same source as the progress ring
+                                              above and the calendar strip. attendanceData
+                                              only ever holds batch-level attendance, so a
+                                              day marked through a session showed 0%. */}
                                           {t('DASHBOARD.PERCENT_ATTENDANCE', {
                                             percent_students:
-                                              attendanceData?.numberOfCohortMembers &&
-                                              attendanceData.numberOfCohortMembers !==
-                                                0
-                                                ? (
-                                                    (attendanceData.presentCount /
-                                                      attendanceData.numberOfCohortMembers) *
-                                                    100
+                                              currentAttendance?.totalcount
+                                                ? Number(
+                                                    currentAttendance.present_percentage
                                                   ).toFixed(2)
                                                 : '0',
                                           })}
@@ -1241,9 +1304,12 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                         >
                                           {t('DASHBOARD.PRESENT_STUDENTS', {
                                             present_students:
-                                              attendanceData.presentCount,
+                                              currentAttendance?.present_students ??
+                                              0,
                                             total_students:
-                                              attendanceData.numberOfCohortMembers,
+                                              currentAttendance?.totalcount ??
+                                              attendanceData?.numberOfCohortMembers ??
+                                              0,
                                           })}
                                         </Typography>
                                       </Box>
@@ -1303,16 +1369,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'notMarked' ||
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
+                                    // Same source as the ring and the strip; reading
+                                    // attendanceData here left Reset greyed out on days
+                                    // marked through a session.
                                     Number(
-                                      attendanceData?.numberOfCohortMembers &&
-                                        attendanceData.numberOfCohortMembers !==
-                                          0
-                                        ? (
-                                            (attendanceData.presentCount /
-                                              attendanceData.numberOfCohortMembers) *
-                                            100
-                                          ).toFixed(2)
-                                        : '0'
+                                      currentAttendance?.present_percentage ?? 0
                                     ) === 0
                                   }
                                 >

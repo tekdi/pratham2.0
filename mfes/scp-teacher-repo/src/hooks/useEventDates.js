@@ -16,7 +16,9 @@ const useEventDates = (
   eventUpdated,
   eventDeleted,
   eventCreated,
-  cohortId
+  cohortId,
+  rangeStartDate,
+  rangeEndDate
 ) => {
   const [eventDates, setEventDates] = useState({});
 
@@ -26,7 +28,13 @@ const useEventDates = (
         if (idValue && idValue !== '') {
           let startDate, lastDate;
 
-          if (modifyAttendanceLimit === dashboardDaysLimit) {
+          if (rangeStartDate && rangeEndDate) {
+            // Explicit window (yyyy-MM-dd) from the caller. Used when the
+            // rendered range can span more than one month, so a month-wide
+            // fetch would miss events on the days outside it.
+            startDate = rangeStartDate;
+            lastDate = rangeEndDate;
+          } else if (modifyAttendanceLimit === dashboardDaysLimit) {
             const date = new Date(timeTableDate);
             const firstDayOfMonth = new Date(
               date.getFullYear(),
@@ -75,7 +83,17 @@ const useEventDates = (
             response.events.forEach((event) => {
               if (event.startDateTime) {
                 const eventDate = convertToIST(event.startDateTime);
-                newEventDates[eventDate] = { event: true };
+                if (!newEventDates[eventDate]) {
+                  // `event: true` is what the calendar checks; `eventIds` lets callers
+                  // look up session-level attendance, which is stored against the
+                  // event repetition rather than the batch.
+                  newEventDates[eventDate] = { event: true, eventIds: [] };
+                }
+                if (event.eventRepetitionId) {
+                  newEventDates[eventDate].eventIds.push(
+                    event.eventRepetitionId
+                  );
+                }
               }
             });
           }
@@ -96,6 +114,8 @@ const useEventDates = (
     eventDeleted,
     eventCreated,
     cohortId,
+    rangeStartDate,
+    rangeEndDate,
   ]);
 
   return eventDates;
