@@ -938,7 +938,6 @@ const Dashboard: React.FC<DashboardProps> = () => {
               before: beforeDate,
             },
             cohortId: classId,
-            createdBy: userId,
             status: ['live'],
           };
 
@@ -980,8 +979,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
   ]);
 
   const eventDates = useEventDates(
-    userId,
-    'userId',
+    classId,
+    'cohortId',
     lastSevenDaysLimit,
     timeTableDate,
     eventUpdated,
@@ -991,8 +990,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
   );
 
   const attendanceEventDates = useEventDates(
-    userId,
-    'userId',
+    classId,
+    'cohortId',
     dashboardDaysLimit,
     selectedDate,
     eventUpdated,
