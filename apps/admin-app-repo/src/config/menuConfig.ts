@@ -184,6 +184,16 @@ export const MENU_CONFIG = {
           link: '/user-mobilizer',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
+        {
+          title: 'SIDEBAR.PLACEMENT_COORDINATOR',
+          link: '/user-placement-coordinator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.RETENTION_COORDINATOR',
+          link: '/user-retention-coordinator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
       ],
     },
     master: {
