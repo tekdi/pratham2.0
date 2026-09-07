@@ -1,4 +1,4 @@
-export const PlacementCoordinatorSearchSchema = {
+export const PlacementRetentionCoordinatorSearchSchema = {
   type: 'object',
   properties: {
     state: {
@@ -27,7 +27,7 @@ export const PlacementCoordinatorSearchSchema = {
     },
     name: {
       type: 'string',
-      title: 'Search Placement Coordinator',
+      title: 'Search Placement Retention Coordinator',
     },
     sortBy: {
       type: 'string',
@@ -44,7 +44,7 @@ export const PlacementCoordinatorSearchSchema = {
   },
 };
 
-export const PlacementCoordinatorUISchema = {
+export const PlacementRetentionCoordinatorUISchema = {
   'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
 
   state: {

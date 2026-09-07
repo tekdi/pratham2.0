@@ -4,9 +4,9 @@ import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
 import {
-  RetentionCoordinatorSearchSchema,
-  RetentionCoordinatorUISchema,
-} from '../constant/Forms/RetentionCoordinatorSearch';
+  PlacementRetentionCoordinatorSearchSchema,
+  PlacementRetentionCoordinatorUISchema,
+} from '../constant/Forms/PlacementRetentionCoordinatorSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
@@ -63,14 +63,14 @@ import {
   pageTableSectionSx,
 } from '@/utils/filterTableActionsForAcademicYear';
 
-const RetentionCoordinator = () => {
+const PlacementRetentionCoordinator = () => {
   const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
 
   const theme = useTheme<any>();
   const isActiveYear = useStore((state) => state.isActiveYearSelected);
   const [isLoading, setIsLoading] = useState(false);
-  const [schema, setSchema] = useState(RetentionCoordinatorSearchSchema);
-  const [uiSchema, setUiSchema] = useState(RetentionCoordinatorUISchema);
+  const [schema, setSchema] = useState(PlacementRetentionCoordinatorSearchSchema);
+  const [uiSchema, setUiSchema] = useState(PlacementRetentionCoordinatorUISchema);
   const [addSchema, setAddSchema] = useState(null);
   const [addUiSchema, setAddUiSchema] = useState(null);
   const [prefilledState, setPrefilledState] = useState({});
@@ -95,7 +95,7 @@ const RetentionCoordinator = () => {
   const [checked, setChecked] = useState(false);
   const [userID, setUserId] = useState('');
 
-  const searchStoreKey = 'retentionCoordinator';
+  const searchStoreKey = 'placementRetentionCoordinator';
   const initialFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
     localStorage.getItem(searchStoreKey) != '{}'
@@ -118,11 +118,11 @@ const RetentionCoordinator = () => {
     const fetchData = async () => {
       const responseForm = await fetchForm([
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.retentionCoordinator.context}&contextType=${FormContext.retentionCoordinator.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.placementRetentionCoordinator.context}&contextType=${FormContext.placementRetentionCoordinator.contextType}`,
           header: {},
         },
         {
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.retentionCoordinator.context}&contextType=${FormContext.retentionCoordinator.contextType}`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/form/read?context=${FormContext.placementRetentionCoordinator.context}&contextType=${FormContext.placementRetentionCoordinator.contextType}`,
           header: {
             tenantid: TenantService.getTenantId(),
           },
@@ -166,7 +166,7 @@ const RetentionCoordinator = () => {
     setPrefilledAddFormData(initialFormDataSearch);
     fetchData();
 
-    setRoleID(RoleId.RETENTION_COORDINATOR);
+    setRoleID(RoleId.PLACEMENT_RETENTION_COORDINATOR);
     setTenantId(localStorage.getItem('tenantId'));
   }, []);
 
@@ -215,7 +215,7 @@ const RetentionCoordinator = () => {
         delete formData.tenantStatus;
       }
       const staticFilter = {
-        role: RoleName.RETENTION_COORDINATOR,
+        role: RoleName.PLACEMENT_RETENTION_COORDINATOR,
         // tenantId: storedUserData.tenantData[0].tenantId,
       };
       const { sortBy } = formData;
@@ -238,7 +238,7 @@ const RetentionCoordinator = () => {
   let columns = [
     {
       keys: ['firstName', 'middleName', 'lastName'],
-      label: 'Retention Coordinator Name',
+      label: 'Placement Retention Coordinator Name',
       render: (row: any) =>
         `${row.firstName || ''} ${row.middleName || ''} ${
           row.lastName || ''
@@ -288,7 +288,7 @@ const RetentionCoordinator = () => {
 
       showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
     } catch (error) {
-      console.error('Error updating placement coordinator:', error);
+      console.error('Error updating placement retention coordinator:', error);
     }
   };
   // Define actions
@@ -304,7 +304,7 @@ const RetentionCoordinator = () => {
             justifyContent: 'center',
             padding: '10px',
           }}
-          title="Edit Retention Coordinator"
+          title="Edit Placement Retention Coordinator"
         >
           <Image src={editIcon} alt="" />
         </Box>
@@ -329,7 +329,7 @@ const RetentionCoordinator = () => {
             justifyContent: 'center',
             padding: '10px',
           }}
-          title="Delete Retention Coordinator"
+          title="Delete Placement Retention Coordinator"
         >
           {' '}
           <Image src={deleteIcon} alt="" />
@@ -370,7 +370,7 @@ const RetentionCoordinator = () => {
             justifyContent: 'center',
             padding: '10px',
           }}
-          title="Reactivate Retention Coordinator"
+          title="Reactivate Placement Retention Coordinator"
         >
           {' '}
           <Image src={restoreIcon} alt="" />
@@ -424,19 +424,19 @@ const RetentionCoordinator = () => {
     tenantCohortRoleMapping: [
       {
         tenantId: TenantService.getTenantId(),
-        roleId: RoleId.RETENTION_COORDINATOR,
+        roleId: RoleId.PLACEMENT_RETENTION_COORDINATOR,
       },
     ],
     password: Math.floor(10000 + Math.random() * 90000),
   };
-  const successUpdateMessage = 'RETENTION_COORDINATORS.RETENTION_COORDINATOR_UPDATED_SUCCESSFULLY';
-  const telemetryUpdateKey = 'retention-coordinator-updated-successfully';
-  const failureUpdateMessage = 'RETENTION_COORDINATORS.NOT_ABLE_UPDATE_RETENTION_COORDINATOR';
-  const successCreateMessage = 'RETENTION_COORDINATORS.RETENTION_COORDINATOR_CREATED_SUCCESSFULLY';
-  const telemetryCreateKey = 'retention-coordinator-created-successfully';
-  const failureCreateMessage = 'RETENTION_COORDINATORS.NOT_ABLE_CREATE_RETENTION_COORDINATOR';
-  const notificationKey = 'onYouthnetRetentionCoordinatorCreate';
-  const notificationMessage = 'RETENTION_COORDINATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
+  const successUpdateMessage = 'PLACEMENT_RETENTION_COORDINATORS.PLACEMENT_RETENTION_COORDINATOR_UPDATED_SUCCESSFULLY';
+  const telemetryUpdateKey = 'placement-retention-coordinator-updated-successfully';
+  const failureUpdateMessage = 'PLACEMENT_RETENTION_COORDINATORS.NOT_ABLE_UPDATE_PLACEMENT_RETENTION_COORDINATOR';
+  const successCreateMessage = 'PLACEMENT_RETENTION_COORDINATORS.PLACEMENT_RETENTION_COORDINATOR_CREATED_SUCCESSFULLY';
+  const telemetryCreateKey = 'placement-retention-coordinator-created-successfully';
+  const failureCreateMessage = 'PLACEMENT_RETENTION_COORDINATORS.NOT_ABLE_CREATE_PLACEMENT_RETENTION_COORDINATOR';
+  const notificationKey = 'onYouthnetPlacementRetentionCoordinatorCreate';
+  const notificationMessage = 'PLACEMENT_RETENTION_COORDINATORS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
   const notificationContext = 'USER';
   useEffect(() => {
     setPrefilledFormData(initialFormDataSearch);
@@ -461,7 +461,7 @@ const RetentionCoordinator = () => {
         )}
         <Box mt={4} sx={pageActionBarSx}>
           <ResetFiltersButton
-            searchStoreKey="retentionCoordinator"
+            searchStoreKey="placementRetentionCoordinator"
             formRef={formRef}
             SubmitaFunction={SubmitaFunction}
             setPrefilledFormData={setPrefilledFormData}
@@ -513,7 +513,7 @@ const RetentionCoordinator = () => {
                 height="20vh"
               >
                 <Typography marginTop="10px" textAlign={'center'}>
-                  {t('COMMON.NO_RETENTION_COORDINATOR_FOUND')}
+                  {t('COMMON.NO_PLACEMENT_RETENTION_COORDINATOR_FOUND')}
                 </Typography>
               </Box>
             )}
@@ -583,7 +583,7 @@ const RetentionCoordinator = () => {
           }}
         >
           <Typography variant="h1" component="div">
-            {t('Map User as Retention Coordinator')}
+            {t('Map User as Placement Retention Coordinator')}
           </Typography>
           <IconButton
             aria-label="close"
@@ -644,14 +644,14 @@ const RetentionCoordinator = () => {
                             localStorage.getItem('tenantName') ||
                             localStorage.getItem('program') ||
                             '';
-                          const loginLink = ROLE_LOGIN_URL_MAP[Role.RETENTION_COORDINATOR];
+                          const loginLink = ROLE_LOGIN_URL_MAP[Role.PLACEMENT_RETENTION_COORDINATOR];
 
                           if (mappedUserEmail) {
                             await sendCredentialService(
                               buildProgramMappingEmailRequest({
                                 email: mappedUserEmail,
                                 firstName: mappedUserFirstName,
-                                role: RoleName.RETENTION_COORDINATOR,
+                                role: RoleName.PLACEMENT_RETENTION_COORDINATOR,
                                 program,
                                 platform: 'Pratham learning Platform (PLP)',
                                 loginLink,
@@ -699,7 +699,7 @@ const RetentionCoordinator = () => {
                 }}
                 roleId={roleId}
                 tenantId={tenantId}
-                type="retention-coordinator"
+                type="placement-retention-coordinator"
               />
             </Box>
           )}
@@ -764,7 +764,7 @@ const RetentionCoordinator = () => {
           }}
         >
           <Typography variant="h1" component="div">
-            {t('Edit User as Retention Coordinator')}
+            {t('Edit User as Placement Retention Coordinator')}
           </Typography>
           <IconButton
             aria-label="close"
@@ -839,7 +839,7 @@ const RetentionCoordinator = () => {
                 userId={selectedUserIdEdit}
                 roleId={roleId}
                 tenantId={tenantId}
-                type="retention-coordinator"
+                type="placement-retention-coordinator"
               />
             </Box>
           )}
@@ -882,4 +882,4 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default RetentionCoordinator;
+export default PlacementRetentionCoordinator;

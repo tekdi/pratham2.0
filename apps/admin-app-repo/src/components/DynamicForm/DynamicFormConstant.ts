@@ -47,11 +47,7 @@ export const FormContext = {
     context: 'USERS',
     contextType: 'MOBILIZER'
   },
-  placementCoordinator: {
-    context: 'USERS',
-    contextType: 'PLACEMENT RETENTION'
-  },
-  retentionCoordinator: {
+  placementRetentionCoordinator: {
     context: 'USERS',
     contextType: 'PLACEMENT RETENTION'
   }
