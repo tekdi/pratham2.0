@@ -6,11 +6,6 @@
   "URDU": "اردو",
   "UNIT_NAME": "یونٹ کا نام",
   "TYPE_OF_CENTER": "مرکز کی قسم",
-  "PREMISE_TYPE": "احاطے کی قسم",
-  "PINCODE": "پن کوڈ",
-  "COURSES": "کورسز",
-  "START_DATE": "شروع ہونے کی تاریخ",
-  "END_DATE": "ختم ہونے کی تاریخ",
   "GOOGLE MAP_LINK": "گوگل میپ لنک",
   "MY_MAIN_SUBJECTS": "اہم مضامین",
   "LIFE_SKILLS": "زندگی کی مہارتیں",
@@ -27,6 +22,7 @@
   "BOARD": "بورڈ",
   "MEDIUM": "ذریعہ تعلیم",
   "GRADE": "گریڈ",
+  "STREAM": "اسٹریم",
   "REGULAR": "باقاعدہ",
   "REMOTE": "ریموٹ",
   "SKILLING_CENTER_IMAGE": "اسکلنگ سینٹر کی تصویر",
@@ -322,9 +318,7 @@
       "SUB_DESCRIPTION": "ہمارے ماہر سے ذاتی رہنمائی حاصل کرنے کے لیے اپنی دلچسپی دکھائیں!",
       "INTEREST_BUTTON": "مجھے دلچسپی ہے۔",
       "SUBMIT_BUTTON": "جمع کروائیں۔",
-      "OKAY_BUTTON": "ٹھیک ہے۔",
-      "CONFIRM_INTEREST_MESSAGE": "زبردست! ہم آپ کو لیول اپ کرنے میں مدد کرنے کے لیے پرجوش ہیں! کیا آپ واقعی دلچسپی رکھتے ہیں؟",
-      "CONFIRM_BUTTON": "تصدیق کریں"
+      "OKAY_BUTTON": "ٹھیک ہے۔"
     },
     "LEVEL_UP": {
       "TITLE": "بہت اچھا! ہم آپ کی مدد کرنے کے لیے پرجوش ہیں!",
@@ -373,7 +367,6 @@
     "USER_PROFILE_CARD": {
       "MY_PROFILE": "میرا پروفائل",
       "JOINED_ON": "پر شامل ہوا۔",
-      "ENROLLMENT_ID": "اندراج آئی ڈی",
       "CONTACT_INFORMATION": "رابطہ کی معلومات",
       "EMAIL_ADDRESS": "ای میل ایڈریس",
       "PHONE_NUMBER": "فون نمبر",
@@ -630,17 +623,7 @@
     "SECOND_CHANCE_PROGRAM": "سیکنڈ چانس پروگرام",
     "PARENT_GUARDIAN_PHONE_NO": "والدین/سرپرست کا فون نمبر",
     "COURSE_COMPLETION_CONGRATULATIONS": "کورس مکمل کرنے پر مبارکباد!",
-    "HURRAY": "واہ!",
-    "READY_TO_JOIN_NAVAPATHAM": "نواپتھم میں شامل ہونے کے لیے تیار ہیں؟",
-    "ENROL_NOW": "ابھی اندراج کریں",
-    "ALREADY_ENROLLED_LOGIN": "پہلے سے اندراج شدہ ہیں؟ لاگ ان کریں",
-    "ENROL_HINT": "نئے ہوں یا پہلے سے اندراج شدہ — صرف اپنا فون نمبر درج کریں۔ ہم آپ کی رہنمائی کریں گے۔",
-    "ABOUT_THE_PROGRAM": "پروگرام کے بارے میں",
-    "REGISTER_YOUR_INTEREST": "اپنی دلچسپی درج کریں:",
-    "REGISTER_YOUR_INTEREST_TEXT": "پروگرام میں شامل ہونے کی اپنی دلچسپی کے اظہار کے لیے اندراج فارم بھریں۔ ہماری ٹیم آپ سے رابطہ کرے گی اور اگلے مراحل میں آپ کی رہنمائی کرے گی۔",
-    "NEVER_TOO_LATE_TO_LEARN": "سیکھنا جاری رکھنے کے لیے کبھی دیر نہیں ہوتی!",
-    "CONTACT": "رابطہ",
-    "WRITE_TO_US_AT": "ہمیں لکھیں"
+    "HURRAY": "واہ!"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "صارف نام یا پاس ورڈ درست نہیں ہے۔",
@@ -837,6 +820,7 @@
     "BOARD": "بورڈ",
     "MEDIUM": "ذریعہ تعلیم",
     "GRADE": "گریڈ",
+    "STREAM": "اسٹریم",
     "USERNAME": "صارف کا نام",
     "DESCRIPTION": "تفصیل",
     "PROGRAM_NAME": "پروگرام کا نام",
@@ -1000,12 +984,7 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "میں اپنے طور پر والنٹیر کا کام کر رہا ہوں۔",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "اگر آپ آزادانہ طور پر والنٹیر کی خدمات انجام دے رہے ہیں تو اس اختیار کو منتخب کریں۔",
     "NO_ACTIVE_COHORTS_FOUND": "کوئی فعال گروہ نہیں ملا",
-    "ORGANISATION_TYPE": "تنظیم کی قسم",
-    "RENTED": "کرائے پر",
-    "OWNED": "ملکیت",
-    "GOVERNMENT": "سرکاری",
-    "VIRTUAL": "ورچوئل",
-    "EXTENSION_CENTER": "توسیعی مرکز"
+    "ORGANISATION_TYPE": "تنظیم کی قسم"
   },
   "ORGANISATION_NAME": "ادارے کا نام",
   "FORM_ERROR_MESSAGES": {

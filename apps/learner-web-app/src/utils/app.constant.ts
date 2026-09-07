@@ -40,18 +40,17 @@ export enum Role {
 
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
+  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Second Chance Program Pathways',
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club',
- LEARNING_AND_DEVELOPMENT ="Learning and Development",
- CREATIVITY_CLUB ="Creativity Club",
- EARLY_CHILDHOOD_EDUCATION ="Early Childhood Education",
- INCLUSIVE_EDUCATION ="Inclusive Education (ENABLE)",
- ELEMENTARY ="Elementary",
- ANNUAL_STATUS_OF_EDUCATION_REPORT ="Annual Status of Education Report"
-
-
+  LEARNING_AND_DEVELOPMENT = 'Learning and Development',
+  CREATIVITY_CLUB = 'Creativity Club',
+  EARLY_CHILDHOOD_EDUCATION = 'Early Childhood Education',
+  INCLUSIVE_EDUCATION = 'Inclusive Education (ENABLE)',
+  ELEMENTARY = 'Elementary',
+  ANNUAL_STATUS_OF_EDUCATION_REPORT = 'Annual Status of Education Report',
 }
 export enum FilterKey {
   GROUP_MEMBERSHIP = 'groupMembership',
@@ -135,8 +134,5 @@ export enum FormValues {
   REMOTE = 'REMOTE',
   TRANSGENDER = 'TRANSGENDER',
 }
-
-// Custom field used to record that the learner has confirmed interest in the L2 course.
-export const L2_INTEREST_FIELD_ID = '3cd23569-3995-483e-9e0f-0ff6cbd9bad0';
 
 
