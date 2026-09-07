@@ -159,7 +159,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       board?: string[];
       medium?: string[];
       grade?: string[];
-      industry?: string[];
+      domain?: string[];
       courses?: string[];
     }
   ) => {
@@ -196,7 +196,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     }
 
     const overrideEnum = (
-      fieldKey: 'board' | 'medium' | 'grade' | 'industry',
+      fieldKey: 'board' | 'medium' | 'grade' | 'domain',
       centerVals: string[]
     ) => {
       if (alterSchema?.properties?.[fieldKey]) {
@@ -222,7 +222,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     if (useL2Form) {
       // Industry/courses options come only from what's already configured on
       // the center — no framework/content-search API call for this form.
-      overrideEnum('industry', centerIndustries);
+      overrideEnum('domain', centerIndustries);
 
       if (alterSchema?.properties?.courses) {
         const currentCourseIds = Array.isArray(centerCourses)
@@ -274,8 +274,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       if (centerGrades?.length === 1 && alterUiSchema?.grade) {
         alterUiSchema.grade['ui:disabled'] = true;
       }
-      if (centerIndustries?.length === 1 && alterUiSchema?.industry) {
-        alterUiSchema.industry['ui:disabled'] = true;
+      if (centerIndustries?.length === 1 && alterUiSchema?.domain) {
+        alterUiSchema.domain['ui:disabled'] = true;
       }
       if (centerCourses?.length === 1 && alterUiSchema?.courses) {
         alterUiSchema.courses['ui:disabled'] = true;
@@ -287,8 +287,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         delete alterUiSchema.medium['ui:disabled'];
       if (alterUiSchema?.grade?.['ui:disabled'])
         delete alterUiSchema.grade['ui:disabled'];
-      if (alterUiSchema?.industry?.['ui:disabled'])
-        delete alterUiSchema.industry['ui:disabled'];
+      if (alterUiSchema?.domain?.['ui:disabled'])
+        delete alterUiSchema.domain['ui:disabled'];
       if (alterUiSchema?.courses?.['ui:disabled'])
         delete alterUiSchema.courses['ui:disabled'];
     }
@@ -418,12 +418,14 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     ...(storedProgram === TenantName.YOUTHNET
       ? [
           {
-            key: 'industry',
-            label: 'Industry',
+            key: 'domain',
+            label: 'Domain',
             render: (row) =>
               transformLabel(
                 row.customFields
-                  .find((field) => field.label === 'INDUSTRY')
+                  .find(
+                    (field) => field.label === 'DOMAIN'
+                  )
                   ?.selectedValues?.join(', ')
               ) || '-',
           },
@@ -508,9 +510,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
           grade:
             row?.customFields?.find((f: any) => f.label === 'GRADE')
               ?.selectedValues || [],
-          industry:
-            row?.customFields?.find((f: any) => f.label === 'INDUSTRY')
-              ?.selectedValues || [],
+          domain:
+            row?.customFields?.find(
+              (f: any) => f.label === 'DOMAIN'
+            )?.selectedValues || [],
           courses:
             row?.customFields?.find((f: any) => f.label === 'COURSES')
               ?.selectedValues || [],
@@ -632,7 +635,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
                 if (centerGrades?.length === 1)
                   prefillWithBMGS.grade = [centerGrades[0]];
                 if (centerIndustries?.length === 1)
-                  prefillWithBMGS.industry = [centerIndustries[0]];
+                  prefillWithBMGS.domain = [centerIndustries[0]];
                 if (centerCourses?.length === 1)
                   prefillWithBMGS.courses = [centerCourses[0]];
 

@@ -386,12 +386,14 @@ const Centers = () => {
   // ];
   const extraColumnsForYouthnet = [
     {
-      key: 'industry',
-      label: 'Industry',
+      key: 'domain',
+      label: 'Domain',
       render: (row) =>
         transformLabel(
           row.customFields
-            .find((field) => field.label === 'INDUSTRY')
+            .find(
+              (field) => field.label === 'DOMAIN'
+            )
             ?.selectedValues?.join(', ')
         ) || '-',
     },
@@ -876,7 +878,8 @@ const Centers = () => {
               }
               centerIndustries={
                 selectedCenter?.customFields?.find(
-                  (field: any) => field.label === 'INDUSTRY'
+                  (field: any) =>
+                    field.label === 'INDUSTRY' || field.label === 'DOMAIN'
                 )?.selectedValues || []
               }
               centerCourses={

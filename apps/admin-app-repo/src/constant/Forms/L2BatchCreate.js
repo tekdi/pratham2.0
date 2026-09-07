@@ -44,30 +44,11 @@ export const L2BatchCreate = {
                 "field_type": "text",
                 "isRequired": true
             },
-            "industry": {
+            "domain": {
                 "type": "array",
-                "title": "INDUSTRY",
+                "title": "DOMAIN",
                 "coreField": 0,
-                "fieldId": "8704db2a-33a9-4438-8ba7-7404b3aa55e7",
-                "field_type": "drop_down",
-                "maxSelection": 1,
-                "isMultiSelect": true,
-                "uniqueItems": true,
-                "items": {
-                    "type": "string",
-                    "enum": [
-                        "Select"
-                    ],
-                    "enumNames": [
-                        "Select"
-                    ]
-                }
-            },
-            "courses": {
-                "type": "array",
-                "title": "COURSES",
-                "coreField": 0,
-                "fieldId": "d327b384-ccc7-4971-8bca-53b588ea98c5",
+                "fieldId": "e5277d7b-e7ef-4a11-9a54-a8e6e7975383",
                 "field_type": "drop_down",
                 "maxSelection": 1,
                 "isMultiSelect": true,
@@ -81,7 +62,27 @@ export const L2BatchCreate = {
                     "enumNames": [
                         "Select"
                     ]
-                }
+                },
+            },
+            "courses": {
+                "type": "array",
+                "title": "COURSES",
+                "coreField": 0,
+                "fieldId": "323d95c5-f217-44c7-a157-7a435df10f49",
+                "field_type": "drop_down",
+                "maxSelection": 1,
+                "isMultiSelect": true,
+                "uniqueItems": true,
+                "isRequired": true,
+                "items": {
+                    "type": "string",
+                    "enum": [
+                        "Select"
+                    ],
+                    "enumNames": [
+                        "Select"
+                    ]
+                },
             }
         },
         "required": [
@@ -89,8 +90,7 @@ export const L2BatchCreate = {
             "courses",
             "startdate",
             "enddate",
-            "industry",
-            "courses"
+            "domain"
         ]
     },
     "uiSchema": {
@@ -101,7 +101,7 @@ export const L2BatchCreate = {
                 "hideError": true
             }
         },
-        "industry": {
+        "domain": {
             "ui:widget": "AutoCompleteMultiSelectWidget",
             "ui:options": {
                 "multiple": true,
@@ -142,7 +142,7 @@ export const L2BatchCreate = {
             "batch_type",
             "startdate",
             "enddate",
-            "industry",
+            "domain",
             "courses"
         ]
     }
