@@ -51,6 +51,8 @@ export enum Role {
   SCTA = 'Content creator',
   CCTA = 'Content reviewer',
   MOBILIZER = 'Mobilizer',
+  PLACEMENT_COORDINATOR = 'Placement Coordinator',
+  RETENTION_COORDINATOR = 'Retention Coordinator',
 }
 
 export enum TenantName {
@@ -114,6 +116,8 @@ export enum RoleId {
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
   STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
   MOBILIZER = 'a4694781-65c1-4b92-8ff1-ad490ab6d140',
+  PLACEMENT_COORDINATOR = '4c0c8421-2969-4155-9e78-c8d975d028ef',
+  RETENTION_COORDINATOR = '4c0c8421-2969-4155-9e78-c8d975d028ef',
 }
 
 export enum RoleName {
@@ -121,6 +125,8 @@ export enum RoleName {
   CONTENT_REVIEWER = 'Content reviewer',
   STATE_LEAD = 'State Lead',
   MOBILIZER = 'Mobilizer',
+  PLACEMENT_COORDINATOR = 'Placement Coordinator',
+  RETENTION_COORDINATOR = 'Retention Coordinator',
 }
 
 export enum DataKey {
@@ -278,5 +284,7 @@ export const ROLE_LOGIN_URL_MAP: Record<string, string | undefined> = {
   'State Lead': ADMIN_LOGIN_URL,
   'Content Creator': ADMIN_LOGIN_URL,
   'Content Reviewer': ADMIN_LOGIN_URL,
-  'Mobilizer': DEFAULT_LOGIN_URL
+  'Mobilizer': DEFAULT_LOGIN_URL,
+  'Placement Coordinator': ADMIN_LOGIN_URL,
+  'Retention Coordinator': ADMIN_LOGIN_URL
 };
