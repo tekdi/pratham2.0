@@ -207,16 +207,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
     };
 
     fetchTopicSubtopic();
-  }, [
-    item,
-    medium,
-    grade,
-    board,
-    dashboard,
-    CohortBMG?.medium,
-    CohortBMG?.grade,
-    CohortBMG?.board,
-  ]);
+  }, [item, medium, grade, board, dashboard, CohortBMG]);
 
   const extractResources = (learningResources: any): IResource[] => {
     const resources: IResource[] = [];
