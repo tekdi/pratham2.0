@@ -2,9 +2,15 @@
 import * as React from 'react';
 
 import useNotification from '@/hooks/useNotification';
-import { createEvent, editEvent } from '@/services/EventService';
+import { bulkDeleteAttendance } from '@/services/AttendanceService';
+import { createEvent, editEvent, getEventList } from '@/services/EventService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
-import { getOptionsByCategory } from '@/utils/helper';
+import {
+  getAfterDate,
+  getBeforeDate,
+  getOptionsByCategory,
+  shortDateFormat,
+} from '@/utils/helper';
 import { CreateEvent, PlannedModalProps } from '@/utils/Interfaces';
 import {
   CenterType,
@@ -121,6 +127,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
   const queryClient = useQueryClient();
 
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [slotConflictModalOpen, setSlotConflictModalOpen] =
+    React.useState<boolean>(false);
+  const conflictDecisionResolver = React.useRef<
+    ((decision: 'yes' | 'no') => void) | null
+  >(null);
   const [selectedSubject, setSelectedSubject] = useState<string>();
   const [selectedCourseType, setSelectedCourseType] = useState<string>();
   const [selectedBlockId, setSelectedBlockId] = useState<number>(0);
@@ -355,6 +366,16 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
   const handleOpenModel = () => {
     setModalOpen(true);
   };
+
+  const handleSlotConflictModalClose = () => {
+    conflictDecisionResolver.current?.('no');
+    conflictDecisionResolver.current = null;
+    setSlotConflictModalOpen(false);
+  };
+  const handleSlotConflictConfirm = () => {
+    conflictDecisionResolver.current?.('yes');
+  };
+
   const handleCloseModal = () => {
     setModalOpen(false);
   };
@@ -884,6 +905,45 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     setSessionBlocks(sessionBlocks.filter((block) => block?.id !== id));
   };
 
+  // Any existing, non-archived session for this batch whose time range
+  // overlaps the given session block's start/end, regardless of mode.
+  const findConflictingSessionEvent = async (apiBody: CreateEvent) => {
+    const newStart = apiBody?.startDatetime;
+    const newEnd = apiBody?.endDatetime;
+    if (!cohortId || !newStart || !newEnd) return null;
+
+    try {
+      const dateStr = dayjs(newStart).format('YYYY-MM-DD');
+      const filters = {
+        cohortId,
+        startDate: { after: getAfterDate(dateStr) },
+        endDate: { before: getBeforeDate(dateStr) },
+        status: ['live'],
+      };
+      const result = await getEventList({ limit: 0, offset: 0, filters });
+      const events = result?.events ?? [];
+
+      const newStartMs = new Date(newStart).getTime();
+      const newEndMs = new Date(newEnd).getTime();
+
+      return (
+        events.find((existingEvent: any) => {
+          const existingStartMs = new Date(
+            existingEvent?.startDateTime
+          ).getTime();
+          const existingEndMs = new Date(
+            existingEvent?.endDateTime
+          ).getTime();
+          if (isNaN(existingStartMs) || isNaN(existingEndMs)) return false;
+          return newStartMs < existingEndMs && newEndMs > existingStartMs;
+        }) || null
+      );
+    } catch (error) {
+      console.error('Error checking session slot conflict:', error);
+      return null;
+    }
+  };
+
   const scheduleNewEvent = async () => {
     if (!scheduleEvent) return;
 
@@ -1006,105 +1066,166 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         return baseBody;
       });
       // if (eventValid) {
-      await Promise.all(
-        apiBodies.map(async (apiBody) => {
-          try {
-            const isEventValid = validateEventBody(apiBody);
-            if (isEventValid) {
-              const response = await createEvent(apiBody);
+      for (const apiBody of apiBodies) {
+        try {
+          const isEventValid = validateEventBody(apiBody);
+          if (isEventValid) {
+            const conflictingEvent = await findConflictingSessionEvent(
+              apiBody
+            );
 
-              if (response?.responseCode === 'Created') {
-                showToastMessage(
-                  t('COMMON.SESSION_SCHEDULED_SUCCESSFULLY'),
-                  'success'
-                );
+            if (conflictingEvent) {
+              setSlotConflictModalOpen(true);
+              const decision = await new Promise<'yes' | 'no'>((resolve) => {
+                conflictDecisionResolver.current = resolve;
+              });
+              setSlotConflictModalOpen(false);
+              conflictDecisionResolver.current = null;
 
-                if (cohortId) {
-                  const replacements = { '{sessionName}': shortDescription };
-                  const filters = {
-                    cohortId,
-                    role: Role.STUDENT,
-                    // status: [Status.ACTIVE],
-                  };
+              if (decision === 'no') {
+                // Discard this session; leave the existing session untouched
+                // and keep the scheduling popup open for the user.
+                continue;
+              }
+
+              // A session that has already gone live cannot be archived or
+              // have its attendance cleared by the backend, so don't even
+              // attempt it — just proceed to create the new session and let
+              // both coexist for this slot.
+              const conflictingEventId = conflictingEvent?.eventRepetitionId;
+              const conflictingEventStartMs = new Date(
+                conflictingEvent?.startDateTime
+              ).getTime();
+              const hasConflictingSessionStarted =
+                !isNaN(conflictingEventStartMs) &&
+                conflictingEventStartMs <= Date.now();
+
+              if (!hasConflictingSessionStarted) {
+                // Clear any attendance already marked against the session
+                // being replaced, scoped to that session only.
+                if (conflictingEventId && attendeeArray.length > 0) {
                   try {
-                    const response = await getMyCohortMemberList({
-                      // limit: 20,
-                      // page: 0,
-                      filters,
-                    });
-
-                    if (response?.result?.userDetails) {
-                      const deviceId = response?.result?.userDetails
-                        ?.flatMap((device: any) => device.deviceId || [])
-                        .filter((id: any) => id !== null);
-                      if (deviceId?.length > 0) {
-                        getNotification(
-                          deviceId,
-                          'LEARNER_NEW_SESSION_ALERT',
-                          replacements
-                        );
-                      } else {
-                        console.warn(
-                          'No valid device IDs found. Skipping notification API call.'
-                        );
-                      }
-                    }
+                    const attendanceDateStr = shortDateFormat(
+                      new Date(conflictingEvent.startDateTime)
+                    );
+                    await bulkDeleteAttendance(
+                      attendeeArray.map((userId) => ({
+                        userId,
+                        contextIds: [conflictingEventId],
+                        date: attendanceDateStr,
+                      }))
+                    );
                   } catch (error) {
-                    console.error('Error fetching cohort member list:', error);
+                    console.error(
+                      'Error clearing attendance for replaced session:',
+                      error
+                    );
                   }
                 }
 
-                const windowUrl = window.location.pathname;
-                const cleanedUrl = windowUrl.replace(/^\//, '');
-                const telemetryInteract = {
-                  context: {
-                    env: 'teaching-center',
-                    cdata: [],
-                  },
-                  edata: {
-                    id: 'event-created-successfully',
-                    type: Telemetry.CLICK,
-                    subtype: '',
-                    pageid: cleanedUrl,
-                  },
+                // Replace the previously scheduled session using the same
+                // delete flow as the "Delete this session" action.
+                await handelDeleteEvent(
+                  conflictingEvent,
+                  t('CENTER_SESSION.EDIT_THIS_SESSION'),
+                  'CENTER_SESSION.PREVIOUS_SESSION_DELETED_SUCCESSFULLY'
+                );
+              }
+            }
+
+            const response = await createEvent(apiBody);
+
+            if (response?.responseCode === 'Created') {
+              showToastMessage(
+                t('COMMON.SESSION_SCHEDULED_SUCCESSFULLY'),
+                'success'
+              );
+
+              if (cohortId) {
+                const replacements = { '{sessionName}': shortDescription };
+                const filters = {
+                  cohortId,
+                  role: Role.STUDENT,
+                  // status: [Status.ACTIVE],
                 };
-                telemetryFactory.interact(telemetryInteract);
+                try {
+                  const response = await getMyCohortMemberList({
+                    // limit: 20,
+                    // page: 0,
+                    filters,
+                  });
 
-                ReactGA.event('event-created-successfully', {
-                  creatorId: userId,
-                });
-                if (onCloseModal) {
-                  onCloseModal();
-                }
-              } else {
-                if (response?.response?.data?.params?.errmsg) {
-                  const errMsg = response?.response?.data?.params?.errmsg;
-                  let errorMessage;
-                  if (typeof errMsg === 'string') {
-                    console.log(errMsg);
-                    errorMessage = errMsg;
-                  } else {
-                    errorMessage =
-                      errMsg[0] + (errMsg[1] ? ' and ' + errMsg[1] : '');
+                  if (response?.result?.userDetails) {
+                    const deviceId = response?.result?.userDetails
+                      ?.flatMap((device: any) => device.deviceId || [])
+                      .filter((id: any) => id !== null);
+                    if (deviceId?.length > 0) {
+                      getNotification(
+                        deviceId,
+                        'LEARNER_NEW_SESSION_ALERT',
+                        replacements
+                      );
+                    } else {
+                      console.warn(
+                        'No valid device IDs found. Skipping notification API call.'
+                      );
+                    }
                   }
-                  showToastMessage(errorMessage, 'error');
-                } else {
-                  showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+                } catch (error) {
+                  console.error('Error fetching cohort member list:', error);
                 }
               }
-              // if (onCloseModal) {
-              //   console.log('list api got called');
-              //   onCloseModal();
-              // }
+
+              const windowUrl = window.location.pathname;
+              const cleanedUrl = windowUrl.replace(/^\//, '');
+              const telemetryInteract = {
+                context: {
+                  env: 'teaching-center',
+                  cdata: [],
+                },
+                edata: {
+                  id: 'event-created-successfully',
+                  type: Telemetry.CLICK,
+                  subtype: '',
+                  pageid: cleanedUrl,
+                },
+              };
+              telemetryFactory.interact(telemetryInteract);
+
+              ReactGA.event('event-created-successfully', {
+                creatorId: userId,
+              });
+              if (onCloseModal) {
+                onCloseModal();
+              }
+            } else {
+              if (response?.response?.data?.params?.errmsg) {
+                const errMsg = response?.response?.data?.params?.errmsg;
+                let errorMessage;
+                if (typeof errMsg === 'string') {
+                  console.log(errMsg);
+                  errorMessage = errMsg;
+                } else {
+                  errorMessage =
+                    errMsg[0] + (errMsg[1] ? ' and ' + errMsg[1] : '');
+                }
+                showToastMessage(errorMessage, 'error');
+              } else {
+                showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+              }
             }
-          } catch (error) {
-            console.error('Error creating event:', error);
             // if (onCloseModal) {
+            //   console.log('list api got called');
             //   onCloseModal();
             // }
           }
-        })
-      );
+        } catch (error) {
+          console.error('Error creating event:', error);
+          // if (onCloseModal) {
+          //   onCloseModal();
+          // }
+        }
+      }
       // }
     } catch (error) {
       console.error('Error scheduling new event:', error);
@@ -1119,6 +1240,13 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       showToastMessage(message, 'error');
       return false;
     };
+
+    if (eventBody?.startDatetime) {
+      const startTimeMs = new Date(eventBody.startDatetime).getTime();
+      if (!isNaN(startTimeMs) && startTimeMs < Date.now()) {
+        return showError(t('CENTER_SESSION.SESSION_START_TIME_IN_PAST_ERROR'));
+      }
+    }
 
     if (eventBody?.meetingDetails && eventBody?.meetingDetails?.url === '') {
       return showError(t('CENTER_SESSION.MEETING_URL_ERROR'));
@@ -1193,7 +1321,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     setEditSelection(event.target.value);
   };
 
-  const handelDeleteEvent = async (eventData: any, deleteSelection: string) => {
+  const handelDeleteEvent = async (
+    eventData: any,
+    deleteSelection: string,
+    successMessageKey = 'CENTER_SESSION.SESSION_DELETED_SUCCESSFULLY'
+  ) => {
     try {
       const isMainEvent =
         !eventData?.isRecurring ||
@@ -1211,10 +1343,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       };
       const response = await editEvent(eventRepetitionId, apiBody);
       if (response?.responseCode === 'OK') {
-        showToastMessage(
-          t('CENTER_SESSION.SESSION_DELETED_SUCCESSFULLY'),
-          'success'
-        );
+        showToastMessage(t(successMessageKey), 'success');
       } else {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
@@ -2045,6 +2174,16 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           modalOpen={modalOpen}
         />
       )}
+      <ConfirmationModal
+        message={t('CENTER_SESSION.SESSION_SLOT_CONFLICT_MSG')}
+        buttonNames={{
+          primary: t('COMMON.YES'),
+          secondary: t('COMMON.NO'),
+        }}
+        handleCloseModal={handleSlotConflictModalClose}
+        handleAction={handleSlotConflictConfirm}
+        modalOpen={slotConflictModalOpen}
+      />
     </Box>
   );
 };
