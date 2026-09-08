@@ -247,9 +247,12 @@ const MonthCalender: React.FC<CalendarWithAttendanceProps> = ({
           return null;
       }
     } else if (
+      // `== null` covers both null and undefined on purpose. Callers with no attendance
+      // to show pass null (or omit the prop); a strict `=== undefined` let a null
+      // silently swallow the session marker.
       eventScheduled &&
-      formattedAttendanceData === undefined &&
-      learnerAttendanceDate === undefined
+      formattedAttendanceData == null &&
+      learnerAttendanceDate == null
     ) {
       return (
         <div className="calender-icon">
