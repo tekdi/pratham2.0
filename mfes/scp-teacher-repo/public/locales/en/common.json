@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "Something went wrong",
     "NO_GO_BACK": "No, go back",
     "YES": "Yes",
+    "NO": "No",
     "REVIEW_ATTENDANCE": "Review Attendance",
     "ADD_NEW": "Add New",
     "ADD": "ADD",
@@ -557,7 +558,10 @@
     "END_DATE_ERROR": "End date cannot be earlier than start date",
     "DELETE_THIS_SESSION": "Delete this session",
     "LEARNER_PREREQUISITES": "Learner Prerequisites",
-    "LEARNER_POSTREQUISITES": "Learner Postrequisites"
+    "LEARNER_POSTREQUISITES": "Learner Postrequisites",
+    "SESSION_SLOT_CONFLICT_MSG": "There is already a session scheduled for the same time slot for the batch, are you sure you want to schedule another session for the same time slot?",
+    "PREVIOUS_SESSION_DELETED_SUCCESSFULLY": "Previous session deleted successfully",
+    "SESSION_START_TIME_IN_PAST_ERROR": "Start time has already passed. Please select a future time slot."
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "Center requested successfully",
