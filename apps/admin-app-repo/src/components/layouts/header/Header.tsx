@@ -21,6 +21,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Role } from '@/utils/app.constant';
 import MenuIcon from '@mui/icons-material/Menu';
 
+// Toggle back on to restore the dashboard header's language switcher.
+const SHOW_LANGUAGE_DROPDOWN = false;
+
 const Header = ({
   sx,
   customClass,
@@ -257,65 +260,69 @@ const Header = ({
             </Box>
           )}
 
-        <Box
-          sx={{
-            display: 'flex',
-            backgroundColor: '#bdbdbd',
-            padding: { xs: '3px', sm: '5px' }, // Responsive padding
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: { xs: '24px', sm: '20px' }, // Responsive height
-            width: { xs: '30px', sm: '35px' }, // Responsive width
-            borderRadius: '10px',
-            cursor: 'pointer',
-            marginRight: { xs: '6px', sm: '8px' }, // Responsive margin
-            marginLeft: { xs: '6px', sm: '0px' }, // Add left margin on mobile
-          }}
-          onClick={handleClick}
-        >
-          <Image 
-            src={deleteIcon} 
-            alt="" 
-            width={18} 
-            height={18}
-            style={{ maxWidth: '100%', height: 'auto' }}
-          />
-        </Box>
-        <Menu
-          id="long-menu"
-          MenuListProps={{
-            'aria-labelledby': 'long-button',
-          }}
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          PaperProps={{
-            style: {
-              // maxHeight: ITEM_HEIGHT * 4.5,
-              width: '20ch',
-            },
-          }}
-        >
-          {config.languages.map((lang) => (
-            <MenuItem
-              value={lang.code}
-              key={lang.code}
-              onClick={() => handleMenuItemClick(lang.code)}
+        {SHOW_LANGUAGE_DROPDOWN && (
+          <>
+            <Box
               sx={{
-                backgroundColor:
-                  lang.code === language ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
-                '&:hover': {
-                  backgroundColor:
-                    lang.code === language
-                      ? 'rgba(0, 0, 0, 0.12)'
-                      : 'rgba(0, 0, 0, 0.08)',
+                display: 'flex',
+                backgroundColor: '#bdbdbd',
+                padding: { xs: '3px', sm: '5px' }, // Responsive padding
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: { xs: '24px', sm: '20px' }, // Responsive height
+                width: { xs: '30px', sm: '35px' }, // Responsive width
+                borderRadius: '10px',
+                cursor: 'pointer',
+                marginRight: { xs: '6px', sm: '8px' }, // Responsive margin
+                marginLeft: { xs: '6px', sm: '0px' }, // Add left margin on mobile
+              }}
+              onClick={handleClick}
+            >
+              <Image
+                src={deleteIcon}
+                alt=""
+                width={18}
+                height={18}
+                style={{ maxWidth: '100%', height: 'auto' }}
+              />
+            </Box>
+            <Menu
+              id="long-menu"
+              MenuListProps={{
+                'aria-labelledby': 'long-button',
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              PaperProps={{
+                style: {
+                  // maxHeight: ITEM_HEIGHT * 4.5,
+                  width: '20ch',
                 },
               }}
             >
-              {lang.label}
-            </MenuItem>
-          ))}
-        </Menu>
+              {config.languages.map((lang) => (
+                <MenuItem
+                  value={lang.code}
+                  key={lang.code}
+                  onClick={() => handleMenuItemClick(lang.code)}
+                  sx={{
+                    backgroundColor:
+                      lang.code === language ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
+                    '&:hover': {
+                      backgroundColor:
+                        lang.code === language
+                          ? 'rgba(0, 0, 0, 0.12)'
+                          : 'rgba(0, 0, 0, 0.08)',
+                    },
+                  }}
+                >
+                  {lang.label}
+                </MenuItem>
+              ))}
+            </Menu>
+          </>
+        )}
         <Profile />
         {/* ------------------------------------------- */}
         {/* Profile Dropdown */}

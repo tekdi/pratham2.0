@@ -593,8 +593,7 @@ const DynamicForm = forwardRef(({
 
           // Add helper text for CustomTextFieldWidget if isForNavaPatham is true
           if (isForNavaPatham) {
-            uiOptions.helperText =
-              'దయచేసి ఈ సమాచారాన్ని ఇంగ్లీష్ భాషలో మాత్రమే నమోదు చేయండి';
+            uiOptions.helperText = t('NAVAPATHAM.TYPE_IN_ENGLISH');
           }
 
           setFormUiSchema((prevUiSchema) => ({

@@ -73,6 +73,9 @@ export default function LandingPage() {
     fetchPrograms();
   if (typeof window !== 'undefined' && window.localStorage) {
     localStorage.removeItem('isForNavaPatham');
+    // Landing here starts a fresh registration, so drop any half-filled
+    // form data left behind by an abandoned attempt.
+    localStorage.removeItem('formData');
   }
   }, []);
 

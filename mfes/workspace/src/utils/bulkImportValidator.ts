@@ -28,6 +28,8 @@ import {
   POS_DOMAIN_TO_SUBDOMAINS,
   POS_SUBDOMAIN_TO_SUBJECTS,
   splitMultiValue,
+  getUnitPath,
+  MAX_UNIT_DEPTH,
 } from './frameworkConfig';
 import { extractDriveFileId } from '../services/BulkImportService';
 
@@ -452,8 +454,33 @@ const validateCourseMappings = (
 
     if (!row.courseTempId)
       errors.push(err('CourseChildrenMapping', rowNum, 'Course Temp ID*', '"Course Temp ID*" is required'));
-    if (!row.unitName)
-      errors.push(err('CourseChildrenMapping', rowNum, 'Unit Name*', '"Unit Name*" is required'));
+
+    // ── Unit path checks ──────────────────────────────────────
+    // getUnitPath() stops at the first blank level, so a gap (e.g. Level 3
+    // filled while Level 2 is empty) would silently attach the child higher up
+    // than intended. Catch it here rather than importing into the wrong unit.
+    const unitPath = getUnitPath(row);
+    if (unitPath.length === 0) {
+      errors.push(err('CourseChildrenMapping', rowNum, 'Unit Level 1*', '"Unit Level 1*" is required'));
+    } else {
+      const filledLevels = [row.unitLevel1, row.unitLevel2, row.unitLevel3, row.unitLevel4]
+        .map((v) => String(v ?? '').trim());
+      const deepestFilled = filledLevels.reduce((acc, v, i) => (v ? i + 1 : acc), 0);
+      if (deepestFilled > unitPath.length) {
+        errors.push(err(
+          'CourseChildrenMapping', rowNum, `Unit Level ${unitPath.length + 1}`,
+          `Unit levels must be filled in order — "Unit Level ${unitPath.length + 1}" is empty `
+          + `but a deeper level is filled. Fill each level from 1 downwards, without gaps.`
+        ));
+      }
+      if (unitPath.length > MAX_UNIT_DEPTH) {
+        errors.push(err(
+          'CourseChildrenMapping', rowNum, 'Unit Level 4',
+          `Units can be nested at most ${MAX_UNIT_DEPTH} levels deep`
+        ));
+      }
+    }
+
     if (!row.childRef)
       errors.push(err('CourseChildrenMapping', rowNum, 'Child Ref*', '"Child Ref*" is required'));
     if (!row.childType)

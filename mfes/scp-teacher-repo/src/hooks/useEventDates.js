@@ -23,7 +23,7 @@ const useEventDates = (
   useEffect(() => {
     const fetchEventDates = async () => {
       try {
-        if (idValue && idValue !== '') {
+        if (idValue && idValue !== '' && idValue !== 'all') {
           let startDate, lastDate;
 
           if (modifyAttendanceLimit === dashboardDaysLimit) {

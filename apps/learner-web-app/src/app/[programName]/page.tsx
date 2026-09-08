@@ -52,6 +52,14 @@ export default function ProgramDetailPage() {
   const [enrolModalOpen, setEnrolModalOpen] = useState(false);
 
   useEffect(() => {
+    // Landing here starts a fresh registration, so drop any half-filled
+    // form data left behind by an abandoned attempt.
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('formData');
+    }
+  }, []);
+
+  useEffect(() => {
     if (!programName) return;
     const fetchProgram = async () => {
       try {

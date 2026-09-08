@@ -30,12 +30,22 @@ if (courseId) {
 
     const keywords = (data?.keywords || []).map(k => k.toLowerCase());
 
-    if (keywords.includes('health')) {
+    // Course keywords are aggregated from all child nodes, so a course can carry
+    // both keywords. Environment takes precedence in that case.
+    if (keywords.includes('health') && keywords.includes('environment')) {
+      backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
+    } else if (keywords.includes('health')) {
       backgroundSx = { backgroundImage: "url(/images/healthbackground.png)" };
     } else if (keywords.includes('environment')) {
       backgroundSx = { backgroundImage: "url(/images/environment-background.png)" };
     } else if (keywords.includes('energy')) {
       backgroundSx = { backgroundImage: "url(/images/energy-background.png)" };
+    } else if (
+      // Maths keywords are stored as comma-joined phrases rather than single
+      // words, so match on a substring instead of an exact keyword.
+      keywords.some((k) => k.includes('math') || k.includes('pictograph'))
+    ) {
+      backgroundSx = { backgroundImage: "url(/images/mathbackground.png)" };
     }
 
     console.log('backgroundSx', backgroundSx);
