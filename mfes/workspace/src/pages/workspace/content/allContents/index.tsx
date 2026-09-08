@@ -278,10 +278,39 @@ const AllContentsPage = () => {
           undefined,
           selectedNames
         );
+        let questionSetItems = response?.QuestionSet || [];
+
+        // A QuestionSet is unpublished via the questionset retire API, so it
+        // ends up with status "Retired" instead of "Unlisted". Treat it as
+        // Unpublished: when this filter is active, fetch retired
+        // QuestionSets separately (without touching the regular content
+        // status query above) and fold them in, so it shows up here too
+        // (it still shows under Deleted via the "Retired" status query).
+        const unpublishedQuestionSetIds = new Set<string>();
+        if (statusBy === 'Unlisted' || statusBy === 'Unpublished') {
+          const retiredQuestionSetsResponse = await getContent(
+            ['Retired'],
+            query,
+            LIMIT,
+            offset,
+            primaryCategory,
+            sort_by,
+            tenantConfig?.CHANNEL_ID,
+            undefined,
+            undefined,
+            selectedNames
+          );
+          const retiredQuestionSets = retiredQuestionSetsResponse?.QuestionSet || [];
+          retiredQuestionSets.forEach((item: any) => {
+            if (item?.identifier) unpublishedQuestionSetIds.add(item.identifier);
+          });
+          questionSetItems = [...questionSetItems, ...retiredQuestionSets];
+        }
+
         // Combine content and QuestionSet arrays while avoiding duplicates
         const allContent = [
           ...(response?.content || []),
-          ...(response?.QuestionSet || [])
+          ...questionSetItems,
         ];
         let contentSortList = allContent.sort((a, b) => {
           const dateA = new Date(a.lastUpdatedOn || 0).getTime();
@@ -295,8 +324,15 @@ const AllContentsPage = () => {
             contentMap.set(item.identifier, item);
           }
         });
-        
-        const contentList = Array.from(contentMap.values());
+
+        // Show a retired QuestionSet as Unpublished when it was pulled in
+        // for the Unpublished filter above; it still shows as Deleted on the
+        // Deleted/All tabs (same underlying item, appears on both lists).
+        const contentList = Array.from(contentMap.values()).map((item: any) =>
+          unpublishedQuestionSetIds.has(item?.identifier) && item?.status === 'Retired'
+            ? { ...item, status: 'Unlisted' }
+            : item
+        );
         setContentList(contentList);
         setTotalCount(response?.count);
         setLoading(false);
