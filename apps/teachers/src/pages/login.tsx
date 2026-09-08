@@ -310,12 +310,11 @@ const LoginComponent = () => {
         token &&
         tenant?.toLowerCase() === TENANT_DATA.YOUTHNET?.toLowerCase()
       ) {
-        if (
-          localStorage.getItem('role') === RoleNames.TEACHER ||
-          localStorage.getItem('role') === RoleNames.TEAM_LEADER
-        )
+        if (localStorage.getItem('role') === RoleNames.TEACHER) {
+          router.push('/youthnet/l2-interested-queue');
+        } else if (localStorage.getItem('role') === RoleNames.TEAM_LEADER) {
           router.push('/youthnet');
-        else router.push('/unauthorized');
+        } else router.push('/unauthorized');
       }
     }
     setLoading(false);
