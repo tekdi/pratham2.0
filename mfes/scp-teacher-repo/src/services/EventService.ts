@@ -59,9 +59,20 @@ export function mapEventToDaySession(ev: EventListApiEvent): DaySessionFromApi {
   };
 }
 
+/** Sort key for a session. Invalid/missing dates sort last instead of poisoning the sort. */
+function startDateTimeSortKey(ev: EventListApiEvent): number {
+  const time = new Date(ev.startDateTime).getTime();
+  return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
+}
+
 /**
- * Fetch events (sessions) for a single day for the given cohort.
+ * Fetch events (sessions) for a single day for the given cohort, earliest first.
  * Used by Mark Center Attendance sessions modal.
+ *
+ * The event list API returns no guaranteed order, so the same day could come back in a
+ * different sequence on each call. Sorting here keeps the session list stable and in
+ * chronological order. It must sort on the raw `startDateTime` - `DaySessionFromApi`
+ * only carries `startTime` as a formatted 12-hour string, which does not sort.
  */
 export const getEventsForDay = async (
   cohortId: string,
@@ -82,7 +93,9 @@ export const getEventsForDay = async (
     });
     const result = response?.data?.result;
     const events: EventListApiEvent[] = result?.events ?? [];
-    return events.map(mapEventToDaySession);
+    return [...events]
+      .sort((a, b) => startDateTimeSortKey(a) - startDateTimeSortKey(b))
+      .map(mapEventToDaySession);
   } catch (error) {
     console.error('getEventsForDay error', error);
     throw error;
