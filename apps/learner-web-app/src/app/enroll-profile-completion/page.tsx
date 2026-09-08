@@ -183,6 +183,15 @@ const EnrollProfileCompletionInner = () => {
 
         try {
           const preferredLanguage = localStorage.getItem('preferred_language');
+          // Build the search filter from the program actually being enrolled
+          // into (matching the pattern used in ProgramSwitchModal,
+          // EnrollProgramCarousel, login page, AssessmentAttempts, and
+          // AttemptAssessmentButton) so each program finds its own assessment
+          // content instead of always searching under SCP's legacy tag.
+          const programFilter =
+            tenantName === TenantName.SECOND_CHANCE_PROGRAM
+              ? [tenantName, 'Second Chance']
+              : [tenantName];
           const response = await ContentSearch({
             query: '',
             filters: {
@@ -190,7 +199,7 @@ const EnrollProfileCompletionInner = () => {
               primaryCategory: ['Practice Question Set'],
               assessmentType: 'Eligibility Test',
               ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
-              program: ['Second Chance'],
+              program: programFilter,
             },
             sort_by: {
               lastUpdatedOn: 'desc',
