@@ -559,8 +559,7 @@
     "DELETE_THIS_SESSION": "Delete this session",
     "LEARNER_PREREQUISITES": "Learner Prerequisites",
     "LEARNER_POSTREQUISITES": "Learner Postrequisites",
-    "SESSION_SLOT_CONFLICT_MSG": "A session is already scheduled for this batch during this time. If you continue, the existing session will be replaced with the new one. Do you want to continue?",
-    "SESSION_REPLACED_SUCCESSFULLY": "Previous session replaced with the new session successfully",
+    "SESSION_SLOT_CONFLICT_MSG": "A session is already scheduled for this batch during this time. Do you want to schedule another session for the same time slot?",
     "SESSION_START_TIME_IN_PAST_ERROR": "Start time has already passed. Please select a future time slot."
   },
   "MANAGE_USERS": {
