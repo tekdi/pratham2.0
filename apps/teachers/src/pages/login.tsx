@@ -278,8 +278,14 @@ const LoginComponent = () => {
               router.push('/teacher');
             }
           } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
-            router.push('/youth');
-         
+            if (localStorage.getItem('role') === RoleNames.TEACHER) {
+              // Trainer (Instructor): go straight to the L2 Interested Queue,
+              // skipping the /youth -> bare /youthnet hop every other
+              // Youthnet role takes.
+              router.push('/youthnet/l2-interested-queue');
+            } else {
+              router.push('/youth');
+            }
           } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
             
             if (activeSessionId) {
