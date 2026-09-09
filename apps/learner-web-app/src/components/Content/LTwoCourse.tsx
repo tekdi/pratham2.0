@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import ConfirmationModal from '@learner/components/ConfirmationModal/ConfirmationModal';
+import CommonModal from '@learner/components/Modal/CommonModal';
+import LevelUp from '@learner/components/LTwoContent/LevelUp';
+import ResponseRecorded from '@learner/components/LTwoContent/ResponseRecorded';
 import { useTranslation } from '@shared-lib';
-import { fetchUserCoursesWithContent } from '@learner/utils/API/contentService';
+import {
+  fetchUserCoursesWithContent,
+  createL2Course,
+} from '@learner/utils/API/contentService';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 import { getUserDetails, updateUser } from '@learner/utils/API/userService';
@@ -24,9 +29,13 @@ const getCustomFieldValueFromArray = (customFields: any, label: string[]) => {
 const LTwoCourse: React.FC = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [count, setCount] = useState(0);
   const [topics, setTopics] = useState<TopicProp[]>([]);
   const [userResponse, setUserResponse] = useState<any>(null);
   const [isInterested, setIsInterested] = useState(false);
+  const [selectedTopic, setSelectedTopic] = React.useState<
+    TopicProp | undefined
+  >(undefined);
 
   useEffect(() => {
     const fetchTopics = async () => {
@@ -69,8 +78,9 @@ const LTwoCourse: React.FC = () => {
     fetchTopics();
   }, []);
 
-  // Return null if there are no topics, or the learner has already confirmed interest
-  if (topics.length === 0 || isInterested) {
+  // Return null if there are no topics, or the learner has already confirmed
+  // interest and isn't currently looking at the post-submit confirmation modal
+  if (topics.length === 0 || (isInterested && !isModalOpen)) {
     return null;
   }
 
@@ -78,12 +88,41 @@ const LTwoCourse: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleConfirmInterest = async () => {
+  const handleSubmit = async () => {
     const userId = localStorage.getItem('userId');
     if (!userId) {
       return;
     }
     try {
+      // Get user data
+      const salesforceUserData = {
+        first_name: userResponse?.firstName ?? '',
+        middle_name: userResponse?.middleName ?? '',
+        last_name: userResponse?.lastName ?? '',
+        mother_name: userResponse?.MOTHER_NAME ?? '',
+        gender: userResponse?.gender ?? '',
+        email_address: userResponse?.email ?? '',
+        dob: userResponse?.dob ?? '',
+        enrollmentId: userResponse?.enrollmentId ?? '',
+        qualification:
+          userResponse?.HIGHEST_EDCATIONAL_QUALIFICATION_OR_LAST_PASSED_GRADE ??
+          '',
+        phone_number: userResponse?.mobile?.toString() ?? '',
+        state: userResponse?.STATE ?? '',
+        district: userResponse?.DISTRICT ?? '',
+        block: userResponse?.BLOCK ?? '',
+        village: userResponse?.VILLAGE ?? '',
+        blood_group: '',
+        userId: userResponse?.userId ?? '',
+        courseId: selectedTopic?.courses?.[0]?.courseId ?? '',
+        courseName: selectedTopic?.courses?.[0]?.name ?? '',
+        topicName: selectedTopic?.topic ?? '',
+      };
+
+      // Call createL2Course API (Salesforce)
+      await createL2Course(salesforceUserData);
+
+      // Flag interest on the user's profile so the section stays hidden on revisit
       const response = await updateUser(userId, {
         userData: {
           firstName: userResponse?.firstName ?? '',
@@ -105,14 +144,29 @@ const LTwoCourse: React.FC = () => {
       }
 
       setIsInterested(true);
-    } catch (error) {
-      console.error('Error updating interest:', error);
+      setCount(1);
+    } catch (error: any) {
+      const errorResponse = error?.response;
+      console.error(
+        'Error in handleSubmit:',
+        errorResponse?.data?.message?.join('') ?? error
+      );
       showToastMessage(t('LEARNER_APP.COMMON.REACHOUT_TO_MENTOR'), 'error');
     }
   };
 
+  const handleCloseResponse = () => {
+    setIsModalOpen(false);
+    setCount(0);
+  };
+
+  const handleTopicChange = (event: TopicProp) => {
+    setSelectedTopic(event);
+  };
+
   const handleClose = () => {
     setIsModalOpen(false);
+    setCount(0);
   };
 
   return (
@@ -179,16 +233,29 @@ const LTwoCourse: React.FC = () => {
         >
           {t('LEARNER_APP.L_TWO_COURSE.INTEREST_BUTTON')}
         </Button>
-        <ConfirmationModal
-          modalOpen={isModalOpen}
-          message={t('LEARNER_APP.L_TWO_COURSE.CONFIRM_INTEREST_MESSAGE')}
-          handleAction={handleConfirmInterest}
-          buttonNames={{
-            primary: t('LEARNER_APP.L_TWO_COURSE.CONFIRM_BUTTON'),
-            secondary: t('COMMON.CANCEL'),
-          }}
-          handleCloseModal={handleClose}
-        />
+        {count == 0 ? (
+          <CommonModal
+            handleSubmit={handleSubmit}
+            isOpen={isModalOpen}
+            onClose={handleClose}
+            submitText={t('LEARNER_APP.L_TWO_COURSE.SUBMIT_BUTTON')}
+          >
+            <LevelUp
+              handleTopicChange={handleTopicChange}
+              selectedTopic={selectedTopic?.topic ?? ''}
+              topics={topics}
+            />
+          </CommonModal>
+        ) : (
+          <CommonModal
+            handleSubmit={handleCloseResponse}
+            isOpen={isModalOpen}
+            onClose={handleClose}
+            submitText={t('LEARNER_APP.L_TWO_COURSE.OKAY_BUTTON')}
+          >
+            <ResponseRecorded />
+          </CommonModal>
+        )}
       </Box>
     </Box>
   );
