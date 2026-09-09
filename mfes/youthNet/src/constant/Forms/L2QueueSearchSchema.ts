@@ -137,13 +137,19 @@ export const L2QueueSearchSchema = {
       // on the existing /fields/options/read convention. Correct here only
       // if the real backend differs.
       api: {
-        url: `${baseurl}/fields/options/read`,
+       url: `/api/dynamic-form/get-framework`,
         method: 'POST',
-        payload: { fieldName: 'domain', sort: ['domain', 'asc'] },
         options: {
-          optionObj: 'result.values',
           label: 'label',
           value: 'value',
+          optionObj: 'options',
+        },
+        payload: {
+          code: 'subDomain',
+          fetchUrl:
+            'https://dev-middleware.prathamdigital.org/api/framework/v1/read/youthnet-framework',
+          findcode: 'stream',
+          selectedvalue: ['Career Exploration'],
         },
         callType: 'initial',
       },
@@ -164,20 +170,33 @@ export const L2QueueSearchSchema = {
       // AssesmentService use), filtering by domain instead of identifier.
       api: {
         url: `${baseurl}/action/composite/v3/search`,
-        method: 'POST',
-        payload: {
-          request: {
-            filters: { domain: ['**'] },
-            fields: ['name'],
-          },
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
         },
+        method: 'POST',
         options: {
-          optionObj: 'result.content',
           label: 'name',
           value: 'identifier',
+          optionObj: 'result.content',
+        },
+        payload: {
+          request: {
+            fields: ['name'],
+            filters: {
+              status: ['live'],
+              channel: 'pos-channel',
+              program: 'Vocational Training',
+              se_domains: ['Learning for work'],
+              se_subjects: '**',
+              se_subDomains: ['Career Exploration'],
+              primaryCategory: ['Course'],
+            },
+          },
         },
         callType: 'dependent',
-        dependent: 'taggedDomain',
+        dependent: 'domain',
       },
       uniqueItems: true,
       isMultiSelect: true,

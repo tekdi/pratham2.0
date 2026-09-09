@@ -33,7 +33,6 @@ import {
   getLearnerLocationValue,
   isLearnerTagged,
   buildTagCustomFields,
-  buildBatchEnrollCustomFields,
   isUpdateUserSuccess,
   getUpdateUserErrorMessage,
 } from '../services/l2InterestedQueue/l2QueueHelpers';
@@ -45,6 +44,7 @@ import {
   L2QueueAssignSchema,
   L2QueueAssignUISchema,
 } from '../constant/Forms/L2QueueAssignSchema';
+import AllocateToBatchModal from '../components/l2InterestedQueue/AllocateToBatchModal';
 
 const PAGE_SIZE = 10;
 
@@ -60,6 +60,15 @@ const L2InterestedQueuePage = () => {
 
   const [uiSchema, setUiSchema] = useState(L2QueueSearchUISchema);
   const [prefilledFormData, setPrefilledFormData] = useState<any>({ status: 'all' });
+  // DynamicForm only reads `uiSchema`/`prefilledFormData` into its own
+  // internal state on first mount (see formUiSchema/formData useState in
+  // shared-lib-v2's DynamicForm.tsx) — later prop changes on an already-
+  // mounted instance are ignored, which is why toggling the Tagged
+  // Domain/Course widgets and Clear All previously had no visible effect.
+  // Bumping this key forces a full remount so the fresh uiSchema/
+  // prefilledFormData are actually picked up, without touching the shared
+  // component itself.
+  const [searchFormKey, setSearchFormKey] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [response, setResponse] = useState<any>(null);
 
@@ -71,6 +80,11 @@ const L2InterestedQueuePage = () => {
   const [drawerLearners, setDrawerLearners] = useState<any[]>([]);
   const [assignFormData, setAssignFormData] = useState<any>({});
   const [saving, setSaving] = useState(false);
+
+  const [allocateOpen, setAllocateOpen] = useState(false);
+  const [allocateLearners, setAllocateLearners] = useState<any[]>([]);
+  const [allocateDomain, setAllocateDomain] = useState('');
+  const [allocateCourseId, setAllocateCourseId] = useState('');
 
   const rows: any[] = response?.getUserDetails || [];
 
@@ -139,14 +153,18 @@ const L2InterestedQueuePage = () => {
           'ui:widget': wantTagged ? 'AutoCompleteMultiSelectWidget' : 'hidden',
         },
       }));
+      setPrefilledFormData(formData);
+      setSearchFormKey((key) => key + 1);
+    } else {
+      setPrefilledFormData(formData);
     }
-    setPrefilledFormData(formData);
     await searchData(formData, 0);
   };
 
   const handleClearAll = () => {
     setUiSchema(L2QueueSearchUISchema);
     setPrefilledFormData({ status: 'all' });
+    setSearchFormKey((key) => key + 1);
     searchData({ status: 'all' }, 0);
   };
 
@@ -224,14 +242,25 @@ const L2InterestedQueuePage = () => {
   const selectedRows = Object.values(selectedRowsMap);
   const selectedRowIds = useMemo(() => new Set(Object.keys(selectedRowsMap)), [selectedRowsMap]);
 
-  const bulkAction = useMemo(() => {
-    if (selectedRows.length === 0) return null;
-    if (selectedRows.some((row: any) => !isLearnerTagged(row))) return 'none';
+  // "Assign to batch" is a quick-path shortcut that skips the drawer — it
+  // only makes sense when every selected learner is already tagged with the
+  // exact same Domain+Course, since it reuses the first row's domain/course
+  // to search batches for the whole selection.
+  const canQuickAssignToBatch = useMemo(() => {
+    if (selectedRows.length === 0) return false;
+    if (selectedRows.some((row: any) => !isLearnerTagged(row))) return false;
     const combos = new Set(
       selectedRows.map((row: any) => `${getLearnerDomain(row)}::${getLearnerCourseId(row)}`)
     );
-    return combos.size === 1 ? 'assign' : 'review';
+    return combos.size === 1;
   }, [selectedRows]);
+
+  // Review (the drawer) lets you assign/update Domain+Course for the whole
+  // selection regardless of each learner's current tagging state — same
+  // combo, different combos, or a mix of tagged/untagged all land here once
+  // more than one learner is selected. A single selected learner already has
+  // its own Interact/Review button in the row's Action column.
+  const canBulkReview = selectedRows.length > 1;
 
   const refreshCurrentPage = () => {
     searchData(prefilledFormData, currentPage);
@@ -247,27 +276,17 @@ const L2InterestedQueuePage = () => {
     setDrawerOpen(true);
   };
 
-  const handleBulkAssignToBatch = async () => {
-    if (saving) return;
-    setSaving(true);
-    try {
-      const customFields = buildBatchEnrollCustomFields();
-      const results = await Promise.all(
-        selectedRows.map((row: any) => updateUser(row.userId, { customFields }))
-      );
-      const failed = results.find((r) => !isUpdateUserSuccess(r));
-      if (failed) {
-        showToastMessage(getUpdateUserErrorMessage(failed) || t('COMMON.SOMETHING_WENT_WRONG'), 'error');
-        return;
-      }
-      showToastMessage(t('L2_QUEUE.BATCH_ASSIGN_SUCCESS'), 'success');
-      clearSelection();
-      refreshCurrentPage();
-    } catch (error) {
-      showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
-    } finally {
-      setSaving(false);
-    }
+  const openAllocateModal = (targetLearners: any[], domain: string, courseId: string) => {
+    setAllocateLearners(targetLearners);
+    setAllocateDomain(domain);
+    setAllocateCourseId(courseId);
+    setAllocateOpen(true);
+  };
+
+  const handleBulkAssignToBatch = () => {
+    if (selectedRows.length === 0) return;
+    const first: any = selectedRows[0];
+    openAllocateModal(selectedRows as any[], getLearnerDomain(first) || '', getLearnerCourseId(first) || '');
   };
 
   const canSaveDrawer = !!assignFormData?.domain?.[0] && !!assignFormData?.course?.[0];
@@ -282,7 +301,7 @@ const L2InterestedQueuePage = () => {
         assignFormData.note
       );
       const results = await Promise.all(
-        drawerLearners.map((learner) => updateUser(learner.userId, { customFields }))
+        drawerLearners.map((learner) => updateUser(learner.userId, { userData: {}, customFields }))
       );
       const failed = results.find((r) => !isUpdateUserSuccess(r));
       if (failed) {
@@ -304,22 +323,21 @@ const L2InterestedQueuePage = () => {
     if (!canSaveDrawer || saving) return;
     setSaving(true);
     try {
-      const customFields = [
-        ...buildTagCustomFields(assignFormData.domain[0], assignFormData.course[0], assignFormData.note),
-        ...buildBatchEnrollCustomFields(),
-      ];
+      const domain = assignFormData.domain[0];
+      const courseId = assignFormData.course[0];
+      const customFields = buildTagCustomFields(domain, courseId, assignFormData.note);
       const results = await Promise.all(
-        drawerLearners.map((learner) => updateUser(learner.userId, { customFields }))
+        drawerLearners.map((learner) => updateUser(learner.userId, { userData: {}, customFields }))
       );
       const failed = results.find((r) => !isUpdateUserSuccess(r));
       if (failed) {
         showToastMessage(getUpdateUserErrorMessage(failed) || t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         return;
       }
-      showToastMessage(t('L2_QUEUE.BATCH_ASSIGN_SUCCESS'), 'success');
+      // Tags are saved — now let the trainer pick the actual batch before
+      // creating the cohort membership + flipping the enrolled flag.
       setDrawerOpen(false);
-      clearSelection();
-      refreshCurrentPage();
+      openAllocateModal(drawerLearners, domain, courseId);
     } catch (error) {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     } finally {
@@ -437,6 +455,7 @@ const L2InterestedQueuePage = () => {
 
       <Box display="flex" flexDirection="column" gap={2} sx={{ px: 2 }}>
         <DynamicForm
+          key={searchFormKey}
           schema={L2QueueSearchSchema}
           uiSchema={{
             ...uiSchema,
@@ -447,7 +466,7 @@ const L2InterestedQueuePage = () => {
           prefilledFormData={prefilledFormData}
           type="l2-interested-queue"
         />
-        <Box>
+        <Box display="flex" justifyContent="flex-end" my={3}>
           <Button size="small" onClick={handleClearAll}>
             {t('L2_QUEUE.CLEAR_ALL')}
           </Button>
@@ -461,10 +480,10 @@ const L2InterestedQueuePage = () => {
             sx={{ p: 1.5, border: '1px solid #eee', borderRadius: 2, bgcolor: '#FAFAFA' }}
           >
             <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="body2">
+              <Typography variant="body2" mb={0}>
                 {t('L2_QUEUE.LEARNERS_SELECTED', { count: selectedRows.length })}
               </Typography>
-              {bulkAction === 'assign' && (
+              {canQuickAssignToBatch && (
                 <Button
                   variant="contained"
                   size="small"
@@ -474,7 +493,7 @@ const L2InterestedQueuePage = () => {
                   {t('L2_QUEUE.ASSIGN_TO_BATCH')}
                 </Button>
               )}
-              {bulkAction === 'review' && (
+              {canBulkReview && (
                 <Button
                   variant="contained"
                   size="small"
@@ -568,15 +587,41 @@ const L2InterestedQueuePage = () => {
           )
         )}
 
-        <DynamicForm
-          schema={L2QueueAssignSchema}
-          uiSchema={{ ...L2QueueAssignUISchema, 'ui:submitButtonOptions': { norender: true } }}
-          SubmitaFunction={(formData: any) => setAssignFormData(formData)}
-          isCallSubmitInHandle={true}
-          prefilledFormData={assignFormData}
-          type="l2-interested-queue-assign"
-        />
+        {/* DynamicForm hardcodes a Grid item xs={12} md={4} lg={3} per field
+            whenever isCallSubmitInHandle is true, ignoring any uiSchema grid
+            option — forcing full width here at the call site instead of
+            touching that shared, widely-used component. */}
+        <Box
+          sx={{
+            '& .MuiGrid-item': {
+              flexBasis: '100% !important',
+              maxWidth: '100% !important',
+            },
+          }}
+        >
+          <DynamicForm
+            schema={L2QueueAssignSchema}
+            uiSchema={{ ...L2QueueAssignUISchema, 'ui:submitButtonOptions': { norender: true } }}
+            SubmitaFunction={(formData: any) => setAssignFormData(formData)}
+            isCallSubmitInHandle={true}
+            prefilledFormData={assignFormData}
+            type="l2-interested-queue-assign"
+          />
+        </Box>
       </CommonSidePanel>
+
+      <AllocateToBatchModal
+        open={allocateOpen}
+        onClose={() => setAllocateOpen(false)}
+        learners={allocateLearners}
+        domain={allocateDomain}
+        courseId={allocateCourseId}
+        courseName={courseNameMap[allocateCourseId] || allocateCourseId}
+        onAllocated={() => {
+          clearSelection();
+          refreshCurrentPage();
+        }}
+      />
     </>
   );
 };
