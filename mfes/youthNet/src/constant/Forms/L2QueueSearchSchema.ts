@@ -133,19 +133,15 @@ export const L2QueueSearchSchema = {
         enum: ['Select'],
         enumNames: ['Select'],
       },
-      // Real Domain API: local BFF proxy (src/pages/api/dynamic-form/get-framework.ts)
-      // reads the youthnet-framework and returns the `subDomain` category's
-      // terms as the Tagged Domain dropdown's options.
+      // Placeholder endpoint — no Domain Search API was ever given; modeled
+      // on the existing /fields/options/read convention. Correct here only
+      // if the real backend differs.
       api: {
-        url: '/youthnet/api/dynamic-form/get-framework',
+        url: `${baseurl}/fields/options/read`,
         method: 'POST',
-        payload: {
-          code: 'subDomain',
-          fetchUrl: `${baseurl}/api/framework/v1/read/youthnet-framework`,
-          findcode: 'stream',
-        },
+        payload: { fieldName: 'domain', sort: ['domain', 'asc'] },
         options: {
-          optionObj: 'options',
+          optionObj: 'result.values',
           label: 'label',
           value: 'value',
         },
@@ -163,30 +159,17 @@ export const L2QueueSearchSchema = {
         enum: ['Select'],
         enumNames: ['Select'],
       },
-      // Real Course API: same composite-search endpoint/filters given for this
-      // feature verbatim — only se_subDomains is templated from the selected
-      // Tagged Domain value; everything else stays fixed as given.
+      // Placeholder endpoint — modeled on the existing composite-search
+      // convention (same one admin-app-repo's getCourseName() and this mfe's
+      // AssesmentService use), filtering by domain instead of identifier.
       api: {
         url: `${baseurl}/action/composite/v3/search`,
         method: 'POST',
         payload: {
           request: {
+            filters: { domain: ['**'] },
             fields: ['name'],
-            filters: {
-              status: ['live'],
-              channel: 'pos-channel',
-              program: 'Vocational Training',
-              se_domains: ['Learning for work'],
-              se_subjects: ['Agriculture Education'],
-              se_subDomains: '**',
-              primaryCategory: ['Course'],
-            },
           },
-        },
-        header: {
-          tenantId: '**',
-          Authorization: '**',
-          academicyearid: '**',
         },
         options: {
           optionObj: 'result.content',
