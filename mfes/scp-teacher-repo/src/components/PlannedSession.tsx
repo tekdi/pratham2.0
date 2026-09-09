@@ -2,14 +2,12 @@
 import * as React from 'react';
 
 import useNotification from '@/hooks/useNotification';
-import { bulkDeleteAttendance } from '@/services/AttendanceService';
 import { createEvent, editEvent, getEventList } from '@/services/EventService';
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import {
   getAfterDate,
   getBeforeDate,
   getOptionsByCategory,
-  shortDateFormat,
 } from '@/utils/helper';
 import { CreateEvent, PlannedModalProps } from '@/utils/Interfaces';
 import {
@@ -1088,49 +1086,8 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                 continue;
               }
 
-              // A session that has already gone live cannot be archived or
-              // have its attendance cleared by the backend, so don't even
-              // attempt it — just proceed to create the new session and let
-              // both coexist for this slot.
-              const conflictingEventId = conflictingEvent?.eventRepetitionId;
-              const conflictingEventStartMs = new Date(
-                conflictingEvent?.startDateTime
-              ).getTime();
-              const hasConflictingSessionStarted =
-                !isNaN(conflictingEventStartMs) &&
-                conflictingEventStartMs <= Date.now();
-
-              if (!hasConflictingSessionStarted) {
-                // Clear any attendance already marked against the session
-                // being replaced, scoped to that session only.
-                if (conflictingEventId && attendeeArray.length > 0) {
-                  try {
-                    const attendanceDateStr = shortDateFormat(
-                      new Date(conflictingEvent.startDateTime)
-                    );
-                    await bulkDeleteAttendance(
-                      attendeeArray.map((userId) => ({
-                        userId,
-                        contextIds: [conflictingEventId],
-                        date: attendanceDateStr,
-                      }))
-                    );
-                  } catch (error) {
-                    console.error(
-                      'Error clearing attendance for replaced session:',
-                      error
-                    );
-                  }
-                }
-
-                // Replace the previously scheduled session using the same
-                // delete flow as the "Delete this session" action.
-                await handelDeleteEvent(
-                  conflictingEvent,
-                  t('CENTER_SESSION.EDIT_THIS_SESSION'),
-                  'CENTER_SESSION.PREVIOUS_SESSION_DELETED_SUCCESSFULLY'
-                );
-              }
+              // Yes: fall through and create the new session alongside the
+              // existing one — no replacement, both sessions coexist.
             }
 
             const response = await createEvent(apiBody);
@@ -1321,11 +1278,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     setEditSelection(event.target.value);
   };
 
-  const handelDeleteEvent = async (
-    eventData: any,
-    deleteSelection: string,
-    successMessageKey = 'CENTER_SESSION.SESSION_DELETED_SUCCESSFULLY'
-  ) => {
+  const handelDeleteEvent = async (eventData: any, deleteSelection: string) => {
     try {
       const isMainEvent =
         !eventData?.isRecurring ||
@@ -1343,7 +1296,10 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       };
       const response = await editEvent(eventRepetitionId, apiBody);
       if (response?.responseCode === 'OK') {
-        showToastMessage(t(successMessageKey), 'success');
+        showToastMessage(
+          t('CENTER_SESSION.SESSION_DELETED_SUCCESSFULLY'),
+          'success'
+        );
       } else {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
