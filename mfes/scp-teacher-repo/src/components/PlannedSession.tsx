@@ -1039,6 +1039,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       // if (eventValid) {
       for (const apiBody of apiBodies) {
         try {
+          let wasSessionReplaced = false;
           const isEventValid = validateEventBody(apiBody);
           if (isEventValid) {
             const conflictingEvent = await findConflictingSessionEvent(
@@ -1072,6 +1073,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                 conflictingEventStartMs <= Date.now();
 
               if (!hasConflictingSessionStarted) {
+                wasSessionReplaced = true;
                 // Clear any attendance already marked against the session
                 // being replaced, scoped to that session only.
                 if (conflictingEventId && attendeeArray.length > 0) {
@@ -1095,11 +1097,13 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                 }
 
                 // Replace the previously scheduled session using the same
-                // delete flow as the "Delete this session" action.
+                // delete flow as the "Delete this session" action. The
+                // success toast is shown once, combined, after the new
+                // session is created below — not here.
                 await handelDeleteEvent(
                   conflictingEvent,
                   t('CENTER_SESSION.EDIT_THIS_SESSION'),
-                  'CENTER_SESSION.PREVIOUS_SESSION_DELETED_SUCCESSFULLY'
+                  null
                 );
               }
             }
@@ -1108,7 +1112,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
 
             if (response?.responseCode === 'Created') {
               showToastMessage(
-                t('COMMON.SESSION_SCHEDULED_SUCCESSFULLY'),
+                t(
+                  wasSessionReplaced
+                    ? 'CENTER_SESSION.SESSION_REPLACED_SUCCESSFULLY'
+                    : 'COMMON.SESSION_SCHEDULED_SUCCESSFULLY'
+                ),
                 'success'
               );
 
@@ -1314,7 +1322,9 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       };
       const response = await editEvent(eventRepetitionId, apiBody);
       if (response?.responseCode === 'OK') {
-        showToastMessage(t(successMessageKey), 'success');
+        if (successMessageKey) {
+          showToastMessage(t(successMessageKey), 'success');
+        }
       } else {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
       }
