@@ -43,7 +43,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
       console.log('Publish clicked');
       if (rowData?.identifier) {
         try {
-     await publishContent(rowData?.identifier);
+     await publishContent(rowData?.identifier, undefined, rowData?.mimeType);
           console.log(`Unpublished item with identifier - ${rowData?.identifier}`);
 
           await delay(2000);
@@ -79,7 +79,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
 
       if (rowData?.identifier) {
         try {
-     await unpublishContent(rowData?.identifier);
+     await unpublishContent(rowData?.identifier, rowData?.mimeType);
           console.log(`Unpublished item with identifier - ${rowData?.identifier}`);
 
           await delay(2000);
