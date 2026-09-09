@@ -334,9 +334,14 @@ const L2InterestedQueuePage = () => {
         showToastMessage(getUpdateUserErrorMessage(failed) || t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         return;
       }
-      // Tags are saved — now let the trainer pick the actual batch before
-      // creating the cohort membership + flipping the enrolled flag.
+      // Tags are saved — refresh the list right away so it reflects the new
+      // Domain/Course immediately, regardless of what happens with the batch
+      // modal next (confirmed or cancelled). Then let the trainer pick the
+      // actual batch before creating the cohort membership + flipping the
+      // enrolled flag.
       setDrawerOpen(false);
+      clearSelection();
+      refreshCurrentPage();
       openAllocateModal(drawerLearners, domain, courseId);
     } catch (error) {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
