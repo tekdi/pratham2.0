@@ -31,6 +31,7 @@ const EnrollProfileCompletionInner = () => {
   const [landingPage, setLandingPage] = useState<string>('');
 
   const handleAccessProgram = async () => {
+    if (typeof window === 'undefined') return;
     try {
       const storedUserId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
