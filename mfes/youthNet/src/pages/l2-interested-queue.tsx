@@ -458,7 +458,7 @@ const L2InterestedQueuePage = () => {
         />
       </Box>
 
-      <Box display="flex" flexDirection="column" gap={2} sx={{ px: 2 }}>
+      <Box display="flex" flexDirection="column" gap={2} sx={{ px: 2, mb: 4 }}>
         <DynamicForm
           key={searchFormKey}
           schema={L2QueueSearchSchema}
@@ -471,7 +471,7 @@ const L2InterestedQueuePage = () => {
           prefilledFormData={prefilledFormData}
           type="l2-interested-queue"
         />
-        <Box display="flex" justifyContent="flex-end" my={3}>
+        <Box display="flex" justifyContent="flex-end" mt={3}>
           <Button size="small" onClick={handleClearAll}>
             {t('L2_QUEUE.CLEAR_ALL')}
           </Button>
