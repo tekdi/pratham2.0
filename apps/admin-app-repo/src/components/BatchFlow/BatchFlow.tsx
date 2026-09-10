@@ -189,27 +189,38 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         }
       }
     };
+    const mergedBoardValues = Array.from(
+      new Set([
+        ...(Array.isArray(centerBoards) ? centerBoards : []),
+        ...(existingValues?.board || []),
+      ])
+    ).filter(Boolean);
+
     overrideEnum('board', centerBoards);
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
 
     // Stream is scoped to the center's own selected streams (same as the
     // other fields above), but must also be filtered by whichever board is
-    // currently selected in the batch form - a center can be associated
-    // with several boards, each with its own streams via the framework's
-    // term associations, so a flat "all of the center's streams" list (as
-    // overrideEnum would produce) leaks streams from boards other than the
-    // one selected. Re-fetching via the board-dependent framework lookup
-    // (with the result restricted to this center's streams) keeps that
-    // filtering driven entirely by the framework's association data,
-    // rather than any hardcoded board/stream mapping.
+    // currently selected in the batch form - a center associated with
+    // several boards can have streams that only apply under some of them
+    // via the framework's term associations, so a flat "all of the
+    // center's streams" list (as overrideEnum would produce) would leak
+    // streams from boards other than the one selected. That ambiguity only
+    // exists when the center actually has more than one board to choose
+    // from; with a single (or no) board there's nothing else a stream
+    // could belong to, so the flat center-scoped list is safe and the
+    // board-dependent live lookup (and its API call) can be skipped
+    // entirely.
+    const isBoardAmbiguous = mergedBoardValues.length > 1;
+
     if (alterSchema?.properties?.stream) {
       const currentVals = Array.isArray(centerStreams) ? centerStreams : [];
       const existing = existingValues?.stream || [];
       const mergedStreams = Array.from(
         new Set([...(currentVals || []), ...(existing || [])])
       ).filter(Boolean);
-      if (mergedStreams.length && boardFrameworkFetchUrl) {
+      if (mergedStreams.length && isBoardAmbiguous && boardFrameworkFetchUrl) {
         // Start empty - no board selected yet means no valid stream yet.
         // The shared DynamicForm's own dependent-field handling (the same
         // mechanism board->medium already relies on) fetches and fills
