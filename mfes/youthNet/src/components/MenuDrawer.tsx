@@ -12,6 +12,8 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import {
@@ -65,6 +67,7 @@ interface NavItemProps {
   endIcon?: boolean;
   sx?: Record<string, unknown>;
   className?: string;
+  locked?: boolean;
 }
 
 const NavItem: React.FC<NavItemProps> = ({
@@ -78,14 +81,16 @@ const NavItem: React.FC<NavItemProps> = ({
   endIcon = false,
   sx = {},
   className = 'fs-14',
+  locked = false,
 }) => {
   const theme = useTheme<any>();
   const button = (
     <Button
       className={className}
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
+      disabled={locked}
       startIcon={!endIcon ? icon : undefined}
-      endIcon={endIcon ? icon : undefined}
+      endIcon={endIcon ? icon : locked ? <LockOutlinedIcon fontSize="small" /> : undefined}
       sx={{
         gap: '10px',
         width: '100%',
@@ -100,6 +105,7 @@ const NavItem: React.FC<NavItemProps> = ({
           : '0px 18px !important',
         color: isActive ? activeColor : color ?? theme.palette.warning.A200,
         fontWeight: isActive ? '600' : 500,
+        '&.Mui-disabled': { opacity: 0.5, color: color ?? theme.palette.warning.A200 },
         '& .MuiButton-startIcon': collapsed ? { margin: 0 } : undefined,
         '& .MuiButton-endIcon': collapsed ? { margin: 0 } : undefined,
         '&:hover': {
@@ -381,6 +387,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isOrganisationDashboard = router.pathname === '/organisation';
   const isOrganisationVolunteerDashboard = router.pathname === '/organisation-volunteer';
 
+  const isTrainer =
+    typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.TEACHER;
+  const isL2InterestedQueue = router.pathname.includes('/l2-interested-queue');
+  const isBatches = router.pathname.includes('/batches');
+
   return (
     <Drawer
       open={isDesktop || isOpen}
@@ -559,7 +570,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
           </Box>
         )}
 
-        {tenantName === TENANT_DATA.YOUTHNET && (
+        {tenantName === TENANT_DATA.YOUTHNET && !isTrainer && (
           <Box>
             <NavItem
               collapsed={collapsed}
@@ -632,6 +643,34 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 sx={{ marginTop: '15px' }}
               />
             </Box>
+          </Box>
+        )}
+
+        {tenantName === TENANT_DATA.YOUTHNET && isTrainer && (
+          <Box>
+            <NavItem
+              collapsed={collapsed}
+              isActive={isL2InterestedQueue}
+              icon={<AssignmentIndOutlinedIcon sx={{ fontSize: '24px !important' }} />}
+              onClick={() => {
+                closeDrawer();
+                router.push('/l2-interested-queue');
+              }}
+              label={t('DASHBOARD.L2_INTERESTED_QUEUE')}
+              sx={{ marginTop: '25px' }}
+            />
+
+            <NavItem
+              collapsed={collapsed}
+              isActive={isBatches}
+              icon={<GroupsIcon sx={{ fontSize: '24px !important' }} />}
+              onClick={() => {
+                closeDrawer();
+                router.push('/batches');
+              }}
+              label={t('DASHBOARD.BATCHES')}
+              sx={{ marginTop: '25px' }}
+            />
           </Box>
         )}
 

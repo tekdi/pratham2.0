@@ -162,6 +162,7 @@
     "SUBMIT_YOUR_REQUEST_FOR_ISSUES": "Submit your request and let us assist you with any issues or concerns.",
     "WE_ARE_HERE_TO_HELP": "We’re Here to Help",
     "NO_STATE_LEAD_FOUND": "No State Lead Found",
+    "NO_PLACEMENT_RETENTION_COORDINATOR_FOUND": "No Placement Retention Coordinator Found",
     "FAQS": "FAQ's",
     "RESET_FILTERS": "Reset Filters",
     "ACTIVATE_USER": "Activate User",
@@ -244,6 +245,7 @@
     "YOUTH": "Youth",
     "FAQS": "FAQ's",
     "STATE_LEAD": "State Lead",
+    "PLACEMENT_RETENTION_COORDINATOR": "Placement Retention",
     "MASTER": "Master",
     "STATES": "States",
     "DISTRICTS": "Districts",
@@ -808,6 +810,18 @@
     "NOT_ABLE_UPDATE_STATE_LEAD": "Not able to update State Lead",
     "NOT_ABLE_CREATE_STATE_LEAD": "Not able to create State Lead",
     "UPDATE_STATE_LEAD": "Update State Lead"
+  },
+  "PLACEMENT_RETENTION_COORDINATORS": {
+    "SEARCHBAR_PLACEHOLDER": "Search Placement Retention Coordinator..",
+    "NEW_PLACEMENT_RETENTION_COORDINATOR": "New Placement Retention Coordinator",
+    "FIRST_SELECT_REQUIRED_FIELDS": "First select required fields",
+    "PLACEMENT_RETENTION_COORDINATOR_CREATED_SUCCESSFULLY": "Placement Retention Coordinator has been successfully created!",
+    "USER_CREDENTIALS_WILL_BE_SEND_SOON": "Placement Retention Coordinator is created, credentials will be sent soon",
+    "PLACEMENT_RETENTION_COORDINATOR_UPDATED_SUCCESSFULLY": "Placement Retention Coordinator has been successfully updated!",
+    "EDIT_PLACEMENT_RETENTION_COORDINATOR": "Edit Placement Retention Coordinator",
+    "NOT_ABLE_UPDATE_PLACEMENT_RETENTION_COORDINATOR": "Not able to update Placement Retention Coordinator",
+    "NOT_ABLE_CREATE_PLACEMENT_RETENTION_COORDINATOR": "Not able to create Placement Retention Coordinator",
+    "UPDATE_PLACEMENT_RETENTION_COORDINATOR": "Update Placement Retention Coordinator"
   },
   "MENTORS": {
     "SEARCHBAR_PLACEHOLDER": "Search mentors..",
