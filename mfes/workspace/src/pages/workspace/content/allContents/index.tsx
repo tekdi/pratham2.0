@@ -84,6 +84,43 @@ const columns = [
     width: '220px',
   },
 ];
+
+// How long after an action we keep locally overriding the search index's
+// verdict on this identifier - long enough to cover the usual reindex lag,
+// short enough that a genuinely new state for the same item later isn't
+// masked forever.
+const RECENT_ACTION_GUARD_MS = 30000;
+
+// A row's new state right after an action is more up to date than what the
+// (possibly not-yet-reindexed) search API says. Returns true when a row
+// should be hidden from the currently active status tab as a result.
+const shouldHideAfterAction = (
+  actionType: string,
+  currentStatusBy: string
+): boolean => {
+  // The "All" tab shows every status, so there's nothing to hide there.
+  if (currentStatusBy === '' || currentStatusBy === 'All') return false;
+
+  switch (actionType) {
+    case 'publish':
+      // Item is now Live - stays visible only on the Live tab.
+      return currentStatusBy !== 'Live';
+    case 'unpublish':
+      // Item is now Unlisted (QuestionSets retire under the hood but are
+      // normalized to Unlisted for display - see the fetch effect below).
+      // Delete is hidden entirely for QuestionSets (see ActionIcon.tsx), so
+      // an unpublished QuestionSet is never a "Deleted" item and never
+      // shows there, regardless of mimeType.
+      return currentStatusBy !== 'Unlisted' && currentStatusBy !== 'Unpublished';
+    case 'delete':
+      // Delete is only ever available for non-QuestionSet rows (see
+      // ActionIcon.tsx); the item is now Retired.
+      return currentStatusBy !== 'Deleted';
+    default:
+      return false;
+  }
+};
+
 const AllContentsPage = () => {
   const tenantConfig = useTenantConfig();
   const theme = useTheme<any>();
@@ -132,6 +169,12 @@ const AllContentsPage = () => {
   const prevFilterRef = useRef(filter);
 
   const fetchContentAPI = useSharedStore((state: any) => state.fetchContentAPI);
+  const lastContentAction = useSharedStore((state: any) => state.lastContentAction);
+  // Identifiers recently acted on (publish/unpublish/delete), so a refetch
+  // that still hits a not-yet-reindexed search result doesn't silently
+  // re-introduce a row we already know should be gone from this tab. See
+  // shouldHideAfterAction below and its uses in the two effects that follow.
+  const recentlyMutatedRef = useRef<Map<string, { actionType: string; mimeType?: string; ts: number }>>(new Map());
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
   const [totalCount, setTotalCount] = useState(0);
@@ -152,6 +195,28 @@ const AllContentsPage = () => {
     const headerValue = localStorage.getItem('showHeader');
     setShowHeader(headerValue === 'true');
   }, []);
+
+  // Patch the currently displayed list the instant a publish/unpublish/delete
+  // succeeds anywhere (see DeleteConfirmation.tsx), rather than waiting for
+  // the follow-up refetch - the search index it reads from can lag a few
+  // seconds behind the mutation, which otherwise left a stale row visible
+  // until a manual page refresh.
+  useEffect(() => {
+    if (!lastContentAction?.identifier) return;
+    const hide = shouldHideAfterAction(lastContentAction.actionType, statusBy);
+    if (hide) {
+      setContentList((prev) =>
+        prev.filter((item) => item?.identifier !== lastContentAction.identifier)
+      );
+      recentlyMutatedRef.current.set(lastContentAction.identifier, {
+        actionType: lastContentAction.actionType,
+        mimeType: lastContentAction.mimeType,
+        ts: lastContentAction.ts,
+      });
+    } else {
+      recentlyMutatedRef.current.delete(lastContentAction.identifier);
+    }
+  }, [lastContentAction]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -266,6 +331,19 @@ const AllContentsPage = () => {
           prevSearchTermRef.current = debouncedSearchTerm;
         }
         console.log('seraching', debouncedSearchTerm);
+        // Unpublishing a QuestionSet retires it (same API as delete - see
+        // ContentService.unpublishContent), so retired QuestionSets are
+        // Unpublished items, not deleted ones, and must not appear under
+        // Deleted. Excluding them in the query itself (rather than dropping
+        // them from the response) keeps response.count - and therefore the
+        // pagination - in step with the rows actually listed.
+        const searchFilters =
+          statusBy === 'Deleted'
+            ? {
+                ...selectedNames,
+                mimeType: { '!=': MIME_TYPE.QUESTIONSET_MIME_TYPE },
+              }
+            : selectedNames;
         const response = await getContent(
           status,
           query,
@@ -276,17 +354,19 @@ const AllContentsPage = () => {
           tenantConfig?.CHANNEL_ID,
           undefined,
           undefined,
-          selectedNames
+          searchFilters
         );
         let questionSetItems = response?.QuestionSet || [];
 
         // A QuestionSet is unpublished via the questionset retire API, so it
-        // ends up with status "Retired" instead of "Unlisted". Treat it as
-        // Unpublished: when this filter is active, fetch retired
-        // QuestionSets separately (without touching the regular content
-        // status query above) and fold them in, so it shows up here too
-        // (it still shows under Deleted via the "Retired" status query).
-        const unpublishedQuestionSetIds = new Set<string>();
+        // ends up with status "Retired" instead of "Unlisted". Since Delete
+        // is hidden entirely for QuestionSets (see ActionIcon.tsx), a
+        // retired QuestionSet is always the result of Unpublish - never a
+        // genuine delete - so it belongs under Unpublished only, never
+        // Deleted. The primary query above won't return it when this tab
+        // asks for status "Unlisted" only, so fetch retired QuestionSets
+        // separately here (without touching the regular content status
+        // query) and fold them in.
         if (statusBy === 'Unlisted' || statusBy === 'Unpublished') {
           const retiredQuestionSetsResponse = await getContent(
             ['Retired'],
@@ -300,11 +380,10 @@ const AllContentsPage = () => {
             undefined,
             selectedNames
           );
-          const retiredQuestionSets = retiredQuestionSetsResponse?.QuestionSet || [];
-          retiredQuestionSets.forEach((item: any) => {
-            if (item?.identifier) unpublishedQuestionSetIds.add(item.identifier);
-          });
-          questionSetItems = [...questionSetItems, ...retiredQuestionSets];
+          questionSetItems = [
+            ...questionSetItems,
+            ...(retiredQuestionSetsResponse?.QuestionSet || []),
+          ];
         }
 
         // Combine content and QuestionSet arrays while avoiding duplicates
@@ -325,14 +404,43 @@ const AllContentsPage = () => {
           }
         });
 
-        // Show a retired QuestionSet as Unpublished when it was pulled in
-        // for the Unpublished filter above; it still shows as Deleted on the
-        // Deleted/All tabs (same underlying item, appears on both lists).
-        const contentList = Array.from(contentMap.values()).map((item: any) =>
-          unpublishedQuestionSetIds.has(item?.identifier) && item?.status === 'Retired'
+        // A retired QuestionSet is always Unpublished, never Deleted -
+        // re-classify its status for display/filtering purposes wherever it
+        // turns up (All, Unpublished, or a stray Deleted-tab result).
+        const normalizedList = Array.from(contentMap.values()).map((item: any) =>
+          item?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE &&
+          item?.status === 'Retired'
             ? { ...item, status: 'Unlisted' }
             : item
         );
+
+        // Backstop to the mimeType exclusion sent with the Deleted query
+        // above, in case the search API ignores that filter - QuestionSets
+        // must never be listed as Deleted. (When the query filter works,
+        // there is nothing left here to drop, so the count still matches.)
+        const visibleList =
+          statusBy === 'Deleted'
+            ? normalizedList.filter(
+                (item: any) => item?.mimeType !== MIME_TYPE.QUESTIONSET_MIME_TYPE
+              )
+            : normalizedList;
+
+        // Safety net for the search index lagging behind a just-performed
+        // action: if this refetch still returns a row we already know (from
+        // a recent local action) should be hidden from this tab, drop it
+        // again instead of letting a stale result reintroduce it. Expired
+        // guard entries are pruned so a genuinely new state later isn't
+        // masked forever.
+        const now = Date.now();
+        const contentList = visibleList.filter((item: any) => {
+          const mutation = recentlyMutatedRef.current.get(item?.identifier);
+          if (!mutation) return true;
+          if (now - mutation.ts > RECENT_ACTION_GUARD_MS) {
+            recentlyMutatedRef.current.delete(item?.identifier);
+            return true;
+          }
+          return !shouldHideAfterAction(mutation.actionType, statusBy);
+        });
         setContentList(contentList);
         setTotalCount(response?.count);
         setLoading(false);

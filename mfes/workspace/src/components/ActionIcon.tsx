@@ -44,7 +44,9 @@ const ActionIcon: React.FC<ActionCellProps> = ({
 
   // QuestionSets are deleted and unpublished through the same retire API, so
   // there's no separate Delete action for them - only Unpublish is shown.
+  // A Draft QuestionSet was never published, so it gets no Unpublish either.
   const isQuestionSet = rowData?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE;
+  const isDraftQuestionSet = isQuestionSet && rowData?.status === 'Draft';
 
   // Deleted (Retired) content has no actions left
   if (rowData?.status === 'Retired') {
@@ -96,7 +98,7 @@ const ActionIcon: React.FC<ActionCellProps> = ({
           </Box>
         </Tooltip>
       )}
-      {((isQuestionSet && rowData?.status !== 'Unlisted') || rowData?.status === 'Live') && getLocalStoredUserRole() !== Role.SCTA && (
+      {((isQuestionSet && rowData?.status !== 'Unlisted' && !isDraftQuestionSet) || rowData?.status === 'Live') && getLocalStoredUserRole() !== Role.SCTA && (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {
