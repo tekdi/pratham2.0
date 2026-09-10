@@ -50,7 +50,7 @@ const CustomSingleSelectWidget = ({
         value={value}
         onChange={handleChange}
         displayEmpty
-        label={value ? label : ''}
+        label={value !== undefined && value !== null && value !== '' ? label : ''}
       >
         {isEmptyOptionIncluded && (
           <MenuItem value="">

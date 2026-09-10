@@ -317,7 +317,7 @@ const CatchmentAreaWidget = ({
 
   const handleStateSelect = async (event: any) => {
     const selectedStateId = event.target.value;
-    if (selectedStateId) {
+    if (selectedStateId !== '' && selectedStateId !== undefined && selectedStateId !== null) {
       const selectedState = states.find((s) => s.id === selectedStateId);
       if (selectedState) {
         const newState: SelectedState = {
@@ -337,7 +337,7 @@ const CatchmentAreaWidget = ({
   };
 
   const handleDistrictSelect = async (stateId: number, districtId: number) => {
-    if (districtId) {
+    if (districtId !== '' && districtId !== undefined && districtId !== null) {
       const district = districts[stateId]?.find((d) => d.id === districtId);
       if (district) {
         const updatedStates = selectedStates.map((state) => {
@@ -490,7 +490,9 @@ const CatchmentAreaWidget = ({
   const hasSelectedStates = () => {
     return (
       normalizedSelectedStates.length > 0 &&
-      normalizedSelectedStates.some((s: any) => s?.stateId || s?.stateName)
+      normalizedSelectedStates.some(
+        (s: any) => (s?.stateId !== undefined && s?.stateId !== null) || s?.stateName
+      )
     );
   };
 
