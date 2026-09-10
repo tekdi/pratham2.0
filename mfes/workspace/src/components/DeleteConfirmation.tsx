@@ -38,6 +38,9 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
   const setFetchContentAPI = useSharedStore(
     (state: any) => state.setFetchContentAPI
   );
+  const setLastContentAction = useSharedStore(
+    (state: any) => state.setLastContentAction
+  );
   const handleDelete = async (content?: any) => {
     if (actionType === 'publish') {
       console.log('Publish clicked');
@@ -45,6 +48,16 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
         try {
      await publishContent(rowData?.identifier, undefined, rowData?.mimeType);
           console.log(`Unpublished item with identifier - ${rowData?.identifier}`);
+
+          // Set before the delay below: the search index the list re-queries
+          // from can lag a few seconds behind this mutation, so listening
+          // pages patch their own row immediately instead of waiting on it.
+          setLastContentAction({
+            identifier: rowData.identifier,
+            actionType: 'publish',
+            mimeType: rowData?.mimeType,
+            ts: Date.now(),
+          });
 
           await delay(2000);
           toast.success('Content published Successfully', {
@@ -82,6 +95,13 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
      await unpublishContent(rowData?.identifier, rowData?.mimeType);
           console.log(`Unpublished item with identifier - ${rowData?.identifier}`);
 
+          setLastContentAction({
+            identifier: rowData.identifier,
+            actionType: 'unpublish',
+            mimeType: rowData?.mimeType,
+            ts: Date.now(),
+          });
+
           await delay(2000);
           toast.success('Content Unpublished Successfully', {
             icon: <CheckCircleIcon style={{ color: 'white' }} />,
@@ -116,6 +136,13 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
       try {
         await deleteContent(rowData?.identifier, rowData?.mimeType);
         console.log(`Deleted item with identifier - ${rowData?.identifier}`);
+
+        setLastContentAction({
+          identifier: rowData.identifier,
+          actionType: 'delete',
+          mimeType: rowData?.mimeType,
+          ts: Date.now(),
+        });
 
         await delay(2000);
         toast.success('Delete Content Successfully', {
