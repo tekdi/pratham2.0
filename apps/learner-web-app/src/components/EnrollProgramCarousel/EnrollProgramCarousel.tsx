@@ -306,8 +306,8 @@ console.log('result=====>', result);
           programType
             ? list.filter((p: any) =>
                 isVolunteer
-                  ? p.type === 'VolunteerOnboarding'
-                  : p.type !== 'VolunteerOnboarding'
+                  ? p.type === 'VolunteerOnboarding' || p?.params?.uiConfig?.isVolunteerShow == true
+                  : p.type !== 'VolunteerOnboarding' && p?.params?.uiConfig?.isVolunteerShow !== true
               )
             : list;
 
