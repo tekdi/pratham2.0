@@ -83,7 +83,7 @@ const NdaPolicyAcknowledgementWidget = ({
           }}
         />
         <Typography
-          variant="h1"
+          variant="h2"
           sx={{
             fontWeight: 600,
             color: '#424242', // Dark grey
