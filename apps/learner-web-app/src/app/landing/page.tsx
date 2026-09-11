@@ -76,8 +76,8 @@ export default function LandingPage() {
   }
   }, []);
 
-  const learnerPrograms = programs.filter((p) => p.type !== 'VolunteerOnboarding');
-  const volunteerPrograms = programs.filter((p) => p.type === 'VolunteerOnboarding');
+  const learnerPrograms = programs.filter((p) => p.type !== 'VolunteerOnboarding' && p?.params?.uiConfig?.isVolunteerShow !== true);
+  const volunteerPrograms = programs.filter((p) => p.type === 'VolunteerOnboarding' || p?.params?.uiConfig?.isVolunteerShow == true);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
