@@ -114,6 +114,29 @@ const DynamicForm = forwardRef(({
     return cleaned;
   };
 
+  // The family member fields get stripped from the schema whenever nothing is selected and are
+  // rebuilt by addField, which used to lose the fieldId / coreField that transformFormData needs
+  // to route the value into customFields - without them the name was sent at the root of the
+  // payload and silently dropped. Stash the original definitions so addField can restore them.
+  // Captured before getInitialSchema runs, because it shallow-copies and therefore deletes these
+  // straight out of the schema prop.
+  const familyMemberFieldNames = ['father_name', 'mother_name', 'spouse_name'];
+  const originalFamilyMemberSchemaRef = useRef<Record<string, any>>({});
+  const rememberFamilyMemberSchema = (properties: any) => {
+    if (!properties) return;
+    familyMemberFieldNames.forEach((fieldKey) => {
+      if (
+        properties[fieldKey] &&
+        !originalFamilyMemberSchemaRef.current[fieldKey]
+      ) {
+        originalFamilyMemberSchemaRef.current[fieldKey] = {
+          ...properties[fieldKey],
+        };
+      }
+    });
+  };
+  rememberFamilyMemberSchema(schema?.properties);
+
   const getInitialSchema = () => {
     if (!prefilledFormData || !prefilledFormData.family_member_details) {
       const cleanedSchema = { ...schema };
@@ -314,6 +337,9 @@ const DynamicForm = forwardRef(({
       if (uischema.mobile && !originalMobileUiSchemaRef.current) {
         originalMobileUiSchemaRef.current = { ...uischema.mobile };
       }
+
+      // Capture before the family member selector below strips these from the schema
+      rememberFamilyMemberSchema(schemaa.properties);
 
       setFormSchema(schemaa);
       setFormUiSchema(uischema);
@@ -615,9 +641,20 @@ const DynamicForm = forwardRef(({
             const updatedSchema = { ...prevSchema };
             if (updatedSchema.properties) {
               updatedSchema.properties = { ...updatedSchema.properties };
+              // Carry over fieldId / coreField, otherwise transformFormData treats this as a
+              // core field and sends the name at the root of the payload instead of inside
+              // customFields, where it is silently dropped by the user service.
+              const originalField =
+                originalFamilyMemberSchemaRef.current[fieldKey] || {};
               updatedSchema.properties[fieldKey] = {
                 type: 'string',
                 title,
+                ...(originalField.fieldId !== undefined && {
+                  fieldId: originalField.fieldId,
+                }),
+                ...(originalField.coreField !== undefined && {
+                  coreField: originalField.coreField,
+                }),
               };
             }
             if (
