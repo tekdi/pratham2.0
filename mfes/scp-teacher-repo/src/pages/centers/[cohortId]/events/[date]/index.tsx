@@ -316,7 +316,6 @@ const EventMonthView: React.FC<any> = () => {
               {/* No attendance data on this screen - the calendar only marks the days
                   that have sessions scheduled. */}
               <MonthCalender
-                formattedAttendanceData={percentageAttendance}
                 onChange={handleActiveStartDateChange}
                 onDateChange={handleSelectedDateChange}
                 eventData={eventDates}
