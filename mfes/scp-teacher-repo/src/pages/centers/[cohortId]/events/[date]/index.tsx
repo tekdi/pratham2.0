@@ -56,8 +56,6 @@ const EventMonthView: React.FC<any> = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(() =>
     dateParam ? getDateFromMonthName(dateParam) : new Date()
   );
-  const [percentageAttendance, setPercentageAttendance] =
-    React.useState<any>(null);
   const [extraSessions, setExtraSessions] = React.useState<Session[]>();
   const [eventDeleted, setEventDeleted] = React.useState(false);
   const [eventUpdated, setEventUpdated] = React.useState(false);
@@ -315,6 +313,8 @@ const EventMonthView: React.FC<any> = () => {
             </Box>
 
             <Box className="calender-container">
+              {/* No attendance data on this screen - the calendar only marks the days
+                  that have sessions scheduled. */}
               <MonthCalender
                 formattedAttendanceData={percentageAttendance}
                 onChange={handleActiveStartDateChange}
