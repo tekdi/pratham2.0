@@ -246,14 +246,11 @@ const MonthCalender: React.FC<CalendarWithAttendanceProps> = ({
         default:
           return null;
       }
-    } else if (
-      // `== null` covers both null and undefined on purpose. Callers with no attendance
-      // to show pass null (or omit the prop); a strict `=== undefined` let a null
-      // silently swallow the session marker.
-      eventScheduled &&
-      formattedAttendanceData === null &&
-      learnerAttendanceDate === null
-    ) {
+    } else if (eventScheduled) {
+      // Reaching here already guarantees both attendance props are falsy - that is what
+      // the `if` / `else if` above tested. Do not re-check them: callers pass null,
+      // undefined, or omit the prop entirely, and a strict comparison against any one of
+      // those silently swallows the session marker for all the others.
       return (
         <div className="calender-icon">
           <CalendarMonthRoundedIcon
