@@ -207,7 +207,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
     };
 
     fetchTopicSubtopic();
-  }, [item]);
+  }, [item, medium, grade, board, dashboard, CohortBMG]);
 
   const extractResources = (learningResources: any): IResource[] => {
     const resources: IResource[] = [];
@@ -241,11 +241,12 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           (content: any) => content?.identifier === resource?.id
         );
         return {
-          ...resource,
           ...content,
-          name: resource.name,
-          topic: resource.topic,
-          subtopic: resource.subtopic,
+          ...resource,
+          // Show the live content title (as the learner app does) rather than
+          // the label captured in the course plan; fall back when the content
+          // lookup returns nothing.
+          name: content?.name || resource?.name,
         };
       });
 

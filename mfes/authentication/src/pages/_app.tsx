@@ -26,6 +26,7 @@ import rtlPlugin from 'stylis-plugin-rtl';
 import { Box, IconButton } from '@mui/material';
 import { ToastContainer } from 'react-toastify';
 import { useChunkErrorReload } from '@shared-lib-v2/hooks/useChunkErrorReload';
+import { useLanguageFromStorage } from '@shared-lib-v2/hooks/useLanguageFromStorage';
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 const poppins = Poppins({
@@ -68,6 +69,7 @@ export function DarkTheme() {
 function CustomApp({ Component, pageProps }: AppProps) {
   useChunkErrorReload();
   const { i18n } = useTranslation(); // Get the i18n object to access the selected language
+  useLanguageFromStorage();
   const [client] = React.useState(
     new QueryClient({
       defaultOptions: {

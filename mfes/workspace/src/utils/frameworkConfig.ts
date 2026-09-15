@@ -746,16 +746,48 @@ export const QUESTION_COLUMNS: ColumnDef[] = [
   { header: 'Solution',              apiField: 'solution',             required: false },
 ];
 
+// Units nest up to 4 levels deep (the platform's limit). Fill Unit Level 1 for
+// a top-level unit and add deeper levels to nest; leave deeper levels blank to
+// attach the child higher up. Rows sharing the same path land in the same unit.
+export const MAX_UNIT_DEPTH = 4;
+
 export const COURSE_MAPPING_COLUMNS: ColumnDef[] = [
   { header: 'Course Temp ID*',      apiField: 'courseTempId',     required: true,  note: 'Must match a Temp ID from Courses sheet' },
-  { header: 'Unit Name*',           apiField: 'unitName',         required: true,  note: 'e.g. Unit 1: Introduction — groups children under a unit' },
-  // Unit-level metadata — fill on any one row of the unit; blank on the rest.
-  { header: 'Unit Description',     apiField: 'unitDescription',  required: false, note: 'Optional description for this unit (shown to learners). Fill on the first row of each unit.' },
-  { header: 'Unit Icon Drive URL',  apiField: 'unitAppIconUrl',   required: false, note: 'Optional Google Drive public share URL for the unit icon image. Fill on the first row of each unit.' },
+  // 'Unit Name*' is the pre-nesting header — kept as an alias so previously
+  // downloaded templates keep working.
+  { header: 'Unit Level 1*',        apiField: 'unitLevel1',       required: true,  aliases: ['Unit Name*', 'Unit Name'], note: 'Top-level unit, e.g. Unit 1: Introduction' },
+  { header: 'Unit Level 2',         apiField: 'unitLevel2',       required: false, note: 'Optional sub-unit inside Level 1' },
+  { header: 'Unit Level 3',         apiField: 'unitLevel3',       required: false, note: 'Optional sub-unit inside Level 2' },
+  { header: 'Unit Level 4',         apiField: 'unitLevel4',       required: false, note: 'Optional sub-unit inside Level 3 (deepest level allowed)' },
+  // Unit-level metadata — applies to the DEEPEST filled level on this row.
+  // Fill on any one row for that unit; blank on the rest.
+  { header: 'Unit Description',     apiField: 'unitDescription',  required: false, note: 'Optional description for the deepest unit on this row. Fill on one row per unit.' },
+  { header: 'Unit Icon Drive URL',  apiField: 'unitAppIconUrl',   required: false, note: 'Optional Google Drive public share URL for that unit\'s icon. Fill on one row per unit.' },
   { header: 'Child Ref*',           apiField: 'childRef',         required: true,  note: 'Temp ID (TEMP_CONTENT_1, TEMP_QS_1) OR real do_xxxx identifier' },
   { header: 'Child Type*',          apiField: 'childType',        required: true,  lookupKey: 'CHILD_TYPES' },
   { header: 'Sequence*',            apiField: 'sequence',         required: true,  note: 'Order within the unit e.g. 1, 2, 3' },
 ];
+
+/**
+ * Resolve a mapping row into its unit path, e.g. ['Unit 1', 'Basics'].
+ * Falls back to the legacy single `unitName` field for older workbooks.
+ */
+export const getUnitPath = (row: Record<string, any>): string[] => {
+  const levels = [row?.unitLevel1, row?.unitLevel2, row?.unitLevel3, row?.unitLevel4]
+    .slice(0, MAX_UNIT_DEPTH)
+    .map((v) => String(v ?? '').trim());
+
+  // Legacy workbooks only had a single Unit Name column.
+  if (!levels[0] && row?.unitName) levels[0] = String(row.unitName).trim();
+
+  // Stop at the first blank so a gap can never silently re-parent a child.
+  const path: string[] = [];
+  for (const level of levels) {
+    if (!level) break;
+    path.push(level);
+  }
+  return path;
+};
 
 // ExistingContentMapping: reference existing platform content by its do_xxx identifier.
 // Fill Course Temp ID + Unit Name + Sequence to add it directly to a course unit
@@ -766,7 +798,12 @@ export const EXISTING_MAPPING_COLUMNS: ColumnDef[] = [
   { header: 'Existing Identifier*', apiField: 'existingIdentifier', required: true,  note: 'Real platform identifier e.g. do_abc123' },
   { header: 'Entity Type*',         apiField: 'entityType',         required: true,  lookupKey: 'CHILD_TYPES' },
   { header: 'Course Temp ID',       apiField: 'courseTempId',       required: false, note: 'e.g. TEMP_COURSE_1 — which course to add this content to' },
-  { header: 'Unit Name',            apiField: 'unitName',           required: false, note: 'e.g. Unit 1: Introduction — which unit within the course' },
+  // Same 4-level unit addressing as CourseChildrenMapping, so existing content
+  // can be attached to a nested sub-unit rather than only a top-level one.
+  { header: 'Unit Level 1',         apiField: 'unitLevel1',         required: false, aliases: ['Unit Name'], note: 'Top-level unit within the course' },
+  { header: 'Unit Level 2',         apiField: 'unitLevel2',         required: false, note: 'Optional sub-unit inside Level 1' },
+  { header: 'Unit Level 3',         apiField: 'unitLevel3',         required: false, note: 'Optional sub-unit inside Level 2' },
+  { header: 'Unit Level 4',         apiField: 'unitLevel4',         required: false, note: 'Optional sub-unit inside Level 3' },
   { header: 'Sequence',             apiField: 'sequence',           required: false, note: 'Order within the unit e.g. 1, 2, 3' },
 ];
 
