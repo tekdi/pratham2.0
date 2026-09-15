@@ -1162,6 +1162,8 @@
     "SEE_ALL_EMPLOYEES": "सभी {{count}} कर्मचारी देखें",
     "CERTIFICATES_ISSUED": "{{count}} प्रमाणपत्र जारी",
     "NO_TOP_PERFORMERS": "अभी तक कोई प्रमाणपत्र जारी नहीं हुआ",
+    "FROM_DATE": "तिथि से",
+    "TO_DATE": "तिथि तक",
     "STATUS_SUMMARY_CERT": "{{count}} प्रमाणपत्र",
     "STATUS_SUMMARY_COMPLETED": "{{count}} पूर्ण",
     "STATUS_SUMMARY_IN_PROGRESS": "{{count}} प्रगति में",
