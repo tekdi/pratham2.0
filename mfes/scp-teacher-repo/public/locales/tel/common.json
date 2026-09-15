@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "ఏదో లోపం జరిగింది",
     "NO_GO_BACK": "వద్దు, వెనుకకు వెళ్ళు",
     "YES": "అవును",
+    "NO": "కాదు",
     "REVIEW_ATTENDANCE": "హాజరును సమీక్షించండి",
     "ADD_NEW": "కొత్తది జత చేయి",
     "ADD": "జత చేయి",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "ముగింపు తేదీ ప్రారంభ తేదీ కంటే ముందు ఉండకూడదు",
     "DELETE_THIS_SESSION": "ఈ సెషన్‌ను తొలగించండి",
     "LEARNER_PREREQUISITES": "అభ్యాసకుల ముందస్తు అవసరాలు",
-    "LEARNER_POSTREQUISITES": "అభ్యాసకుల తర్వాత అవసరాలు"
+    "LEARNER_POSTREQUISITES": "అభ్యాసకుల తర్వాత అవసరాలు",
+    "SESSION_SLOT_CONFLICT_MSG": "ఈ సమయంలో ఈ బ్యాచ్ కోసం ఇప్పటికే ఒక సెషన్ షెడ్యూల్ చేయబడింది. అదే సమయానికి మరొక సెషన్ షెడ్యూల్ చేయాలనుకుంటున్నారా?",
+    "SESSION_START_TIME_IN_PAST_ERROR": "ప్రారంభ సమయం ఇప్పటికే గడిచిపోయింది. దయచేసి భవిష్యత్తు సమయాన్ని ఎంచుకోండి."
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "సెంటర్ విజయవంతంగా అభ్యర్థించబడింది",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "యూనిట్ పేరు",
     "UNIT_CODE": "యూనిట్ కోడ్",
     "ENROLLMENT_NUMBER": "నమోదు సంఖ్య",
+    "ENROLLMENT_ID": "నమోదు ID",
+    "DATE_OF_JOINING": "చేరిన తేదీ",
     "BLOCK_NAME": "బ్లాక్ పేరు",
     "STUDENT_TYPE": "అభ్యాసకుని రకం",
     "STATE_NAME": "రాష్ట్రం పేరు",

@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "کچھ تو غلط ہے۔",
     "NO_GO_BACK": "نہیں، واپس جائیں",
     "YES": "جی ہاں",
+    "NO": "نہیں",
     "REVIEW_ATTENDANCE": "حاضری کا جائزہ لیں۔",
     "ADD_NEW": "نیا شامل کریں۔",
     "ADD": "شامل کریں۔",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "اختتامی تاریخ تاریخ آغاز سے پہلے کی نہیں ہو سکتی",
     "DELETE_THIS_SESSION": "اس سیشن کو حذف کریں",
     "LEARNER_PREREQUISITES": "طالبِ علم کی پیشگی ضروریات",
-    "LEARNER_POSTREQUISITES": "طالبِ علم کی بعد از سبق ضروریات"
+    "LEARNER_POSTREQUISITES": "طالبِ علم کی بعد از سبق ضروریات",
+    "SESSION_SLOT_CONFLICT_MSG": "اس وقت کے دوران اس بیچ کے لیے پہلے سے ہی ایک سیشن شیڈول ہے۔ کیا آپ اسی وقت کے لیے ایک اور سیشن شیڈول کرنا چاہتے ہیں؟",
+    "SESSION_START_TIME_IN_PAST_ERROR": "آغاز کا وقت گزر چکا ہے۔ براہ کرم مستقبل کا وقت منتخب کریں۔"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "مرکزکی درخواست کامیابی کی گئی",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "یونٹ کا نام",
     "UNIT_CODE": "یونٹ کا کوڈ",
     "ENROLLMENT_NUMBER": "داخلہ نمبر",
+    "ENROLLMENT_ID": "داخلہ آئی ڈی",
+    "DATE_OF_JOINING": "شمولیت کی تاریخ",
     "BLOCK_NAME": "بلک کا نام",
     "STUDENT_TYPE": "طالب علم کی قسم",
     "STATE_NAME": "ریاست کا نام",
