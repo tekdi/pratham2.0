@@ -17,7 +17,6 @@ import editIcon from '../../../public/images/editIcon.svg';
 import deleteIcon from '../../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import {
-  extractMatchingKeys,
   fetchForm,
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
@@ -506,23 +505,43 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         </Box>
       ),
       callback: (row: any) => {
+        const getSelectedValues = (label: string) =>
+          row?.customFields?.find((f: any) => f.label === label)
+            ?.selectedValues || [];
         const existingValues = {
-          board:
-            row?.customFields?.find((f: any) => f.label === 'BOARD')
-              ?.selectedValues || [],
-          medium:
-            row?.customFields?.find((f: any) => f.label === 'MEDIUM')
-              ?.selectedValues || [],
-          grade:
-            row?.customFields?.find((f: any) => f.label === 'GRADE')
-              ?.selectedValues || [],
-          stream:
-            row?.customFields?.find((f: any) => f.label === 'STREAM')
-              ?.selectedValues || [],
+          board: getSelectedValues('BOARD'),
+          medium: getSelectedValues('MEDIUM'),
+          grade: getSelectedValues('GRADE'),
+          stream: getSelectedValues('STREAM'),
         };
         buildSchemaAndUi(true, existingValues);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        // Force batch_type to "remote" if centerType is "remote"
+
+        // Build form data directly from the batch's own customFields,
+        // matched by label, instead of extractMatchingKeys's fieldId
+        // lookup - custom field fieldIds for MEDIUM/GRADE are assigned
+        // per tenant/program and don't match the fieldId literals
+        // hardcoded in PathwaysBatchCreate.js/BatchCreate.js, so a fieldId
+        // match silently drops those values even though the batch has them.
+        const tempFormData: Record<string, any> = {
+          name: row?.name,
+          board: existingValues.board,
+          medium: existingValues.medium,
+          grade: existingValues.grade,
+        };
+        if (isPathwaysProgram) {
+          tempFormData.stream = existingValues.stream;
+        }
+        const batchTypeValues = getSelectedValues('TYPE_OF_BATCH');
+        const batchTypeValue =
+          batchTypeValues.length > 0
+            ? typeof batchTypeValues[0] === 'object'
+              ? batchTypeValues[0]?.value
+              : batchTypeValues[0]
+            : undefined;
+        if (batchTypeValue) {
+          tempFormData.batch_type = batchTypeValue;
+        }
+        // Force batch_type to "regular" if centerType is "regular"
         if (centerType === 'regular') {
           tempFormData.batch_type = 'regular';
         }
