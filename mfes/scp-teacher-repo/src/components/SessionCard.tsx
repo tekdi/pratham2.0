@@ -49,10 +49,23 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [editSession, setEditSession] = React.useState();
   const [eventStatus, setEventStatus] = React.useState('');
   const [CohortBMG, setCohortBMG] = React.useState<any>({});
+  const [currentUserId, setCurrentUserId] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;
   const dashboard = pathname === '/dashboard';
   const { getNotification } = useNotification();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      setCurrentUserId(localStorage.getItem('userId') || '');
+    }
+  }, []);
+
+  // A session may only be edited by the person who scheduled it. The event list API is
+  // the only source of the creator, so when it does not send `createdBy` we keep the
+  // previous behaviour rather than hiding the edit icon from everyone.
+  const sessionCreatorId = data?.createdBy ?? data?.metadata?.createdBy;
+  const canEditSession = !sessionCreatorId || sessionCreatorId === currentUserId;
 
   const handleEditSelection = (selection: string) => {
     setEditSelection(selection);
@@ -324,7 +337,7 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             {showCenterName ? data?.location : data?.metadata?.teacherName}
           </Typography>
         </Box>
-        {eventStatus === EventStatus.UPCOMING && (
+        {eventStatus === EventStatus.UPCOMING && canEditSession && (
           <EditOutlined
             onClick={() => handleOpen(data)}
             sx={{ cursor: 'pointer' }}
