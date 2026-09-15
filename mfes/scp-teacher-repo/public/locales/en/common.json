@@ -268,6 +268,7 @@
     "MY_TIMETABLE": "Batch Timetable",
     "MY_TEACHING_CENTERS": "My Teaching Centers",
     "TEACHING_CENTERS": "Teaching Centers",
+    "CROSS_CENTER_SESSIONS": "Cross-Center Sessions",
     "UPCOMING_EXTRA_SESSION": "Upcoming Extra Sessions",
     "BACK_TO_TOP": "Back to Top",
     "LAST_SEVEN_DAYS_RANGE": "Last 7 Days {{date_range}}",
@@ -560,7 +561,15 @@
     "LEARNER_PREREQUISITES": "Learner Prerequisites",
     "LEARNER_POSTREQUISITES": "Learner Postrequisites",
     "SESSION_SLOT_CONFLICT_MSG": "A session is already scheduled for this batch during this time. Do you want to schedule another session for the same time slot?",
-    "SESSION_START_TIME_IN_PAST_ERROR": "Start time has already passed. Please select a future time slot."
+    "SESSION_START_TIME_IN_PAST_ERROR": "Start time has already passed. Please select a future time slot.",
+    "UPCOMING_EXTRA_SESSIONS": "Upcoming Extra Sessions",
+    "NO_CROSS_CENTER_SESSIONS": "No cross-center sessions yet. Sessions scheduled across more than one batch will show up here.",
+    "BATCH_CENTER_COVERAGE": "{{batchCount}} batches · {{centerCount}} centers",
+    "CREATED_BY_YOU": "Created by you",
+    "CREATED_BY": "Created by {{name}}",
+    "SCHEDULING_A_SESSION_TITLE": "Scheduling a session",
+    "SCHEDULE_NOTE_BEFORE_LINK": "To schedule one session across batches from more than one center, use",
+    "SCHEDULE_NOTE_AFTER_LINK": "in the sidebar — that's now the home for multi-batch sessions. To schedule a session for a single batch, open that batch and use its own \"{{scheduleNew}}\" button."
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "Center requested successfully",

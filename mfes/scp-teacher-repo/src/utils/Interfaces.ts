@@ -551,6 +551,7 @@ export interface eventFilters {
   title?: string;
   status?: string[];
   cohortId?: string;
+  cohortIds?: string[];
   createdBy?: string;
 }
 
@@ -653,6 +654,8 @@ export interface MetaData {
   subject?: string;
   teacherName?: string;
   cohortId?: string;
+  cohortIds?: string[];
+  multiSession?: boolean;
   cycleId?: string;
   tenantId?: string;
   type?: string;
