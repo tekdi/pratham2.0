@@ -1290,7 +1290,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                         >
                                           {t('DASHBOARD.PRESENT_STUDENTS', {
                                             present_students:
-                                              currentAttendance?.present_students ??
+                                               currentAttendance?.present_students ??
                                               0,
                                             total_students:
                                               currentAttendance?.totalcount ??

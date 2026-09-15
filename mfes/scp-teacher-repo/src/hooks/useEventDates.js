@@ -18,8 +18,7 @@ const useEventDates = (
   eventCreated,
   cohortId,
   rangeStartDate,
-  rangeEndDate
-) => {
+  rangeEndDate) => {
   const [eventDates, setEventDates] = useState({});
 
   useEffect(() => {
@@ -27,7 +26,8 @@ const useEventDates = (
       try {
         if (idValue && idValue !== '' && idValue !== 'all') {
           let startDate, lastDate;
-
+          
+          
           if (rangeStartDate && rangeEndDate) {
             // Explicit window (yyyy-MM-dd) from the caller. Used when the
             // rendered range can span more than one month, so a month-wide

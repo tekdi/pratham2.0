@@ -68,7 +68,7 @@ function startDateTimeSortKey(ev: EventListApiEvent): number {
 /**
  * Fetch events (sessions) for a single day for the given cohort, earliest first.
  * Used by Mark Center Attendance sessions modal.
- *
+ * 
  * The event list API returns no guaranteed order, so the same day could come back in a
  * different sequence on each call. Sorting here keeps the session list stable and in
  * chronological order. It must sort on the raw `startDateTime` - `DaySessionFromApi`
