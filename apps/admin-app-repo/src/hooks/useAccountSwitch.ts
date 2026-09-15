@@ -166,10 +166,8 @@ export const useAccountSwitch = () => {
           ) {
             const { locale } = router;
             if (locale) {
-              window.location.href = '/learners';
               router.push('/learners', undefined, { locale: locale });
             } else {
-              window.location.href = '/learners';
               router.push('/learners');
             }
           }
@@ -180,7 +178,6 @@ export const useAccountSwitch = () => {
               window.location.href = '/faqs';
               router.push('/faqs');
             } else {
-              window.location.href = '/course-planner';
               if (locale) {
                 router.push('/course-planner', undefined, {
                   locale: locale,
@@ -191,7 +188,6 @@ export const useAccountSwitch = () => {
             userInfo?.role === Role.CENTRAL_ADMIN &&
             tenantData?.tenantName == TenantName.PRAGYANPATH
           ) {
-            window.location.href = '/youth';
             router.push('/youth');
           } else {
             const { locale } = router;
@@ -200,39 +196,33 @@ export const useAccountSwitch = () => {
                 userInfo?.role === Role.CENTRAL_ADMIN &&
                 isSecondChanceTenant(tenantData?.tenantName)
               ) {
-                window.location.href = '/programs';
                 router.push('/programs', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN &&
                 isSecondChanceTenant(tenantData?.tenantName)
               ) {
-                window.location.href = '/centers';
                 router.push('/centers', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN ||
                 (Role.CENTRAL_ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET)
               ) {
-                window.location.href = '/user-leader';
                 router.push('/user-leader', undefined, { locale: locale });
               }
             } else if (
               userInfo?.role === Role.CENTRAL_ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/programs';
               router.push('/programs');
             } else if (
               userInfo?.role === Role.ADMIN &&
               isSecondChanceTenant(tenantData?.tenantName)
             ) {
-              window.location.href = '/centers';
               router.push('/centers');
             } else if (
               userInfo?.role === Role.ADMIN &&
               tenantData?.tenantName == TenantName.YOUTHNET
             ) {
-              window.location.href = '/user-leader';
               router.push('/user-leader');
             }
           }
@@ -264,10 +254,8 @@ export const useAccountSwitch = () => {
                 if (
                   !isSecondChanceTenant(tenantData?.tenantName)
                 ) {
-                  window.location.href = '/faqs';
                   router.push('/faqs');
                 } else {
-                  window.location.href = '/course-planner';
                   if (locale) {
                     router.push('/course-planner', undefined, {
                       locale: locale,
@@ -281,20 +269,17 @@ export const useAccountSwitch = () => {
                     userInfo?.role === Role.CENTRAL_ADMIN &&
                     isSecondChanceTenant(tenantData?.tenantName)
                   ) {
-                    window.location.href = '/programs';
                     router.push('/programs', undefined, { locale: locale });
                   } else if (
                     userInfo?.role === Role.ADMIN &&
                     isSecondChanceTenant(tenantData?.tenantName)
                   ) {
-                    window.location.href = '/centers';
                     router.push('/centers', undefined, { locale: locale });
                   } else if (
                     userInfo?.role === Role.ADMIN ||
                     (Role.CENTRAL_ADMIN &&
                       tenantData?.tenantName == TenantName.YOUTHNET)
                   ) {
-                    window.location.href = '/user-leader';
                     router.push('/user-leader', undefined, {
                       locale: locale,
                     });
@@ -303,19 +288,16 @@ export const useAccountSwitch = () => {
                   userInfo?.role === Role.CENTRAL_ADMIN &&
                   isSecondChanceTenant(tenantData?.tenantName)
                 ) {
-                  window.location.href = '/programs';
                   router.push('/programs');
                 } else if (
                   userInfo?.role === Role.ADMIN &&
                   isSecondChanceTenant(tenantData?.tenantName)
                 ) {
-                  window.location.href = '/centers';
                   router.push('/centers');
                 } else if (
                   userInfo?.role === Role.ADMIN &&
                   tenantData?.tenantName == TenantName.YOUTHNET
                 ) {
-                  window.location.href = '/user-leader';
                   router.push('/user-leader');
                 }
               }

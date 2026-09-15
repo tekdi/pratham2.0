@@ -31,6 +31,7 @@ import {
   POS_SUBJECT_NAME_TO_ID,
   splitMultiValue,
   EVALUATION_TYPE_LABEL_TO_VALUE,
+  getUnitPath,
 } from './frameworkConfig';
 import {
   createContentNode,
@@ -354,11 +355,17 @@ export class BulkImportQueue {
       // Also fold in ExistingContentMapping rows that directly specify this course.
       // This allows existing do_xxx content to be added to a course unit without
       // requiring a separate CourseChildrenMapping row.
+      // Existing content can target a nested unit too, so the full level path
+      // is carried across rather than just a single unit name.
       const existingChildMappings = data.existingMappings
-        .filter((e) => e.courseTempId === course.tempId && e.unitName)
+        .filter((e) => e.courseTempId === course.tempId && getUnitPath(e).length > 0)
         .map((e) => ({
           courseTempId: course.tempId,
-          unitName:     e.unitName!,
+          unitName:     e.unitName,
+          unitLevel1:   e.unitLevel1,
+          unitLevel2:   e.unitLevel2,
+          unitLevel3:   e.unitLevel3,
+          unitLevel4:   e.unitLevel4,
           childRef:     e.existingIdentifier,  // use do_xxx directly
           childType:    e.entityType as 'content' | 'questionset',
           sequence:     e.sequence ?? 999,
@@ -1112,34 +1119,66 @@ export class BulkImportQueue {
     const courseId = this.resolvedIds.get(_courseTempId);
     if (!courseId) throw new Error(`Course ID not resolved for ${_courseTempId}`);
 
-    // ── 1. Group children by unit (preserve insertion order with Map) ──
-    // Each unique Unit Name becomes one unit node with a client-generated UUID.
-    // Unit-level description/icon are taken from the first row of each unit
-    // that supplies them, so users only need to fill them once per unit.
-    const unitMap = new Map<string, {
+    // ── 1. Resolve each row's unit path into a nested unit tree ──
+    // A row addresses its unit with up to 4 levels (Unit Level 1-4). Every
+    // distinct path prefix becomes its own unit node, so "Unit 1 / Basics"
+    // creates BOTH "Unit 1" and "Basics" nested inside it, and any later row
+    // under the same prefix reuses the same nodes rather than duplicating them.
+    //
+    // Keyed by the joined path so lookups are O(1) and order of insertion is
+    // preserved — units appear in the course in the order they first appear.
+    interface UnitNode {
       name: string;
       unitId: string;
+      /** Joined path key of the parent unit, or null for a top-level unit */
+      parentKey: string | null;
       description?: string;
       appIconUrl?: string;
+      /** Resolved identifiers of content/QS attached directly to this unit */
       children: string[];
-    }>();
+    }
+
+    const unitMap = new Map<string, UnitNode>();
+    const pathKey = (segments: string[]) => segments.join(' › ');
+
+    /**
+     * Ensure every node along a path exists, and return the deepest one.
+     * Intermediate units are created implicitly, so users never have to add
+     * filler rows just to declare a parent.
+     */
+    const ensureUnitPath = (segments: string[]): UnitNode | null => {
+      let parentKey: string | null = null;
+      let node: UnitNode | null = null;
+
+      segments.forEach((name, idx) => {
+        const key = pathKey(segments.slice(0, idx + 1));
+        if (!unitMap.has(key)) {
+          unitMap.set(key, {
+            name,
+            unitId: uuidv4(),  // Sunbird requires a proper UUID for new nodes
+            parentKey,
+            children: [],
+          });
+        }
+        node = unitMap.get(key)!;
+        parentKey = key;
+      });
+
+      return node;
+    };
 
     _childMappings
       .sort((a: any, b: any) => a.sequence - b.sequence)
       .forEach((mapping: any) => {
-        const unitName = (mapping.unitName || 'Unit 1').trim();
+        const segments = getUnitPath(mapping);
+        // A row with no unit at all still needs somewhere to live.
+        const path = segments.length > 0 ? segments : ['Unit 1'];
 
-        if (!unitMap.has(unitName)) {
-          unitMap.set(unitName, {
-            name: unitName,
-            unitId: uuidv4(),   // Sunbird requires a proper UUID for new unit nodes
-            children: [],
-          });
-        }
+        const unit = ensureUnitPath(path);
+        if (!unit) return;
 
-        const unit = unitMap.get(unitName)!;
-
-        // First non-empty value wins — lets users fill these on any single row
+        // Metadata applies to the DEEPEST unit on the row. First non-empty
+        // value wins, so users fill it on any single row for that unit.
         if (!unit.description && mapping.unitDescription) {
           unit.description = String(mapping.unitDescription).trim();
         }
@@ -1204,18 +1243,29 @@ export class BulkImportQueue {
     });
 
     // ── 3. hierarchy ──────────────────────────────────────────────
+    // A unit's children are its sub-units FIRST, then its own content/QS, so
+    // sub-units surface above loose items in the course view. Only top-level
+    // units (parentKey === null) hang off the course root.
+    const childUnitIdsOf = (parentKey: string | null): string[] =>
+      units.filter((u) => u.parentKey === parentKey).map((u) => u.unitId);
+
     const hierarchy: Record<string, any> = {
       [courseId]: {
         name: _courseName,   // use the actual course name, not the temp ID
-        children: units.map((u) => u.unitId),
+        children: childUnitIdsOf(null),
         root: true,
       },
     };
 
+    // Key each unit by its own path so we can find its sub-units.
+    const keyByUnitId = new Map<string, string>();
+    unitMap.forEach((node, key) => keyByUnitId.set(node.unitId, key));
+
     units.forEach((unit) => {
+      const ownKey = keyByUnitId.get(unit.unitId)!;
       hierarchy[unit.unitId] = {
         name: unit.name,
-        children: unit.children,
+        children: [...childUnitIdsOf(ownKey), ...unit.children],
         root: false,
       };
     });

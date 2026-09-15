@@ -35,7 +35,7 @@ import AddEditUser from '@/components/EntityForms/AddEditUser/AddEditUser';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import DeleteDetails from '@/components/DeleteDetails';
 import { editEditUser, updateUserTenantStatus } from '@/services/UserService';
-import { transformLabel } from '@/utils/helper';
+import { transformLabel, formatDateToDDMMYYYY } from '@/utils/helper';
 import { getCohortList } from '@/services/GetCohortList';
 import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
@@ -177,6 +177,11 @@ const Youth = () => {
         } ${transformLabel(row.lastName) || ''}`.trim(),
     },
     {
+      keys: ['enrollmentId'],
+      label: 'Enrollment ID',
+      render: (row) => row.enrollmentId || '-',
+    },
+    {
       key: 'status',
       label: 'Status',
       render: (row: any) => transformLabel(row.tenantStatus),
@@ -190,10 +195,16 @@ const Youth = () => {
       render: (row) => transformLabel(row.gender) || '',
     },
     {
-      keys: ['mobile'],
-      label: 'Mobile',
-      render: (row) => transformLabel(row.mobile) || '',
+      keys: ['tenantJoinedAt'],
+      label: 'DOJ',
+      render: (row) =>
+        row.tenantJoinedAt ? formatDateToDDMMYYYY(row.tenantJoinedAt) : '-',
     },
+    // {
+    //   keys: ['mobile'],
+    //   label: 'Mobile',
+    //   render: (row) => transformLabel(row.mobile) || '',
+    // },
     // {
     //   key: 'STATE',
     //   label: 'State',

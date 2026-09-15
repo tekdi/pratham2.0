@@ -96,11 +96,12 @@ const Header = ({ isShowLogout = false, isLogin = false }) => {
         onClick={(event) => {
           if (isShowLogout) {
             handleLogoutMenuOpen(event);
-          } else {
-            typeof window !== 'undefined' &&
-              localStorage.getItem('landingPage');
+          } else if (typeof window !== 'undefined') {
             if (localStorage.getItem('landingPage')) {
               router.push(localStorage.getItem('landingPage'));
+            } else if (localStorage.getItem('isForNavaPatham') === 'true') {
+              // NavaPatham learners belong on their own landing page
+              router.push('/navapatham');
             } else {
               router.push('/');
             }
