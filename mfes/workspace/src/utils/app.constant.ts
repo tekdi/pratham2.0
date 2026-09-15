@@ -54,6 +54,7 @@ export const PrimaryCategoryValue = [
 export const TENANT_DATA = {
   TENANT_NAME: 'tenantName',
   SECOND_CHANCE_PROGRAM: 'Second Chance Program',
+  SECOND_CHANCE_PROGRAM_PATHWAYS: 'Second Chance Program Pathways',
   PRATHAM_SCP: 'pratham SCP',
   YOUTHNET: 'Vocational Training',
   POS : 'Open School',
@@ -61,3 +62,7 @@ export const TENANT_DATA = {
   CAMP_TO_CLUB : 'Camp to Club'
 
 };
+
+export const isSecondChanceTenant = (tenantName?: string | null): boolean =>
+  tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM ||
+  tenantName === TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS;

@@ -450,7 +450,7 @@ export const getZatpatTestIdentifiers = async () => {
         primaryCategory: ['Practice Question Set'],
         assessmentType: 'Eligibility Test',
         ...(preferredLanguage ? { contentLanguage: [preferredLanguage] } : {}),
-        program: ['Second Chance Program', 'Second Chance']
+        program: ['Second Chance Program', 'Second Chance Program Pathways', 'Second Chance']
       },
       fields: ['name', 'englishName', 'appIcon', 'description', 'posterImage', 'mimeType', 'identifier', 'leafNodes', 'se_subjects'],
       sort_by: { lastUpdatedOn: 'desc' }

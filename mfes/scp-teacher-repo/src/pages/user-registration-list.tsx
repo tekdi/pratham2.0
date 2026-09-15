@@ -998,4 +998,7 @@ export async function getStaticProps({ locale }: any) {
   };
 }
 
-export default withRole(TENANT_DATA.SECOND_CHANCE_PROGRAM)(UserRegistrationList);
+export default withRole([
+  TENANT_DATA.SECOND_CHANCE_PROGRAM,
+  TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS,
+])(UserRegistrationList);

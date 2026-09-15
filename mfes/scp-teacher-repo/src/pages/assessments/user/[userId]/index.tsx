@@ -39,7 +39,7 @@ import { useDirection } from '../../../../hooks/useDirection';
 import {
   accessControl,
   AssessmentType,
-  Program,
+  getTenantProgramFilter,
 } from '../../../../../app.config';
 import { useQueryClient } from '@tanstack/react-query';
 import withAccessControl from '@/utils/hoc/withAccessControl';
@@ -98,7 +98,7 @@ function AssessmentsDetails() {
       const stateName = localStorage.getItem('stateName');
 
       const filters = {
-        program: Program,
+        program: getTenantProgramFilter(),
         state: stateName as string,
         board: board ? [board] : [],
         status: ['Live'],

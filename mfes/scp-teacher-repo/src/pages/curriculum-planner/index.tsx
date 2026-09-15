@@ -163,7 +163,7 @@ const CoursePlanner = () => {
     const fetchTaxonomyResultsOne = async () => {
       try {
         // Define the URL for the API
-        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${frameworkId}`;
+        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
 
         // Use axios to fetch data from the API
         const response = await axios.get(url);
@@ -226,7 +226,7 @@ const CoursePlanner = () => {
 
         console.log(boardNew, mediumNew, gradeNew);
 
-        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${frameworkId}`;
+        const url = process.env.NEXT_PUBLIC_MIDDLEWARE_URL+`/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
 
         // Use axios to fetch data from the API
         const response = await axios.get(url);
@@ -266,32 +266,45 @@ const CoursePlanner = () => {
 
         console.log(courseTypesAssociations);
 
+        // Derive options for a target category from the SELECTED terms'
+        // own `associations`, not the category's full global term list.
+        // A selected term that declares no associations for the target
+        // category imposes no constraint on it (rather than nulling the
+        // result) — only terms that actually list that category are
+        // intersected together. This keeps subject derivation dynamic
+        // across frameworks (e.g. plain SCP vs pathwayFramework), instead
+        // of assuming board/medium/grade all declare the same categories.
+        const getAssociationsByCategory = (term: any, category: string) =>
+          (term?.associations || []).filter(
+            (assoc: any) =>
+              assoc?.category === category && assoc?.status !== 'Retired'
+          );
+
+        const getIntersectedOptions = (terms: any[], category: string) => {
+          const lists = terms
+            .map((term) => getAssociationsByCategory(term, category))
+            .filter((list) => list.length > 0);
+          if (!lists.length) return [];
+          return lists.reduce((acc, list) => {
+            const codes = new Set(list.map((item: any) => item.code));
+            return acc.filter((item: any) => codes.has(item.code));
+          }, lists[0]);
+        };
+
+        const selectedTerms = [matchBoard, matchMedium, matchGrade].filter(
+          Boolean
+        );
+
         const courseSubjectLists = courseTypesAssociations.map(
           (courseType: any) => {
-            const commonAssociations =
-              matchBoard?.associations?.filter(
-                (assoc: any) =>
-                  matchMedium?.associations.some(
-                    (item: any) => item.code === assoc.code
-                  ) &&
-                  matchGrade?.associations.some(
-                    (item: any) => item.code === assoc.code
-                  )
-              ) || [];
-
-            const getSubjects = getOptionsByCategory(framework, 'subject');
-
-            const subjectAssociations = commonAssociations?.filter(
-              (assoc: any) =>
-                getSubjects.map((item: any) => assoc.code === item?.code)
-            );
-            const data=subjectAssociations?.filter(
-              (subject: any) => subject?.status !== "Retired"
+            const subjectAssociations = getIntersectedOptions(
+              selectedTerms,
+              'subject'
             );
             return {
               courseTypeName: courseType?.name,
               courseType: courseType?.code,
-              subjects: data?.map(
+              subjects: subjectAssociations?.map(
                 (subject: any) => subject?.name
               ),
             };

@@ -42,12 +42,15 @@ export const getFrameworkFromStorage = (): FrameworkId => {
 export const getChannelId = (): string => {
   if (typeof window === 'undefined') return '';
   try {
+    const storedChannelId = localStorage.getItem('channelId');
+    if (storedChannelId) return storedChannelId;
+
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    return (
-      userData?.tenantData?.[0]?.tenantId ||
-      localStorage.getItem('channelId') ||
-      'scp-channel'
-    );
+    const selectedTenantId = localStorage.getItem('tenantId');
+    const selectedTenant =
+      userData?.tenantData?.find((tenant: any) => tenant?.tenantId === selectedTenantId) ||
+      userData?.tenantData?.[0];
+    return selectedTenant?.channelId || selectedTenant?.tenantId || 'scp-channel';
   } catch {
     return 'scp-channel';
   }

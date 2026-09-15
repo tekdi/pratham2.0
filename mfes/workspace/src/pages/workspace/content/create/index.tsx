@@ -32,7 +32,7 @@ import WorkspaceText from '../../../../components/WorkspaceText';
 import { getLocalStoredUserId } from '../../../../services/LocalStorageService';
 import useTenantConfig from '../../../../hooks/useTenantConfig';
 import WorkspaceHeader from '../../../../components/WorkspaceHeader';
-import { TENANT_DATA } from '../../../../utils/app.constant';
+import { isSecondChanceTenant } from '../../../../utils/app.constant';
 
 const CreatePage = () => {
   const tenantConfig = useTenantConfig();
@@ -58,8 +58,7 @@ const CreatePage = () => {
 
     // Set isSCP based on localStorage program value
     if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-      const isSCPValue =
-        localStorage.getItem('program') === TENANT_DATA.SECOND_CHANCE_PROGRAM;
+      const isSCPValue = isSecondChanceTenant(localStorage.getItem('program'));
       setIsSCP(isSCPValue);
     }
 

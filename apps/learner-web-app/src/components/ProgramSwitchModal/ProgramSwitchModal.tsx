@@ -17,6 +17,7 @@ import { ContentSearch } from '@learner/utils/API/contentService';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
 import { getCohortList } from '@learner/utils/API/CohortService';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
+import { setUserProgram as setActiveUserProgram } from '@learner/utils/hooks/useUserProgram';
 
 type RegistrationTestStatus =
   | 'clear'
@@ -309,7 +310,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
       const landingPage = tenantData.params?.uiConfig?.landingPage;
 
       localStorage.setItem('tenantId', tenantId);
-      localStorage.setItem('userProgram', tenantName);
+      setActiveUserProgram(tenantName);
       localStorage.setItem('landingPage', landingPage || '');
       localStorage.setItem('uiConfig', JSON.stringify(uiConfig || {}));
 

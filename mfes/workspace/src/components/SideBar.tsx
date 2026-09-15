@@ -26,7 +26,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import logo from '/public/logo.png';
 import { Role } from '@workspace/utils/app.constant';
 import { getLocalStoredUserRole } from '@workspace/services/LocalStorageService';
-import { TENANT_DATA } from '@workspace/utils/app.constant';
+import { TENANT_DATA, isSecondChanceTenant } from '@workspace/utils/app.constant';
 import TenantService from '@workspace/services/TenantService';
 const route = process.env.NEXT_PUBLIC_WORKSPACE_ROUTES;
 import aiAssessment from '../assets/images/assessment.svg';
@@ -34,7 +34,7 @@ import aiAssessment from '../assets/images/assessment.svg';
 let isAdmin: boolean;
 let isSCP: boolean;
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
-  isSCP = localStorage.getItem('program')===TENANT_DATA.SECOND_CHANCE_PROGRAM ? true : false;
+  isSCP = isSecondChanceTenant(localStorage.getItem('program'));
 }
 if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
   isAdmin = localStorage.getItem('adminInfo') ? true : false;
@@ -61,7 +61,11 @@ const Sidebar: React.FC<SidebarProps> = ({ selectedKey, onSelect }) => {
     const headerValue = localStorage.getItem('showHeader');
     setShowHeader(headerValue === 'true');
     const tenant = userData ? JSON.parse(userData) : null;
-    setTenantName(tenant?.tenantData[0]?.tenantName);
+    const selectedTenantId = localStorage.getItem('tenantId');
+    const selectedTenant =
+      tenant?.tenantData?.find((t: any) => t?.tenantId === selectedTenantId) ||
+      tenant?.tenantData?.[0];
+    setTenantName(selectedTenant?.tenantName);
   }, []);
 
   if (userRole === null) return null;

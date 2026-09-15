@@ -8,7 +8,7 @@ import support from '../../../assets/images/Support.svg';
 
 import coursePlannerIcon from '../../../../public/images/event_available.svg';
 import { store } from '@/store/store';
-import { Role, TenantName } from '@/utils/app.constant';
+import { Role, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
 const isActiveYear = store.getState().isActiveYearSelected;
 
 const Menuitems = [
@@ -126,10 +126,13 @@ export const getFilteredMenuItems = () => {
       userInfo = JSON.parse(adminInfo || '{}');
     }
 
+    const selectedTenant = getSelectedTenantData(
+      userInfo?.tenantData,
+      localStorage.getItem('tenantId')
+    );
+
     if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
-      if (
-        userInfo?.tenantData[0]?.tenantName != TenantName.SECOND_CHANCE_PROGRAM
-      ) {
+      if (!isSecondChanceTenant(selectedTenant?.tenantName)) {
         return Menuitems.filter((item) => item.title === 'SIDEBAR.WORKSPACE');
       }
       // For SCTA and CCTA, show only Course Planner and Workspace
@@ -143,7 +146,7 @@ export const getFilteredMenuItems = () => {
 
     if (
       userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === TenantName.YOUTHNET
+      selectedTenant?.tenantName === TenantName.YOUTHNET
     ) {
       return Menuitems.filter(
         (item) =>
@@ -172,7 +175,7 @@ export const getFilteredMenuItems = () => {
 
     if (
       userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM
+      isSecondChanceTenant(selectedTenant?.tenantName)
     ) {
       return Menuitems.map((item) => {
         if (item.title === 'SIDEBAR.MANAGE_USERS' && item.subOptions) {
@@ -199,7 +202,7 @@ export const getFilteredMenuItems = () => {
 
     if (
       userInfo?.role === Role.ADMIN &&
-      userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM
+      isSecondChanceTenant(selectedTenant?.tenantName)
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(
@@ -213,7 +216,7 @@ export const getFilteredMenuItems = () => {
     if (
       (userInfo?.role === Role.ADMIN ||
         userInfo?.role === Role.CENTRAL_ADMIN) &&
-      userInfo?.tenantData[0]?.tenantName === TenantName.SECOND_CHANCE_PROGRAM
+      isSecondChanceTenant(selectedTenant?.tenantName)
     ) {
       // Exclude Course Planner and Workspace for Admin and Central Admin
       return Menuitems.filter(

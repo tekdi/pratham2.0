@@ -20,6 +20,7 @@ import { useTranslation } from '@shared-lib';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { searchAssessment } from '@learner/utils/API/AssesmentService';
 import { TenantName } from '@learner/utils/app.constant';
+import { useUserProgram } from '@learner/utils/hooks/useUserProgram';
 import {
   AssessmentAttemptCardData,
   mapAttemptCards,
@@ -44,6 +45,7 @@ const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
   const theme = useTheme();
   const { customColors } = theme.palette;
   const pathname = usePathname();
+  const userProgram = useUserProgram();
   const [isOpen, setIsOpen] = useSharedAccordionState();
   const [loadState, setLoadState] = useState<LoadState>('idle');
   const [attemptCards, setAttemptCards] = useState(mapAttemptCards([]));
@@ -51,14 +53,13 @@ const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
   const [isBatchAssigned, setIsBatchAssigned] = useState(false);
 
   const loadAssessmentAttempts = useCallback(async () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !userProgram) return;
 
-    const userProgram = localStorage.getItem('userProgram');
-    if (userProgram !== TenantName.SECOND_CHANCE_PROGRAM) {
-      setLoadState('notApplicable');
-      return;
-    }
-
+    // Whether Assessment Attempts applies is entirely driven by the
+    // currently selected program's own tenant config (uiConfig.RegisterationTest),
+    // not a hardcoded program name — so this keeps working unchanged if a
+    // future program also enables the registration test feature, and stays
+    // hidden for programs (like Second Chance Program Pathways) that don't.
     const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
     const isRegistrationTestEnabled =
       uiConfig?.RegisterationTest === true ||
@@ -78,7 +79,10 @@ const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
     setLoadState('loading');
 
     try {
-      const programFilter = [userProgram, 'Second Chance'];
+      const programFilter =
+        userProgram === TenantName.SECOND_CHANCE_PROGRAM
+          ? [userProgram, 'Second Chance']
+          : [userProgram];
       const preferredLanguage = localStorage.getItem('preferred_language');
 
       const [response, hasActiveBatch] = await Promise.all([
@@ -95,7 +99,7 @@ const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
           limit: 1,
           offset: 0,
         }),
-        checkUserHasActiveBatch(storedUserId),
+        checkUserHasActiveBatch(storedUserId, userProgram),
       ]);
 
       const identifier = response?.result?.QuestionSet?.[0]?.identifier;
@@ -128,7 +132,7 @@ const AssessmentAttempts: React.FC<AssessmentAttemptsProps> = ({
       console.error('AssessmentAttempts: failed to load attempts', error);
       setLoadState('error');
     }
-  }, []);
+  }, [userProgram]);
 
   useEffect(() => {
     loadAssessmentAttempts();

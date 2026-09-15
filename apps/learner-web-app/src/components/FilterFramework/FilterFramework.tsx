@@ -17,6 +17,7 @@ import {
   Paper,
 } from '@mui/material';
 import StaticFilterFields from '../staticFilterFields/StaticFilterFields';
+import { TenantName } from '@learner/utils/app.constant';
 
 interface FilterFrameworkProps {
   framework: string;
@@ -100,9 +101,12 @@ const FilterFramework: React.FC<FilterFrameworkProps> = ({
     }
   }, []);
 
+  const userProgram =
+    typeof window !== 'undefined' ? localStorage.getItem('userProgram') : null;
+
   const isSecondChanceProgram =
-    typeof window !== 'undefined' &&
-    localStorage.getItem('userProgram') === 'Second Chance Program';
+    userProgram === TenantName.SECOND_CHANCE_PROGRAM ||
+    userProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
 
   const ITEMS_TO_SHOW = 3; // Number of items to show initially
 
