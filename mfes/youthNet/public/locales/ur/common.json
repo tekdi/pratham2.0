@@ -831,6 +831,8 @@
     "SEE_ALL_EMPLOYEES": "تمام {{count}} ملازمین دیکھیں",
     "CERTIFICATES_ISSUED": "{{count}} سرٹیفکیٹ جاری",
     "NO_TOP_PERFORMERS": "ابھی تک کوئی سرٹیفکیٹ جاری نہیں ہوا",
+    "FROM_DATE": "تاریخ سے",
+    "TO_DATE": "تاریخ تک",
     "STATUS_SUMMARY_CERT": "{{count}} سرٹیفکیٹ",
     "STATUS_SUMMARY_COMPLETED": "{{count}} مکمل",
     "STATUS_SUMMARY_IN_PROGRESS": "{{count}} جاری",
