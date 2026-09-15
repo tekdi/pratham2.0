@@ -814,6 +814,7 @@ const UserLeader = () => {
           reason={reason}
           setReason={setReason}
           center={availableCenters}
+          isForTeamLead={true}
         />
       </ConfirmationPopup>
       <ConfirmationPopup

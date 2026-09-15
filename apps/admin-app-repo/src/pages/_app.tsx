@@ -35,8 +35,8 @@ import { PUBLIC_ROUTES } from '@/config/routesConfig';
 
 function App({ Component, pageProps }: AppProps) {
   useChunkErrorReload();
-  useLanguageFromStorage();
   const router = useRouter();
+  useLanguageFromStorage({ skip: router.pathname === '/login' });
   const setIsArchived = useSubmittedButtonStore(
     (state: any) => state.setIsArchived
   );
