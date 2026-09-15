@@ -220,6 +220,11 @@ export const MENU_CONFIG = {
           link: '/village',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
+        {
+          title: 'SIDEBAR.PLACEMENT_PROPERTY',
+          link: '/placement-property',
+          roles: [Role.CENTRAL_ADMIN],
+        },
       ],
     },
     certificateIssuance: {

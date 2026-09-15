@@ -2,6 +2,18 @@
   "COMMON": {
     "LANGUAGE": "Language",
     "ADD_NEW": "Add New",
+    "STATUS": "Status",
+    "NO": "No",
+    "CONFIRM": "Confirm",
+    "ADD_PLACEMENT_PROPERTY": "Add Placement Property",
+    "UPDATE_PLACEMENT_PROPERTY": "Update Placement Property",
+    "PLACEMENT_PROPERTY_CREATED_SUCCESSFULLY": "Placement Property Created Successfully",
+    "PLACEMENT_PROPERTY_UPDATED_SUCCESSFULLY": "Placement Property Updated Successfully",
+    "STATUS_UPDATED_SUCCESSFULLY": "Status Updated Successfully",
+    "CHANGE_STATUS": "Change Status",
+    "CONFIRM_ACTIVATE_PLACEMENT_PROPERTY": "Are you sure you want to activate this Placement Property?",
+    "CONFIRM_DEACTIVATE_PLACEMENT_PROPERTY": "Are you sure you want to deactivate this Placement Property?",
+    "DEACTIVATE": "Deactivate",
     "PAGE_SIZE": "Page Size",
     "DELETE_USER": "Delete User",
     "DELETE_USER_WITH_REASON": "Delete User",
@@ -143,6 +155,7 @@
     "NO_YOUTH_FOUND": "No Youth Found",
     "NO_MENTOR_LEAD_FOUND": "No Central Head Found",
     "NO_STATE_FOUND": "No State Found",
+    "NO_PLACEMENT_PROPERTY_FOUND": "No Placement Property Found",
     "NO_VILLAGE_FOUND": "No Village Found",
     "NO_DISTRICTS_FOUND": "No District Found",
     "NO_BLOCK_FOUND": "No Block Found",
@@ -255,7 +268,8 @@
     "SKILLING_CENTERS": "Skilling Centers",
     "CURRICULUM_PLANNER": "Curriculum Planner",
     "BATCH": "Batch",
-    "MOBILIZER": "Mentor"
+    "MOBILIZER": "Mentor",
+    "PLACEMENT_PROPERTY": "Placement Property"
   },
   "FACILITATORS": {
     "STATE": "State",
@@ -393,7 +407,18 @@
     "DISTRICT_CODE": "District Code",
     "BLOCK_CODE": "Block Code",
     "CODE": "Code",
-    "MASTER": "Master"
+    "MASTER": "Master",
+    "PLACEMENT_PROPERTY": "Placement Property",
+    "PLACEMENT_PROPERTY_NAME": "Placement Property Name",
+    "PINCODE": "Pincode",
+    "INDUSTRY_TYPE": "Industry Type",
+    "DOMAIN": "Domain",
+    "PLACEMENT_PROPERTY_CONTACT": "Contact",
+    "PLACEMENT_PROPERTY_EMAIL": "Email",
+    "MEDICAL_INSURANCE": "Medical Insurance",
+    "MEDICAL_ASSISTANCE": "Medical Assistance",
+    "PROPERTY_SANITISED": "Property Sanitised",
+    "TRANSPORTATION_FACILITY": "Transportation Facility"
   },
   "CENTERS": {
     "CENTER": "center",

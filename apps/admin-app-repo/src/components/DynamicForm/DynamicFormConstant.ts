@@ -50,5 +50,9 @@ export const FormContext = {
   placementRetentionCoordinator: {
     context: 'USERS',
     contextType: 'PLACEMENT RETENTION'
+  },
+  placementProperty: {
+    context: 'PLACEMENTPROPERTY',
+    contextType: 'PLACEMENTPROPERTY'
   }
 };
