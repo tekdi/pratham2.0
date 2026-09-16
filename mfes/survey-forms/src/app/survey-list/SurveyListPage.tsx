@@ -35,10 +35,10 @@ interface SurveyListPageProps {
 function readLearnerTargetGeoFromLocalStorage(): TargetGeoFilter | undefined {
   if (typeof window === 'undefined') return undefined;
   const targetGeo: TargetGeoFilter = {
-    stateId: localStorage.getItem('mfe_state') || undefined,
-    districtId: localStorage.getItem('mfe_district') || undefined,
-    blockId: localStorage.getItem('mfe_block') || undefined,
-    villageId: localStorage.getItem('mfe_villageId') || undefined,
+    stateId: localStorage.getItem('mfe_state') ?? undefined,
+    districtId: localStorage.getItem('mfe_district') ?? undefined,
+    blockId: localStorage.getItem('mfe_block') ?? undefined,
+    villageId: localStorage.getItem('mfe_villageId') ?? undefined,
   };
   return Object.values(targetGeo).some(Boolean) ? targetGeo : undefined;
 }
