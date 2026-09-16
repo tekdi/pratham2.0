@@ -179,6 +179,10 @@ export interface SessionsModalProps {
   handleEditModal?: () => void;
   disable?: boolean;
   handleBack?: () => void;
+  /** Desktop (>=600px) modal width override; defaults to 450px when omitted. */
+  width?: string;
+  /** Modal max-height override; defaults to 626px when omitted. */
+  maxHeight?: string;
 }
 
 export interface PlannedModalProps {

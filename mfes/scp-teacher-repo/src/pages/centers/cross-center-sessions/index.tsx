@@ -1,60 +1,28 @@
+import CrossCenterScheduleWizard from '@/components/CrossCenterScheduleWizard';
 import Header from '@/components/Header';
 import NoDataFound from '@/components/common/NoDataFound';
 import { getCohortDetails, getCohortList } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
 import { sessionType } from '@/utils/app.constant';
+import { flattenBatches } from '@/utils/crossCenter';
 import {
   convertUTCToIST,
   getAfterDate,
+  getBeforeDate,
   shortDateFormat,
   toPascalCase,
 } from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
+import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import GroupsIcon from '@mui/icons-material/Groups';
-import { Box, Snackbar, Typography } from '@mui/material';
+import { Box, Button, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useEffect, useState } from 'react';
 import { accessControl } from '../../../../app.config';
-
-interface BatchInfo {
-  batchId: string;
-  batchName: string;
-  centerId: string;
-  centerName: string;
-}
-
-// The facilitator's own cohort tree comes back center -> batch (or, for team
-// leaders, block -> center -> batch). A leaf node (no childData) is always a
-// batch; its immediate parent is the center it belongs to.
-const flattenBatches = (
-  nodes: any[],
-  parent?: { id: string; name: string }
-): BatchInfo[] => {
-  let result: BatchInfo[] = [];
-  for (const node of nodes || []) {
-    const children = Array.isArray(node?.childData) ? node.childData : [];
-    if (children.length > 0) {
-      result = result.concat(
-        flattenBatches(children, {
-          id: node?.cohortId,
-          name: node?.cohortName || node?.name,
-        })
-      );
-    } else if (parent?.id && node?.cohortId) {
-      result.push({
-        batchId: node.cohortId,
-        batchName: toPascalCase(node?.cohortName || node?.name || ''),
-        centerId: parent.id,
-        centerName: toPascalCase(parent.name || ''),
-      });
-    }
-  }
-  return result;
-};
 
 const getSessionTitle = (subject?: string, sessionTitle?: string) => {
   return subject && sessionTitle
@@ -190,6 +158,8 @@ const CrossCenterSessionsPage = () => {
   const [plannedSessions, setPlannedSessions] = useState<any[]>([]);
   const [currentUserId, setCurrentUserId] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -221,8 +191,14 @@ const CrossCenterSessionsPage = () => {
           return;
         }
 
+        // The backend requires startDate and endDate together — there is no
+        // open-ended range, so this uses a generous 1-year window to
+        // effectively mean "all upcoming sessions".
+        const farFuture = new Date();
+        farFuture.setDate(farFuture.getDate() + 365);
         const filters = {
           startDate: { after: getAfterDate(shortDateFormat(new Date())) },
+          endDate: { before: getBeforeDate(shortDateFormat(farFuture)) },
           cohortIds,
           status: ['live'],
         };
@@ -300,7 +276,7 @@ const CrossCenterSessionsPage = () => {
       }
     };
     load();
-  }, []);
+  }, [refreshKey]);
 
   const hasSessions = extraSessions.length > 0 || plannedSessions.length > 0;
 
@@ -316,6 +292,23 @@ const CrossCenterSessionsPage = () => {
         >
           {t('DASHBOARD.CROSS_CENTER_SESSIONS')}
         </Typography>
+
+        <Box sx={{ marginBottom: '16px' }}>
+          <Button
+            sx={{
+              border: `1px solid ${theme.palette.error.contrastText}`,
+              borderRadius: '100px',
+              height: '40px',
+              px: '16px',
+              color: theme.palette.error.contrastText,
+            }}
+            className="text-1E"
+            endIcon={<AddIcon />}
+            onClick={() => setWizardOpen(true)}
+          >
+            {t('COMMON.SCHEDULE_NEW')}
+          </Button>
+        </Box>
 
         {loading ? (
           <Typography>{t('COMMON.LOADING')}</Typography>
@@ -402,6 +395,11 @@ const CrossCenterSessionsPage = () => {
         autoHideDuration={2000}
         onClose={() => setSnackbarOpen(false)}
         message="URL copied to clipboard"
+      />
+      <CrossCenterScheduleWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onScheduled={() => setRefreshKey((prev) => prev + 1)}
       />
     </>
   );

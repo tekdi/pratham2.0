@@ -272,6 +272,22 @@ const CohortPage = () => {
     (state) => state.setRemoveCohortId
   );
 
+  // Redirect target from the Cross-Center Sessions wizard when the
+  // facilitator ends up selecting only one batch — reopen this batch's own
+  // Schedule New flow instead of continuing the multi-batch wizard.
+  useEffect(() => {
+    if (router.isReady && router.query.openSchedule === '1') {
+      handleOpen();
+      const { openSchedule: _openSchedule, ...restQuery } = router.query;
+      router.replace(
+        { pathname: router.pathname, query: restQuery },
+        undefined,
+        { shallow: true }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.query.openSchedule]);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const role = localStorage.getItem('role');
@@ -418,7 +434,7 @@ const CohortPage = () => {
             after: afterDate,
             before: beforeDate,
           },
-          cohortId: cohortId,
+          cohortIds: [cohortId],
           status: ['live'],
         };
         const response = await getEventList({ limit, offset, filters });
@@ -472,7 +488,7 @@ const CohortPage = () => {
           endDate: {
             before: beforeDate,
           },
-          cohortId: cohortId,
+          cohortIds: [cohortId],
           status: ['live'],
         };
         const response = await getEventList({ limit, offset, filters });

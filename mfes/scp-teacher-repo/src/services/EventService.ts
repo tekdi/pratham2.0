@@ -82,7 +82,7 @@ export const getEventsForDay = async (
   const filters = {
     startDate: { after: getAfterDate(selectedDateStr) },
     endDate: { before: getBeforeDate(selectedDateStr) },
-    cohortId,
+    cohortIds: [cohortId],
     status: ['live'],
   };
   try {

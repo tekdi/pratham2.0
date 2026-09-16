@@ -884,7 +884,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     try {
       const dateStr = dayjs(newStart).format('YYYY-MM-DD');
       const filters = {
-        cohortId,
+        cohortIds: [cohortId],
         startDate: { after: getAfterDate(dateStr) },
         endDate: { before: getBeforeDate(dateStr) },
         status: ['live'],
