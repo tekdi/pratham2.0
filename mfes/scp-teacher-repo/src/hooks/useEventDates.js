@@ -67,10 +67,20 @@ const useEventDates = (
               after: afterDate,
               before: beforeDate,
             },
-            [idType]: idValue,
             status: ['live'],
-            ...(cohortId && cohortId !== 'all' ? { cohortId } : {}),
           };
+          // `filters.cohortId` (singular) was replaced by `filters.cohortIds`
+          // (array) — the backend silently ignores the old singular field
+          // instead of erroring, so this used to return every live event
+          // across every cohort instead of just the one being asked for.
+          if (idType === 'cohortId') {
+            filters.cohortIds = [idValue];
+          } else {
+            filters[idType] = idValue;
+          }
+          if (cohortId && cohortId !== 'all') {
+            filters.cohortIds = [cohortId];
+          }
 
           const response = await getEventList({
             limit: 0,

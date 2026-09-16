@@ -70,7 +70,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
 
   useEffect(() => {
     if (dashboard) {
-      const classId = item?.metadata?.cohortId;
+      const classId = item?.metadata?.cohortId ?? item?.metadata?.cohortIds?.[0];
       const getCohortData = async () => {
         const response = await getCohortDetails(classId);
 
