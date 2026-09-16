@@ -101,6 +101,10 @@ import { updateUser } from '@shared-lib-v2/DynamicForm/services/CreateUserServic
 import { sendCredentialService } from '../../services/NotificationService';
 import { buildProgramMappingEmailRequest } from '@shared-lib-v2/DynamicForm/utils/notifications/programMapping';
 
+// State/district/block/village ids can legitimately be 0 (e.g. production "test" location records),
+// so truthy checks (`if (id)`) or `x || fallback` would wrongly treat a real id 0 as missing.
+const hasId = (val: any): boolean => val !== undefined && val !== null && val !== '';
+
 const Index = () => {
   const { isRTL } = useDirection();
   const { t } = useTranslation();
@@ -287,7 +291,7 @@ const Index = () => {
       const blockMap = new Map<string, boolean>();
 
       catchmentAreaField.selectedValues.forEach((state: any) => {
-        if (state.stateId && !stateMap.has(state.stateId)) {
+        if (hasId(state.stateId) && !stateMap.has(state.stateId)) {
           states.push({ id: state.stateId, name: state.stateName });
           stateMap.set(state.stateId, true);
           districtsByState[state.stateId] = [];
@@ -296,7 +300,7 @@ const Index = () => {
           state.districts.forEach((district: any) => {
             const districtKey = `${state.stateId}-${district.districtId}`;
             if (
-              district.districtId &&
+              hasId(district.districtId) &&
               !districtMap.has(districtKey) &&
               !districtsByState[state.stateId]?.find((d: any) => d.id === district.districtId)
             ) {
@@ -310,7 +314,7 @@ const Index = () => {
             if (district.blocks && Array.isArray(district.blocks)) {
               district.blocks.forEach((block: any) => {
                 const blockKey = `${district.districtId}-${block.id}`;
-                if (block.id && !blockMap.has(blockKey)) {
+                if (hasId(block.id) && !blockMap.has(blockKey)) {
                   if (!blocksByDistrict[district.districtId]) {
                     blocksByDistrict[district.districtId] = [];
                   }
@@ -357,7 +361,7 @@ const Index = () => {
         if (!Array.isArray(catchmentAreaArray)) return;
 
         catchmentAreaArray.forEach((state: any) => {
-          if (state.stateId && !stateMap.has(state.stateId)) {
+          if (hasId(state.stateId) && !stateMap.has(state.stateId)) {
             states.push({ id: state.stateId, name: state.stateName });
             stateMap.set(state.stateId, true);
             districtsByState[state.stateId] = [];
@@ -366,7 +370,7 @@ const Index = () => {
             state.districts.forEach((district: any) => {
               const districtKey = `${state.stateId}-${district.districtId}`;
               if (
-                district.districtId &&
+                hasId(district.districtId) &&
                 !districtMap.has(districtKey) &&
                 !districtsByState[state.stateId]?.find((d: any) => d.id === district.districtId)
               ) {
@@ -380,7 +384,7 @@ const Index = () => {
               if (district.blocks && Array.isArray(district.blocks)) {
                 district.blocks.forEach((block: any) => {
                   const blockKey = `${district.districtId}-${block.id}`;
-                  if (block.id && !blockMap.has(blockKey)) {
+                  if (hasId(block.id) && !blockMap.has(blockKey)) {
                     if (!blocksByDistrict[district.districtId]) {
                       blocksByDistrict[district.districtId] = [];
                     }
@@ -435,13 +439,13 @@ const Index = () => {
       setAllDistrictsByState(districtsByState);
       setAllBlocksByDistrict(blocksByDistrict);
 
-      if (initialStateId && districtsByState[initialStateId]) {
+      if (hasId(initialStateId) && districtsByState[initialStateId]) {
         const initialDistricts = districtsByState[initialStateId];
         setDistrictData(initialDistricts);
         const initialDistrictId = initialDistricts[0]?.id;
         setSelectedDistrictValue(initialDistrictId ?? '');
 
-        if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
+        if (hasId(initialDistrictId) && blocksByDistrict[initialDistrictId]) {
           setBlockData(blocksByDistrict[initialDistrictId]);
           setSelectedBlockValue(blockId ? blockId : blocksByDistrict[initialDistrictId][0]?.id ?? '');
         } else {
@@ -479,12 +483,12 @@ const Index = () => {
           setSelectedStateValue(initialStateId);
           setAllDistrictsByState(districtsByState);
           setAllBlocksByDistrict(blocksByDistrict);
-          if (initialStateId && districtsByState[initialStateId]) {
+          if (hasId(initialStateId) && districtsByState[initialStateId]) {
             const initialDistricts = districtsByState[initialStateId];
             setDistrictData(initialDistricts);
             const initialDistrictId = initialDistricts[0]?.id;
             setSelectedDistrictValue(initialDistrictId ?? '');
-            if (initialDistrictId && blocksByDistrict[initialDistrictId]) {
+            if (hasId(initialDistrictId) && blocksByDistrict[initialDistrictId]) {
               const initialBlocks = blocksByDistrict[initialDistrictId];
               setBlockData(initialBlocks);
               setSelectedBlockValue(blockId ? blockId : initialBlocks[0]?.id ?? '');
@@ -513,7 +517,7 @@ const Index = () => {
 
   // Update districts when state changes
   useEffect(() => {
-    if (selectedStateValue && allDistrictsByState[selectedStateValue]) {
+    if (hasId(selectedStateValue) && allDistrictsByState[selectedStateValue]) {
       const districtsForState = allDistrictsByState[selectedStateValue];
       setDistrictData(districtsForState);
       // Reset selected district to first district of new state
@@ -528,7 +532,7 @@ const Index = () => {
 
   // Update blocks when district changes
   useEffect(() => {
-    if (selectedDistrictValue && allBlocksByDistrict[selectedDistrictValue]) {
+    if (hasId(selectedDistrictValue) && allBlocksByDistrict[selectedDistrictValue]) {
       const blocksForDistrict = allBlocksByDistrict[selectedDistrictValue];
       setBlockData(blocksForDistrict);
       // Reset selected block to first block of new district
@@ -1564,7 +1568,7 @@ const Index = () => {
             for (const block of district.blocks) {
               if (block.villages && Array.isArray(block.villages)) {
                 for (const village of block.villages) {
-                  if (village.id) {
+                  if (hasId(village.id)) {
                     villageIds.push(String(village.id));
                   }
                 }
@@ -1633,7 +1637,7 @@ const Index = () => {
 
   useEffect(() => {
     const noVillageSelection =
-      !selectedVillageValue ||
+      !hasId(selectedVillageValue) ||
       (Array.isArray(selectedVillageValue) && selectedVillageValue.length === 0);
     if (
       value === 3 &&
@@ -2817,7 +2821,7 @@ const Index = () => {
                       <Dropdown
                         name={stateData?.STATE_NAME}
                         values={stateData}
-                        defaultValue={selectedStateValue || stateData?.[0]?.id}
+                        defaultValue={hasId(selectedStateValue) ? selectedStateValue : stateData?.[0]?.id}
                         onSelect={(val) => {
                           setSelectedStateValue(val);
                           setSelectedVillageValue([]);
@@ -2848,7 +2852,7 @@ const Index = () => {
                         name={districtData?.DISTRICT_NAME}
                         values={districtData}
                         defaultValue={
-                          selectedDistrictValue || districtData?.[0]?.id
+                          hasId(selectedDistrictValue) ? selectedDistrictValue : districtData?.[0]?.id
                         }
                         onSelect={(val) => {
                           setSelectedDistrictValue(val);
@@ -2879,7 +2883,7 @@ const Index = () => {
                       <Dropdown
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
-                        defaultValue={selectedBlockValue || blockData?.[0]?.id}
+                        defaultValue={hasId(selectedBlockValue) ? selectedBlockValue : blockData?.[0]?.id}
                         onSelect={(val) => {
                           setSelectedBlockValue(val);
                           setSelectedVillageValue([]);
@@ -3057,7 +3061,7 @@ const Index = () => {
                       <Dropdown
                         name={stateData?.STATE_NAME}
                         values={stateData}
-                        defaultValue={selectedStateValue || stateData?.[0]?.id}
+                        defaultValue={hasId(selectedStateValue) ? selectedStateValue : stateData?.[0]?.id}
                         onSelect={(val) => {
                           setSelectedStateValue(val);
                           setSelectedVillageValue([]);
@@ -3088,7 +3092,7 @@ const Index = () => {
                         name={districtData?.DISTRICT_NAME}
                         values={districtData}
                         defaultValue={
-                          selectedDistrictValue || districtData?.[0]?.id
+                          hasId(selectedDistrictValue) ? selectedDistrictValue : districtData?.[0]?.id
                         }
                         onSelect={(val) => {
                           setSelectedDistrictValue(val);
@@ -3119,7 +3123,7 @@ const Index = () => {
                       <Dropdown
                         name={blockData?.BLOCK_NAME}
                         values={blockData}
-                        defaultValue={selectedBlockValue || blockData?.[0]?.id}
+                        defaultValue={hasId(selectedBlockValue) ? selectedBlockValue : blockData?.[0]?.id}
                         onSelect={(val) => {
                           setSelectedBlockValue(val);
                           setSelectedVillageValue([]);

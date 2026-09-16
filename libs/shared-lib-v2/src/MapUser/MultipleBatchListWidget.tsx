@@ -223,7 +223,7 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
         // Normalize values to strings for consistent comparison
         const states =
           response?.data?.result?.values?.map((item) => ({
-            value: String(item.value || ''),
+            value: String(item.value ?? ''),
             label: item.label || '',
           })) || [];
 
@@ -638,24 +638,24 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
               stateField?.selectedValues?.[0]?.value ||
               stateField?.selectedValues?.[0]?.label ||
               '';
-            const stateIdValue = stateField?.selectedValues?.[0]?.id || null;
+            const stateIdValue = stateField?.selectedValues?.[0]?.id ?? null;
             const districtValue =
               districtField?.selectedValues?.[0]?.value ||
               districtField?.selectedValues?.[0]?.label ||
               '';
             const districtIdValue =
-              districtField?.selectedValues?.[0]?.id || null;
+              districtField?.selectedValues?.[0]?.id ?? null;
             const blockValue =
               blockField?.selectedValues?.[0]?.value ||
               blockField?.selectedValues?.[0]?.label ||
               '';
-            const blockIdValue = blockField?.selectedValues?.[0]?.id || null;
+            const blockIdValue = blockField?.selectedValues?.[0]?.id ?? null;
             const villageValue =
               villageField?.selectedValues?.[0]?.value ||
               villageField?.selectedValues?.[0]?.label ||
               '';
             const villageIdValue =
-              villageField?.selectedValues?.[0]?.id || null;
+              villageField?.selectedValues?.[0]?.id ?? null;
 
             return {
               value: item.cohortId,
@@ -1205,10 +1205,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
-            stateId: center?.stateId || null,
-            districtId: center?.districtId || null,
-            blockId: center?.blockId || null,
-            villageId: center?.villageId || null,
+            stateId: center?.stateId ?? null,
+            districtId: center?.districtId ?? null,
+            blockId: center?.blockId ?? null,
+            villageId: center?.villageId ?? null,
           },
         ];
       }
@@ -1265,10 +1265,10 @@ const MultipleBatchListWidget: React.FC<MultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
-            stateId: center?.stateId || null,
-            districtId: center?.districtId || null,
-            blockId: center?.blockId || null,
-            villageId: center?.villageId || null,
+            stateId: center?.stateId ?? null,
+            districtId: center?.districtId ?? null,
+            blockId: center?.blockId ?? null,
+            villageId: center?.villageId ?? null,
           };
         });
         const updatedBatches = [...prev, ...newBatches];

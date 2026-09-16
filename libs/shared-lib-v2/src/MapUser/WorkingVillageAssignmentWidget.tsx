@@ -574,7 +574,7 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
         // Normalize values to strings for consistent comparison
         const states =
           response?.data?.result?.values?.map((item) => ({
-            value: String(item.value || ''),
+            value: String(item.value ?? ''),
             label: item.label || '',
           })) || [];
 
@@ -728,10 +728,10 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
               return {
                 id: String(item.cohortId),
                 name: item.name?.trim() || `Center ${item.cohortId}`,
-                stateId: stateField?.selectedValues?.[0]?.id || null,
-                districtId: districtField?.selectedValues?.[0]?.id || null,
-                blockId: blockField?.selectedValues?.[0]?.id || null,
-                villageId: villageField?.selectedValues?.[0]?.id || null,
+                stateId: stateField?.selectedValues?.[0]?.id ?? null,
+                districtId: districtField?.selectedValues?.[0]?.id ?? null,
+                blockId: blockField?.selectedValues?.[0]?.id ?? null,
+                villageId: villageField?.selectedValues?.[0]?.id ?? null,
                 villages: 0,
                 blocks: 0,
                 customFields: item.customFields || [],
@@ -793,12 +793,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
                 (field: any) => field.label === 'VILLAGE'
               );
 
-              const stateIdValue = stateField?.selectedValues?.[0]?.id || null;
+              const stateIdValue = stateField?.selectedValues?.[0]?.id ?? null;
               const districtIdValue =
-                districtField?.selectedValues?.[0]?.id || null;
-              const blockIdValue = blockField?.selectedValues?.[0]?.id || null;
+                districtField?.selectedValues?.[0]?.id ?? null;
+              const blockIdValue = blockField?.selectedValues?.[0]?.id ?? null;
               const villageIdValue =
-                villageField?.selectedValues?.[0]?.id || null;
+                villageField?.selectedValues?.[0]?.id ?? null;
 
               // Count villages and blocks (placeholder - would need actual API call for accurate counts)
               const villages = 0; // TODO: Get actual village count from API
@@ -894,12 +894,12 @@ const WorkingVillageAssignmentWidget: React.FC<WorkingVillageAssignmentWidgetPro
               (field: any) => field.label === 'VILLAGE'
             );
 
-            const stateIdValue = stateField?.selectedValues?.[0]?.id || null;
+            const stateIdValue = stateField?.selectedValues?.[0]?.id ?? null;
             const districtIdValue =
-              districtField?.selectedValues?.[0]?.id || null;
-            const blockIdValue = blockField?.selectedValues?.[0]?.id || null;
+              districtField?.selectedValues?.[0]?.id ?? null;
+            const blockIdValue = blockField?.selectedValues?.[0]?.id ?? null;
             const villageIdValue =
-              villageField?.selectedValues?.[0]?.id || null;
+              villageField?.selectedValues?.[0]?.id ?? null;
 
             // Count villages and blocks (placeholder - would need actual API call for accurate counts)
             const villages = 0; // TODO: Get actual village count from API

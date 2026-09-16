@@ -147,7 +147,7 @@ const volunteerList = () => {
             const villageEntriesData: any = {};
             completedEntriesList.forEach((item: any) => {
               const villageId = userVillageMap[item.id];
-              if (villageId) {
+              if (villageId !== undefined && villageId !== null && villageId !== '') {
                 if (!villageEntriesData[villageId]) {
                   villageEntriesData[villageId] = { count: 0, ids: [] };
                 }

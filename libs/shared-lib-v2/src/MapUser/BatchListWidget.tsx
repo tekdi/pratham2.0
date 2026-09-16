@@ -624,14 +624,12 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
               typeof batchIdRaw === 'string' && isNaN(Number(batchIdRaw))
                 ? batchIdRaw
                 : Number(batchIdRaw);
-            // Only include batches with valid IDs (not null/undefined/empty)
+            // Only include batches with valid IDs (not null/undefined/empty).
+            // Note: a numeric batchId of 0 is a valid id (e.g. production test batches) and must not be excluded.
             if (
               batchId != null &&
               batchId !== '' &&
-              !(
-                typeof batchId === 'number' &&
-                (isNaN(batchId) || batchId === 0)
-              )
+              !(typeof batchId === 'number' && isNaN(batchId))
             ) {
               return {
                 id: batchId,
@@ -660,7 +658,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
 
   const handleStateSelect = async (event: any) => {
     const selectedStateId = event.target.value;
-    if (selectedStateId) {
+    if (selectedStateId !== '' && selectedStateId !== undefined && selectedStateId !== null) {
       const selectedState = states.find((s) => s.id === selectedStateId);
       if (selectedState) {
         // Single state selection - replace existing state
@@ -681,7 +679,7 @@ const BatchListWidget: React.FC<BatchListWidgetProps> = ({
   };
 
   const handleDistrictSelect = async (stateId: number, districtId: number) => {
-    if (districtId) {
+    if (districtId !== '' && districtId !== undefined && districtId !== null) {
       const district = districts[stateId]?.find((d) => d.id === districtId);
       if (district) {
         const updatedStates = selectedStates.map((state) => {
