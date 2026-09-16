@@ -67,7 +67,7 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
 
   useEffect(() => {
     if (dashboard) {
-      const classId = data.metadata?.cohortId;
+      const classId = data.metadata?.cohortId ?? data.metadata?.cohortIds?.[0];
       const getCohortData = async () => {
         const response = await getCohortDetails(classId);
 
