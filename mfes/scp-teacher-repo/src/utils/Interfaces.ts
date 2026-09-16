@@ -713,6 +713,7 @@ export interface GetUserProjectDetailsParams {
 export interface EditEvent {
   isMainEvent: boolean;
   status?: string;
+  updatedBy?: string;
 }
 
 export interface ISearchAssessment {

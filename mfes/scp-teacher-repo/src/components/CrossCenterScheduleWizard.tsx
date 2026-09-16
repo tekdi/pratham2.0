@@ -1,5 +1,5 @@
 import { getCohortList } from '@/services/CohortServices';
-import { createEvent, getEventList } from '@/services/EventService';
+import { createEvent, editEvent, getEventList } from '@/services/EventService';
 import { CenterType, sessionMode, sessionType } from '@/utils/app.constant';
 import { BatchInfo, flattenBatches } from '@/utils/crossCenter';
 import {
@@ -8,6 +8,7 @@ import {
   getOptionsByCategory,
 } from '@/utils/helper';
 import { CreateEvent } from '@/utils/Interfaces';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
@@ -46,12 +47,17 @@ interface CrossCenterScheduleWizardProps {
   open: boolean;
   onClose: () => void;
   onScheduled: () => void;
+  /** When set, the wizard edits this existing event (PATCH) instead of
+   * creating a new one — pre-filled from its current data, still starting
+   * on the batches step. */
+  editingEvent?: any;
 }
 
 const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
   open,
   onClose,
   onScheduled,
+  editingEvent,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
@@ -94,6 +100,9 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     ((decision: 'yes' | 'no') => void) | null
   >(null);
 
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const resetState = () => {
     setStep(1);
     setSearch('');
@@ -123,6 +132,41 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     if (!open) {
       resetState();
       return;
+    }
+
+    if (editingEvent) {
+      const meta = editingEvent.metadata || {};
+      setSelectedBatchIds(
+        new Set(
+          meta.cohortIds || (meta.cohortId ? [meta.cohortId] : [])
+        )
+      );
+      setSessionTypeKey(
+        meta.type === sessionType.PLANNED ? 'PLANNED_SESSION' : 'EXTRA_SESSION'
+      );
+      setMode(editingEvent.eventType || sessionMode.OFFLINE);
+      const start = dayjs(editingEvent.startDateTime);
+      const end = dayjs(editingEvent.endDateTime);
+      setDate(start);
+      setStartTime(start);
+      setEndTime(end);
+      setCourseType(meta.courseType || '');
+      setSubject(meta.subject || '');
+      setSubTopic(editingEvent.shortDescription || '');
+      setMeetingLink(editingEvent.meetingDetails?.url || '');
+      setMeetingPasscode(editingEvent.meetingDetails?.password || '');
+      if (editingEvent.isRecurring && editingEvent.recurrencePattern) {
+        const dayNameByIndex: Record<number, string> = {};
+        Object.entries(DaysOfWeek).forEach(([name, idx]) => {
+          dayNameByIndex[idx] = name;
+        });
+        const days = (editingEvent.recurrencePattern.daysOfWeek || [])
+          .map((idx: number) => dayNameByIndex[idx])
+          .filter(Boolean);
+        setSelectedWeekDays(days);
+        const endConditionValue = editingEvent.recurrencePattern.endCondition?.value;
+        if (endConditionValue) setRecurEndDate(dayjs(endConditionValue));
+      }
     }
 
     const loadBatches = async () => {
@@ -244,8 +288,9 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
 
   const batchesByCenter = filteredBatches.reduce<Record<string, BatchInfo[]>>(
     (acc, batch) => {
-      acc[batch.centerId] = acc[batch.centerId] || [];
-      acc[batch.centerId].push(batch);
+      const centerBatches = acc[batch.centerId] || [];
+      centerBatches.push(batch);
+      acc[batch.centerId] = centerBatches;
       return acc;
     },
     {}
@@ -292,7 +337,10 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
 
   const handleBatchStepNext = () => {
     if (selectedBatchIds.size === 0) return;
-    if (selectedBatchIds.size === 1) {
+    // Only the create flow redirects a 1-batch selection to the single-batch
+    // page — when editing an existing cross-center session down to 1 batch,
+    // it still gets saved here via PATCH (per US-4 AC), not redirected away.
+    if (selectedBatchIds.size === 1 && !editingEvent) {
       const onlyBatchId = Array.from(selectedBatchIds)[0];
       onClose();
       router.push(`/centers/${onlyBatchId}?openSchedule=1`);
@@ -365,6 +413,13 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     const newStartMs = new Date(startIso).getTime();
     const newEndMs = new Date(endIso).getTime();
     return events.some((existingEvent) => {
+      // Editing a session must not flag it as conflicting with itself.
+      if (
+        editingEvent &&
+        existingEvent?.eventRepetitionId === editingEvent.eventRepetitionId
+      ) {
+        return false;
+      }
       const existingStartMs = new Date(existingEvent?.startDateTime).getTime();
       const existingEndMs = new Date(existingEvent?.endDateTime).getTime();
       if (isNaN(existingStartMs) || isNaN(existingEndMs)) return false;
@@ -474,6 +529,90 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
         .filter(Boolean)
         .join(', ');
 
+      const metaData = {
+        category: title,
+        courseType,
+        subject,
+        teacherName: userName,
+        cohortIds: batchIds,
+        cycleId: '',
+        tenantId: '',
+        type:
+          sessionTypeKey === 'PLANNED_SESSION'
+            ? sessionType.PLANNED
+            : sessionType.EXTRA,
+      };
+
+      const recurrencePattern =
+        isRecurring && recurEndDate
+          ? (() => {
+              const daysOfWeekNumeric = selectedWeekDays.map(
+                (day) => DaysOfWeek[day as keyof typeof DaysOfWeek]
+              );
+              const endConditionValue = recurEndDate
+                .hour(endTime.hour())
+                .minute(endTime.minute())
+                .second(0)
+                .toISOString();
+              return {
+                frequency:
+                  daysOfWeekNumeric.length === eventDaysLimit
+                    ? 'daily'
+                    : 'weekly',
+                interval: 1,
+                daysOfWeek: daysOfWeekNumeric,
+                endCondition: { type: 'endDate', value: endConditionValue },
+                recurringStartDate: startDatetime,
+              };
+            })()
+          : undefined;
+
+      const onlineMeetingFields =
+        mode === sessionMode.ONLINE
+          ? {
+              onlineProvider: meetingLink.includes('zoom')
+                ? t('CENTER_SESSION.ZOOM')
+                : t('CENTER_SESSION.GOOGLEMEET'),
+              isMeetingNew: false,
+              meetingDetails: {
+                url: meetingLink,
+                password: meetingPasscode,
+                id: '',
+              },
+            }
+          : null;
+
+      if (editingEvent) {
+        const apiBody: any = {
+          updatedBy: userId,
+          isMainEvent: true,
+          title,
+          shortDescription: subTopic || '',
+          // No `eventType` here — the backend rejects edits that change it
+          // ("Event type change not supported"), which is also why the mode
+          // toggle is disabled above while editing.
+          status: 'live',
+          startDatetime,
+          endDatetime,
+          metadata: metaData,
+          ...(recurrencePattern ? { recurrencePattern } : {}),
+          ...(onlineMeetingFields ?? {}),
+        };
+
+        const response = await editEvent(editingEvent.eventRepetitionId, apiBody);
+        if (response?.responseCode === 'OK') {
+          showToastMessage(
+            t('CENTER_SESSION.SESSION_EDITED_SUCCESSFULLY'),
+            'success'
+          );
+          onScheduled();
+          onClose();
+        } else {
+          showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+        }
+        return;
+      }
+
       const apiBody: CreateEvent = {
         title,
         shortDescription: subTopic || '',
@@ -493,52 +632,10 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
         endDatetime,
         registrationStartDate: '',
         registrationEndDate: '',
-        metaData: {
-          category: title,
-          courseType,
-          subject,
-          teacherName: userName,
-          cohortIds: batchIds,
-          cycleId: '',
-          tenantId: '',
-          type:
-            sessionTypeKey === 'PLANNED_SESSION'
-              ? sessionType.PLANNED
-              : sessionType.EXTRA,
-        },
+        metaData,
+        ...(recurrencePattern ? { recurrencePattern } : {}),
+        ...(onlineMeetingFields ?? {}),
       };
-
-      if (isRecurring && recurEndDate) {
-        const daysOfWeekNumeric = selectedWeekDays.map(
-          (day) => DaysOfWeek[day as keyof typeof DaysOfWeek]
-        );
-        const endConditionValue = recurEndDate
-          .hour(endTime.hour())
-          .minute(endTime.minute())
-          .second(0)
-          .toISOString();
-        apiBody.recurrencePattern = {
-          frequency:
-            daysOfWeekNumeric.length === eventDaysLimit ? 'daily' : 'weekly',
-          interval: 1,
-          daysOfWeek: daysOfWeekNumeric,
-          endCondition: { type: 'endDate', value: endConditionValue },
-          recurringStartDate: startDatetime,
-        };
-      }
-
-      if (mode === sessionMode.ONLINE) {
-        const onlineProvider = meetingLink.includes('zoom')
-          ? t('CENTER_SESSION.ZOOM')
-          : t('CENTER_SESSION.GOOGLEMEET');
-        apiBody.onlineProvider = onlineProvider;
-        apiBody.isMeetingNew = false;
-        apiBody.meetingDetails = {
-          url: meetingLink,
-          password: meetingPasscode,
-          id: '',
-        };
-      }
 
       const response = await createEvent(apiBody);
       if (response?.responseCode === 'OK' || response?.result) {
@@ -559,6 +656,38 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     }
   };
 
+  const handleDelete = async () => {
+    if (!editingEvent) return;
+    setDeleting(true);
+    try {
+      const userId =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('userId') || ''
+          : '';
+      const response = await editEvent(editingEvent.eventRepetitionId, {
+        isMainEvent: true,
+        status: 'archived',
+        updatedBy: userId,
+      });
+      if (response?.responseCode === 'OK') {
+        showToastMessage(
+          t('CENTER_SESSION.SESSION_DELETED_SUCCESSFULLY'),
+          'success'
+        );
+        onScheduled();
+        onClose();
+      } else {
+        showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting cross-center session', error);
+      showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteConfirmOpen(false);
+    }
+  };
+
   const title =
     step === 1
       ? t('CENTER_SESSION.WHO_IS_THIS_SESSION_FOR')
@@ -569,7 +698,11 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
       : 'Extra Session';
 
   const primaryLabel =
-    step === 3 ? t('CENTER_SESSION.SCHEDULE') : t('COMMON.NEXT');
+    step === 3
+      ? editingEvent
+        ? t('COMMON.UPDATE')
+        : t('CENTER_SESSION.SCHEDULE')
+      : t('COMMON.NEXT');
 
   const primaryDisabled =
     step === 1
@@ -805,6 +938,10 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
                 mode2: t('CENTER_SESSION.OFFLINE'),
               }}
               cohortType={CenterType.UNKNOWN}
+              // The backend rejects an edit that changes eventType ("Event
+              // type change not supported") — the existing single-batch edit
+              // flow (PlannedSession.tsx) disables this the same way.
+              disabled={!!editingEvent}
             />
 
             {mode === sessionMode.ONLINE && (
@@ -982,6 +1119,32 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
             >
               {t('CENTER_SESSION.ONE_LINK_NOTE')}
             </Box>
+
+            {editingEvent && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: '5px',
+                  mt: 2,
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                }}
+                onClick={() => setDeleteConfirmOpen(true)}
+              >
+                <Box
+                  sx={{
+                    fontSize: '14px',
+                    color: theme?.palette?.secondary.main,
+                    fontWeight: '500',
+                  }}
+                >
+                  {t('CENTER_SESSION.DELETE_THIS_SESSION')}
+                </Box>
+                <DeleteOutlineIcon
+                  sx={{ fontSize: '18px', color: theme?.palette?.error.main }}
+                />
+              </Box>
+            )}
           </Box>
         )}
       </CenterSessionModal>
@@ -995,6 +1158,17 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
         handleCloseModal={() => conflictDecisionResolver.current?.('no')}
         handleAction={() => conflictDecisionResolver.current?.('yes')}
         modalOpen={conflictModalOpen}
+      />
+
+      <ConfirmationModal
+        message={t('CENTER_SESSION.DELETE_SESSION_MSG')}
+        buttonNames={{
+          primary: t('COMMON.YES'),
+          secondary: t('COMMON.NO_GO_BACK'),
+        }}
+        handleCloseModal={() => setDeleteConfirmOpen(false)}
+        handleAction={handleDelete}
+        modalOpen={deleteConfirmOpen}
       />
     </>
   );

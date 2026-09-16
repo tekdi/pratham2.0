@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import NoDataFound from '@/components/common/NoDataFound';
 import { getCohortDetails, getCohortList } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
-import { sessionType } from '@/utils/app.constant';
+import { EventStatus, sessionType } from '@/utils/app.constant';
 import { flattenBatches } from '@/utils/crossCenter';
 import {
   convertUTCToIST,
@@ -16,6 +16,7 @@ import withAccessControl from '@/utils/hoc/withAccessControl';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import EditOutlined from '@mui/icons-material/EditOutlined';
 import GroupsIcon from '@mui/icons-material/Groups';
 import { Box, Button, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -38,7 +39,8 @@ const CrossCenterSessionCard: React.FC<{
   centerCount: number;
   currentUserId: string;
   onCopy: () => void;
-}> = ({ event, batchCount, centerCount, currentUserId, onCopy }) => {
+  onEdit: (event: any) => void;
+}> = ({ event, batchCount, centerCount, currentUserId, onCopy, onEdit }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const startDateTime = convertUTCToIST(event?.startDateTime);
@@ -48,6 +50,21 @@ const CrossCenterSessionCard: React.FC<{
   const creatorId = event?.createdBy ?? event?.metadata?.createdBy;
   const creatorName = event?.metadata?.teacherName;
   const meetingUrl = event?.meetingDetails?.url;
+
+  // Same UPCOMING/LIVE/PASSED computation as SessionCard.tsx, so edit is
+  // only offered while it makes sense (matches the existing 538fed8b
+  // creator-only-edit pattern, plus the completed-session lock).
+  const now = new Date();
+  const eventStart = new Date(event?.startDateTime);
+  const eventEnd = new Date(event?.endDateTime);
+  const eventStatus =
+    now < eventStart
+      ? EventStatus.UPCOMING
+      : now <= eventEnd
+      ? EventStatus.LIVE
+      : EventStatus.PASSED;
+  const canEditSession =
+    creatorId === currentUserId && eventStatus === EventStatus.UPCOMING;
 
   const handleCopyUrl = () => {
     if (meetingUrl) {
@@ -63,14 +80,22 @@ const CrossCenterSessionCard: React.FC<{
         padding: '12px 16px',
       }}
     >
-      <Typography
-        color={theme.palette.warning['300']}
-        fontWeight={400}
-        fontSize={'16px'}
-        className="one-line-text"
-      >
-        {getSessionTitle(subject, sessionTitle)}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
+        <Typography
+          color={theme.palette.warning['300']}
+          fontWeight={400}
+          fontSize={'16px'}
+          className="one-line-text"
+        >
+          {getSessionTitle(subject, sessionTitle)}
+        </Typography>
+        {canEditSession && (
+          <EditOutlined
+            onClick={() => onEdit(event)}
+            sx={{ cursor: 'pointer', fontSize: '20px', flexShrink: 0 }}
+          />
+        )}
+      </Box>
       <Typography
         fontWeight={400}
         fontSize={'14px'}
@@ -159,7 +184,18 @@ const CrossCenterSessionsPage = () => {
   const [currentUserId, setCurrentUserId] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleEdit = (event: any) => {
+    setEditingEvent(event);
+    setWizardOpen(true);
+  };
+
+  const handleWizardClose = () => {
+    setWizardOpen(false);
+    setEditingEvent(null);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -345,6 +381,7 @@ const CrossCenterSessionsPage = () => {
                       centerCount={centerCount}
                       currentUserId={currentUserId}
                       onCopy={() => setSnackbarOpen(true)}
+                      onEdit={handleEdit}
                     />
                   ))}
                 </Box>
@@ -381,6 +418,7 @@ const CrossCenterSessionsPage = () => {
                         centerCount={centerCount}
                         currentUserId={currentUserId}
                         onCopy={() => setSnackbarOpen(true)}
+                        onEdit={handleEdit}
                       />
                     )
                   )}
@@ -398,8 +436,9 @@ const CrossCenterSessionsPage = () => {
       />
       <CrossCenterScheduleWizard
         open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
+        onClose={handleWizardClose}
         onScheduled={() => setRefreshKey((prev) => prev + 1)}
+        editingEvent={editingEvent}
       />
     </>
   );
