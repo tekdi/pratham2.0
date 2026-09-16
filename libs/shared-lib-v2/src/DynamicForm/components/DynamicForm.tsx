@@ -1,7 +1,11 @@
 //@ts-nocheck
 import React, { useState, useEffect, useRef, useImperativeHandle,forwardRef } from 'react';
 import Form from '@rjsf/mui';
-import validator from '@rjsf/validator-ajv8';
+import { customizeValidator } from '@rjsf/validator-ajv8';
+
+// $data enables cross-field schema constraints (e.g. enddate's formatMinimum
+// referencing startdate's value via a relative JSON pointer).
+const validator = customizeValidator({ ajvOptionsOverrides: { $data: true } });
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import { Box, Alert } from '@mui/material';
@@ -2139,6 +2143,24 @@ const DynamicForm = forwardRef(({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Friendlier messages for AJV date-range keywords — schema-driven date
+    // validation (startdate/enddate) uses formatMinimum/formatExclusiveMinimum,
+    // whose default AJV message ("should be > 2026-09-23") is too technical.
+    updatedError = updatedError.map((error) => {
+      if (error.name === 'formatMinimum' || error.name === 'formatExclusiveMinimum') {
+        const fieldKey = error.property?.replace(/^\./, '');
+        if (fieldKey === 'enddate' && error.name === 'formatExclusiveMinimum') {
+          error.message = t('FORM_ERROR_MESSAGES.END_DATE_AFTER_START_DATE', {
+            defaultValue: 'Please select an End Date that is after the Start Date.',
+          });
+        } else if (fieldKey === 'startdate' || fieldKey === 'enddate') {
+          error.message = t('FORM_ERROR_MESSAGES.DATE_CANNOT_BE_IN_PAST', {
+            defaultValue: 'Please select today or a future date.',
+          });
+        }
+      }
+      return error;
+    });
     // Suppress enum errors for fields with no value selected (empty string / undefined)
     updatedError = updatedError.filter((error) => {
       if (error.name === 'enum') {

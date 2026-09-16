@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "எண்கள் மற்றும் சிறப்பு எழுத்துகள் அனுமதிக்கப்படாது",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "எழுத்துகள் மற்றும் சிறப்பு எழுத்துகள் அனுமதிக்கப்படாது",
     "NAME_CANNOT_INCLUDE_DIGITS": "பெயரில் எண்கள் இருக்கக்கூடாது",
+    "DATE_CANNOT_BE_IN_PAST": "தயவுசெய்து இன்றைய அல்லது எதிர்கால தேதியைத் தேர்ந்தெடுக்கவும்.",
+    "END_DATE_AFTER_START_DATE": "தொடக்க தேதிக்குப் பிறகான முடிவு தேதியைத் தேர்ந்தெடுக்கவும்.",
     "INVALID_EMAIL_FORMAT": "தவறான மின்னஞ்சல் வடிவம்",
     "ENTER_VALID_EMAIL": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "ENTER_VALID_MOBILE_NUMBER": "சரியான கைபேசி எண்ணை உள்ளிடவும்",

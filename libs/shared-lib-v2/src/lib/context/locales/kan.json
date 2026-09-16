@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ಅಂಕಿಗಳು ಮತ್ತು ವಿಶೇಷ ಅಕ್ಷರಗಳು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "ಅಕ್ಷರಗಳು ಮತ್ತು ವಿಶೇಷ ಅಕ್ಷರಗಳು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ",
     "NAME_CANNOT_INCLUDE_DIGITS": "ಹೆಸರುಗಳಲ್ಲಿ ಅಂಕಿಗಳಿರಲು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ",
+    "DATE_CANNOT_BE_IN_PAST": "ದಯವಿಟ್ಟು ಇಂದಿನ ಅಥವಾ ಭವಿಷ್ಯದ ದಿನಾಂಕವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+    "END_DATE_AFTER_START_DATE": "ದಯವಿಟ್ಟು ಪ್ರಾರಂಭ ದಿನಾಂಕದ ನಂತರದ ಅಂತಿಮ ದಿನಾಂಕವನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
     "INVALID_EMAIL_FORMAT": "ಅಮಾನ್ಯ ಈಮೈಲ್ ಸ್ವರೂಪ",
     "ENTER_VALID_EMAIL": "ಒಂದು ಮಾನ್ಯ ಈಮೈಲ್ ವಿಳಾಸವನ್ನೇ ನಮೂದಿಸಿ",
     "ENTER_VALID_MOBILE_NUMBER": "ಒಂದು ಮಾನ್ಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",

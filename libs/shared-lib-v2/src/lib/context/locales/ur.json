@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "نمبرز اور خصوصی حروف کی اجازت نہیں ہے۔",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "حروف اور خصوصی حروف کی اجازت نہیں ہے۔",
     "NAME_CANNOT_INCLUDE_DIGITS": "نام میں ہندسے شامل نہیں ہو سکتے",
+    "DATE_CANNOT_BE_IN_PAST": "براہ کرم آج کی یا مستقبل کی تاریخ منتخب کریں۔",
+    "END_DATE_AFTER_START_DATE": "براہ کرم شروع ہونے کی تاریخ کے بعد کی ختم ہونے کی تاریخ منتخب کریں۔",
     "INVALID_EMAIL_FORMAT": "غلط ای میل فارمیٹ",
     "ENTER_VALID_EMAIL": "ایک درست ای میل ایڈریس درج کریں۔",
     "ENTER_VALID_MOBILE_NUMBER": "ایک درست موبائل نمبر درج کریں۔",

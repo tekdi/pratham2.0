@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "અંકો અને વિશેષ અક્ષરો મંજૂર નથી",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "અક્ષરો અને વિશેષ અક્ષરો મંજૂર નથી",
     "NAME_CANNOT_INCLUDE_DIGITS": "નામમાં અંકો શામેલ થઈ શકતા નથી",
+    "DATE_CANNOT_BE_IN_PAST": "કૃપા કરી આજની અથવા ભવિષ્યની તારીખ પસંદ કરો.",
+    "END_DATE_AFTER_START_DATE": "કૃપા કરી શરૂઆતની તારીખ પછીની સમાપ્તિ તારીખ પસંદ કરો.",
     "INVALID_EMAIL_FORMAT": "અમાન્ય ઈમેલ ફોર્મેટ",
     "ENTER_VALID_EMAIL": "એક માન્ય ઈમેલ સરનામું દાખલ કરો",
     "ENTER_VALID_MOBILE_NUMBER": "એક માન્ય મોબાઇલ નંબર દાખલ કરો",

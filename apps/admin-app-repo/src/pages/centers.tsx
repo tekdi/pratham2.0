@@ -882,12 +882,11 @@ const Centers = () => {
                     field.label === 'INDUSTRY' || field.label === 'DOMAIN'
                 )?.selectedValues || []
               }
-              centerCourses={
+              centerSkills={
                 selectedCenter?.customFields?.find(
-                  (field: any) => field.label === 'COURSES'
+                  (field: any) => field.label === 'SKILLS'
                 )?.selectedValues || []
               }
-              centerCourseNameMap={courseNameMap}
               centerType={
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'TYPE_OF_CENTER'

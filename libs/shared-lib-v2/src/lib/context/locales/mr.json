@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "अंक आणि विशेष अक्षरे परवानगी नाही",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "अक्षरे आणि विशेष अक्षरे परवानगी नाही",
     "NAME_CANNOT_INCLUDE_DIGITS": "नावामध्ये अंक असू शकत नाही",
+    "DATE_CANNOT_BE_IN_PAST": "कृपया आजची किंवा भविष्यातील तारीख निवडा.",
+    "END_DATE_AFTER_START_DATE": "कृपया प्रारंभ तारखेनंतरची समाप्ती तारीख निवडा.",
     "INVALID_EMAIL_FORMAT": "अवैध ईमेल स्वरूप",
     "ENTER_VALID_EMAIL": "एक वैध ईमेल पत्ता भरा",
     "ENTER_VALID_MOBILE_NUMBER": "एक वैध मोबाईल नंबर भरा",

@@ -1025,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "అంకెలు మరియు ప్రత్యేక అక్షరాలు అనుమతించబడవు.",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "అక్షరాలు మరియు ప్రత్యేక అక్షరాలు అనుమతించబడవు.",
     "NAME_CANNOT_INCLUDE_DIGITS": "పేరులో అంకెలు ఉండకూడదు.",
+    "DATE_CANNOT_BE_IN_PAST": "దయచేసి ఈరోజు లేదా భవిష్యత్ తేదీని ఎంచుకోండి.",
+    "END_DATE_AFTER_START_DATE": "దయచేసి ప్రారంభ తేదీ తర్వాత ముగింపు తేదీని ఎంచుకోండి.",
     "INVALID_EMAIL_FORMAT": "చెల్లని ఇమెయిల్ ఫార్మాట్‌",
     "ENTER_VALID_EMAIL": "చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి.",
     "ENTER_VALID_MOBILE_NUMBER": "చెల్లుబాటు అయ్యే మొబైల్ నంబర్‌ను నమోదు చేయండి",
