@@ -176,7 +176,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
         // Normalize values to strings for consistent comparison
         const states =
           response?.data?.result?.values?.map((item) => ({
-            value: String(item.value || ''),
+            value: String(item.value ?? ''),
             label: item.label || '',
           })) || [];
 
@@ -496,19 +496,19 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
             const centerData = {
               value: centerId,
               label: centerDetails.name,
-              stateId: stateSelectedValue?.id || null,
+              stateId: stateSelectedValue?.id ?? null,
               state:
                 stateSelectedValue?.value ||
                 stateSelectedValue?.label ||
                 stateSelectedValue?.name ||
                 null,
-              districtId: districtSelectedValue?.id || null,
+              districtId: districtSelectedValue?.id ?? null,
               district:
                 districtSelectedValue?.value ||
                 districtSelectedValue?.label ||
                 districtSelectedValue?.name ||
                 null,
-              blockId: blockSelectedValue?.id || null,
+              blockId: blockSelectedValue?.id ?? null,
               block:
                 blockSelectedValue?.value ||
                 blockSelectedValue?.label ||
@@ -817,21 +817,21 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
               value: item.cohortId,
               label: centerName,
               // State: extract ID and name/value
-              stateId: stateSelectedValue?.id || null,
+              stateId: stateSelectedValue?.id ?? null,
               state:
                 stateSelectedValue?.value ||
                 stateSelectedValue?.label ||
                 stateSelectedValue?.name ||
                 null,
               // District: extract ID and name/value
-              districtId: districtSelectedValue?.id || null,
+              districtId: districtSelectedValue?.id ?? null,
               district:
                 districtSelectedValue?.value ||
                 districtSelectedValue?.label ||
                 districtSelectedValue?.name ||
                 null,
               // Block: extract ID and name/value
-              blockId: blockSelectedValue?.id || null,
+              blockId: blockSelectedValue?.id ?? null,
               block:
                 blockSelectedValue?.value ||
                 blockSelectedValue?.label ||
@@ -1050,7 +1050,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
               return {
                 ...center,
                 label: details?.name?.trim() || center.label,
-                stateId: stateSelectedValue?.id || center.stateId || null,
+                stateId: stateSelectedValue?.id ?? center.stateId ?? null,
                 state:
                   stateSelectedValue?.value ||
                   stateSelectedValue?.label ||
@@ -1058,14 +1058,14 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
                   center.state ||
                   null,
                 districtId:
-                  districtSelectedValue?.id || center.districtId || null,
+                  districtSelectedValue?.id ?? center.districtId ?? null,
                 district:
                   districtSelectedValue?.value ||
                   districtSelectedValue?.label ||
                   districtSelectedValue?.name ||
                   center.district ||
                   null,
-                blockId: blockSelectedValue?.id || center.blockId || null,
+                blockId: blockSelectedValue?.id ?? center.blockId ?? null,
                 block:
                   blockSelectedValue?.value ||
                   blockSelectedValue?.label ||
@@ -1120,19 +1120,19 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
             return {
               value: centerId,
               label: details?.name || `Center ${centerId}`,
-              stateId: stateSelectedValue?.id || null,
+              stateId: stateSelectedValue?.id ?? null,
               state:
                 stateSelectedValue?.value ||
                 stateSelectedValue?.label ||
                 stateSelectedValue?.name ||
                 null,
-              districtId: districtSelectedValue?.id || null,
+              districtId: districtSelectedValue?.id ?? null,
               district:
                 districtSelectedValue?.value ||
                 districtSelectedValue?.label ||
                 districtSelectedValue?.name ||
                 null,
-              blockId: blockSelectedValue?.id || null,
+              blockId: blockSelectedValue?.id ?? null,
               block:
                 blockSelectedValue?.value ||
                 blockSelectedValue?.label ||
@@ -1571,21 +1571,21 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
 
                 const updatedCenterObj = {
                   ...centerObj,
-                  stateId: stateSelectedValue?.id || null,
+                  stateId: stateSelectedValue?.id ?? null,
                   state:
                     stateSelectedValue?.value ||
                     stateSelectedValue?.label ||
                     stateSelectedValue?.name ||
                     centerObj.state ||
                     null,
-                  districtId: districtSelectedValue?.id || null,
+                  districtId: districtSelectedValue?.id ?? null,
                   district:
                     districtSelectedValue?.value ||
                     districtSelectedValue?.label ||
                     districtSelectedValue?.name ||
                     centerObj.district ||
                     null,
-                  blockId: blockSelectedValue?.id || null,
+                  blockId: blockSelectedValue?.id ?? null,
                   block:
                     blockSelectedValue?.value ||
                     blockSelectedValue?.label ||
@@ -1732,29 +1732,29 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
       if (!center) return;
 
       // Use IDs directly from center object (extracted from customFields)
-      const stateId = center.stateId || null;
+      const stateId = center.stateId ?? null;
       const stateName = center.state || 'Unknown';
-      const districtId = center.districtId || null;
+      const districtId = center.districtId ?? null;
       const districtName = center.district || 'Unknown';
-      const blockId = center.blockId || null;
+      const blockId = center.blockId ?? null;
       const blockName = center.block || 'Unknown';
 
       // Fallback: If IDs are not available, try to find from options by name
       const finalStateId =
-        stateId ||
-        stateOptions.find((opt) => opt.label === stateName)?.value ||
+        stateId ??
+        stateOptions.find((opt) => opt.label === stateName)?.value ??
         null;
       const finalDistrictId =
-        districtId ||
-        districtOptions.find((opt) => opt.label === districtName)?.value ||
+        districtId ??
+        districtOptions.find((opt) => opt.label === districtName)?.value ??
         null;
       const finalBlockId =
-        blockId ||
-        blockOptions.find((opt) => opt.label === blockName)?.value ||
+        blockId ??
+        blockOptions.find((opt) => opt.label === blockName)?.value ??
         null;
 
       // Create hierarchical structure using final IDs
-      const structureKey = finalStateId || stateName;
+      const structureKey = finalStateId ?? stateName;
       if (!structure[structureKey]) {
         structure[structureKey] = {
           stateId: finalStateId,
@@ -1763,7 +1763,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
         };
       }
 
-      const districtKey = finalDistrictId || districtName;
+      const districtKey = finalDistrictId ?? districtName;
       if (!structure[structureKey].districts[districtKey]) {
         structure[structureKey].districts[districtKey] = {
           districtId: finalDistrictId,
@@ -1772,7 +1772,7 @@ const MultipleCenterListWidget: React.FC<MultipleCenterListWidgetProps> = ({
         };
       }
 
-      const blockKey = finalBlockId || blockName;
+      const blockKey = finalBlockId ?? blockName;
       if (!structure[structureKey].districts[districtKey].blocks[blockKey]) {
         structure[structureKey].districts[districtKey].blocks[blockKey] = {
           blockId: finalBlockId,
