@@ -2073,8 +2073,13 @@ const DynamicForm = forwardRef(({
             errors[key].__errors = []; // ✅ Clear existing errors
           }
           delete errors[key]; // ✅ Completely remove errors if empty
-        } else if (field.pattern) {
-          // ✅ Validate pattern only if the field has a value
+        } else if (field.pattern && typeof value === 'string') {
+          // ✅ Validate pattern only if the field has a value.
+          // `pattern` is only meaningful for string values — an array-typed
+          // (multi-select) field coerces to a joined string when tested
+          // against a RegExp, which fails a numeric/anchored pattern for
+          // any non-empty selection. Skip pattern checks for non-strings
+          // (e.g. multi-select arrays) instead of false-failing them.
           const patternRegex = new RegExp(field.pattern);
           if (!patternRegex.test(value)) {
             const errorMessage =
