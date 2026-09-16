@@ -4,6 +4,7 @@ import { convertUTCToIST, getBMG, toPascalCase } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import LockOutlined from '@mui/icons-material/LockOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
@@ -51,10 +52,23 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [CohortBMG, setCohortBMG] = React.useState<any>({});
   const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
     React.useState(false);
+  const [currentUserId, setCurrentUserId] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;
   const dashboard = pathname === '/dashboard';
   const { getNotification } = useNotification();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      setCurrentUserId(localStorage.getItem('userId') || '');
+    }
+  }, []);
+
+  // A session may only be edited by the person who scheduled it. The event list API is
+  // the only source of the creator, so when it does not send `createdBy` we keep the
+  // previous behaviour rather than hiding the edit icon from everyone.
+  const sessionCreatorId = data?.createdBy ?? data?.metadata?.createdBy;
+  const canEditSession = !sessionCreatorId || sessionCreatorId === currentUserId;
 
   const handleEditSelection = (selection: string) => {
     setEditSelection(selection);
@@ -340,11 +354,26 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             {showCenterName ? data?.location : data?.metadata?.teacherName}
           </Typography>
         </Box>
-        {eventStatus === EventStatus.UPCOMING && (
+        {eventStatus === EventStatus.UPCOMING && canEditSession && (
           <EditOutlined
             onClick={() => handleOpen(data)}
             sx={{ cursor: 'pointer' }}
           />
+        )}
+        {eventStatus === EventStatus.PASSED && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              color: theme.palette.warning['400'],
+            }}
+          >
+            <LockOutlined sx={{ fontSize: '16px' }} />
+            <Typography fontSize={'12px'}>
+              {t('CENTER_SESSION.COMPLETED')}
+            </Typography>
+          </Box>
         )}
       </Box>
       <Box

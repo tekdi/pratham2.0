@@ -18,6 +18,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import GroupsIcon from '@mui/icons-material/Groups';
+import LockOutlined from '@mui/icons-material/LockOutlined';
 import { Box, Button, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
@@ -95,6 +96,22 @@ const CrossCenterSessionCard: React.FC<{
             onClick={() => onEdit(event)}
             sx={{ cursor: 'pointer', fontSize: '20px', flexShrink: 0 }}
           />
+        )}
+        {eventStatus === EventStatus.PASSED && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              flexShrink: 0,
+              color: theme.palette.warning['400'],
+            }}
+          >
+            <LockOutlined sx={{ fontSize: '16px' }} />
+            <Typography fontSize={'12px'}>
+              {t('CENTER_SESSION.COMPLETED')}
+            </Typography>
+          </Box>
         )}
       </Box>
       <Typography
@@ -213,7 +230,11 @@ const CrossCenterSessionsPage = () => {
     const match = allSessions.find(
       (event) => event?.eventRepetitionId === editEventId
     );
-    if (match) {
+    // Defence in depth against a hand-crafted URL: the edit icon this param
+    // is meant to be reached from is already creator-gated, but a direct
+    // visit shouldn't open the editor for anyone else either.
+    const matchCreatorId = match?.createdBy ?? match?.metadata?.createdBy;
+    if (match && matchCreatorId === currentUserId) {
       handleEdit(match);
     }
 
