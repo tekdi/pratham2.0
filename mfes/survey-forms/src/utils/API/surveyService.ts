@@ -32,14 +32,30 @@ function normalizeEntityResult<T extends object>(
   return { ...api, result: { data: r as T } };
 }
 
+export interface TargetGeoFilter {
+  stateId?: string;
+  districtId?: string;
+  blockId?: string;
+  villageId?: string;
+}
+
 export const fetchSurveyList = async (
   page = 1,
   limit = 20,
   sortBy = 'createdAt',
   sortOrder: 'ASC' | 'DESC' = 'DESC',
-  listFilters?: { contextType?: string; skipAcademicYear?: boolean }
+  listFilters?: {
+    contextType?: string;
+    skipAcademicYear?: boolean;
+    targetGeo?: TargetGeoFilter;
+  }
 ) => {
-  const filters: { status: string; contextType?: string; academicYear?: string } = {
+  const filters: {
+    status: string;
+    contextType?: string;
+    academicYear?: string;
+    targetGeo?: TargetGeoFilter;
+  } = {
     status: 'published',
   };
   if (listFilters?.contextType) {
@@ -51,6 +67,9 @@ export const fetchSurveyList = async (
     if (session) {
       filters.academicYear = session;
     }
+  }
+  if (listFilters?.targetGeo && Object.values(listFilters.targetGeo).some(Boolean)) {
+    filters.targetGeo = listFilters.targetGeo;
   }
   const response = await post<{
     page: number;
