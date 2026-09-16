@@ -12,7 +12,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import { useSurveyStore } from '../../store/surveyFormStore';
-import { fetchSurveyList, fetchSurveyResponseStatus } from '../../utils/API/surveyService';
+import { fetchSurveyList, fetchSurveyResponseStatus, TargetGeoFilter } from '../../utils/API/surveyService';
 import { Survey } from '../../types/survey';
 import SurveyCard from '../../Components/SurveyCard/SurveyCard';
 import NoDataFound from '../../Components/NoDataFound/NoDataFound';
@@ -24,6 +24,23 @@ import { resolvePostSurveyListRoute } from '../../utils/resolveSurveyFillRoute';
 
 interface SurveyListPageProps {
   skipAcademicYear?: boolean;
+}
+
+/**
+ * Reads the learner's own SDBV (state/district/block/village) ids, populated by
+ * the Learner App at profile-completion time (apps/learner-web-app/src/utils/API/userService.ts).
+ * Only meaningful for the PLP learner flow (skipAcademicYear) — returns undefined for
+ * any level not present so the backend treats it as unconstrained, not an empty-string match.
+ */
+function readLearnerTargetGeoFromLocalStorage(): TargetGeoFilter | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const targetGeo: TargetGeoFilter = {
+    stateId: localStorage.getItem('mfe_state') || undefined,
+    districtId: localStorage.getItem('mfe_district') || undefined,
+    blockId: localStorage.getItem('mfe_block') || undefined,
+    villageId: localStorage.getItem('mfe_villageId') || undefined,
+  };
+  return Object.values(targetGeo).some(Boolean) ? targetGeo : undefined;
 }
 
 const SurveyListPage: React.FC<SurveyListPageProps> = ({ skipAcademicYear = false }) => {
@@ -52,6 +69,9 @@ const SurveyListPage: React.FC<SurveyListPageProps> = ({ skipAcademicYear = fals
         const result = await fetchSurveyList(currentPage, limit, 'createdAt', 'DESC', {
           contextType,
           skipAcademicYear,
+          ...(skipAcademicYear
+            ? { targetGeo: readLearnerTargetGeoFromLocalStorage() }
+            : {}),
         });
         if (result.params.status === 'successful') {
           setSurveys(result.result.data, result.result.meta);
