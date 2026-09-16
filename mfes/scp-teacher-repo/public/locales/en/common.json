@@ -563,6 +563,7 @@
     "LEARNER_PREREQUISITES": "Learner Prerequisites",
     "LEARNER_POSTREQUISITES": "Learner Postrequisites",
     "SESSION_SLOT_CONFLICT_MSG": "A session is already scheduled for this batch during this time. Do you want to schedule another session for the same time slot?",
+    "CROSS_CENTER_SLOT_CONFLICT_MSG": "{{batches}} already has a session scheduled during this time. Do you want to schedule this session for the same time slot anyway?",
     "SESSION_START_TIME_IN_PAST_ERROR": "Start time has already passed. Please select a future time slot.",
     "UPCOMING_EXTRA_SESSIONS": "Upcoming Extra Sessions",
     "NO_CROSS_CENTER_SESSIONS": "No cross-center sessions yet. Sessions scheduled across more than one batch will show up here.",

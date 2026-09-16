@@ -96,6 +96,7 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
   const [submitting, setSubmitting] = useState(false);
 
   const [conflictModalOpen, setConflictModalOpen] = useState(false);
+  const [conflictMessage, setConflictMessage] = useState('');
   const conflictDecisionResolver = useRef<
     ((decision: 'yes' | 'no') => void) | null
   >(null);
@@ -126,6 +127,7 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     setMeetingLinkError('');
     setMeetingPasscode('');
     setSubmitting(false);
+    setConflictMessage('');
   };
 
   useEffect(() => {
@@ -396,7 +398,11 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     }
   };
 
-  const findConflictingEvents = async (
+  // Returns the ids of whichever selected batches already have an
+  // overlapping live session — not just a yes/no — so the confirmation can
+  // name exactly which batch(es)/center(s) are already booked, instead of a
+  // generic "a session already exists" message.
+  const findConflictingBatchIds = async (
     batchIds: string[],
     startIso: string,
     endIso: string
@@ -412,19 +418,37 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     const events: any[] = result?.events || [];
     const newStartMs = new Date(startIso).getTime();
     const newEndMs = new Date(endIso).getTime();
-    return events.some((existingEvent) => {
+    const conflictingBatchIds = new Set<string>();
+
+    events.forEach((existingEvent) => {
       // Editing a session must not flag it as conflicting with itself.
       if (
         editingEvent &&
         existingEvent?.eventRepetitionId === editingEvent.eventRepetitionId
       ) {
-        return false;
+        return;
       }
       const existingStartMs = new Date(existingEvent?.startDateTime).getTime();
       const existingEndMs = new Date(existingEvent?.endDateTime).getTime();
-      if (isNaN(existingStartMs) || isNaN(existingEndMs)) return false;
-      return newStartMs < existingEndMs && newEndMs > existingStartMs;
+      if (isNaN(existingStartMs) || isNaN(existingEndMs)) return;
+      const overlaps =
+        newStartMs < existingEndMs && newEndMs > existingStartMs;
+      if (!overlaps) return;
+
+      // Which of THIS event's batches does the existing conflicting event
+      // actually belong to? cohortIds filter above matches on "any", so the
+      // existing event may include batches we didn't select at all.
+      const existingBatchIds: string[] =
+        existingEvent?.metadata?.cohortIds ||
+        (existingEvent?.metadata?.cohortId
+          ? [existingEvent.metadata.cohortId]
+          : []);
+      batchIds.forEach((id) => {
+        if (existingBatchIds.includes(id)) conflictingBatchIds.add(id);
+      });
     });
+
+    return Array.from(conflictingBatchIds);
   };
 
   // Mirrors `validateEventBody` in PlannedSession.tsx: the button stays
@@ -488,12 +512,26 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     try {
       const batchIds = Array.from(selectedBatchIds);
 
-      const hasConflict = await findConflictingEvents(
+      const conflictingBatchIds = await findConflictingBatchIds(
         batchIds,
         startDatetime,
         endDatetime
       );
-      if (hasConflict) {
+      if (conflictingBatchIds.length > 0) {
+        // Selected batches always come from `myBatches`, so every conflicting
+        // id here is expected to resolve — the id itself is a last-resort
+        // fallback in case that ever isn't true.
+        const conflictingBatchLabels = conflictingBatchIds
+          .map((id) => {
+            const b = myBatches.find((batch) => batch.batchId === id);
+            return b ? `${b.batchName} (${b.centerName})` : id;
+          })
+          .join(', ');
+        setConflictMessage(
+          t('CENTER_SESSION.CROSS_CENTER_SLOT_CONFLICT_MSG', {
+            batches: conflictingBatchLabels,
+          })
+        );
         setConflictModalOpen(true);
         const decision = await new Promise<'yes' | 'no'>((resolve) => {
           conflictDecisionResolver.current = resolve;
@@ -1150,7 +1188,9 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
       </CenterSessionModal>
 
       <ConfirmationModal
-        message={t('CENTER_SESSION.SESSION_SLOT_CONFLICT_MSG')}
+        message={
+          conflictMessage || t('CENTER_SESSION.SESSION_SLOT_CONFLICT_MSG')
+        }
         buttonNames={{
           primary: t('COMMON.YES'),
           secondary: t('COMMON.NO'),
