@@ -3,6 +3,7 @@
     "LANGUAGE": "Language",
     "LOADING": "Loading",
     "DATE": "Date",
+    "CONTINUE": "Continue",
     "MARK": "Mark",
     "MARK_MY_ATTENDANCE": "Mark My Attendance",
     "MARK_CENTER_ATTENDANCE": "Mark Center Attendance",
@@ -579,7 +580,8 @@
     "CROSS_CENTER_PLANNED_WARNING": "Heads up: planned sessions follow each batch's own fixed timetable slot — cross-center scheduling is best suited to Extra Sessions. You can still continue with a Planned Session.",
     "SCHEDULING_FOR": "Scheduling for",
     "ONE_LINK_NOTE": "One join link will be generated and shared with every batch selected above — this is a single session, not separate sessions per batch.",
-    "SELECT_SUBJECT_PLACEHOLDER": "Select subject"
+    "SELECT_SUBJECT_PLACEHOLDER": "Select subject",
+    "MULTI_BATCH_EDIT_REDIRECT_MSG": "This session is shared across more than one batch. It's managed from Cross-Center Sessions, so changes there apply everywhere it's scheduled. Continue to edit it there?"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "Center requested successfully",

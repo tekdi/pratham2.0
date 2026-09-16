@@ -22,6 +22,7 @@ import { Box, Button, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { accessControl } from '../../../../app.config';
 
@@ -178,6 +179,7 @@ const CrossCenterSessionCard: React.FC<{
 const CrossCenterSessionsPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [extraSessions, setExtraSessions] = useState<any[]>([]);
   const [plannedSessions, setPlannedSessions] = useState<any[]>([]);
@@ -196,6 +198,33 @@ const CrossCenterSessionsPage = () => {
     setWizardOpen(false);
     setEditingEvent(null);
   };
+
+  // Redirect target from a batch page's multi-batch-edit confirmation
+  // (SessionCard.tsx) — once this page's own session list has loaded, find
+  // the referenced session and open its editor directly, per US-5.
+  useEffect(() => {
+    if (!router.isReady || loading) return;
+    const editEventId = router.query.editEventId;
+    if (!editEventId || typeof editEventId !== 'string') return;
+
+    const allSessions = [...extraSessions, ...plannedSessions].map(
+      (item) => item.event
+    );
+    const match = allSessions.find(
+      (event) => event?.eventRepetitionId === editEventId
+    );
+    if (match) {
+      handleEdit(match);
+    }
+
+    const { editEventId: _editEventId, ...restQuery } = router.query;
+    router.replace(
+      { pathname: router.pathname, query: restQuery },
+      undefined,
+      { shallow: true }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.isReady, router.query.editEventId, loading]);
 
   useEffect(() => {
     const load = async () => {

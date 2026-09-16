@@ -49,6 +49,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [editSession, setEditSession] = React.useState();
   const [eventStatus, setEventStatus] = React.useState('');
   const [CohortBMG, setCohortBMG] = React.useState<any>({});
+  const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
+    React.useState(false);
   const router = useRouter();
   const { cohortId }: any = router.query;
   const dashboard = pathname === '/dashboard';
@@ -58,9 +60,23 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
     setEditSelection(selection);
   };
   const handleOpen = (eventData: any) => {
+    // A multi-batch session is managed centrally from Cross-Center Sessions —
+    // editing it inline here would let a facilitator change time/subject
+    // without realising it applies to every other batch on the session too.
+    if (eventData?.metadata?.multiSession) {
+      setMultiBatchConfirmOpen(true);
+      return;
+    }
     setOpen(true);
     setEditSession(eventData);
     setEventEdited(true);
+  };
+
+  const handleGoToCrossCenterEdit = () => {
+    setMultiBatchConfirmOpen(false);
+    router.push(
+      `/centers/cross-center-sessions?editEventId=${data?.eventRepetitionId}`
+    );
   };
 
   const handleClose = () => setOpen(false);
@@ -414,6 +430,16 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
         handleCloseModal={handleCloseModal}
         handleAction={onUpdateClick}
         modalOpen={modalOpen}
+      />
+      <ConfirmationModal
+        message={t('CENTER_SESSION.MULTI_BATCH_EDIT_REDIRECT_MSG')}
+        buttonNames={{
+          primary: t('COMMON.CONTINUE'),
+          secondary: t('COMMON.CANCEL'),
+        }}
+        handleCloseModal={() => setMultiBatchConfirmOpen(false)}
+        handleAction={handleGoToCrossCenterEdit}
+        modalOpen={multiBatchConfirmOpen}
       />
       <Box sx={{ position: 'absolute', bottom: '2px', width: '100%' }}>
         {children}
