@@ -911,5 +911,16 @@
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "कामाचे ठिकाण आवश्यक आहे. कृपया सर्व ब्लॉकमध्ये किमान एक गाव निवडा.",
     "MOBILIZER_NAME": "मार्गदर्शकाचे नाव",
     "EDIT_MOBILIZER": "मोबिलायझर एडिट करा"
-  }
+  },
+  "PLACEMENT PROPERTY": "Placement Property",
+  "PLACEMENT PROPERTY NAME": "Placement Property Name",
+  "PINCODE": "Pincode",
+  "DOMAIN": "Domain",
+  "INDUSTRY TYPE": "Industry Type",
+  "PLACEMENT PROPERTY CONTACT": "Placement Property Contact",
+  "PLACEMENT PROPERTY EMAIL": "Placement Property Email",
+  "MEDICAL INSURACE": "Medical Insurance",
+  "MEDICAL ASSISTANCE": "Medical Assistance",
+  "PROPERTY SANITISED": "Property Sanitised",
+  "TRANSPORTATION FACILITY": "Transportation Facility"
 }

@@ -390,7 +390,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isTrainer =
     typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.TEACHER;
   const isL2InterestedQueue = router.pathname.includes('/l2-interested-queue');
-  const isBatches = router.pathname.includes('/batches');
+  const isMyTeachingCenter = router.pathname.includes('/my-teaching-center');
 
   return (
     <Drawer
@@ -662,13 +662,13 @@ const MenuDrawer: React.FC<DrawerProps> = ({
 
             <NavItem
               collapsed={collapsed}
-              isActive={isBatches}
-              icon={<GroupsIcon sx={{ fontSize: '24px !important' }} />}
+              isActive={isMyTeachingCenter}
+              icon={<LocalLibraryOutlinedIcon sx={{ fontSize: '24px !important' }} />}
               onClick={() => {
                 closeDrawer();
-                router.push('/batches');
+                router.push('/my-teaching-center');
               }}
-              label={t('DASHBOARD.BATCHES')}
+              label={t('DASHBOARD.MY_TEACHING_CENTERS')}
               sx={{ marginTop: '25px' }}
             />
           </Box>

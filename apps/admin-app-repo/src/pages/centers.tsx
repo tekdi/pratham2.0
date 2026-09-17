@@ -31,7 +31,6 @@ import {
   getCohortList,
 } from '@/services/CohortService/cohortService';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
-import { getCourseName } from '@/services/CertificateService/coursesCertificates';
 import { updateCohort } from '@/services/MasterDataService';
 import { transformLabel, transformLabelWithoutSpaces } from '@/utils/helper';
 import { useTheme } from '@mui/material/styles';
@@ -77,9 +76,6 @@ const Centers = () => {
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [totalCountBatch, setTotalCountBatch] = useState(0);
-  const [courseNameMap, setCourseNameMap] = useState<Record<string, string>>(
-    {}
-  );
 
   const storedProgram =
     typeof window !== 'undefined'
@@ -104,41 +100,6 @@ const Centers = () => {
       searchData(prefilledFormData, 0);
     }
   }, [pageLimit]);
-
-  // Resolve COURSES do_ids from the current page of centers into names.
-  useEffect(() => {
-    const cohortDetails = response?.result?.results?.cohortDetails || [];
-    const courseIds: string[] = Array.from(
-      new Set(
-        cohortDetails.flatMap(
-          (row: any) =>
-            row?.customFields?.find((field: any) => field.label === 'COURSES')
-              ?.selectedValues || []
-        )
-      )
-    );
-    if (courseIds.length === 0) return;
-
-    const idsToResolve = courseIds.filter((id) => !courseNameMap[id]);
-    if (idsToResolve.length === 0) return;
-
-    getCourseName(idsToResolve)
-      .then((result) => {
-        const resolved = (result?.content || []).reduce(
-          (acc: Record<string, string>, course: any) => {
-            acc[course.identifier] = course.name;
-            return acc;
-          },
-          {}
-        );
-        if (Object.keys(resolved).length > 0) {
-          setCourseNameMap((prev) => ({ ...prev, ...resolved }));
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching course names:', error);
-      });
-  }, [response]);
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -398,17 +359,14 @@ const Centers = () => {
         ) || '-',
     },
     {
-      key: 'courses',
-      label: 'Courses',
-      render: (row) => {
-        const courseIds =
-          row.customFields.find((field) => field.label === 'COURSES')
-            ?.selectedValues || [];
-        return (
-          courseIds.map((id: string) => courseNameMap[id] || id).join(', ') ||
-          '-'
-        );
-      },
+      key: 'skills',
+      label: 'Skills',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'SKILLS')
+            ?.selectedValues?.join(', ')
+        ) || '-',
     },
     {
       key: 'active_batches',

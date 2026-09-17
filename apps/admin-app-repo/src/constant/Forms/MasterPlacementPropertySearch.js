@@ -32,7 +32,10 @@ export const MasterPlacementPropertySearchSchema = {
         method: 'POST',
         payload: {
           fieldName: 'district',
-          controllingfieldfk: '**',
+          // Wrapped in an array (not a bare '**') so DynamicForm's
+          // replaceControllingField() substitutes the state value in place
+          // inside the array, matching what the fields/options API expects.
+          controllingfieldfk: ['**'],
           sort: ['district_name', 'asc'],
         },
         options: {
@@ -67,8 +70,8 @@ export const MasterPlacementPropertySearchSchema = {
         },
         payload: {
           code: 'subDomain',
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/framework/v1/read/youthnet-framework`,
-          findcode: 'stream',
+          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/framework/v1/read/pos-framework`,
+          findcode: 'subject',
           selectedvalue: ['Career Exploration'],
         },
         callType: 'initial',

@@ -52,7 +52,15 @@ const AddEditPlacementPropertyModal: React.FC<
           },
         },
       ]);
-      setAddSchema(responseForm?.schema ?? null);
+      const schema = responseForm?.schema ?? null;
+      // The backend sends controllingfieldfk as a bare '**', but the
+      // fields/options API expects it as an array; wrapping it here lets
+      // DynamicForm's replaceControllingField() substitute the state value
+      // in place inside the array (it already recurses into arrays).
+      if (schema?.properties?.district?.api?.payload) {
+        schema.properties.district.api.payload.controllingfieldfk = ['**'];
+      }
+      setAddSchema(schema);
       setAddUiSchema(responseForm?.uiSchema ?? null);
     };
     fetchData();

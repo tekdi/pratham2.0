@@ -530,7 +530,9 @@ const L2InterestedQueuePage = () => {
             emptyMessage={t('L2_QUEUE.NO_LEARNERS_FOUND')}
           />
         ) : (
-          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+          <Box display="flex" flexDirection="column" alignItems="center" sx={{ py: 4 }}>
+            <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+          </Box>
         )}
       </Box>
 

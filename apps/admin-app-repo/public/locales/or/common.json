@@ -911,5 +911,16 @@
     "WORKING_LOCATION_REQUIRED_AT_LEAST_ONE": "କାର୍ଯ୍ୟସ୍ଥଳ ଆବଶ୍ୟକ। ଦୟାକରି ସମସ୍ତ ବ୍ଲକ୍‌ରେ କମ୍ ସେ କମ୍ ଗୋଟିଏ ଗାଁ ଚୟନ କରନ୍ତୁ।",
     "MOBILIZER_NAME": "ପରାମର୍ଶଦାତାଙ୍କ ନାମ",
     "EDIT_MOBILIZER": "ମୋବିଲାଇଜର୍‌କୁ ଏଡିଟ୍ କରନ୍ତୁ"
-  }
+  },
+  "PLACEMENT PROPERTY": "Placement Property",
+  "PLACEMENT PROPERTY NAME": "Placement Property Name",
+  "PINCODE": "Pincode",
+  "DOMAIN": "Domain",
+  "INDUSTRY TYPE": "Industry Type",
+  "PLACEMENT PROPERTY CONTACT": "Placement Property Contact",
+  "PLACEMENT PROPERTY EMAIL": "Placement Property Email",
+  "MEDICAL INSURACE": "Medical Insurance",
+  "MEDICAL ASSISTANCE": "Medical Assistance",
+  "PROPERTY SANITISED": "Property Sanitised",
+  "TRANSPORTATION FACILITY": "Transportation Facility"
 }

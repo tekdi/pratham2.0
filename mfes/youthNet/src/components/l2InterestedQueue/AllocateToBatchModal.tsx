@@ -147,6 +147,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
       const bulkResult = await bulkCreateCohortMembers({
         userId: userIds,
         cohortId: [selectedBatch.value],
+        status: 'in_training',
       });
       if (!isBulkCreateCohortMembersSuccess(bulkResult)) {
         showToastMessage('Could not create batch membership', 'error');
