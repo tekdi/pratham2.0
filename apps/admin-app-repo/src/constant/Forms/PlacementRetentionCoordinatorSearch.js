@@ -25,6 +25,93 @@ export const PlacementRetentionCoordinatorSearchSchema = {
       isMultiSelect: true,
       maxSelection: 1,
     },
+    district: {
+      type: 'array',
+      title: 'District',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+        method: 'POST',
+        payload: {
+          fieldName: 'district',
+          controllingfieldfk: '**',
+          sort: ['district_name', 'asc'],
+        },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'dependent',
+        dependent: 'state',
+      },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 1,
+    },
+    block: {
+      type: 'array',
+      title: 'Block',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+        method: 'POST',
+        payload: {
+          fieldName: 'block',
+          controllingfieldfk: '**',
+          sort: ['block_name', 'asc'],
+        },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'dependent',
+        dependent: 'district',
+      },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 1,
+    },
+    village: {
+      type: 'array',
+      title: 'Village',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+        method: 'POST',
+        payload: {
+          fieldName: 'village',
+          controllingfieldfk: '**',
+          sort: ['village_name', 'asc'],
+        },
+        options: {
+          optionObj: 'result.values',
+          label: 'label',
+          value: 'value',
+        },
+        callType: 'dependent',
+        dependent: 'block',
+      },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 5,
+    },
     name: {
       type: 'string',
       title: 'Search Placement Retention Coordinator',
@@ -45,9 +132,38 @@ export const PlacementRetentionCoordinatorSearchSchema = {
 };
 
 export const PlacementRetentionCoordinatorUISchema = {
-  'ui:order': ['state', 'name', 'sortBy', 'tenantStatus'],
+  'ui:order': [
+    'state',
+    'district',
+    'block',
+    'village',
+    'name',
+    'sortBy',
+    'tenantStatus',
+  ],
 
   state: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  district: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  block: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  village: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,
