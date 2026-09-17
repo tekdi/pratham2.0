@@ -731,10 +731,11 @@ console.log('######### updateUserResponse', updateUserResponse);
   };
 
   const displayFields = withOnlySelectedFamilyName(getFieldsToDisplay());
-
+  
   // Group fields into sections
   const contactFields = ['mobile', 'phone_type_accessible', 'own_phone_check', 'parent_phone', 'guardian_name', 'guardian_relation'];
   const personalFields = ['firstName', 'middleName', 'lastName', 'dob', 'gender', 'class', 'marital_status', 'state', 'district', 'block', 'village', 'mother_name', 'father_name', 'spouse_name', 'family_member_details', 'enrollmentId'];
+  const hideFields = ['child_pocso_fraud_policy','nda_policy'];
 
   const getSectionFields = (sectionFieldNames: string[]) => {
     return displayFields.filter((field) => sectionFieldNames.includes(field.name));
@@ -743,7 +744,7 @@ console.log('######### updateUserResponse', updateUserResponse);
   const contactSectionFields = getSectionFields(contactFields);
   const personalSectionFields = getSectionFields(personalFields);
   const otherSectionFields = displayFields.filter(
-    (field) => !contactFields.includes(field.name) && !personalFields.includes(field.name)
+    (field) => !contactFields.includes(field.name) && !personalFields.includes(field.name) && !hideFields.includes(field.name)
   );
 
   // Helper to get location fields combined
