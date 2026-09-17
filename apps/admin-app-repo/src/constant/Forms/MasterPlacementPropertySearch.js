@@ -70,7 +70,7 @@ export const MasterPlacementPropertySearchSchema = {
         },
         payload: {
           code: 'subDomain',
-          fetchUrl: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/framework/v1/read/pos-framework`,
+          fetchUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
           findcode: 'subject',
           selectedvalue: ['Career Exploration'],
         },

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { debounce } from 'lodash';
@@ -12,6 +12,7 @@ import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import CenteredLoader from '@/components/CenteredLoader/CenteredLoader';
 import ConfirmationPopup from '@/components/ConfirmationPopup';
 import AddEditPlacementPropertyModal from '@/components/AddEditPlacementPropertyModal';
+import ResetFiltersButton from '@/components/ResetFiltersButton/ResetFiltersButton';
 import { showToastMessage } from '@/components/Toastify';
 import {
   MasterPlacementPropertySearchSchema,
@@ -55,6 +56,7 @@ const PlacementProperty = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editData, setEditData] = useState(null);
   const [statusTarget, setStatusTarget] = useState(null);
+  const formRef = useRef(null);
 
   useEffect(() => {
     if (response?.result?.total !== 0) {
@@ -297,9 +299,17 @@ const PlacementProperty = () => {
           SubmitaFunction={SubmitaFunction}
           isCallSubmitInHandle={true}
           prefilledFormData={prefilledFormData || {}}
+          ref={formRef}
         />
 
         <Box sx={pageActionBarSx}>
+          <ResetFiltersButton
+            searchStoreKey="placementProperty"
+            formRef={formRef}
+            SubmitaFunction={SubmitaFunction}
+            setPrefilledFormData={setPrefilledFormData}
+            defaultFilter={{}}
+          />
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
