@@ -23,6 +23,12 @@ interface CreateBatchModalProps {
   // more, so this is only available once at least one batch already
   // exists for the Trainer's Domain/Skills.
   centerId: string;
+  // TYPE_OF_CENTER off the Center's own Cohort Details (cohort/search by
+  // the Center's cohortId) — controls which Type of Batch options are
+  // offered, mirroring apps/admin-app-repo/BatchFlow.tsx's own centerType
+  // handling exactly: 'regular' -> only Regular (locked); 'remote' ->
+  // Remote + Hybrid (not locked). Not hardcoded per Trainer/page.
+  centerType: string | null;
   trainerTaxonomy: TrainerAssignedTaxonomy;
   onCreated: () => void;
 }
@@ -40,6 +46,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
   open,
   onClose,
   centerId,
+  centerType,
   trainerTaxonomy,
   onCreated,
 }) => {
@@ -80,6 +87,30 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
     }
   }
 
+  // Type of Batch options, mirroring apps/admin-app-repo/BatchFlow.tsx's
+  // own centerType handling verbatim: 'regular' centers only ever offer
+  // Regular (locked, since there's exactly one option); 'remote' centers
+  // offer Remote + Hybrid (both selectable, not locked). Dynamically
+  // sourced from the Center's own TYPE_OF_CENTER — nothing hardcoded per
+  // Trainer/page. If centerType is unknown/unconfirmed, the form's
+  // original Regular/Remote/Hybrid options are left untouched.
+  if (schema.properties.batch_type) {
+    if (centerType === 'remote') {
+      schema.properties.batch_type.enum = ['remote', 'hybrid'];
+      schema.properties.batch_type.enumNames = ['REMOTE', 'HYBRID'];
+      schema.properties.batch_type.default = 'remote';
+      if (uiSchema.batch_type?.['ui:disabled']) {
+        uiSchema.batch_type = { ...uiSchema.batch_type };
+        delete uiSchema.batch_type['ui:disabled'];
+      }
+    } else if (centerType === 'regular') {
+      schema.properties.batch_type.enum = ['regular'];
+      schema.properties.batch_type.enumNames = ['REGULAR'];
+      schema.properties.batch_type.default = 'regular';
+      uiSchema.batch_type = { ...uiSchema.batch_type, 'ui:disabled': true };
+    }
+  }
+
   // Neither date can be in the past — same formatMinimum/minValue injection
   // BatchFlow.tsx applies, since "today" can't be a static schema value.
   const today = new Date().toISOString().slice(0, 10);
@@ -96,6 +127,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
   const prefilledFormData: Record<string, any> = {};
   if (trainerTaxonomy.domains.length === 1) prefilledFormData.domain = [trainerTaxonomy.domains[0]];
   if (trainerTaxonomy.skills.length === 1) prefilledFormData.skills = [trainerTaxonomy.skills[0]];
+  if (centerType === 'regular') prefilledFormData.batch_type = 'regular';
 
   const handleSubmit = async () => {
     if (saving) return;

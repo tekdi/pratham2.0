@@ -80,3 +80,26 @@ export const getBatchById = async (cohortId: string): Promise<MyTeachingCenterBa
 
   return mapToMyTeachingCenterBatch(batch);
 };
+
+// Fetches the Center's own Cohort Details (by its cohortId, i.e. an
+// existing batch's parentId) and extracts TYPE_OF_CENTER — used to control
+// which Type of Batch options the Create Batch form offers (see
+// CreateBatchModal.tsx). Filter shape confirmed against a real
+// /cohort/search request: a plain cohortId string, not wrapped in an array
+// (unlike getBatchById's own call, which does use an array — the two
+// requests were given as different shapes and each is kept as given).
+export const getCohortTypeOfCenter = async (cohortId: string): Promise<string | null> => {
+  const raw = await searchCohorts({
+    limit: 100,
+    offset: 0,
+    filters: { cohortId },
+  });
+  if (!raw || raw?.isAxiosError || raw instanceof Error) return null;
+  const cohort = raw?.results?.cohortDetails?.[0];
+  const selected = findField(cohort, 'TYPE_OF_CENTER')?.selectedValues?.[0];
+  // selectedValues[0] is an object ({id,value,label,order}) for this field,
+  // confirmed against a real response — but fall back to a plain string
+  // just in case, matching the defensive shape-handling already used
+  // elsewhere in this file for fields that vary between the two shapes.
+  return (typeof selected === 'string' ? selected : selected?.value) ?? null;
+};

@@ -15,7 +15,7 @@ import { TENANT_DATA } from '../../utils/app.config';
 import { getLoggedInUserRole } from '../../utils/helper';
 import { YOUTHNET_USER_ROLE } from '../../components/youthNet/tempConfigs';
 import { getTrainerTaxonomy } from '../../services/myTeachingCenter/TrainerTaxonomyService';
-import { getMyTeachingCenterBatches } from '../../services/myTeachingCenter/BatchListService';
+import { getMyTeachingCenterBatches, getCohortTypeOfCenter } from '../../services/myTeachingCenter/BatchListService';
 import BatchList from '../../components/myTeachingCenter/BatchList';
 import CreateBatchModal from '../../components/myTeachingCenter/CreateBatchModal';
 import { MyTeachingCenterBatch, TrainerAssignedTaxonomy } from '../../utils/Interfaces';
@@ -38,6 +38,10 @@ const MyTeachingCenterPage = () => {
 
   const [taxonomy, setTaxonomy] = useState<TrainerAssignedTaxonomy>({ domains: [], skills: [] });
   const [batches, setBatches] = useState<MyTeachingCenterBatch[] | null>(null);
+  // TYPE_OF_CENTER off the Center's own Cohort Details (fetched once we
+  // know a Center id from an existing matching batch) — controls which
+  // Type of Batch options CreateBatchModal offers.
+  const [centerType, setCenterType] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -52,6 +56,8 @@ const MyTeachingCenterPage = () => {
       setTaxonomy(trainerTaxonomy);
       const list = await getMyTeachingCenterBatches(trainerTaxonomy.domains, trainerTaxonomy.skills);
       setBatches(list);
+      const firstCenterId = list[0]?.centerId;
+      setCenterType(firstCenterId ? await getCohortTypeOfCenter(firstCenterId) : null);
     } catch (error) {
       console.error('Error loading My Teaching Center batches:', error);
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
@@ -173,6 +179,7 @@ const MyTeachingCenterPage = () => {
           open={createOpen}
           onClose={() => setCreateOpen(false)}
           centerId={centerId}
+          centerType={centerType}
           trainerTaxonomy={taxonomy}
           onCreated={loadBatches}
         />
