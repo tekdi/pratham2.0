@@ -397,11 +397,13 @@ export interface TrainerAssignedTaxonomy {
 export interface MyTeachingCenterBatch {
   cohortId: string;
   name: string;
-  // Raw parentId off the batch record — there's no dedicated "Center"
-  // lookup anymore (see BatchListService.ts), so no resolved name is
-  // available, only the id (reused as cohort/create's parentId when
-  // creating a new batch under the same Center).
+  // Raw parentId off the batch record (reused as cohort/create's parentId
+  // when creating a new batch under the same Center). centerName is a
+  // separate lookup (BatchListService.getCenterName) — not filled in by
+  // the batch mapping itself, only where a caller (Batch Details page)
+  // fetches and merges it in.
   centerId?: string;
+  centerName?: string;
   domain: string;
   skill: string;
   startDate?: string;

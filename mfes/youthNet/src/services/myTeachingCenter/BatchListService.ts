@@ -81,25 +81,38 @@ export const getBatchById = async (cohortId: string): Promise<MyTeachingCenterBa
   return mapToMyTeachingCenterBatch(batch);
 };
 
-// Fetches the Center's own Cohort Details (by its cohortId, i.e. an
-// existing batch's parentId) and extracts TYPE_OF_CENTER — used to control
-// which Type of Batch options the Create Batch form offers (see
-// CreateBatchModal.tsx). Filter shape confirmed against a real
-// /cohort/search request: a plain cohortId string, not wrapped in an array
-// (unlike getBatchById's own call, which does use an array — the two
-// requests were given as different shapes and each is kept as given).
-export const getCohortTypeOfCenter = async (cohortId: string): Promise<string | null> => {
+// Fetches a Cohort's own Cohort Details record by its cohortId — used for
+// the Center (an existing batch's parentId), never a BATCH itself (that's
+// getBatchById above). Filter shape confirmed against a real /cohort/search
+// request: a plain cohortId string, not wrapped in an array (unlike
+// getBatchById's own call, which does use an array — the two requests were
+// given as different shapes and each is kept as given).
+const getCohortDetails = async (cohortId: string): Promise<any | null> => {
   const raw = await searchCohorts({
     limit: 100,
     offset: 0,
     filters: { cohortId },
   });
   if (!raw || raw?.isAxiosError || raw instanceof Error) return null;
-  const cohort = raw?.results?.cohortDetails?.[0];
+  return raw?.results?.cohortDetails?.[0] ?? null;
+};
+
+// Extracts TYPE_OF_CENTER off the Center's Cohort Details — used to control
+// which Type of Batch options the Create Batch form offers (see
+// CreateBatchModal.tsx).
+export const getCohortTypeOfCenter = async (cohortId: string): Promise<string | null> => {
+  const cohort = await getCohortDetails(cohortId);
   const selected = findField(cohort, 'TYPE_OF_CENTER')?.selectedValues?.[0];
   // selectedValues[0] is an object ({id,value,label,order}) for this field,
   // confirmed against a real response — but fall back to a plain string
   // just in case, matching the defensive shape-handling already used
   // elsewhere in this file for fields that vary between the two shapes.
   return (typeof selected === 'string' ? selected : selected?.value) ?? null;
+};
+
+// The Center's own display name — used by the Batch Details page header
+// (see BatchDetailsHeader.tsx), which shows Center · Domain · Skill.
+export const getCenterName = async (cohortId: string): Promise<string | null> => {
+  const cohort = await getCohortDetails(cohortId);
+  return cohort?.name ?? cohort?.cohortName ?? null;
 };

@@ -31,7 +31,7 @@ const BatchDetailsHeader: React.FC<BatchDetailsHeaderProps> = ({ batch }) => {
         {batch.name}
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-        {[batch.domain, batch.skill].filter(Boolean).join(' · ')}
+        {[batch.centerName, batch.domain, batch.skill].filter(Boolean).join(' · ')}
       </Typography>
 
       <Box display="flex" flexWrap="wrap" alignItems="center" gap={3} sx={{ mt: 1.5 }}>

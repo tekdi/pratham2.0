@@ -10,7 +10,7 @@ import withRole from '../../components/withRole';
 import { TENANT_DATA } from '../../utils/app.config';
 import { getLoggedInUserRole } from '../../utils/helper';
 import { YOUTHNET_USER_ROLE } from '../../components/youthNet/tempConfigs';
-import { getBatchById } from '../../services/myTeachingCenter/BatchListService';
+import { getBatchById, getCenterName } from '../../services/myTeachingCenter/BatchListService';
 import BatchDetailsHeader from '../../components/myTeachingCenter/BatchDetailsHeader';
 import LearnerListTable from '../../components/myTeachingCenter/LearnerListTable';
 import { MyTeachingCenterBatch } from '../../utils/Interfaces';
@@ -30,6 +30,7 @@ const BatchDetailsPage = () => {
   }, []);
 
   const [batch, setBatch] = useState<MyTeachingCenterBatch | null>(null);
+  const [centerName, setCenterName] = useState<string | null>(null);
   const [headerLoaded, setHeaderLoaded] = useState(false);
   // Filled in by LearnerListTable's own fetch (see its onTotalCountChange)
   // instead of a second, duplicate cohortmember/list call here just for a
@@ -40,7 +41,12 @@ const BatchDetailsPage = () => {
     if (!batchId) return;
     const loadBatch = async () => {
       try {
-        setBatch(await getBatchById(batchId));
+        const batchData = await getBatchById(batchId);
+        setBatch(batchData);
+        // Separate Cohort Details call for the Center's own display name
+        // (see BatchListService.getCenterName) — the batch record itself
+        // only carries the Center's id (parentId), not its name.
+        setCenterName(batchData?.centerId ? await getCenterName(batchData.centerId) : null);
       } catch (error) {
         // Non-fatal: the Learner List only needs batchId from the URL, so
         // a failed header fetch still lets the page show the table rather
@@ -68,14 +74,14 @@ const BatchDetailsPage = () => {
         />
       </Box>
 
-      <Box sx={{ px: 2 }}>
+      <Box sx={{ px: 2, mb: 5 }}>
         {!batchId ? null : !headerLoaded ? (
           <Box display="flex" flexDirection="column" alignItems="center" sx={{ py: 4 }}>
             <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
           </Box>
         ) : (
           <>
-            {batch && <BatchDetailsHeader batch={{ ...batch, learnerCount }} />}
+            {batch && <BatchDetailsHeader batch={{ ...batch, centerName: centerName ?? undefined, learnerCount }} />}
             <LearnerListTable batchCohortId={batchId} onTotalCountChange={setLearnerCount} />
           </>
         )}
