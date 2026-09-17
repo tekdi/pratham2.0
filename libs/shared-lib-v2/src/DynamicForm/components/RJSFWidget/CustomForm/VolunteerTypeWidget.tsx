@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
-import GroupsIcon from '@mui/icons-material/Groups';
+import BusinessIcon from '@mui/icons-material/Business';
 import InfoIcon from '@mui/icons-material/Info';
 import { useTranslation } from 'libs/shared-lib-v2/src/lib/context/LanguageContext';
 
@@ -34,18 +34,18 @@ const VolunteerTypeWidget = ({
   // Default options if not provided
   const defaultOptions = [
     {
-      label: 'INDIVIDUAL_VOLUNTEER',
+      label: 'No',
       value: 'individual_volunteer',
       description: 'INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION',
       helpText: 'INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT',
       icon: PersonIcon,
     },
     {
-      label: 'INDIVIDUAL_VOLUNTEER_THROUGH_AN_ORGANISATION',
+      label: 'Yes',
       value: 'individual_volunteer_through_an_organisation',
       description: 'INDIVIDUAL_VOLUNTEER_THROUGH_ORGANISATION_DESCRIPTION',
       helpText: 'INDIVIDUAL_VOLUNTEER_THROUGH_ORGANISATION_HELP_TEXT',
-      icon: GroupsIcon,
+      icon: BusinessIcon,
     },
   ];
 
@@ -129,15 +129,72 @@ const VolunteerTypeWidget = ({
           clip: 'rect(0, 0, 0, 0)',
           overflow: 'hidden',
           marginLeft: 100,
-          marginTop: 65,
+          marginTop: 205,
         }}
         aria-hidden="true"
       />
 
+      {(() => {
+        const parseLS = (key: string) => {
+          try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+        };
+        const stateVal   = parseLS('onboarding_state');
+        const districtVal = parseLS('onboarding_district');
+        const blockVal   = parseLS('onboarding_block');
+        const villageVal = parseLS('onboarding_village');
+        const fields = [
+          { labelKey: 'STATE',    val: stateVal },
+          { labelKey: 'DISTRICT', val: districtVal },
+          { labelKey: 'BLOCK',    val: blockVal },
+          // { labelKey: 'VILLAGE',  val: villageVal },
+        ].filter(f => f.val?.value);
+        if (!fields.length) return null;
+        return (
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                mb: 2,
+                border: '1px solid #e0e0e0',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}
+            >
+              {fields.map(({ labelKey, val }, index) => (
+                <Box
+                  key={labelKey}
+                  sx={{
+                    flex: 1,
+                    px: 2,
+                    py: 1.5,
+                    borderRight: index < fields.length - 1 ? '1px solid #e0e0e0' : 'none',
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: '#757575', display: 'block', mb: 0.5 }}>
+                    {t(labelKey, { defaultValue: labelKey })}
+                  </Typography>
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#212121' }}>
+                    {val.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+            <Typography
+              variant="body1"
+              sx={{ fontWeight: 600, color: '#212121', mb: 2 }}
+            >
+              {t('ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION', { defaultValue: 'Are you associated with a partner organisation?' })}
+            </Typography>
+          </>
+        );
+      })()}
+
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           gap: 2,
         }}
       >
@@ -150,6 +207,7 @@ const VolunteerTypeWidget = ({
               key={option.value}
               onClick={() => handleOptionClick(option.value)}
               sx={{
+                flex: 1,
                 border: selected
                   ? '2px solid #ff9800'
                   : '1px solid #e0e0e0',

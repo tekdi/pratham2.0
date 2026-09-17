@@ -29,11 +29,13 @@ const RequisitesAccordion: React.FC<RequisitesAccordionProps> = ({
   subTopic,
 }) => {
 
-  const uniqueContent = content.filter(
-    (item, index, self) =>
-      item.type === type &&
-      index === self.findIndex((t) => t.id === item.id)
-  );
+  // Filter by type first, then de-duplicate within that type. De-duplicating
+  // across the whole list would drop content shared between requisite types.
+  const uniqueContent = content
+    .filter((item) => item.type === type)
+    .filter(
+      (item, index, self) => index === self.findIndex((t) => t.id === item.id)
+    );
 
   return (
     <Accordion
