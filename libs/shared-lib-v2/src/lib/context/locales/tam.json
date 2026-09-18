@@ -6,6 +6,11 @@
   "URDU": "உருது",
   "UNIT_NAME": "அலகு பெயர்",
   "TYPE_OF_CENTER": "மையத்தின் வகை",
+  "PREMISE_TYPE": "வளாக வகை",
+  "PINCODE": "பின்கோடு",
+  "COURSES": "படிப்புகள்",
+  "START_DATE": "தொடக்க தேதி",
+  "END_DATE": "முடிவு தேதி",
   "GOOGLE MAP_LINK": "கூகுள் மேப் இணைப்பு",
   "MY_MAIN_SUBJECTS": "முக்கிய பாடங்கள்",
   "LIFE_SKILLS": "வாழ்க்கை திறன்கள்",
@@ -26,6 +31,8 @@
   "REMOTE": "ரிமோட்",
   "SKILLING_CENTER_IMAGE": "ஸ்கில்லிங் சென்டர் படம்",
   "INDUSTRY": "தொழில்",
+  "DOMAIN": "துறை",
+  "SKILLS": "திறன்கள்",
   "GOOGLE_MAP_LINK": "கூகுள் மேப் லிங்க்",
   "ADDRESS": "முகவரி",
   "DOB": "பிறந்த தேதி",
@@ -317,7 +324,9 @@
       "SUB_DESCRIPTION": "எங்கள் நிபுணரிடமிருந்து தனிப்பயன் வழிகாட்டலைப் பெற உங்கள் ஆர்வத்தை தெரிவிக்கவும்!",
       "INTEREST_BUTTON": "நான் ஆர்வமாக உள்ளேன்",
       "SUBMIT_BUTTON": "சமர்ப்பி",
-      "OKAY_BUTTON": "சரி"
+      "OKAY_BUTTON": "சரி",
+      "CONFIRM_INTEREST_MESSAGE": "அருமை! உங்களை மேம்படுத்த உதவ நாங்கள் ஆர்வமாக உள்ளோம்! நீங்கள் உண்மையிலேயே ஆர்வமாக உள்ளீர்களா?",
+      "CONFIRM_BUTTON": "உறுதிப்படுத்து"
     },
     "LEVEL_UP": {
       "TITLE": "அருமை! உங்களை மேம்படுத்த உதவுவதில் நாங்கள் உற்சாகமாக உள்ளோம்!",
@@ -993,7 +1002,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "நான் தனியாக தன்னார்வமாக செயல்படுகிறேன்",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "நீங்கள் தனிப்பட்ட முறையில் தன்னார்வமாக செயல்படுகிறீர்கள் என்றால் இந்த விருப்பத்தைத் தேர்வு செய்க.",
     "NO_ACTIVE_COHORTS_FOUND": "செயலில் உள்ள cohort-கள் எதுவும் கிடைக்கவில்லை",
-    "ORGANISATION_TYPE": "நிறுவனத்தின் வகை"
+    "ORGANISATION_TYPE": "நிறுவனத்தின் வகை",
+    "RENTED": "வாடகைக்கு",
+    "OWNED": "சொந்தமானது",
+    "GOVERNMENT": "அரசு",
+    "VIRTUAL": "மெய்நிகர்",
+    "EXTENSION_CENTER": "விரிவாக்க மையம்"
   },
   "ORGANISATION_NAME": "நிறுவனத்தின் பெயர்",
   "FORM_ERROR_MESSAGES": {
@@ -1011,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "எண்கள் மற்றும் சிறப்பு எழுத்துகள் அனுமதிக்கப்படாது",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "எழுத்துகள் மற்றும் சிறப்பு எழுத்துகள் அனுமதிக்கப்படாது",
     "NAME_CANNOT_INCLUDE_DIGITS": "பெயரில் எண்கள் இருக்கக்கூடாது",
+    "DATE_CANNOT_BE_IN_PAST": "தயவுசெய்து இன்றைய அல்லது எதிர்கால தேதியைத் தேர்ந்தெடுக்கவும்.",
+    "END_DATE_AFTER_START_DATE": "தொடக்க தேதிக்குப் பிறகான முடிவு தேதியைத் தேர்ந்தெடுக்கவும்.",
     "INVALID_EMAIL_FORMAT": "தவறான மின்னஞ்சல் வடிவம்",
     "ENTER_VALID_EMAIL": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்",
     "ENTER_VALID_MOBILE_NUMBER": "சரியான கைபேசி எண்ணை உள்ளிடவும்",

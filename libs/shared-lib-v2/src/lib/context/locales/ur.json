@@ -6,6 +6,11 @@
   "URDU": "اردو",
   "UNIT_NAME": "یونٹ کا نام",
   "TYPE_OF_CENTER": "مرکز کی قسم",
+  "PREMISE_TYPE": "احاطے کی قسم",
+  "PINCODE": "پن کوڈ",
+  "COURSES": "کورسز",
+  "START_DATE": "شروع ہونے کی تاریخ",
+  "END_DATE": "ختم ہونے کی تاریخ",
   "GOOGLE MAP_LINK": "گوگل میپ لنک",
   "MY_MAIN_SUBJECTS": "اہم مضامین",
   "LIFE_SKILLS": "زندگی کی مہارتیں",
@@ -26,6 +31,8 @@
   "REMOTE": "ریموٹ",
   "SKILLING_CENTER_IMAGE": "اسکلنگ سینٹر کی تصویر",
   "INDUSTRY": "صنعت",
+  "DOMAIN": "ڈومین",
+  "SKILLS": "مہارتیں",
   "GOOGLE_MAP_LINK": "گوگل میپ لنک",
   "ADDRESS": "پتہ",
   "DOB": "تاریخ پیدائش",
@@ -317,7 +324,9 @@
       "SUB_DESCRIPTION": "ہمارے ماہر سے ذاتی رہنمائی حاصل کرنے کے لیے اپنی دلچسپی دکھائیں!",
       "INTEREST_BUTTON": "مجھے دلچسپی ہے۔",
       "SUBMIT_BUTTON": "جمع کروائیں۔",
-      "OKAY_BUTTON": "ٹھیک ہے۔"
+      "OKAY_BUTTON": "ٹھیک ہے۔",
+      "CONFIRM_INTEREST_MESSAGE": "زبردست! ہم آپ کو لیول اپ کرنے میں مدد کرنے کے لیے پرجوش ہیں! کیا آپ واقعی دلچسپی رکھتے ہیں؟",
+      "CONFIRM_BUTTON": "تصدیق کریں"
     },
     "LEVEL_UP": {
       "TITLE": "بہت اچھا! ہم آپ کی مدد کرنے کے لیے پرجوش ہیں!",
@@ -993,7 +1002,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "میں اپنے طور پر والنٹیر کا کام کر رہا ہوں۔",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "اگر آپ آزادانہ طور پر والنٹیر کی خدمات انجام دے رہے ہیں تو اس اختیار کو منتخب کریں۔",
     "NO_ACTIVE_COHORTS_FOUND": "کوئی فعال گروہ نہیں ملا",
-    "ORGANISATION_TYPE": "تنظیم کی قسم"
+    "ORGANISATION_TYPE": "تنظیم کی قسم",
+    "RENTED": "کرائے پر",
+    "OWNED": "ملکیت",
+    "GOVERNMENT": "سرکاری",
+    "VIRTUAL": "ورچوئل",
+    "EXTENSION_CENTER": "توسیعی مرکز"
   },
   "ORGANISATION_NAME": "ادارے کا نام",
   "FORM_ERROR_MESSAGES": {
@@ -1011,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "نمبرز اور خصوصی حروف کی اجازت نہیں ہے۔",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "حروف اور خصوصی حروف کی اجازت نہیں ہے۔",
     "NAME_CANNOT_INCLUDE_DIGITS": "نام میں ہندسے شامل نہیں ہو سکتے",
+    "DATE_CANNOT_BE_IN_PAST": "براہ کرم آج کی یا مستقبل کی تاریخ منتخب کریں۔",
+    "END_DATE_AFTER_START_DATE": "براہ کرم شروع ہونے کی تاریخ کے بعد کی ختم ہونے کی تاریخ منتخب کریں۔",
     "INVALID_EMAIL_FORMAT": "غلط ای میل فارمیٹ",
     "ENTER_VALID_EMAIL": "ایک درست ای میل ایڈریس درج کریں۔",
     "ENTER_VALID_MOBILE_NUMBER": "ایک درست موبائل نمبر درج کریں۔",

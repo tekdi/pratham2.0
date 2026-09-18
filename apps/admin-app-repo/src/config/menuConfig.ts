@@ -184,6 +184,11 @@ export const MENU_CONFIG = {
           link: '/user-mobilizer',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
         },
+        {
+          title: 'SIDEBAR.PLACEMENT_RETENTION_COORDINATOR',
+          link: '/user-placement-retention-coordinator',
+          roles: [Role.CENTRAL_ADMIN],
+        },
       ],
     },
     master: {
@@ -214,6 +219,11 @@ export const MENU_CONFIG = {
           title: 'SIDEBAR.VILLAGES',
           link: '/village',
           roles: [Role.ADMIN, Role.CENTRAL_ADMIN],
+        },
+        {
+          title: 'SIDEBAR.PLACEMENT_PROPERTY',
+          link: '/placement-property',
+          roles: [Role.CENTRAL_ADMIN],
         },
       ],
     },

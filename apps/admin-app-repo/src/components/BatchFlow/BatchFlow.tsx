@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status } from '@/utils/app.constant';
+import { CohortTypes, Status, TenantName } from '@/utils/app.constant';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
@@ -22,6 +22,7 @@ import {
   BatchSearchSchema,
   BatchSearchUISchema,
 } from '@/constant/Forms/BatchSearchNew';
+import { L2BatchCreate } from '@/constant/Forms/L2BatchCreate';
 import {
   BatchCreateSchema,
   BatchCreateUISchema,
@@ -49,6 +50,8 @@ interface BatchFlowProps {
   centerBoards?: string[];
   centerMediums?: string[];
   centerGrades?: string[];
+  centerIndustries?: string[];
+  centerSkills?: string[];
   centerType?: string | null;
 }
 
@@ -57,6 +60,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   centerBoards = [],
   centerMediums = [],
   centerGrades = [],
+  centerIndustries = [],
+  centerSkills = [],
   centerType = null,
 }) => {
   const theme = useTheme<any>();
@@ -81,6 +86,11 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   const [firstName, setFirstName] = useState('');
   const [totalCount, setTotalCount] = useState(0);
 
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
+
   const { t } = useTranslation();
   const initialFormData =
     typeof window !== 'undefined' && localStorage.getItem('stateId')
@@ -104,13 +114,29 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
 
   const buildSchemaAndUi = (
     isEditMode: boolean,
-    existingValues?: { board?: string[]; medium?: string[]; grade?: string[] }
+    existingValues?: {
+      board?: string[];
+      medium?: string[];
+      grade?: string[];
+      domain?: string[];
+      skills?: string[];
+    }
   ) => {
-    let alterSchema = JSON.parse(JSON.stringify(BatchCreateSchema));
-    let alterUiSchema = JSON.parse(JSON.stringify(BatchCreateUISchema));
+    // Vocational Training centers use the L2 batch form (domain/skills/
+    // dates); every other program keeps the original SCP board/medium/grade form.
+    const useL2Form = storedProgram === TenantName.YOUTHNET;
+    let alterSchema = JSON.parse(
+      JSON.stringify(useL2Form ? L2BatchCreate.schema : BatchCreateSchema)
+    );
+    let alterUiSchema = JSON.parse(
+      JSON.stringify(useL2Form ? L2BatchCreate.uiSchema : BatchCreateUISchema)
+    );
 
     let requiredArray = alterSchema?.required || [];
-    const mustRequired = ['name', 'board', 'medium', 'grade'];
+    // Only force fields that actually exist on this form's schema.
+    const mustRequired = ['name', 'board', 'medium', 'grade'].filter(
+      (key) => alterSchema?.properties?.[key]
+    );
     mustRequired.forEach((item) => {
       if (!requiredArray.includes(item)) {
         requiredArray.push(item);
@@ -129,7 +155,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     }
 
     const overrideEnum = (
-      fieldKey: 'board' | 'medium' | 'grade',
+      fieldKey: 'board' | 'medium' | 'grade' | 'domain' | 'skills',
       centerVals: string[]
     ) => {
       if (alterSchema?.properties?.[fieldKey]) {
@@ -151,6 +177,30 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     overrideEnum('board', centerBoards);
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
+
+    if (useL2Form) {
+      // Domain/skills options come only from what's already configured on
+      // the center — no framework API call for this form.
+      overrideEnum('domain', centerIndustries);
+      overrideEnum('skills', centerSkills);
+    }
+
+    // Neither startdate nor enddate can be in the past. "Today" can't live
+    // as a static value in the schema file since it changes daily, so it's
+    // injected here (formatMinimum for AJV validation on submit, ui:options
+    // minValue to also block past dates in the date picker itself).
+    const today = new Date().toISOString().slice(0, 10);
+    ['startdate', 'enddate'].forEach((key) => {
+      if (alterSchema?.properties?.[key]) {
+        alterSchema.properties[key].formatMinimum = today;
+      }
+      if (alterUiSchema?.[key]) {
+        alterUiSchema[key]['ui:options'] = {
+          ...alterUiSchema[key]['ui:options'],
+          minValue: today,
+        };
+      }
+    });
 
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {
@@ -183,6 +233,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       if (centerGrades?.length === 1 && alterUiSchema?.grade) {
         alterUiSchema.grade['ui:disabled'] = true;
       }
+      if (centerIndustries?.length === 1 && alterUiSchema?.domain) {
+        alterUiSchema.domain['ui:disabled'] = true;
+      }
+      if (centerSkills?.length === 1 && alterUiSchema?.skills) {
+        alterUiSchema.skills['ui:disabled'] = true;
+      }
     } else {
       if (alterUiSchema?.board?.['ui:disabled'])
         delete alterUiSchema.board['ui:disabled'];
@@ -190,6 +246,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         delete alterUiSchema.medium['ui:disabled'];
       if (alterUiSchema?.grade?.['ui:disabled'])
         delete alterUiSchema.grade['ui:disabled'];
+      if (alterUiSchema?.domain?.['ui:disabled'])
+        delete alterUiSchema.domain['ui:disabled'];
+      if (alterUiSchema?.skills?.['ui:disabled'])
+        delete alterUiSchema.skills['ui:disabled'];
     }
 
     setAddSchema(alterSchema);
@@ -313,36 +373,76 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       label: 'Center',
       render: (row) => <CenterLabel parentId={row?.parentId} />,
     },
-    {
-      key: 'board',
-      label: 'Boards',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'BOARD')
-            ?.selectedValues?.join(', ')
-        ) || '-',
-    },
-    {
-      key: 'medium',
-      label: 'Medium',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'MEDIUM')
-            ?.selectedValues?.join(', ')
-        ) || '-',
-    },
-    {
-      key: 'grade',
-      label: 'Grade',
-      render: (row) =>
-        transformLabel(
-          row.customFields
-            .find((field) => field.label === 'GRADE')
-            ?.selectedValues?.join(', ')
-        ) || '-',
-    },
+    // Vocational Training batches carry domain/skills instead of board/medium/grade.
+    ...(storedProgram === TenantName.YOUTHNET
+      ? [
+          {
+            key: 'domain',
+            label: 'Domain',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'DOMAIN')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+          {
+            key: 'skills',
+            label: 'Skills',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'SKILLS')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+          {
+            key: 'startdate',
+            label: 'Start Date',
+            render: (row) =>
+              row.customFields.find((field) => field.label === 'START_DATE')
+                ?.selectedValues?.[0] || '-',
+          },
+          {
+            key: 'enddate',
+            label: 'End Date',
+            render: (row) =>
+              row.customFields.find((field) => field.label === 'END_DATE')
+                ?.selectedValues?.[0] || '-',
+          },
+        ]
+      : [
+          {
+            key: 'board',
+            label: 'Boards',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'BOARD')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+          {
+            key: 'medium',
+            label: 'Medium',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'MEDIUM')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+          {
+            key: 'grade',
+            label: 'Grade',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'GRADE')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+        ]),
     {
       key: 'status',
       label: 'Status',
@@ -376,6 +476,13 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
               ?.selectedValues || [],
           grade:
             row?.customFields?.find((f: any) => f.label === 'GRADE')
+              ?.selectedValues || [],
+          domain:
+            row?.customFields?.find(
+              (f: any) => f.label === 'INDUSTRY' || f.label === 'DOMAIN'
+            )?.selectedValues || [],
+          skills:
+            row?.customFields?.find((f: any) => f.label === 'SKILLS')
               ?.selectedValues || [],
         };
         buildSchemaAndUi(true, existingValues);
@@ -494,6 +601,10 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
                   prefillWithBMGS.medium = [centerMediums[0]];
                 if (centerGrades?.length === 1)
                   prefillWithBMGS.grade = [centerGrades[0]];
+                if (centerIndustries?.length === 1)
+                  prefillWithBMGS.domain = [centerIndustries[0]];
+                if (centerSkills?.length === 1)
+                  prefillWithBMGS.skills = [centerSkills[0]];
 
                 // Prefill batch_type for remote center
                 if (centerType === 'remote') {

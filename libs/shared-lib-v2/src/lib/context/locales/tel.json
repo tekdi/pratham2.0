@@ -6,6 +6,11 @@
   "URDU": "ఉర్దూ",
   "UNIT_NAME": "యూనిట్ పేరు",
   "TYPE_OF_CENTER": "కేంద్రం రకం",
+  "PREMISE_TYPE": "ఆవరణ రకం",
+  "PINCODE": "పిన్‌కోడ్",
+  "COURSES": "కోర్సులు",
+  "START_DATE": "ప్రారంభ తేదీ",
+  "END_DATE": "ముగింపు తేదీ",
   "GOOGLE MAP_LINK": "గూగుల్ మ్యాప్ లింక్",
   "MY_MAIN_SUBJECTS": "ప్రధాన అంశాలు",
   "LIFE_SKILLS": "లైఫ్ స్కిల్స్",
@@ -26,6 +31,8 @@
   "REMOTE": "రిమోట్",
   "SKILLING_CENTER_IMAGE": "వృత్తి నైపుణ్యాల  చిత్రం",
   "INDUSTRY": "పరిశ్రమ",
+  "DOMAIN": "డొమైన్",
+  "SKILLS": "నైపుణ్యాలు",
   "GOOGLE_MAP_LINK": "గూగుల్ మ్యాప్ లింక్",
   "ADDRESS": "చిరునామా",
   "DOB": "పుట్టిన తేదీ",
@@ -317,7 +324,9 @@
       "SUB_DESCRIPTION": "మా నిపుణుడి నుండి వ్యక్తిగత మార్గదర్శనం పొందడానికి మీ ఆసక్తిని చూపించండి!",
       "INTEREST_BUTTON": "నాకు ఆసక్తి ఉంది",
       "SUBMIT_BUTTON": "సమర్పించు",
-      "OKAY_BUTTON": "సరే"
+      "OKAY_BUTTON": "సరే",
+      "CONFIRM_INTEREST_MESSAGE": "అద్భుతం! మిమ్మల్ని లెవెల్ అప్ చేయడంలో సహాయపడటానికి మేము ఉత్సాహంగా ఉన్నాము! మీకు నిజంగా ఆసక్తి ఉందా?",
+      "CONFIRM_BUTTON": "నిర్ధారించండి"
     },
     "LEVEL_UP": {
       "TITLE": "గొప్ప! మీకు లెవల్ అప్ చేయడానికి మేము సంతోషిస్తున్నాము!",
@@ -993,7 +1002,12 @@
     "INDIVIDUAL_VOLUNTEER_ALONE_DESCRIPTION": "నేను స్వచ్ఛందంగా సేవ చేస్తున్నాను",
     "INDIVIDUAL_VOLUNTEER_ALONE_HELP_TEXT": "మీరు స్వతంత్రంగా స్వచ్ఛంద సేవ చేస్తుంటే ఈ ఎంపికను ఎంచుకోండి.",
     "NO_ACTIVE_COHORTS_FOUND": "యాక్టివ్ కోహోర్ట్‌లు ఏవీ కనుగొనబడలేదు",
-    "ORGANISATION_TYPE": "సంస్థ రకం"
+    "ORGANISATION_TYPE": "సంస్థ రకం",
+    "RENTED": "అద్దెకు",
+    "OWNED": "సొంతం",
+    "GOVERNMENT": "ప్రభుత్వ",
+    "VIRTUAL": "వర్చువల్",
+    "EXTENSION_CENTER": "విస్తరణ కేంద్రం"
   },
   "ORGANISATION_NAME": "సంస్థ పేరు",
   "FORM_ERROR_MESSAGES": {
@@ -1011,6 +1025,8 @@
     "NUMBER_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "అంకెలు మరియు ప్రత్యేక అక్షరాలు అనుమతించబడవు.",
     "CHARACTERS_AND_SPECIAL_CHARACTERS_NOT_ALLOWED": "అక్షరాలు మరియు ప్రత్యేక అక్షరాలు అనుమతించబడవు.",
     "NAME_CANNOT_INCLUDE_DIGITS": "పేరులో అంకెలు ఉండకూడదు.",
+    "DATE_CANNOT_BE_IN_PAST": "దయచేసి ఈరోజు లేదా భవిష్యత్ తేదీని ఎంచుకోండి.",
+    "END_DATE_AFTER_START_DATE": "దయచేసి ప్రారంభ తేదీ తర్వాత ముగింపు తేదీని ఎంచుకోండి.",
     "INVALID_EMAIL_FORMAT": "చెల్లని ఇమెయిల్ ఫార్మాట్‌",
     "ENTER_VALID_EMAIL": "చెల్లుబాటు అయ్యే ఇమెయిల్ చిరునామాను నమోదు చేయండి.",
     "ENTER_VALID_MOBILE_NUMBER": "చెల్లుబాటు అయ్యే మొబైల్ నంబర్‌ను నమోదు చేయండి",
