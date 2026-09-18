@@ -6,32 +6,38 @@ const findField = (row: any, label: string) =>
 export const getLearnerDomain = (row: any): string | null =>
   findField(row, 'DOMAIN')?.selectedValues?.[0] ?? null;
 
-export const getLearnerCourseId = (row: any): string | null =>
-  findField(row, 'COURSES')?.selectedValues?.[0] ?? null;
+// 'SKILLS' label confirmed against real API responses on a person profile
+// (see services/myTeachingCenter/myTeachingCenter.config.ts's
+// BATCH_SKILLS_LABEL) — same fieldId/label pair as L2BatchCreate.ts's own
+// `skills` field. Its selectedValues[0] is already the plain, human-readable
+// skill name (unlike the old Course field, which stored a content id
+// needing a separate name lookup) — no name-resolution step needed here.
+export const getLearnerSkill = (row: any): string | null =>
+  findField(row, 'SKILLS')?.selectedValues?.[0] ?? null;
 
 export const getLearnerNote = (row: any): string =>
   findField(row, 'INTERACTION_NOTE')?.selectedValues?.[0] ?? '';
 
 export const getLearnerTaggedByUserId = (row: any): string | null =>
-  findField(row, 'DOMAIN')?.updatedBy ?? findField(row, 'COURSES')?.updatedBy ?? null;
+  findField(row, 'DOMAIN')?.updatedBy ?? findField(row, 'SKILLS')?.updatedBy ?? null;
 
 export const getLearnerInterestedAt = (row: any): string | null =>
   findField(row, 'L2_INTERESTED')?.createdAt ?? row?.createdAt ?? null;
 
 export const isLearnerTagged = (row: any): boolean =>
-  !!getLearnerDomain(row) && !!getLearnerCourseId(row);
+  !!getLearnerDomain(row) && !!getLearnerSkill(row);
 
 export const getLearnerLocationValue = (row: any, label: string): string =>
   findField(row, label)?.selectedValues?.[0]?.value ?? '-';
 
 export const buildTagCustomFields = (
   domain: string,
-  courseId: string,
+  skill: string,
   note?: string
 ) => {
   const customFields = [
     { fieldId: L2_FIELD_IDS.DOMAIN, value: domain },
-    { fieldId: L2_FIELD_IDS.COURSES, value: courseId },
+    { fieldId: L2_FIELD_IDS.SKILLS, value: skill },
   ];
   if (note) {
     customFields.push({ fieldId: L2_FIELD_IDS.INTERACTION_NOTE, value: note });

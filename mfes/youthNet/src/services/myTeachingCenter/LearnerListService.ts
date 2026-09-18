@@ -6,11 +6,12 @@ import { UpdateCohortMemberStatusParams, LearnerProgressStatus } from '../../uti
 import { ALL_LEARNER_STATUSES, OJT_ADDRESS_FIELD_ID } from './myTeachingCenter.config';
 
 // cohortmember/list returns each learner's dynamic fields as `customField`
-// (singular) with a plain {label, value} shape — confirmed against
-// scp-teacher-repo's CohortLearnerList.tsx / CohortFacilitatorList.tsx
-// (`user.customField.find(...)`, reading `.value`). This is a different
-// shape from the {label, selectedValues} customFields used on
-// cohort/mycohorts and cohort/search nodes — do not conflate the two.
+// (singular key name), but the actual value lives at `.selectedValues[0]`
+// — confirmed against a real response; there is no plain `.value` property
+// on these entries at all (an earlier, wrong assumption modeled on
+// scp-teacher-repo's own `user.customField` reads). This is the same
+// {label, selectedValues} shape cohort/mycohorts and cohort/search nodes
+// use, just under the singular key `customField` instead of `customFields`.
 const findLearnerCustomFieldById = (user: any, fieldId: string) =>
   user?.customField?.find((field: any) => field.fieldId === fieldId);
 
@@ -21,10 +22,23 @@ const findLearnerCustomFieldById = (user: any, fieldId: string) =>
 export const getLearnerStatus = (user: any): LearnerProgressStatus | null =>
   (user?.status as LearnerProgressStatus) ?? null;
 
-// Matched by fieldId (confirmed real), not label — the label was never
-// confirmed against the backend, fieldId is.
-export const getOjtAddress = (user: any): string =>
-  findLearnerCustomFieldById(user, OJT_ADDRESS_FIELD_ID)?.value ?? '';
+// A saved OJT Address value round-trips through the backend as a
+// JSON-encoded string (confirmed against a real response: saving the
+// plain text "This is OJT Address" comes back as the string
+// `"\"This is OJT Address\""` — i.e. selectedValues[0] is itself the
+// JSON.stringify() of the original text). Parse it back to plain text for
+// display/prefill; fall back to the raw value untouched if it isn't
+// actually JSON (e.g. a value saved before this was understood).
+export const getOjtAddress = (user: any): string => {
+  const raw = findLearnerCustomFieldById(user, OJT_ADDRESS_FIELD_ID)?.selectedValues?.[0];
+  if (typeof raw !== 'string' || raw === '') return raw ?? '';
+  try {
+    const parsed = JSON.parse(raw);
+    return typeof parsed === 'string' ? parsed : raw;
+  } catch {
+    return raw;
+  }
+};
 
 export const getLearnerDisplayName = (user: any): string => {
   const first = user?.firstName || user?.name || '';

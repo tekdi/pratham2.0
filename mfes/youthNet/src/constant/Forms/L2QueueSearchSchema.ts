@@ -157,46 +157,36 @@ export const L2QueueSearchSchema = {
       isMultiSelect: true,
       maxSelection: 1,
     },
-    taggedCourse: {
+    taggedSkill: {
       type: 'array',
-      title: 'Tagged Course',
+      title: 'Tagged Skill',
       items: {
         type: 'string',
         enum: ['Select'],
         enumNames: ['Select'],
       },
-      // Placeholder endpoint — modeled on the existing composite-search
-      // convention (same one admin-app-repo's getCourseName() and this mfe's
-      // AssesmentService use), filtering by domain instead of identifier.
+      // Same confirmed get-framework contract as L2QueueAssignSchema's
+      // `skill` field (see its comment for the Domain/pos-framework caveat).
+      // Also fixes a pre-existing bug: this was `dependent: 'domain'`, but
+      // no `domain` field exists in this schema (only `taggedDomain`) — the
+      // cascade could never have fired.
       api: {
-        url: `${baseurl}/action/composite/v3/search`,
-        header: {
-          tenantId: '**',
-          Authorization: '**',
-          academicyearid: '**',
-        },
+        url: `/api/dynamic-form/get-framework`,
         method: 'POST',
         options: {
-          label: 'name',
-          value: 'identifier',
-          optionObj: 'result.content',
+          label: 'label',
+          value: 'value',
+          optionObj: 'options',
         },
         payload: {
-          request: {
-            fields: ['name'],
-            filters: {
-              status: ['live'],
-              channel: 'pos-channel',
-              program: 'Vocational Training',
-              se_domains: ['Learning for work'],
-              se_subjects: '**',
-              se_subDomains: ['Career Exploration'],
-              primaryCategory: ['Course'],
-            },
-          },
+          code: 'subject',
+          fetchUrl:
+            'https://dev-middleware.prathamdigital.org/api/framework/v1/read/pos-framework',
+          findcode: 'skills',
+          selectedvalue: '**',
         },
         callType: 'dependent',
-        dependent: 'domain',
+        dependent: 'taggedDomain',
       },
       uniqueItems: true,
       isMultiSelect: true,
@@ -214,7 +204,7 @@ export const L2QueueSearchUISchema = {
     'name',
     'status',
     'taggedDomain',
-    'taggedCourse',
+    'taggedSkill',
   ],
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -243,7 +233,7 @@ export const L2QueueSearchUISchema = {
   taggedDomain: {
     'ui:widget': 'hidden',
   },
-  taggedCourse: {
+  taggedSkill: {
     'ui:widget': 'hidden',
   },
 };

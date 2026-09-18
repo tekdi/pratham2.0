@@ -1,11 +1,20 @@
-// Domain/Course/Note fields used inside the "Review & assign interest"
-// side panel. Same api-driven cascade shape as L2QueueSearchSchema's
-// taggedDomain/taggedCourse fields, just under plain `domain`/`course` keys.
+// Domain/Skill/Note fields used inside the "Review & assign interest" side
+// panel. Same api-driven cascade shape as L2QueueSearchSchema's
+// taggedDomain/taggedSkill fields, just under plain `domain`/`skill` keys.
 // `fieldId` on each property lets extractMatchingKeys() (shared-lib-v2)
 // prefill this schema from an already-tagged learner's customFields.
+//
+// Skill replaces the earlier Course field, and uses the get-framework proxy
+// (same mechanism as `domain` below) with a *confirmed* real contract —
+// matching apps/admin-app-repo's/L2BatchCreate.ts's own Domain+Skills pair
+// exactly: code 'subject', fetchUrl pos-framework, findcode 'skills',
+// dependent on domain via '**' substitution. NOTE: L2BatchCreate.ts's own
+// Domain field also sources from pos-framework (findcode 'subject'), while
+// this Domain field still sources from youthnet-framework (findcode
+// 'stream') — left unchanged since it's the earlier already-verified
+// source. If Skill comes back empty, the two frameworks likely don't share
+// term values and Domain's source needs to switch to pos-framework too.
 import { L2_FIELD_IDS } from '../../services/l2InterestedQueue/l2Queue.config';
-
-const baseurl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL;
 
 export const L2QueueAssignSchema = {
   type: 'object',
@@ -40,41 +49,29 @@ export const L2QueueAssignSchema = {
       isMultiSelect: true,
       maxSelection: 1,
     },
-    course: {
+    skill: {
       type: 'array',
-      title: 'Course',
-      fieldId: L2_FIELD_IDS.COURSES,
+      title: 'Skill',
+      fieldId: L2_FIELD_IDS.SKILLS,
       items: {
         type: 'string',
         enum: ['Select'],
         enumNames: ['Select'],
       },
       api: {
-        url: `${baseurl}/action/composite/v3/search`,
-        header: {
-          tenantId: '**',
-          Authorization: '**',
-          academicyearid: '**',
-        },
+        url: `/api/dynamic-form/get-framework`,
         method: 'POST',
         options: {
-          label: 'name',
-          value: 'identifier',
-          optionObj: 'result.content',
+          label: 'label',
+          value: 'value',
+          optionObj: 'options',
         },
         payload: {
-          request: {
-            fields: ['name'],
-            filters: {
-              status: ['live'],
-              channel: 'pos-channel',
-              program: 'Vocational Training',
-              se_domains: ['Learning for work'],
-              se_subjects: '**',
-              se_subDomains: ['Career Exploration'],
-              primaryCategory: ['Course'],
-            },
-          },
+          code: 'subject',
+          fetchUrl:
+            'https://dev-middleware.prathamdigital.org/api/framework/v1/read/pos-framework',
+          findcode: 'skills',
+          selectedvalue: '**',
         },
         callType: 'dependent',
         dependent: 'domain',
@@ -92,13 +89,13 @@ export const L2QueueAssignSchema = {
 };
 
 export const L2QueueAssignUISchema = {
-  'ui:order': ['domain', 'course', 'note'],
+  'ui:order': ['domain', 'skill', 'note'],
   domain: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': { multiple: true, uniqueItems: true },
     'ui:placeholder': 'Select a domain',
   },
-  course: {
+  skill: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': { multiple: true, uniqueItems: true },
     'ui:placeholder': 'Choose a domain first',

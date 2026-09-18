@@ -29,8 +29,7 @@ interface AllocateToBatchModalProps {
   onClose: () => void;
   learners: any[];
   domain: string;
-  courseId: string;
-  courseName?: string;
+  skill: string;
   onAllocated: () => void;
 }
 
@@ -44,9 +43,9 @@ interface Option {
 // own, and /cohort/search's response needs client-side unwrapping too,
 // neither of which DynamicForm's schema-driven api/dependent mechanism
 // (simple label/value mapping only, no filtering) can express. Batch is
-// scoped to the selected Center + the learner's own Domain/Course.
+// scoped to the selected Center + the learner's own Domain/Skill.
 //
-// filters.domain/filters.courses/filters.parentId on the Batch search are
+// filters.domain/filters.skills/filters.parentId on the Batch search are
 // UNVERIFIED against the real backend — no existing caller in the codebase
 // filters /cohort/search by a customField (only core fields:
 // type/status/parentId/state/district/block). Modeled on the established
@@ -57,8 +56,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
   onClose,
   learners,
   domain,
-  courseId,
-  courseName,
+  skill,
   onAllocated,
 }) => {
   const [centerOptions, setCenterOptions] = useState<Option[] | null>(null);
@@ -113,7 +111,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
         status: ['active'],
         parentId: [centerId],
         domain: [domain],
-        courses: [courseId],
+        skills: [skill],
       },
     });
     if (!raw || raw?.isAxiosError || raw instanceof Error) {
@@ -204,8 +202,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
               Allocate to batch
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {learners.length} learner{learners.length > 1 ? 's' : ''} · course:{' '}
-              {courseName || courseId}
+              {learners.length} learner{learners.length > 1 ? 's' : ''} · skill: {skill}
             </Typography>
           </Box>
           <IconButton size="small" onClick={onClose} aria-label="Close">

@@ -20,13 +20,12 @@ import {
   getUserDetails,
   updateUser,
 } from '../services/youthNet/Dashboard/UserServices';
-import { getCourseNames } from '../services/l2InterestedQueue/getCourseNames';
 import {
   L2_INTERESTED_VALUES,
 } from '../services/l2InterestedQueue/l2Queue.config';
 import {
   getLearnerDomain,
-  getLearnerCourseId,
+  getLearnerSkill,
   getLearnerNote,
   getLearnerTaggedByUserId,
   getLearnerInterestedAt,
@@ -64,7 +63,7 @@ const L2InterestedQueuePage = () => {
   // internal state on first mount (see formUiSchema/formData useState in
   // shared-lib-v2's DynamicForm.tsx) — later prop changes on an already-
   // mounted instance are ignored, which is why toggling the Tagged
-  // Domain/Course widgets and Clear All previously had no visible effect.
+  // Domain/Skill widgets and Clear All previously had no visible effect.
   // Bumping this key forces a full remount so the fresh uiSchema/
   // prefilledFormData are actually picked up, without touching the shared
   // component itself.
@@ -73,7 +72,6 @@ const L2InterestedQueuePage = () => {
   const [response, setResponse] = useState<any>(null);
 
   const [selectedRowsMap, setSelectedRowsMap] = useState<Record<string, any>>({});
-  const [courseNameMap, setCourseNameMap] = useState<Record<string, string>>({});
   const [taggedByNameMap, setTaggedByNameMap] = useState<Record<string, string>>({});
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -84,7 +82,7 @@ const L2InterestedQueuePage = () => {
   const [allocateOpen, setAllocateOpen] = useState(false);
   const [allocateLearners, setAllocateLearners] = useState<any[]>([]);
   const [allocateDomain, setAllocateDomain] = useState('');
-  const [allocateCourseId, setAllocateCourseId] = useState('');
+  const [allocateSkill, setAllocateSkill] = useState('');
 
   const rows: any[] = response?.getUserDetails || [];
 
@@ -116,8 +114,8 @@ const L2InterestedQueuePage = () => {
     if (cleaned.status === 'tagged' && cleaned.taggedDomain?.[0]) {
       filters.domain = cleaned.taggedDomain[0];
     }
-    if (cleaned.status === 'tagged' && cleaned.taggedCourse?.length) {
-      filters.courses = cleaned.taggedCourse;
+    if (cleaned.status === 'tagged' && cleaned.taggedSkill?.length) {
+      filters.skills = cleaned.taggedSkill;
     }
 
     setCurrentPage(newPage);
@@ -148,8 +146,8 @@ const L2InterestedQueuePage = () => {
           ...prev.taggedDomain,
           'ui:widget': wantTagged ? 'AutoCompleteMultiSelectWidget' : 'hidden',
         },
-        taggedCourse: {
-          ...prev.taggedCourse,
+        taggedSkill: {
+          ...prev.taggedSkill,
           'ui:widget': wantTagged ? 'AutoCompleteMultiSelectWidget' : 'hidden',
         },
       }));
@@ -172,25 +170,6 @@ const L2InterestedQueuePage = () => {
     searchData(prefilledFormData, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Resolve course-id -> name for the "Assigned Domain & Course" column.
-  useEffect(() => {
-    const courseIds = Array.from(
-      new Set(rows.map((row) => getLearnerCourseId(row)).filter(Boolean))
-    ) as string[];
-    const idsToResolve = courseIds.filter((id) => !courseNameMap[id]);
-    if (idsToResolve.length === 0) return;
-    getCourseNames(idsToResolve).then((courses) => {
-      const resolved = courses.reduce((acc: Record<string, string>, c) => {
-        acc[c.identifier] = c.name;
-        return acc;
-      }, {});
-      if (Object.keys(resolved).length > 0) {
-        setCourseNameMap((prev) => ({ ...prev, ...resolved }));
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response]);
 
   // Resolve "tagged by" userId -> display name.
   useEffect(() => {
@@ -244,18 +223,18 @@ const L2InterestedQueuePage = () => {
 
   // "Assign to batch" is a quick-path shortcut that skips the drawer — it
   // only makes sense when every selected learner is already tagged with the
-  // exact same Domain+Course, since it reuses the first row's domain/course
+  // exact same Domain+Skill, since it reuses the first row's domain/skill
   // to search batches for the whole selection.
   const canQuickAssignToBatch = useMemo(() => {
     if (selectedRows.length === 0) return false;
     if (selectedRows.some((row: any) => !isLearnerTagged(row))) return false;
     const combos = new Set(
-      selectedRows.map((row: any) => `${getLearnerDomain(row)}::${getLearnerCourseId(row)}`)
+      selectedRows.map((row: any) => `${getLearnerDomain(row)}::${getLearnerSkill(row)}`)
     );
     return combos.size === 1;
   }, [selectedRows]);
 
-  // Review (the drawer) lets you assign/update Domain+Course for the whole
+  // Review (the drawer) lets you assign/update Domain+Skill for the whole
   // selection regardless of each learner's current tagging state — same
   // combo, different combos, or a mix of tagged/untagged all land here once
   // more than one learner is selected. A single selected learner already has
@@ -276,20 +255,20 @@ const L2InterestedQueuePage = () => {
     setDrawerOpen(true);
   };
 
-  const openAllocateModal = (targetLearners: any[], domain: string, courseId: string) => {
+  const openAllocateModal = (targetLearners: any[], domain: string, skill: string) => {
     setAllocateLearners(targetLearners);
     setAllocateDomain(domain);
-    setAllocateCourseId(courseId);
+    setAllocateSkill(skill);
     setAllocateOpen(true);
   };
 
   const handleBulkAssignToBatch = () => {
     if (selectedRows.length === 0) return;
     const first: any = selectedRows[0];
-    openAllocateModal(selectedRows as any[], getLearnerDomain(first) || '', getLearnerCourseId(first) || '');
+    openAllocateModal(selectedRows as any[], getLearnerDomain(first) || '', getLearnerSkill(first) || '');
   };
 
-  const canSaveDrawer = !!assignFormData?.domain?.[0] && !!assignFormData?.course?.[0];
+  const canSaveDrawer = !!assignFormData?.domain?.[0] && !!assignFormData?.skill?.[0];
 
   const handleSaveTagsOnly = async () => {
     if (!canSaveDrawer || saving) return;
@@ -297,7 +276,7 @@ const L2InterestedQueuePage = () => {
     try {
       const customFields = buildTagCustomFields(
         assignFormData.domain[0],
-        assignFormData.course[0],
+        assignFormData.skill[0],
         assignFormData.note
       );
       const results = await Promise.all(
@@ -324,8 +303,8 @@ const L2InterestedQueuePage = () => {
     setSaving(true);
     try {
       const domain = assignFormData.domain[0];
-      const courseId = assignFormData.course[0];
-      const customFields = buildTagCustomFields(domain, courseId, assignFormData.note);
+      const skill = assignFormData.skill[0];
+      const customFields = buildTagCustomFields(domain, skill, assignFormData.note);
       const results = await Promise.all(
         drawerLearners.map((learner) => updateUser(learner.userId, { userData: {}, customFields }))
       );
@@ -335,14 +314,14 @@ const L2InterestedQueuePage = () => {
         return;
       }
       // Tags are saved — refresh the list right away so it reflects the new
-      // Domain/Course immediately, regardless of what happens with the batch
+      // Domain/Skill immediately, regardless of what happens with the batch
       // modal next (confirmed or cancelled). Then let the trainer pick the
       // actual batch before creating the cohort membership + flipping the
       // enrolled flag.
       setDrawerOpen(false);
       clearSelection();
       refreshCurrentPage();
-      openAllocateModal(drawerLearners, domain, courseId);
+      openAllocateModal(drawerLearners, domain, skill);
     } catch (error) {
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
     } finally {
@@ -395,18 +374,17 @@ const L2InterestedQueuePage = () => {
     },
     {
       key: 'assigned',
-      label: t('L2_QUEUE.ASSIGNED_DOMAIN_COURSE'),
+      label: t('L2_QUEUE.ASSIGNED_DOMAIN_SKILL'),
       render: (row: any) => {
         const domain = getLearnerDomain(row);
-        const courseId = getLearnerCourseId(row);
-        if (!domain || !courseId) return '—';
-        const courseName = courseNameMap[courseId] || courseId;
+        const skill = getLearnerSkill(row);
+        if (!domain || !skill) return '—';
         const taggerId = getLearnerTaggedByUserId(row);
         const taggerName = taggerId ? taggedByNameMap[taggerId] : null;
         return (
           <Box>
             <Typography variant="body2">
-              {domain} › {courseName}
+              {domain} › {skill}
             </Typography>
             {taggerName && (
               <Typography variant="caption" color="text.secondary">
@@ -622,8 +600,7 @@ const L2InterestedQueuePage = () => {
         onClose={() => setAllocateOpen(false)}
         learners={allocateLearners}
         domain={allocateDomain}
-        courseId={allocateCourseId}
-        courseName={courseNameMap[allocateCourseId] || allocateCourseId}
+        skill={allocateSkill}
         onAllocated={() => {
           clearSelection();
           refreshCurrentPage();
