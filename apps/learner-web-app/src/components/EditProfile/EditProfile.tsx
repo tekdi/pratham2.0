@@ -618,9 +618,13 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
       customFields.push(data);
     }
 
-    // Ensure "WHAT PROGRAM ARE YOU PART OF" is explicitly sent even when empty
+    // Ensure "WHAT PROGRAM ARE YOU PART OF" is explicitly sent even when empty,
+    // but only when it was actually part of the form rendered this submission -
+    // `responseFormData` is the tenant's full master schema and always has this
+    // field, so keying off it wiped the saved value on unrelated submits (e.g.
+    // a Complete Profile form that only asked for Middle Name).
     const programSchema =
-      responseFormData?.schema?.properties?.what_program_are_you_part_of;
+      (addSchema as any)?.properties?.what_program_are_you_part_of;
     const programFieldId = programSchema?.fieldId;
 
     const programFieldIndex = customFields.findIndex(
