@@ -22,10 +22,10 @@ export type SessionIdsByDate = { [date: string]: string[] };
  */
 const SESSION_GAP_DATE_LIMIT = 10;
 
-const getTotalStudentCount = async (
+const getCountedStudentIds = async (
   response: any,
   fromDate: Date
-): Promise<number> => {
+): Promise<string[]> => {
   try {
     const filteredFields = response?.result?.userDetails || [];
 
@@ -59,14 +59,14 @@ const getTotalStudentCount = async (
       shortDateFormat(fromDate)
     );
 
-    const totalStudentsCount = filteredEntries.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
+    const countedMembers = filteredEntries.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
     (member.memberStatus === "reassigned" && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
-    (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))).length;
-  
-    return totalStudentsCount;
+    (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate))));
+
+    return countedMembers.map((member) => member.userId);
   } catch (error) {
-    // console.error('Error in getTotalStudentCount:', error);
-    return 0;
+    // console.error('Error in getCountedStudentIds:', error);
+    return [];
   }
 };
 
@@ -170,6 +170,31 @@ const getSessionPresentCount = async (
   return presentStudents;
 };
 
+const getCohortPresentCount = async (
+  date: string,
+  contextId: string,
+  scope: string,
+  countedStudentIds: string[]
+): Promise<number> => {
+  const res = await attendanceStatusList({
+    limit: AttendanceAPILimit,
+    page: 0,
+    filters: { fromDate: date, toDate: date, contextId, scope, context: 'cohort' },
+  });
+  const countedIds = new Set(countedStudentIds);
+  const presentUserIds = new Set<string>();
+  (res?.data?.attendanceList ?? []).forEach((row: any) => {
+    if (row?.attendance === 'present' && countedIds.has(row?.userId)) {
+      presentUserIds.add(row.userId);
+    }
+  });
+  console.log(
+    `presentCount for ${date}: ${presentUserIds.size}, userIds:`,
+    Array.from(presentUserIds)
+  );
+  return presentUserIds.size;
+};
+
 export const calculatePercentage = async (
   cohortMemberRequest: CohortMemberList,
   attendanceRequest: AttendancePercentageProps,
@@ -211,14 +236,23 @@ export const calculatePercentage = async (
   // overlap and there is nothing to reconcile.
   const dates = Object.keys({ ...presentStudents, ...sessionPresentStudents });
   for (const date of dates) {
-    const totalStudentsCount = await getTotalStudentCount(
+    const countedStudentIds = await getCountedStudentIds(
       response,
       new Date(date)
     );
-    const presentCount =
-      presentStudents[date]?.present_students ??
-      sessionPresentStudents[date]?.present_students ??
-      0;
+    const totalStudentsCount = countedStudentIds.length;
+    console.log(
+      `totalStudentsCount for ${date}: ${totalStudentsCount}, userIds:`,
+      countedStudentIds
+    );
+    const presentCount = presentStudents[date]
+      ? await getCohortPresentCount(
+          date,
+          attendanceRequest.filters.contextId,
+          attendanceRequest.filters.scope,
+          countedStudentIds
+        )
+      : sessionPresentStudents[date]?.present_students ?? 0;
     const presentPercentage =
       totalStudentsCount > 0
         ? parseFloat(((presentCount / totalStudentsCount) * 100).toFixed(2))
