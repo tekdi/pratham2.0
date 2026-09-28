@@ -207,10 +207,10 @@
               );
             } else if (telemetry?.eid === 'END') {
               let originalDuration = event?.detail?.edata?.duration;
-              let newDuration = originalDuration / 10;
-              let seconds = (newDuration = Math.round(newDuration * 10) / 10);
+              // let newDuration = originalDuration / 10;
+              // let seconds = (newDuration = Math.round(newDuration * 10) / 10);
 
-              localStorage.setItem('totalDuration', seconds);
+              localStorage.setItem('totalDuration', originalDuration);
             }
 
             const endPageSeen = telemetry?.edata?.extra?.find(

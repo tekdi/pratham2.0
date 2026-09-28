@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "பள்ளி பயிற்சி இல்லை"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"பதிவை சமர்ப்பிக்கவும்",
+    "SUBMIT_POC_REQUEST":"POC கோரிக்கையை சமர்ப்பிக்கவும்",
+    "REGISTER_ORGANISATION":"நிறுவனத்தை பதிவு செய்யவும்",
     "L1_COURSES": "L1 படிப்புகள்",
     "EXPLORE": "ஆராயுங்கள்",
     "SURVEYS": "கணக்கெடுப்புகள்",
@@ -553,6 +556,8 @@
     "MAKE_A_DIFFERENCE": "எங்கள் தன்னார்வத் திட்டங்கள் மூலம் மாற்றத்தை உருவாக்குங்கள்",
     "YES_CREATE_NEW_ACCOUNT": "ஆம், புதிய கணக்கை உருவாக்கு",
     "ENROLLED_TO_BELOW_PROGRAMS": "நீங்கள் கீழேயுள்ள திட்டங்களில் சேர்ந்துள்ளீர்கள் என்பதை நாங்கள் காணலாம்:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "நீங்கள் ஏற்கனவே இந்தத் திட்டத்தில் சேர்ந்துள்ளீர்கள்:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "நீங்கள் ஏற்கனவே இந்தத் திட்டங்களில் சேர்ந்துள்ளீர்கள்:",
     "SURE_TO_ENROLL_INTO": "நீங்கள் இதில் சேர விரும்புகிறீர்கள் என்பது உறுதியா",
     "YES": "ஆம்",
     "ENROL_MODAL": {
@@ -623,7 +628,17 @@
     "SECOND_CHANCE_PROGRAM": "செகண்ட் சான்ஸ் திட்டம்",
     "PARENT_GUARDIAN_PHONE_NO": "பெற்றோர் பாதுகாவலர் தொலைபேசி எண்",
     "COURSE_COMPLETION_CONGRATULATIONS": "பாடத்திட்டத்தை முடித்ததற்கு வாழ்த்துகள்!",
-    "HURRAY": "சிறப்பு!"
+    "HURRAY": "சிறப்பு!",
+    "READY_TO_JOIN_NAVAPATHAM": "நவபதம் இல் இணைய தயாரா?",
+    "ENROL_NOW": "இப்போது பதிவு செய்யுங்கள்",
+    "ALREADY_ENROLLED_LOGIN": "ஏற்கனவே பதிவு செய்துவிட்டீர்களா? உள்நுழையுங்கள்",
+    "ENROL_HINT": "புதியவரா அல்லது ஏற்கனவே பதிவு செய்தவரா — உங்கள் தொலைபேசி எண்ணை மட்டும் உள்ளிடுங்கள். நாங்கள் உங்களுக்கு வழிகாட்டுவோம்.",
+    "ABOUT_THE_PROGRAM": "திட்டம் பற்றி",
+    "REGISTER_YOUR_INTEREST": "உங்கள் ஆர்வத்தை பதிவு செய்யுங்கள்:",
+    "REGISTER_YOUR_INTEREST_TEXT": "திட்டத்தில் இணைவதற்கான உங்கள் ஆர்வத்தை தெரிவிக்க பதிவு படிவத்தை நிரப்புங்கள். எங்கள் குழு உங்களைத் தொடர்பு கொண்டு அடுத்த கட்டங்களில் வழிகாட்டும்.",
+    "NEVER_TOO_LATE_TO_LEARN": "கற்றலைத் தொடர எப்போதும் தாமதமில்லை!",
+    "CONTACT": "தொடர்பு",
+    "WRITE_TO_US_AT": "எங்களுக்கு எழுதுங்கள்"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "பயனர்பெயர் அல்லது கடவுச்சொல் சரியாக இல்லை",
@@ -918,6 +933,10 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "பிரதம் ரீட்இண்டியா முன்முயற்சி (RII)",
     "GOVERNMENT_PARTNERSHIP": "கவர்ன்மெண்ட் பார்ட்னர்ஷிப்",
     "SUMMER_CAMP_VOLUNTEER": "கோடைக்கால முகாம் தன்னார்வலர்",
+    "ITC": "ITC",
+    "ADP": "ADP",
+    "STANDALONE_UPPER_PRIMARY": "தனி உயர் தொடக்கநிலை",
+    "Others": "மற்றவை",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "நீங்கள் எந்த திட்டத்தில் உள்ளீர்கள்?",
     "WHAT PROGRAM ARE YOU PART OF": "நீங்கள் எந்த திட்டத்தில் உள்ளீர்கள்?",
     "CATCHMENT_AREA": "கேட்ச்மென்ட் பகுதி",
@@ -930,6 +949,9 @@
     "POCSO_POLICY": "POCSO கொள்கை",
     "NDA_POLICY": "NDA கொள்கை",
     "FRAUD_PROTECTION_POLICY": "மோசடி பாதுகாப்பு கொள்கை",
+    "PTM_PHONE_NUMBER": "PTM இன் தொலைபேசி எண்",
+    "PTM_MOBILE_PLACEHOLDER": "10-இலக்க எண்",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "நீங்கள் ஒரு கூட்டாளி நிறுவனத்துடன் தொடர்புடையீர்களா?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "மற்றும் இரகசியத்தை பராமரிக்க ஒப்புக்கொள்கிறேன்.",
     "AND_TO_COMPLY": "மற்றும் இணங்க ஒப்புக்கொள்கிறேன்.",
     "AND": "மற்றும்",

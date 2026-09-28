@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "ಶಾಲೆಗೆ ಹೋಗಿಲ್ಲ"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"ನೋಂದಣಿ ಸಲ್ಲಿಸಿ",
+    "SUBMIT_POC_REQUEST":"POC ವಿನಂತಿ ಸಲ್ಲಿಸಿ",
+    "REGISTER_ORGANISATION":"ಸಂಸ್ಥೆಯನ್ನು ನೋಂದಾಯಿಸಿ",
     "L1_COURSES": "L1 ಕೋರ್ಸುಗಳು",
     "EXPLORE": "ಅನ್ವೇಷಿಸಿ",
     "SURVEYS": "ಸರ್ವೇಗಳು",
@@ -553,6 +556,8 @@
     "MAKE_A_DIFFERENCE": "ನಮ್ಮ ಸ್ವಯಂಸೇವಕ ಕಾರ್ಯಕ್ರಮಗಳ ಮೂಲಕ ಬದಲಾವಣೆ ತನ್ನಿ",
     "YES_CREATE_NEW_ACCOUNT": "ಹೌದು, ಹೊಸ ಖಾತೆ ರಚಿಸಿ",
     "ENROLLED_TO_BELOW_PROGRAMS": "ನೀವು ಕೆಳಗಿನ ಕಾರ್ಯಕ್ರಮಗಳಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ ಎಂದು ನಾವು ನೋಡಬಹುದು:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "ನೀವು ಈಗಾಗಲೇ ಈ ಕಾರ್ಯಕ್ರಮದಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "ನೀವು ಈಗಾಗಲೇ ಈ ಕಾರ್ಯಕ್ರಮಗಳಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ:",
     "SURE_TO_ENROLL_INTO": "ನೀವು ಇದರಲ್ಲಿ ದಾಖಲಾಗಲು ಬಯಸುತ್ತೀರಿ ಎಂದು ಖಚಿತವಾಗಿದೆಯೇ",
     "YES": "ಹೌದು",
     "ENROL_MODAL": {
@@ -623,7 +628,17 @@
     "SECOND_CHANCE_PROGRAM": "ಸೆಕಂಡ್ ಚಾನ್ಸೆ ಕಾರ್ಯಕ್ರಮ",
     "PARENT_GUARDIAN_PHONE_NO": "ಪೋಷಕರ ಫೋನ್ ಸಂಖ್ಯೆ",
     "COURSE_COMPLETION_CONGRATULATIONS": "ಕೋರ್ಸ್ ಪೂರ್ಣಗೊಳಿಸಿದ್ದಕ್ಕಾಗಿ ಅಭಿನಂದನೆಗಳು!",
-    "HURRAY": "ಹುರ್ರೇ!"
+    "HURRAY": "ಹುರ್ರೇ!",
+    "READY_TO_JOIN_NAVAPATHAM": "ನವಪಥಂಗೆ ಸೇರಲು ಸಿದ್ಧರಿದ್ದೀರಾ?",
+    "ENROL_NOW": "ಈಗಲೇ ದಾಖಲಾಗಿ",
+    "ALREADY_ENROLLED_LOGIN": "ಈಗಾಗಲೇ ದಾಖಲಾಗಿದ್ದೀರಾ? ಲಾಗ್ ಇನ್ ಮಾಡಿ",
+    "ENROL_HINT": "ಹೊಸಬರಾಗಿರಿ ಅಥವಾ ಈಗಾಗಲೇ ದಾಖಲಾಗಿರಿ — ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ. ನಾವು ನಿಮಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತೇವೆ.",
+    "ABOUT_THE_PROGRAM": "ಕಾರ್ಯಕ್ರಮದ ಬಗ್ಗೆ",
+    "REGISTER_YOUR_INTEREST": "ನಿಮ್ಮ ಆಸಕ್ತಿಯನ್ನು ನೋಂದಾಯಿಸಿ:",
+    "REGISTER_YOUR_INTEREST_TEXT": "ಕಾರ್ಯಕ್ರಮಕ್ಕೆ ಸೇರುವ ನಿಮ್ಮ ಆಸಕ್ತಿಯನ್ನು ವ್ಯಕ್ತಪಡಿಸಲು ನೋಂದಣಿ ನಮೂನೆಯನ್ನು ಭರ್ತಿ ಮಾಡಿ. ನಮ್ಮ ತಂಡ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ ಮುಂದಿನ ಹಂತಗಳಲ್ಲಿ ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ.",
+    "NEVER_TOO_LATE_TO_LEARN": "ಕಲಿಕೆಯನ್ನು ಮುಂದುವರಿಸಲು ಎಂದಿಗೂ ತಡವಾಗಿಲ್ಲ!",
+    "CONTACT": "ಸಂಪರ್ಕ",
+    "WRITE_TO_US_AT": "ನಮಗೆ ಬರೆಯಿರಿ"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "ಯೂಸರ್  ಹೆಸರು ಅಥವಾ ಪಾಸ್ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ",
@@ -918,6 +933,10 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "ಪ್ರಥಮ್ ರೀಡ್ ಇಂಡಿಯಾ ಇನಿಶಿಯೇಟಿವ್ RII",
     "GOVERNMENT_PARTNERSHIP": "ಸರ್ಕಾರಿ ಪಾಲುದಾರಿಕೆ",
     "SUMMER_CAMP_VOLUNTEER": "ಬೇಸಿಗೆ ಶಿಬಿರದ ಸ್ವಯಂಸೇವಕರು",
+    "ITC": "ITC",
+    "ADP": "ADP",
+    "STANDALONE_UPPER_PRIMARY": "ಸ್ವತಂತ್ರ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ",
+    "Others": "ಇತರೆ",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "WHAT PROGRAM ARE YOU PART OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "CATCHMENT_AREA": "ಕ್ಯಾಚಮೆಂಟ್ ಏರಿಯಾ",
@@ -930,6 +949,8 @@
     "POCSO_POLICY": "POCSO ನೀತಿ",
     "NDA_POLICY": "NDA ನೀತಿ",
     "FRAUD_PROTECTION_POLICY": "ವಂಚನೆ ರಕ್ಷಣೆ ನೀತಿ",
+    "PTM_PHONE_NUMBER": "PTM ಫೋನ್ ಸಂಖ್ಯೆ",
+    "PTM_MOBILE_PLACEHOLDER": "10-ಅಂಕಿ ಸಂಖ್ಯೆ",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "ಮತ್ತು ಗೌಪ್ಯತೆಯನ್ನು ಕಾಪಾಡಲು ಒಪ್ಪುತ್ತೇನೆ.",
     "AND_TO_COMPLY": "ಮತ್ತು ಅನುಸರಿಸಲು ಒಪ್ಪುತ್ತೇನೆ.",
     "AND": "ಮತ್ತು",

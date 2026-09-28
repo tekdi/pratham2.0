@@ -73,11 +73,14 @@ export default function LandingPage() {
     fetchPrograms();
   if (typeof window !== 'undefined' && window.localStorage) {
     localStorage.removeItem('isForNavaPatham');
+    // Landing here starts a fresh registration, so drop any half-filled
+    // form data left behind by an abandoned attempt.
+    localStorage.removeItem('formData');
   }
   }, []);
 
-  const learnerPrograms = programs.filter((p) => p.type !== 'VolunteerOnboarding');
-  const volunteerPrograms = programs.filter((p) => p.type === 'VolunteerOnboarding');
+  const learnerPrograms = programs.filter((p) => p.type !== 'VolunteerOnboarding' && p?.params?.uiConfig?.isVolunteerShow !== true);
+  const volunteerPrograms = programs.filter((p) => p.type === 'VolunteerOnboarding' || p?.params?.uiConfig?.isVolunteerShow == true);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });

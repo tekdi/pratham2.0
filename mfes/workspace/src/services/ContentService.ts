@@ -435,8 +435,27 @@ export const createCourse = async (
 
 export const publishContent = async (
   identifier: any,
-  publishChecklist?: any
+  publishChecklist?: any,
+  mimeType?: string
 ) => {
+  // QuestionSets are published through their own questionset publish API,
+  // which also publishes the questions in their hierarchy.
+  if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
+    try {
+      const response = await post(`/action/questionset/v2/publish/${identifier}`, {
+        request: {
+          questionset: {
+            lastPublishedBy: getLocalStoredUserId(),
+          },
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error during publishing question set:', error);
+      throw error;
+    }
+  }
+
   const requestBody = {
     request: {
       content: {
@@ -606,7 +625,22 @@ export const getPosFrameworkList = async (): Promise<any> => {
   }
 };
 
-export const unpublishContent = async (identifier: string) => {
+export const unpublishContent = async (
+  identifier: string,
+  mimeType?: string
+) => {
+  // Question sets are unpublished through the questionset retire API
+  if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
+    const questionsetRetireURL = `/action/questionset/v2/retire/${identifier}`;
+    try {
+      const response = await delApi(questionsetRetireURL);
+      return response?.data;
+    } catch (error) {
+      console.error('Error unpublishing question set:', error);
+      throw error;
+    }
+  }
+
   const baseurl = process.env.NEXT_PUBLIC_BASE_URL;
   const apiURL = `${baseurl}/collection/v4/unlisted/publish/${identifier}`;
   const reqBody = {

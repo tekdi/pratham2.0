@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "ସ୍କୁଲ ନାହିଁ"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"ପଞ୍ଜୀକରଣ ଦାଖଲ କରନ୍ତୁ",
+    "SUBMIT_POC_REQUEST":"POC ଅନୁରୋଧ ଦାଖଲ କରନ୍ତୁ",
+    "REGISTER_ORGANISATION":"ସଂଗଠନ ପଞ୍ଜୀଭୁକ୍ତ କରନ୍ତୁ",
     "L1_COURSES": "L1 କୋର୍ସ ଗୁଡିକ",
     "EXPLORE": "ଏକ୍ସପ୍ଲୋର୍‍ କରନ୍ତୁ",
     "SURVEYS": "ସର୍ଭେ",
@@ -553,6 +556,8 @@
     "MAKE_A_DIFFERENCE": "ଆମର ସ୍ୱେଚ୍ଛାସେବୀ କାର୍ଯ୍ୟକ୍ରମ ମାଧ୍ୟମରେ ପରିବର୍ତ୍ତନ ଆଣନ୍ତୁ",
     "YES_CREATE_NEW_ACCOUNT": "ହଁ, ନୂଆ ଆକାଉଣ୍ଟ ତିଆରି କରନ୍ତୁ",
     "ENROLLED_TO_BELOW_PROGRAMS": "ଆମେ ଦେଖିପାରୁଛୁ ଯେ ଆପଣ ନିମ୍ନ କାର୍ଯ୍ୟକ୍ରମରେ ନାମ ଲେଖାଇଛନ୍ତି:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "ଆପଣ ପୂର୍ବରୁ ଏହି କାର୍ଯ୍ୟକ୍ରମରେ ନାମ ଲେଖାଇଛନ୍ତି:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "ଆପଣ ପୂର୍ବରୁ ଏହି କାର୍ଯ୍ୟକ୍ରମଗୁଡ଼ିକରେ ନାମ ଲେଖାଇଛନ୍ତି:",
     "SURE_TO_ENROLL_INTO": "ଆପଣ ନିଶ୍ଚିତ କି ଆପଣ ଏଥିରେ ନାମ ଲେଖାଇବାକୁ ଚାହୁଁଛନ୍ତି",
     "YES": "ହଁ",
     "ENROL_MODAL": {
@@ -623,7 +628,17 @@
     "SECOND_CHANCE_PROGRAM": "ସେକେଣ୍ଡ ଚାନ୍ସ  ପ୍ରୋଗ୍ରାମ",
     "PARENT_GUARDIAN_PHONE_NO": "ଅଭିଭାବକଙ୍କ ଫୋନ୍ ନମ୍ବର",
     "COURSE_COMPLETION_CONGRATULATIONS": "ପାଠ୍ୟକ୍ରମ ସମାପ୍ତ କରିବା ପାଇଁ ଅଭିନନ୍ଦନ!",
-    "HURRAY": "ଅଭିନନ୍ଦନ"
+    "HURRAY": "ଅଭିନନ୍ଦନ",
+    "READY_TO_JOIN_NAVAPATHAM": "ନବପଥମରେ ଯୋଗ ଦେବାକୁ ପ୍ରସ୍ତୁତ?",
+    "ENROL_NOW": "ଏବେ ନାମ ଲେଖାନ୍ତୁ",
+    "ALREADY_ENROLLED_LOGIN": "ପୂର୍ବରୁ ନାମ ଲେଖାଇଛନ୍ତି? ଲଗ୍ ଇନ୍ କରନ୍ତୁ",
+    "ENROL_HINT": "ନୂଆ ହୁଅନ୍ତୁ କିମ୍ବା ପୂର୍ବରୁ ନାମ ଲେଖାଇଥାନ୍ତୁ — କେବଳ ଆପଣଙ୍କ ଫୋନ୍ ନମ୍ବର ଦିଅନ୍ତୁ। ଆମେ ଆପଣଙ୍କୁ ମାର୍ଗଦର୍ଶନ କରିବୁ।",
+    "ABOUT_THE_PROGRAM": "କାର୍ଯ୍ୟକ୍ରମ ବିଷୟରେ",
+    "REGISTER_YOUR_INTEREST": "ଆପଣଙ୍କ ଆଗ୍ରହ ପଞ୍ଜୀକରଣ କରନ୍ତୁ:",
+    "REGISTER_YOUR_INTEREST_TEXT": "କାର୍ଯ୍ୟକ୍ରମରେ ଯୋଗ ଦେବାର ଆପଣଙ୍କ ଆଗ୍ରହ ପ୍ରକଟ କରିବା ପାଇଁ ନାମଲେଖା ଫର୍ମ ପୂରଣ କରନ୍ତୁ। ଆମ ଦଳ ଆପଣଙ୍କ ସହ ସମ୍ପର୍କ କରି ପରବର୍ତ୍ତୀ ପଦକ୍ଷେପରେ ମାର୍ଗଦର୍ଶନ କରିବ।",
+    "NEVER_TOO_LATE_TO_LEARN": "ଶିକ୍ଷା ଜାରି ରଖିବା ପାଇଁ କେବେ ବି ବିଳମ୍ବ ନୁହେଁ!",
+    "CONTACT": "ସମ୍ପର୍କ",
+    "WRITE_TO_US_AT": "ଆମକୁ ଲେଖନ୍ତୁ"
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "ୟୁଜର  ନାମ କିମ୍ବା ପାସୱାର୍ଡ ଠିକ୍ ନୁହେଁ",
@@ -918,6 +933,10 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "ପ୍ରଥମ ରିଡ୍ ଇଣ୍ଡିଆ ଇନିସିଏଟିଭ୍ RII",
     "GOVERNMENT_PARTNERSHIP": "ସରକାରୀ ସହଭାଗୀତା",
     "SUMMER_CAMP_VOLUNTEER": "ଗ୍ରୀଷ୍ମ ଶିବିର ସ୍ଵେଚ୍ଛାସେବକ",
+    "ITC": "ITC",
+    "ADP": "ADP",
+    "STANDALONE_UPPER_PRIMARY": "ସ୍ୱତନ୍ତ୍ର ଉଚ୍ଚ ପ୍ରାଥମିକ",
+    "Others": "ଅନ୍ୟାନ୍ୟ",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "ଆପଣ କେଉଁ ପ୍ରୋଗ୍ରାମର ଅଂଶ?",
     "WHAT PROGRAM ARE YOU PART OF": "ଆପଣ କେଉଁ ପ୍ରୋଗ୍ରାମର ଅଂଶ?",
     "CATCHMENT_AREA": "ଜଳାଭଙ୍ଗ ଅଞ୍ଚଳ",
@@ -930,6 +949,9 @@
     "POCSO_POLICY": "POCSO ନୀତି",
     "NDA_POLICY": "NDA ନୀତି",
     "FRAUD_PROTECTION_POLICY": "ପ୍ରତାରଣା ସୁରକ୍ଷା ନୀତି",
+    "PTM_PHONE_NUMBER": "PTM ର ଫୋନ ନମ୍ବର",
+    "PTM_MOBILE_PLACEHOLDER": "10-ଅଙ୍କ ସଂଖ୍ୟା",
+    "ARE_YOU_ASSOCIATED_WITH_A_PARTNER_ORGANISATION": "ଆପଣ କ'ଣ ଏକ ଭାଗୀଦାର ସଂଗଠନ ସହ ଯୋଡ଼ାହୋଇଛନ୍ତି?",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "ଏବଂ ଗୋପନୀୟତା ବଜାୟ ରଖିବାକୁ ସମ୍ମତ ଅଛି।",
     "AND_TO_COMPLY": "ଏବଂ ପାଳନ କରିବାକୁ ସମ୍ମତ ଅଛି।",
     "AND": "ଏବଂ",

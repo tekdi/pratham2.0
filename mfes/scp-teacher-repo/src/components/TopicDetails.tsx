@@ -193,6 +193,14 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
           subTopic={subTopic}
         />
         <RequisitesAccordion
+          title={t('CENTER_SESSION.DURING_COURSE')}
+          type={RequisiteType.DURING_COURSE}
+          content={contentData}
+          handlePlayers={handlePlayers}
+          theme={theme}
+          subTopic={subTopic}
+        />
+        <RequisitesAccordion
           title={t('CENTER_SESSION.POST_REQUISITES')}
           type={RequisiteType.POST_REQUISITES}
           content={contentData}

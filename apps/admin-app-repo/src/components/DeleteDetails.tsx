@@ -22,6 +22,7 @@ interface DeleteDetailsProps {
   reason: string;
   setReason: (reason: string) => void;
   isForFacilitator?: boolean;
+  isForTeamLead?: boolean;
   customLabel?: string;
 }
 
@@ -35,6 +36,7 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
   reason,
   setReason,
   isForFacilitator = false,
+  isForTeamLead = false,
   customLabel
 }) => {
   const { t } = useTranslation();
@@ -87,14 +89,14 @@ const DeleteDetails: React.FC<DeleteDetailsProps> = ({
               control={<Radio />}
               label={t("COMMON.DUPLICATED_USER")}
             />
-            {isForFacilitator && (
+            {(isForFacilitator || isForTeamLead) && (
               <FormControlLabel
                 value="Resigned from Company"
                 control={<Radio />}
                 label={t('COMMON.RESIGNED_FROM_COMPANY')}
               />
             )}
-            {isForFacilitator && (
+            {(isForFacilitator || isForTeamLead) && (
               <FormControlLabel
                 value="Moved to Different Role"
                 control={<Radio />}

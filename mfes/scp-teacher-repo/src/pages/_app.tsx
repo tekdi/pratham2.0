@@ -37,6 +37,7 @@ import AllowNotification from '@/components/AllowNotification';
 import dynamic from 'next/dynamic';
 import { LanguageProvider } from '@shared-lib-v2/lib/context/LanguageContext';
 import { useChunkErrorReload } from '@shared-lib-v2/hooks/useChunkErrorReload';
+import { useLanguageFromStorage } from '@shared-lib-v2/hooks/useLanguageFromStorage';
 
 const InstallPopup = dynamic(() => import(`@/components/InstallPopup`), { ssr: false });
 
@@ -81,6 +82,7 @@ export function DarkTheme() {
 function App({ Component, pageProps }: AppProps) {
   useChunkErrorReload();
   const { i18n } = useTranslation(); // Get the i18n object to access the selected language
+  useLanguageFromStorage();
   const [client] = React.useState(
     new QueryClient({
       defaultOptions: {
