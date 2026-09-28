@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "ಏನೋ ತಪ್ಪಾಗಿದೆ",
     "NO_GO_BACK": "ಇಲ್ಲ, ಹಿಂತಿರುಗಿ",
     "YES": "ಹೌದು",
+    "NO": "ಇಲ್ಲ",
     "REVIEW_ATTENDANCE": "ಹಾಜರಾತಿಯನ್ನು ಪರಿಶೀಲಿಸಿ",
     "ADD_NEW": "ಹೊಸದನ್ನು ಸೇರಿಸಿ",
     "ADD": "ಸೇರಿಸಿ",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "ಅಂತಿಮ ದಿನಾಂಕವು ಪ್ರಾರಂಭ ದಿನಾಂಕಕ್ಕಿಂತ ಮೊದಲು ಇರಬಾರದು.",
     "DELETE_THIS_SESSION": "ಈ ಸೆಷನ್ ಅಳಿಸಿ",
     "LEARNER_PREREQUISITES": "ಕಲಿಯುವವರ ಪೂರ್ವಾಪೇಕ್ಷಿತಗಳು",
-    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು"
+    "LEARNER_POSTREQUISITES": "ಕಲಿಯುವವರ ನಂತರದ ಅವಶ್ಯಕತೆಗಳು",
+    "SESSION_SLOT_CONFLICT_MSG": "ಈ ಸಮಯದಲ್ಲಿ ಈ ಬ್ಯಾಚ್‌ಗಾಗಿ ಈಗಾಗಲೇ ಒಂದು ಸೆಷನ್ ನಿಗದಿಯಾಗಿದೆ. ಅದೇ ಸಮಯಕ್ಕೆ ಇನ್ನೊಂದು ಸೆಷನ್ ನಿಗದಿಪಡಿಸಲು ನೀವು ಬಯಸುವಿರಾ?",
+    "SESSION_START_TIME_IN_PAST_ERROR": "ಪ್ರಾರಂಭದ ಸಮಯ ಈಗಾಗಲೇ ಕಳೆದಿದೆ. ದಯವಿಟ್ಟು ಭವಿಷ್ಯದ ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ."
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "ಕೇಂದ್ರವು ಯಶಸ್ವಿಯಾಗಿ ವಿನಂತಿಸಿದೆ",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "ಯೂನಿಟ್ ಹೆಸರು",
     "UNIT_CODE": "ಯೂನಿಟ್ ಕೋಡ್",
     "ENROLLMENT_NUMBER": "ನೋಂದಣಿ ಸಂಖ್ಯೆ",
+    "ENROLLMENT_ID": "ನೋಂದಣಿ ಐಡಿ",
+    "DATE_OF_JOINING": "ಸೇರಿದ ದಿನಾಂಕ",
     "BLOCK_NAME": "ಬ್ಲಾಕ್ ಹೆಸರು",
     "STUDENT_TYPE": "ಕಲಿಯುವವರ ಪ್ರಕಾರ",
     "STATE_NAME": "ರಾಜ್ಯದ ಹೆಸರು",

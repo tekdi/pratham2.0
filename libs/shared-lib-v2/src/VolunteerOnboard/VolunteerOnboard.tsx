@@ -23,6 +23,7 @@ import { showToastMessage } from '../DynamicForm/components/Toastify';
 import { fetchActiveAcademicYearId } from '../DynamicForm/utils/helper';
 import { post } from '../DynamicForm/services/RestClient';
 import API_ENDPOINTS from '../DynamicForm/utils/API/APIEndpoints';
+import { readUserIdTrue } from '../DynamicForm/services/NotificationService';
 
 interface VolunteerOnboardProps {
   t: any;
@@ -56,6 +57,49 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
 
   const [tempYearId, setTempYearId] = useState<string>('');
   const [tempTenantId, setTempTenantId] = useState<string>('');
+
+  const [state, setState] = useState<any>(null);
+  const [district, setDistrict] = useState<any>(null);
+  const [block, setBlock] = useState<any>(null);
+  const [village, setVillage] = useState<any>(null);
+
+  //fetch user details
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (typeof window !== 'undefined') {
+        let userId = localStorage.getItem('userId') || '';
+        const response = await readUserIdTrue(userId);
+        let userDataDetails= response?.result?.userData;
+
+        const customFields = userDataDetails?.customFields ?? [];
+        const getFieldValue = (label: string) => {
+          const field = customFields.find((f: any) => f.label === label);
+          const val = field?.selectedValues?.[0];
+          return typeof val === 'object' ? val : null;
+        };
+
+        const stateVal = getFieldValue('STATE');
+        const districtVal = getFieldValue('DISTRICT');
+        const blockVal = getFieldValue('BLOCK');
+        const villageVal = getFieldValue('VILLAGE');
+
+        setState(stateVal);
+        setDistrict(districtVal);
+        setBlock(blockVal);
+        setVillage(villageVal);
+
+        if (stateVal) localStorage.setItem('onboarding_state', JSON.stringify(stateVal));
+        if (districtVal) localStorage.setItem('onboarding_district', JSON.stringify(districtVal));
+        if (blockVal) localStorage.setItem('onboarding_block', JSON.stringify(blockVal));
+        if (villageVal) localStorage.setItem('onboarding_village', JSON.stringify(villageVal));
+
+      }
+    };
+    if(learnerSchema)
+    {
+      loadUserData();
+    }
+  }, [learnerSchema]);
 
   useEffect(() => {
     // Fetch form schema from API and set it in state.
@@ -172,13 +216,22 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           schema: {
             "type": "object",
             "properties": {
+              //step3_1
+              volunteer_type: learnerSchema?.properties?.volunteer_type,
+
               ptm_id: learnerSchema?.properties?.ptm_id,
             },
             "required": [
+              // step3_1
+              "volunteer_type",
+
               "ptm_id",
             ]
           },
           uiSchema: {
+            // step3_1
+            volunteer_type: learnerUiSchema?.volunteer_type,
+
             ptm_id: learnerUiSchema?.ptm_id,
           },
         },
@@ -186,34 +239,129 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
           schema: {
             "type": "object",
             "properties": {
+              //step3_1
+              volunteer_type: learnerSchema?.properties?.volunteer_type,
+
               org_id: learnerSchema?.properties?.org_id,
               poc_id: learnerSchema?.properties?.poc_id,
             },
             "required": [
+              // step3_1
+              "volunteer_type",
+
               "org_id",
               "poc_id",
             ]
           },
           uiSchema: {
+            // step3_1
+            volunteer_type: learnerUiSchema?.volunteer_type,
+
             org_id: learnerUiSchema?.org_id,
             poc_id: learnerUiSchema?.poc_id,
           },
         },
         step4_3: {
-          schema: orgSchema,
-          uiSchema: orgUiSchema,
+          schema: {
+            "type": "object",
+            "properties": {
+              // step3_2
+              organisation_registered: learnerSchema?.properties?.organisation_registered,
+
+              ...((({ state, district, ...rest }) => rest)(orgSchema?.properties || {})),
+              // state: {
+              //   type: 'array',
+              //   title: 'State',
+              //   items: {
+              //     type: 'string',
+              //     enum: [state?.id],
+              //     enumNames: [state?.value],
+              //   },
+              //   api: undefined,
+              //   //for multiselect
+              //   uniqueItems: true,
+              //   isMultiSelect: true,
+              //   maxSelection: 1,
+              // },
+              district: {
+                type: 'array',
+                title: 'FORM.DISTRICT',
+                items: {
+                  type: 'string',
+                  enum: ['Select'],
+                  enumNames: ['Select'],
+                },
+                api: {
+                  url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+                  method: 'POST',
+                  payload: {
+                    fieldName: 'district',
+                    controllingfieldfk:
+                      [state?.id],
+                    sort: ['district_name', 'asc'],
+                  },
+                  options: {
+                    optionObj: 'result.values',
+                    label: 'label',
+                    value: 'value',
+                  },
+                  callType: 'initial',
+                },
+                //for multiselect
+                uniqueItems: true,
+                isMultiSelect: true,
+                maxSelection: 1,
+              },
+            },
+            "required": [
+              // step3_2
+              "organisation_registered",
+
+              "name",
+              "organisation_type",
+              "ptm_id",
+              // "state",
+              "district",
+              "block"
+              // ...(orgSchema?.required || []),
+            ]
+          },
+          uiSchema: {
+              // step3_2
+            organisation_registered: learnerUiSchema?.organisation_registered,
+            
+            ...((({ ["ui:order"]: _,state, ...rest }) => rest)(orgUiSchema || {})),
+            'ui:order': [
+              'organisation_registered',
+              'name',
+              // 'state',
+              'district',
+              'block',
+              'organisation_type',
+              'ptm_id'
+            ],
+          }
         },
         step4_4: {
           schema: {
             "type": "object",
             "properties": {
+              // step3_2
+              organisation_registered: learnerSchema?.properties?.organisation_registered,
+
               org_id: learnerSchema?.properties?.org_id,
             },
             "required": [
+              // step3_2
+              "organisation_registered",
+
               "org_id",
             ]
           },
           uiSchema: {
+              // step3_2
+            organisation_registered: learnerUiSchema?.organisation_registered,
+
             org_id: learnerUiSchema?.org_id,
           },
         },
@@ -383,6 +531,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
         }
       }
     }
+    // console.log("isSubmitSetActionPerform",isSubmitSetActionPerform);
     performAction()
   }, [isSubmitSetActionPerform]);
 
@@ -539,6 +688,32 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
     }
   }
 
+  const valueSelectedChange=(changedFormData:any)=>{
+    console.log("##########changedFormData",changedFormData);
+    if(changedFormData?.volunteer_type){
+      if(changedFormData.volunteer_type=='individual_volunteer'){
+        setActiveStep('step4_1');
+        formStepsData['step4_1']={volunteer_type:changedFormData.volunteer_type};
+      }
+      if(changedFormData.volunteer_type=='individual_volunteer_through_an_organisation'){
+        setActiveStep('step4_2');
+        formStepsData['step4_2']={volunteer_type:changedFormData.volunteer_type};
+      }
+    }
+    if(changedFormData?.organisation_registered){
+      if(changedFormData.organisation_registered=='this_is_the_first_time_my_organisation_is_registering'){
+        setActiveStep('step4_3');
+        formStepsData['step4_3']={organisation_registered:changedFormData.organisation_registered,
+          state:[state?.id.toString()]
+        };
+      }
+      if(changedFormData.organisation_registered=='my_organisation_is_already_registered'){
+        setActiveStep('step4_4');
+        formStepsData['step4_4']={organisation_registered:changedFormData.organisation_registered};
+      }
+    }
+  }
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Box
@@ -596,7 +771,11 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
                   }
                   else if (formData.how_would_you_like_to_register == 'register_an_organisation_as_poc') {
                     localStorage.removeItem('temp_organization_register');
+                    // normal step 3
                     setActiveStep('step3_2');
+                    //direct to form step 4
+                    // setActiveStep('step4_4');
+                    // formStepsData['step4_4']={organisation_registered:'my_organisation_is_alresady_registered'};
                   }
                 }
                 else if (activeStep == 'step3_1') {
@@ -626,6 +805,7 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               prefilledFormData={formStepsData?.[activeStep] || {}}
               hideSubmit={true}
               type={''}
+              valueSelectedChange={valueSelectedChange}
             />
             <Button
               sx={{
@@ -650,7 +830,17 @@ const VolunteerOnboard: React.FC<VolunteerOnboardProps> = ({
               disabled={isSubmitting}
             >
               {isSubmitting ? <CircularProgress color="inherit" size={20} /> : null}
-              {activeStep.includes('step4') ? t('COMMON.SUBMIT') : t('COMMON.CONTINUE')}
+              {
+              activeStep=='step4_1' 
+              ? t('COMMON.SUBMIT_REGISTRATION') 
+              : activeStep=='step4_2' 
+              ? t('COMMON.SUBMIT_REGISTRATION') 
+              : activeStep=='step4_3' 
+              ? t('COMMON.REGISTER_ORGANISATION') 
+              : activeStep=='step4_4' 
+              ? t('COMMON.SUBMIT_POC_REQUEST') 
+              : t('COMMON.CONTINUE')
+              }
             </Button>
           </Box>
           :

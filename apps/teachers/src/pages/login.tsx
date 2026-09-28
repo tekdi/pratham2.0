@@ -223,7 +223,12 @@ const LoginComponent = () => {
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRATHAM_SCP?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase() ||
         tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()
+        //add SUMMER_CAMP
+        || tenant?.toLocaleLowerCase() === TENANT_DATA?.SUMMER_CAMP?.toLowerCase()
       ) {
+
+    // console.log("########details",{tenantId,tenantName,tenantType,roleId,roleName})
+
         const userDetails = await getUserDetails(userId, true);
         console.log(userDetails);
 
@@ -288,7 +293,11 @@ const LoginComponent = () => {
           } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.YOUTHNET?.toLowerCase()) {
             router.push('/youth');
          
-          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
+          } else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.SUMMER_CAMP?.toLowerCase()) {
+            router.push('/youthnet/individual-volunteer');
+         
+          }
+          else if (tenant?.toLocaleLowerCase() === TENANT_DATA?.PRAGYANPATH?.toLowerCase()) {
             
             if (activeSessionId) {
               localStorage.setItem('academicYearId', activeSessionId);
