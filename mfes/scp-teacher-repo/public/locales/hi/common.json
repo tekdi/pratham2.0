@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "काहीतरी चूक झाली",
     "NO_GO_BACK": "नहीं, वापस जाएं",
     "YES": "हाँ",
+    "NO": "नहीं",
     "REVIEW_ATTENDANCE": "उपस्थिति की समीक्षा करें",
     "ADD_NEW": "नया जोड़ें",
     "ADD": "जोडा",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "समाप्ति तिथि प्रारंभ तिथि से पहले नहीं हो सकती",
     "DELETE_THIS_SESSION": "यह सत्र हटाएं",
     "LEARNER_PREREQUISITES": "शिक्षार्थी पूर्वापेक्षाएं",
-    "LEARNER_POSTREQUISITES": "शिक्षार्थी उत्तरापेक्षाएं"
+    "LEARNER_POSTREQUISITES": "शिक्षार्थी उत्तरापेक्षाएं",
+    "SESSION_SLOT_CONFLICT_MSG": "इस समय के दौरान इस बैच के लिए पहले से ही एक सत्र निर्धारित है। क्या आप इसी समय के लिए एक और सत्र निर्धारित करना चाहते हैं?",
+    "SESSION_START_TIME_IN_PAST_ERROR": "प्रारंभ समय बीत चुका है। कृपया भविष्य का समय चुनें।"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "केंद्र सफलतापूर्वक अनुरोधित",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "युनिटचे नाव",
     "UNIT_CODE": "यूनिट कोड",
     "ENROLLMENT_NUMBER": "नामांकन संख्या",
+    "ENROLLMENT_ID": "नामांकन आईडी",
+    "DATE_OF_JOINING": "शामिल होने की तिथि",
     "BLOCK_NAME": "ब्लॉक का नाम",
     "STUDENT_TYPE": "शिक्षार्थी का प्रकार",
     "STATE_NAME": "राज्य का नाम",

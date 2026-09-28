@@ -29,40 +29,40 @@ const ContentPlayerV2 = ({
       let contentType='';
       switch (mimeType) {
         case 'application/vnd.ekstep.h5p-archive':
-          contentType='h5p';
+          contentType='H5P';
           break;
         case 'application/pdf':
-          contentType='pdf';
+          contentType='PDF';
           break;
         case 'video/mp4':
-          contentType='mp4';
+          contentType='VIDEO_MP4';
           break;
         case 'video/webm':    
-          contentType='webm';
+          contentType='WEBM_VIDEO';
           break;
         case 'video/youtube':
-          contentType='youtube';
+          contentType='YOUTUBE_X_VIDEO';
           break;
         case 'video/x-youtube':
-          contentType='youtube';
+          contentType='YOUTUBE_X_VIDEO';
           break;
         case 'application/vnd.ekstep.html-archive':
-          contentType='ecml';
+          contentType='HTML';
           break;
         case 'application/epub':
-          contentType='epub';
+          contentType='EPUB';
           break;
         case 'audio/mp3':
-          contentType='mp3';
+          contentType='AUDIO_MP3';
           break;
         case 'audio/wav':
-          contentType='wav';
+          contentType='AUDIO_WAV';
           break;
         case 'audio/mpeg':
-          contentType='mpeg';
+          contentType='AUDIO_MP3';
           break;
         default :
-          contentType='content';
+          contentType='CONTENT';
           break;
       }
 
@@ -96,7 +96,7 @@ const ContentPlayerV2 = ({
                 configFunctionality,
               });
             }
-            if(detail.eid=='PROGRESS' && detail?.edata?.resumeData!='' && contentType!='epub')
+            if(detail.eid=='PROGRESS' && detail?.edata?.resumeData!='' && contentType!='EPUB')
             {
               await getTelemetryEventsResume(detail, contentType, {
                   courseId,
