@@ -31,6 +31,20 @@ export const getRetentionForm = async (): Promise<RetentionFormBundle | null> =>
     'ui:submitButtonOptions': { norender: true },
   };
 
+  // The backend form config sends callingDate as a plain CustomTextFieldWidget
+  // text box. Swap in the project's real date-picker widget instead — same
+  // fieldId/required/validation on the schema side stay untouched, only how
+  // the value is entered changes. Same fix PlacementFormService already
+  // applies to dateOfJoining; CustomDateWidget already reads/writes this
+  // field's `string` schema type as a plain 'YYYY-MM-DD' string, so no
+  // schema change is needed for it to work.
+  if (uiSchema.callingDate) {
+    uiSchema.callingDate = {
+      ...uiSchema.callingDate,
+      'ui:widget': 'CustomDateWidget',
+    };
+  }
+
   return { schema, uiSchema };
 };
 
@@ -44,12 +58,21 @@ export const getRetentionForm = async (): Promise<RetentionFormBundle | null> =>
 // this layer instead, see applySkipAndHide below for the initial-render
 // gap that leaves open regardless), so a genuinely missing key can never
 // trigger the "" branch even though it's a valid skipAndHide entry. An
-// empty array is truthy and stringifies to '' for that lookup, so it
-// resolves correctly once the user's first interaction re-evaluates it.
+// empty array (not [''], see below) is truthy and stringifies to '' for
+// that lookup, so it resolves correctly once the user's first interaction
+// re-evaluates it.
+//
+// Deliberately [] and not [''] — AutoCompleteMultiSelectWidget disables
+// every remaining option once `selectedValues.length >= maxSelection`
+// (see its own getOptionDisabled). For a maxSelection:1 field like
+// currentlyEmployed, a single placeholder element (even an empty string)
+// already "fills" that one slot, so both Yes/No would render disabled
+// before the Coordinator ever gets to pick one. A truly empty array keeps
+// the count at 0 while still resolving the same '' skipAndHide branch.
 export const getInitialRetentionFormData = (schema: any): Record<string, any> => {
   const initial: Record<string, any> = {};
   Object.entries(schema?.properties || {}).forEach(([key, property]: [string, any]) => {
-    initial[key] = property?.type === 'array' ? [''] : '';
+    initial[key] = property?.type === 'array' ? [] : '';
   });
   return initial;
 };

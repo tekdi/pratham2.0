@@ -97,13 +97,22 @@ const RetentionModal: React.FC<RetentionModalProps> = ({
     }
   };
 
-  const baseUiSchema = isCompleted
-    ? getReadOnlyUiSchema(form.schema, form.uiSchema)
+  // applySkipAndHide is only safe to precompute for a Completed (read-only,
+  // never-changes-again) Follow-Up. DynamicForm's own live handleChange
+  // recomputes skip/hide from scratch on every interaction, but only ever
+  // *adds* 'ui:widget': 'hidden' onto whatever uiSchema it was first
+  // mounted with (see hideFieldsInUISchema — it never removes one). Feeding
+  // it an already-hidden uiSchema for the editable case would permanently
+  // wedge monthlySalary/reasonForLeavingJob hidden — DynamicForm's own
+  // per-interaction recompute could add hides but never take one back. So
+  // the editable case is left to start from the untouched uiSchema and
+  // rely entirely on DynamicForm's own (correct, unconditional)
+  // handleChange logic for every skip/hide toggle, accepting that
+  // dependent fields may briefly show before the Coordinator's first
+  // interaction with any field.
+  const uiSchema = isCompleted
+    ? applySkipAndHide(form.schema, getReadOnlyUiSchema(form.schema, form.uiSchema), initialFormData)
     : withCallIntervalLocked(form.uiSchema);
-  // Precomputed once, from the same initialFormData formData itself starts
-  // as — see applySkipAndHide's own comment for why this can't just rely
-  // on DynamicForm's own internal skip/hide effect for this form's shape.
-  const uiSchema = applySkipAndHide(form.schema, baseUiSchema, initialFormData);
 
   return (
     <Modal open onClose={onClose} aria-labelledby="retention-modal-title">
