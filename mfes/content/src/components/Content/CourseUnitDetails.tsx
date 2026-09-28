@@ -103,14 +103,9 @@ export default function Details(props: DetailsProps) {
       try {
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-        const isPosPath = currentPath.includes('/pos');        let resultHierarchyCourse;
-        if(isPosPath) {
-          resultHierarchyCourse = await hierarchyAPI(courseId as string) as any;
-        } else {
-          resultHierarchyCourse = await hierarchyAPI(courseId as string, {
-            mode: 'edit',
-          }) as any;
-        }
+        const isPosPath = currentPath.includes('/pos');
+        // Read the Live hierarchy only; mode=edit returned unpublished Draft/Review changes to learners
+        const resultHierarchyCourse = await hierarchyAPI(courseId as string) as any;
        
      
         const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
