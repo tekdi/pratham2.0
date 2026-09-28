@@ -175,6 +175,10 @@ const AutoCompleteMultiSelectWidget = ({
         isOptionEqualToValue={(option, value) => option.value === value.value}
         disabled={isDisabled}
         disableCloseOnSelect={true}
+        // The dropdown-level clear (X) icon clears every selection at once, so
+        // it only earns its place once there are 2+ to clear — with a single
+        // selection the chip's own delete icon already covers it.
+        disableClearable={selectedOptions.length <= 1}
         renderTags={(value, getTagProps) => (
           <>
             {visibleChips.map((option, index) => (
