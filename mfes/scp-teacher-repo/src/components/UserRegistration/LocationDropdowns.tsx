@@ -62,7 +62,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
         });
         if (response?.result?.values) {
           const stateOptions = response.result.values.map((item: any) => ({
-            value: item.value || item.state_id,
+            value: item.value != null ? item.value : item.state_id,
             label: item.label || item.state_name,
           }));
           setStates(stateOptions);
@@ -94,7 +94,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
           });
           if (response?.result?.values) {
             const districtOptions = response.result.values.map((item: any) => ({
-              value: item.value || item.district_id,
+              value: item.value != null ? item.value : item.district_id,
               label: item.label || item.district_name,
             }));
             setDistricts(districtOptions);
@@ -130,7 +130,7 @@ const LocationDropdowns: React.FC<LocationDropdownsProps> = ({ onLocationChange 
           });
           if (response?.result?.values) {
             const blockOptions = response.result.values.map((item: any) => ({
-              value: item.value || item.block_id,
+              value: item.value != null ? item.value : item.block_id,
               label: item.label || item.block_name,
             }));
             setBlocks(blockOptions);

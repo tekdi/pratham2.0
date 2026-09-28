@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "କିଛି ଭୁଲ ହେଲା",
     "NO_GO_BACK": "ନାହିଁ ପୂର୍ବକୁ ପେରନ୍ତୁ",
     "YES": "ହଁ",
+    "NO": "ନାହିଁ",
     "REVIEW_ATTENDANCE": "ଉପସ୍ଥିତି ରିଭିଉ କରନ୍ତୁ",
     "ADD_NEW": "ଏଡ୍ ନିୟୁ",
     "ADD": "ଏଡ୍",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "ଶେଷ ତାରିଖ ଆରମ୍ଭ ତାରିଖ ଠାରୁ ପୂର୍ବରୁ ହୋଇପାରିବ ନାହିଁ |",
     "DELETE_THIS_SESSION": "ଏହି ଅଧିବେଶନ ଡିଲିଟ୍ କରନ୍ତୁ |",
     "LEARNER_PREREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପୂର୍ବଆବଶ୍ୟକତା",
-    "LEARNER_POSTREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପରବର୍ତ୍ତୀ ଆବଶ୍ୟକତା |"
+    "LEARNER_POSTREQUISITES": "ଶିକ୍ଷାର୍ଥୀଙ୍କ  ପରବର୍ତ୍ତୀ ଆବଶ୍ୟକତା |",
+    "SESSION_SLOT_CONFLICT_MSG": "ଏହି ସମୟରେ ଏହି ବ୍ୟାଚ ପାଇଁ ପୂର୍ବରୁ ଏକ ଅଧିବେଶନ ନିର୍ଦ୍ଧାରିତ ଅଛି। ଆପଣ ସେହି ସମୟ ପାଇଁ ଆଉ ଏକ ଅଧିବେଶନ ନିର୍ଦ୍ଧାରଣ କରିବାକୁ ଚାହୁଁଛନ୍ତି କି?",
+    "SESSION_START_TIME_IN_PAST_ERROR": "ଆରମ୍ଭ ସମୟ ପୂର୍ବରୁ ଚାଲିଯାଇଛି। ଦୟାକରି ଏକ ଭବିଷ୍ୟତ ସମୟ ବାଛନ୍ତୁ।"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "କେନ୍ଦ୍ର ଅନୁରୋଧ ସଫଳତାର ସହିତ",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "ୟୁନିଟ୍ ନାମ",
     "UNIT_CODE": "ୟୁନିଟ୍ କୋଡ",
     "ENROLLMENT_NUMBER": "ନାମାଙ୍କନ  ସଂଖ୍ୟା",
+    "ENROLLMENT_ID": "ନାମାଙ୍କନ ଆଇ.ଡି.",
+    "DATE_OF_JOINING": "ଯୋଗଦାନ ତାରିଖ",
     "BLOCK_NAME": "ବ୍ଲକ୍ ନାମ",
     "STUDENT_TYPE": "ଶିକ୍ଷାର୍ଥୀ ପ୍ରକାର",
     "STATE_NAME": "ରାଜ୍ୟ ନାମ",

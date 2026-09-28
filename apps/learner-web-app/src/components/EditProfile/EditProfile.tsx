@@ -210,8 +210,8 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         delete responseFormForEnroll?.schema?.properties?.consent_file;
         delete responseFormForEnroll?.schema?.properties?.privacy_consent;
         delete responseFormForEnroll?.schema?.properties?.parent_guardian_consent;
-        delete responseFormForEnroll?.schema?.properties?.nda_policy;
-        delete responseFormForEnroll?.schema?.properties?.child_pocso_fraud_policy;
+        // delete responseFormForEnroll?.schema?.properties?.nda_policy;
+        // delete responseFormForEnroll?.schema?.properties?.child_pocso_fraud_policy;
         delete responseFormForEnroll?.schema?.properties?.how_would_you_like_to_register;
         delete responseFormForEnroll?.schema?.properties?.organisation_registered;
         delete responseFormForEnroll?.schema?.properties?.volunteer_type;
@@ -482,6 +482,19 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
               }
             }
           }
+          //shift nda policy at end
+          const order = alterUISchema['ui:order'];
+          const policies = ['nda_policy', 'child_pocso_fraud_policy'];
+          alterUISchema['ui:order'] = [
+            ...order.filter((item:any) => !policies.includes(item)),
+            ...order.filter((item:any) => policies.includes(item)),
+          ];
+          //if !enrolledProgram then remove from required policies
+          if(!enrolledProgram){
+            alterSchema.required = alterSchema?.required?.filter(
+              (item:any) => !['nda_policy', 'child_pocso_fraud_policy'].includes(item)
+            );
+          }
           setAddSchema(alterSchema);
           alterUISchema.mobile = responseForm?.uiSchema?.mobile
           console.log("alterUISchema", alterUISchema);
@@ -515,7 +528,12 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
         }
 
         // Push grid option
-        enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+        if(['nda_policy','child_pocso_fraud_policy']?.includes(fieldKey)){
+          enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 12 };
+        }
+        else{
+          enhancedSchema[fieldKey]['ui:options'].grid = { xs: 12, sm: 12, md: 6 };
+        }
       }
     });
 
