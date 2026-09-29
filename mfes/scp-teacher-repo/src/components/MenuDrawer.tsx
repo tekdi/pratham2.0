@@ -7,6 +7,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
+import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import {
   Button,
   FormControl,
@@ -283,7 +284,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     '/attendance-history',
     '/attendance-overview',
   ].includes(router.pathname);
-  const isTeacherCenter = router.pathname.includes('/centers');
+  const isCrossCenterSessions = router.pathname.includes(
+    '/centers/cross-center-sessions'
+  );
+  const isTeacherCenter =
+    router.pathname.includes('/centers') && !isCrossCenterSessions;
   const isCoursePlanner = [
     '/curriculum-planner',
     '/topic-detail-view',
@@ -658,6 +663,43 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               {accessGranted('showTeachingCenter', accessControl, userRole)
                 ? t('DASHBOARD.TEACHING_CENTERS')
                 : t('DASHBOARD.MY_TEACHING_CENTERS')}
+            </Button>
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isCrossCenterSessions
+                  ? theme.palette.primary.main
+                  : 'transparent',
+
+                padding: isCrossCenterSessions
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                color: isCrossCenterSessions
+                  ? '#2E1500'
+                  : theme.palette.warning.A200,
+                fontWeight: isCrossCenterSessions ? '600' : 500,
+                '&:hover': {
+                  background: isCrossCenterSessions
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+                marginTop: '15px',
+                gap: '10px',
+              }}
+              startIcon={
+                <HubOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                closeDrawer();
+                router.push('/centers/cross-center-sessions');
+              }}
+              component="a"
+              href={withBasePath('/centers/cross-center-sessions')}
+            >
+              {t('DASHBOARD.CROSS_CENTER_SESSIONS')}
             </Button>
           </Box>
         )}

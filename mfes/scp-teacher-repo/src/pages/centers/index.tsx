@@ -947,6 +947,39 @@ const CentersPage = () => {
               ) : (
                 <NoDataFound />
               )}
+              <Box sx={{ px: 2, mt: 3 }}>
+                <Typography
+                  fontSize={'12px'}
+                  fontWeight={600}
+                  letterSpacing={'0.5px'}
+                  color={theme.palette.warning['400']}
+                  sx={{ textTransform: 'uppercase' }}
+                >
+                  {t('CENTER_SESSION.SCHEDULING_A_SESSION_TITLE')}
+                </Typography>
+                <Typography
+                  fontSize={'14px'}
+                  color={theme.palette.warning['300']}
+                  sx={{ mt: 0.5 }}
+                >
+                  {t('CENTER_SESSION.SCHEDULE_NOTE_BEFORE_LINK')}{' '}
+                  <Box
+                    component="span"
+                    onClick={() => router.push('/centers/cross-center-sessions')}
+                    sx={{
+                      color: theme.palette.secondary.main,
+                      fontWeight: 600,
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t('DASHBOARD.CROSS_CENTER_SESSIONS')}
+                  </Box>{' '}
+                  {t('CENTER_SESSION.SCHEDULE_NOTE_AFTER_LINK', {
+                    scheduleNew: t('COMMON.SCHEDULE_NEW'),
+                  })}
+                </Typography>
+              </Box>
             </>
           )}
         </Box>
