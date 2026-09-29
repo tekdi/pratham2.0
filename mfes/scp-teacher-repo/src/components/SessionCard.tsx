@@ -50,8 +50,11 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [editSession, setEditSession] = React.useState();
   const [eventStatus, setEventStatus] = React.useState('');
   const [CohortBMG, setCohortBMG] = React.useState<any>({});
+<<<<<<< HEAD
   const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
     React.useState(false);
+=======
+>>>>>>> e6581e8c1d530bd5e5640bb69edb4a6347114e90
   const [currentUserId, setCurrentUserId] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;

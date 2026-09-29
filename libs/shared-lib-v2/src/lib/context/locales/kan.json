@@ -104,6 +104,9 @@
     "NO_SCHOOLING": "ಶಾಲೆಗೆ ಹೋಗಿಲ್ಲ"
   },
   "COMMON": {
+    "SUBMIT_REGISTRATION":"ನೋಂದಣಿ ಸಲ್ಲಿಸಿ",
+    "SUBMIT_POC_REQUEST":"POC ವಿನಂತಿ ಸಲ್ಲಿಸಿ",
+    "REGISTER_ORGANISATION":"ಸಂಸ್ಥೆಯನ್ನು ನೋಂದಾಯಿಸಿ",
     "L1_COURSES": "L1 ಕೋರ್ಸುಗಳು",
     "EXPLORE": "ಅನ್ವೇಷಿಸಿ",
     "SURVEYS": "ಸರ್ವೇಗಳು",
@@ -553,6 +556,8 @@
     "MAKE_A_DIFFERENCE": "ನಮ್ಮ ಸ್ವಯಂಸೇವಕ ಕಾರ್ಯಕ್ರಮಗಳ ಮೂಲಕ ಬದಲಾವಣೆ ತನ್ನಿ",
     "YES_CREATE_NEW_ACCOUNT": "ಹೌದು, ಹೊಸ ಖಾತೆ ರಚಿಸಿ",
     "ENROLLED_TO_BELOW_PROGRAMS": "ನೀವು ಕೆಳಗಿನ ಕಾರ್ಯಕ್ರಮಗಳಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ ಎಂದು ನಾವು ನೋಡಬಹುದು:",
+    "ALREADY_ENROLLED_TO_PROGRAM": "ನೀವು ಈಗಾಗಲೇ ಈ ಕಾರ್ಯಕ್ರಮದಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ:",
+    "ALREADY_ENROLLED_TO_PROGRAMS": "ನೀವು ಈಗಾಗಲೇ ಈ ಕಾರ್ಯಕ್ರಮಗಳಲ್ಲಿ ದಾಖಲಾಗಿದ್ದೀರಿ:",
     "SURE_TO_ENROLL_INTO": "ನೀವು ಇದರಲ್ಲಿ ದಾಖಲಾಗಲು ಬಯಸುತ್ತೀರಿ ಎಂದು ಖಚಿತವಾಗಿದೆಯೇ",
     "YES": "ಹೌದು",
     "ENROL_MODAL": {
@@ -928,6 +933,10 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "ಪ್ರಥಮ್ ರೀಡ್ ಇಂಡಿಯಾ ಇನಿಶಿಯೇಟಿವ್ RII",
     "GOVERNMENT_PARTNERSHIP": "ಸರ್ಕಾರಿ ಪಾಲುದಾರಿಕೆ",
     "SUMMER_CAMP_VOLUNTEER": "ಬೇಸಿಗೆ ಶಿಬಿರದ ಸ್ವಯಂಸೇವಕರು",
+    "ITC": "ITC",
+    "ADP": "ADP",
+    "STANDALONE_UPPER_PRIMARY": "ಸ್ವತಂತ್ರ ಹಿರಿಯ ಪ್ರಾಥಮಿಕ",
+    "Others": "ಇತರೆ",
     "WHAT_PROGRAM_ARE_YOU_PART_OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "WHAT PROGRAM ARE YOU PART OF": "ನೀವು ಯಾವ ಕಾರ್ಯಕ್ರಮದ ಭಾಗವಾಗಿದ್ದೀರಿ?",
     "CATCHMENT_AREA": "ಕ್ಯಾಚಮೆಂಟ್ ಏರಿಯಾ",
@@ -940,6 +949,8 @@
     "POCSO_POLICY": "POCSO ನೀತಿ",
     "NDA_POLICY": "NDA ನೀತಿ",
     "FRAUD_PROTECTION_POLICY": "ವಂಚನೆ ರಕ್ಷಣೆ ನೀತಿ",
+    "PTM_PHONE_NUMBER": "PTM ಫೋನ್ ಸಂಖ್ಯೆ",
+    "PTM_MOBILE_PLACEHOLDER": "10-ಅಂಕಿ ಸಂಖ್ಯೆ",
     "AND_TO_MAINTAIN_CONFIDENTIALITY": "ಮತ್ತು ಗೌಪ್ಯತೆಯನ್ನು ಕಾಪಾಡಲು ಒಪ್ಪುತ್ತೇನೆ.",
     "AND_TO_COMPLY": "ಮತ್ತು ಅನುಸರಿಸಲು ಒಪ್ಪುತ್ತೇನೆ.",
     "AND": "ಮತ್ತು",
