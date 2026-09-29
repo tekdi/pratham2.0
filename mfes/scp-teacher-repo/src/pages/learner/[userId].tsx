@@ -495,14 +495,38 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     fetchUserDetails();
   }, [reload]);
 
+  // Joining date comes as an ISO timestamp, show it as "16 Aug 1995"
+  const formatJoiningDate = (date: any) => {
+    if (!date) return '';
+    const parsedDate = new Date(date);
+    return isNaN(parsedDate.getTime())
+      ? date
+      : parsedDate.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        });
+  };
+
   const coreFields = [
     // { label: 'FIRST_NAME', value: userData?.firstName },
     // { label: 'MIDDLE_NAME', value: userData?.middleName },
     // { label: 'LAST_NAME', value: userData?.lastName },
-    { label: 'GENDER', value: userData?.gender },
-    { label: 'DOB', value: userData?.dob },
-    { label: 'EMAIL', value: userData?.email },
-    { label: 'MOBILE', value: userData?.mobile },
+    { label: 'GENDER', value: userData?.gender, type: 'text' },
+    { label: 'DOB', value: userData?.dob, type: 'text' },
+    { label: 'EMAIL', value: userData?.email, type: 'text' },
+    { label: 'MOBILE', value: userData?.mobile, type: 'text' },
+    // 'readonly' keeps these out of the text/pascal-case formatting below
+    {
+      label: 'ENROLLMENT_ID',
+      value: userData?.enrollmentId || userData?.username,
+      type: 'readonly',
+    },
+    {
+      label: 'DATE_OF_JOINING',
+      value: formatJoiningDate(userData?.createdOn || userData?.createdAt),
+      type: 'readonly',
+    },
   ];
 
   const coreFieldsForDisplay = coreFields
@@ -510,10 +534,10 @@ const LearnerProfile: React.FC<LearnerProfileProp> = ({
     .map((f, idx) => ({
       fieldId: f.label,
       label: f.label,
-      type: 'text',
+      type: f.type,
       value: f.value,
       displayValue: f.value,
-      order: idx, 
+      order: idx,
       coreField: 1,
     }));
 

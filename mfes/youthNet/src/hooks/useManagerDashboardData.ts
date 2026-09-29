@@ -93,9 +93,15 @@ const loadManagerDashboardData = (): Promise<void> => {
     let fetchedCourses_EMP_GROUP: Course[] = [];
     let fetchedCourses: Course[] = [];
     try {
-      fetchedCourses_JOB_FAMILY = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, jobFamily : user_custom_family?.JOB_FAMILY} });
-      fetchedCourses_PSU = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, psu : user_custom_family?.PSU} });
-      fetchedCourses_EMP_GROUP = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, groupMembership : user_custom_family?.EMP_GROUP} });
+      if (Array.isArray(user_custom_family?.JOB_FAMILY) && user_custom_family.JOB_FAMILY.length > 0) {
+        fetchedCourses_JOB_FAMILY = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, jobFamily : user_custom_family.JOB_FAMILY} });
+      }
+      if (Array.isArray(user_custom_family?.PSU) && user_custom_family.PSU.length > 0) {
+        fetchedCourses_PSU = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, psu : user_custom_family.PSU} });
+      }
+      if (Array.isArray(user_custom_family?.EMP_GROUP) && user_custom_family.EMP_GROUP.length > 0) {
+        fetchedCourses_EMP_GROUP = await fetchCourses({ filters: {...COURSE_CATALOGUE_FILTERS, groupMembership : user_custom_family.EMP_GROUP} });
+      }
       // fetchedCourses=[...fetchedCourses_JOB_FAMILY,...fetchedCourses_PSU,...fetchedCourses_EMP_GROUP];
       fetchedCourses = [
         ...new Map(
