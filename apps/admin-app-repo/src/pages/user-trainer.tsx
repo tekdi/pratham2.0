@@ -7,7 +7,7 @@ import { TrainerSearchSchema, TrainerSearchUISchema } from '../constant/Forms/Tr
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Role, RoleId } from '@/utils/app.constant';
-import { userList } from '@/services/UserList';
+import { HierarchicalSearchUserList } from '@/services/UserList';
 import {
   Box,
   Typography,
@@ -25,7 +25,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
-import restoreIcon from '../../public/images/restore_user.svg';
+import apartment from '../../public/images/apartment.svg';
 import Image from 'next/image';
 import { searchListData } from '@/components/DynamicForm/DynamicFormCallback';
 import TenantService from '@/services/TenantService';
@@ -49,9 +49,11 @@ import {
 } from '@/utils/filterTableActionsForAcademicYear';
 import { bulkCreateCohortMembers } from '@/services/CohortService/cohortService';
 import {
+  disableDomainSkillFields,
   extractDomainSkillValues,
   getTrainerMappingForm,
 } from '@/services/trainer/TrainerFormService';
+import { getUserAssignedCenters, TrainerCenter } from '@/services/trainer/TrainerCenterService';
 import TrainerCenterSelector from '@/components/trainer/TrainerCenterSelector';
 
 // Trainer listing + filters, matching user-placement-retention-coordinator.tsx's
@@ -59,8 +61,11 @@ import TrainerCenterSelector from '@/components/trainer/TrainerCenterSelector';
 // list + Edit/Delete/Reactivate), sitting next to it under Manage Users.
 // Trainer itself reuses the Instructor role (RoleId.TEACHER, same as
 // user-instructor.tsx) — there is no separate backend role for it — and the
-// list is filtered/searched the same way that page's own Instructor search
-// already works (`userList` with role:'Instructor').
+// list is fetched via /user/hierarchical-search, same as user-instructor.tsx
+// and user-leader.tsx's own listings, rather than plain /user/list — that's
+// what embeds each row's own `cohortData` (needed by Reassign Center to know
+// a Trainer's currently active Centers) and flat `customfield` object
+// (needed by the Domain/Skill/Location columns below).
 //
 // The one structural difference from PRC's single-step "Map New" (which just
 // enrolls the user into the role) is the Map New wizard here still has two
@@ -75,7 +80,9 @@ const TrainerMapping = () => {
   const [schema] = useState(TrainerSearchSchema);
   const [uiSchema] = useState(TrainerSearchUISchema);
   const [pageLimit, setPageLimit] = useState<number>(10);
-  const [pageOffset, setPageOffset] = useState<number>(0);
+  // Only the setter is needed — searchListData requires it to track
+  // pagination offset internally, but this page never reads the value back.
+  const [, setPageOffset] = useState<number>(0);
   const [prefilledFormData, setPrefilledFormData] = useState({});
   const [response, setResponse] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -144,6 +151,23 @@ const TrainerMapping = () => {
     }
   };
 
+  // /user/hierarchical-search (same endpoint + convention as
+  // user-instructor.tsx's own HierarchicalSearchUserListCustom) instead of
+  // plain /user/list — this is what actually returns `cohortData` embedded
+  // per row, which Reassign Center needs to know a Trainer's currently
+  // active Centers, and it's the same source Domain/Skill/State/District/
+  // Block/Village come back from as a flat `customfield` object (see the
+  // table columns below) rather than the customFields array /user/list uses.
+  const HierarchicalSearchUserListCustom = async (data: any) => {
+    const { role, tenantId, ...filteredFilters } = data.filters || {};
+    const newData = { ...data, filters: filteredFilters };
+    return await HierarchicalSearchUserList({
+      ...newData,
+      role: [Role.TEACHER],
+      customfields: ['state', 'district', 'block', 'village', 'domain', 'skills'],
+    });
+  };
+
   const searchData = async (formData: any, newPage: any) => {
     if (formData) {
       formData = Object.fromEntries(
@@ -169,35 +193,24 @@ const TrainerMapping = () => {
         setPageOffset,
         setCurrentPage,
         setResponse,
-        userList,
+        HierarchicalSearchUserListCustom,
         staticSort
       );
     }
   };
 
-  // Domain/Skill/State/District/Block/Village are all read out of each
-  // row's own customFields by label — same convention
-  // PlacementRetentionCoordinator's own Domain column and
-  // TrainerTaxonomyService (mfes/youthNet) already use. A customField's own
-  // selectedValues come back in two different shapes from /user/list —
-  // DOMAIN/SKILLS as plain strings (["Apparel"]), but
-  // STATE/DISTRICT/BLOCK/VILLAGE as objects ([{id, value}]) — rendering the
-  // object form directly is what produced "[object Object]" in the table.
-  // Read whichever shape is present.
-  const getSelectedValueLabel = (selectedValue: any): string | null => {
-    if (selectedValue == null) return null;
-    if (typeof selectedValue === 'object') {
-      return selectedValue.label || selectedValue.value || null;
-    }
-    return String(selectedValue);
-  };
-
-  const findCustomFieldValues = (row: any, label: string): string => {
-    const field = row?.customFields?.find((f: any) => f.label === label);
-    const values = (field?.selectedValues || [])
-      .map(getSelectedValueLabel)
-      .filter(Boolean);
-    return values.length ? values.join(', ') : '-';
+  // Domain/Skill/State/District/Block/Village all come back on
+  // /user/hierarchical-search's own flat `row.customfield.<code>` object
+  // (lowercase field codes, plain display strings) — same shape
+  // user-instructor.tsx's own State/District/Block/Village/Main Subjects/
+  // Subjects Teach columns already read (`row?.customfield?.state`,
+  // `.district`, `.main_subject`, ...). This is a different, flatter shape
+  // than plain /user/list's `customFields` array of
+  // {fieldId, label, selectedValues}.
+  const getCustomFieldValue = (row: any, code: string): string => {
+    const raw = row?.customfield?.[code];
+    if (raw === undefined || raw === null || raw === '') return '-';
+    return String(raw);
   };
 
   const columns = [
@@ -229,8 +242,8 @@ const TrainerMapping = () => {
       key: 'LOCATION',
       label: 'Location (State / District / Block / Village)',
       render: (row: any) => {
-        const parts = ['STATE', 'DISTRICT', 'BLOCK', 'VILLAGE']
-          .map((label) => findCustomFieldValues(row, label))
+        const parts = ['state', 'district', 'block', 'village']
+          .map((code) => transformLabel(getCustomFieldValue(row, code)))
           .filter((part) => part && part !== '-');
         return parts.length ? parts.join(' / ') : '-';
       },
@@ -238,12 +251,12 @@ const TrainerMapping = () => {
     {
       key: 'DOMAIN',
       label: 'Domain',
-      render: (row: any) => findCustomFieldValues(row, 'DOMAIN'),
+      render: (row: any) => transformLabel(getCustomFieldValue(row, 'domain')),
     },
     {
       key: 'SKILLS',
       label: 'Skill',
-      render: (row: any) => findCustomFieldValues(row, 'SKILLS'),
+      render: (row: any) => transformLabel(getCustomFieldValue(row, 'skills')),
     },
   ];
 
@@ -255,7 +268,7 @@ const TrainerMapping = () => {
   const [userPayload, setUserPayload] = useState<any>(null);
   const [domain, setDomain] = useState<string | undefined>(undefined);
   const [skills, setSkills] = useState<string[]>([]);
-  const [selectedCenter, setSelectedCenter] = useState<any>(null);
+  const [selectedCenters, setSelectedCenters] = useState<TrainerCenter[]>([]);
   const [isMapping, setIsMapping] = useState(false);
 
   const resetWizard = () => {
@@ -265,7 +278,7 @@ const TrainerMapping = () => {
     setUserPayload(null);
     setDomain(undefined);
     setSkills([]);
-    setSelectedCenter(null);
+    setSelectedCenters([]);
   };
 
   const handleCloseMapModal = () => {
@@ -287,7 +300,7 @@ const TrainerMapping = () => {
   };
 
   const handleConfirmMapping = async () => {
-    if (!selectedUserId || !selectedCenter || !userPayload || isMapping) return;
+    if (!selectedUserId || selectedCenters.length === 0 || !userPayload || isMapping) return;
     setIsMapping(true);
     try {
       const { userData, customFields } = splitUserData(userPayload);
@@ -308,7 +321,7 @@ const TrainerMapping = () => {
 
       const bulkResponse = await bulkCreateCohortMembers({
         userId: [selectedUserId],
-        cohortId: [selectedCenter.cohortId],
+        cohortId: selectedCenters.map((center) => center.cohortId),
       });
 
       const isBulkSuccess =
@@ -318,7 +331,7 @@ const TrainerMapping = () => {
 
       if (!isBulkSuccess) {
         showToastMessage(
-          bulkResponse?.params?.errmsg || 'Could not map Trainer to this Center',
+          bulkResponse?.params?.errmsg || 'Could not map Trainer to the selected Centers',
           'error'
         );
         return;
@@ -341,9 +354,116 @@ const TrainerMapping = () => {
   const [selectedUserRow, setSelectedUserRow] = useState<any>(null);
   const [isEditInProgress, setIsEditInProgress] = useState(false);
 
-  // ---- Delete / Reactivate confirmation state ----
+  // ---- Reassign Center state ----
+  // Trainer can add additional Centers and remove previously assigned ones.
+  // Opens pre-populated with the Trainer's own Domain/Skill (read off the
+  // row) and their current Centers — the latter is the intersection of
+  // /cohort/geographical-hierarchy (every Center this user is assigned to,
+  // across every role they hold) and /cohort/search filtered by this
+  // Trainer's Domain/Skill (see getUserAssignedCenters in
+  // TrainerCenterService for why neither API alone is enough for a
+  // multi-role user).
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [reassignUserId, setReassignUserId] = useState<string | null>(null);
+  const [reassignUserName, setReassignUserName] = useState('');
+  const [reassignDomain, setReassignDomain] = useState<string | undefined>(undefined);
+  const [reassignSkills, setReassignSkills] = useState<string[]>([]);
+  const [reassignCenters, setReassignCenters] = useState<TrainerCenter[]>([]);
+  const [originalReassignCenterIds, setOriginalReassignCenterIds] = useState<string[]>([]);
+  const [isReassignLoading, setIsReassignLoading] = useState(false);
+  const [isReassigning, setIsReassigning] = useState(false);
+
+  const handleCloseReassignModal = () => {
+    setReassignModalOpen(false);
+    setReassignUserId(null);
+    setReassignDomain(undefined);
+    setReassignSkills([]);
+    setReassignCenters([]);
+    setOriginalReassignCenterIds([]);
+  };
+
+  const openReassignModal = async (row: any) => {
+    setReassignModalOpen(true);
+    setReassignUserId(row?.userId);
+    setReassignUserName(`${row.firstName || ''} ${row.lastName || ''}`.trim());
+    setReassignCenters([]);
+    setOriginalReassignCenterIds([]);
+    setIsReassignLoading(true);
+
+    const rowDomain = row?.customfield?.domain;
+    const rowSkillsRaw = row?.customfield?.skills;
+    const rowSkills = rowSkillsRaw
+      ? String(rowSkillsRaw)
+          .split(',')
+          .map((skill: string) => skill.trim())
+          .filter(Boolean)
+      : [];
+    setReassignDomain(rowDomain || undefined);
+    setReassignSkills(rowSkills);
+
+    try {
+      // Intersects /cohort/geographical-hierarchy (every Center this user
+      // is assigned to, across every role they hold) with /cohort/search
+      // filtered by this Trainer's own Domain/Skill — see
+      // TrainerCenterService.getUserAssignedCenters for why neither API
+      // alone is enough to isolate a multi-role user's Trainer-specific
+      // Centers.
+      const currentCenters = await getUserAssignedCenters(row?.userId, rowDomain, rowSkills);
+      setReassignCenters(currentCenters);
+      setOriginalReassignCenterIds(currentCenters.map((center) => center.cohortId));
+    } catch (error) {
+      console.error('Error loading Trainer Centers:', error);
+      showToastMessage('Could not load this Trainer\'s current Centers', 'error');
+    } finally {
+      setIsReassignLoading(false);
+    }
+  };
+
+  const handleReassignConfirm = async () => {
+    if (!reassignUserId || isReassigning) return;
+    if (reassignCenters.length === 0) {
+      showToastMessage('Please select at least one Center', 'error');
+      return;
+    }
+    setIsReassigning(true);
+    try {
+      const finalCenterIds = reassignCenters.map((center) => center.cohortId);
+      const removedCenterIds = originalReassignCenterIds.filter(
+        (id) => !finalCenterIds.includes(id)
+      );
+
+      const response = await bulkCreateCohortMembers({
+        userId: [reassignUserId],
+        cohortId: finalCenterIds,
+        ...(removedCenterIds.length > 0 ? { removeCohortId: removedCenterIds } : {}),
+      });
+
+      const isSuccess =
+        response?.responseCode === 201 ||
+        response?.data?.responseCode === 201 ||
+        response?.status === 201;
+
+      if (!isSuccess) {
+        showToastMessage(
+          response?.params?.errmsg || 'Could not update this Trainer\'s Centers',
+          'error'
+        );
+        return;
+      }
+
+      showToastMessage('Trainer\'s Centers updated successfully', 'success');
+      handleCloseReassignModal();
+      searchData(prefilledFormData, currentPage);
+    } catch (error) {
+      console.error('Error reassigning Trainer Centers:', error);
+      showToastMessage('Could not update this Trainer\'s Centers', 'error');
+    } finally {
+      setIsReassigning(false);
+    }
+  };
+
+  // ---- Delete confirmation state ----
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [reactivateConfirmOpen, setReactivateConfirmOpen] = useState(false);
   const [actionUserId, setActionUserId] = useState<string | null>(null);
   const [actionUserName, setActionUserName] = useState('');
   const [reason, setReason] = useState('');
@@ -388,17 +508,13 @@ const TrainerMapping = () => {
       icon: (
         <Box
           sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', justifyContent: 'center', padding: '10px' }}
-          title="Reactivate Trainer"
+          title="Reassign Center"
         >
-          <Image src={restoreIcon} alt="" />
+          <Image src={apartment} alt="" />
         </Box>
       ),
-      callback: (row: any) => {
-        setActionUserId(row?.userId);
-        setActionUserName(`${row.firstName || ''} ${row.lastName || ''}`.trim());
-        setReactivateConfirmOpen(true);
-      },
-      show: (row: any) => row.tenantStatus !== 'active',
+      callback: openReassignModal,
+      show: (row: any) => row.tenantStatus !== 'archived',
     },
   ];
 
@@ -419,25 +535,6 @@ const TrainerMapping = () => {
       showToastMessage('Failed to remove Trainer', 'error');
     } finally {
       setDeleteConfirmOpen(false);
-      setActionUserId(null);
-    }
-  };
-
-  const handleReactivateConfirm = async () => {
-    if (!actionUserId) return;
-    try {
-      const resp = await deleteUser({ userId: actionUserId, roleId, tenantId, status: 'active' });
-      if (resp?.responseCode === 200) {
-        showToastMessage('Trainer activated successfully', 'success');
-        searchData(prefilledFormData, currentPage);
-      } else {
-        showToastMessage('Failed to activate Trainer', 'error');
-      }
-    } catch (error) {
-      console.error('Error activating Trainer:', error);
-      showToastMessage('Failed to activate Trainer', 'error');
-    } finally {
-      setReactivateConfirmOpen(false);
       setActionUserId(null);
     }
   };
@@ -568,13 +665,14 @@ const TrainerMapping = () => {
           {formStep === 1 && (
             <Box sx={{ mb: 3 }} display="flex" flexDirection="column" gap={2}>
               <Typography variant="body1">
-                Centers matching {domain} / {skills.join(', ')}
+                Centers matching {domain} / {skills.join(', ')} — a Trainer can be assigned to
+                multiple Centers.
               </Typography>
               <TrainerCenterSelector
                 domain={domain}
                 skills={skills}
-                value={selectedCenter}
-                onChange={setSelectedCenter}
+                value={selectedCenters}
+                onChange={setSelectedCenters}
               />
             </Box>
           )}
@@ -590,7 +688,7 @@ const TrainerMapping = () => {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={!selectedCenter || isMapping}
+              disabled={selectedCenters.length === 0 || isMapping}
               onClick={handleConfirmMapping}
             >
               {isMapping ? <CircularProgress size={20} /> : 'Map as Trainer'}
@@ -615,7 +713,7 @@ const TrainerMapping = () => {
       >
         <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', p: 2 }}>
           <Typography variant="h1" component="div">
-            Edit Trainer's Domain/Skill
+            Edit Trainer Details
           </Typography>
           <IconButton aria-label="close" onClick={() => setEditModalOpen(false)}>
             <CloseIcon />
@@ -666,7 +764,10 @@ const TrainerMapping = () => {
                 }}
                 selectedUserRow={selectedUserRow}
                 schema={trainerMappingForm.schema}
-                uiSchema={trainerMappingForm.uiSchema}
+                uiSchema={disableDomainSkillFields(
+                  trainerMappingForm.schema,
+                  trainerMappingForm.uiSchema
+                )}
                 userId={selectedUserIdEdit}
                 roleId={roleId}
                 tenantId={tenantId}
@@ -685,6 +786,63 @@ const TrainerMapping = () => {
             type="submit"
           >
             {t('COMMON.SAVE')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Reassign Center: add additional Centers / remove previously
+          assigned ones. Domain/Skill are fixed (read from the Trainer's own
+          profile), only the Center selection is editable here. */}
+      <Dialog
+        open={reassignModalOpen}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') handleCloseReassignModal();
+        }}
+        maxWidth={false}
+        fullWidth
+        PaperProps={{ sx: { width: '100%', maxWidth: '100%', maxHeight: '100vh' } }}
+      >
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', p: 2 }}>
+          <Typography variant="h1" component="div">
+            Reassign {reassignUserName ? `${reassignUserName}'s` : "Trainer's"} Centers
+          </Typography>
+          <IconButton aria-label="close" onClick={handleCloseReassignModal}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, overflowY: 'auto' }}>
+          {isReassignLoading ? (
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '150px' }}>
+              <CircularProgress />
+              <Typography variant="h1" component="div" sx={{ mt: 2 }}>
+                Loading...
+              </Typography>
+            </Box>
+          ) : (
+            <Box display="flex" flexDirection="column" gap={2}>
+              <Typography variant="body1">
+                Centers matching {reassignDomain} / {reassignSkills.join(', ')} — add additional
+                Centers or remove previously assigned ones.
+              </Typography>
+              <TrainerCenterSelector
+                key={reassignUserId}
+                domain={reassignDomain}
+                skills={reassignSkills}
+                value={reassignCenters}
+                onChange={setReassignCenters}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={isReassignLoading || isReassigning || reassignCenters.length === 0}
+            onClick={handleReassignConfirm}
+          >
+            {isReassigning ? <CircularProgress size={20} /> : 'Save Centers'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -713,22 +871,6 @@ const TrainerMapping = () => {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
-      </ConfirmationPopup>
-
-      {/* Reactivate confirmation */}
-      <ConfirmationPopup
-        checked={true}
-        open={reactivateConfirmOpen}
-        onClose={() => setReactivateConfirmOpen(false)}
-        title={t('COMMON.ACTIVATE_USER')}
-        primary={t('COMMON.ACTIVATE')}
-        secondary={t('COMMON.CANCEL')}
-        reason="yes"
-        onClickPrimary={handleReactivateConfirm}
-      >
-        <Typography fontWeight="bold">
-          {actionUserName} — {t('FORM.CONFIRM_TO_ACTIVATE')}
-        </Typography>
       </ConfirmationPopup>
     </>
   );

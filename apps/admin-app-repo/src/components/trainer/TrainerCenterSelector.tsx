@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Paper,
@@ -10,11 +10,21 @@ import {
   Chip,
   CircularProgress,
   Button,
+  Card,
+  CardContent,
+  Checkbox,
+  IconButton,
 } from '@mui/material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import BusinessIcon from '@mui/icons-material/Business';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CloseIcon from '@mui/icons-material/Close';
+import SearchIcon from '@mui/icons-material/Search';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { showToastMessage } from '@/components/Toastify';
 import { getStateBlockDistrictList } from '@/services/MasterDataService';
 import {
@@ -30,16 +40,24 @@ interface Option {
 interface TrainerCenterSelectorProps {
   domain?: string;
   skills: string[];
-  value: TrainerCenter | null;
-  onChange: (center: TrainerCenter | null) => void;
+  // A Trainer can be assigned to multiple Centers — used both by Map New
+  // (fresh selection) and Reassign Center (pre-populated with the Trainer's
+  // current Centers, so they can add/remove from that set — the "earlier
+  // assigned" Centers show up already checked and in the Selected Centers
+  // summary below).
+  value: TrainerCenter[];
+  onChange: (centers: TrainerCenter[]) => void;
 }
 
-// Same "Geography Filters" + "Centers" sectioned layout as
-// MultipleBatchListWidget.tsx (the widget behind Instructor Mapping's own
-// Center/Batch step) — State/District/Block/Village cascading multi-select
-// filters narrow the Center search, same as that widget. Deliberately
-// Center-only: no Batch section, no Batch fetch, per the ticket's "No Batch
-// Selection" section.
+// Same three-section layout as MultipleCenterListWidgetNew.tsx (the widget
+// behind /user-leader's own Center picker: Geography Filters -> card-grid
+// Centers with checkboxes/Select All -> Selected Centers grouped by state)
+// — ported here rather than reused directly because that widget has no
+// Domain/Skill awareness at all (geography-only /cohort/search), while
+// Trainer Centers must also match the Trainer's own Domain/Skill
+// (customFieldsName, via TrainerCenterService). Deliberately Center-only:
+// no Batch section, no Batch fetch, per the ticket's "No Batch Selection"
+// section.
 const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
   domain,
   skills,
@@ -49,8 +67,6 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
   // Theme color
   const themeColor = '#FDBE16';
   const themeColorLight = 'rgba(253, 190, 22, 0.1)'; // 10% opacity
-  const themeColorLighter = 'rgba(253, 190, 22, 0.05)'; // 5% opacity
-  const themeColorDark = '#E5A814'; // Slightly darker for hover states
 
   const [stateOptions, setStateOptions] = useState<Option[]>([]);
   const [districtOptions, setDistrictOptions] = useState<Option[]>([]);
@@ -212,6 +228,33 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBlock.join(',')]);
 
+  // Reset the selection only when Domain/Skill actually change to a
+  // different value — not on mount, so a pre-populated `value` (Reassign
+  // Center opens with the Trainer's existing Centers already selected)
+  // survives the initial render, and not on geography-filter/search
+  // changes, which only narrow what's browsable below and must never
+  // silently drop what's already chosen.
+  //
+  // Compares against the *previous value* via a ref rather than a simple
+  // "has an effect run before" boolean — confirmed via console logging that
+  // the boolean version breaks under React 18 Strict Mode's dev-only
+  // double-invocation of effects on mount (mount -> simulated unmount ->
+  // mount again): the boolean ref survives that fake unmount, so the
+  // second simulated mount sees "already ran once" and wrongly fires
+  // onChange([]) despite domain/skills never having actually changed,
+  // wiping out Reassign's freshly-loaded selection the instant it appeared.
+  // Storing the actual previous key sidesteps this: the second Strict Mode
+  // invocation recomputes the same key, sees no difference, and no-ops.
+  const prevDepsKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    const depsKey = `${domain ?? ''}|${skills.join(',')}`;
+    if (prevDepsKeyRef.current !== null && prevDepsKeyRef.current !== depsKey) {
+      onChange([]);
+    }
+    prevDepsKeyRef.current = depsKey;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [domain, skills.join(',')]);
+
   // Search Centers whenever Domain/Skill (from the previous step) or any of
   // the geography filters / name search change. Debounced so typing in the
   // name search doesn't fire one request per keystroke.
@@ -220,7 +263,6 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
     const timeoutId = setTimeout(
       async () => {
         setCenterOptions(null);
-        onChange(null);
         if (!domain || skills.length === 0) {
           if (isCurrent) setCenterOptions([]);
           return;
@@ -333,6 +375,46 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
     </Grid>
   );
 
+  // ---- Center selection (card grid + Select All) ----
+  const selectedCenterIds = useMemo(() => value.map((c) => c.cohortId), [value]);
+
+  const handleCenterToggle = (center: TrainerCenter) => {
+    const isSelected = selectedCenterIds.includes(center.cohortId);
+    if (isSelected) {
+      onChange(value.filter((c) => c.cohortId !== center.cohortId));
+    } else {
+      onChange([...value, center]);
+    }
+  };
+
+  const visibleCenters = centerOptions || [];
+  const isAllSelected =
+    visibleCenters.length > 0 &&
+    visibleCenters.every((center) => selectedCenterIds.includes(center.cohortId));
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      const idsToRemove = visibleCenters.map((c) => c.cohortId);
+      onChange(value.filter((c) => !idsToRemove.includes(c.cohortId)));
+    } else {
+      const existingIds = value.map((c) => c.cohortId);
+      const toAdd = visibleCenters.filter((c) => !existingIds.includes(c.cohortId));
+      onChange([...value, ...toAdd]);
+    }
+  };
+
+  // ---- Selected Centers summary, grouped by state ----
+  const selectedCentersByState = useMemo(() => {
+    const grouped: Record<string, TrainerCenter[]> = {};
+    value.forEach((center) => {
+      const state = center.state || 'Unknown';
+      if (!grouped[state]) grouped[state] = [];
+      grouped[state].push(center);
+    });
+    return grouped;
+  }, [value]);
+  const selectedStatesCount = Object.keys(selectedCentersByState).length;
+
   return (
     <Box sx={{ width: '100%' }}>
       {/* Geography Filters */}
@@ -432,42 +514,64 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
         </Grid>
       </Paper>
 
-      {/* Centers */}
+      {/* Centers — card grid with checkboxes + Select All */}
       <Paper
         elevation={0}
         sx={{
           p: 2,
+          mb: 2,
           border: '1px solid',
           borderColor: 'divider',
           borderRadius: 2,
         }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: 1,
-              bgcolor: themeColorLight,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <BusinessIcon sx={{ fontSize: 16, color: themeColor }} />
-          </Box>
-          <Box>
-            <Typography variant="subtitle1" fontWeight={600}>
-              Centers
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {centerOptions == null
-                ? 'Loading…'
-                : `${centerOptions.length} center${
-                    centerOptions.length === 1 ? '' : 's'
-                  } found`}
-            </Typography>
-          </Box>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: 1,
+                bgcolor: themeColorLight,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <BusinessIcon sx={{ fontSize: 16, color: themeColor }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600}>
+                Centers
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {centerOptions == null
+                  ? 'Loading…'
+                  : `${centerOptions.length} center${
+                      centerOptions.length === 1 ? '' : 's'
+                    } found`}
+              </Typography>
+            </Box>
+          </Stack>
+          {visibleCenters.length > 0 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Checkbox
+                checked={isAllSelected}
+                onChange={handleSelectAll}
+                icon={<CheckBoxOutlineBlankIcon />}
+                checkedIcon={<CheckBoxIcon />}
+                sx={{ color: themeColor, '&.Mui-checked': { color: themeColor } }}
+              />
+              <Typography variant="body2" color="text.secondary">
+                Select All
+              </Typography>
+            </Box>
+          )}
         </Stack>
 
         <TextField
@@ -476,29 +580,235 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
           placeholder="Search centers..."
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+          }}
           sx={{ mb: 2 }}
         />
 
-        <Autocomplete
-          options={centerOptions || []}
-          loading={loading.centers}
-          getOptionLabel={(o) => o.name}
-          isOptionEqualToValue={(o, v) => o.cohortId === v.cohortId}
-          value={value}
-          onChange={(_, option) => onChange(option)}
-          renderInput={(params) => <TextField {...params} label="Center" />}
-        />
-        {centerOptions != null && centerOptions.length === 0 && (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            textAlign="center"
-            sx={{ mt: 2 }}
-          >
-            No centers found. Please adjust your filters.
-          </Typography>
+        {loading.centers ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress sx={{ color: themeColor }} />
+          </Box>
+        ) : visibleCenters.length === 0 ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <Typography variant="body2" color="text.secondary">
+              No centers found. Please adjust your filters.
+            </Typography>
+          </Box>
+        ) : (
+          <Box sx={{ maxHeight: '600px', overflowY: 'auto', overflowX: 'hidden', pr: 1 }}>
+            <Grid container spacing={2}>
+              {visibleCenters.map((center) => {
+                const isSelected = selectedCenterIds.includes(center.cohortId);
+                const locationParts = [center.village, center.block, center.district, center.state].filter(
+                  Boolean
+                );
+                return (
+                  <Grid item xs={12} sm={6} md={3} key={center.cohortId} sx={{ display: 'flex' }}>
+                    <Card
+                      sx={{
+                        border: isSelected ? `2px solid ${themeColor}` : '1px solid',
+                        borderColor: isSelected ? themeColor : 'divider',
+                        borderRadius: 2,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        height: '100%',
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        '&:hover': { boxShadow: 2, borderColor: themeColor },
+                      }}
+                      onClick={() => handleCenterToggle(center)}
+                    >
+                      <CardContent sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, flex: 1 }}>
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={() => handleCenterToggle(center)}
+                            onClick={(e) => e.stopPropagation()}
+                            icon={<CheckBoxOutlineBlankIcon />}
+                            checkedIcon={<CheckBoxIcon />}
+                            sx={{
+                              color: themeColor,
+                              '&.Mui-checked': { color: themeColor },
+                              p: 0,
+                              mt: 0.5,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                            <Typography
+                              variant="subtitle2"
+                              fontWeight={600}
+                              sx={{
+                                mb: 1,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                minHeight: '2.5em',
+                              }}
+                            >
+                              {center.name}
+                            </Typography>
+                            {locationParts.length > 0 && (
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}>
+                                <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary', flexShrink: 0 }} />
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexWrap: 'wrap' }}
+                                >
+                                  {locationParts.map((part, index) => (
+                                    <React.Fragment key={index}>
+                                      {index > 0 && (
+                                        <Box component="span" sx={{ mx: 0.5, color: 'text.secondary' }}>
+                                          •
+                                        </Box>
+                                      )}
+                                      <Box
+                                        component="span"
+                                        sx={{
+                                          color: index === locationParts.length - 1 ? themeColor : 'text.secondary',
+                                          fontWeight: index === locationParts.length - 1 ? 500 : 400,
+                                        }}
+                                      >
+                                        {part}
+                                      </Box>
+                                    </React.Fragment>
+                                  ))}
+                                </Typography>
+                              </Box>
+                            )}
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Box>
         )}
       </Paper>
+
+      {/* Selected Centers — includes earlier-assigned Centers (Reassign
+          opens with `value` already populated), grouped by state, each
+          removable individually. */}
+      {value.length > 0 && (
+        <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 1,
+                  bgcolor: themeColorLight,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <CheckCircleIcon sx={{ fontSize: 16, color: themeColor }} />
+              </Box>
+              <Box>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  Selected Centers
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {value.length} center{value.length !== 1 ? 's' : ''} across {selectedStatesCount} state
+                  {selectedStatesCount !== 1 ? 's' : ''}
+                </Typography>
+              </Box>
+            </Stack>
+            <Button
+              variant="text"
+              size="small"
+              startIcon={<DeleteIcon />}
+              onClick={() => onChange([])}
+              sx={{ textTransform: 'none' }}
+            >
+              Clear
+            </Button>
+          </Stack>
+
+          <Grid container spacing={2}>
+            {Object.entries(selectedCentersByState).map(([state, centers]) => (
+              <Grid item xs={12} sm={6} key={state}>
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    fontWeight={600}
+                    sx={{ color: themeColor, mb: 1.5, textTransform: 'uppercase' }}
+                  >
+                    {state} ({centers.length})
+                  </Typography>
+                  <Stack spacing={1.5}>
+                    {centers.map((center) => {
+                      const locationParts = [center.village, center.block, center.district].filter(Boolean);
+                      return (
+                        <Card
+                          key={center.cohortId}
+                          sx={{
+                            bgcolor: themeColorLight,
+                            border: '1px solid',
+                            borderColor: 'rgba(253, 190, 22, 0.3)',
+                            borderRadius: 1.5,
+                            p: 1.5,
+                            position: 'relative',
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => handleCenterToggle(center)}
+                            sx={{
+                              position: 'absolute',
+                              top: 4,
+                              right: 4,
+                              p: 0.5,
+                              color: 'text.secondary',
+                              '&:hover': { color: 'error.main', bgcolor: 'rgba(0, 0, 0, 0.04)' },
+                            }}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5, pr: 3 }}>
+                            {center.name}
+                          </Typography>
+                          {locationParts.length > 0 && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <LocationOnIcon sx={{ fontSize: 12, color: 'text.secondary' }} />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                              >
+                                {locationParts.map((part, index) => (
+                                  <React.Fragment key={index}>
+                                    {index > 0 && (
+                                      <Box component="span" sx={{ mx: 0.5, color: 'text.secondary' }}>
+                                        •
+                                      </Box>
+                                    )}
+                                    <Box component="span">{part}</Box>
+                                  </React.Fragment>
+                                ))}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Card>
+                      );
+                    })}
+                  </Stack>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+      )}
     </Box>
   );
 };

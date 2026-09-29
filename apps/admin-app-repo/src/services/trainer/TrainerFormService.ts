@@ -88,3 +88,33 @@ export const extractDomainSkillValues = (
 
   return { domain, skills };
 };
+
+// Edit Trainer only allows changing profile fields (state/district/block/
+// village/gender/mobile) — Domain and Skill are locked once the Trainer has
+// been mapped, since changing them here wouldn't touch their existing
+// Center memberships (those are already scoped to the original Domain/
+// Skill via customFieldsName). Reassign Center is the dedicated flow for
+// moving a Trainer to a different Domain/Skill's Centers. Finds the
+// property keys by fieldId (TRAINER_FIELD_IDS) rather than assuming a name,
+// same convention as the rest of this file.
+export const disableDomainSkillFields = (
+  schema: any,
+  uiSchema: any
+): any => {
+  const properties = schema?.properties || {};
+  const domainKey = Object.keys(properties).find(
+    (key) => properties[key]?.fieldId === TRAINER_FIELD_IDS.DOMAIN
+  );
+  const skillKey = Object.keys(properties).find(
+    (key) => properties[key]?.fieldId === TRAINER_FIELD_IDS.SKILLS
+  );
+
+  const nextUiSchema = { ...uiSchema };
+  if (domainKey && nextUiSchema[domainKey]) {
+    nextUiSchema[domainKey] = { ...nextUiSchema[domainKey], 'ui:disabled': true };
+  }
+  if (skillKey && nextUiSchema[skillKey]) {
+    nextUiSchema[skillKey] = { ...nextUiSchema[skillKey], 'ui:disabled': true };
+  }
+  return nextUiSchema;
+};

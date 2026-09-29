@@ -14,7 +14,6 @@ import LinkIcon from '@mui/icons-material/Link';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
-import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -399,7 +398,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isMyTeachingCenter = router.pathname.includes('/my-teaching-center');
   const isPlacements = router.pathname.includes('/placements');
   const isRetention = router.pathname.includes('/retention');
-  const isUserTrainer = router.pathname.includes('/user-trainer');
 
   return (
     <Drawer
@@ -603,20 +601,6 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                   ? t('DASHBOARD.USERS_&_VILLAGES')
                   : t('DASHBOARD.VILLAGES_AND_YOUTH')
               }
-              sx={{ marginTop: '25px' }}
-            />
-
-            {/* Trainer Role Mapping — map a user (Domain + Skill) to a
-                matching Center as a Trainer (stops at Center, no Batch). */}
-            <NavItem
-              collapsed={collapsed}
-              isActive={isUserTrainer}
-              icon={<BadgeOutlinedIcon sx={{ fontSize: '24px !important' }} />}
-              onClick={() => {
-                closeDrawer();
-                router.push('/user-trainer');
-              }}
-              label={t('DASHBOARD.TRAINER_MAPPING')}
               sx={{ marginTop: '25px' }}
             />
 
