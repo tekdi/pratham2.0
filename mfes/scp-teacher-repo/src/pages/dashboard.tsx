@@ -997,7 +997,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
               after: afterDate,
               before: beforeDate,
             },
-            cohortId: classId,
+            // Backend ignores singular `cohortId`; it needs `cohortIds` (array)
+            cohortIds: [classId],
             status: ['live'],
           };
 

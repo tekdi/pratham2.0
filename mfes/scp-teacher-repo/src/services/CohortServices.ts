@@ -80,8 +80,11 @@ export const getCohortList = async (
         if (
           block?.cohortStatus === Status.ACTIVE &&
           //if no center then also show in list only for facilitator
+          // A batch can itself have child batches, so childData alone does not
+          // mean "center"; only real centers (COHORT) skip the rebuild below.
           ((effectiveRole === Role.TEACHER &&
-            block?.childData.length > 0) ||
+            block?.type === 'COHORT' &&
+            block?.childData?.length > 0) ||
             effectiveRole !== Role.TEACHER)
           //
         ) {
