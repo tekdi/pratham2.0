@@ -424,6 +424,10 @@ export const genericEditorReviewFormResponse = {
                               "value": "Second Chance"
                           },
                           {
+                              "name": "Second Chance Program Pathways",
+                              "value": "Second Chance Program Pathways"
+                          },
+                          {
                               "name": "Digital Initiatives",
                               "value": "Digital Initiatives"
                           },

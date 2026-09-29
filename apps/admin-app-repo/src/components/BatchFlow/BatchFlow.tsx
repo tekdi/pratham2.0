@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react';
 import DynamicForm from '@/components/DynamicForm/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status } from '@/utils/app.constant';
+import {
+  CohortTypes,
+  Status,
+  resolveFrameworkPlaceholders,
+  TenantName,
+} from '@/utils/app.constant';
 import { Box, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
@@ -12,7 +17,6 @@ import editIcon from '../../../public/images/editIcon.svg';
 import deleteIcon from '../../../public/images/deleteIcon.svg';
 import Image from 'next/image';
 import {
-  extractMatchingKeys,
   fetchForm,
   searchListData,
 } from '@/components/DynamicForm/DynamicFormCallback';
@@ -26,6 +30,10 @@ import {
   BatchCreateSchema,
   BatchCreateUISchema,
 } from '@/constant/Forms/BatchCreate';
+import {
+  PathwaysBatchCreateSchema,
+  PathwaysBatchCreateUISchema,
+} from '@/constant/Forms/PathwaysBatchCreate';
 import {
   fetchCohortMemberList,
   getCohortList,
@@ -49,6 +57,7 @@ interface BatchFlowProps {
   centerBoards?: string[];
   centerMediums?: string[];
   centerGrades?: string[];
+  centerStreams?: string[];
   centerType?: string | null;
 }
 
@@ -57,6 +66,7 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   centerBoards = [],
   centerMediums = [],
   centerGrades = [],
+  centerStreams = [],
   centerType = null,
 }) => {
   const theme = useTheme<any>();
@@ -82,6 +92,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
   const [totalCount, setTotalCount] = useState(0);
 
   const { t } = useTranslation();
+  const storedProgram =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('tenantName') ?? localStorage.getItem('program')
+      : null;
+  const isPathwaysProgram =
+    storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
   const initialFormData =
     typeof window !== 'undefined' && localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
@@ -104,13 +120,27 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
 
   const buildSchemaAndUi = (
     isEditMode: boolean,
-    existingValues?: { board?: string[]; medium?: string[]; grade?: string[] }
+    existingValues?: {
+      board?: string[];
+      medium?: string[];
+      grade?: string[];
+      stream?: string[];
+    }
   ) => {
-    let alterSchema = JSON.parse(JSON.stringify(BatchCreateSchema));
-    let alterUiSchema = JSON.parse(JSON.stringify(BatchCreateUISchema));
+    let alterSchema = resolveFrameworkPlaceholders(
+      structuredClone(
+        isPathwaysProgram ? PathwaysBatchCreateSchema : BatchCreateSchema
+      )
+    );
+    let alterUiSchema = structuredClone(
+      isPathwaysProgram ? PathwaysBatchCreateUISchema : BatchCreateUISchema
+    );
 
     let requiredArray = alterSchema?.required || [];
     const mustRequired = ['name', 'board', 'medium', 'grade'];
+    if (alterSchema?.properties?.stream) {
+      mustRequired.push('stream');
+    }
     mustRequired.forEach((item) => {
       if (!requiredArray.includes(item)) {
         requiredArray.push(item);
@@ -127,9 +157,19 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     if (alterSchema?.properties?.grade) {
       alterSchema.properties.grade.maxSelection = 1;
     }
+    if (alterSchema?.properties?.stream) {
+      alterSchema.properties.stream.maxSelection = 1;
+    }
+
+    // The board field's own framework fetch URL (tenant-resolved by
+    // resolveFrameworkPlaceholders above) is what the stream field's
+    // dependent lookup below needs, so grab it before `overrideEnum`
+    // strips `api` off of the board field.
+    const boardFrameworkFetchUrl =
+      alterSchema?.properties?.board?.api?.payload?.fetchUrl;
 
     const overrideEnum = (
-      fieldKey: 'board' | 'medium' | 'grade',
+      fieldKey: 'board' | 'medium' | 'grade' | 'stream',
       centerVals: string[]
     ) => {
       if (alterSchema?.properties?.[fieldKey]) {
@@ -148,9 +188,81 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         }
       }
     };
+    const mergedBoardValues = Array.from(
+      new Set([
+        ...(Array.isArray(centerBoards) ? centerBoards : []),
+        ...(existingValues?.board || []),
+      ])
+    ).filter(Boolean);
+
     overrideEnum('board', centerBoards);
     overrideEnum('medium', centerMediums);
     overrideEnum('grade', centerGrades);
+
+    // Stream is scoped to the center's own selected streams (same as the
+    // other fields above), but must also be filtered by whichever board is
+    // currently selected in the batch form - a center associated with
+    // several boards can have streams that only apply under some of them
+    // via the framework's term associations, so a flat "all of the
+    // center's streams" list (as overrideEnum would produce) would leak
+    // streams from boards other than the one selected. That ambiguity only
+    // exists when the center actually has more than one board to choose
+    // from; with a single (or no) board there's nothing else a stream
+    // could belong to, so the flat center-scoped list is safe and the
+    // board-dependent live lookup (and its API call) can be skipped
+    // entirely.
+    const isBoardAmbiguous = mergedBoardValues.length > 1;
+
+    if (alterSchema?.properties?.stream) {
+      const currentVals = Array.isArray(centerStreams) ? centerStreams : [];
+      const existing = existingValues?.stream || [];
+      const mergedStreams = Array.from(
+        new Set([...(currentVals || []), ...(existing || [])])
+      ).filter(Boolean);
+      if (mergedStreams.length && isBoardAmbiguous && boardFrameworkFetchUrl) {
+        // Start empty - no board selected yet means no valid stream yet.
+        // The shared DynamicForm's own dependent-field handling (the same
+        // mechanism board->medium already relies on) fetches and fills
+        // this in once a board is selected, re-fetches it whenever the
+        // board changes, and clears any previously chosen stream when it
+        // no longer belongs to the newly selected board - all driven by
+        // `api.dependent` below, nothing bespoke needed here. On edit,
+        // it's populated from the prefilled board value the same way.
+        alterSchema.properties.stream.items = {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        };
+        alterSchema.properties.stream.api = {
+          url: '/api/dynamic-form/get-framework',
+          method: 'POST',
+          options: {
+            label: 'label',
+            value: 'value',
+            optionObj: 'options',
+          },
+          payload: {
+            code: 'board',
+            fetchUrl: boardFrameworkFetchUrl,
+            findcode: 'stream',
+            selectedvalue: '**',
+            allowedValues: mergedStreams,
+          },
+          callType: 'dependent',
+          dependent: 'board',
+        };
+      } else if (mergedStreams.length) {
+        // No framework URL to drive a live board-dependent lookup - fall
+        // back to the flat, center-scoped list rather than leaving the
+        // field with no options at all.
+        alterSchema.properties.stream.items = {
+          type: 'string',
+          enum: mergedStreams,
+          enumNames: mergedStreams,
+        };
+        delete alterSchema.properties.stream.api;
+      }
+    }
 
     // Modify batch_type based on centerType
     if (centerType && alterSchema?.properties?.batch_type) {
@@ -183,6 +295,9 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       if (centerGrades?.length === 1 && alterUiSchema?.grade) {
         alterUiSchema.grade['ui:disabled'] = true;
       }
+      if (centerStreams?.length === 1 && alterUiSchema?.stream) {
+        alterUiSchema.stream['ui:disabled'] = true;
+      }
     } else {
       if (alterUiSchema?.board?.['ui:disabled'])
         delete alterUiSchema.board['ui:disabled'];
@@ -190,6 +305,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         delete alterUiSchema.medium['ui:disabled'];
       if (alterUiSchema?.grade?.['ui:disabled'])
         delete alterUiSchema.grade['ui:disabled'];
+      if (alterUiSchema?.stream?.['ui:disabled'])
+        delete alterUiSchema.stream['ui:disabled'];
     }
 
     setAddSchema(alterSchema);
@@ -217,7 +334,14 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     );
     setPrefilledFormData(withParent);
     fetchData();
-  }, [initialParentId, centerType, centerBoards, centerMediums, centerGrades]);
+  }, [
+    initialParentId,
+    centerType,
+    centerBoards,
+    centerMediums,
+    centerGrades,
+    centerStreams,
+  ]);
 
   const updatedUiSchema = {
     ...uiSchema,
@@ -343,6 +467,20 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
             ?.selectedValues?.join(', ')
         ) || '-',
     },
+    ...(isPathwaysProgram
+      ? [
+          {
+            key: 'stream',
+            label: 'Stream',
+            render: (row) =>
+              transformLabel(
+                row.customFields
+                  .find((field) => field.label === 'STREAM')
+                  ?.selectedValues?.join(', ')
+              ) || '-',
+          },
+        ]
+      : []),
     {
       key: 'status',
       label: 'Status',
@@ -367,20 +505,43 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         </Box>
       ),
       callback: (row: any) => {
+        const getSelectedValues = (label: string) =>
+          row?.customFields?.find((f: any) => f.label === label)
+            ?.selectedValues || [];
         const existingValues = {
-          board:
-            row?.customFields?.find((f: any) => f.label === 'BOARD')
-              ?.selectedValues || [],
-          medium:
-            row?.customFields?.find((f: any) => f.label === 'MEDIUM')
-              ?.selectedValues || [],
-          grade:
-            row?.customFields?.find((f: any) => f.label === 'GRADE')
-              ?.selectedValues || [],
+          board: getSelectedValues('BOARD'),
+          medium: getSelectedValues('MEDIUM'),
+          grade: getSelectedValues('GRADE'),
+          stream: getSelectedValues('STREAM'),
         };
         buildSchemaAndUi(true, existingValues);
-        let tempFormData = extractMatchingKeys(row, addSchema);
-        // Force batch_type to "remote" if centerType is "remote"
+
+        // Build form data directly from the batch's own customFields,
+        // matched by label, instead of extractMatchingKeys's fieldId
+        // lookup - custom field fieldIds for MEDIUM/GRADE are assigned
+        // per tenant/program and don't match the fieldId literals
+        // hardcoded in PathwaysBatchCreate.js/BatchCreate.js, so a fieldId
+        // match silently drops those values even though the batch has them.
+        const tempFormData: Record<string, any> = {
+          name: row?.name,
+          board: existingValues.board,
+          medium: existingValues.medium,
+          grade: existingValues.grade,
+        };
+        if (isPathwaysProgram) {
+          tempFormData.stream = existingValues.stream;
+        }
+        const batchTypeValues = getSelectedValues('TYPE_OF_BATCH');
+        const batchTypeValue =
+          batchTypeValues.length > 0
+            ? typeof batchTypeValues[0] === 'object'
+              ? batchTypeValues[0]?.value
+              : batchTypeValues[0]
+            : undefined;
+        if (batchTypeValue) {
+          tempFormData.batch_type = batchTypeValue;
+        }
+        // Force batch_type to "regular" if centerType is "regular"
         if (centerType === 'regular') {
           tempFormData.batch_type = 'regular';
         }
@@ -494,6 +655,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
                   prefillWithBMGS.medium = [centerMediums[0]];
                 if (centerGrades?.length === 1)
                   prefillWithBMGS.grade = [centerGrades[0]];
+                if (centerStreams?.length === 1)
+                  prefillWithBMGS.stream = [centerStreams[0]];
 
                 // Prefill batch_type for remote center
                 if (centerType === 'remote') {
