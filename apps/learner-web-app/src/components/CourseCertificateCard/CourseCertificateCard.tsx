@@ -10,6 +10,7 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { get } from '@shared-lib';
+import { getCertificateTemplateId } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import { baseurl } from '@learner/utils/API/EndUrls';
 import CardShimmer from './CardShimmer';
 
@@ -21,13 +22,15 @@ interface CertificateCardProps {
     certificateId: string;
     issuedOn: string;
   };
-  onPreviewCertificate: () => void;
+  onPreviewCertificate: (certificateTemplate?: string) => void;
 }
 
 interface CourseDetails {
   name: string;
   description: string;
   posterImage: string;
+  // Course-level template, when the course carries one of its own.
+  certificateTemplate?: string;
 }
 
 const CourseCertificateCard: React.FC<CertificateCardProps> = ({
@@ -66,11 +69,15 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
         );
         console.log('courseDetails', Details);
         const content = Details.data.result.content;
-        
+        const certificateTemplate = getCertificateTemplateId(
+          content.certificateTemplate
+        );
+
         setCourseDetails({
           name: content.name || '',
           description: content.description || '',
           posterImage: content.posterImage || '',
+          certificateTemplate,
         });
       } catch (error) {
         console.error(
@@ -218,7 +225,7 @@ const CourseCertificateCard: React.FC<CertificateCardProps> = ({
 
        {!isCertificateRestricted && (<Button
           variant="text"
-          onClick={onPreviewCertificate}
+          onClick={() => onPreviewCertificate(courseDetails?.certificateTemplate)}
           sx={{
             fontSize: '14px',
             fontWeight: 700,
