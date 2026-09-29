@@ -16,15 +16,24 @@ import { getLoggedInUserRole } from '../../utils/helper';
 import { YOUTHNET_USER_ROLE } from '../../components/youthNet/tempConfigs';
 import { getTrainerTaxonomy } from '../../services/myTeachingCenter/TrainerTaxonomyService';
 import { getMyTeachingCenterBatches, getCohortTypeOfCenter } from '../../services/myTeachingCenter/BatchListService';
+import { getTrainerCenters, TrainerCenter } from '../../services/myTeachingCenter/TrainerCentersService';
 import BatchList from '../../components/myTeachingCenter/BatchList';
 import CreateBatchModal from '../../components/myTeachingCenter/CreateBatchModal';
+import CenterSwitcher from '../../components/myTeachingCenter/CenterSwitcher';
 import { MyTeachingCenterBatch, TrainerAssignedTaxonomy } from '../../utils/Interfaces';
 
+// Persists the Trainer's last-picked Center across navigation/remounts (the
+// page's own component state doesn't survive leaving and coming back to
+// this route) — read back on load and preferred over defaulting to the
+// first assigned Center, as long as it's still one of the Trainer's Centers.
+const SELECTED_CENTER_STORAGE_KEY = 'myTeachingCenterSelectedCenterId';
+
 // Same page layout/design as /scp-teacher-repo/centers?tab=1 (search +
-// "Add New" button above a BatchList grid) — no new visual design, just the
-// Domain/Skills-scoped data behind it. No Center dropdown/concept at all:
-// the Trainer's own Domain/Skills (from their profile) are the only scope,
-// not a specific Center.
+// "Add New" button above a BatchList grid). The Trainer's own Domain/Skills
+// (from their profile) scope which batches are fetched at all; a Trainer
+// assigned to more than one Center additionally picks which Center's
+// batches to view via the switcher in the title row (client-side filter —
+// the batch search itself stays Domain/Skills-scoped, unchanged).
 const MyTeachingCenterPage = () => {
   const { t } = useTranslation();
   const router = useRouter();
@@ -38,9 +47,10 @@ const MyTeachingCenterPage = () => {
 
   const [taxonomy, setTaxonomy] = useState<TrainerAssignedTaxonomy>({ domains: [], skills: [] });
   const [batches, setBatches] = useState<MyTeachingCenterBatch[] | null>(null);
-  // TYPE_OF_CENTER off the Center's own Cohort Details (fetched once we
-  // know a Center id from an existing matching batch) — controls which
-  // Type of Batch options CreateBatchModal offers.
+  const [centers, setCenters] = useState<TrainerCenter[]>([]);
+  const [selectedCenterId, setSelectedCenterId] = useState<string>('');
+  // TYPE_OF_CENTER off the selected Center's own Cohort Details — controls
+  // which Type of Batch options CreateBatchModal offers.
   const [centerType, setCenterType] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
@@ -52,12 +62,25 @@ const MyTeachingCenterPage = () => {
       return;
     }
     try {
-      const trainerTaxonomy = await getTrainerTaxonomy(userId);
+      const [trainerTaxonomy, trainerCenters] = await Promise.all([
+        getTrainerTaxonomy(userId),
+        getTrainerCenters(userId),
+      ]);
       setTaxonomy(trainerTaxonomy);
+      setCenters(trainerCenters);
+      // Prefer the last-picked Center (persisted in localStorage) if it's
+      // still one of the Trainer's Centers, else fall back to the first
+      // one. Only applied when nothing is selected yet in this component
+      // instance, so reloading batches after Create Batch doesn't reset the
+      // Trainer's current in-page selection out from under them.
+      setSelectedCenterId((prev) => {
+        if (prev) return prev;
+        const storedCenterId = localStorage.getItem(SELECTED_CENTER_STORAGE_KEY);
+        const storedIsValid = storedCenterId && trainerCenters.some((c) => c.id === storedCenterId);
+        return (storedIsValid ? storedCenterId : trainerCenters[0]?.id) || '';
+      });
       const list = await getMyTeachingCenterBatches(trainerTaxonomy.domains, trainerTaxonomy.skills);
       setBatches(list);
-      const firstCenterId = list[0]?.centerId;
-      setCenterType(firstCenterId ? await getCohortTypeOfCenter(firstCenterId) : null);
     } catch (error) {
       console.error('Error loading My Teaching Center batches:', error);
       showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
@@ -70,27 +93,51 @@ const MyTeachingCenterPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Refetch centerType whenever the selected Center changes (including the
+  // initial default selection above).
+  useEffect(() => {
+    if (!selectedCenterId) {
+      setCenterType(null);
+      return;
+    }
+    getCohortTypeOfCenter(selectedCenterId).then(setCenterType);
+  }, [selectedCenterId]);
+
   const filteredBatches = useMemo(() => {
     if (!batches) return [];
-    if (!searchInput.trim()) return batches;
-    const query = searchInput.trim().toLowerCase();
-    return batches.filter((batch) => batch.name?.toLowerCase().includes(query));
-  }, [batches, searchInput]);
+    return batches.filter((batch) => {
+      if (selectedCenterId && batch.centerId !== selectedCenterId) return false;
+      if (!searchInput.trim()) return true;
+      return batch.name?.toLowerCase().includes(searchInput.trim().toLowerCase());
+    });
+  }, [batches, searchInput, selectedCenterId]);
 
   const hasTaxonomy = taxonomy.domains.length > 0 && taxonomy.skills.length > 0;
-  // Create Batch reuses an existing matching batch's own parentId (there's
-  // no dedicated Center lookup any more) — so it's only offered once at
-  // least one batch already exists for the Trainer's Domain/Skills.
-  const centerId = batches?.[0]?.centerId;
-  const canCreateBatch = hasTaxonomy && !!centerId;
+  const canCreateBatch = hasTaxonomy && !!selectedCenterId;
+
+  const handleCenterChange = (centerId: string) => {
+    setSelectedCenterId(centerId);
+    localStorage.setItem(SELECTED_CENTER_STORAGE_KEY, centerId);
+  };
 
   return (
     <>
       <Box>
         <Header />
       </Box>
-      <Box ml={2}>
+      <Box
+        ml={2}
+        pr={2}
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}
+      >
         <BackHeader headingOne={t('MY_TEACHING_CENTER.PAGE_TITLE')} />
+        {centers.length > 1 && (
+          <CenterSwitcher
+            centers={centers}
+            selectedCenterId={selectedCenterId}
+            onChange={handleCenterChange}
+          />
+        )}
       </Box>
 
       <Box
@@ -174,11 +221,11 @@ const MyTeachingCenterPage = () => {
         )}
       </Box>
 
-      {canCreateBatch && centerId && (
+      {canCreateBatch && (
         <CreateBatchModal
           open={createOpen}
           onClose={() => setCreateOpen(false)}
-          centerId={centerId}
+          centerId={selectedCenterId}
           centerType={centerType}
           trainerTaxonomy={taxonomy}
           onCreated={loadBatches}
