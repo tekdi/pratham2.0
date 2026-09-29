@@ -851,6 +851,13 @@ const DynamicForm = forwardRef(({
   // the Family Member Details choices (so it can't be selected) and clear any spouse selection/name
   // already on the form (so it can't be retained or resubmitted).
   useEffect(() => {
+    // formData can be null on first render for some consumers (createNew + null
+    // prefilledFormData). The deps array below reads formData?.* on every render, including
+    // Next.js static prerendering, so this must guard before that - not just inside the effect.
+    if (!formData) {
+      return;
+    }
+
     const familyMemberDetailsSchema =
       formSchema?.properties?.family_member_details;
     if (
@@ -877,7 +884,7 @@ const DynamicForm = forwardRef(({
       return;
     }
 
-    const isUnmarried = String(formData.marital_status ?? '')
+    const isUnmarried = String(formData?.marital_status ?? '')
       .trim()
       .toLowerCase()
       .includes('unmarried');
@@ -911,7 +918,7 @@ const DynamicForm = forwardRef(({
       });
     }
 
-    if (isUnmarried && formData.family_member_details === 'spouse') {
+    if (isUnmarried && formData?.family_member_details === 'spouse') {
       setFormData((prev) => ({
         ...prev,
         family_member_details: undefined,
@@ -919,8 +926,8 @@ const DynamicForm = forwardRef(({
       }));
     }
   }, [
-    formData.marital_status,
-    formData.family_member_details,
+    formData?.marital_status,
+    formData?.family_member_details,
     formSchema?.properties?.family_member_details,
   ]);
 
