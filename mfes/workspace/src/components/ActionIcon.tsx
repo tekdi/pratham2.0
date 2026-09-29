@@ -30,9 +30,11 @@ const ActionIcon: React.FC<ActionCellProps> = ({
     setOpen(true);
   };
 
-  // Hide delete button if prevStatus is "Live" and status is "Draft"
+  // Hide delete for a Draft/Review copy of content that is (or was) Live
   console.log("rowData====>", rowData);
-  const shouldHideDelete = rowData?.prevStatus === "Live" && (rowData?.status === "Draft" || rowData?.status === "Review");
+  const shouldHideDelete =
+    (rowData?.prevStatus === "Live" || rowData?.hasLiveVersion) &&
+    (rowData?.status === "Draft" || rowData?.status === "Review");
 
   if (shouldHideDelete) {
     return null; // Don't render anything if delete should be hidden

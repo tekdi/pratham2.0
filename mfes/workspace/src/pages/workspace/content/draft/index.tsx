@@ -15,6 +15,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   getContent,
+  getLiveIdentifiers,
   getfilterList,
   getPosFrameworkList,
   getMediaFilterList,
@@ -139,6 +140,7 @@ const DraftPage = () => {
       language: item.contentLanguage ? item.contentLanguage : item.language,
       lastUpdatedOn: timeAgo(item.lastUpdatedOn),
       status: item.status,
+      hasLiveVersion: item.hasLiveVersion,
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,
@@ -211,7 +213,16 @@ const DraftPage = () => {
           const dateB = new Date(b.lastUpdatedOn || 0).getTime();
           return dateB - dateA; // Descending order
         });
-        setContentList(contentList);
+        const liveIds = await getLiveIdentifiers(
+          contentList,
+          tenantConfig?.CHANNEL_ID
+        );
+        setContentList(
+          contentList.map((item: any) => ({
+            ...item,
+            hasLiveVersion: liveIds.has(item?.identifier),
+          }))
+        );
         setTotalCount(response?.count);
       } catch (error) {
         console.error(error);
