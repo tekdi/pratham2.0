@@ -133,7 +133,9 @@ export function FilterForm({
       );
       const allFields = [
         ...transformedRenderForm,
-        ...(filtered[0]?.fields ?? []).map(normalizeStaticField),
+        ...(filtered[0]?.fields ?? [])
+          .filter((f: any) => !HIDDEN_FILTER_CODES.includes(f.code))
+          .map(normalizeStaticField),
       ];
 
       setFilterData(allFields);
@@ -218,6 +220,9 @@ export function FilterForm({
 }
 
 // Utility Functions
+// Static form fields that should never be shown as filters
+const HIDDEN_FILTER_CODES = ['certificateTemplate'];
+
 const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
   Object.keys(payload).forEach((key) => {
