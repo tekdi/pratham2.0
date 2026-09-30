@@ -494,6 +494,7 @@ const CentersPage = () => {
     boards: string[];
     mediums: string[];
     grades: string[];
+    streams: string[];
   }) => {
     const schema = cloneDeep(params.baseSchema);
     const uiSchema = cloneDeep(params.baseUiSchema);
@@ -540,7 +541,7 @@ const CentersPage = () => {
       }
     };
 
-    const overrideEnum = (key: 'board' | 'medium' | 'grade', allowed: any[]) => {
+    const overrideEnum = (key: 'board' | 'medium' | 'grade' | 'stream', allowed: any[]) => {
       const allowedValues = Array.isArray(allowed) ? allowed.filter(Boolean) : [];
       if (!allowedValues.length) {
         ensureEnabled(key);
@@ -582,6 +583,7 @@ const CentersPage = () => {
     overrideEnum('board', params.boards);
     overrideEnum('medium', params.mediums);
     overrideEnum('grade', params.grades);
+    overrideEnum('stream', params.streams);
 
     // Batch type behavior (if supported by schema), similar to admin app.
     const ct = (params.centerType || '').toLowerCase();
@@ -641,6 +643,9 @@ const CentersPage = () => {
           'medium',
           'grade',
         ];
+        if (alterSchema?.properties?.stream) {
+          mustRequired.push('stream');
+        }
         // Merge only missing items from required2 into required1
         mustRequired.forEach((item) => {
           if (!requiredArray.includes(item)) {
@@ -670,6 +675,9 @@ const CentersPage = () => {
         }
         if (alterSchema?.properties?.grade) {
           alterSchema.properties.grade.maxSelection = 1;
+        }
+        if (alterSchema?.properties?.stream) {
+          alterSchema.properties.stream.maxSelection = 1;
         }
 
         const hideFields = (data: any, fieldsToHide: string[]): any => {
@@ -720,6 +728,7 @@ const CentersPage = () => {
     const boards = getCustomFieldValues(cf, 'BOARD');
     const mediums = getCustomFieldValues(cf, 'MEDIUM');
     const grades = getCustomFieldValues(cf, 'GRADE');
+    const streams = getCustomFieldValues(cf, 'STREAM');
     const selectedCenterType =
       getCustomFieldSingleValue(cf, 'TYPE_OF_COHORT') ||
       getCustomFieldSingleValue(cf, 'TYPE_OF_CENTER');
@@ -736,6 +745,7 @@ const CentersPage = () => {
       boards,
       mediums,
       grades,
+      streams,
     });
 
     setAddBatchSchema(schema);

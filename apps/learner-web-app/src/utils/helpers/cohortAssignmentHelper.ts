@@ -12,19 +12,28 @@ interface AcademicYearRecord {
   isActive?: boolean;
 }
 
-// Module-scoped cache so the batch-assignment API check runs once per full
-// page load/reload, not on every client-side route change within the SPA.
-// A full reload re-executes this module and clears the cache; a route change
-// (which keeps the module alive) reuses the in-flight/resolved promise.
-let cachedCheck: { userId: string; promise: Promise<boolean> } | null = null;
+// Module-scoped cache so the batch-assignment API check runs once per
+// user+program combination per full page load/reload, not on every
+// client-side route change within the SPA. Keyed by program too (not just
+// userId) because a learner enrolled in multiple programs at once shares a
+// single userId — caching by userId alone would leak one program's batch
+// status into another's dashboard after an in-app program switch. A full
+// reload re-executes this module and clears the cache; a route/program
+// change that keeps the module alive reuses the in-flight/resolved promise
+// only when the key still matches.
+let cachedCheck: { key: string; promise: Promise<boolean> } | null = null;
 
-export const checkUserHasActiveBatch = (userId: string): Promise<boolean> => {
-  if (cachedCheck?.userId === userId) {
+export const checkUserHasActiveBatch = (
+  userId: string,
+  programKey: string
+): Promise<boolean> => {
+  const key = `${userId}:${programKey}`;
+  if (cachedCheck?.key === key) {
     return cachedCheck.promise;
   }
 
   const promise = fetchUserHasActiveBatch(userId);
-  cachedCheck = { userId, promise };
+  cachedCheck = { key, promise };
   return promise;
 };
 
