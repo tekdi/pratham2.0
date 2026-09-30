@@ -101,6 +101,7 @@ const PlacementLearnerTable: React.FC<PlacementLearnerTableProps> = ({
         .map((key) => ({
           key: `placement_${key}`,
           label: t(placementForm.schema?.properties?.[key]?.title || key),
+          minWidth: 200,
           render: (row: any) =>
             formatPlacementValueForDisplay(placementForm.schema, key, row, t),
         }))
@@ -110,12 +111,14 @@ const PlacementLearnerTable: React.FC<PlacementLearnerTableProps> = ({
     {
       key: 'learnerName',
       label: t('PLACEMENTS.LEARNER'),
+      minWidth: 150,
       render: (row: any) => getLearnerDisplayName(row),
     },
     ...placementFieldColumns,
     {
       key: 'status',
       label: t('PLACEMENTS.STATUS'),
+      minWidth: 120,
       render: (row: any) => {
         const status = getLearnerStatus(row);
         return status ? (
@@ -132,6 +135,7 @@ const PlacementLearnerTable: React.FC<PlacementLearnerTableProps> = ({
     {
       key: 'action',
       label: t('PLACEMENTS.ACTION'),
+      minWidth: 100,
       render: (row: any) => {
         const isPlaced = getLearnerStatus(row) === 'placed';
         if (!isPlaced) {

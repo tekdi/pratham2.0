@@ -18,6 +18,7 @@ export interface CommonDataTableColumn<T = any> {
   key: string;
   label: React.ReactNode;
   render?: (row: T) => React.ReactNode;
+  minWidth?: number | string;
 }
 
 export interface CommonDataTableProps<T = any> {
@@ -80,7 +81,9 @@ export function CommonDataTable<T = any>({
                 </TableCell>
               )}
               {columns.map((col) => (
-                <TableCell key={col.key}>{col.label}</TableCell>
+                <TableCell key={col.key} sx={{ minWidth: col.minWidth }}>
+                  {col.label}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>

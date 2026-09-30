@@ -333,9 +333,10 @@ const L2InterestedQueuePage = () => {
     {
       key: 'learner',
       label: t('L2_QUEUE.LEARNER'),
+      minWidth: 220,
       render: (row: any) => (
         <Box>
-          <Typography variant="body2" fontWeight={600}>
+          <Typography variant="body2" fontWeight={600} mb={0.5}>
             {row?.name || row?.firstName}
           </Typography>
           <Typography variant="caption" color="text.secondary">
@@ -347,26 +348,31 @@ const L2InterestedQueuePage = () => {
     {
       key: 'state',
       label: t('L2_QUEUE.STATE'),
+      minWidth: 240,
       render: (row: any) => getLearnerLocationValue(row, 'STATE'),
     },
     {
       key: 'district',
       label: t('L2_QUEUE.DISTRICT'),
+      minWidth: 140,
       render: (row: any) => getLearnerLocationValue(row, 'DISTRICT'),
     },
     {
       key: 'block',
       label: t('L2_QUEUE.BLOCK'),
+      minWidth: 140,
       render: (row: any) => getLearnerLocationValue(row, 'BLOCK'),
     },
     {
       key: 'village',
       label: t('L2_QUEUE.VILLAGE'),
+      minWidth: 140,
       render: (row: any) => getLearnerLocationValue(row, 'VILLAGE'),
     },
     {
       key: 'interestedAt',
       label: t('L2_QUEUE.INTERESTED_DATE'),
+      minWidth: 240,
       render: (row: any) => {
         const value = getLearnerInterestedAt(row);
         return value ? new Date(value).toLocaleString() : '-';
@@ -375,6 +381,7 @@ const L2InterestedQueuePage = () => {
     {
       key: 'assigned',
       label: t('L2_QUEUE.ASSIGNED_DOMAIN_SKILL'),
+      minWidth: 360,
       render: (row: any) => {
         const domain = getLearnerDomain(row);
         const skill = getLearnerSkill(row);
@@ -383,7 +390,7 @@ const L2InterestedQueuePage = () => {
         const taggerName = taggerId ? taggedByNameMap[taggerId] : null;
         return (
           <Box>
-            <Typography variant="body2">
+            <Typography variant="body2" mb={0.5}>
               {domain} › {skill}
             </Typography>
             {taggerName && (
@@ -398,11 +405,13 @@ const L2InterestedQueuePage = () => {
     {
       key: 'contact',
       label: t('L2_QUEUE.CONTACT'),
+      minWidth: 150,
       render: (row: any) => row?.mobile || '-',
     },
     {
       key: 'status',
       label: t('L2_QUEUE.STATUS'),
+      minWidth: 140,
       render: (row: any) => (
         <Chip
           size="small"
@@ -416,6 +425,7 @@ const L2InterestedQueuePage = () => {
     {
       key: 'action',
       label: t('L2_QUEUE.ACTION'),
+      minWidth: 140,
       render: (row: any) => (
         <Button size="small" variant="outlined" onClick={() => openDrawer([row])}>
           {isLearnerTagged(row) ? t('L2_QUEUE.REVIEW') : t('L2_QUEUE.INTERACT')}

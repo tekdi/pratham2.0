@@ -97,6 +97,7 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
   const milestoneColumns = RETENTION_MILESTONES.map((milestone) => ({
     key: `milestone_${milestone.key}`,
     label: t(milestone.labelKey),
+    minWidth: 200,
     render: (row: any) => {
       const placementDate =
         placementForm?.schema &&
@@ -126,6 +127,7 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
     {
       key: 'learnerName',
       label: t('RETENTION.LEARNER'),
+      minWidth: 150,
       render: (row: any) => (
         <Box>
           <Box>{getLearnerDisplayName(row)}</Box>
