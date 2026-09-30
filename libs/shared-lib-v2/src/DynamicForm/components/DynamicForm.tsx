@@ -2215,6 +2215,18 @@ const DynamicForm = forwardRef(({
       }
       return true;
     });
+    // Suppress required errors for fields currently hidden by skip/hide logic —
+    // the user can't fill them, and handleSubmit drops their values anyway.
+    updatedError = updatedError.filter((error) => {
+      if (error.name === 'required') {
+        const fieldKey =
+          error.params?.missingProperty || error.property?.replace(/^\./, '');
+        if (formUiSchema?.[fieldKey]?.['ui:widget'] === 'hidden') {
+          return false;
+        }
+      }
+      return true;
+    });
     // Filter errors for UI display, but keep working_village errors for onSubmit handler
     return updatedError.filter(
       (err) =>

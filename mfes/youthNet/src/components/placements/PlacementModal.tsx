@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, IconButton, CircularProgress, Modal, Divider } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
-import CloseSharpIcon from '@mui/icons-material/CloseSharp';
+import SimpleModal from '@shared-lib-v2/lib/SimpleModal/SimpleModal';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import {
@@ -26,7 +25,7 @@ interface PlacementModalProps {
 
 // Placement Form is fetched from the backend (form/read?context=PLACEMENT&
 // contextType=PLACEMENT — see PlacementFormService) and rendered with
-// DynamicForm, same Modal shell as AllocateToBatchModal.tsx.
+// DynamicForm inside SimpleModal (same pattern as admin-app AddEditPlacementPropertyModal).
 //
 // The caller (PlacementLearnerTable) only renders this component AT ALL
 // while a row is selected for Place/Update — there is no `open` prop here,
@@ -53,11 +52,11 @@ const PlacementModal: React.FC<PlacementModalProps> = ({
   onSaved,
 }) => {
   const { t } = useTranslation();
-  const theme = useTheme<any>();
-  const [formData, setFormData] = useState<Record<string, any>>(initialFormData);
   const [saving, setSaving] = useState(false);
 
-  const handleSave = async () => {
+  // Called by DynamicForm only after RJSF validation passes (required fields
+  // filled, patterns valid) — the Save button submits the form via `form=`.
+  const handleSave = async (formData: Record<string, any>) => {
     if (saving) return;
     setSaving(true);
     try {
@@ -85,88 +84,54 @@ const PlacementModal: React.FC<PlacementModalProps> = ({
   };
 
   return (
-    <Modal open onClose={onClose} aria-labelledby="placement-modal-title">
+    <SimpleModal
+      open
+      onClose={onClose}
+      showFooter={true}
+      modalTitle={isUpdate ? t('PLACEMENTS.UPDATE_PLACEMENT') : t('PLACEMENTS.PLACE_STUDENT')}
+      secondaryText={t('COMMON.CANCEL')}
+      secondaryActionHandler={onClose}
+      primaryText={t('COMMON.SAVE')}
+      primaryDisabled={saving}
+      // SimpleModal's primary button is type="submit" form={id}, so Save
+      // submits DynamicForm (default id "dynamic-form-id") and RJSF
+      // validation runs before FormSubmitFunction is called.
+      id="dynamic-form-id"
+    >
+      {learnerName && (
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {learnerName}
+        </Typography>
+      )}
+      {/* Stack the Placement Form one field per row. */}
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: { xs: '92%', sm: 560 },
-          maxHeight: '85vh',
-          display: 'flex',
-          flexDirection: 'column',
-          bgcolor: '#fff',
-          borderRadius: '12px',
-          outline: 'none',
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.15)',
+          '& .MuiGrid-item': {
+            flexBasis: '100% !important',
+            maxWidth: '100% !important',
+          },
         }}
       >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="flex-start"
-          sx={{ p: 2, borderRadius: '12px 12px 0 0', backgroundColor: theme.palette.warning?.A400 }}
-        >
-          <Box>
-            <Typography id="placement-modal-title" variant="h6">
-              {isUpdate ? t('PLACEMENTS.UPDATE_PLACEMENT') : t('PLACEMENTS.PLACE_STUDENT')}
-            </Typography>
-            {learnerName && (
-              <Typography variant="body2" color="text.secondary">
-                {learnerName}
-              </Typography>
-            )}
-          </Box>
-          <IconButton size="small" onClick={onClose} aria-label="Close">
-            <CloseSharpIcon fontSize="small" />
-          </IconButton>
-        </Box>
-        <Divider />
-
-        <Box sx={{ p: 2, overflowY: 'auto' }}>
-          {/* DynamicForm hardcodes a Grid item xs={12} md={4} lg={3} per
-              field whenever isCallSubmitInHandle is true, ignoring any
-              uiSchema grid option — same quirk l2-interested-queue.tsx's
-              side panel already works around this exact way. Forcing every
-              field to 100% width here stacks the Placement Form one field
-              below another instead of several per row. */}
-          <Box
-            sx={{
-              '& .MuiGrid-item': {
-                flexBasis: '100% !important',
-                maxWidth: '100% !important',
-              },
-            }}
-          >
-            <DynamicForm
-              schema={form.schema}
-              uiSchema={form.uiSchema}
-              SubmitaFunction={(data: any) => setFormData(data)}
-              isCallSubmitInHandle={true}
-              // The Placement Form has dependent-API fields (district
-              // depends on state) — isReassign makes DynamicForm do an
-              // explicit full re-apply of prefilledFormData once rendering
-              // is complete (same fix already used for the SDBV filter
-              // bar's own State→District cascade).
-              isReassign={isUpdate}
-              prefilledFormData={initialFormData}
-              type="placement"
-            />
-          </Box>
-        </Box>
-
-        <Divider />
-        <Box display="flex" gap={1} justifyContent="flex-end" sx={{ p: 2 }}>
-          <Button onClick={onClose} disabled={saving}>
-            {t('COMMON.CANCEL')}
-          </Button>
-          <Button variant="contained" disabled={saving} onClick={handleSave}>
-            {saving ? <CircularProgress size={20} /> : t('COMMON.SAVE')}
-          </Button>
-        </Box>
+        <DynamicForm
+          schema={form.schema}
+          uiSchema={form.uiSchema}
+          // Full-form mode (not isCallSubmitInHandle): the per-field
+          // mode renders each field as its own <Form> without the
+          // schema's `required` array, so required fields got no
+          // asterisk and no validation.
+          hideSubmit={true}
+          FormSubmitFunction={(cleanedData: any) => handleSave(cleanedData)}
+          // The Placement Form has dependent-API fields (district
+          // depends on state) — isReassign makes DynamicForm do an
+          // explicit full re-apply of prefilledFormData once rendering
+          // is complete (same fix already used for the SDBV filter
+          // bar's own State→District cascade).
+          isReassign={isUpdate}
+          prefilledFormData={initialFormData}
+          type="placement"
+        />
       </Box>
-    </Modal>
+    </SimpleModal>
   );
 };
 
