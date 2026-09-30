@@ -221,7 +221,7 @@ export function FilterForm({
 
 // Utility Functions
 // Static form fields that should never be shown as filters
-const HIDDEN_FILTER_CODES = ['certificateTemplate'];
+const HIDDEN_FILTER_CODES = ['certificateTemplate', 'skills'];
 
 const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
