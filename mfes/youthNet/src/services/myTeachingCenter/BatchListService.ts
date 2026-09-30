@@ -13,17 +13,24 @@ const getDateField = (row: any, fieldId: string): string | undefined =>
   row?.customFields?.find((field: any) => field.fieldId === fieldId)?.selectedValues?.[0];
 
 // Confirmed real /cohort/search payload shape for this flow: filter by
-// customFieldsName (plain domain/skills display strings), no parentId
-// (Center) scoping at all — there's no Center lookup anywhere in this
-// flow any more, so a Trainer sees every active batch matching their
-// Domain/Skills regardless of Center.
-const searchBatchesForPair = async (domain: string, skill: string): Promise<any[]> => {
+// customFieldsName (plain domain/skills display strings). parentId (Center)
+// is optional — My Teaching Center's own batch list has no Center scoping
+// at all (a Trainer sees every active batch matching their Domain/Skills
+// regardless of Center), but AllocateToBatchModal.tsx (L2 Interested
+// Queue's batch allocation flow) narrows to one Center at a time first, so
+// it passes one in.
+const searchBatchesForPair = async (
+  domain: string,
+  skill: string,
+  parentId?: string
+): Promise<any[]> => {
   const raw = await searchCohorts({
     limit: 200,
     offset: 0,
     filters: {
       type: 'BATCH',
       status: ['active'],
+      ...(parentId ? { parentId: [parentId] } : {}),
       customFieldsName: { domain, skills: skill },
     },
   });
@@ -60,6 +67,29 @@ export const getMyTeachingCenterBatches = async (
   domains.forEach((domain) => skills.forEach((skill) => pairs.push([domain, skill])));
 
   const results = await Promise.all(pairs.map(([domain, skill]) => searchBatchesForPair(domain, skill)));
+  const flattened = results.flat();
+  const deduped = Array.from(new Map(flattened.map((batch: any) => [batch.cohortId, batch])).values());
+
+  return deduped.map(mapToMyTeachingCenterBatch);
+};
+
+// Same Domain×Skill pair-fanout + dedupe as getMyTeachingCenterBatches, but
+// also scoped to one Center (parentId) — used by AllocateToBatchModal.tsx
+// once the Trainer has picked which of their (possibly several) Centers
+// they're allocating this batch under.
+export const searchBatchesForCenter = async (
+  centerId: string,
+  domains: string[],
+  skills: string[]
+): Promise<MyTeachingCenterBatch[]> => {
+  if (domains.length === 0 || skills.length === 0) return [];
+
+  const pairs: Array<[string, string]> = [];
+  domains.forEach((domain) => skills.forEach((skill) => pairs.push([domain, skill])));
+
+  const results = await Promise.all(
+    pairs.map(([domain, skill]) => searchBatchesForPair(domain, skill, centerId))
+  );
   const flattened = results.flat();
   const deduped = Array.from(new Map(flattened.map((batch: any) => [batch.cohortId, batch])).values());
 

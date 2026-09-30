@@ -13,10 +13,11 @@ import {
 import { useTheme } from '@mui/material/styles';
 import CloseSharpIcon from '@mui/icons-material/CloseSharp';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
-import { getCohortList as searchCohorts } from '../../services/youthNet/Dashboard/VillageServices';
 import { getCohortList as getMyCohorts } from '../../services/GetCohortList';
 import { bulkCreateCohortMembers } from '../../services/CohortService';
 import { updateUser } from '../../services/youthNet/Dashboard/UserServices';
+import { getTrainerTaxonomy } from '../../services/myTeachingCenter/TrainerTaxonomyService';
+import { searchBatchesForCenter } from '../../services/myTeachingCenter/BatchListService';
 import {
   buildBatchEnrollCustomFields,
   isUpdateUserSuccess,
@@ -43,14 +44,11 @@ interface Option {
 // own, and /cohort/search's response needs client-side unwrapping too,
 // neither of which DynamicForm's schema-driven api/dependent mechanism
 // (simple label/value mapping only, no filtering) can express. Batch is
-// scoped to the selected Center + the learner's own Domain/Skill.
-//
-// filters.domain/filters.skills/filters.parentId on the Batch search are
-// UNVERIFIED against the real backend — no existing caller in the codebase
-// filters /cohort/search by a customField (only core fields:
-// type/status/parentId/state/district/block). Modeled on the established
-// "schema field name becomes filter key verbatim" convention, matching
-// L2BatchCreate.js's own field names. Confirm end-to-end.
+// scoped to the selected Center + the *Trainer's own* assigned Domain/Skill
+// (from their own profile, via getTrainerTaxonomy — not the learner's
+// tagged domain/skill props, which are for header display only) — same
+// searchBatchesForCenter (BatchListService.ts) my-teaching-center already
+// uses, confirmed against the real customFieldsName filter contract.
 const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
   open,
   onClose,
@@ -103,24 +101,14 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
   const loadBatches = async (centerId: string) => {
     setBatchOptions(null);
     setSelectedBatch(null);
-    const raw = await searchCohorts({
-      limit: 200,
-      offset: 0,
-      filters: {
-        type: 'BATCH',
-        status: ['active'],
-        parentId: [centerId],
-        domain: [domain],
-        skills: [skill],
-      },
-    });
-    if (!raw || raw?.isAxiosError || raw instanceof Error) {
-      showToastMessage('Something went wrong while fetching batches', 'error');
+    const userId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    if (!userId) {
       setBatchOptions([]);
       return;
     }
-    const list = raw?.results?.cohortDetails || [];
-    setBatchOptions(list.map((b: any) => ({ label: b.name, value: b.cohortId })));
+    const taxonomy = await getTrainerTaxonomy(userId);
+    const list = await searchBatchesForCenter(centerId, taxonomy.domains, taxonomy.skills);
+    setBatchOptions(list.map((b) => ({ label: b.name, value: b.cohortId })));
   };
 
   const handleCenterChange = (option: Option | null) => {
@@ -202,7 +190,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
               Allocate to batch
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {learners.length} learner{learners.length > 1 ? 's' : ''} · skill: {skill}
+              {learners.length} learner{learners.length > 1 ? 's' : ''} · {domain} › {skill}
             </Typography>
           </Box>
           <IconButton size="small" onClick={onClose} aria-label="Close">
