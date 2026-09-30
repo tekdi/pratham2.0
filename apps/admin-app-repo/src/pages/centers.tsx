@@ -100,6 +100,7 @@ const Centers = () => {
       searchData(prefilledFormData, 0);
     }
   }, [pageLimit]);
+
   useEffect(() => {
     // Fetch form schema from API and set it in state.
     const fetchData = async () => {
@@ -174,22 +175,9 @@ const Centers = () => {
 
       //set 2 grid layout
       let alterUISchema = responseForm?.uiSchema;
-      alterUISchema['ui:order'] = [
-        "state",
-        "district",
-        "block",
-        "village",
-        "board",
-        "medium",
-        "grade",
-        "name",
-        "center_type",
-        "address",
-        "image",
-        "google_map_link",
-        'industry',
-        "catchment_area"
-      ];
+      // ui:order fully driven by the schema's own property order, so any
+      // field the form adds/removes is reflected automatically.
+      alterUISchema['ui:order'] = Object.keys(alterSchema?.properties || {});
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
       setAddUiSchema(alterUISchema);
@@ -359,6 +347,42 @@ const Centers = () => {
   // ];
   const extraColumnsForYouthnet = [
     {
+      key: 'domain',
+      label: 'Domain',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find(
+              (field) => field.label === 'DOMAIN'
+            )
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
+    {
+      key: 'skills',
+      label: 'Skills',
+      render: (row) =>
+        transformLabel(
+          row.customFields
+            .find((field) => field.label === 'SKILLS')
+            ?.selectedValues?.join(', ')
+        ) || '-',
+    },
+    {
+      key: 'active_batches',
+      label: 'Active Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ACTIVE} />
+      ),
+    },
+    {
+      key: 'archived_batches',
+      label: 'Archived Batches',
+      render: (row) => (
+        <ActiveArchivedBatch cohortId={row?.cohortId} type={Status.ARCHIVED} />
+      ),
+    },
+    {
       key: 'image',
       label: 'Images',
       render: (row: any) => {
@@ -510,9 +534,9 @@ const Centers = () => {
         setOpenBatchModal(true);
         // console.log('row in view batch', row);
       },
-      show: (row) =>
-        row.status !== 'archived' &&
-        storedProgram === TenantName.SECOND_CHANCE_PROGRAM,
+      // Batch creation/viewing (via BatchFlow) is no longer SCP-only —
+      // reuses the same SCP batch create form until a dedicated one is provided.
+      show: (row) => row.status !== 'archived',
     },
     {
       icon: (
@@ -808,6 +832,17 @@ const Centers = () => {
               centerGrades={
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'GRADE'
+                )?.selectedValues || []
+              }
+              centerIndustries={
+                selectedCenter?.customFields?.find(
+                  (field: any) =>
+                    field.label === 'INDUSTRY' || field.label === 'DOMAIN'
+                )?.selectedValues || []
+              }
+              centerSkills={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'SKILLS'
                 )?.selectedValues || []
               }
               centerType={
