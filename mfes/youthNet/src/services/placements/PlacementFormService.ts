@@ -78,14 +78,6 @@ export const getPlacementForm = async (): Promise<PlacementFormBundle | null> =>
   // else reads this title (the learner-table columns that used to use it
   // already exclude state/district separately — see
   // PLACEMENT_TABLE_EXCLUDED_FIELDS), so blanking it is safe.
-  ['state', 'district'].forEach((key) => {
-    if (uiSchema[key]) {
-      uiSchema[key] = { ...uiSchema[key], 'ui:widget': 'hidden' };
-    }
-    if (schema?.properties?.[key]) {
-      schema.properties[key] = { ...schema.properties[key], title: '' };
-    }
-  });
 
   return {
     schema,
