@@ -46,12 +46,12 @@ const CustomSingleSelectWidget = ({
       <InputLabel
         id={`${id}-label`}
         sx={{
-          color: 'black',
+          color: 'rgba(0, 0, 0, 0.6)', // same as TextField label (text.secondary)
           '&.Mui-error': {
-            color: 'black', // override error red
+            color: 'rgba(0, 0, 0, 0.6)', // override error red
           },
           '&.Mui-disabled': {
-            color: 'black', // override disabled grey
+            color: 'rgba(0, 0, 0, 0.6)',
           }
         }}
       >
