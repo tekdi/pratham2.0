@@ -1,7 +1,11 @@
 //@ts-nocheck
 import React, { useState, useEffect, useRef, useImperativeHandle,forwardRef } from 'react';
 import Form from '@rjsf/mui';
-import validator from '@rjsf/validator-ajv8';
+import { customizeValidator } from '@rjsf/validator-ajv8';
+
+// $data enables cross-field schema constraints (e.g. enddate's formatMinimum
+// referencing startdate's value via a relative JSON pointer).
+const validator = customizeValidator({ ajvOptionsOverrides: { $data: true } });
 import axios from 'axios';
 import Grid from '@mui/material/Grid';
 import { Box, Alert } from '@mui/material';
@@ -62,6 +66,7 @@ const DynamicForm = forwardRef(({
   parentDataSchema = {},
   id,
   mobileNumber="",
+  onFormDataChange,
   valueSelectedChange=null,
 }: any, ref) => {
   console.log('schema=======>', schema);
@@ -893,6 +898,33 @@ const DynamicForm = forwardRef(({
       resetForm: (newFormData) => {
         setFormData(newFormData);
         handleChange({ formData: newFormData });
+      },
+      // Lets a caller push a fresh set of {label, value} choices into a
+      // field's own enum/enumNames, same shape the built-in dependent-field
+      // cascade above already writes into formSchema. Needed when a caller
+      // resolves a field's valid options itself (e.g. via an association
+      // graph walk the generic cascade doesn't do) - without this, a value
+      // set via resetForm that isn't already in the field's enum wouldn't
+      // render as selected, since the widget only shows/checks values that
+      // are present in its own enumOptions.
+      setFieldOptions: (fieldKey, fieldOptions) => {
+        setFormSchema((prevSchema) => {
+          const targetField = prevSchema.properties?.[fieldKey];
+          if (!targetField) return prevSchema;
+          const enumValues = (fieldOptions || []).map((opt) => opt.value);
+          const enumNames = (fieldOptions || []).map((opt) => opt.label);
+          const updatedField =
+            targetField.isMultiSelect === true
+              ? {
+                  ...targetField,
+                  items: { type: 'string', enum: enumValues, enumNames },
+                }
+              : { ...targetField, enum: enumValues, enumNames };
+          return {
+            ...prevSchema,
+            properties: { ...prevSchema.properties, [fieldKey]: updatedField },
+          };
+        });
       },
     }));
   useEffect(() => {
@@ -1877,6 +1909,9 @@ const DynamicForm = forwardRef(({
       // console.log('Form data changed:', formData);
       // live error
       setFormData(formData);
+      if (changedField && onFormDataChange) {
+        onFormDataChange(formData, changedField);
+      }
 
       //submit new form data
       if(valueSelectedChange){
@@ -2116,8 +2151,13 @@ const DynamicForm = forwardRef(({
             errors[key].__errors = []; // ✅ Clear existing errors
           }
           delete errors[key]; // ✅ Completely remove errors if empty
-        } else if (field.pattern) {
-          // ✅ Validate pattern only if the field has a value
+        } else if (field.pattern && typeof value === 'string') {
+          // ✅ Validate pattern only if the field has a value.
+          // `pattern` is only meaningful for string values — an array-typed
+          // (multi-select) field coerces to a joined string when tested
+          // against a RegExp, which fails a numeric/anchored pattern for
+          // any non-empty selection. Skip pattern checks for non-strings
+          // (e.g. multi-select arrays) instead of false-failing them.
           const patternRegex = new RegExp(field.pattern);
           if (!patternRegex.test(value)) {
             const errorMessage =
@@ -2177,12 +2217,42 @@ const DynamicForm = forwardRef(({
     if (!submitted) {
       updatedError = updatedError.filter((error) => error.name !== 'pattern');
     }
+    // Friendlier messages for AJV date-range keywords — schema-driven date
+    // validation (startdate/enddate) uses formatMinimum/formatExclusiveMinimum,
+    // whose default AJV message ("should be > 2026-09-23") is too technical.
+    updatedError = updatedError.map((error) => {
+      if (error.name === 'formatMinimum' || error.name === 'formatExclusiveMinimum') {
+        const fieldKey = error.property?.replace(/^\./, '');
+        if (fieldKey === 'enddate' && error.name === 'formatExclusiveMinimum') {
+          error.message = t('FORM_ERROR_MESSAGES.END_DATE_AFTER_START_DATE', {
+            defaultValue: 'Please select an End Date that is after the Start Date.',
+          });
+        } else if (fieldKey === 'startdate' || fieldKey === 'enddate') {
+          error.message = t('FORM_ERROR_MESSAGES.DATE_CANNOT_BE_IN_PAST', {
+            defaultValue: 'Please select today or a future date.',
+          });
+        }
+      }
+      return error;
+    });
     // Suppress enum errors for fields with no value selected (empty string / undefined)
     updatedError = updatedError.filter((error) => {
       if (error.name === 'enum') {
         const fieldKey = error.property?.replace(/^\./, '');
         const fieldValue = formData[fieldKey];
         if (fieldValue === '' || fieldValue === null || fieldValue === undefined) {
+          return false;
+        }
+      }
+      return true;
+    });
+    // Suppress required errors for fields currently hidden by skip/hide logic —
+    // the user can't fill them, and handleSubmit drops their values anyway.
+    updatedError = updatedError.filter((error) => {
+      if (error.name === 'required') {
+        const fieldKey =
+          error.params?.missingProperty || error.property?.replace(/^\./, '');
+        if (formUiSchema?.[fieldKey]?.['ui:widget'] === 'hidden') {
           return false;
         }
       }

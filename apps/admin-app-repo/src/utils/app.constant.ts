@@ -51,15 +51,63 @@ export enum Role {
   SCTA = 'Content creator',
   CCTA = 'Content reviewer',
   MOBILIZER = 'Mobilizer',
+  PLACEMENT_RETENTION_COORDINATOR = 'Placement Retention Coordinator',
 }
 
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
+  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Second Chance Program Pathways',
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
   CAMP_TO_CLUB = 'Camp to Club'
 }
+
+export const isSecondChanceTenant = (tenantName?: string | null): boolean =>
+  tenantName === TenantName.SECOND_CHANCE_PROGRAM ||
+  tenantName === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS;
+
+export const getSelectedTenantData = (tenantData?: any[] | null, tenantId?: string | null) =>
+  tenantData?.find((tenant: any) => tenant?.tenantId === tenantId) ?? tenantData?.[0];
+
+// Form schemas (both static constant/Forms/*.js files using a '{{FRAMEWORK}}'
+// placeholder, and schemas returned live by the backend's /form/read API with
+// a framework id already baked in) can carry the WRONG tenant's framework id
+// inside a framework-read fetchUrl. Call this on a schema clone before
+// rendering it so every tenant queries its own collectionFramework.
+const FRAMEWORK_URL_PATTERN = /(\/api\/framework\/v1\/read\/|\/action\/framework\/v3\/read\/)([^/?"'`]+)/;
+
+export const resolveFrameworkPlaceholders = <T,>(schema: T): T => {
+  const collectionFramework =
+    (typeof window !== 'undefined' && localStorage.getItem('collectionFramework')) || '';
+
+  if (!collectionFramework) return schema;
+
+  const walk = (node: any) => {
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+    } else if (node && typeof node === 'object') {
+      Object.keys(node).forEach((key) => {
+        const value = node[key];
+        if (typeof value === 'string') {
+          if (value.includes('{{FRAMEWORK}}')) {
+            node[key] = value.replace('{{FRAMEWORK}}', collectionFramework);
+          } else if (FRAMEWORK_URL_PATTERN.test(value)) {
+            node[key] = value.replace(
+              FRAMEWORK_URL_PATTERN,
+              (_match, prefix) => `${prefix}${collectionFramework}`
+            );
+          }
+        } else {
+          walk(value);
+        }
+      });
+    }
+  };
+
+  walk(schema);
+  return schema;
+};
 
 export enum Status {
   ARCHIVED = 'archived',
@@ -114,6 +162,7 @@ export enum RoleId {
   CONTENT_REVIEWER = '2dc13fcc-29c4-42c1-b125-82d3dcaa4b42',
   STATE_LEAD = '4a3493aa-a4f7-4e2b-b141-f213084b5599',
   MOBILIZER = 'a4694781-65c1-4b92-8ff1-ad490ab6d140',
+  PLACEMENT_RETENTION_COORDINATOR = '4c0c8421-2969-4155-9e78-c8d975d028ef',
 }
 
 export enum RoleName {
@@ -121,6 +170,7 @@ export enum RoleName {
   CONTENT_REVIEWER = 'Content reviewer',
   STATE_LEAD = 'State Lead',
   MOBILIZER = 'Mobilizer',
+  PLACEMENT_RETENTION_COORDINATOR = 'Placement Retention',
 }
 
 export enum DataKey {
@@ -278,5 +328,6 @@ export const ROLE_LOGIN_URL_MAP: Record<string, string | undefined> = {
   'State Lead': ADMIN_LOGIN_URL,
   'Content Creator': ADMIN_LOGIN_URL,
   'Content Reviewer': ADMIN_LOGIN_URL,
-  'Mobilizer': DEFAULT_LOGIN_URL
+  'Mobilizer': DEFAULT_LOGIN_URL,
+  'Placement Retention Coordinator': ADMIN_LOGIN_URL
 };
