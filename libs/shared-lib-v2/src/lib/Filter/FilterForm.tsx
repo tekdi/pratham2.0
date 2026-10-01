@@ -133,7 +133,9 @@ export function FilterForm({
       );
       const allFields = [
         ...transformedRenderForm,
-        ...(filtered[0]?.fields ?? []),
+        ...(filtered[0]?.fields ?? [])
+          .filter((f: any) => !HIDDEN_FILTER_CODES.includes(f.code))
+          .map(normalizeStaticField),
       ];
 
       setFilterData(allFields);
@@ -218,18 +220,39 @@ export function FilterForm({
 }
 
 // Utility Functions
+// Static form fields that should never be shown as filters
+const HIDDEN_FILTER_CODES = ['certificateTemplate', 'skills'];
+
 const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
       formattedPayload[key] = payload[key].map(
-        (item: any) => item?.name ?? item
+        (item: any) => item?.value ?? item?.name ?? item
       );
     } else {
       formattedPayload[key] = payload[key];
     }
   });
   return formattedPayload;
+};
+
+// Static form range options may be plain strings or { identifier, label } objects;
+// map objects to the { code, name } shape used by the form (value is sent to search).
+const normalizeStaticField = (field: any) => {
+  if (!Array.isArray(field?.range)) return field;
+  return {
+    ...field,
+    range: field.range.map((opt: any) =>
+      opt && typeof opt === 'object' && !opt.name
+        ? {
+            code: opt.identifier ?? opt.label,
+            name: opt.label ?? opt.identifier,
+            value: opt.identifier ?? opt.label,
+          }
+        : opt
+    ),
+  };
 };
 
 function filterObjectsWithSourceCategory(data: any[], filteredNames: string[]) {
@@ -699,7 +722,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     Array.isArray(selected) &&
                     selected.some((s) =>
                       typeof s === 'string'
-                        ? s === item.name || s === item
+                        ? s === item.name || s === item.code || s === item
                         : s.code === item.code || s.name === item.name
                     );
                   return (
