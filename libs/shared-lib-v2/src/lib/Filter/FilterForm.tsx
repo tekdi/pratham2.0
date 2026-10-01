@@ -132,7 +132,9 @@ export function FilterForm({
         transformedRenderForm.map((r) => r.name)
       );
       const allFields = [
-        ...transformedRenderForm,
+        ...transformedRenderForm.filter(
+          (f: any) => !HIDDEN_FILTER_CODES.includes(f.old_code)
+        ),
         ...(filtered[0]?.fields ?? [])
           .filter((f: any) => !HIDDEN_FILTER_CODES.includes(f.code))
           .map(normalizeStaticField),
@@ -221,7 +223,7 @@ export function FilterForm({
 
 // Utility Functions
 // Static form fields that should never be shown as filters
-const HIDDEN_FILTER_CODES = ['certificateTemplate', 'skills'];
+const HIDDEN_FILTER_CODES = ['certificateTemplate', 'skills', 'targetSkillsIds'];
 
 const formatPayload = (payload: any) => {
   const formattedPayload: any = {};
