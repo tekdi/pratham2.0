@@ -1,7 +1,4 @@
-import {
-  attendanceInPercentageStatusList,
-  attendanceStatusList,
-} from '../services/AttendanceService';
+import { attendanceStatusList } from '../services/AttendanceService';
 import { getMyCohortMemberList } from '../services/MyClassDetailsService';
 import {
   AttendancePercentageProps,
@@ -22,10 +19,12 @@ export type SessionIdsByDate = { [date: string]: string[] };
  */
 const SESSION_GAP_DATE_LIMIT = 10;
 
-const getTotalStudentCount = async (
+const COHORT_RANGE_ATTENDANCE_LIMIT = 10000;
+
+const getCountedStudentIds = async (
   response: any,
   fromDate: Date
-): Promise<number> => {
+): Promise<string[]> => {
   try {
     const filteredFields = response?.result?.userDetails || [];
 
@@ -59,38 +58,18 @@ const getTotalStudentCount = async (
       shortDateFormat(fromDate)
     );
 
-    const totalStudentsCount = filteredEntries.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
+    const countedMembers = filteredEntries.filter(member => member.memberStatus === Status.ACTIVE || (member.memberStatus === Status.DROPOUT && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
     (member.memberStatus === "reassigned" && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))||
-    (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate)))).length;
-  
-    return totalStudentsCount;
+    (member.memberStatus === Status.ARCHIVED && shortDateFormat(new Date(member.updatedAt)) > shortDateFormat(new Date(fromDate))));
+
+    return countedMembers.map((member) => member.userId);
   } catch (error) {
-    // console.error('Error in getTotalStudentCount:', error);
-    return 0;
+    // console.error('Error in getCountedStudentIds:', error);
+    return [];
   }
 };
 
 
-
-const getPresentStudentCount = async (
-  attendanceRequest: AttendancePercentageProps
-): Promise<PresentStudents> => {
-  const response = await attendanceInPercentageStatusList(attendanceRequest);
-  const attendanceDates = response?.data?.result?.attendanceDate;
-  const presentStudents: any = {};
-
-  if (!attendanceDates) {
-    return presentStudents;
-  }
-  for (const date of Object.keys(attendanceDates)) {
-    const attendance = attendanceDates[date];
-    const present = attendance.present || 0;
-    presentStudents[date] = {
-      present_students: present,
-    };
-  }
-  return presentStudents;
-};
 
 type PresentStudents = {
   [date: string]: {
@@ -170,6 +149,50 @@ const getSessionPresentCount = async (
   return presentStudents;
 };
 
+/** Attendance status per userId per date (yyyy-MM-dd) for the batch, from one range request. */
+const getCohortAttendanceByDate = async (
+  filters: AttendancePercentageProps['filters']
+): Promise<{ [date: string]: Map<string, string> }> => {
+  // Without an explicit limit the backend returns a default page of 20 rows.
+  const res = await attendanceStatusList({
+    limit: COHORT_RANGE_ATTENDANCE_LIMIT,
+    page: 0,
+    filters: {
+      fromDate: filters.fromDate,
+      toDate: filters.toDate,
+      contextId: filters.contextId,
+      scope: filters.scope,
+      context: 'cohort',
+    },
+  });
+  const rows = res?.data?.attendanceList ?? [];
+  console.log(
+    `cohort attendance rows for ${filters.fromDate} -> ${filters.toDate}:`,
+    rows.length
+  );
+  if (rows.length >= COHORT_RANGE_ATTENDANCE_LIMIT) {
+    console.warn(
+      `cohort attendance range hit the ${COHORT_RANGE_ATTENDANCE_LIMIT}-row limit; counts may be incomplete`
+    );
+  }
+  const byDate: { [date: string]: Map<string, string> } = {};
+  rows.forEach((row: any) => {
+    if (row?.userId && row?.attendanceDate) {
+      (byDate[row.attendanceDate] ??= new Map<string, string>()).set(
+        row.userId,
+        row.attendance
+      );
+    }
+  });
+  console.log(
+    'cohort attendance rows per date:',
+    Object.fromEntries(
+      Object.entries(byDate).map(([date, statuses]) => [date, statuses.size])
+    )
+  );
+  return byDate;
+};
+
 export const calculatePercentage = async (
   cohortMemberRequest: CohortMemberList,
   attendanceRequest: AttendancePercentageProps,
@@ -178,8 +201,10 @@ export const calculatePercentage = async (
 ): Promise<Result> => {
   const response = await getMyCohortMemberList(cohortMemberRequest);
 
-  // Batch-level attendance (context 'cohort', contextId = the batch).
-  const presentStudents = await getPresentStudentCount(attendanceRequest);
+  // Batch-level attendance (context 'cohort', contextId = the batch), one row per learner per day.
+  const cohortAttendanceByDate = await getCohortAttendanceByDate(
+    attendanceRequest.filters
+  );
 
   // Attendance marked through the session flow is stored against the event repetition,
   // so the query above cannot see it and the day looks unmarked. Fill in only those
@@ -188,7 +213,7 @@ export const calculatePercentage = async (
   if (sessionIdsByDate) {
     const gapDates: SessionIdsByDate = {};
     Object.keys(sessionIdsByDate).forEach((date) => {
-      if (!presentStudents[date] && sessionIdsByDate[date]?.length) {
+      if (!cohortAttendanceByDate[date] && sessionIdsByDate[date]?.length) {
         gapDates[date] = sessionIdsByDate[date];
       }
     });
@@ -207,18 +232,43 @@ export const calculatePercentage = async (
   }
 
   const result: Result = {};
-  // Gap dates are by definition absent from `presentStudents`, so the two never
+  // Gap dates are by definition absent from `cohortAttendanceByDate`, so the two never
   // overlap and there is nothing to reconcile.
-  const dates = Object.keys({ ...presentStudents, ...sessionPresentStudents });
+  const dates = Object.keys({
+    ...cohortAttendanceByDate,
+    ...sessionPresentStudents,
+  });
   for (const date of dates) {
-    const totalStudentsCount = await getTotalStudentCount(
+    const countedStudentIds = await getCountedStudentIds(
       response,
       new Date(date)
     );
-    const presentCount =
-      presentStudents[date]?.present_students ??
-      sessionPresentStudents[date]?.present_students ??
-      0;
+    const totalStudentsCount = countedStudentIds.length;
+    console.log(
+      `totalStudentsCount for ${date}: ${totalStudentsCount}, userIds:`,
+      countedStudentIds
+    );
+    let presentCount: number;
+    const statusByUserId = cohortAttendanceByDate[date];
+    if (statusByUserId) {
+      const countedPresentIds = countedStudentIds.filter(
+        (id) => statusByUserId.get(id) === 'present'
+      );
+      presentCount = countedPresentIds.length;
+      console.log(
+        `presentCount for ${date}: ${presentCount}, userIds:`,
+        countedPresentIds
+      );
+      console.log(
+        `attendance status for ${date}:`,
+        countedStudentIds.map((id) => ({
+          userId: id,
+          attendance: statusByUserId.get(id) ?? 'not marked',
+        }))
+      );
+    } else {
+      presentCount = sessionPresentStudents[date]?.present_students ?? 0;
+    }
     const presentPercentage =
       totalStudentsCount > 0
         ? parseFloat(((presentCount / totalStudentsCount) * 100).toFixed(2))
