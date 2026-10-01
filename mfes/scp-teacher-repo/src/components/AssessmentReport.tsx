@@ -8,7 +8,7 @@ import {
 } from '@/services/AssesmentService';
 import { showToastMessage } from './Toastify';
 import AssessmentReportCard from './AssessmentReportCard';
-import { AssessmentType, Program } from '../../app.config';
+import { AssessmentType, getTenantProgramFilter } from '../../app.config';
 import { useQueryClient } from '@tanstack/react-query';
 import { getCohortDetails } from '@/services/CohortServices';
 
@@ -41,7 +41,7 @@ const AssessmentReport: React.FC<AssessmentReportProp> = ({
     let filters: any;
     if (stateName) {
       filters = {
-        program: Program,
+        program: getTenantProgramFilter(),
         state: [stateName],
         board: [board],
         status: ['Live'],

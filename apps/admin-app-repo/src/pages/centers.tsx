@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import Loader from '@/components/Loader';
 import { useTranslation } from 'react-i18next';
-import { CohortTypes, Status, TenantName } from '@/utils/app.constant';
+import { CohortTypes, Status, TenantName, isSecondChanceTenant, resolveFrameworkPlaceholders } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import { Box, Tooltip, Typography } from '@mui/material';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
@@ -122,7 +122,7 @@ const Centers = () => {
       console.log('responseForm', responseForm);
 
       //unit name is missing from required so handled from frotnend
-      let alterSchema = responseForm?.schema;
+      let alterSchema = resolveFrameworkPlaceholders(responseForm?.schema);
       let requiredArray = alterSchema?.required;
       const mustRequired = [
         'name',
@@ -132,7 +132,7 @@ const Centers = () => {
         'village',
         // 'catchment_area',
       ];
-      if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
+      if (isSecondChanceTenant(storedProgram)) {
         mustRequired.push('center_type', 'board', 'medium', 'grade');
       }
       // Merge only missing items from required2 into required1
@@ -175,9 +175,36 @@ const Centers = () => {
 
       //set 2 grid layout
       let alterUISchema = responseForm?.uiSchema;
-      // ui:order fully driven by the schema's own property order, so any
-      // field the form adds/removes is reflected automatically.
-      alterUISchema['ui:order'] = Object.keys(alterSchema?.properties || {});
+      // YouthNet: ui:order fully driven by the schema's own property order,
+      // so any field the form adds/removes is reflected automatically.
+      // Other programs: keep the preferred SCP/Pathways field order, limited
+      // to fields present on the schema, with any others appended after.
+      const schemaKeys = Object.keys(alterSchema?.properties || {});
+      if (storedProgram === TenantName.YOUTHNET) {
+        alterUISchema['ui:order'] = schemaKeys;
+      } else {
+        const preferredOrder = [
+          'state',
+          'district',
+          'block',
+          'village',
+          'board',
+          'medium',
+          'grade',
+          'stream',
+          'name',
+          'center_type',
+          'address',
+          'image',
+          'google_map_link',
+          'industry',
+          'catchment_area',
+        ].filter((key) => schemaKeys.includes(key));
+        alterUISchema['ui:order'] = [
+          ...preferredOrder,
+          ...schemaKeys.filter((key) => !preferredOrder.includes(key)),
+        ];
+      }
       alterUISchema = enhanceUiSchemaWithGrid(alterUISchema);
 
       setAddUiSchema(alterUISchema);
@@ -473,8 +500,20 @@ const Centers = () => {
     },
   ];
 
-  if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM) {
+  if (isSecondChanceTenant(storedProgram)) {
     columns.push(...extraColumnsForSCP);
+    if (storedProgram === TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS) {
+      columns.push({
+        key: 'stream',
+        label: 'Stream',
+        render: (row) =>
+          transformLabel(
+            row.customFields
+              .find((field) => field.label === 'STREAM')
+              ?.selectedValues?.join(', ')
+          ) || '-',
+      });
+    }
   }
   if (storedProgram === TenantName.YOUTHNET) {
     columns.push(...extraColumnsForYouthnet);
@@ -535,7 +574,7 @@ const Centers = () => {
         // console.log('row in view batch', row);
       },
       // Batch creation/viewing (via BatchFlow) is no longer SCP-only —
-      // reuses the same SCP batch create form until a dedicated one is provided.
+      // YouthNet uses the L2 batch form, SCP/Pathways their own forms.
       show: (row) => row.status !== 'archived',
     },
     {
@@ -843,6 +882,11 @@ const Centers = () => {
               centerSkills={
                 selectedCenter?.customFields?.find(
                   (field: any) => field.label === 'SKILLS'
+                )?.selectedValues || []
+              }
+              centerStreams={
+                selectedCenter?.customFields?.find(
+                  (field: any) => field.label === 'STREAM'
                 )?.selectedValues || []
               }
               centerType={

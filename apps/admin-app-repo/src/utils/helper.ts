@@ -1,16 +1,14 @@
+import { getCohortList } from '@/services/GetCohortList';
+import axios from 'axios';
 import FingerprintJS from 'fingerprintjs2';
 import { getUserDetailsInfo } from '../services/UserList';
 import {
-  Role,
   FormContextType,
   FormValues,
   InputTypes,
-  Storage,
+  Storage
 } from './app.constant';
 import { State } from './Interfaces';
-import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
-import { getCohortList } from '@/services/GetCohortList';
 
 interface Value {
   value: string;
@@ -291,11 +289,13 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   return (
     category?.terms
-      ?.filter((term: any) => term.status !== "Retired") // ✅ exclude retired
+      ?.filter((term: any) => term.status !== 'Retired') // ✅ exclude retired
       .map((term: any) => ({
+        identifier: term.identifier,
         name: term.name,
         code: term.code,
         status: term.status,
+        index: term.index,
         associations: term.associations,
       })) || []
   );
