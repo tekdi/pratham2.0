@@ -913,7 +913,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     try {
       const dateStr = dayjs(newStart).format('YYYY-MM-DD');
       const filters = {
-        cohortId,
+        cohortIds: [cohortId],
         startDate: { after: getAfterDate(dateStr) },
         endDate: { before: getBeforeDate(dateStr) },
         status: ['live'],
@@ -1024,7 +1024,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             courseType: block?.courseType || '',
             subject: block?.subject || '',
             teacherName: userName,
-            cohortId: cohortId || '',
+            cohortIds: cohortId ? [cohortId] : [],
             cycleId: '',
             tenantId: '',
             type:
@@ -1389,7 +1389,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             courseType: eventData?.metadata?.courseType || '',
             subject: eventData?.metadata?.subject || '',
             teacherName: eventData?.metadata?.teacherName || '',
-            cohortId: eventData?.metadata?.cohortId || '',
+            cohortIds:
+              eventData?.metadata?.cohortIds ||
+              (eventData?.metadata?.cohortId
+                ? [eventData.metadata.cohortId]
+                : []),
             cycleId: eventData?.metadata?.cycleId || '',
             tenantId: eventData?.metadata?.tenantId || '',
             type: eventData?.metadata?.type || '',

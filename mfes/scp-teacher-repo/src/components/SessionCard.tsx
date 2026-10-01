@@ -4,6 +4,7 @@ import { convertUTCToIST, getBMG, toPascalCase } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import LockOutlined from '@mui/icons-material/LockOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
@@ -49,6 +50,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [editSession, setEditSession] = React.useState();
   const [eventStatus, setEventStatus] = React.useState('');
   const [CohortBMG, setCohortBMG] = React.useState<any>({});
+  const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
+    React.useState(false);
   const [currentUserId, setCurrentUserId] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;
@@ -71,16 +74,30 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
     setEditSelection(selection);
   };
   const handleOpen = (eventData: any) => {
+    // A multi-batch session is managed centrally from Cross-Center Sessions —
+    // editing it inline here would let a facilitator change time/subject
+    // without realising it applies to every other batch on the session too.
+    if (eventData?.metadata?.multiSession) {
+      setMultiBatchConfirmOpen(true);
+      return;
+    }
     setOpen(true);
     setEditSession(eventData);
     setEventEdited(true);
+  };
+
+  const handleGoToCrossCenterEdit = () => {
+    setMultiBatchConfirmOpen(false);
+    router.push(
+      `/centers/cross-center-sessions?editEventId=${data?.eventRepetitionId}`
+    );
   };
 
   const handleClose = () => setOpen(false);
 
   useEffect(() => {
     if (dashboard) {
-      const classId = data.metadata?.cohortId;
+      const classId = data.metadata?.cohortId ?? data.metadata?.cohortIds?.[0];
       const getCohortData = async () => {
         const response = await getCohortDetails(classId);
 
@@ -343,6 +360,21 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             sx={{ cursor: 'pointer' }}
           />
         )}
+        {eventStatus === EventStatus.PASSED && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              color: theme.palette.warning['400'],
+            }}
+          >
+            <LockOutlined sx={{ fontSize: '16px' }} />
+            <Typography fontSize={'12px'}>
+              {t('CENTER_SESSION.COMPLETED')}
+            </Typography>
+          </Box>
+        )}
       </Box>
       <Box
         sx={{
@@ -427,6 +459,16 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
         handleCloseModal={handleCloseModal}
         handleAction={onUpdateClick}
         modalOpen={modalOpen}
+      />
+      <ConfirmationModal
+        message={t('CENTER_SESSION.MULTI_BATCH_EDIT_REDIRECT_MSG')}
+        buttonNames={{
+          primary: t('COMMON.CONTINUE'),
+          secondary: t('COMMON.CANCEL'),
+        }}
+        handleCloseModal={() => setMultiBatchConfirmOpen(false)}
+        handleAction={handleGoToCrossCenterEdit}
+        modalOpen={multiBatchConfirmOpen}
       />
       <Box sx={{ position: 'absolute', bottom: '2px', width: '100%' }}>
         {children}
