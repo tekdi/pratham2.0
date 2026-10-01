@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { post } from '@/services/RestClient';
 import { Role, TenantName } from '@/utils/app.constant';
 import { showToastMessage } from '@/components/Toastify';
-import { getUserId } from '@/services/LoginService';
+import { getUserId, getTenantInfo } from '@/services/LoginService';
 import { getUserDetailsInfo } from '@/services/UserList';
 import { getAcademicYear } from '@/services/AcademicYearService';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -337,6 +337,19 @@ const SSOContent = () => {
       localStorage.setItem('collectionFramework', frameworkId);
       localStorage.setItem('channelId', channel);
       localStorage.setItem('tenantId', tenantId);
+      // Used by workspace to build the copy-content (cmslink) URL
+      localStorage.setItem('program', tenantName || '');
+      try {
+        const tenantInfo = await getTenantInfo();
+        const matchedTenant = (tenantInfo?.result || []).find(
+          (item: { tenantId: string }) => item.tenantId === tenantId
+        );
+        if (matchedTenant?.domain) {
+          localStorage.setItem('tenantDomain', matchedTenant.domain);
+        }
+      } catch (tenantInfoErr) {
+        console.error('[SSO] getTenantInfo failed:', tenantInfoErr);
+      }
 
       const tenantData = userResponse?.tenantData?.find(
         (tenant: any) => tenant.tenantId === tenantId
