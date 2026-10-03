@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import SimpleModal from '../SimpleModal';
 import { L2BatchCreate } from '../../constant/Forms/L2BatchCreate';
-import { createBatch, isCreateBatchSuccess } from '../../services/myTeachingCenter/CreateBatchService';
-import { TrainerAssignedTaxonomy } from '../../utils/Interfaces';
+import {
+  createBatch,
+  isCreateBatchSuccess,
+  updateBatch,
+} from '../../services/myTeachingCenter/CreateBatchService';
+import { MyTeachingCenterBatch, TrainerAssignedTaxonomy } from '../../utils/Interfaces';
 
 // Cast to `any` deliberately: the RJSF schema/uiSchema objects get
 // field-specific overrides spliced in below (enum/enumNames/ui:disabled/
@@ -30,8 +34,38 @@ interface CreateBatchModalProps {
   // Remote + Hybrid (not locked). Not hardcoded per Trainer/page.
   centerType: string | null;
   trainerTaxonomy: TrainerAssignedTaxonomy;
+  // Called after a successful create, or a successful update in Edit mode.
   onCreated: () => void;
+  // Edit mode: the batch being edited. Same form as Create, prefilled with
+  // the batch's values, with Domain and Skills removed (not shown, not
+  // sent - the batch keeps its existing Domain/Skills).
+  editBatch?: MyTeachingCenterBatch | null;
 }
+
+const EDIT_HIDDEN_FIELDS = ['domain', 'skills'];
+
+// The batch's own current values, in the form's field keys.
+const getEditPrefill = (batch: MyTeachingCenterBatch | null): Record<string, any> => {
+  if (!batch) return {};
+  const prefill: Record<string, any> = { name: batch.name };
+  if (batch.batchType) prefill.batch_type = batch.batchType;
+  if (batch.startDate) prefill.startdate = batch.startDate;
+  if (batch.endDate) prefill.enddate = batch.endDate;
+  return prefill;
+};
+
+// Local date (not UTC) so "today" matches the Trainer's own calendar day.
+const getToday = () => {
+  const now = new Date();
+  return [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+};
+
+const toDateKey = (value?: string) =>
+  typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value) ? value.slice(0, 10) : undefined;
 
 // Same modal chrome as /scp-teacher-repo/centers?tab=1's "Add Batch" (the
 // SimpleModal component — identical here, shared component shape) and the
@@ -49,11 +83,20 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
   centerType,
   trainerTaxonomy,
   onCreated,
+  editBatch = null,
 }) => {
   const { t } = useTranslation();
+  const isEdit = !!editBatch;
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
+
+  // Seed formData with the batch's current values each time Edit opens, so
+  // saving without touching any field still submits the existing values.
+  useEffect(() => {
+    if (open && editBatch) setFormData(getEditPrefill(editBatch));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, editBatch]);
 
   if (!open) return null;
 
@@ -64,6 +107,19 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
   // drop the framework-taxonomy `api` fetch and restrict each field to the
   // Trainer's own assigned values (both already plain display strings, so
   // enum and enumNames are identical).
+  if (isEdit) {
+    EDIT_HIDDEN_FIELDS.forEach((key) => {
+      delete (schema.properties as any)[key];
+      delete uiSchema[key];
+    });
+    schema.required = schema.required.filter((key: string) => !EDIT_HIDDEN_FIELDS.includes(key));
+    if (Array.isArray(uiSchema['ui:order'])) {
+      uiSchema['ui:order'] = uiSchema['ui:order'].filter(
+        (key: string) => !EDIT_HIDDEN_FIELDS.includes(key)
+      );
+    }
+  }
+
   if (schema.properties.domain) {
     delete (schema.properties.domain as any).api;
     schema.properties.domain.items = {
@@ -113,24 +169,69 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
 
   // Neither date can be in the past — same formatMinimum/minValue injection
   // BatchFlow.tsx applies, since "today" can't be a static schema value.
-  const today = new Date().toISOString().slice(0, 10);
+  // In Edit mode, also same as BatchFlow.tsx: a saved date that has already
+  // passed (< today) is locked (disabled, and the "no past dates" rule is
+  // skipped for it); a date that is today or later stays editable.
+  const today = getToday();
   (['startdate', 'enddate'] as const).forEach((key) => {
-    if (schema.properties[key]) (schema.properties[key] as any).formatMinimum = today;
+    const savedDate = isEdit
+      ? toDateKey(key === 'startdate' ? editBatch?.startDate : editBatch?.endDate)
+      : undefined;
+    const isLocked = !!savedDate && savedDate < today;
+    if (schema.properties[key] && !isLocked) (schema.properties[key] as any).formatMinimum = today;
     if (uiSchema[key]) {
       uiSchema[key] = {
         ...uiSchema[key],
-        'ui:options': { ...uiSchema[key]['ui:options'], minValue: today },
+        'ui:options': {
+          ...uiSchema[key]['ui:options'],
+          ...(isLocked ? {} : { minValue: today }),
+        },
+        ...(isLocked ? { 'ui:disabled': true } : {}),
       };
     }
   });
 
-  const prefilledFormData: Record<string, any> = {};
-  if (trainerTaxonomy.domains.length === 1) prefilledFormData.domain = [trainerTaxonomy.domains[0]];
-  if (trainerTaxonomy.skills.length === 1) prefilledFormData.skills = [trainerTaxonomy.skills[0]];
+  const prefilledFormData: Record<string, any> = isEdit ? getEditPrefill(editBatch) : {};
+  if (!isEdit) {
+    if (trainerTaxonomy.domains.length === 1) prefilledFormData.domain = [trainerTaxonomy.domains[0]];
+    if (trainerTaxonomy.skills.length === 1) prefilledFormData.skills = [trainerTaxonomy.skills[0]];
+  }
   if (centerType === 'regular') prefilledFormData.batch_type = 'regular';
+
+  const handleUpdate = async () => {
+    if (!editBatch?.cohortId) {
+      showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
+      return;
+    }
+    if (!formData?.name || !formData?.batch_type || !formData?.startdate || !formData?.enddate) {
+      showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
+      return;
+    }
+    // Never send Domain/Skills from the Edit form.
+    const editFormData = { ...formData };
+    EDIT_HIDDEN_FIELDS.forEach((key) => delete editFormData[key]);
+
+    setSaving(true);
+    try {
+      const result = await updateBatch({ cohortId: editBatch.cohortId, formData: editFormData });
+      if (!isCreateBatchSuccess(result)) {
+        showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
+        return;
+      }
+      showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATED_SUCCESS'), 'success');
+      onCreated();
+      onClose();
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (saving) return;
+    if (isEdit) {
+      await handleUpdate();
+      return;
+    }
     const domain = formData?.domain?.[0];
     const skill = formData?.skills?.[0];
     // Re-validate against the Trainer's actual taxonomy right before
@@ -173,12 +274,20 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       open={open}
       onClose={onClose}
       showFooter
-      primaryText={saving ? t('COMMON.LOADING') : t('MY_TEACHING_CENTER.CREATE')}
+      primaryText={
+        saving
+          ? t('COMMON.LOADING')
+          : isEdit
+          ? t('MY_TEACHING_CENTER.UPDATE')
+          : t('MY_TEACHING_CENTER.CREATE')
+      }
       secondaryText={t('MY_TEACHING_CENTER.CANCEL')}
       primaryActionHandler={handleSubmit}
       secondaryActionHandler={onClose}
-      modalTitle={t('MY_TEACHING_CENTER.CREATE_BATCH_TITLE')}
-      id="my-teaching-center-batch-create"
+      modalTitle={
+        isEdit ? t('MY_TEACHING_CENTER.EDIT_BATCH_TITLE') : t('MY_TEACHING_CENTER.CREATE_BATCH_TITLE')
+      }
+      id={isEdit ? 'my-teaching-center-batch-edit' : 'my-teaching-center-batch-create'}
     >
       {/* DynamicForm hardcodes a Grid item xs={12} md={4} lg={3} per field
           whenever isCallSubmitInHandle is true, ignoring any uiSchema grid
@@ -199,7 +308,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
           SubmitaFunction={(fd: any) => setFormData(fd)}
           isCallSubmitInHandle={true}
           prefilledFormData={prefilledFormData}
-          type="my-teaching-center-batch-create"
+          type={isEdit ? 'my-teaching-center-batch-edit' : 'my-teaching-center-batch-create'}
         />
       </Box>
     </SimpleModal>

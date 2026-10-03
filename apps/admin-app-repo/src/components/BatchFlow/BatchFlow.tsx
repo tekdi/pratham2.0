@@ -137,6 +137,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
       domain?: string[];
       skills?: string[];
       stream?: string[];
+      startdate?: string;
+      enddate?: string;
     }
   ) => {
     let alterSchema;
@@ -219,26 +221,107 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     overrideEnum('grade', centerGrades);
 
     if (useL2Form) {
-      // Domain/skills options come only from what's already configured on
-      // the center — no framework API call for this form.
-      overrideEnum('domain', centerIndustries);
-      overrideEnum('skills', centerSkills);
+      // Domain/Skills options are the center's own configured values (plus
+      // the batch's saved ones on edit), resolved through the framework so
+      // Skills always follow the selected Domain: Domain is an `initial`
+      // lookup and Skills a `dependent` lookup on Domain. On a Domain change
+      // the shared DynamicForm clears the selected Skills and refetches the
+      // options for the new Domain, so a Skill from another Domain can't be
+      // kept or saved. `directOnly` keeps Skills to the Domain's own direct
+      // associations (see api/dynamic-form/get-framework.js).
+      const mergeValues = (centerVals: string[], existing?: string[]) =>
+        Array.from(
+          new Set([
+            ...(Array.isArray(centerVals) ? centerVals : []),
+            ...(existing || []),
+          ])
+        ).filter(Boolean);
+      const allowedDomains = mergeValues(centerIndustries, existingValues?.domain);
+      const allowedSkills = mergeValues(centerSkills, existingValues?.skills);
+      // Same pos-framework the schema points at, on this environment's own
+      // middleware instead of the hardcoded dev host.
+      const schemaFrameworkUrl =
+        alterSchema?.properties?.skills?.api?.payload?.fetchUrl;
+      const frameworkUrl = process.env.NEXT_PUBLIC_MIDDLEWARE_URL
+        ? `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/framework/v1/read/pos-framework`
+        : schemaFrameworkUrl;
+
+      if (alterSchema?.properties?.domain) {
+        alterSchema.properties.domain.items = {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        };
+        alterSchema.properties.domain.api = {
+          ...alterSchema.properties.domain.api,
+          // Same lookup as the Center form's own Domain field (subjects under
+          // Career Exploration), narrowed to the center's domains.
+          payload: {
+            ...alterSchema.properties.domain.api?.payload,
+            fetchUrl: frameworkUrl,
+            allowedValues: allowedDomains,
+            directOnly: true,
+          },
+          callType: 'initial',
+        };
+      }
+      if (alterSchema?.properties?.skills) {
+        alterSchema.properties.skills.items = {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        };
+        alterSchema.properties.skills.api = {
+          ...alterSchema.properties.skills.api,
+          // Same lookup as the Center form's own Skills field (the selected
+          // Domain's skills), narrowed to the center's skills.
+          payload: {
+            ...alterSchema.properties.skills.api?.payload,
+            fetchUrl: frameworkUrl,
+            allowedValues: allowedSkills,
+            directOnly: true,
+          },
+          callType: 'dependent',
+          dependent: 'domain',
+        };
+      }
     }
 
     // Neither startdate nor enddate can be in the past. "Today" can't live
     // as a static value in the schema file since it changes daily, so it's
     // injected here (formatMinimum for AJV validation on submit, ui:options
     // minValue to also block past dates in the date picker itself).
-    const today = new Date().toISOString().slice(0, 10);
+    // Local date (not UTC) so "today" matches the user's own calendar day.
+    const now = new Date();
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0'),
+    ].join('-');
+    const toDateKey = (value: any) => {
+      const raw = typeof value === 'object' ? value?.value : value;
+      return typeof raw === 'string' && /^\d{4}-\d{2}-\d{2}/.test(raw)
+        ? raw.slice(0, 10)
+        : null;
+    };
     ['startdate', 'enddate'].forEach((key) => {
-      if (alterSchema?.properties?.[key]) {
+      // On edit, a date that has already passed (< today) is locked - today
+      // itself stays editable. A locked field is disabled and the "no past
+      // dates" rule is skipped for it, otherwise the unchanged saved value
+      // would fail validation.
+      const savedDate = isEditMode ? toDateKey(existingValues?.[key]) : null;
+      const isLocked = !!savedDate && savedDate < today;
+      if (alterSchema?.properties?.[key] && !isLocked) {
         alterSchema.properties[key].formatMinimum = today;
       }
       if (alterUiSchema?.[key]) {
         alterUiSchema[key]['ui:options'] = {
           ...alterUiSchema[key]['ui:options'],
-          minValue: today,
+          ...(isLocked ? {} : { minValue: today }),
         };
+        if (isLocked) {
+          alterUiSchema[key]['ui:disabled'] = true;
+        }
       }
     });
 
@@ -360,6 +443,24 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
         delete alterUiSchema.skills['ui:disabled'];
       if (alterUiSchema?.stream?.['ui:disabled'])
         delete alterUiSchema.stream['ui:disabled'];
+    }
+
+    // Same label on every program's batch form (L2 form's schema says UNIT_NAME).
+    if (alterSchema?.properties?.name) {
+      alterSchema.properties.name.title = 'Batch Name';
+    }
+
+    // YouthNet: once a batch's Start Date has passed (< today), its Domain
+    // and Skills can no longer be changed (same rule as the date fields).
+    if (useL2Form && isEditMode) {
+      const savedStartDate = toDateKey(existingValues?.startdate);
+      if (savedStartDate && savedStartDate < today) {
+        ['domain', 'skills'].forEach((key) => {
+          if (alterUiSchema?.[key]) {
+            alterUiSchema[key]['ui:disabled'] = true;
+          }
+        });
+      }
     }
 
     setAddSchema(alterSchema);
@@ -613,6 +714,8 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
             )?.selectedValues || [],
           skills: getSelectedValues('SKILLS'),
           stream: getSelectedValues('STREAM'),
+          startdate: getSelectedValues('START_DATE')?.[0],
+          enddate: getSelectedValues('END_DATE')?.[0],
         };
         buildSchemaAndUi(true, existingValues);
 

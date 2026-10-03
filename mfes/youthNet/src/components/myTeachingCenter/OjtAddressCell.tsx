@@ -60,10 +60,20 @@ const OjtAddressCell: React.FC<OjtAddressCellProps> = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onBlur={handleBlur}
-      sx={{ minWidth: 220 }}
+      // Multi-line text box with a fixed width so long addresses wrap onto
+      // new lines (paragraph-style) instead of scrolling on one line; grows
+      // up to maxRows, then scrolls.
+      multiline
+      minRows={2}
+      maxRows={6}
+      sx={{
+        width: 580,
+        '& .MuiInputBase-root': { alignItems: 'flex-start' },
+        '& textarea': { wordBreak: 'break-word', lineHeight: 1.4 },
+      }}
       InputProps={{
         endAdornment: (
-          <InputAdornment position="end">
+          <InputAdornment position="end" sx={{ mt: 1.5 }}>
             {status === 'saving' && <CircularProgress size={16} />}
             {status === 'saved' && <CheckCircleIcon color="success" fontSize="small" />}
             {status === 'error' && <ErrorIcon color="error" fontSize="small" />}

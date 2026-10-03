@@ -171,6 +171,11 @@ const Centers = () => {
       //   alterSchema.properties.center_type.default = 'regular';
       // }
 
+      // Same label on every program's center form (API form says UNIT_NAME).
+      if (alterSchema?.properties?.name) {
+        alterSchema.properties.name.title = 'Center Name';
+      }
+
       setAddSchema(alterSchema);
 
       //set 2 grid layout

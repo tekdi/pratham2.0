@@ -25,12 +25,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import { showToastMessage } from '@/components/Toastify';
-import { getStateBlockDistrictList } from '@/services/MasterDataService';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
+import { getStateBlockDistrictList } from '../../services/youthNet/Dashboard/VillageServices';
 import {
   getCentersForDomainSkills,
   TrainerCenter,
-} from '@/services/trainer/TrainerCenterService';
+} from '../../services/trainerMapping/TrainerMappingService';
 
 interface Option {
   value: string;
@@ -52,8 +52,17 @@ interface TrainerCenterSelectorProps {
   // no States are assigned, so nothing is browsable). Left undefined for
   // Central Lead, who sees Centers across every State.
   allowedStateIds?: string[];
+  // Center Head scope: when set, only these Centers (the Center Head's own
+  // assigned Centers) are ever listed — the Domain/Skill + geography search
+  // results are narrowed to them. An empty array means nothing is listed.
+  allowedCenterIds?: string[];
 }
 
+// Ported from admin-app-repo's components/trainer/TrainerCenterSelector.tsx
+// (Central Lead / State Lead Trainer Mapping) so the Center Head sees the
+// exact same Center step; only the imports and the allowedCenterIds scope
+// differ. Keep the two in sync.
+//
 // Same three-section layout as MultipleCenterListWidgetNew.tsx (the widget
 // behind /user-leader's own Center picker: Geography Filters -> card-grid
 // Centers with checkboxes/Select All -> Selected Centers grouped by state)
@@ -69,6 +78,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
   value,
   onChange,
   allowedStateIds,
+  allowedCenterIds,
 }) => {
   // Theme color
   const themeColor = '#FDBE16';
@@ -281,7 +291,8 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
         if (
           !domain ||
           skills.length === 0 ||
-          (allowedStateIds && allowedStateIds.length === 0)
+          (allowedStateIds && allowedStateIds.length === 0) ||
+          (allowedCenterIds && allowedCenterIds.length === 0)
         ) {
           if (isCurrent) setCenterOptions([]);
           return;
@@ -299,7 +310,10 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
             village: selectedVillage,
             name: searchKeyword || undefined,
           });
-          if (isCurrent) setCenterOptions(centers);
+          const scopedCenters = allowedCenterIds
+            ? centers.filter((center) => allowedCenterIds.includes(center.cohortId))
+            : centers;
+          if (isCurrent) setCenterOptions(scopedCenters);
         } catch (error) {
           console.error('Error loading centers for Trainer mapping:', error);
           showToastMessage(
@@ -328,6 +342,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
     selectedVillage.join(','),
     searchKeyword,
     allowedStateIds?.join(','),
+    allowedCenterIds?.join(','),
   ]);
 
   const activeFiltersCount =
