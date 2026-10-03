@@ -1,5 +1,7 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import { useTranslation } from 'next-i18next';
@@ -7,13 +9,17 @@ import { MyTeachingCenterBatch } from '../../utils/Interfaces';
 
 interface BatchDetailsHeaderProps {
   batch: MyTeachingCenterBatch;
+  // When given, shows the 3-dot menu next to the batch name with an Edit
+  // Batch option (same pattern as scp-teacher-repo's centers/[cohortId]).
+  onEditBatch?: () => void;
 }
 
 // Summary card at the top of the Batch Details page — batch name, center ·
 // domain · course, date range, and learner count, with a helper line above
 // the Learner List below it.
-const BatchDetailsHeader: React.FC<BatchDetailsHeaderProps> = ({ batch }) => {
+const BatchDetailsHeader: React.FC<BatchDetailsHeaderProps> = ({ batch, onEditBatch }) => {
   const { t } = useTranslation();
+  const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const dateRange =
     batch.startDate && batch.endDate ? `${batch.startDate} → ${batch.endDate}` : null;
 
@@ -27,10 +33,43 @@ const BatchDetailsHeader: React.FC<BatchDetailsHeaderProps> = ({ batch }) => {
         mb: 3,
       }}
     >
-      <Typography variant="h5" fontWeight={700}>
-        {batch.name}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+        <Typography variant="h5" fontWeight={700} textTransform="capitalize">
+          {batch.name}
+        </Typography>
+        {onEditBatch && (
+          <>
+            <IconButton
+              aria-label="more"
+              aria-controls="batch-details-menu"
+              aria-haspopup="true"
+              onClick={(event) => setMenuAnchorEl(event.currentTarget)}
+            >
+              <MoreVertIcon sx={{ cursor: 'pointer' }} />
+            </IconButton>
+            <Menu
+              id="batch-details-menu"
+              anchorEl={menuAnchorEl}
+              keepMounted
+              open={Boolean(menuAnchorEl)}
+              onClose={() => setMenuAnchorEl(null)}
+            >
+              <MenuItem
+                onClick={() => {
+                  setMenuAnchorEl(null);
+                  onEditBatch();
+                }}
+              >
+                <ListItemIcon>
+                  <ModeEditOutlineOutlinedIcon fontSize="small" />
+                </ListItemIcon>
+                {t('MY_TEACHING_CENTER.EDIT_BATCH')}
+              </MenuItem>
+            </Menu>
+          </>
+        )}
+      </Box>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }} textTransform="capitalize">
         {[batch.centerName, batch.domain, batch.skill].filter(Boolean).join(' · ')}
       </Typography>
 

@@ -38,6 +38,13 @@ const searchBatchesForPair = async (
   return raw?.results?.cohortDetails || [];
 };
 
+// TYPE_OF_BATCH's selectedValues[0] may be an {value,label} object or a
+// plain string, same as TYPE_OF_CENTER (see getCohortTypeOfCenter below).
+const getBatchType = (batch: any): string | undefined => {
+  const selected = findField(batch, 'TYPE_OF_BATCH')?.selectedValues?.[0];
+  return (typeof selected === 'string' ? selected : selected?.value) ?? undefined;
+};
+
 const mapToMyTeachingCenterBatch = (batch: any): MyTeachingCenterBatch => ({
   cohortId: batch.cohortId,
   name: batch.name,
@@ -48,6 +55,7 @@ const mapToMyTeachingCenterBatch = (batch: any): MyTeachingCenterBatch => ({
   // (e.g. "Sewing Machine Operator (SMO)") — confirmed against a real
   // /cohort/search response.
   skill: findField(batch, BATCH_SKILLS_LABEL)?.selectedValues?.[0] ?? '',
+  batchType: getBatchType(batch),
   startDate: getDateField(batch, BATCH_DATE_FIELD_IDS.START_DATE),
   endDate: getDateField(batch, BATCH_DATE_FIELD_IDS.END_DATE),
   status: batch?.status,

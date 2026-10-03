@@ -53,7 +53,12 @@ import {
   extractDomainSkillValues,
   getTrainerMappingForm,
 } from '@/services/trainer/TrainerFormService';
-import { getUserAssignedCenters, TrainerCenter } from '@/services/trainer/TrainerCenterService';
+import {
+  getAssignedStateIds,
+  getCentersForDomainSkills,
+  getUserAssignedCenters,
+  TrainerCenter,
+} from '@/services/trainer/TrainerCenterService';
 import TrainerCenterSelector from '@/components/trainer/TrainerCenterSelector';
 
 // Trainer listing + filters, matching user-placement-retention-coordinator.tsx's
@@ -99,6 +104,14 @@ const TrainerMapping = () => {
   // ready, instead of the filter bar flashing its own separate loader while
   // that form fetch is still in flight.
   const [isPageLoading, setIsPageLoading] = useState(true);
+
+  // State Lead reuses this same page, scoped to the States assigned to them:
+  // the Trainer list, the Map New Center step and Reassign Center all stay
+  // inside those States. Central Lead (undefined scope) sees every State.
+  const isStateLead = localStorage.getItem('roleName') === Role.ADMIN;
+  const [allowedStateIds] = useState<string[] | undefined>(() =>
+    isStateLead ? getAssignedStateIds() : undefined
+  );
 
   const searchStoreKey = 'trainer';
   const initialFormDataSearch =
@@ -179,10 +192,13 @@ const TrainerMapping = () => {
       if (formData.tenantStatus === 'all') {
         delete formData.tenantStatus;
       }
-      const staticFilter = {
+      const staticFilter: any = {
         role: Role.TEACHER,
         tenantId: TenantService.getTenantId(),
       };
+      if (allowedStateIds) {
+        staticFilter.state = allowedStateIds;
+      }
       const { sortBy } = formData;
       const staticSort = ['firstName', sortBy || 'asc'];
       await searchListData(
@@ -370,6 +386,10 @@ const TrainerMapping = () => {
   const [reassignSkills, setReassignSkills] = useState<string[]>([]);
   const [reassignCenters, setReassignCenters] = useState<TrainerCenter[]>([]);
   const [originalReassignCenterIds, setOriginalReassignCenterIds] = useState<string[]>([]);
+  // State Lead only: the Trainer's Centers outside the assigned States.
+  // They aren't shown or editable here, but are kept in the save payload so
+  // a State Lead can never drop a Trainer from another State's Center.
+  const [outOfScopeCenterIds, setOutOfScopeCenterIds] = useState<string[]>([]);
   const [isReassignLoading, setIsReassignLoading] = useState(false);
   const [isReassigning, setIsReassigning] = useState(false);
 
@@ -380,6 +400,7 @@ const TrainerMapping = () => {
     setReassignSkills([]);
     setReassignCenters([]);
     setOriginalReassignCenterIds([]);
+    setOutOfScopeCenterIds([]);
   };
 
   const openReassignModal = async (row: any) => {
@@ -388,6 +409,7 @@ const TrainerMapping = () => {
     setReassignUserName(`${row.firstName || ''} ${row.lastName || ''}`.trim());
     setReassignCenters([]);
     setOriginalReassignCenterIds([]);
+    setOutOfScopeCenterIds([]);
     setIsReassignLoading(true);
 
     const rowDomain = row?.customfield?.domain;
@@ -408,7 +430,25 @@ const TrainerMapping = () => {
       // TrainerCenterService.getUserAssignedCenters for why neither API
       // alone is enough to isolate a multi-role user's Trainer-specific
       // Centers.
-      const currentCenters = await getUserAssignedCenters(row?.userId, rowDomain, rowSkills);
+      const assignedCenters = await getUserAssignedCenters(row?.userId, rowDomain, rowSkills);
+      let currentCenters = assignedCenters;
+      if (allowedStateIds) {
+        const inScopeIds = new Set(
+          allowedStateIds.length > 0
+            ? (
+                await getCentersForDomainSkills(rowDomain, rowSkills, {
+                  state: allowedStateIds,
+                })
+              ).map((center) => center.cohortId)
+            : []
+        );
+        currentCenters = assignedCenters.filter((center) => inScopeIds.has(center.cohortId));
+        setOutOfScopeCenterIds(
+          assignedCenters
+            .filter((center) => !inScopeIds.has(center.cohortId))
+            .map((center) => center.cohortId)
+        );
+      }
       setReassignCenters(currentCenters);
       setOriginalReassignCenterIds(currentCenters.map((center) => center.cohortId));
     } catch (error) {
@@ -434,7 +474,7 @@ const TrainerMapping = () => {
 
       const response = await bulkCreateCohortMembers({
         userId: [reassignUserId],
-        cohortId: finalCenterIds,
+        cohortId: [...finalCenterIds, ...outOfScopeCenterIds],
         ...(removedCenterIds.length > 0 ? { removeCohortId: removedCenterIds } : {}),
       });
 
@@ -673,6 +713,7 @@ const TrainerMapping = () => {
                 skills={skills}
                 value={selectedCenters}
                 onChange={setSelectedCenters}
+                allowedStateIds={allowedStateIds}
               />
             </Box>
           )}
@@ -830,6 +871,7 @@ const TrainerMapping = () => {
                 skills={reassignSkills}
                 value={reassignCenters}
                 onChange={setReassignCenters}
+                allowedStateIds={allowedStateIds}
               />
             </Box>
           )}

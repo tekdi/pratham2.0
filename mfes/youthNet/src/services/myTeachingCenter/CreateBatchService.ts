@@ -1,4 +1,4 @@
-import { post } from '@shared-lib';
+import { post, put } from '@shared-lib';
 import API_ENDPOINTS from '../../utils/API/APIEndpoints';
 import { L2BatchCreate } from '../../constant/Forms/L2BatchCreate';
 
@@ -46,3 +46,28 @@ export const createBatch = async ({ centerId, formData }: CreateBatchPayload): P
 
 export const isCreateBatchSuccess = (result: any): boolean =>
   !!result && !result?.isAxiosError && !(result instanceof Error);
+
+export interface UpdateBatchPayload {
+  cohortId: string;
+  formData: Record<string, any>;
+}
+
+// PUTs to /cohort/update/:cohortId with the same {name, customFields}
+// shape createBatch() sends (plus updatedBy, as admin-app-repo's
+// updateCohortUpdate does). Only fields present in formData are sent, so
+// the Edit form's hidden Domain/Skills are left untouched on the batch.
+export const updateBatch = async ({ cohortId, formData }: UpdateBatchPayload): Promise<any> => {
+  const apiUrl: string = API_ENDPOINTS.cohortUpdate(cohortId);
+  const requestBody = {
+    name: formData.name,
+    customFields: buildCustomFields(formData),
+    updatedBy: localStorage.getItem('userId'),
+  };
+  try {
+    const response = await put(apiUrl, requestBody);
+    return response?.data;
+  } catch (error) {
+    console.error('Error updating batch:', error);
+    return null;
+  }
+};

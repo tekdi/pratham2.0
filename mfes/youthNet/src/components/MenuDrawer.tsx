@@ -14,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -384,6 +385,9 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isVillagesAndYouths = router.pathname.includes('/villages');
   const isSurveys = router.pathname.includes('/surveys');
   const isManualAssessments = router.pathname.includes('/manual-assessments');
+  const isTrainerMapping = router.pathname.includes('/trainer-mapping');
+  const isCenterHead =
+    typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD;
   const isManagerDashboard = router.pathname === '/manager-dashboard';
   const isIndividualVolunteerDashboard = router.pathname === '/individual-volunteer';
   const isOrganisationDashboard = router.pathname === '/organisation';
@@ -603,6 +607,20 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               }
               sx={{ marginTop: '25px' }}
             />
+
+            {isCenterHead && (
+              <NavItem
+                collapsed={collapsed}
+                isActive={isTrainerMapping}
+                icon={<BadgeOutlinedIcon sx={{ fontSize: '24px !important' }} />}
+                onClick={() => {
+                  closeDrawer();
+                  router.push('/trainer-mapping');
+                }}
+                label={t('TRAINER_MAPPING.NAV_LABEL')}
+                sx={{ marginTop: '25px' }}
+              />
+            )}
 
             <NavItem
               collapsed={collapsed}

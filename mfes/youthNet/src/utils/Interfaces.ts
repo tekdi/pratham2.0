@@ -406,6 +406,8 @@ export interface MyTeachingCenterBatch {
   centerName?: string;
   domain: string;
   skill: string;
+  // TYPE_OF_BATCH value (regular/remote/hybrid) — prefills Edit Batch.
+  batchType?: string;
   startDate?: string;
   endDate?: string;
   learnerCount?: number;
