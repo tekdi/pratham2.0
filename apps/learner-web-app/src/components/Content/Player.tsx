@@ -15,6 +15,8 @@ import {
   IconButton,
   Snackbar,
   Alert,
+  Tab,
+  Tabs,
   Typography,
   useMediaQuery,
   useTheme,
@@ -41,6 +43,10 @@ import { logEvent } from '@learner/utils/googleAnalytics';
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
+const RecommendedContent = dynamic(
+  () => import('@learner/components/Content/RecommendedContent'),
+  { ssr: false }
+);
 const App = ({
   userIdLocalstorageName,
   contentBaseUrl,
@@ -59,6 +65,7 @@ const App = ({
   const [item, setItem] = useState<{ [key: string]: any }>({});
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [isShowMoreContent, setIsShowMoreContent] = useState(false);
+  const [contentTabValue, setContentTabValue] = useState(0);
   const [mimeType, setMemetype] = useState('');
   const [isVideo, setIsVideo] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -99,13 +106,41 @@ const App = ({
   let previousPage = null;
   let exitLink = null;
   let returnUrl = null;
+  // Recommended Content is scoped strictly to POS Content pages. POS pages
+  // are always under /pos, and every recommended-content link explicitly
+  // carries isPOSContent=true so this doesn't have to be re-inferred from
+  // the URL shape when navigating between recommended items.
+  let isPosContent =
+    typeof window !== 'undefined' && window.location.pathname.includes('/pos');
   if (typeof window !== 'undefined') {
     const searchParams = new URLSearchParams(window.location.search);
     activeLink = searchParams.get('activeLink');
     previousPage = searchParams.get('previousPage');
     exitLink = searchParams.get('exitLink');
     returnUrl = searchParams.get('returnUrl');
+    isPosContent = isPosContent || searchParams.get('isPOSContent') === 'true';
   }
+
+  // Env vars are always strings (including on the server), but guard against
+  // an actual boolean too — String(true) === 'true', String(false) !== 'true'.
+  const showRecommendationsEnvFlag =
+    String(process.env.NEXT_PUBLIC_SHOW_RECOMMENDATIONS).trim().toLowerCase() ===
+    'true';
+  // localStorage can override the env flag off, but never turn it on when the
+  // env flag is off; a missing key means "don't show" rather than defaulting on.
+  let showRecommendationsFromStorage = false;
+  if (typeof window !== 'undefined') {
+    showRecommendationsFromStorage =
+      localStorage.getItem('showRecommenededContent')?.trim().toLowerCase() ===
+      'true';
+  }
+  const showRecommendations =
+    showRecommendationsEnvFlag && showRecommendationsFromStorage;
+  // The right-hand panel is worth showing whenever Related content exists,
+  // or (for POS pages) whenever recommendations are enabled — Recommended
+  // Content is always fetched, but its presence isn't known until it loads.
+  const showMoreContentPanel =
+    isShowMoreContent || (isPosContent && showRecommendations);
 
   // Intercept browser ← button — covers new-tab (returnUrl), explicit exitLink, and same-tab POS (activeLink).
   const effectiveExitLink = exitLink || returnUrl || activeLink;
@@ -441,6 +476,24 @@ const App = ({
     });
   };
 
+  const courseUnitDetailsConfig = {
+    ...(_config?.courseUnitDetails || {}),
+    getContentData: (item: any) => {
+      setIsShowMoreContent(
+        item.children.filter(
+          (item: any) => item.identifier !== identifier
+        )?.length > 0
+      );
+    },
+    _parentGrid: { pb: 2 },
+    default_img: '/images/image_ver.png',
+    _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
+    _card: {
+      isHideProgress: true,
+      ...(_config?.courseUnitDetails?._card || {}),
+    },
+  };
+
   return (
     <Grid
       container
@@ -460,14 +513,14 @@ const App = ({
           flex: { xs: 1, md: 15 },
           gap: 1,
           flexDirection: 'column',
-          width: isShowMoreContent ? 'initial' : '100%',
+          width: showMoreContentPanel ? 'initial' : '100%',
         }}
         item
         xs={12}
         sm={12}
-        md={isShowMoreContent ? 8 : 12}
-        lg={isShowMoreContent ? 8 : 12}
-        xl={isShowMoreContent ? 8 : 12}
+        md={showMoreContentPanel ? 8 : 12}
+        lg={showMoreContentPanel ? 8 : 12}
+        xl={showMoreContentPanel ? 8 : 12}
       >
         <Box
           sx={{
@@ -516,7 +569,7 @@ const App = ({
           )}
         </Box>
         <PlayerBox
-          isShowMoreContent={isShowMoreContent}
+          isShowMoreContent={showMoreContentPanel}
           userIdLocalstorageName={userIdLocalstorageName}
           item={item}
           identifier={identifier}
@@ -584,16 +637,20 @@ const App = ({
 
       <Grid
         sx={{
-          display: isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)) ? 'flex' : 'none',
+          display:
+            (isPosContent && showMoreContentPanel) ||
+            (isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)))
+              ? 'flex'
+              : 'none',
 
           flexDirection: 'column',
           flex: { xs: 1, sm: 1, md: 9 },
         }}
         xs={12}
         sm={12}
-        md={isShowMoreContent ? 4 : 12}
-        lg={isShowMoreContent ? 4 : 12}
-        xl={isShowMoreContent ? 4 : 12}
+        md={showMoreContentPanel ? 4 : 12}
+        lg={showMoreContentPanel ? 4 : 12}
+        xl={showMoreContentPanel ? 4 : 12}
       >
         <Box
           sx={{
@@ -607,47 +664,120 @@ const App = ({
             },
           }}
         >
-          <Typography
-            variant="body5"
-            component="h2"
-            sx={{
-              mb: 2,
-              fontWeight: 500,
-              // fontSize: '18px',
-              // lineHeight: '24px',
-              mt: 3,
-            }}
-          >
-            {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
-          </Typography>
+          {isPosContent ? (
+            <>
+              <Typography
+                variant="body5"
+                component="h2"
+                sx={{
+                  mb: 2,
+                  fontWeight: 500,
+                  mt: 3,
+                }}
+              >
+                {t(
+                  isShowMoreContent || !showRecommendations
+                    ? 'LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES'
+                    : 'LEARNER_APP.PLAYER.MORE_RECOMMENDED_CONTENT'
+                )}
+              </Typography>
 
-          <CourseUnitDetails
-            isShowLayout={false}
-            isHideInfoCard={true}
-            _box={{
-              pt: 1,
-              pb: 1,
-              px: { md: 1 },
-              height: 'calc(100vh - 185px)',
-            }}
-            _config={{
-              ...(_config?.courseUnitDetails || {}),
-              getContentData: (item: any) => {
-                setIsShowMoreContent(
-                  item.children.filter(
-                    (item: any) => item.identifier !== identifier
-                  )?.length > 0
-                );
-              },
-              _parentGrid: { pb: 2 },
-              default_img: '/images/image_ver.png',
-              _grid: { xs: 6, sm: 4, md: 6, lg: 6, xl: 6 },
-              _card: {
-                isHideProgress: true,
-                ...(_config?.courseUnitDetails?._card || {}),
-              },
-            }}
-          />
+              <Box
+                sx={{
+                  display:
+                    isShowMoreContent && showRecommendations
+                      ? 'block'
+                      : 'none',
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  mb: 2,
+                }}
+              >
+                <Tabs
+                  value={contentTabValue}
+                  onChange={(_e, newValue) => setContentTabValue(newValue)}
+                  aria-label={t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+                >
+                  <Tab label={t('LEARNER_APP.PLAYER.RELATED')} />
+                  <Tab label={t('LEARNER_APP.PLAYER.RECOMMENDED')} />
+                </Tabs>
+              </Box>
+
+              <Box
+                sx={{
+                  display:
+                    isShowMoreContent &&
+                    (!showRecommendations || contentTabValue === 0)
+                      ? 'block'
+                      : 'none',
+                }}
+              >
+                <CourseUnitDetails
+                  isShowLayout={false}
+                  isHideInfoCard={true}
+                  _box={{
+                    pt: 1,
+                    pb: 1,
+                    px: { md: 1 },
+                    height: 'calc(100vh - 185px)',
+                  }}
+                  _config={courseUnitDetailsConfig}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  // RecommendedContent always stays mounted so its API call
+                  // fires regardless of the feature flag; only visibility is
+                  // gated on showRecommendations.
+                  display:
+                    showRecommendations &&
+                    (!isShowMoreContent || contentTabValue === 1)
+                      ? 'block'
+                      : 'none',
+                  overflowY: 'auto',
+                  height: 'calc(100vh - 185px)',
+                }}
+              >
+                <RecommendedContent
+                  currentContentId={
+                    Array.isArray(identifier) ? identifier[0] : identifier
+                  }
+                  courseId={Array.isArray(courseId) ? courseId[0] : courseId}
+                  unitId={Array.isArray(unitId) ? unitId[0] : unitId}
+                  contentBaseUrl={contentBaseUrl}
+                />
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography
+                variant="body5"
+                component="h2"
+                sx={{
+                  mb: 2,
+                  fontWeight: 500,
+                  // fontSize: '18px',
+                  // lineHeight: '24px',
+                  mt: 3,
+                }}
+              >
+                {t('LEARNER_APP.PLAYER.MORE_RELATED_RESOURCES')}
+              </Typography>
+
+              <CourseUnitDetails
+                isShowLayout={false}
+                isHideInfoCard={true}
+                _box={{
+                  pt: 1,
+                  pb: 1,
+                  px: { md: 1 },
+                  height: 'calc(100vh - 185px)',
+                }}
+                _config={courseUnitDetailsConfig}
+              />
+            </>
+          )}
         </Box>
       </Grid>
 

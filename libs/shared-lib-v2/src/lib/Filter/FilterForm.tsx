@@ -133,7 +133,7 @@ export function FilterForm({
       );
       const allFields = [
         ...transformedRenderForm,
-        ...(filtered[0]?.fields ?? []),
+        ...(filtered[0]?.fields ?? []).map(normalizeStaticField),
       ];
 
       setFilterData(allFields);
@@ -223,7 +223,7 @@ const formatPayload = (payload: any) => {
   Object.keys(payload).forEach((key) => {
     if (Array.isArray(payload[key])) {
       formattedPayload[key] = payload[key].map(
-        (item: any) => item?.name ?? item
+        (item: any) => item?.value ?? item?.name ?? item
       );
     } else {
       formattedPayload[key] = payload[key];
@@ -231,6 +231,24 @@ const formatPayload = (payload: any) => {
   });
   return formattedPayload;
 };
+
+// Static form ranges may come as { identifier, label } objects; map them to
+// the { name, code } shape the filter UI renders, keeping identifier as value.
+function normalizeStaticField(field: any) {
+  if (!Array.isArray(field?.range)) return field;
+  return {
+    ...field,
+    range: field.range.map((option: any) =>
+      option && typeof option === 'object' && !('name' in option)
+        ? {
+          name: option.label ?? option.identifier,
+          code: option.identifier ?? option.label,
+          value: option.identifier ?? option.label,
+        }
+        : option
+    ),
+  };
+}
 
 function filterObjectsWithSourceCategory(data: any[], filteredNames: string[]) {
   const filtered = data.filter((section) =>
@@ -699,7 +717,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     Array.isArray(selected) &&
                     selected.some((s) =>
                       typeof s === 'string'
-                        ? s === item.name || s === item
+                        ? s === item.name || s === item || s === item.value
                         : s.code === item.code || s.name === item.name
                     );
                   return (

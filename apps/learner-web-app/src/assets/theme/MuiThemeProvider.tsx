@@ -53,6 +53,8 @@ declare module '@mui/material/styles' {
       warningA400: string;
       warningA700: string;
       warningContrastText: string;
+      recommendationCardBackground: string;
+      recommendationCardBorder: string;
       assessmentCardBorder: string;
       assessmentCardBackground: string;
       assessmentCompletedBadgeBg: string;
@@ -122,6 +124,8 @@ declare module '@mui/material/styles' {
       warningA400?: string;
       warningA700?: string;
       warningContrastText?: string;
+      recommendationCardBackground?: string;
+      recommendationCardBorder?: string;
     };
   }
 }
@@ -295,6 +299,8 @@ export const theme = createTheme({
       warningA400: '#FFFFFF',
       warningA700: '#EDEDED',
       warningContrastText: '#3B383E',
+      recommendationCardBackground: '#FFF8E7',
+      recommendationCardBorder: '#FDBE16',
       assessmentCardBorder: '#E5E1D8',
       assessmentCardBackground: '#FFFFFF',
       assessmentCompletedBadgeBg: '#DFF5E1',
