@@ -114,13 +114,21 @@ const TrainerMapping = () => {
   );
 
   const searchStoreKey = 'trainer';
-  const initialFormDataSearch =
+  const storedFormDataSearch =
     localStorage.getItem(searchStoreKey) &&
     localStorage.getItem(searchStoreKey) != '{}'
       ? JSON.parse(localStorage.getItem(searchStoreKey))
       : localStorage.getItem('stateId')
       ? { state: [localStorage.getItem('stateId')] }
       : {};
+  // The State filter is locked for a State Lead (see TrainerSearch.js), so
+  // never restore a saved search pointing at a different State — its
+  // District/Block/Village wouldn't belong to the assigned State either.
+  const lockedStateId = isStateLead ? localStorage.getItem('stateId') : null;
+  const initialFormDataSearch =
+    lockedStateId && storedFormDataSearch?.state?.[0] !== lockedStateId
+      ? { state: [lockedStateId] }
+      : storedFormDataSearch;
 
   useEffect(() => {
     if (isPageLoading) return;

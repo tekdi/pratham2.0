@@ -5,6 +5,20 @@
 // since (unlike /cohort/search's confirmed customFieldsName contract) there
 // is no confirmed contract yet for filtering /user/list by those two
 // customFields.
+import { Role } from '@/utils/app.constant';
+
+// State Lead: State is fixed to their assigned State and locked — same
+// pattern as TeamLeaderSearch.js (/user-leader): a single static State
+// option instead of the State options API, District loaded up front from
+// that State, and the State field disabled in the UI schema.
+const stateId =
+  typeof window !== 'undefined' ? localStorage.getItem('stateId') : null;
+const stateName =
+  typeof window !== 'undefined' ? localStorage.getItem('stateName') : null;
+const userRole =
+  typeof window !== 'undefined' ? localStorage.getItem('roleName') : null;
+const isStateLocked = userRole === Role.ADMIN && !!stateId;
+
 export const TrainerSearchSchema = {
   type: 'object',
   properties: {
@@ -13,20 +27,22 @@ export const TrainerSearchSchema = {
       title: 'State',
       items: {
         type: 'string',
-        enum: ['Select'],
-        enumNames: ['Select'],
+        enum: isStateLocked ? [stateId] : ['Select'],
+        enumNames: isStateLocked ? [stateName] : ['Select'],
       },
-      api: {
-        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
-        method: 'POST',
-        payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
-        options: {
-          optionObj: 'result.values',
-          label: 'label',
-          value: 'value',
-        },
-        callType: 'initial',
-      },
+      api: isStateLocked
+        ? undefined
+        : {
+            url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/fields/options/read`,
+            method: 'POST',
+            payload: { fieldName: 'state', sort: ['state_name', 'asc'] },
+            options: {
+              optionObj: 'result.values',
+              label: 'label',
+              value: 'value',
+            },
+            callType: 'initial',
+          },
       uniqueItems: true,
       isMultiSelect: true,
       maxSelection: 1,
@@ -44,7 +60,7 @@ export const TrainerSearchSchema = {
         method: 'POST',
         payload: {
           fieldName: 'district',
-          controllingfieldfk: '**',
+          controllingfieldfk: isStateLocked ? [stateId] : '**',
           sort: ['district_name', 'asc'],
         },
         options: {
@@ -52,8 +68,8 @@ export const TrainerSearchSchema = {
           label: 'label',
           value: 'value',
         },
-        callType: 'dependent',
-        dependent: 'state',
+        callType: isStateLocked ? 'initial' : 'dependent',
+        ...(isStateLocked ? {} : { dependent: 'state' }),
       },
       uniqueItems: true,
       isMultiSelect: true,
@@ -147,6 +163,7 @@ export const TrainerSearchUISchema = {
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': { multiple: true, uniqueItems: true },
+    ...(isStateLocked ? { 'ui:disabled': true } : {}),
   },
   district: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',

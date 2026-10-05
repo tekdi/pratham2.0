@@ -91,8 +91,10 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
 
   // A State Lead with a single assigned State gets it preselected, so the
   // District filter is usable straight away.
-  const defaultSelectedState =
-    allowedStateIds?.length === 1 ? allowedStateIds : [];
+  // ...and, like /user-leader's Center picker (MultipleCenterListWidgetNew),
+  // that State is locked so the State Lead can't switch away from it.
+  const isStateLocked = allowedStateIds?.length === 1;
+  const defaultSelectedState = isStateLocked ? allowedStateIds : [];
   const [selectedState, setSelectedState] =
     useState<string[]>(defaultSelectedState);
   const [selectedDistrict, setSelectedDistrict] = useState<string[]>([]);
@@ -345,8 +347,10 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
     allowedCenterIds?.join(','),
   ]);
 
+  // A locked State isn't a user-applied filter, so it doesn't count toward
+  // the "N filters active" badge or bring up Clear on its own.
   const activeFiltersCount =
-    (selectedState.length > 0 ? 1 : 0) +
+    (selectedState.length > 0 && !isStateLocked ? 1 : 0) +
     (selectedDistrict.length > 0 ? 1 : 0) +
     (selectedBlock.length > 0 ? 1 : 0) +
     (selectedVillage.length > 0 ? 1 : 0);
@@ -521,7 +525,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
             setSelectedState,
             'Select states...',
             loading.state,
-            false
+            isStateLocked
           )}
           {geoField(
             'District',
