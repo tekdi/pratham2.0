@@ -451,11 +451,12 @@ const BatchFlow: React.FC<BatchFlowProps> = ({
     }
 
     // YouthNet: once a batch's Start Date has passed (< today), its Domain
-    // and Skills can no longer be changed (same rule as the date fields).
+    // and Skills (and the Skills-dependent Assessments) can no longer be
+    // changed (same rule as the date fields).
     if (useL2Form && isEditMode) {
       const savedStartDate = toDateKey(existingValues?.startdate);
       if (savedStartDate && savedStartDate < today) {
-        ['domain', 'skills'].forEach((key) => {
+        ['domain', 'skills', 'assessments'].forEach((key) => {
           if (alterUiSchema?.[key]) {
             alterUiSchema[key]['ui:disabled'] = true;
           }
