@@ -6,7 +6,7 @@ import {
   RadioGroup,
 } from '@mui/material';
 
-import { CenterType } from '@/utils/app.constant';
+import { CenterType, sessionMode } from '@/utils/app.constant';
 import { toPascalCase } from '@/utils/helper';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
@@ -43,7 +43,7 @@ const SessionMode: React.FC<SessionModeProps> = ({
         onChange={handleSessionModeChange}
       >
         <FormControlLabel
-          value={sessions.mode2}
+          value={sessionMode.OFFLINE}
           control={
             <Radio
               style={{
@@ -70,7 +70,7 @@ const SessionMode: React.FC<SessionModeProps> = ({
           }
         />
         <FormControlLabel
-          value={sessions.mode1}
+          value={sessionMode.ONLINE}
           control={
             <Radio
               style={{
