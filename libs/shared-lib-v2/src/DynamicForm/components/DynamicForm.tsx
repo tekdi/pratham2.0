@@ -1252,7 +1252,8 @@ const DynamicForm = forwardRef(({
             let updatedPayload = replaceControllingField(
               api.payload,
               changedFieldValue,
-              isMultiSelect
+              isMultiSelect,
+              temp_prefilled_form
             );
             // Replace "**" in the payload with changedFieldValue
             // const updatedPayload = JSON.parse(
@@ -1314,7 +1315,8 @@ const DynamicForm = forwardRef(({
                       let updatedPayload = replaceControllingField(
                         api.payload,
                         changedFieldValue,
-                        isMultiSelect
+                        isMultiSelect,
+                        temp_prefilled_form
                       );
                       // Replace "**" in the payload with changedFieldValue
                       // const updatedPayload = JSON.parse(
@@ -1608,7 +1610,8 @@ const DynamicForm = forwardRef(({
   const replaceControllingField = (
     payload,
     changedFieldValue,
-    isMultiSelect
+    isMultiSelect,
+    formValues = {}
   ) => {
     // Deep clone to avoid modifying the original object
     const updatedPayload = JSON.parse(JSON.stringify(payload));
@@ -1619,6 +1622,20 @@ const DynamicForm = forwardRef(({
         : [changedFieldValue]
       : changedFieldValue;
 
+    // "**" is the controlling (dependent) field's value; "**:<fieldKey>"
+    // is another form field's current value, always sent as an array.
+    const resolvePlaceholder = (item) => {
+      if (item === '**') return newValue;
+      if (typeof item === 'string' && item.startsWith('**:')) {
+        const value = formValues?.[item.slice(3)];
+        if (value === undefined || value === null) return [];
+        return Array.isArray(value) ? [...value] : [value];
+      }
+      return item;
+    };
+    const isPlaceholder = (item) =>
+      typeof item === 'string' && (item === '**' || item.startsWith('**:'));
+
     // Recursive function to replace ** in nested objects/arrays
     const replaceNested = (obj) => {
       if (Array.isArray(obj)) {
@@ -1626,15 +1643,15 @@ const DynamicForm = forwardRef(({
         obj.forEach((item, index) => {
           if (typeof item === 'object' && item !== null) {
             replaceNested(item); // Recursive call for nested objects/arrays
-          } else if (item === '**') {
-            obj[index] = newValue;
+          } else if (isPlaceholder(item)) {
+            obj[index] = resolvePlaceholder(item);
           }
         });
       } else if (typeof obj === 'object' && obj !== null) {
         // If object, iterate through keys
         Object.keys(obj).forEach((key) => {
-          if (obj[key] === '**') {
-            obj[key] = newValue;
+          if (isPlaceholder(obj[key])) {
+            obj[key] = resolvePlaceholder(obj[key]);
           } else if (typeof obj[key] === 'object' && obj[key] !== null) {
             replaceNested(obj[key]); // Recursive call for nested objects/arrays
           }
@@ -1766,7 +1783,8 @@ const DynamicForm = forwardRef(({
                 let updatedPayload = replaceControllingField(
                   api.payload,
                   changedFieldValue,
-                  isMultiSelect
+                  isMultiSelect,
+                  formData
                 );
                 // console.log('updatedPayload', updatedPayload);
 

@@ -133,22 +133,20 @@ export const L2BatchCreate = {
           options: {
             label: 'name',
             value: 'identifier',
-            optionObj: 'result.content',
+            optionObj: 'result.QuestionSet',
           },
-          // Every '**' in the payload is replaced with the selected Skills
-          // value, so only se_skills is filtered on (se_subjects holds
-          // Domain values, not Skills).
+          // '**' is the selected Skills value and '**:domain' the selected
+          // Domain value (the framework's subject).
           payload: {
             request: {
-              fields: ['name'],
               filters: {
-                status: ['live'],
-                channel: 'pos-channel',
-                program: 'Vocational Training',
-                se_skills: '**',
-                se_domains: ['Learning for work'],
-                se_subDomains: ['Career Exploration'],
+                status: ['Live'],
                 primaryCategory: ['Practice Question Set'],
+                channel: 'pos-channel',
+                domain: ['Learning for Work'],
+                subject: '**:domain',
+                subDomain: ['Career Exploration'],
+                skills: '**',
               },
             },
           },

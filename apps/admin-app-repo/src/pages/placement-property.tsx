@@ -163,66 +163,79 @@ const PlacementProperty = () => {
     {
       keys: ['propertyName'],
       label: t('MASTER.PLACEMENT_PROPERTY_NAME'),
+      minWidth: 200,
       render: (row) => row.propertyName,
     },
     {
       keys: ['stateName'],
       label: t('STATE'),
+      minWidth: 200,
       render: (row) => row.stateName ?? row.stateId,
     },
     {
       keys: ['districtName'],
       label: t('DISTRICT'),
+      minWidth: 200,
       render: (row) => row.districtName ?? row.districtId,
     },
     {
       keys: ['pincode'],
       label: t('MASTER.PINCODE'),
+      minWidth: 100,
       render: (row) => row.pincode,
     },
     {
       keys: ['industry'],
       label: t('MASTER.INDUSTRY_TYPE'),
+      minWidth: 150,
       render: (row) => row.industry,
     },
     {
       keys: ['domain'],
       label: t('MASTER.DOMAIN'),
+      minWidth: 200,
       render: (row) => row.domain,
     },
     {
       keys: ['propertyContact'],
       label: t('MASTER.PLACEMENT_PROPERTY_CONTACT'),
+      minWidth: 150,
       render: (row) => row.propertyContact,
     },
     {
       keys: ['propertyEmail'],
       label: t('MASTER.PLACEMENT_PROPERTY_EMAIL'),
+      minWidth: 200,
       render: (row) => row.propertyEmail,
     },
     {
       keys: ['medicalInsurance'],
       label: t('MASTER.MEDICAL_INSURANCE'),
+      minWidth: 150,
       render: (row) => yesNo(row.medicalInsurance),
     },
     {
       keys: ['medicalAssistance'],
       label: t('MASTER.MEDICAL_ASSISTANCE'),
+      minWidth: 150,
       render: (row) => yesNo(row.medicalAssistance),
     },
     {
       keys: ['propertySanitised'],
       label: t('MASTER.PROPERTY_SANITISED'),
+      minWidth: 150,
       render: (row) => yesNo(row.propertySanitised),
     },
     {
       keys: ['transportationFacility'],
       label: t('MASTER.TRANSPORTATION_FACILITY'),
+      minWidth: 150,
       render: (row) => yesNo(row.transportationFacility),
     },
     {
       keys: ['status'],
       label: t('COMMON.STATUS'),
+      minWidth: 100,
       render: (row) =>
         row.status === PlacementPropertyStatus.ACTIVE
           ? t('COMMON.ACTIVE')
