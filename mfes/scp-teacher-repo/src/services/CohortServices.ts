@@ -75,17 +75,17 @@ export const getCohortList = async (
       // that the flresponsetotl path reconstructs the proper center hierarchy
       // from BATCH-level parentIds instead of returning raw BATCH items.
       const effectiveRole = localStorage.getItem('role') ?? localStorage.getItem('roleName')
+      // Lead (Team Leader) also needs the reconstructed Center hierarchy, same as Instructor.
+      const isHierarchyRole =
+        effectiveRole === Role.TEACHER || effectiveRole === Role.TEAM_LEADER;
 
       res = res.filter((block: any) => {
         if (
           block?.cohortStatus === Status.ACTIVE &&
           //if no center then also show in list only for facilitator
-          // A batch can itself have child batches, so childData alone does not
-          // mean "center"; only real centers (COHORT) skip the rebuild below.
-          ((effectiveRole === Role.TEACHER &&
-            block?.type === 'COHORT' &&
-            block?.childData?.length > 0) ||
-            effectiveRole !== Role.TEACHER)
+          ((isHierarchyRole &&
+            block?.childData.length > 0) ||
+            !isHierarchyRole)
           //
         ) {
           return block;
@@ -104,7 +104,7 @@ export const getCohortList = async (
         //patch for alter response for facilitator
         try {
           // Also call flresponsetotl when role is null (defaults to Teacher)
-          if (effectiveRole === Role.TEACHER) {
+          if (isHierarchyRole) {
             res = await flresponsetotl(res);
             // console.log('########## response', res);
           }
