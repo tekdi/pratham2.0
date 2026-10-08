@@ -1,5 +1,9 @@
 import { getCohortList as searchCohorts } from '../youthNet/Dashboard/VillageServices';
-import { BATCH_DATE_FIELD_IDS, BATCH_SKILLS_LABEL } from './myTeachingCenter.config';
+import {
+  BATCH_ASSESSMENTS_FIELD_ID,
+  BATCH_DATE_FIELD_IDS,
+  BATCH_SKILLS_LABEL,
+} from './myTeachingCenter.config';
 import { MyTeachingCenterBatch } from '../../utils/Interfaces';
 
 // COHORT-type nodes (cohort/mycohorts, cohort/search) carry their dynamic
@@ -38,6 +42,16 @@ const searchBatchesForPair = async (
   return raw?.results?.cohortDetails || [];
 };
 
+// Multi-select selectedValues entries may be plain strings or {value,label}
+// objects (same as TYPE_OF_BATCH below).
+const getAssessmentIds = (row: any): string[] =>
+  (
+    row?.customFields?.find((field: any) => field.fieldId === BATCH_ASSESSMENTS_FIELD_ID)
+      ?.selectedValues || []
+  )
+    .map((selected: any) => (typeof selected === 'string' ? selected : selected?.value))
+    .filter(Boolean);
+
 // TYPE_OF_BATCH's selectedValues[0] may be an {value,label} object or a
 // plain string, same as TYPE_OF_CENTER (see getCohortTypeOfCenter below).
 const getBatchType = (batch: any): string | undefined => {
@@ -58,6 +72,7 @@ const mapToMyTeachingCenterBatch = (batch: any): MyTeachingCenterBatch => ({
   batchType: getBatchType(batch),
   startDate: getDateField(batch, BATCH_DATE_FIELD_IDS.START_DATE),
   endDate: getDateField(batch, BATCH_DATE_FIELD_IDS.END_DATE),
+  assessmentIds: getAssessmentIds(batch),
   status: batch?.status,
 });
 

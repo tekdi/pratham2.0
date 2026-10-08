@@ -104,7 +104,11 @@ const BatchDetailsPage = () => {
                 onEditBatch={() => setEditOpen(true)}
               />
             )}
-            <LearnerListTable batchCohortId={batchId} onTotalCountChange={setLearnerCount} />
+            <LearnerListTable
+              batchCohortId={batchId}
+              onTotalCountChange={setLearnerCount}
+              assessmentIds={batch?.assessmentIds}
+            />
             {batch && (
               <CreateBatchModal
                 open={editOpen}

@@ -76,7 +76,10 @@
     "DROPOUT_COLUMN": "Dropout",
     "MARK_AS_DROPOUT": "Mark as Dropout",
     "UNMARK_AS_DROPOUT": "Unmark as Dropout",
-    "LEARNER_UNMARKED_DROPOUT": "Learner moved back to In Training"
+    "LEARNER_UNMARKED_DROPOUT": "Learner moved back to In Training",
+    "ASSESSMENT_COLUMN_HEADER": "{{name}} ({{marks}} marks)",
+    "ASSESSMENT_NOT_STARTED": "Not Started",
+    "ASSESSMENT_REQUIRED": "Select at least one assessment"
   },
   "PLACEMENTS": {
     "PAGE_TITLE": "Placements",

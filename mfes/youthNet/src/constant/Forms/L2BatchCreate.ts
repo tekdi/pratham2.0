@@ -112,8 +112,30 @@ export const L2BatchCreate = {
           dependent: 'domain',
         },
       },
+      // Same fieldId/title as admin-app-repo's L2BatchCreate.js `assessments`
+      // field. Stored as the selected Assessments' do_ids. No `api` config:
+      // the options (Practice Question Sets for the batch's Domain + Skill)
+      // are fetched by CreateBatchModal.tsx itself, since Domain/Skills
+      // there are prefilled/locked (Create) or hidden (Edit) and so never
+      // trigger the form's own dependent-field fetch.
+      assessments: {
+        type: 'array',
+        title: 'ASSESSMENTS',
+        coreField: 0,
+        fieldId: 'bf8d78c0-ea90-4e27-98ab-d7e5fac46576',
+        field_type: 'drop_down',
+        maxSelection: 20,
+        isMultiSelect: true,
+        uniqueItems: true,
+        isRequired: true,
+        items: {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        },
+      },
     },
-    required: ['name', 'batch_type', 'domain', 'skills', 'startdate', 'enddate'],
+    required: ['name', 'batch_type', 'domain', 'skills', 'assessments', 'startdate', 'enddate'],
   },
   uiSchema: {
     name: {
@@ -145,6 +167,14 @@ export const L2BatchCreate = {
         hideError: false,
       },
     },
+    assessments: {
+      'ui:widget': 'AutoCompleteMultiSelectWidget',
+      'ui:options': {
+        multiple: true,
+        uniqueItems: true,
+        hideError: false,
+      },
+    },
     startdate: {
       'ui:widget': 'CustomDateWidget',
       'ui:options': {
@@ -159,6 +189,14 @@ export const L2BatchCreate = {
         hideError: true,
       },
     },
-    'ui:order': ['name', 'batch_type', 'domain', 'skills', 'startdate', 'enddate'],
+    'ui:order': [
+      'name',
+      'batch_type',
+      'domain',
+      'skills',
+      'assessments',
+      'startdate',
+      'enddate',
+    ],
   },
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
@@ -10,6 +10,10 @@ import {
   isCreateBatchSuccess,
   updateBatch,
 } from '../../services/myTeachingCenter/CreateBatchService';
+import {
+  getAssessmentsByIds,
+  searchAssessmentsForSkill,
+} from '../../services/myTeachingCenter/BatchAssessmentService';
 import { MyTeachingCenterBatch, TrainerAssignedTaxonomy } from '../../utils/Interfaces';
 
 // Cast to `any` deliberately: the RJSF schema/uiSchema objects get
@@ -51,6 +55,7 @@ const getEditPrefill = (batch: MyTeachingCenterBatch | null): Record<string, any
   if (batch.batchType) prefill.batch_type = batch.batchType;
   if (batch.startDate) prefill.startdate = batch.startDate;
   if (batch.endDate) prefill.enddate = batch.endDate;
+  if (batch.assessmentIds.length) prefill.assessments = batch.assessmentIds;
   return prefill;
 };
 
@@ -90,6 +95,46 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
+  const formRef = useRef<any>(null);
+
+  // Assessment options follow the batch's Domain + Skill: the selected
+  // ones in Create, the batch's own (hidden, unchangeable) ones in Edit.
+  const assessmentDomain = isEdit ? editBatch?.domain : formData?.domain?.[0];
+  const assessmentSkill = isEdit ? editBatch?.skill : formData?.skills?.[0];
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    const loadAssessmentOptions = async () => {
+      const options = await searchAssessmentsForSkill(
+        assessmentDomain ?? '',
+        assessmentSkill ?? ''
+      );
+      // Keep a batch's already-saved Assessments selectable (and shown as
+      // selected) even if they no longer match the search.
+      const savedIds = editBatch?.assessmentIds ?? [];
+      const missingIds = savedIds.filter((id) => !options.some((o) => o.identifier === id));
+      const saved = await getAssessmentsByIds(missingIds);
+      if (cancelled) return;
+
+      const allOptions = [...options, ...saved];
+      formRef.current?.setFieldOptions?.(
+        'assessments',
+        allOptions.map((o) => ({ value: o.identifier, label: o.name }))
+      );
+      // Drop selections that don't belong to a newly selected Skill.
+      const selected: string[] = formData?.assessments ?? [];
+      const kept = selected.filter((id) => allOptions.some((o) => o.identifier === id));
+      if (kept.length !== selected.length) {
+        formRef.current?.resetForm?.({ ...formData, assessments: kept });
+      }
+    };
+    loadAssessmentOptions();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, assessmentDomain, assessmentSkill]);
 
   // Seed formData with the batch's current values each time Edit opens, so
   // saving without touching any field still submits the existing values.
@@ -207,6 +252,10 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
       return;
     }
+    if (!formData?.assessments?.length) {
+      showToastMessage(t('MY_TEACHING_CENTER.ASSESSMENT_REQUIRED'), 'error');
+      return;
+    }
     // Never send Domain/Skills from the Edit form.
     const editFormData = { ...formData };
     EDIT_HIDDEN_FIELDS.forEach((key) => delete editFormData[key]);
@@ -251,6 +300,10 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
     }
     if (!formData?.name || !formData?.batch_type || !formData?.startdate || !formData?.enddate) {
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_CREATE_FAILED'), 'error');
+      return;
+    }
+    if (!formData?.assessments?.length) {
+      showToastMessage(t('MY_TEACHING_CENTER.ASSESSMENT_REQUIRED'), 'error');
       return;
     }
 
@@ -303,6 +356,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
         }}
       >
         <DynamicForm
+          ref={formRef}
           schema={schema}
           uiSchema={{ ...uiSchema, 'ui:submitButtonOptions': { norender: true } }}
           SubmitaFunction={(fd: any) => setFormData(fd)}

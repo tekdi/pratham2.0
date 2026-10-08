@@ -18,6 +18,12 @@ import {
   LEARNER_STATUS_LABEL_KEYS,
   LEARNER_STATUS_OPTIONS,
 } from '../../services/myTeachingCenter/myTeachingCenter.config';
+import {
+  BatchAssessment,
+  LearnerAssessmentResult,
+  getAssessmentsByIds,
+  getLearnerAssessmentResults,
+} from '../../services/myTeachingCenter/BatchAssessmentService';
 import { LearnerProgressStatus } from '../../utils/Interfaces';
 import OjtAddressCell from './OjtAddressCell';
 
@@ -32,11 +38,14 @@ interface LearnerListTableProps {
   // for the unfiltered fetch (no search term, no status filter), since a
   // filtered totalCount doesn't represent the batch's full roster size.
   onTotalCountChange?: (count: number) => void;
+  // The batch's own Assessment do_ids - one result column per Assessment.
+  assessmentIds?: string[];
 }
 
 const LearnerListTable: React.FC<LearnerListTableProps> = ({
   batchCohortId,
   onTotalCountChange,
+  assessmentIds = [],
 }) => {
   const { t } = useTranslation();
 
@@ -49,6 +58,37 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     null
   );
   const [unmarking, setUnmarking] = useState<string | number | null>(null);
+  const [assessments, setAssessments] = useState<BatchAssessment[]>([]);
+  // userId -> (assessment do_id -> latest attempt), for the current page.
+  const [assessmentResults, setAssessmentResults] = useState<
+    Record<string, Record<string, LearnerAssessmentResult>>
+  >({});
+
+  // Stable dependency for the (new-array-every-render) assessmentIds prop.
+  const assessmentIdsKey = assessmentIds.join(',');
+
+  useEffect(() => {
+    let cancelled = false;
+    getAssessmentsByIds(assessmentIds).then((list) => {
+      if (!cancelled) setAssessments(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assessmentIdsKey]);
+
+  useEffect(() => {
+    const userIds = (rows || []).map((row) => row.userId).filter(Boolean);
+    let cancelled = false;
+    getLearnerAssessmentResults(userIds, assessmentIds).then((results) => {
+      if (!cancelled) setAssessmentResults(results);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, assessmentIdsKey]);
 
   const fetchLearners = async (page: number) => {
     try {
@@ -102,15 +142,44 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     }
   };
 
-  // Assessment columns are intentionally omitted this phase (spec item 7 —
-  // dynamic Assessment columns are explicit future work, not implemented
-  // or hardcoded here).
+  // One column per Assessment assigned to the batch, headed by its name and
+  // total marks, e.g. "L2 Batch Assessment 2 (5 marks)" - the attempts'
+  // totalMaxScore, so only shown once a learner on the page has attempted
+  // it. Each cell is that learner's own totalScore (latest attempt, mapped
+  // by do_id).
+  const getTotalMarks = (assessmentId: string) =>
+    Object.values(assessmentResults).find((byId) => byId[assessmentId]?.totalMaxScore != null)?.[
+      assessmentId
+    ]?.totalMaxScore;
+
+  const assessmentColumns = assessments.map((assessment) => {
+    const totalMarks = getTotalMarks(assessment.identifier);
+    return {
+      key: `assessment_${assessment.identifier}`,
+      minWidth: 250,
+      label:
+        totalMarks != null
+          ? t('MY_TEACHING_CENTER.ASSESSMENT_COLUMN_HEADER', {
+              name: assessment.name,
+              marks: totalMarks,
+            })
+          : assessment.name,
+      render: (row: any) => {
+        const attempt = assessmentResults[row.userId]?.[assessment.identifier];
+        if (!attempt) return t('MY_TEACHING_CENTER.ASSESSMENT_NOT_STARTED');
+        return attempt.totalScore ?? 0;
+      },
+    };
+  });
+
   const columns = [
     {
       key: 'learnerName',
       label: t('MY_TEACHING_CENTER.LEARNER_NAME'),
-      render: (row: any) => getLearnerDisplayName(row),
+      minWidth: 200,
+      render: (row: any) => <Box sx={{ fontWeight: 500, textTransform: 'capitalize' }}>{getLearnerDisplayName(row)}</Box>,
     },
+    ...assessmentColumns,
     {
       key: 'ojtAddress',
       label: t('MY_TEACHING_CENTER.OJT_ADDRESS'),
@@ -125,6 +194,7 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     {
       key: 'learnerStatus',
       label: t('MY_TEACHING_CENTER.LEARNER_STATUS'),
+      minWidth: 200,
       render: (row: any) => {
         const status = getLearnerStatus(row);
         return status ? t(LEARNER_STATUS_LABEL_KEYS[status]) : '-';
@@ -133,6 +203,7 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     {
       key: 'dropout',
       label: t('MY_TEACHING_CENTER.DROPOUT_COLUMN'),
+      minWidth: 200,
       render: (row: any) => {
         const status = getLearnerStatus(row);
         if (status === 'in_training') {

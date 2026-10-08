@@ -410,6 +410,8 @@ export interface MyTeachingCenterBatch {
   batchType?: string;
   startDate?: string;
   endDate?: string;
+  // The batch's selected Assessment do_ids (ASSESSMENTS customField).
+  assessmentIds: string[];
   learnerCount?: number;
   status?: string;
 }

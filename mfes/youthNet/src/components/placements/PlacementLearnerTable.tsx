@@ -101,7 +101,7 @@ const PlacementLearnerTable: React.FC<PlacementLearnerTableProps> = ({
         .map((key) => ({
           key: `placement_${key}`,
           label: t(placementForm.schema?.properties?.[key]?.title || key),
-          minWidth: 200,
+          minWidth: 250,
           render: (row: any) =>
             formatPlacementValueForDisplay(placementForm.schema, key, row, t),
         }))
@@ -118,7 +118,7 @@ const PlacementLearnerTable: React.FC<PlacementLearnerTableProps> = ({
     {
       key: 'status',
       label: t('PLACEMENTS.STATUS'),
-      minWidth: 120,
+      minWidth: 200,
       render: (row: any) => {
         const status = getLearnerStatus(row);
         return status ? (
