@@ -5,6 +5,7 @@ import {
   getAfterDate,
   getBeforeDate,
   convertToIST,
+  eventBelongsToCohort,
 } from '../utils/helper';
 import { dashboardDaysLimit } from '../../app.config';
 
@@ -81,13 +82,25 @@ const useEventDates = (
           });
 
           const newEventDates = {};
+          const targetCohortId =
+            cohortId && cohortId !== 'all'
+              ? cohortId
+              : idType === 'cohortId'
+              ? idValue
+              : null;
           if (response?.events?.length > 0) {
-            response.events.forEach((event) => {
-              if (event.startDateTime) {
-                const eventDate = convertToIST(event.startDateTime);
-                newEventDates[eventDate] = { event: true };
-              }
-            });
+            response.events
+              .filter((event) =>
+                targetCohortId
+                  ? eventBelongsToCohort(event, targetCohortId)
+                  : true
+              )
+              .forEach((event) => {
+                if (event.startDateTime) {
+                  const eventDate = convertToIST(event.startDateTime);
+                  newEventDates[eventDate] = { event: true };
+                }
+              });
           }
           setEventDates(newEventDates);
         }

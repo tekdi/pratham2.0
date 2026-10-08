@@ -1,10 +1,11 @@
+import CenterSessionModal from '@/components/CenterSessionModal';
 import CrossCenterScheduleWizard from '@/components/CrossCenterScheduleWizard';
 import Header from '@/components/Header';
 import NoDataFound from '@/components/common/NoDataFound';
 import { getCohortDetails, getCohortList } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
 import { EventStatus, sessionType } from '@/utils/app.constant';
-import { flattenBatches } from '@/utils/crossCenter';
+import { BatchInfo, flattenBatches } from '@/utils/crossCenter';
 import {
   convertUTCToIST,
   getAfterDate,
@@ -19,13 +20,22 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import GroupsIcon from '@mui/icons-material/Groups';
 import LockOutlined from '@mui/icons-material/LockOutlined';
-import { Box, Button, Snackbar, Typography } from '@mui/material';
+import { Box, Button, Divider, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { accessControl } from '../../../../app.config';
+import React, { ComponentType, useEffect, useState } from 'react';
+import { DaysOfWeek, accessControl } from '../../../../app.config';
+import { isEliminatedFromBuild } from '../../../../featureEliminationUtil';
+
+let SessionCardFooter: ComponentType<any> | null = null;
+if (!isEliminatedFromBuild('SessionCardFooter', 'component')) {
+  SessionCardFooter = dynamic(() => import('@/components/SessionCardFooter'), {
+    ssr: false,
+  });
+}
 
 const getSessionTitle = (subject?: string, sessionTitle?: string) => {
   return subject && sessionTitle
@@ -35,16 +45,54 @@ const getSessionTitle = (subject?: string, sessionTitle?: string) => {
     : toPascalCase(sessionTitle || '');
 };
 
+interface BatchDetail {
+  batchId: string;
+  batchName: string;
+  centerName: string;
+}
+
+const dayNameByIndex: Record<number, string> = {};
+Object.entries(DaysOfWeek).forEach(([name, idx]) => {
+  dayNameByIndex[idx as unknown as number] = name;
+});
+
+/** e.g. "Every Mon, Wed until 28 Oct 2026", or null for a one-time session. */
+const getRecurrenceSummary = (event: any): string | null => {
+  if (!event?.isRecurring || !event?.recurrencePattern) return null;
+  const days = (event.recurrencePattern.daysOfWeek || [])
+    .map((idx: number) => dayNameByIndex[idx])
+    .filter(Boolean)
+    .join(', ');
+  const endValue = event.recurrencePattern.endCondition?.value;
+  const endDate = endValue ? convertUTCToIST(endValue).date : '';
+  if (!days) return null;
+  return endDate ? `Every ${days} until ${endDate}` : `Every ${days}`;
+};
+
 const CrossCenterSessionCard: React.FC<{
   event: any;
   batchCount: number;
   centerCount: number;
   currentUserId: string;
+  primaryBatch?: BatchInfo;
+  batchDetails?: BatchDetail[];
   onCopy: () => void;
   onEdit: (event: any) => void;
-}> = ({ event, batchCount, centerCount, currentUserId, onCopy, onEdit }) => {
+  onTopicUpdated: () => void;
+}> = ({
+  event,
+  batchCount,
+  centerCount,
+  currentUserId,
+  primaryBatch,
+  batchDetails,
+  onCopy,
+  onEdit,
+  onTopicUpdated,
+}) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const startDateTime = convertUTCToIST(event?.startDateTime);
   const endDateTime = convertUTCToIST(event?.endDateTime);
   const subject = event?.metadata?.subject;
@@ -52,6 +100,7 @@ const CrossCenterSessionCard: React.FC<{
   const creatorId = event?.createdBy ?? event?.metadata?.createdBy;
   const creatorName = event?.metadata?.teacherName;
   const meetingUrl = event?.meetingDetails?.url;
+  const recurrenceSummary = getRecurrenceSummary(event);
 
   // Same UPCOMING/LIVE/PASSED computation as SessionCard.tsx, so edit is
   // only offered while it makes sense (matches the existing 538fed8b
@@ -180,15 +229,143 @@ const CrossCenterSessionCard: React.FC<{
           />
         </Box>
       )}
-      <Typography
-        fontWeight={400}
-        fontSize={'12px'}
-        sx={{ marginTop: '8px', color: theme.palette.warning['400'] }}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '8px',
+          gap: '8px',
+        }}
       >
-        {creatorId === currentUserId
-          ? t('CENTER_SESSION.CREATED_BY_YOU')
-          : t('CENTER_SESSION.CREATED_BY', { name: creatorName || '' })}
-      </Typography>
+        <Typography
+          fontWeight={400}
+          fontSize={'12px'}
+          color={theme.palette.warning['400']}
+        >
+          {creatorId === currentUserId
+            ? t('CENTER_SESSION.CREATED_BY_YOU')
+            : t('CENTER_SESSION.CREATED_BY', { name: creatorName || '' })}
+        </Typography>
+        <Typography
+          fontWeight={500}
+          fontSize={'12px'}
+          color={theme.palette.secondary.main}
+          sx={{ cursor: 'pointer', flexShrink: 0 }}
+          onClick={() => setDetailsOpen(true)}
+        >
+          {t('CENTER_SESSION.VIEW_DETAILS')}
+        </Typography>
+      </Box>
+      {SessionCardFooter && primaryBatch && (
+        <Box sx={{ marginTop: '8px' }}>
+          <SessionCardFooter
+            item={event}
+            cohortName={primaryBatch.batchName}
+            isTopicSubTopicAdded={onTopicUpdated}
+            board={primaryBatch.bmg.board}
+            medium={primaryBatch.bmg.medium}
+            grade={primaryBatch.bmg.grade}
+            cohortId={primaryBatch.batchId}
+          />
+        </Box>
+      )}
+      <CenterSessionModal
+        open={detailsOpen}
+        handleClose={() => setDetailsOpen(false)}
+        title={getSessionTitle(subject, sessionTitle)}
+        center={t('CENTER_SESSION.BATCH_CENTER_COVERAGE', {
+          batchCount,
+          centerCount,
+        })}
+        date={startDateTime.date}
+      >
+        <Box sx={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <Box>
+            <Typography fontSize={'12px'} color={theme.palette.warning['400']}>
+              {t('CENTER_SESSION.SCHEDULE')}
+            </Typography>
+            <Typography fontSize={'14px'} color={theme.palette.warning['300']}>
+              {startDateTime.time} - {endDateTime.time}
+            </Typography>
+            <Typography fontSize={'14px'} color={theme.palette.warning['300']}>
+              {recurrenceSummary || t('CENTER_SESSION.ONE_TIME_SESSION')}
+            </Typography>
+          </Box>
+
+          {meetingUrl && (
+            <Box>
+              <Typography fontSize={'12px'} color={theme.palette.warning['400']}>
+                {t('CENTER_SESSION.MEETING_LINK')}
+              </Typography>
+              <Typography
+                fontSize={'14px'}
+                color={theme.palette.secondary.main}
+                sx={{ wordBreak: 'break-all' }}
+              >
+                {meetingUrl}
+              </Typography>
+              {event?.meetingDetails?.password && (
+                <Typography
+                  fontSize={'14px'}
+                  color={theme.palette.warning['300']}
+                >
+                  {t('CENTER_SESSION.PASSCODE', {
+                    passcode: event.meetingDetails.password,
+                  })}
+                </Typography>
+              )}
+            </Box>
+          )}
+
+          <Divider />
+
+          <Box>
+            <Typography fontSize={'12px'} color={theme.palette.warning['400']}>
+              {t('CENTER_SESSION.BATCHES_AND_CENTERS_LIST')}
+            </Typography>
+            {(batchDetails || []).map((b) => (
+              <Typography
+                key={b.batchId}
+                fontSize={'14px'}
+                color={theme.palette.warning['300']}
+                sx={{ marginTop: '4px' }}
+              >
+                {toPascalCase(b.batchName)}
+                {b.centerName ? ` — ${toPascalCase(b.centerName)}` : ''}
+              </Typography>
+            ))}
+          </Box>
+
+          {event?.erMetaData?.topic && (
+            <>
+              <Divider />
+              <Box>
+                <Typography
+                  fontSize={'12px'}
+                  color={theme.palette.warning['400']}
+                >
+                  {t('COMMON.TO_BE_TAUGHT')}
+                </Typography>
+                <Typography
+                  fontSize={'14px'}
+                  color={theme.palette.warning['300']}
+                >
+                  {event.erMetaData.topic.join(', ')}
+                </Typography>
+                {event?.erMetaData?.subTopic?.length > 0 && (
+                  <Typography
+                    fontSize={'14px'}
+                    color={theme.palette.warning['300']}
+                  >
+                    {event.erMetaData.subTopic.join(', ')}
+                  </Typography>
+                )}
+              </Box>
+            </>
+          )}
+        </Box>
+      </CenterSessionModal>
     </Box>
   );
 };
@@ -269,6 +446,12 @@ const CrossCenterSessionsPage = () => {
         const centerIdByBatchId = new Map(
           myBatches.map((b) => [b.batchId, b.centerId])
         );
+        const batchNameById = new Map(
+          myBatches.map((b) => [b.batchId, b.batchName])
+        );
+        const centerNameByCenterId = new Map(
+          myBatches.map((b) => [b.centerId, b.centerName])
+        );
         const cohortIds = myBatches.map((b) => b.batchId).filter(Boolean);
 
         if (cohortIds.length === 0) {
@@ -311,13 +494,38 @@ const CrossCenterSessionsPage = () => {
           Array.from(unresolvedBatchIds).map(async (batchId) => {
             try {
               const details = await getCohortDetails(batchId);
-              const centerId = details?.cohortData?.[0]?.parentId;
+              const batchRecord = details?.cohortData?.[0];
+              const centerId = batchRecord?.parentId;
+              if (batchRecord?.name) batchNameById.set(batchId, batchRecord.name);
               if (centerId) centerIdByBatchId.set(batchId, centerId);
             } catch (error) {
               console.error('Error resolving batch center', batchId, error);
             }
           })
         );
+
+        // Same reasoning, one hop further - the "View details" breakdown needs
+        // each batch's center *name*, not just its id, for centers outside
+        // this facilitator's own tree.
+        const unresolvedCenterIds = new Set<string>();
+        centerIdByBatchId.forEach((centerId) => {
+          if (centerId && !centerNameByCenterId.has(centerId)) {
+            unresolvedCenterIds.add(centerId);
+          }
+        });
+        await Promise.all(
+          Array.from(unresolvedCenterIds).map(async (centerId) => {
+            try {
+              const details = await getCohortDetails(centerId);
+              const centerName = details?.cohortData?.[0]?.name;
+              if (centerName) centerNameByCenterId.set(centerId, centerName);
+            } catch (error) {
+              console.error('Error resolving center name', centerId, error);
+            }
+          })
+        );
+
+        const myBatchesById = new Map(myBatches.map((b) => [b.batchId, b]));
 
         const withCoverage = crossCenterEvents.map((event) => {
           const batchIds: string[] =
@@ -328,10 +536,34 @@ const CrossCenterSessionsPage = () => {
               .map((id) => centerIdByBatchId.get(id))
               .filter((id): id is string => Boolean(id))
           );
+          // The wizard only allows batches with matching Board/Medium/Grade into
+          // one cross-center session, so any member batch this facilitator
+          // teaches (there is always at least one - it's how this event matched
+          // the `cohortIds` filter above) is a valid stand-in for the course
+          // planner's board/medium/grade/entityId lookup.
+          const primaryBatch = batchIds
+            .map((id) => myBatchesById.get(id))
+            .find((b): b is BatchInfo => Boolean(b));
+          // Read-only breakdown for the "View details" modal - every batch on
+          // the session, by name, with the center it belongs to.
+          const batchDetails = batchIds.map((id) => {
+            const known = myBatchesById.get(id);
+            const centerId = centerIdByBatchId.get(id);
+            return {
+              batchId: id,
+              batchName: known?.batchName || batchNameById.get(id) || id,
+              centerName:
+                known?.centerName ||
+                (centerId ? centerNameByCenterId.get(centerId) : undefined) ||
+                '',
+            };
+          });
           return {
             event,
             batchCount: batchIds.length,
             centerCount: centerIds.size,
+            primaryBatch,
+            batchDetails,
           };
         });
 
@@ -423,17 +655,30 @@ const CrossCenterSessionsPage = () => {
                     gap: '12px',
                   }}
                 >
-                  {extraSessions.map(({ event, batchCount, centerCount }) => (
-                    <CrossCenterSessionCard
-                      key={event?.eventRepetitionId}
-                      event={event}
-                      batchCount={batchCount}
-                      centerCount={centerCount}
-                      currentUserId={currentUserId}
-                      onCopy={() => setSnackbarOpen(true)}
-                      onEdit={handleEdit}
-                    />
-                  ))}
+                  {extraSessions.map(
+                    ({
+                      event,
+                      batchCount,
+                      centerCount,
+                      primaryBatch,
+                      batchDetails,
+                    }) => (
+                      <CrossCenterSessionCard
+                        key={event?.eventRepetitionId}
+                        event={event}
+                        batchCount={batchCount}
+                        centerCount={centerCount}
+                        currentUserId={currentUserId}
+                        primaryBatch={primaryBatch}
+                        batchDetails={batchDetails}
+                        onCopy={() => setSnackbarOpen(true)}
+                        onEdit={handleEdit}
+                        onTopicUpdated={() =>
+                          setRefreshKey((prev) => prev + 1)
+                        }
+                      />
+                    )
+                  )}
                 </Box>
               </Box>
             )}
@@ -460,15 +705,26 @@ const CrossCenterSessionsPage = () => {
                   }}
                 >
                   {plannedSessions.map(
-                    ({ event, batchCount, centerCount }) => (
+                    ({
+                      event,
+                      batchCount,
+                      centerCount,
+                      primaryBatch,
+                      batchDetails,
+                    }) => (
                       <CrossCenterSessionCard
                         key={event?.eventRepetitionId}
                         event={event}
                         batchCount={batchCount}
                         centerCount={centerCount}
                         currentUserId={currentUserId}
+                        primaryBatch={primaryBatch}
+                        batchDetails={batchDetails}
                         onCopy={() => setSnackbarOpen(true)}
                         onEdit={handleEdit}
+                        onTopicUpdated={() =>
+                          setRefreshKey((prev) => prev + 1)
+                        }
                       />
                     )
                   )}

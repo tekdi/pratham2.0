@@ -166,9 +166,14 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
           .map((idx: number) => dayNameByIndex[idx])
           .filter(Boolean);
         setSelectedWeekDays(days);
-        const endConditionValue = editingEvent.recurrencePattern.endCondition?.value;
-        if (endConditionValue) setRecurEndDate(dayjs(endConditionValue));
       }
+      // The edit icon addresses one occurrence (its own eventRepetitionId),
+      // not the series, so End Date must default to that occurrence's own
+      // day - same as the single-batch flow's "Edit this session" scope -
+      // rather than the series' recurrencePattern.endCondition.value, which
+      // would show the series' last day and make every edit look like it's
+      // about to shrink the whole recurrence down to one day.
+      setRecurEndDate(start);
     }
 
     const loadBatches = async () => {
@@ -623,7 +628,15 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
       if (editingEvent) {
         const apiBody: any = {
           updatedBy: userId,
-          isMainEvent: true,
+          // This wizard has no "this and following sessions" scope (unlike
+          // the single-batch flow) - the edit icon always addresses one
+          // occurrence. `isMainEvent: false` tells the backend to patch only
+          // that occurrence; `true` would make it redefine the series, which
+          // is also why `recurrencePattern` is never sent here - doing so
+          // previously collapsed the whole series down to whatever End Date
+          // was showing (e.g. editing just the 14 Oct occurrence silently
+          // deleted the 21/28 Oct occurrences that followed it).
+          isMainEvent: !editingEvent.isRecurring,
           title,
           shortDescription: subTopic || '',
           // No `eventType` here — the backend rejects edits that change it
@@ -633,7 +646,6 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
           startDatetime,
           endDatetime,
           metadata: metaData,
-          ...(recurrencePattern ? { recurrencePattern } : {}),
           ...(onlineMeetingFields ?? {}),
         };
 
