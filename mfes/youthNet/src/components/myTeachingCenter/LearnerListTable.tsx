@@ -183,6 +183,7 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     {
       key: 'ojtAddress',
       label: t('MY_TEACHING_CENTER.OJT_ADDRESS'),
+      minWidth: 200,
       render: (row: any) => (
         <OjtAddressCell
           membershipId={row.cohortMembershipId}
