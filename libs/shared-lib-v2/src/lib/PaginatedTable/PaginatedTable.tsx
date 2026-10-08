@@ -140,10 +140,12 @@ const PaginatedTable = <T,>({
                     >
                       {actions
                         .filter((action) => (action.show ? action.show(row) : true))
-                        .map((action, actionIndex) => (
+                        .map((action) => (
                           <IconButton
                             size="small"
-                            key={actionIndex}
+                            // Position in the unfiltered list stays stable when
+                            // `show` hides other actions on this row.
+                            key={action.title ?? actions.indexOf(action)}
                             title={action.title}
                             disabled={action.disabled}
                             onClick={() => action.callback(row)}
