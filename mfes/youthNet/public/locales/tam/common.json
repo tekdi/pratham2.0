@@ -569,6 +569,8 @@
     "SUBJECTS_I_TEACH": "நான் கற்பிக்கும் பாடங்கள்",
     "GENDER": "பாலினம்",
     "UNIT_NAME": "யூனிட் பெயர்",
+    "BATCH_NAME": "தொகுதி பெயர்",
+    "ASSESSMENTS": "மதிப்பீடுகள்",
     "UNIT_CODE": "யூனிட் குறியீடு",
     "ENROLLMENT_NUMBER": "சேர்க்கை எண்",
     "BLOCK_NAME": "வட்டத்தின் பெயர்",
