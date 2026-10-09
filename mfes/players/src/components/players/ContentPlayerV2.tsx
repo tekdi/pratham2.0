@@ -19,7 +19,19 @@ const ContentPlayerV2 = ({
   console.log("########h5p ContentPlayerV2",playerConfig);
   const contentPlayerV2Ref = useRef<HTMLIFrameElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // iPhone Safari has no element Fullscreen API, so there we "pseudo fullscreen":
+  // the player is pinned over the whole viewport and the parent page (learner app)
+  // is asked to expand this iframe to cover the whole screen.
+  const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false);
   const [bottom, setBottom] = useState(10);
+
+  const setPseudoFullscreen = (enter: boolean) => {
+    setIsPseudoFullscreen(enter);
+    setIsFullscreen(enter);
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'player:fullscreen', enter }, '*');
+    }
+  };
 
   useEffect(() => {
     const handlePlayerMessage = async (event: MessageEvent) => {
@@ -158,6 +170,11 @@ const ContentPlayerV2 = ({
         case 'player:error':
           console.error('[player:error]', detail);
           break;
+        case 'player:fullscreen':
+          // Pseudo fullscreen requested by the player's own fullscreen button
+          // (shim in content-player-v2/index.html, iPhone Safari only).
+          setPseudoFullscreen(!!event.data?.enter);
+          break;
         case 'player:close':
           console.log('[player:close]', detail);
           // Notify parent learner page so it can redirect via activeLink (sbplayer runs in iframe).
@@ -225,8 +242,16 @@ const ContentPlayerV2 = ({
       return;
     }
 
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+    const doc: any = document;
+    if (isPseudoFullscreen) {
+      setPseudoFullscreen(false);
+    } else if (doc.fullscreenElement || doc.webkitFullscreenElement) {
+      // Older iPad Safari only has the webkit-prefixed API
+      if (doc.exitFullscreen) {
+        doc.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        doc.webkitExitFullscreen();
+      }
       setIsFullscreen(false);
     } else {
       if (playerContainer.requestFullscreen) {
@@ -236,7 +261,9 @@ const ContentPlayerV2 = ({
       } else if (playerContainer.msRequestFullscreen) {
         playerContainer.msRequestFullscreen(); // IE
       } else {
-        alert('Fullscreen not supported in this browser');
+        // iPhone Safari: no element Fullscreen API
+        setPseudoFullscreen(true);
+        return;
       }
       setIsFullscreen(true);
     }
@@ -245,11 +272,22 @@ const ContentPlayerV2 = ({
   return (
     <div
       id="content-player"
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: '100%',
-      }}
+      style={
+        isPseudoFullscreen
+          ? {
+              position: 'fixed',
+              inset: 0,
+              zIndex: 9999,
+              width: '100%',
+              height: '100%',
+              background: '#000',
+            }
+          : {
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+            }
+      }
     >
       <iframe
         ref={contentPlayerV2Ref}

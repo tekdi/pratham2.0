@@ -19,6 +19,7 @@ import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import AdjustIcon from '@mui/icons-material/Adjust';
 import { useTranslation } from '../context/LanguageContext';
 import { hasQueuedTrackingForContentId } from '../../utils/trackingContentQueueLookup';
+import { scaledFontSize } from '../../utils/scaledFontSize';
 
 export interface ContentItem {
   name: string;
@@ -282,8 +283,8 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               title={title}
               sx={{
                 fontWeight: 500,
-                // fontSize: '16px',
-                // lineHeight: '24px',
+                fontSize: scaledFontSize(16),
+                lineHeight: 1.5,
                 whiteSpace: 'wrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -336,18 +337,14 @@ export const CommonCard: React.FC<CommonCardProps> = ({
               title={typeof content === 'string' ? content : ''}
               sx={{
                 fontWeight: 400,
-                // fontSize: '15.4px',
-                // lineHeight: '22px',
+                fontSize: scaledFontSize(13.5),
+                lineHeight: 1.5,
                 color: '#49454F',
                 display: '-webkit-box',
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                '@media (max-width: 600px)': {
-                  fontSize: '14px',
-                  lineHeight: '20px',
-                },
                 ..._card?._contentText?.sx,
               }}
             >
