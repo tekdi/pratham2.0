@@ -20,7 +20,10 @@ import {
   getUserCertificateStatus,
   issueCertificate,
 } from '@content-mfes/services/Certificate';
-import { checkCriteriaForCertificate } from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
+import {
+  checkCriteriaForCertificate,
+  getCertificateTemplateId,
+} from '@shared-lib-v2/utils/CertificateService/coursesCertificates';
 import AppConst from '@content-mfes/utils/AppConst/AppConst';
 import { checkAuth, getUserId } from '@shared-lib-v2/utils/AuthService';
 import { getUserId as getUserIdLocal } from '@content-mfes/services/LoginService';
@@ -62,6 +65,7 @@ export default function Details(props: DetailsProps) {
   const [breadCrumbs, setBreadCrumbs] = useState<any>();
   const [loading, setLoading] = useState(true);
   const [certificateId, setCertificateId] = useState();
+  const [certificateTemplate, setCertificateTemplate] = useState<string>();
   const [effectiveUnitId, setEffectiveUnitId] = useState<string | undefined>(
     Array.isArray(unitId) ? unitId[0] : unitId
   );
@@ -103,14 +107,9 @@ export default function Details(props: DetailsProps) {
       try {
         const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
         const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-        const isPosPath = currentPath.includes('/pos');        let resultHierarchyCourse;
-        if(isPosPath) {
-          resultHierarchyCourse = await hierarchyAPI(courseId as string) as any;
-        } else {
-          resultHierarchyCourse = await hierarchyAPI(courseId as string, {
-            mode: 'edit',
-          }) as any;
-        }
+        const isPosPath = currentPath.includes('/pos');
+        // Read the Live hierarchy only; mode=edit returned unpublished Draft/Review changes to learners
+        const resultHierarchyCourse = await hierarchyAPI(courseId as string) as any;
        
      
         const isThematicPath = currentPath.includes('/themantic')||hostname.includes('experimentoindia');
@@ -136,6 +135,13 @@ export default function Details(props: DetailsProps) {
       }
         let resultHierarchy = resultHierarchyCourse;
         console.log('resultHierarchyCourse', resultHierarchyCourse);
+
+        // Certificate template is a course-level field, so read it off the course
+        // hierarchy (not the unit). When absent, the modal falls back to the
+        // tenant-wide template in localStorage.
+        setCertificateTemplate(
+          getCertificateTemplateId(resultHierarchyCourse?.certificateTemplate)
+        );
         
         // If no unitId is provided (course level), automatically use the first unit ONLY if there's exactly one child
         if (!unitId && resultHierarchyCourse?.children && resultHierarchyCourse.children.length === 1) {
@@ -478,12 +484,18 @@ export default function Details(props: DetailsProps) {
         }}
       >
         {!isCertificateRestricted && certificateId && !effectiveUnitId && (
-          <CourseCompletionBanner certificateId={certificateId} />
+          <CourseCompletionBanner
+            certificateId={certificateId}
+            certificateTemplate={certificateTemplate}
+          />
         )}
         
         {/* Show completion banner for completed courses */}
         {!isCertificateRestricted && !unitId && courseItem?.children?.length === 1 && courseItem?.issuedOn && (
-          <CourseCompletionBanner certificateId={certificateId || ''} />
+          <CourseCompletionBanner
+            certificateId={certificateId || ''}
+            certificateTemplate={certificateTemplate}
+          />
         )}
         {props?.type === 'collapse' ? (
           selectedContent?.children?.length > 0 && (

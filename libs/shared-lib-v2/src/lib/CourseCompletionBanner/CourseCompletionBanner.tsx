@@ -9,9 +9,11 @@ import CertificateModal from '../CertificateModal/CertificateModal';
 import { useTranslation } from '../context/LanguageContext';
 interface CourseCompletionBannerProps {
   certificateId: string;
+  certificateTemplate?: string;
 }
 export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
   certificateId,
+  certificateTemplate,
 }) => {
   const { t } = useTranslation();
   const [showCertificate, setShowCertificate] = useState(false);
@@ -86,6 +88,7 @@ export const CourseCompletionBanner: React.FC<CourseCompletionBannerProps> = ({
         open={showCertificate}
         setOpen={setShowCertificate}
         certificateId={certificateId}
+        certificateTemplate={certificateTemplate}
       />
     </>
   );

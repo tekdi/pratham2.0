@@ -51,13 +51,13 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
     },
     'video/mp4': {
       icon: (
-        <Image src="/images/video.svg" alt="videoMp4" width="18" height="18" />
+        <Image src="/images/MP4.svg" alt="videoMp4" width="18" height="18" />
       ),
       text: 'Video',
     },
     'video/webm': {
       icon: (
-        <Image src="/images/video.svg" alt="videoWebm" width="18" height="18" />
+        <Image src="/images/MP4.svg" alt="videoWebm" width="18" height="18" />
       ),
       text: 'Video',
     },
@@ -69,7 +69,7 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
     },
     'application/vnd.sunbird.questionset': {
       icon: <Image src="/images/Qml.svg" alt="quml" width="18" height="18" />,
-      text: 'QUML',
+      text: 'Question Set',
     },
     'application/vnd.ekstep.h5p-archive': {
       icon: <Image src="/images/HTML.svg" alt="h5p" width="18" height="18" />,
