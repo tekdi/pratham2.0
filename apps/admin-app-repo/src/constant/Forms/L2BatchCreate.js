@@ -107,12 +107,60 @@ export const L2BatchCreate = {
           dependent: 'domain',
         },
       },
+      assessments: {
+        type: 'array',
+        title: 'ASSESSMENTS',
+        coreField: 0,
+        fieldId: 'bf8d78c0-ea90-4e27-98ab-d7e5fac46576',
+        field_type: 'drop_down',
+        maxSelection: 20,
+        isMultiSelect: true,
+        uniqueItems: true,
+        isRequired: true,
+        items: {
+          type: 'string',
+          enum: ['Select'],
+          enumNames: ['Select'],
+        },
+        api: {
+          url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/action/composite/v3/search`,
+          header: {
+            tenantId: '**',
+            Authorization: '**',
+            academicyearid: '**',
+          },
+          method: 'POST',
+          options: {
+            label: 'name',
+            value: 'identifier',
+            optionObj: 'result.QuestionSet',
+          },
+          // '**' is the selected Skills value and '**:domain' the selected
+          // Domain value (the framework's subject).
+          payload: {
+            request: {
+              filters: {
+                status: ['Live'],
+                primaryCategory: ['Practice Question Set'],
+                channel: 'pos-channel',
+                domain: ['Learning for Work'],
+                subject: '**:domain',
+                subDomain: ['Career Exploration'],
+                skills: '**',
+              },
+            },
+          },
+          callType: 'dependent',
+          dependent: 'skills',
+        },
+      },
     },
     required: [
       'name',
       'batch_type',
       'domain',
       'skills',
+      'assessments',
       'startdate',
       'enddate',
     ],
@@ -147,6 +195,14 @@ export const L2BatchCreate = {
         hideError: false,
       },
     },
+    assessments: {
+      'ui:widget': 'AutoCompleteMultiSelectWidget',
+      'ui:options': {
+        multiple: true,
+        uniqueItems: true,
+        hideError: false,
+      },
+    },
     startdate: {
       'ui:widget': 'CustomDateWidget',
       'ui:options': {
@@ -166,6 +222,7 @@ export const L2BatchCreate = {
       'batch_type',
       'domain',
       'skills',
+      'assessments',
       'startdate',
       'enddate',
     ],

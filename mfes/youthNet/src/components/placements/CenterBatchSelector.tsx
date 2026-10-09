@@ -3,6 +3,7 @@ import { Box, Autocomplete, TextField } from '@mui/material';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { getCentersForDomains, PlacementCenter, SdbvFilters } from '../../services/placements/PlacementCenterService';
 import { getBatchesForCenter, PlacementBatch } from '../../services/placements/PlacementBatchService';
+import { toPascalCase } from '../../utils/helper';
 
 interface CenterBatchSelectorProps {
   domains: string[];
@@ -127,7 +128,7 @@ const CenterBatchSelector: React.FC<CenterBatchSelectorProps> = ({
         sx={{ flex: { xs: '1 1 100%', sm: '1 1 0' }, minWidth: { sm: 240 } }}
         options={centerOptions || []}
         loading={centerOptions == null}
-        getOptionLabel={(o) => o.name}
+        getOptionLabel={(o) => toPascalCase(o.name)}
         isOptionEqualToValue={(o, v) => o.cohortId === v.cohortId}
         value={selectedCenter}
         onChange={(_, option) => handleCenterChange(option)}
@@ -139,7 +140,7 @@ const CenterBatchSelector: React.FC<CenterBatchSelectorProps> = ({
         options={batchOptions || []}
         loading={!!selectedCenter && batchOptions == null}
         disabled={!selectedCenter}
-        getOptionLabel={(o) => o.name}
+        getOptionLabel={(o) => toPascalCase(o.name)}
         isOptionEqualToValue={(o, v) => o.cohortId === v.cohortId}
         value={selectedBatch}
         onChange={(_, option) => handleBatchChange(option)}

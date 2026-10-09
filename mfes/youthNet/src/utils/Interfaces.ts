@@ -406,8 +406,12 @@ export interface MyTeachingCenterBatch {
   centerName?: string;
   domain: string;
   skill: string;
+  // TYPE_OF_BATCH value (regular/remote/hybrid) — prefills Edit Batch.
+  batchType?: string;
   startDate?: string;
   endDate?: string;
+  // The batch's selected Assessment do_ids (ASSESSMENTS customField).
+  assessmentIds: string[];
   learnerCount?: number;
   status?: string;
 }

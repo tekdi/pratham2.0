@@ -20,6 +20,9 @@ export const BATCH_DATE_FIELD_IDS = {
 // Learner's tagged course id), which is a different, unrelated field.
 export const BATCH_SKILLS_LABEL = 'SKILLS';
 
+// The batch's ASSESSMENTS customField (selected Assessment do_ids).
+export const BATCH_ASSESSMENTS_FIELD_ID = L2BatchCreate.schema.properties.assessments.fieldId;
+
 // Real fieldId confirmed. Note the read path (LearnerListService.getOjtAddress)
 // matches on this fieldId rather than a `label` string — the label wasn't
 // given/confirmed, and fieldId is the reliable identifier for both the

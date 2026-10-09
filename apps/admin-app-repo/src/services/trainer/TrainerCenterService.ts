@@ -169,3 +169,26 @@ export const getUserAssignedCenters = async (
   const domainSkillIds = new Set(domainSkillCenters.map((center) => center.cohortId));
   return assignedCenters.filter((center) => domainSkillIds.has(center.cohortId));
 };
+
+// States a State Lead is assigned to, read off the logged-in user's own
+// WORKING_STATE custom field (the same field useAccountSwitch.ts and
+// sso/index.tsx read `stateId` from) — every selected value, not just the
+// first, so a State Lead covering several States gets all of them. Falls
+// back to the single `stateId` already stored at login.
+export const getAssignedStateIds = (): string[] => {
+  try {
+    const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+    const workingState = adminInfo?.customFields?.find(
+      (field: { label: string }) => field?.label === 'WORKING_STATE'
+    );
+    const ids = (workingState?.selectedValues || [])
+      .map((value: any) => value?.id)
+      .filter((id: any) => id !== undefined && id !== null && id !== '')
+      .map(String);
+    if (ids.length > 0) return ids;
+  } catch (error) {
+    console.error('Error reading assigned States:', error);
+  }
+  const stateId = localStorage.getItem('stateId');
+  return stateId ? [stateId] : [];
+};
