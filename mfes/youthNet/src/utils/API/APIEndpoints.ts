@@ -41,6 +41,11 @@ const API_ENDPOINTS = {
   cohortSearch: `${baseurl}/cohort/search`,
   cohortUpdateStatus: `${baseurl}/cohort/updateStatus`,
   rbacUsersRolesBulkUpdate: `${baseurl}/rbac/usersRoles/bulkUpdate`,
+  cohortCreate: `${baseurl}/cohort/create`,
+  cohortUpdate: (cohortId: string) => `${baseurl}/cohort/update/${cohortId}`,
+  cohortMemberUpdate: (membershipId: string | number) =>
+    `${baseurl}/cohortmember/update/${membershipId}`,
+  fieldValuesDelete: `${baseurl}/fields/values/delete`,
 
 };
 
