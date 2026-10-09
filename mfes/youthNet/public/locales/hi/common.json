@@ -598,6 +598,8 @@
     "SUBJECTS_I_TEACH": "मैं जिन विषयों को पढ़ाता हूं",
     "GENDER": "लिंग",
     "UNIT_NAME": "यूनिट का नाम",
+    "BATCH_NAME": "बैच का नाम",
+    "ASSESSMENTS": "मूल्यांकन",
     "UNIT_CODE": "यूनिट कोड",
     "ENROLLMENT_NUMBER": "नामांकन संख्या",
     "BLOCK_NAME": "ब्लॉक का नाम",
