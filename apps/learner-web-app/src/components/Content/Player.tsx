@@ -754,6 +754,11 @@ const PlayerBox = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const playerIframeRef = useRef<HTMLIFrameElement>(null);
+  // iPhone Safari has no element Fullscreen API. There the player asks (via
+  // postMessage) for "pseudo fullscreen": the iframe is pinned over the whole
+  // viewport, above the header and footer.
+  const [isPseudoFullscreen, setIsPseudoFullscreen] = useState(false);
   // Space (px) to reserve around the player: its distance from the top of the
   // document, the fixed footer strip overlaying the bottom of the viewport, and a
   // small gap. The player height is `viewport height - playerTopOffset`, so the
@@ -868,6 +873,25 @@ const PlayerBox = ({
     return () => window.removeEventListener('message', handlePlayerExitNative);
   }, []);
 
+  useEffect(() => {
+    const handlePlayerFullscreen = (event: MessageEvent) => {
+      if (event?.data?.type !== 'player:fullscreen') return;
+      if (event.source !== playerIframeRef.current?.contentWindow) return;
+      setIsPseudoFullscreen(!!event.data.enter);
+    };
+    window.addEventListener('message', handlePlayerFullscreen);
+    return () => window.removeEventListener('message', handlePlayerFullscreen);
+  }, []);
+
+  useEffect(() => {
+    if (!isPseudoFullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isPseudoFullscreen]);
+
   const handlePlay = () => {
     if (checkAuth() || userIdLocalstorageName) {
       setPlay(true);
@@ -932,9 +956,20 @@ const PlayerBox = ({
               ? '100%'
               : { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
             ...playerHeightSx,
+            ...(isPseudoFullscreen && {
+              position: 'fixed',
+              inset: 0,
+              zIndex: 2000,
+              width: '100%',
+              height: '100%',
+              minHeight: 0,
+              '@supports (height: 100svh)': { height: '100%' },
+              backgroundColor: '#000',
+            }),
           }}
         >
          <iframe
+            ref={playerIframeRef}
             name={JSON.stringify({
               isGenerateCertificate: isGenerateCertificate,
               trackable: trackable,

@@ -11,6 +11,74 @@
 <body>
   <content-player id="player"></content-player>
 
+  <!--
+    Fullscreen shim. The player bundle only calls the standard Fullscreen API
+    (element.requestFullscreen / document.exitFullscreen / document.fullscreenElement).
+    - Older iPad Safari only has the webkit-prefixed API: map it to the standard one.
+    - iPhone Safari has no element Fullscreen API at all:
+        * video -> native iOS fullscreen video player (video.webkitEnterFullscreen)
+        * other content -> "pseudo fullscreen": ask the parent pages (sbplayer ->
+          learner app) to expand the player iframe to cover the whole screen.
+    Must run before the bundle loads.
+  -->
+  <script type="text/javascript">
+    (function () {
+      var docProto = Document.prototype;
+      var elProto = Element.prototype;
+      if (elProto.requestFullscreen && docProto.exitFullscreen) return;
+
+      var fireChange = function () {
+        document.dispatchEvent(new Event('fullscreenchange'));
+      };
+
+      if (elProto.webkitRequestFullscreen) {
+        elProto.requestFullscreen = function () {
+          this.webkitRequestFullscreen();
+          return Promise.resolve();
+        };
+        docProto.exitFullscreen = function () {
+          document.webkitExitFullscreen();
+          return Promise.resolve();
+        };
+        Object.defineProperty(document, 'fullscreenElement', {
+          configurable: true,
+          get: function () { return document.webkitFullscreenElement || null; },
+        });
+        document.addEventListener('webkitfullscreenchange', fireChange);
+        return;
+      }
+
+      var pseudoFullscreenElement = null;
+      var notifyParent = function (enter) {
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: 'player:fullscreen', enter: enter }, '*');
+        }
+      };
+
+      elProto.requestFullscreen = function () {
+        var video = this.tagName === 'VIDEO' ? this : this.querySelector('video');
+        if (video && video.webkitEnterFullscreen) {
+          video.webkitEnterFullscreen();
+          return Promise.resolve();
+        }
+        pseudoFullscreenElement = this;
+        notifyParent(true);
+        fireChange();
+        return Promise.resolve();
+      };
+      docProto.exitFullscreen = function () {
+        pseudoFullscreenElement = null;
+        notifyParent(false);
+        fireChange();
+        return Promise.resolve();
+      };
+      Object.defineProperty(document, 'fullscreenElement', {
+        configurable: true,
+        get: function () { return pseudoFullscreenElement; },
+      });
+    })();
+  </script>
+
   <!-- IIFE bundle — includes H5P renderer -->
   <script src="content-player.iife.js"></script>
 
