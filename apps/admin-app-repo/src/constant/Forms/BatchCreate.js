@@ -106,7 +106,7 @@ export const BatchCreateSchema = {
       coreField: 1,
       fieldId: null,
       field_type: 'text',
-      "pattern": "^[a-zA-Z0-9 !@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]+$"
+      pattern: "^[a-zA-Z0-9 !@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]+$"
     },
     batch_type: {
       type: 'string',
