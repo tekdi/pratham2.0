@@ -132,7 +132,7 @@ const CenterListWidget: React.FC<CenterListWidgetProps> = ({
         // Normalize values to strings for consistent comparison
         const states =
           response?.data?.result?.values?.map((item) => ({
-            value: String(item.value || ''),
+            value: String(item.value ?? ''),
             label: item.label || '',
           })) || [];
 

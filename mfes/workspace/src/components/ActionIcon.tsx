@@ -30,9 +30,11 @@ const ActionIcon: React.FC<ActionCellProps> = ({
     setOpen(true);
   };
 
-  // Hide delete button if prevStatus is "Live" and status is "Draft"
+  // Hide delete for a Draft/Review copy of content that is (or was) Live
   console.log("rowData====>", rowData);
-  const shouldHideDelete = rowData?.prevStatus === "Live" && (rowData?.status === "Draft" || rowData?.status === "Review");
+  const shouldHideDelete =
+    (rowData?.prevStatus === "Live" || rowData?.hasLiveVersion) &&
+    (rowData?.status === "Draft" || rowData?.status === "Review");
 
   if (shouldHideDelete) {
     return null; // Don't render anything if delete should be hidden
@@ -41,6 +43,12 @@ const ActionIcon: React.FC<ActionCellProps> = ({
   // Content creators cannot delete published (Live) content
   const isDeleteDisabled =
     rowData?.status === 'Live' && getLocalStoredUserRole() === Role.SCTA;
+
+  // QuestionSets are deleted and unpublished through the same retire API, so
+  // there's no separate Delete action for them - only Unpublish is shown.
+  // A Draft QuestionSet was never published, so it gets no Unpublish either.
+  const isQuestionSet = rowData?.mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE;
+  const isDraftQuestionSet = isQuestionSet && rowData?.status === 'Draft';
 
   // Deleted (Retired) content has no actions left
   if (rowData?.status === 'Retired') {
@@ -64,33 +72,35 @@ const ActionIcon: React.FC<ActionCellProps> = ({
         alignItems: "center",
       }}
     >
-      <Tooltip
-        title={
-          isDeleteDisabled
-            ? 'Published content cannot be deleted'
-            : 'Delete'
-        }
-      >
-        <Box
-          onClick={() => {
-            if (isDeleteDisabled) return;
-            console.log(rowData);
-            handleOpen('delete');
-          }}
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            cursor: isDeleteDisabled ? 'not-allowed' : 'pointer',
-            opacity: isDeleteDisabled ? 0.4 : 1,
-            backgroundColor: '#F8EFE7',
-            p: '10px',
-          }}
+      {!isQuestionSet && (
+        <Tooltip
+          title={
+            isDeleteDisabled
+              ? 'Published content cannot be deleted'
+              : 'Delete'
+          }
         >
-          <img src={'/delete.png'} height="20px" alt="Image" />
-        </Box>
-      </Tooltip>
-      {rowData?.status === 'Live' && getLocalStoredUserRole() !== Role.SCTA && (
+          <Box
+            onClick={() => {
+              if (isDeleteDisabled) return;
+              console.log(rowData);
+              handleOpen('delete');
+            }}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: isDeleteDisabled ? 'not-allowed' : 'pointer',
+              opacity: isDeleteDisabled ? 0.4 : 1,
+              backgroundColor: '#F8EFE7',
+              p: '10px',
+            }}
+          >
+            <img src={'/delete.png'} height="20px" alt="Image" />
+          </Box>
+        </Tooltip>
+      )}
+      {((isQuestionSet && rowData?.status !== 'Unlisted' && !isDraftQuestionSet) || rowData?.status === 'Live') && getLocalStoredUserRole() !== Role.SCTA && (
         <Tooltip title="Unpublish">
           <Box
             onClick={() => {
@@ -112,7 +122,6 @@ const ActionIcon: React.FC<ActionCellProps> = ({
       )}
 
       {rowData?.status === 'Unlisted' &&
-        rowData?.mimeType !== MIME_TYPE.QUESTIONSET_MIME_TYPE &&
         getLocalStoredUserRole() !== Role.SCTA && (
         <Tooltip title="Publish">
           <Box

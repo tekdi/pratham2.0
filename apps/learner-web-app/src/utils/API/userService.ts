@@ -66,6 +66,7 @@ function setLocalStorageFromCustomFields(fields: any) {
   const stateName = getFieldLabel('STATE');
   const districtId = getFieldId('DISTRICT');
   const blockId = getFieldId('BLOCK');
+  const villageId = getFieldId('VILLAGE');
 
   if (stateId) {
     localStorage.setItem('mfe_state', String(stateId));
@@ -74,6 +75,7 @@ function setLocalStorageFromCustomFields(fields: any) {
   if (districtId) localStorage.setItem('mfe_district', String(districtId));
   if (stateName) localStorage.setItem('stateName', stateName);
   if (blockId) localStorage.setItem('mfe_block', String(blockId));
+  if (villageId) localStorage.setItem('mfe_villageId', String(villageId));
   localStorage.setItem('roleName', 'Learner');
 }
 

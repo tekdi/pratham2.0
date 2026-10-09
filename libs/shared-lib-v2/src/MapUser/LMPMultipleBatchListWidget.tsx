@@ -110,10 +110,10 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
         district: center.district || '',
         block: center.block || '',
         village: center.village || '',
-        stateId: center.stateId || null,
-        districtId: center.districtId || null,
-        blockId: center.blockId || null,
-        villageId: center.villageId || null,
+        stateId: center.stateId ?? null,
+        districtId: center.districtId ?? null,
+        blockId: center.blockId ?? null,
+        villageId: center.villageId ?? null,
       }));
     }
     return [];
@@ -524,10 +524,10 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
-            stateId: center?.stateId || null,
-            districtId: center?.districtId || null,
-            blockId: center?.blockId || null,
-            villageId: center?.villageId || null,
+            stateId: center?.stateId ?? null,
+            districtId: center?.districtId ?? null,
+            blockId: center?.blockId ?? null,
+            villageId: center?.villageId ?? null,
           },
         ];
       }
@@ -584,10 +584,10 @@ const LMPMultipleBatchListWidget: React.FC<LMPMultipleBatchListWidgetProps> = ({
             district: center?.district || '',
             block: center?.block || '',
             village: center?.village || '',
-            stateId: center?.stateId || null,
-            districtId: center?.districtId || null,
-            blockId: center?.blockId || null,
-            villageId: center?.villageId || null,
+            stateId: center?.stateId ?? null,
+            districtId: center?.districtId ?? null,
+            blockId: center?.blockId ?? null,
+            villageId: center?.villageId ?? null,
           };
         });
         const updatedBatches = [...prev, ...newBatches];

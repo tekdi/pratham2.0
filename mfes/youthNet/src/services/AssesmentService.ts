@@ -425,8 +425,8 @@ export const createContentTracking = async ({
     contentId,
     courseId,
     unitId,
-    contentType: "COLLECTION",
-    contentMime: "application/vnd.ekstep.content-collection",
+    contentType: "QUESTION_SET",
+    contentMime: "application/vnd.sunbird.questionset",
     lastAccessOn: new Date().toISOString(),
     detailsObject: [
       {

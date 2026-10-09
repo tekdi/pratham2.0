@@ -65,6 +65,7 @@
     "SOMETHING_WENT_WRONG": "કંઈક ખોટું થયું",
     "NO_GO_BACK": "ના, પાછા જાઓ",
     "YES": "હા",
+    "NO": "ના",
     "REVIEW_ATTENDANCE": "હાજરીની સમીક્ષા કરો",
     "ADD_NEW": "નવું ઉમેરો",
     "ADD": "ઉમેરો",
@@ -557,7 +558,9 @@
     "END_DATE_ERROR": "સમાપ્તિ તારીખ પ્રારંભ તારીખ કરતા પહેલાની ન હોઈ શકે",
     "DELETE_THIS_SESSION": "આ સત્ર કાઢી નાખો",
     "LEARNER_PREREQUISITES": "લર્નર ની પૂર્વજરૂરીયાતો",
-    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા"
+    "LEARNER_POSTREQUISITES": "લર્નરની પોસ્ટ-આવશ્યકતા",
+    "SESSION_SLOT_CONFLICT_MSG": "આ સમય દરમિયાન આ બેચ માટે પહેલેથી જ એક સત્ર નિર્ધારિત છે. શું તમે આ જ સમય માટે બીજું સત્ર નિર્ધારિત કરવા માંગો છો?",
+    "SESSION_START_TIME_IN_PAST_ERROR": "પ્રારંભ સમય પસાર થઈ ગયો છે. કૃપા કરીને ભવિષ્યનો સમય પસંદ કરો."
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "સેન્ટર એ સફળતાપૂર્વક વિનંતી કરી",
@@ -619,6 +622,8 @@
     "UNIT_NAME": "યુનિટ નામ",
     "UNIT_CODE": "યુનિટ કોડ",
     "ENROLLMENT_NUMBER": "એનરોલ્મેન્ટ નંબર",
+    "ENROLLMENT_ID": "એનરોલ્મેન્ટ આઈડી",
+    "DATE_OF_JOINING": "જોડાયાની તારીખ",
     "BLOCK_NAME": "બ્લોક નામ",
     "STUDENT_TYPE": "લર્નર ના પ્રકાર",
     "STATE_NAME": "રાજ્ય નું નામ",

@@ -235,6 +235,44 @@ export const getContent = async (
   }
 };
 
+// Draft/Review copies of a published item keep the Live item's identifier, so
+// a Live search on those identifiers tells us which of them still have a Live
+// version (prevStatus can't - it only holds the last state before the draft).
+export const getLiveIdentifiers = async (
+  items: any[],
+  channel?: any
+): Promise<Set<string>> => {
+  const ids = Array.from(
+    new Set(
+      items
+        .filter((i) => i?.status === 'Draft' || i?.status === 'Review')
+        .map((i) => i?.identifier)
+        .filter(Boolean)
+    )
+  );
+  if (!ids.length) return new Set();
+  try {
+    const result = await getContent(
+      ['Live'],
+      '',
+      ids.length,
+      0,
+      [],
+      { lastUpdatedOn: 'desc' },
+      channel,
+      undefined,
+      undefined,
+      undefined,
+      ids
+    );
+    const live = [...(result?.content || []), ...(result?.QuestionSet || [])];
+    return new Set(live.map((i: any) => i?.identifier));
+  } catch (error) {
+    console.log(error);
+    return new Set();
+  }
+};
+
 export const createQuestionSet = async (frameworkId: any, name?: string) => {
   const apiURL = `/action/questionset/v2/create`;
   const reqBody = {
@@ -435,8 +473,27 @@ export const createCourse = async (
 
 export const publishContent = async (
   identifier: any,
-  publishChecklist?: any
+  publishChecklist?: any,
+  mimeType?: string
 ) => {
+  // QuestionSets are published through their own questionset publish API,
+  // which also publishes the questions in their hierarchy.
+  if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
+    try {
+      const response = await post(`/action/questionset/v2/publish/${identifier}`, {
+        request: {
+          questionset: {
+            lastPublishedBy: getLocalStoredUserId(),
+          },
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error during publishing question set:', error);
+      throw error;
+    }
+  }
+
   const requestBody = {
     request: {
       content: {
@@ -606,7 +663,22 @@ export const getPosFrameworkList = async (): Promise<any> => {
   }
 };
 
-export const unpublishContent = async (identifier: string) => {
+export const unpublishContent = async (
+  identifier: string,
+  mimeType?: string
+) => {
+  // Question sets are unpublished through the questionset retire API
+  if (mimeType === MIME_TYPE.QUESTIONSET_MIME_TYPE) {
+    const questionsetRetireURL = `/action/questionset/v2/retire/${identifier}`;
+    try {
+      const response = await delApi(questionsetRetireURL);
+      return response?.data;
+    } catch (error) {
+      console.error('Error unpublishing question set:', error);
+      throw error;
+    }
+  }
+
   const baseurl = process.env.NEXT_PUBLIC_BASE_URL;
   const apiURL = `${baseurl}/collection/v4/unlisted/publish/${identifier}`;
   const reqBody = {
