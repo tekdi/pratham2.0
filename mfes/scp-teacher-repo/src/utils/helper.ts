@@ -638,7 +638,7 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   return (
     category?.terms
-      ?.filter((term: any) => term.status !== "retired") // ✅ exclude retired
+      ?.filter((term: any) => term.status !== 'retired') // ✅ exclude retired
       .map((term: any) => ({
         name: term.name,
         code: term.code,
@@ -1238,4 +1238,21 @@ export const isBlockSetDifferent = (
   const newBlocks = Object.keys(newBlockVillageMap).map(String).sort();
   if (origBlocks.length !== newBlocks.length) return true;
   return !origBlocks.every((blockId, i) => blockId === newBlocks[i]);
+};
+
+// The event list API is filtered by cohort server-side, but not every
+// environment honours the `cohortIds` filter — some return every live event
+// instead. Rendering those builds one session card per event across the whole
+// system, and each card fans out into its own course-plan API chain. Filter
+// again on the client so the page can never render another batch's sessions.
+// A multi-batch session carries `metadata.cohortIds`; a single-batch one may
+// carry either that or the older singular `metadata.cohortId`.
+export const eventBelongsToCohort = (event: any, cohortId: string) => {
+  if (!cohortId || cohortId === 'all') return true;
+  const ids = event?.metadata?.cohortIds;
+  if (Array.isArray(ids) && ids.length) return ids.includes(cohortId);
+  const singular = event?.metadata?.cohortId;
+  // Nothing to match on: keep the event rather than hiding a real session.
+  if (!singular) return true;
+  return singular === cohortId;
 };

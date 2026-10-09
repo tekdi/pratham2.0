@@ -1,9 +1,10 @@
 import { CustomField, SessionsCardProps } from '@/utils/Interfaces';
 import { Box, Snackbar, Typography } from '@mui/material';
-import { convertUTCToIST, getBMG, toPascalCase } from '@/utils/helper';
+import { convertUTCToIST, toPascalCase } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import LockOutlined from '@mui/icons-material/LockOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import React, { useEffect } from 'react';
@@ -18,7 +19,6 @@ import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import useNotification from '@/hooks/useNotification';
 import { useRouter } from 'next/router';
 import { Role } from '@/utils/app.constant';
-import { getCohortDetails } from '@/services/CohortServices';
 import { usePathname } from 'next/navigation';
 
 const SessionsCard: React.FC<SessionsCardProps> = ({
@@ -48,7 +48,8 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [showEdit, setShowEdit] = React.useState(false);
   const [editSession, setEditSession] = React.useState();
   const [eventStatus, setEventStatus] = React.useState('');
-  const [CohortBMG, setCohortBMG] = React.useState<any>({});
+  const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
+    React.useState(false);
   const [currentUserId, setCurrentUserId] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;
@@ -71,6 +72,13 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
     setEditSelection(selection);
   };
   const handleOpen = (eventData: any) => {
+    // A multi-batch session is managed centrally from Cross-Center Sessions —
+    // editing it inline here would let a facilitator change time/subject
+    // without realising it applies to every other batch on the session too.
+    if (eventData?.metadata?.multiSession) {
+      setMultiBatchConfirmOpen(true);
+      return;
+    }
     setOpen(true);
     setEditSession(eventData);
     setEventEdited(true);
@@ -78,28 +86,13 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
 
   const handleClose = () => setOpen(false);
 
-  useEffect(() => {
-    if (dashboard) {
-      const classId = data.metadata?.cohortId;
-      const getCohortData = async () => {
-        const response = await getCohortDetails(classId);
-
-        let cohortData = null;
-
-        if (response?.cohortData?.length) {
-          cohortData = response?.cohortData[0];
-
-          const bgm = getBMG(cohortData);
-          if (bgm) {
-            setCohortBMG(bgm);
-          }
-        }
-      };
-      if (classId) {
-        getCohortData();
-      }
-    }
-  }, [dashboard]);
+  // board/medium/grade are already resolved once by the page and passed down.
+  // Fetching them again per card meant one cohort-hierarchy request for every
+  // session on screen. They can arrive as `{ value }` objects, so unwrap them.
+  const unwrapBMG = (v: any) => (v && typeof v === 'object' ? v.value : v);
+  const sessionBoard = dashboard ? unwrapBMG(board) : board;
+  const sessionMedium = dashboard ? unwrapBMG(medium) : medium;
+  const sessionGrade = dashboard ? unwrapBMG(grade) : grade;
 
   const handleCohortNotification = async (
     cohortId: string,
@@ -343,6 +336,21 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             sx={{ cursor: 'pointer' }}
           />
         )}
+        {eventStatus === EventStatus.PASSED && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '2px',
+              color: theme.palette.warning['400'],
+            }}
+          >
+            <LockOutlined sx={{ fontSize: '16px' }} />
+            <Typography fontSize={'12px'}>
+              {t('CENTER_SESSION.COMPLETED')}
+            </Typography>
+          </Box>
+        )}
       </Box>
       <Box
         sx={{
@@ -412,9 +420,9 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
           eventData={data}
           updateEvent={updateEvent}
           // StateName={StateName}
-          board={dashboard ? CohortBMG?.board : board}
-          medium={dashboard ? CohortBMG?.medium : medium}
-          grade={dashboard ? CohortBMG?.grade : grade}
+          board={sessionBoard}
+          medium={sessionMedium}
+          grade={sessionGrade}
         />
       </CenterSessionModal>
 
@@ -427,6 +435,14 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
         handleCloseModal={handleCloseModal}
         handleAction={onUpdateClick}
         modalOpen={modalOpen}
+      />
+      <ConfirmationModal
+        message={t('CENTER_SESSION.MULTI_BATCH_EDIT_REDIRECT_MSG')}
+        buttonNames={{
+          primary: t('COMMON.OK'),
+        }}
+        handleCloseModal={() => setMultiBatchConfirmOpen(false)}
+        modalOpen={multiBatchConfirmOpen}
       />
       <Box sx={{ position: 'absolute', bottom: '2px', width: '100%' }}>
         {children}

@@ -6,7 +6,7 @@ import {
 } from '@/services/CoursePlannerService';
 import { editEvent } from '@/services/EventService';
 import { fetchBulkContents } from '@/services/PlayerService';
-import { convertUTCToIST, getBMG, getDayMonthYearFormat } from '@/utils/helper';
+import { convertUTCToIST, getDayMonthYearFormat } from '@/utils/helper';
 import { EventStatus } from '@/utils/app.constant';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -25,10 +25,10 @@ import { useTranslation } from 'react-i18next';
 import { useDirection } from '../hooks/useDirection';
 import { CustomField, SessionCardFooterProps } from '../utils/Interfaces';
 import CenterSessionModal from './CenterSessionModal';
+import ConfirmationModal from './ConfirmationModal';
 import SelectTopic from './SelectTopic';
 import { showToastMessage } from './Toastify';
 import TopicDetails from './TopicDetails';
-import { getCohortDetails } from '@/services/CohortServices';
 import { usePathname } from 'next/navigation';
 
 const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
@@ -46,8 +46,16 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   const { isRTL } = useDirection();
   const pathname = usePathname();
   const dashboard = pathname === '/dashboard';
+  // This component is also what the Cross-Center Sessions page itself uses
+  // to let a facilitator pick a topic for a multi-batch session - the
+  // redirect-to-"there" guard below must not fire while already "there",
+  // or it would just loop the confirmation back to this same page.
+  const isMultiSessionManagedHere = pathname === '/centers/cross-center-sessions';
+  const needsCrossCenterRedirect = (): boolean =>
+    !!item?.metadata?.multiSession && !isMultiSessionManagedHere;
   const [open, setOpen] = React.useState(false);
   const [editTopic, setEditTopic] = React.useState(false);
+  const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] = React.useState(false);
   // const [removeTopic, setRemoveTopic] = React.useState(false);
   const [topicList, setTopicList] = React.useState([]);
   const [transformedTasks, setTransformedTasks] = React.useState();
@@ -63,33 +71,17 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   const [endTime, setEndTime] = React.useState('');
   const [startDate, setStartDate] = React.useState('');
   const [eventStatus, setEventStatus] = React.useState('');
-  const [CohortBMG, setCohortBMG] = React.useState<any>({});
 
   const EventDate = getDayMonthYearFormat(item?.startDateTime);
   let removeTopic = false;
 
-  useEffect(() => {
-    if (dashboard) {
-      const classId = item?.metadata?.cohortId;
-      const getCohortData = async () => {
-        const response = await getCohortDetails(classId);
-
-        let cohortData = null;
-
-        if (response?.cohortData?.length) {
-          cohortData = response?.cohortData[0];
-
-          const bgm = getBMG(cohortData);
-          if (bgm) {
-            setCohortBMG(bgm);
-          }
-        }
-      };
-      if (classId) {
-        getCohortData();
-      }
-    }
-  }, [dashboard]);
+  // The dashboard already resolves board/medium/grade for the selected batch and
+  // passes them down, so no per-card cohort fetch is needed. Those values can
+  // arrive as `{ value }` objects, so unwrap them into primitives.
+  const unwrap = (v: any) => (v && typeof v === 'object' ? v.value : v);
+  const bmgMedium = dashboard ? unwrap(medium) : medium;
+  const bmgGrade = dashboard ? unwrap(grade) : grade;
+  const bmgBoard = dashboard ? unwrap(board) : board;
 
   useEffect(() => {
     const fetchTopicSubtopic = async () => {
@@ -107,12 +99,10 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           let courseData = response?.result?.data?.[0];
           let courseId = courseData?._id;
 
-
           if (
             Array.isArray(response?.result?.data) &&
             response?.result?.data.length === 0
           ) {
-
             response = await fetchTargetedSolutions(false);
             if (
               !Array.isArray(response?.result?.data) ||
@@ -122,13 +112,15 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
               return;
             }
 
-            response = await fetchCourseIdFromSolution(response?.result?.data?.[0]?.solutionId, cohortId as string,
+            response = await fetchCourseIdFromSolution(
+              response?.result?.data?.[0]?.solutionId,
+              cohortId as string,
               {
                 visibility: 'SCOPE',
                 users: [],
-                medium: dashboard ? CohortBMG?.medium : medium,
-                class: dashboard ? CohortBMG?.grade : grade,
-                board: dashboard ? CohortBMG?.board : board,
+                medium: bmgMedium,
+                class: bmgGrade,
+                board: bmgBoard,
                 courseType: item?.metadata?.courseType,
                 subject: item?.metadata?.subject,
               }
@@ -148,6 +140,11 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           //   courseData = response?.result?.data[0];
           //   courseId = courseData._id;
           // }
+
+          if (!courseId) {
+            setTopicList([]);
+            return;
+          }
 
           const res = await getUserProjectDetails({
             id: courseId,
@@ -207,7 +204,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
     };
 
     fetchTopicSubtopic();
-  }, [item, medium, grade, board, dashboard, CohortBMG]);
+  }, [item, cohortId, bmgMedium, bmgGrade, bmgBoard]);
 
   const extractResources = (learningResources: any): IResource[] => {
     const resources: IResource[] = [];
@@ -265,9 +262,9 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   const fetchTargetedSolutions = async (isEntity: boolean) => {
     const response = await getTargetedSolutions({
       // state: state,
-      medium: dashboard ? CohortBMG?.medium : medium,
-      class: dashboard ? CohortBMG?.grade : grade,
-      board: dashboard ? CohortBMG?.board : board,
+      medium: bmgMedium,
+      class: bmgGrade,
+      board: bmgBoard,
       courseType: item?.metadata?.courseType,
       subject: item?.metadata?.subject,
       ...(isEntity && { entityId: cohortId }),
@@ -375,7 +372,23 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
     updateTopicSubtopic();
   };
 
+  // A multi-batch session is managed centrally from Cross-Center Sessions -
+  // same reasoning as SessionCard.tsx's edit redirect: picking a topic here
+  // would silently apply it to every other batch on the session too, with
+  // no indication to the facilitator that it isn't scoped to just this one.
+  const handleFooterOpen = () => {
+    if (needsCrossCenterRedirect()) {
+      setMultiBatchConfirmOpen(true);
+      return;
+    }
+    handleOpen();
+  };
+
   const handleClick = () => {
+    if (needsCrossCenterRedirect()) {
+      setMultiBatchConfirmOpen(true);
+      return;
+    }
     handleComponentOpen();
     if (
       topicList?.length >= 1 &&
@@ -460,7 +473,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
               }}
             >
               <Box
-                onClick={handleOpen}
+                onClick={handleFooterOpen}
                 sx={{ display: 'flex', gap: '10px', cursor: 'pointer' }}
               >
                 <MenuBookIcon
@@ -478,7 +491,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
                   marginLeft: '10px',
                   cursor: 'pointer',
                 }}
-                onClick={handleOpen}
+                onClick={handleFooterOpen}
               >
                 <SubdirectoryArrowRightIcon
                   sx={{
@@ -561,6 +574,14 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           />
         )}
       </CenterSessionModal>
+      <ConfirmationModal
+        message={t('CENTER_SESSION.MULTI_BATCH_EDIT_REDIRECT_MSG')}
+        buttonNames={{
+          primary: t('COMMON.OK'),
+        }}
+        handleCloseModal={() => setMultiBatchConfirmOpen(false)}
+        modalOpen={multiBatchConfirmOpen}
+      />
     </>
   );
 };
