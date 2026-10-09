@@ -98,10 +98,24 @@
     "PLACE_STUDENT": "Place Student",
     "UPDATE_PLACEMENT": "Update Placement",
     "DELETE_PLACEMENT": "Delete Placement",
-    "DELETE_PLACEMENT_CONFIRM": "Are you sure you want to delete {{name}}'s placement? This learner will move back to Course Completed.",
+    "DELETE_PLACEMENT_CONFIRM": "Are you sure you want to delete {{name}}'s placement? This is their only placement, so they will move back to Course Completed.",
     "PLACEMENT_SAVED_SUCCESS": "Placement saved successfully",
     "PLACEMENT_UPDATED_SUCCESS": "Placement updated successfully",
-    "PLACEMENT_DELETED_SUCCESS": "Placement deleted successfully"
+    "PLACEMENT_DELETED_SUCCESS": "Placement deleted successfully",
+    "PLACE_AGAIN": "Place Again",
+    "PLACEMENT_HISTORY": "Placement History",
+    "PLACEMENT_DATE": "Placement Date: {{date}}",
+    "PLACEMENT_STATUS_ACTIVE": "Active",
+    "PLACEMENT_STATUS_RESIGNED": "Resigned",
+    "EXIT_DATE": "Exit Date",
+    "RETENTION_FOLLOW_UPS": "Retention Follow-Ups",
+    "NO_PLACEMENTS": "No placements recorded yet",
+    "PLACEMENT_DETAILS": "Placement Details",
+    "PLACEMENT_COUNT_one": "{{count}} placement",
+    "PLACEMENT_COUNT_other": "{{count}} placements",
+    "PLACEMENT_COUNT": "{{count}} placements",
+    "ORGANIZATION_NAME": "Organization Name",
+    "DELETE_PLACEMENT_CONFIRM_RESTORE": "Are you sure you want to delete {{name}}'s current placement? Their previous placement ({{organization}}) will become active again, and they will stay Placed."
   },
   "RETENTION": {
     "PAGE_TITLE": "Retention",
@@ -126,7 +140,10 @@
     "COMPLETE_FOLLOW_UP": "{{milestone}} Follow-Up",
     "VIEW_FOLLOW_UP": "{{milestone}} Follow-Up",
     "FOLLOW_UP_SAVED_SUCCESS": "Retention follow-up saved successfully",
-    "STATUS_UPDATE_FAILED": "Follow-ups saved, but updating the learner's status failed"
+    "STATUS_UPDATE_FAILED": "Follow-ups saved, but updating the learner's status failed",
+    "PLACEMENT": "Placement",
+    "FOR_PLACEMENT": "Placement: {{placement}}",
+    "STATE_NOT_RECORDED": "Not recorded"
   },
   "DOMAIN": "Domain",
   "MONTHLY_SALARY": "Monthly Salary",

@@ -203,7 +203,10 @@
     "COMPLETE_FOLLOW_UP": "{{milestone}} فالو اپ",
     "VIEW_FOLLOW_UP": "{{milestone}} فالو اپ",
     "FOLLOW_UP_SAVED_SUCCESS": "ریٹینشن فالو اپ کامیابی سے محفوظ ہو گیا",
-    "STATUS_UPDATE_FAILED": "فالو اپ محفوظ ہو گئے، لیکن لرنر کی حیثیت اپ ڈیٹ کرنے میں ناکامی"
+    "STATUS_UPDATE_FAILED": "فالو اپ محفوظ ہو گئے، لیکن لرنر کی حیثیت اپ ڈیٹ کرنے میں ناکامی",
+    "PLACEMENT": "پلیسمنٹ",
+    "FOR_PLACEMENT": "پلیسمنٹ: {{placement}}",
+    "STATE_NOT_RECORDED": "درج نہیں کیا گیا"
   },
   "LOGIN_PAGE": {
     "USERNAME": "صارف نام",

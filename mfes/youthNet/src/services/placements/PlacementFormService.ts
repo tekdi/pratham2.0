@@ -1,7 +1,5 @@
-import { deleteApi } from '@shared-lib';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
-import API_ENDPOINTS from '../../utils/API/APIEndpoints';
-import { PLACEMENT_FORM_CONTEXT } from './placements.config';
+import { PLACEMENT_FIELD_LABEL_OVERRIDES, PLACEMENT_FORM_CONTEXT } from './placements.config';
 
 export interface PlacementFormBundle {
   schema: any;
@@ -85,64 +83,8 @@ export const getPlacementForm = async (): Promise<PlacementFormBundle | null> =>
   };
 };
 
-// The Placement Form's own fields become a learner's cohort-membership
-// customFields (there is no separate Placement API — see the plan's
-// "Persisting placement data" section). Field identity is the schema
-// property's own `fieldId` (same fieldId-keyed convention
-// LearnerListService.getOjtAddress / updateCohortMemberStatus already use),
-// not the RJSF key name.
-export const buildPlacementCustomFields = (schema: any, formData: Record<string, any>) => {
-  return Object.entries(formData || {})
-    .filter(([, value]) => value !== undefined && value !== null && value !== '')
-    .map(([key, value]) => ({
-      fieldId: schema?.properties?.[key]?.fieldId,
-      value,
-    }))
-    .filter((field) => !!field.fieldId);
-};
-
-// Confirmed against a real cohortmember/list response: a saved Placement
-// customField's selectedValues[0] is itself a JSON.stringify() of the real
-// value — "[\"full-time\"]" for an array-type field, "\"423\"" for a plain
-// string field — same JSON-round-trip behavior LearnerListService.
-// getOjtAddress already documents for OJT Address. Parse it back to the
-// real value; fall back to the raw string untouched if it isn't actually
-// JSON.
-const parseCustomFieldValue = (raw: any): any => {
-  if (typeof raw !== 'string') return raw;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return raw;
-  }
-};
-
-// Looks up one Placement Form property's saved value off a learner row —
-// shared by extractPlacementFormData (RJSF prefill) and
-// formatPlacementValueForDisplay (table column) so both read the exact same
-// fieldId + JSON-parsing logic.
-export const getLearnerPlacementValue = (schema: any, propertyKey: string, learnerRow: any): any => {
-  const fieldId = schema?.properties?.[propertyKey]?.fieldId;
-  if (!fieldId) return undefined;
-  const match = learnerRow?.customField?.find((field: any) => field.fieldId === fieldId);
-  const raw = match?.selectedValues?.[0];
-  if (raw === undefined || raw === null || raw === '') return undefined;
-  return parseCustomFieldValue(raw);
-};
-
-// Reads a learner row's existing Placement customFields back into RJSF
-// formData for the Update Placement prefill — the inverse of
-// buildPlacementCustomFields.
-export const extractPlacementFormData = (schema: any, learnerRow: any): Record<string, any> => {
-  const formData: Record<string, any> = {};
-  Object.keys(schema?.properties || {}).forEach((key) => {
-    const value = getLearnerPlacementValue(schema, key, learnerRow);
-    if (value !== undefined) formData[key] = value;
-  });
-  return formData;
-};
-
-// One Placement Form field's saved value, formatted for a table cell. For a
+// One Placement Form field's saved value (from a placement record's
+// formData — see PlacementRetentionDataService), formatted for display. For a
 // field with a fixed (non-API-driven) enum — e.g. employmentType,
 // placementDetails — resolves the raw value to its enumNames label via the
 // same `FORM.<label>` translation convention AutoCompleteMultiSelectWidget
@@ -153,12 +95,11 @@ export const extractPlacementFormData = (schema: any, learnerRow: any): Record<s
 export const formatPlacementValueForDisplay = (
   schema: any,
   propertyKey: string,
-  learnerRow: any,
+  value: any,
   t: (key: string, options?: any) => string
 ): string => {
   const property = schema?.properties?.[propertyKey];
-  const value = getLearnerPlacementValue(schema, propertyKey, learnerRow);
-  if (value === undefined) return '-';
+  if (value === undefined || value === null || value === '') return '-';
 
   const resolveLabel = (raw: any): string => {
     const enumArr = property?.items?.enum || property?.enum;
@@ -179,47 +120,16 @@ export const formatPlacementValueForDisplay = (
   return resolveLabel(value);
 };
 
-// A field whose options come from an API (domain, placementPoperty, state,
-// district — anything with `api.callType`) only shows a prefilled value as
-// selected once its enumOptions actually contains that exact value — and
-// that list is empty (just the ['Select'] placeholder) until the live API
-// call resolves. Whether the async prefill re-sync (isReassign) happens to
-// land after that call resolves is a timing race this app has already
-// proven unreliable (see PlacementModal.tsx's own history). Sidestep the
-// race entirely: inject the learner's already-known saved value as a
-// guaranteed option into a *clone* of the schema before handing it to
-// DynamicForm, so the widget can resolve it immediately at mount,
-// independent of whether/when the real API call finishes. When the real
-// options arrive later they simply extend the list (this fallback entry
-// stays valid — the widget's own two-way choice still shows the current
-// value regardless of which array `enum` ends up being).
-export const buildUpdatePlacementSchema = (schema: any, learnerRow: any): any => {
-  const cloned = JSON.parse(JSON.stringify(schema));
-  Object.keys(cloned?.properties || {}).forEach((key) => {
-    const originalProperty = schema?.properties?.[key];
-    if (!originalProperty?.api) return; // only API-driven fields need this
-
-    const value = getLearnerPlacementValue(schema, key, learnerRow);
-    const rawValues = (Array.isArray(value) ? value : [value]).filter(
-      (v) => typeof v === 'string' && v !== ''
-    );
-    if (rawValues.length === 0) return;
-
-    const target = cloned.properties[key]?.items ?? cloned.properties[key];
-    if (!target) return;
-    const enumArr: any[] = Array.isArray(target.enum) ? target.enum : [];
-    const enumNames: any[] = Array.isArray(target.enumNames) ? target.enumNames : [];
-    rawValues.forEach((v: string) => {
-      if (!enumArr.includes(v)) {
-        enumArr.push(v);
-        enumNames.push(v);
-      }
-    });
-    target.enum = enumArr;
-    target.enumNames = enumNames;
-  });
-  return cloned;
-};
+// Display label for one Placement Form field — the schema's own title,
+// except where the UI deliberately renames a field (see
+// PLACEMENT_FIELD_LABEL_OVERRIDES). Shared by the learner table columns and
+// the Placement History modal so both always read the same.
+export const getPlacementFieldLabel = (
+  schema: any,
+  propertyKey: string,
+  t: (key: string, options?: any) => string
+): string =>
+  t(PLACEMENT_FIELD_LABEL_OVERRIDES[propertyKey] || schema?.properties?.[propertyKey]?.title || propertyKey);
 
 // Field keys to render as Placement columns in the learner table, in the
 // order the Placement Form itself presents them — reuses the form's own
@@ -231,31 +141,4 @@ export const getPlacementFieldOrder = (form: PlacementFormBundle | null): string
   const order: string[] | undefined = form?.uiSchema?.['ui:order'];
   if (!Array.isArray(order)) return propertyKeys;
   return order.filter((key) => propertyKeys.includes(key));
-};
-
-// Delete Placement's real data-clearing step: DELETE /fields/values/delete
-// with one {fieldId, itemId} entry per Placement Form field — itemId is the
-// learner's cohortMembershipId (not userId; confirmed contract), fieldId is
-// each field's own schema fieldId, so this can't drift from whatever fields
-// the backend form config actually defines. updateCohortMemberStatus (kept
-// separately, see DeletePlacementModal) still handles reverting `status`
-// back to course_completed — this call only clears the customField values
-// themselves, which that status-only call never touched.
-export const deletePlacementFieldValues = async (
-  schema: any,
-  membershipId: string | number
-): Promise<boolean> => {
-  const fieldValues = Object.values(schema?.properties || {})
-    .map((property: any) => property?.fieldId)
-    .filter(Boolean)
-    .map((fieldId: string) => ({ fieldId, itemId: membershipId }));
-  if (fieldValues.length === 0) return true;
-
-  try {
-    await deleteApi(API_ENDPOINTS.fieldValuesDelete, { fieldValues });
-    return true;
-  } catch (error) {
-    console.error('Error deleting placement field values:', error);
-    return false;
-  }
 };

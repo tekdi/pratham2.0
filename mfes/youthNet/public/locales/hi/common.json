@@ -203,7 +203,10 @@
     "COMPLETE_FOLLOW_UP": "{{milestone}} फॉलो-अप",
     "VIEW_FOLLOW_UP": "{{milestone}} फॉलो-अप",
     "FOLLOW_UP_SAVED_SUCCESS": "रिटेंशन फॉलो-अप सफलतापूर्वक सेव हो गया",
-    "STATUS_UPDATE_FAILED": "फॉलो-अप सेव हो गए, लेकिन लर्नर की स्थिति अपडेट करना विफल रहा"
+    "STATUS_UPDATE_FAILED": "फॉलो-अप सेव हो गए, लेकिन लर्नर की स्थिति अपडेट करना विफल रहा",
+    "PLACEMENT": "प्लेसमेंट",
+    "FOR_PLACEMENT": "प्लेसमेंट: {{placement}}",
+    "STATE_NOT_RECORDED": "दर्ज नहीं किया गया"
   },
   "LOGIN_PAGE": {
     "USERNAME": "उपयोगकर्ता नाम",
