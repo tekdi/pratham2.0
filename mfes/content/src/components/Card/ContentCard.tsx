@@ -118,7 +118,7 @@ const ContentCard = ({
         }
         content={item?.description ? item?.description : <Description />}
         actions={
-          type !== 'Course' || type!=='Job family' || type!=='PSU' || type!=='Group Membership'  || type!=='self' && (
+          type !== 'Course' && type !== 'Job family' && type !== 'PSU' && type !== 'Group Membership' && type !== 'self' && (
             <StatusIcon
               showMimeTypeIcon
               mimeType={item?.mimeType}
