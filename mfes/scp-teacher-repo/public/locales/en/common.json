@@ -582,7 +582,11 @@
     "SCHEDULING_FOR": "Scheduling for",
     "ONE_LINK_NOTE": "One join link will be generated and shared with every batch selected above — this is a single session, not separate sessions per batch.",
     "SELECT_SUBJECT_PLACEHOLDER": "Select subject",
-    "MULTI_BATCH_EDIT_REDIRECT_MSG": "This session is shared across more than one batch. It's managed from Cross-Center Sessions, so changes there apply everywhere it's scheduled. Continue to edit it there?"
+    "MULTI_BATCH_EDIT_REDIRECT_MSG": "This session is shared across more than one batch. It's managed from Cross-Center Sessions, so changes there apply everywhere it's scheduled. So make changes from there.",
+    "VIEW_DETAILS": "View Details",
+    "ONE_TIME_SESSION": "One-time session",
+    "PASSCODE": "Passcode: {{passcode}}",
+    "BATCHES_AND_CENTERS_LIST": "Batches & Centers"
   },
   "MANAGE_USERS": {
     "CENTERS_REQUESTED_SUCCESSFULLY": "Center requested successfully",

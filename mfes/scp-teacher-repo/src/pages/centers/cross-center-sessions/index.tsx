@@ -1,210 +1,48 @@
+import CrossCenterSessionCard from '@/components/CrossCenterSessionCard';
 import CrossCenterScheduleWizard from '@/components/CrossCenterScheduleWizard';
 import Header from '@/components/Header';
 import NoDataFound from '@/components/common/NoDataFound';
-import { getCohortDetails, getCohortList } from '@/services/CohortServices';
-import { getEventList } from '@/services/EventService';
-import { EventStatus, sessionType } from '@/utils/app.constant';
-import { flattenBatches } from '@/utils/crossCenter';
+import WeekCalender from '@/components/WeekCalender';
+import useCrossCenterSessions from '@/hooks/useCrossCenterSessions';
 import {
-  convertUTCToIST,
-  getAfterDate,
-  getBeforeDate,
-  shortDateFormat,
-  toPascalCase,
+  convertToIST,
+  formatSelectedDate,
+  getMonthName,
+  getTodayDate,
+  sortSessionsByTime,
 } from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import AddIcon from '@mui/icons-material/Add';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import EditOutlined from '@mui/icons-material/EditOutlined';
-import GroupsIcon from '@mui/icons-material/Groups';
-import LockOutlined from '@mui/icons-material/LockOutlined';
 import { Box, Button, Snackbar, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
-import { accessControl } from '../../../../app.config';
-
-const getSessionTitle = (subject?: string, sessionTitle?: string) => {
-  return subject && sessionTitle
-    ? `${toPascalCase(subject)} - ${sessionTitle}`
-    : subject
-    ? toPascalCase(subject)
-    : toPascalCase(sessionTitle || '');
-};
-
-const CrossCenterSessionCard: React.FC<{
-  event: any;
-  batchCount: number;
-  centerCount: number;
-  currentUserId: string;
-  onCopy: () => void;
-  onEdit: (event: any) => void;
-}> = ({ event, batchCount, centerCount, currentUserId, onCopy, onEdit }) => {
-  const { t } = useTranslation();
-  const theme = useTheme<any>();
-  const startDateTime = convertUTCToIST(event?.startDateTime);
-  const endDateTime = convertUTCToIST(event?.endDateTime);
-  const subject = event?.metadata?.subject;
-  const sessionTitle = event?.shortDescription;
-  const creatorId = event?.createdBy ?? event?.metadata?.createdBy;
-  const creatorName = event?.metadata?.teacherName;
-  const meetingUrl = event?.meetingDetails?.url;
-
-  // Same UPCOMING/LIVE/PASSED computation as SessionCard.tsx, so edit is
-  // only offered while it makes sense (matches the existing 538fed8b
-  // creator-only-edit pattern, plus the completed-session lock).
-  const now = new Date();
-  const eventStart = new Date(event?.startDateTime);
-  const eventEnd = new Date(event?.endDateTime);
-  const eventStatus =
-    now < eventStart
-      ? EventStatus.UPCOMING
-      : now <= eventEnd
-      ? EventStatus.LIVE
-      : EventStatus.PASSED;
-  const canEditSession =
-    creatorId === currentUserId && eventStatus === EventStatus.UPCOMING;
-
-  const handleCopyUrl = () => {
-    if (meetingUrl) {
-      navigator.clipboard.writeText(meetingUrl).then(onCopy);
-    }
-  };
-
-  return (
-    <Box
-      sx={{
-        border: `1px solid ${theme.palette.warning['A100']}`,
-        borderRadius: '8px',
-        padding: '12px 16px',
-      }}
-    >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
-        <Typography
-          color={theme.palette.warning['300']}
-          fontWeight={400}
-          fontSize={'16px'}
-          className="one-line-text"
-        >
-          {getSessionTitle(subject, sessionTitle)}
-        </Typography>
-        {canEditSession && (
-          <EditOutlined
-            onClick={() => onEdit(event)}
-            sx={{ cursor: 'pointer', fontSize: '20px', flexShrink: 0 }}
-          />
-        )}
-        {eventStatus === EventStatus.PASSED && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '2px',
-              flexShrink: 0,
-              color: theme.palette.warning['400'],
-            }}
-          >
-            <LockOutlined sx={{ fontSize: '16px' }} />
-            <Typography fontSize={'12px'}>
-              {t('CENTER_SESSION.COMPLETED')}
-            </Typography>
-          </Box>
-        )}
-      </Box>
-      <Typography
-        fontWeight={400}
-        fontSize={'14px'}
-        sx={{ display: 'flex', alignItems: 'center', marginTop: '4px' }}
-        gap={'4px'}
-      >
-        <CalendarMonthIcon sx={{ fontSize: '18px' }} /> {startDateTime.date},{' '}
-        {startDateTime.time} - {endDateTime.time}
-      </Typography>
-      <Typography
-        fontWeight={400}
-        fontSize={'14px'}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          marginTop: '4px',
-          color: theme.palette.warning['400'],
-        }}
-        gap={'4px'}
-      >
-        <GroupsIcon sx={{ fontSize: '18px' }} />
-        {t('CENTER_SESSION.BATCH_CENTER_COVERAGE', {
-          batchCount,
-          centerCount,
-        })}
-      </Typography>
-      {meetingUrl && (
-        <Box
-          sx={{
-            marginTop: '8px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '12px',
-            cursor: 'pointer',
-          }}
-          onClick={handleCopyUrl}
-        >
-          <Box
-            className="one-line-text"
-            sx={{
-              fontSize: '14px',
-              color: theme.palette.secondary.main,
-              fontWeight: 500,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            <a
-              href={meetingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: theme.palette.secondary.main,
-                textDecoration: 'none',
-              }}
-            >
-              {meetingUrl}
-            </a>
-          </Box>
-          <ContentCopyIcon
-            sx={{ fontSize: '18px', color: theme.palette.secondary.main }}
-          />
-        </Box>
-      )}
-      <Typography
-        fontWeight={400}
-        fontSize={'12px'}
-        sx={{ marginTop: '8px', color: theme.palette.warning['400'] }}
-      >
-        {creatorId === currentUserId
-          ? t('CENTER_SESSION.CREATED_BY_YOU')
-          : t('CENTER_SESSION.CREATED_BY', { name: creatorName || '' })}
-      </Typography>
-    </Box>
-  );
-};
+import React, { useEffect, useMemo, useState } from 'react';
+import { Navigation, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { accessControl, eventDaysLimit } from '../../../../app.config';
 
 const CrossCenterSessionsPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [extraSessions, setExtraSessions] = useState<any[]>([]);
-  const [plannedSessions, setPlannedSessions] = useState<any[]>([]);
-  const [currentUserId, setCurrentUserId] = useState('');
+  const { loading, extraSessions, plannedSessions, currentUserId, refresh } =
+    useCrossCenterSessions();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayDate());
+  const [sortedExtraSessions, setSortedExtraSessions] = useState<any[]>([]);
+  const [initialSlideIndex, setInitialSlideIndex] = useState<number>(0);
+
+  const showDetailsHandle = (dayStr: string) => {
+    setSelectedDate(formatSelectedDate(dayStr));
+  };
 
   const handleEdit = (event: any) => {
     setEditingEvent(event);
@@ -247,122 +85,49 @@ const CrossCenterSessionsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, router.query.editEventId, loading]);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const userId =
-          typeof window !== 'undefined'
-            ? localStorage.getItem('userId') || ''
-            : '';
-        setCurrentUserId(userId);
-        if (!userId) {
-          setExtraSessions([]);
-          setPlannedSessions([]);
-          return;
-        }
-
-        const centerTree = await getCohortList(userId, {
-          customField: 'true',
-        });
-        const myBatches = flattenBatches(centerTree || []);
-        const centerIdByBatchId = new Map(
-          myBatches.map((b) => [b.batchId, b.centerId])
-        );
-        const cohortIds = myBatches.map((b) => b.batchId).filter(Boolean);
-
-        if (cohortIds.length === 0) {
-          setExtraSessions([]);
-          setPlannedSessions([]);
-          return;
-        }
-
-        // The backend requires startDate and endDate together — there is no
-        // open-ended range, so this uses a generous 1-year window to
-        // effectively mean "all upcoming sessions".
-        const farFuture = new Date();
-        farFuture.setDate(farFuture.getDate() + 365);
-        const filters = {
-          startDate: { after: getAfterDate(shortDateFormat(new Date())) },
-          endDate: { before: getBeforeDate(shortDateFormat(farFuture)) },
-          cohortIds,
-          status: ['live'],
-        };
-        const response = await getEventList({ limit: 0, offset: 0, filters });
-        const events: any[] = response?.events || [];
-        const crossCenterEvents = events.filter(
-          (event) => event?.metadata?.multiSession === true
-        );
-
-        // Resolve the center for every batch on every cross-center session so
-        // "X batches · Y centers" is accurate even for batches taught by other
-        // facilitators (not just the ones this facilitator's own tree covers).
-        const unresolvedBatchIds = new Set<string>();
-        crossCenterEvents.forEach((event) => {
-          const batchIds: string[] =
-            event?.metadata?.cohortIds ||
-            (event?.metadata?.cohortId ? [event.metadata.cohortId] : []);
-          batchIds.forEach((id) => {
-            if (id && !centerIdByBatchId.has(id)) unresolvedBatchIds.add(id);
-          });
-        });
-
-        await Promise.all(
-          Array.from(unresolvedBatchIds).map(async (batchId) => {
-            try {
-              const details = await getCohortDetails(batchId);
-              const centerId = details?.cohortData?.[0]?.parentId;
-              if (centerId) centerIdByBatchId.set(batchId, centerId);
-            } catch (error) {
-              console.error('Error resolving batch center', batchId, error);
-            }
-          })
-        );
-
-        const withCoverage = crossCenterEvents.map((event) => {
-          const batchIds: string[] =
-            event?.metadata?.cohortIds ||
-            (event?.metadata?.cohortId ? [event.metadata.cohortId] : []);
-          const centerIds = new Set(
-            batchIds
-              .map((id) => centerIdByBatchId.get(id))
-              .filter((id): id is string => Boolean(id))
-          );
-          return {
-            event,
-            batchCount: batchIds.length,
-            centerCount: centerIds.size,
-          };
-        });
-
-        const byStartTime = (a: any, b: any) =>
-          new Date(a.event?.startDateTime).getTime() -
-          new Date(b.event?.startDateTime).getTime();
-
-        setExtraSessions(
-          withCoverage
-            .filter(
-              (item) => item.event?.metadata?.type === sessionType.EXTRA
-            )
-            .sort(byStartTime)
-        );
-        setPlannedSessions(
-          withCoverage
-            .filter(
-              (item) => item.event?.metadata?.type === sessionType.PLANNED
-            )
-            .sort(byStartTime)
-        );
-      } catch (error) {
-        console.error('Error loading cross-center sessions', error);
-        setExtraSessions([]);
-        setPlannedSessions([]);
-      } finally {
-        setLoading(false);
+  // Every session this facilitator can see is already loaded (1-year window,
+  // see useCrossCenterSessions), so the day strip and "next N days" carousel
+  // below are built by filtering what's already in hand instead of
+  // re-querying the API per selected day, the way the single-batch page's
+  // own WeekCalender does.
+  const eventDatesMap = useMemo(() => {
+    const map: Record<string, { event: boolean }> = {};
+    [...extraSessions, ...plannedSessions].forEach(({ event }) => {
+      if (event?.startDateTime) {
+        map[convertToIST(event.startDateTime)] = { event: true };
       }
-    };
-    load();
-  }, [refreshKey]);
+    });
+    return map;
+  }, [extraSessions, plannedSessions]);
+
+  const selectedDatePlannedSessions = useMemo(
+    () =>
+      plannedSessions.filter(
+        ({ event }) =>
+          event?.startDateTime &&
+          convertToIST(event.startDateTime) === selectedDate
+      ),
+    [plannedSessions, selectedDate]
+  );
+
+  useEffect(() => {
+    const limitDate = new Date();
+    limitDate.setDate(limitDate.getDate() + eventDaysLimit);
+    const withinWindow = extraSessions.filter(
+      ({ event }) => new Date(event?.startDateTime) < limitDate
+    );
+    const byEventId = new Map(
+      withinWindow.map((item) => [item.event?.eventRepetitionId, item])
+    );
+    const { sessionList, index } = sortSessionsByTime(
+      withinWindow.map((item) => item.event)
+    );
+    const ordered = sessionList
+      .map((ev: any) => byEventId.get(ev?.eventRepetitionId))
+      .filter(Boolean);
+    setSortedExtraSessions(ordered);
+    setInitialSlideIndex(index > 0 ? index : 0);
+  }, [extraSessions]);
 
   const hasSessions = extraSessions.length > 0 || plannedSessions.length > 0;
 
@@ -402,79 +167,159 @@ const CrossCenterSessionsPage = () => {
           <NoDataFound title="CENTER_SESSION.NO_CROSS_CENTER_SESSIONS" />
         ) : (
           <>
-            {extraSessions.length > 0 && (
-              <Box sx={{ marginBottom: '24px' }}>
-                <Typography
-                  fontSize={'14px'}
-                  fontWeight={600}
-                  color={theme.palette.warning['400']}
-                  sx={{ marginBottom: '8px' }}
-                >
-                  {t('CENTER_SESSION.UPCOMING_EXTRA_SESSIONS')}
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                      xs: '1fr',
-                      sm: 'repeat(2, 1fr)',
-                      md: 'repeat(3, 1fr)',
-                    },
-                    gap: '12px',
+            <Box sx={{ marginBottom: '24px' }}>
+              <Typography
+                fontSize={'14px'}
+                fontWeight={600}
+                color={theme.palette.warning['400']}
+                sx={{ marginBottom: '8px' }}
+              >
+                {t('COMMON.UPCOMING_EXTRA_SESSION', { days: eventDaysLimit })}
+              </Typography>
+              {sortedExtraSessions.length > 0 ? (
+                <Swiper
+                  initialSlide={initialSlideIndex}
+                  pagination={{ type: 'fraction' }}
+                  breakpoints={{
+                    600: { slidesPerView: 1, spaceBetween: 20 },
+                    900: { slidesPerView: 2, spaceBetween: 20 },
+                    1200: { slidesPerView: 3, spaceBetween: 30 },
+                    2000: { slidesPerView: 4, spaceBetween: 40 },
                   }}
+                  navigation={true}
+                  modules={[Pagination, Navigation]}
+                  className="mySwiper"
                 >
-                  {extraSessions.map(({ event, batchCount, centerCount }) => (
-                    <CrossCenterSessionCard
-                      key={event?.eventRepetitionId}
-                      event={event}
-                      batchCount={batchCount}
-                      centerCount={centerCount}
-                      currentUserId={currentUserId}
-                      onCopy={() => setSnackbarOpen(true)}
-                      onEdit={handleEdit}
-                    />
-                  ))}
+                  {sortedExtraSessions.map(
+                    ({
+                      event,
+                      batchCount,
+                      centerCount,
+                      primaryBatch,
+                      batchDetails,
+                    }) => (
+                      <SwiperSlide
+                        style={{ paddingBottom: '38px' }}
+                        key={event?.eventRepetitionId}
+                      >
+                        <CrossCenterSessionCard
+                          event={event}
+                          batchCount={batchCount}
+                          centerCount={centerCount}
+                          currentUserId={currentUserId}
+                          primaryBatch={primaryBatch}
+                          batchDetails={batchDetails}
+                          onCopy={() => setSnackbarOpen(true)}
+                          onEdit={handleEdit}
+                          onTopicUpdated={() =>
+                            refresh()
+                          }
+                        />
+                      </SwiperSlide>
+                    )
+                  )}
+                </Swiper>
+              ) : (
+                <Box
+                  className="fs-12 fw-400 italic"
+                  sx={{ color: theme.palette.warning['300'] }}
+                >
+                  {t('COMMON.NO_SESSIONS_SCHEDULED')}
                 </Box>
-              </Box>
-            )}
+              )}
+            </Box>
 
-            {plannedSessions.length > 0 && (
-              <Box>
+            <Box sx={{ padding: '10px 0', mt: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Typography
                   fontSize={'14px'}
                   fontWeight={600}
                   color={theme.palette.warning['400']}
-                  sx={{ marginBottom: '8px' }}
+                  sx={{ marginBottom: '15px' }}
                 >
                   {t('CENTER_SESSION.PLANNED_SESSIONS')}
                 </Typography>
                 <Box
+                  display={'flex'}
                   sx={{
-                    display: 'grid',
-                    gridTemplateColumns: {
-                      xs: '1fr',
-                      sm: 'repeat(2, 1fr)',
-                      md: 'repeat(3, 1fr)',
-                    },
-                    gap: '12px',
+                    cursor: 'pointer',
+                    color: theme.palette.secondary.main,
+                    gap: '4px',
+                    alignItems: 'center',
                   }}
-                >
-                  {plannedSessions.map(
-                    ({ event, batchCount, centerCount }) => (
-                      <CrossCenterSessionCard
-                        key={event?.eventRepetitionId}
-                        event={event}
-                        batchCount={batchCount}
-                        centerCount={centerCount}
-                        currentUserId={currentUserId}
-                        onCopy={() => setSnackbarOpen(true)}
-                        onEdit={handleEdit}
-                      />
+                  onClick={() =>
+                    router.push(
+                      `/centers/cross-center-sessions/events/${getMonthName()?.toLowerCase()}`
                     )
-                  )}
+                  }
+                >
+                  <Typography marginBottom={'0'} style={{ fontWeight: '500' }}>
+                    {getMonthName()}
+                  </Typography>
+                  <CalendarMonthIcon sx={{ fontSize: '18px' }} />
                 </Box>
               </Box>
-            )}
+              <WeekCalender
+                showDetailsHandle={showDetailsHandle}
+                data={null}
+                disableDays={false}
+                classId={'cross-center'}
+                showFromToday={true}
+                newWidth={'100%'}
+                eventData={eventDatesMap}
+                showEventIcon={true}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  md: 'repeat(3, 1fr)',
+                },
+                gap: '12px',
+                mt: 2,
+              }}
+            >
+              {selectedDatePlannedSessions.map(
+                ({
+                  event,
+                  batchCount,
+                  centerCount,
+                  primaryBatch,
+                  batchDetails,
+                }) => (
+                  <CrossCenterSessionCard
+                    key={event?.eventRepetitionId}
+                    event={event}
+                    batchCount={batchCount}
+                    centerCount={centerCount}
+                    currentUserId={currentUserId}
+                    primaryBatch={primaryBatch}
+                    batchDetails={batchDetails}
+                    onCopy={() => setSnackbarOpen(true)}
+                    onEdit={handleEdit}
+                    onTopicUpdated={() => refresh()}
+                  />
+                )
+              )}
+              {selectedDatePlannedSessions.length === 0 && (
+                <Box
+                  className="fs-12 fw-400 italic"
+                  sx={{ color: theme.palette.warning['300'] }}
+                >
+                  {t('COMMON.NO_SESSIONS_SCHEDULED')}
+                </Box>
+              )}
+            </Box>
           </>
         )}
       </Box>
@@ -487,7 +332,7 @@ const CrossCenterSessionsPage = () => {
       <CrossCenterScheduleWizard
         open={wizardOpen}
         onClose={handleWizardClose}
-        onScheduled={() => setRefreshKey((prev) => prev + 1)}
+        onScheduled={() => refresh()}
         editingEvent={editingEvent}
       />
     </>
