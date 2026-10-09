@@ -1302,6 +1302,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'notMarked' ||
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
+                                    formattedFifteenDaysAgo > selectedDate ||
                                     Number(
                                       attendanceData?.numberOfCohortMembers &&
                                         attendanceData.numberOfCohortMembers !==
