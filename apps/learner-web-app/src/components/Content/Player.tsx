@@ -1,7 +1,7 @@
 // pages/content-details/[identifier].tsx
 
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Avatar,
@@ -526,8 +526,6 @@ const App = ({
           exitLink={exitLink || returnUrl || activeLink}
           previousPage={previousPage}
           {..._config?.player}
-          isPortrait={isPortrait}
-          isVideo={isVideo}
         />
         {item?.content?.artifactUrl &&
           
@@ -584,7 +582,11 @@ const App = ({
 
       <Grid
         sx={{
-          display: isShowMoreContent && (!isPortrait || (isVideo && !isPortrait)) ? 'flex' : 'none',
+          display:
+            isShowMoreContent &&
+            (isMobileOrTablet || !isPortrait || (isVideo && !isPortrait))
+              ? 'flex'
+              : 'none',
 
           flexDirection: 'column',
           flex: { xs: 1, sm: 1, md: 9 },
@@ -743,8 +745,6 @@ const PlayerBox = ({
   trackable,
   isShowMoreContent,
   mimeType,
-  isPortrait,
-  isVideo,
   exitLink,
   previousPage,
 }: any) => {
@@ -753,6 +753,55 @@ const PlayerBox = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [play, setPlay] = useState(false);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
+  // Space (px) to reserve around the player: its distance from the top of the
+  // document, the fixed footer strip overlaying the bottom of the viewport, and a
+  // small gap. The player height is `viewport height - playerTopOffset`, so the
+  // whole player (including its controls) fits on screen on load without scrolling.
+  const [playerTopOffset, setPlayerTopOffset] = useState(60);
+
+  useEffect(() => {
+    const el = playerContainerRef.current;
+    if (!el) return;
+    const BOTTOM_GAP = 8;
+    const updateOffset = () => {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      // The layout footer is fixed to the bottom of the viewport; its collapsed
+      // strip (last child) always overlays the page, so reserve its height.
+      const fixedFooter = Array.from(
+        document.querySelectorAll<HTMLElement>('footer')
+      ).find((footer) => getComputedStyle(footer).position === 'fixed');
+      const footerStripHeight =
+        (fixedFooter?.lastElementChild as HTMLElement | null)?.offsetHeight ??
+        0;
+      setPlayerTopOffset(Math.round(top + footerStripHeight + BOTTOM_GAP));
+    };
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+    window.addEventListener('orientationchange', updateOffset);
+    // Content above the player (header, breadcrumb, title, expandable
+    // description) can change size after load, which moves the player.
+    const observer =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(updateOffset)
+        : null;
+    observer?.observe(document.body);
+    return () => {
+      window.removeEventListener('resize', updateOffset);
+      window.removeEventListener('orientationchange', updateOffset);
+      observer?.disconnect();
+    };
+  }, []);
+
+  // Use the small viewport height (svh) where supported so the height doesn't
+  // jump when the mobile browser's address bar shows/hides while scrolling.
+  const playerHeightSx = {
+    height: `calc(100vh - ${playerTopOffset}px)`,
+    '@supports (height: 100svh)': {
+      height: `calc(100svh - ${playerTopOffset}px)`,
+    },
+    minHeight: { xs: '320px', md: '400px' },
+  };
 
   // The sbplayer iframe is hosted on a different origin (NEXT_PUBLIC_LEARNER_SBPLAYER).
   // When its Exit button runs `window.top.location.href = exitLink`, a relative
@@ -832,6 +881,7 @@ const PlayerBox = ({
   };
   return (
     <Box
+      ref={playerContainerRef}
       sx={{
         flex: { xs: 1, sm: 1, md: 8 },
         position: 'relative',
@@ -846,13 +896,15 @@ const PlayerBox = ({
             flexDirection: 'column',
             alignItems: 'center',
             position: 'relative',
+            width: '100%',
+            ...playerHeightSx,
           }}
         >
           <Avatar
             src={item?.posterImage ?? `/images/image_ver.png`}
             alt={item?.identifier}
             style={{
-              height: 'calc(100vh - 235px)',
+              height: '100%',
               width: '100%',
               borderRadius: 0,
             }}
@@ -879,7 +931,7 @@ const PlayerBox = ({
             width: isShowMoreContent
               ? '100%'
               : { xs: '100%', sm: '100%', md: '90%', lg: '80%', xl: '70%' },
-            ...(isPortrait && isVideo ? { p:0, ml:-10, mr:-5 } : {}),
+            ...playerHeightSx,
           }}
         >
          <iframe
@@ -922,7 +974,8 @@ const PlayerBox = ({
         border: 'none',
                     //  objectFit: 'contain',
 
-        height: 'calc(100vh - 60px)',
+        display: 'block',
+        height: '100%',
       }}
       width="100%"
       height="100%"
