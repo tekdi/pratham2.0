@@ -235,6 +235,44 @@ export const getContent = async (
   }
 };
 
+// Draft/Review copies of a published item keep the Live item's identifier, so
+// a Live search on those identifiers tells us which of them still have a Live
+// version (prevStatus can't - it only holds the last state before the draft).
+export const getLiveIdentifiers = async (
+  items: any[],
+  channel?: any
+): Promise<Set<string>> => {
+  const ids = Array.from(
+    new Set(
+      items
+        .filter((i) => i?.status === 'Draft' || i?.status === 'Review')
+        .map((i) => i?.identifier)
+        .filter(Boolean)
+    )
+  );
+  if (!ids.length) return new Set();
+  try {
+    const result = await getContent(
+      ['Live'],
+      '',
+      ids.length,
+      0,
+      [],
+      { lastUpdatedOn: 'desc' },
+      channel,
+      undefined,
+      undefined,
+      undefined,
+      ids
+    );
+    const live = [...(result?.content || []), ...(result?.QuestionSet || [])];
+    return new Set(live.map((i: any) => i?.identifier));
+  } catch (error) {
+    console.log(error);
+    return new Set();
+  }
+};
+
 export const createQuestionSet = async (frameworkId: any, name?: string) => {
   const apiURL = `/action/questionset/v2/create`;
   const reqBody = {

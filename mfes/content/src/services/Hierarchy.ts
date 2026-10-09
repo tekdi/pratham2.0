@@ -125,6 +125,9 @@ export const hierarchyAPI = async (
       maxBodyLength: Infinity,
       url: `${searchApiUrl}/api/course/v1/hierarchy/${doId}`,
       params: params,
+      headers: {
+        tenantid: localStorage.getItem('tenantId') || '',
+      },
     };
 
     // Execute the request
