@@ -957,12 +957,12 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       let title = '';
       if (clickedBox === 'PLANNED_SESSION') {
         title =
-          mode === t('CENTER_SESSION.ONLINE')
+          mode === sessionMode.ONLINE
             ? t('CENTER_SESSION.RECURRING_ONLINE')
             : t('CENTER_SESSION.RECURRING_OFFLINE');
       } else if (clickedBox === 'EXTRA_SESSION') {
         title =
-          mode === t('CENTER_SESSION.ONLINE')
+          mode === sessionMode.ONLINE
             ? t('CENTER_SESSION.EXTRA_ONLINE')
             : t('CENTER_SESSION.EXTRA_OFFLINE');
       }
@@ -1022,7 +1022,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         }
 
         // Add meetingDetails only if sessionMode is 'online'
-        if (block?.sessionMode === t('CENTER_SESSION.ONLINE')) {
+        if (block?.sessionMode === sessionMode.ONLINE) {
           (baseBody.onlineProvider = block?.onlineProvider || ''),
             (baseBody.isMeetingNew = false),
             (baseBody.meetingDetails = {
