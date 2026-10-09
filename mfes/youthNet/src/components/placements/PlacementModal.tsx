@@ -4,24 +4,39 @@ import { useTranslation } from 'next-i18next';
 import SimpleModal from '@shared-lib-v2/lib/SimpleModal/SimpleModal';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
+import { PlacementFormBundle } from '../../services/placements/PlacementFormService';
+import { savePlacementRetentionData } from '../../services/placementRetention/PlacementRetentionRepository';
 import {
-  buildPlacementCustomFields,
-  PlacementFormBundle,
-} from '../../services/placements/PlacementFormService';
-import {
-  updateCohortMemberStatus,
-  isMutationSuccess,
-} from '../../services/myTeachingCenter/LearnerListService';
+  createPlacement,
+  getCurrentActor,
+  updatePlacement,
+} from '../../services/placementRetention/PlacementRetentionDataService';
+
+// 'create' = Place Student, 'placeAgain' = a new placement for a learner who
+// already has one (the current one is resigned), 'update' = edit one
+// existing placement, identified by placementId.
+export type PlacementModalMode = 'create' | 'placeAgain' | 'update';
 
 interface PlacementModalProps {
   onClose: () => void;
-  membershipId: string | number;
+  batchCohortId: string;
+  learnerRow: any;
   learnerName?: string;
-  isUpdate: boolean;
+  mode: PlacementModalMode;
+  placementId?: string;
   initialFormData: Record<string, any>;
   form: PlacementFormBundle;
+  // Unmodified Placement Form schema — used to migrate a learner still on
+  // the old per-field storage before applying this save.
+  placementSchema: any;
   onSaved: () => void;
 }
+
+const MODE_TITLE_KEYS: Record<PlacementModalMode, string> = {
+  create: 'PLACEMENTS.PLACE_STUDENT',
+  placeAgain: 'PLACEMENTS.PLACE_AGAIN',
+  update: 'PLACEMENTS.UPDATE_PLACEMENT',
+};
 
 // Placement Form is fetched from the backend (form/read?context=PLACEMENT&
 // contextType=PLACEMENT — see PlacementFormService) and rendered with
@@ -42,15 +57,24 @@ interface PlacementModalProps {
 // whole component between opens (see PlacementLearnerTable) means a stale
 // instance's delayed callback lands on a component that's genuinely gone —
 // React no-ops it — instead of a component that merely looks new via `key`.
+//
+// The same Placement Form serves all three modes; every save goes through
+// savePlacementRetentionData, which re-reads the learner's latest
+// Placement + Retention JSON, applies just this change, and writes the
+// complete JSON back.
 const PlacementModal: React.FC<PlacementModalProps> = ({
   onClose,
-  membershipId,
+  batchCohortId,
+  learnerRow,
   learnerName,
-  isUpdate,
+  mode,
+  placementId,
   initialFormData,
   form,
+  placementSchema,
   onSaved,
 }) => {
+  const isUpdate = mode === 'update';
   const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
 
@@ -60,13 +84,21 @@ const PlacementModal: React.FC<PlacementModalProps> = ({
     if (saving) return;
     setSaving(true);
     try {
-      const customFields = buildPlacementCustomFields(form.schema, formData);
-      const result = await updateCohortMemberStatus({
-        membershipId,
-        memberStatus: 'placed',
-        dynamicBody: { customFields },
+      const actor = getCurrentActor();
+      const { ok } = await savePlacementRetentionData({
+        batchCohortId,
+        learnerRow,
+        placementSchema,
+        mutate: (current) => {
+          if (!isUpdate) return createPlacement(current, formData, actor);
+          if (!placementId) throw new Error('Update Placement without a placementId');
+          return { data: updatePlacement(current, placementId, formData, actor) };
+        },
+        // A new placement (re)starts the learner's Retention cycle; updating
+        // an existing one leaves their status alone.
+        memberStatus: isUpdate ? undefined : () => 'placed',
       });
-      if (!isMutationSuccess(result)) {
+      if (!ok) {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         return;
       }
@@ -88,7 +120,7 @@ const PlacementModal: React.FC<PlacementModalProps> = ({
       open
       onClose={onClose}
       showFooter={true}
-      modalTitle={isUpdate ? t('PLACEMENTS.UPDATE_PLACEMENT') : t('PLACEMENTS.PLACE_STUDENT')}
+      modalTitle={t(MODE_TITLE_KEYS[mode])}
       secondaryText={t('COMMON.CANCEL')}
       secondaryActionHandler={onClose}
       primaryText={t('COMMON.SAVE')}

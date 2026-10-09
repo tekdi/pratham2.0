@@ -1,11 +1,6 @@
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { filterSchema } from '../../utils/helper';
-import {
-  RETENTION_FORM_CONTEXT,
-  RETENTION_MILESTONE_FIELD_IDS,
-  RetentionMilestoneKey,
-  RETENTION_MILESTONES,
-} from './retention.config';
+import { RETENTION_FORM_CONTEXT, RetentionMilestoneKey } from './retention.config';
 
 export interface RetentionFormBundle {
   schema: any;
@@ -134,82 +129,6 @@ export const getReadOnlyUiSchema = (schema: any, uiSchema: any): any => {
   return disabled;
 };
 
-// --- Per-milestone data storage -------------------------------------------
-//
-// Each of the 6 follow-ups has its own dedicated, backend-provided
-// cohort-membership customField (RETENTION_MILESTONE_FIELD_IDS) — unlike
-// Placements, which has no such per-milestone concept and just maps each
-// form field to its own fieldId. A Retention submission stores the entire
-// form's answers as that one milestone field's value, as a genuine JSON
-// object/array — not a client-side-stringified string, and not wrapped in
-// any envelope (no {formData, submittedAt} — just the form's own key/value
-// pairs directly). updateCohortMemberStatus (LearnerListService) sends this
-// through untouched; the backend does its own single JSON.stringify() when
-// persisting into selectedValues[0], the same as every other customField.
-
-const findLearnerCustomField = (learnerRow: any, fieldId: string) =>
-  learnerRow?.customField?.find((field: any) => field.fieldId === fieldId);
-
-// Undoes the backend's single JSON.stringify() to read the plain formData
-// object back. selectedValues[0] can also already be a plain object (e.g.
-// if a future backend response stops string-encoding it) — handled as-is.
-const parseMilestoneFormData = (raw: any): Record<string, any> | undefined => {
-  if (raw && typeof raw === 'object') return raw;
-  if (typeof raw !== 'string' || raw === '') return undefined;
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : undefined;
-  } catch {
-    return undefined;
-  }
-};
-
-export const getMilestoneFormData = (
-  learnerRow: any,
-  milestoneKey: RetentionMilestoneKey
-): Record<string, any> | undefined => {
-  const fieldId = RETENTION_MILESTONE_FIELD_IDS[milestoneKey];
-  const raw = findLearnerCustomField(learnerRow, fieldId)?.selectedValues?.[0];
-  return parseMilestoneFormData(raw);
-};
-
-export const isMilestoneCompleted = (
-  learnerRow: any,
-  milestoneKey: RetentionMilestoneKey
-): boolean => !!getMilestoneFormData(learnerRow, milestoneKey);
-
-export const areAllMilestonesCompleted = (learnerRow: any): boolean =>
-  RETENTION_MILESTONES.every((milestone) => isMilestoneCompleted(learnerRow, milestone.key));
-
-// Reads a learner's previously submitted answers for one milestone back into
-// RJSF formData — used to prefill the read-only view of a Completed
-// Follow-Up. The inverse of buildRetentionSubmission.
-export const extractRetentionFormData = (
-  learnerRow: any,
-  milestoneKey: RetentionMilestoneKey
-): Record<string, any> => getMilestoneFormData(learnerRow, milestoneKey) || {};
-
-// Builds the single customField write for one Retention Follow-Up
-// submission — that milestone's own dedicated field, holding the whole
-// form's answers as a plain object (not JSON.stringify()'d here — see the
-// module comment above). Also reports whether, counting this submission,
-// every required milestone is now completed — the caller uses that to
-// decide whether to additionally update the learner's status to
-// retention_complete.
-export const buildRetentionSubmission = (
-  learnerRow: any,
-  milestoneKey: RetentionMilestoneKey,
-  formData: Record<string, any>
-): { customFields: { fieldId: string; value: Record<string, any> }[]; allMilestonesCompleted: boolean } => {
-  const customFields = [{ fieldId: RETENTION_MILESTONE_FIELD_IDS[milestoneKey], value: formData }];
-
-  const allMilestonesCompleted = RETENTION_MILESTONES.every((milestone) =>
-    milestone.key === milestoneKey ? true : isMilestoneCompleted(learnerRow, milestone.key)
-  );
-
-  return { customFields, allMilestonesCompleted };
-};
-
 // --- Call Interval auto-select/lock ----------------------------------------
 //
 // The Retention Form's own callInterval field lets the Coordinator record
@@ -250,41 +169,3 @@ export const getFreshRetentionFormData = (
   ...getInitialRetentionFormData(schema),
   callInterval: getCallIntervalValue(milestoneKey),
 });
-
-// Same trick as PlacementFormService.buildUpdatePlacementSchema: guarantees
-// an API-driven field's already-known value (e.g. domain: "Beauty") is
-// present in its enum/enumNames from the very first render, so a Completed
-// Follow-Up's prefilled selection doesn't depend on winning a race against
-// DynamicForm's own async option-fetch — an unreliable race (fine on a warm
-// connection, broken after a full page reload's cold one), the same one
-// Placements' own Update flow already hit and fixed this same way.
-export const buildRetentionSchemaWithKnownValues = (
-  schema: any,
-  formData: Record<string, any>
-): any => {
-  const cloned = JSON.parse(JSON.stringify(schema));
-  Object.keys(cloned?.properties || {}).forEach((key) => {
-    const originalProperty = schema?.properties?.[key];
-    if (!originalProperty?.api) return; // only API-driven fields need this
-
-    const value = formData?.[key];
-    const rawValues = (Array.isArray(value) ? value : [value]).filter(
-      (v) => typeof v === 'string' && v !== ''
-    );
-    if (rawValues.length === 0) return;
-
-    const target = cloned.properties[key]?.items ?? cloned.properties[key];
-    if (!target) return;
-    const enumArr: any[] = Array.isArray(target.enum) ? target.enum : [];
-    const enumNames: any[] = Array.isArray(target.enumNames) ? target.enumNames : [];
-    rawValues.forEach((v: string) => {
-      if (!enumArr.includes(v)) {
-        enumArr.push(v);
-        enumNames.push(v);
-      }
-    });
-    target.enum = enumArr;
-    target.enumNames = enumNames;
-  });
-  return cloned;
-};
