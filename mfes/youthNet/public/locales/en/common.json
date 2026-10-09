@@ -732,6 +732,8 @@
     "SUBJECTS_I_TEACH": "Subjects I Teach",
     "GENDER": "Gender",
     "UNIT_NAME": "Unit Name",
+    "BATCH_NAME": "Batch Name",
+    "ASSESSMENTS": "Assessments",
     "UNIT_CODE": "Unit Code",
     "ENROLLMENT_NUMBER": "Enrollment Number",
     "BLOCK_NAME": "Block Name",

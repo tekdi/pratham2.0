@@ -598,6 +598,8 @@
     "SUBJECTS_I_TEACH": "मी शिकवतो ते विषय",
     "GENDER": "लिंग",
     "UNIT_NAME": "युनिट नाव",
+    "BATCH_NAME": "बॅचचे नाव",
+    "ASSESSMENTS": "मूल्यांकन",
     "UNIT_CODE": "युनिट कोड",
     "ENROLLMENT_NUMBER": "नोंदणी क्रमांक",
     "BLOCK_NAME": "ब्लॉक नाव",

@@ -569,6 +569,8 @@
     "SUBJECTS_I_TEACH": "నేను బోధించే విషయాలు",
     "GENDER": "లింగం",
     "UNIT_NAME": "యూనిట్ పేరు",
+    "BATCH_NAME": "బ్యాచ్ పేరు",
+    "ASSESSMENTS": "మదింపులు (అసెస్మెంట్లు)",
     "UNIT_CODE": "యూనిట్ కోడ్",
     "ENROLLMENT_NUMBER": "వినియోగదారు పేరు",
     "BLOCK_NAME": "బ్లాక్ పేరు",
