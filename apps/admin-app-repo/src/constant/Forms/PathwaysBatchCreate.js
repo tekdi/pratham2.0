@@ -140,7 +140,7 @@ export const PathwaysBatchCreateSchema = {
       coreField: 1,
       fieldId: null,
       field_type: 'text',
-      pattern: '^[a-zA-Z0-9][a-zA-Z0-9 ]*[a-zA-Z0-9]$',
+      pattern: "^[a-zA-Z0-9 !@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]+$"
     },
     batch_type: {
       type: 'string',
