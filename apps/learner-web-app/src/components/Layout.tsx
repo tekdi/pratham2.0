@@ -12,6 +12,7 @@ import {
   Home,
   AssignmentOutlined,
   AssignmentTurnedInOutlined,
+  FactCheckOutlined,
   Logout,
   KeyboardArrowDown,
 } from '@mui/icons-material';
@@ -23,6 +24,12 @@ import ProgramSwitchModal from './ProgramSwitchModal/ProgramSwitchModal';
 import { checkAuth } from '@shared-lib-v2/utils/AuthService';
 import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 import { TenantName } from '../utils/app.constant';
+import { useVtAssessmentEligibility } from '@learner/utils/hooks/useVtAssessmentEligibility';
+
+// Vocational Training only. The Assessment entry is injected here in code rather
+// than driven by the tenant's uiConfig.navbarItems, because it must also depend on
+// the learner having an active batch — something tenant config cannot express.
+const VT_ASSESSMENT_ROUTE = '/assessment';
 
 // Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
@@ -42,6 +49,7 @@ const getDynamicNavConfig = ({
   isMobile,
   handleLogoutModal,
   handleProfileClick,
+  showVtAssessment,
 }: {
   router: any;
   t: any;
@@ -52,6 +60,7 @@ const getDynamicNavConfig = ({
   isMobile: boolean;
   handleLogoutModal: () => void;
   handleProfileClick: () => void;
+  showVtAssessment: boolean;
 }): NewDrawerItemProp[] => {
   const storedConfig =
     typeof window !== 'undefined'
@@ -63,15 +72,27 @@ const getDynamicNavConfig = ({
   console.log('navbarItems:', navbarItems);
   const navLinks: NewDrawerItemProp[] = [];
 
+  const buildVtAssessmentLink = (): NewDrawerItemProp => ({
+    title: t('LEARNER_APP.VT_ASSESSMENT.TITLE'),
+    icon: <FactCheckOutlined sx={{ width: 28, height: 28 }} />,
+    to: () => handleNavClick(() => router.push(VT_ASSESSMENT_ROUTE)),
+    isActive: currentPage === VT_ASSESSMENT_ROUTE,
+    customStyle: getLinkStyle(currentPage === VT_ASSESSMENT_ROUTE),
+  });
+
   // Check if navbarItems exists and has entries
   if (!Array.isArray(navbarItems) || navbarItems.length === 0) {
-    // Return empty array if no navbar items configured
+    if (showVtAssessment) {
+      navLinks.push(buildVtAssessmentLink());
+    }
     return navLinks;
   }
 
   // Sort navigation items by order and generate navigation items
   const sortedNavItems = [...navbarItems].sort((a, b) => (a.order || 0) - (b.order || 0));
-  
+
+  let profileLinkIndex = -1;
+
   sortedNavItems.forEach((item) => {
     const { key, route, order } = item;
     
@@ -81,6 +102,13 @@ const getDynamicNavConfig = ({
       return;
     }
     
+    // The Assessment entry is injected below. Drop a tenant-config `assessment`
+    // item only when we are the ones injecting it, so a non-VT tenant that
+    // configures its own Assessment nav item keeps rendering it.
+    if (showVtAssessment && key.toLowerCase() === 'assessment') {
+      return;
+    }
+
     // Skip Survey item if isVolunteer is not true in localStorage
     if (key.toLowerCase() === 'survey') {
       const isVolunteer = typeof window !== 'undefined'
@@ -122,6 +150,10 @@ const getDynamicNavConfig = ({
       }
     };
 
+    if (key.toLowerCase() === 'profile') {
+      profileLinkIndex = navLinks.length;
+    }
+
     // Add navigation item maintaining exact sequence by order
     navLinks.push({
       title: t(`LEARNER_APP.COMMON.${key}`),
@@ -131,6 +163,11 @@ const getDynamicNavConfig = ({
       customStyle: getLinkStyle(currentPage === route),
     });
   });
+
+  if (showVtAssessment) {
+    const insertAt = profileLinkIndex === -1 ? navLinks.length : profileLinkIndex;
+    navLinks.splice(insertAt, 0, buildVtAssessmentLink());
+  }
 
   // Add logout for mobile
   if (isMobile) {
@@ -161,6 +198,12 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Inert for every non-VT program, so no other program sees a behaviour change.
+  // Re-checks every 3 seconds while the tab is visible, which is what makes the
+  // Assessment item appear/disappear without a reload when a batch is
+  // assigned or removed.
+  const { eligible: showVtAssessment } = useVtAssessmentEligibility();
 
   const handleClose = () => setAnchorEl(null);
   const handleProfileClick = () => {
@@ -218,10 +261,11 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     isMobile,
     handleLogoutModal,
     handleProfileClick,
+    showVtAssessment,
   });
 
   setDefaultNavLinks(navLinks);
-}, [t, router, isMobile]);
+}, [t, router, isMobile, showVtAssessment]);
 
   useEffect(() => {
     let currentPage = '';
@@ -242,10 +286,11 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
       isMobile,
       handleLogoutModal,
       handleProfileClick,
+      showVtAssessment,
     });
 
     setDefaultNavLinks(navLinks);
-  }, [t, router, isMobile]);
+  }, [t, router, isMobile, showVtAssessment]);
 
   const onLanguageChange = (val: string) => setLanguage(val);
 
