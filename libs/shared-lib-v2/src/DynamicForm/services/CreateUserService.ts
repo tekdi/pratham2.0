@@ -1,5 +1,6 @@
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
 import { post, patch } from '../services/RestClient';
+import { withEncryptedPassword } from '../../utils/passwordEncryption';
 
 //     const sortedFields = response?.data?.result.fields?.sort(
 //       (a: { order: string }, b: { order: string }) =>
@@ -20,7 +21,7 @@ import { post, patch } from '../services/RestClient';
 export const createUser = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.accountCreate;
   try {
-    const response = await post(apiUrl, userData);
+    const response = await post(apiUrl, await withEncryptedPassword(userData));
     return response?.data?.result;
   } catch (error) {
     console.error('error in getting cohort list', error);

@@ -4,6 +4,7 @@ import { get, patch, post, put } from '../RestClient';
 import axios from 'axios';
 import { showToastMessage } from '../../components/Toastify';
 import  API_ENDPOINTS  from '../../utils/API/APIEndpoints';
+import { withEncryptedPassword } from '../../../utils/passwordEncryption';
 
 export interface cohortListFilter {
   type: string;
@@ -96,7 +97,7 @@ export const getFormRead = async (
 export const createUser = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.accountCreate;
   try {
-    const response = await post(apiUrl, userData);
+    const response = await post(apiUrl, await withEncryptedPassword(userData));
     return response?.data?.result;
   } catch (error) {
     console.error('error in getting cohort list', error);
