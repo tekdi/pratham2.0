@@ -355,7 +355,9 @@
     "ENROLLMENT_NUMBER": "पंजीकरण संख्या",
     "SELECT_OPTION": "विकल्प चुनें",
     "PROFILE_UPDATE_SUCCESSFULLY": "प्रोफ़ाइल सफलतापूर्वक अपडेट हो गई",
-    "UNABLE_TO_PROFILE_UPDATE_": "प्रोफ़ाइल अपडेट नहीं हो सकी"
+    "UNABLE_TO_PROFILE_UPDATE_": "प्रोफ़ाइल अपडेट नहीं हो सकी",
+    "MOCK_TEST": "मॉक टेस्ट",
+    "UNIT_TEST": "यूनिट टेस्ट"
   },
   "FIELDS": {
     "DESIGNATION": "पद",
@@ -1011,7 +1013,20 @@
     "IMAGE_UPLOADED": "छवि अपलोड की गई",
     "VIEW": "देखना",
     "REUPLOAD": "पुन: अपलोड",
-    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* फॉर्मेट: jpg, jpeg. साइज़: {{mb}} MB तक {{count}} इमेज"
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* फॉर्मेट: jpg, jpeg. साइज़: {{mb}} MB तक {{count}} इमेज",
+    "BATCH": "बैच",
+    "ATTEMPT_DETAILS": "प्रयास विवरण",
+    "ATTEMPT_SUMMARY": "प्रयास सारांश",
+    "CORRECT": "सही",
+    "INCORRECT": "गलत",
+    "SCORE": "अंक",
+    "TIME": "समय",
+    "ATTEMPTED_ON": "प्रयास किया गया",
+    "PERCENTAGE": "प्रतिशत",
+    "NO_ANSWER": "कोई उत्तर नहीं",
+    "ATTEMPT_NOT_FOUND": "मूल्यांकन प्रयास नहीं मिला",
+    "SUBMITTING": "सबमिट हो रहा है...",
+    "UPDATING": "अपडेट हो रहा है..."
   },
   "MOBILIZER": {
     "MOBILIZER": "उपदेशक",

@@ -319,6 +319,10 @@ export interface GetDoIdServiceParam {
     state?: string;
     evaluationType?: string | string[];
     leafNodes?: string | string[];
+    // Restricts the search to specific assessment do_ids. The Manual Assessment (Trainer) list uses
+    // this to fetch exactly the assessments attached to the selected batch (its ASSESSMENTS
+    // customField) rather than every Live offline assessment in the program.
+    identifier?: string | string[];
   };
 }
 

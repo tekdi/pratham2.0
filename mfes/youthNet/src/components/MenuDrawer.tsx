@@ -385,6 +385,12 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const isVillagesAndYouths = router.pathname.includes('/villages');
   const isSurveys = router.pathname.includes('/surveys');
   const isManualAssessments = router.pathname.includes('/manual-assessments');
+  // Distinct from isManualAssessments above: '/manual-assessment-trainer' (singular, Trainer
+  // flow) does not contain '/manual-assessments' (plural, volunteer flow), so the two
+  // highlights stay mutually exclusive, as does '/assessments'.
+  const isManualAssessmentTrainer = router.pathname.includes(
+    '/manual-assessment-trainer'
+  );
   const isTrainerMapping = router.pathname.includes('/trainer-mapping');
   const isCenterHead =
     typeof window !== 'undefined' && window.localStorage.getItem('role') === Role.LEAD;
@@ -696,6 +702,42 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               label={t('DASHBOARD.MY_TEACHING_CENTERS')}
               sx={{ marginTop: '25px' }}
             />
+
+            {!isEliminatedFromBuild('Assessments', 'feature') && isActiveYear && (
+              <NavItem
+                collapsed={collapsed}
+                isActive={isAssessments}
+                icon={
+                  <Image
+                    src={assessment}
+                    alt="Assessment Icon"
+                    width={24}
+                    height={24}
+                  />
+                }
+                onClick={() => {
+                  closeDrawer();
+                  router.push('/assessments');
+                }}
+                label={t('ASSESSMENTS.ASSESSMENTS')}
+                sx={{ marginTop: '25px' }}
+              />
+            )}
+
+            {!isEliminatedFromBuild('ManualAssessmentTrainer', 'feature') &&
+              isActiveYear && (
+                <NavItem
+                  collapsed={collapsed}
+                  isActive={isManualAssessmentTrainer}
+                  icon={<EditNoteIcon sx={{ fontSize: '24px !important' }} />}
+                  onClick={() => {
+                    closeDrawer();
+                    router.push('/manual-assessment-trainer');
+                  }}
+                  label={t('ASSESSMENTS.MANUAL_ASSESSMENT')}
+                  sx={{ marginTop: '25px' }}
+                />
+              )}
           </Box>
         )}
 

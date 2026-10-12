@@ -355,7 +355,9 @@
     "ENROLLMENT_NUMBER": "اندراج نمبر",
     "SELECT_OPTION": "اختیار منتخب کریں۔",
     "PROFILE_UPDATE_SUCCESSFULLY": "پروفائل کامیابی کے ساتھ اپ ڈیٹ ہو گیا۔",
-    "UNABLE_TO_PROFILE_UPDATE_": "پروفائل اپ ڈیٹ کرنے سے قاصر"
+    "UNABLE_TO_PROFILE_UPDATE_": "پروفائل اپ ڈیٹ کرنے سے قاصر",
+    "MOCK_TEST": "موکک ٹیسٹ",
+    "UNIT_TEST": "یونٹ ٹیسٹ"
   },
   "FIELDS": {
     "DESIGNATION": "عہدہ",
@@ -1163,7 +1165,20 @@
     "IMAGE_UPLOADED": "تصویر اپ لوڈ ہو گئی۔",
     "VIEW": "دیکھیں",
     "REUPLOAD": "دوبارہ اپ لوڈ کریں۔",
-    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* فارمیٹ: jpg، jpeg. سائز: {{mb}} MB تک {{count}} تصاویر"
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* فارمیٹ: jpg، jpeg. سائز: {{mb}} MB تک {{count}} تصاویر",
+    "BATCH": "بیچ",
+    "ATTEMPT_DETAILS": "کوشش کی تفصیلات",
+    "ATTEMPT_SUMMARY": "کوشش کا خلاصہ",
+    "CORRECT": "درست",
+    "INCORRECT": "غلط",
+    "SCORE": "اسکور",
+    "TIME": "وقت",
+    "ATTEMPTED_ON": "کوشش کی تاریخ",
+    "PERCENTAGE": "فیصد",
+    "NO_ANSWER": "کوئی جواب نہیں",
+    "ATTEMPT_NOT_FOUND": "تشخیصی کوشش نہیں ملی",
+    "SUBMITTING": "جمع کیا جا رہا ہے...",
+    "UPDATING": "اپ ڈیٹ ہو رہا ہے..."
   },
   "MOBILIZER": {
     "MOBILIZER": "مینٹور",
