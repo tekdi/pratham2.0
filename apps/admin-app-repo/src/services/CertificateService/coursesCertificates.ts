@@ -53,7 +53,9 @@ export const getCourseName = async (courseIds: string[]): Promise<any> => {
         filters: {
           identifier: [...courseIds],
         },
-        fields: ['name'],
+        // certificateTemplate lets a course override the tenant-wide template at
+        // render time; it comes back in this same bulk call, so no per-row read.
+        fields: ['name', 'certificateTemplate'],
       },
     };
     const response = await post(apiUrl, data, headers);

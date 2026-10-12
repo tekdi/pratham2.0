@@ -30,6 +30,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { fetchContent } from '@learner/utils/API/contentService';
+import { logEvent } from '@learner/utils/googleAnalytics';
 import BreadCrumb from '@content-mfes/components/BreadCrumb';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 import { CardComponent } from './List';

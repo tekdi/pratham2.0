@@ -9,11 +9,11 @@ export const L2BatchCreate = {
     properties: {
       name: {
         type: 'string',
-        title: 'UNIT_NAME',
+        title: 'BATCH_NAME',
         coreField: 1,
         fieldId: null,
         field_type: 'text',
-        pattern: "^[a-zA-Z0-9][a-zA-Z0-9 .'-]*[a-zA-Z0-9]$",
+        pattern: "^[a-zA-Z0-9 !@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?`~]+$"
       },
       batch_type: {
         type: 'string',

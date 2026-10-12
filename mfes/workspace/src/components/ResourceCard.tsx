@@ -83,38 +83,43 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
               left: '16px',
               right: '16px',
               zIndex: 2,
-              color: '#FFFFFF',
-              fontSize: '16px',
-              fontWeight: 500,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              gap: '8px',
             }}
           >
-            {title}
-          </Box>
-        </Box>
-
-        <Box
-          sx={{
-            height: '40px',
-            background: '#ECE6F0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 16px',
-            borderRadius: '0px 0px 16px 16px',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Image
-              src={ContentCardsTypes[mimeType as keyof FileType]?.imgPath}
-              alt="Content Thumbnail"
-              style={{ marginRight: '8px', height: '25px', width: '23px' }}
-            />
-            <span style={{ fontSize: '12px', color: '#1F1B13', fontWeight: 400 }}>
-              {ContentCardsTypes[mimeType as keyof FileType]?.name}
-            </span>
+            <Box
+              sx={{
+                color: '#FFFFFF',
+                fontSize: '16px',
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                width: '100%',
+              }}
+            >
+              {title}
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'rgba(255, 255, 255, 0.9)',
+                borderRadius: '6px',
+                padding: '2px 8px',
+              }}
+            >
+              <Image
+                src={ContentCardsTypes[mimeType as keyof FileType]?.imgPath}
+                alt="Content Thumbnail"
+                style={{ marginRight: '6px', height: '16px', width: '16px' }}
+              />
+              <span style={{ fontSize: '11px', color: '#1F1B13', fontWeight: 500 }}>
+                {ContentCardsTypes[mimeType as keyof FileType]?.name}
+              </span>
+            </Box>
           </Box>
         </Box>
       </Box>

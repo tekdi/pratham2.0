@@ -31,10 +31,11 @@ const ProfilePage = () => {
   });
   const [showCertificate, setShowCertificate] = useState(false);
   const [certificateId, setCertificateId] = useState('');
+  const [certificateTemplate, setCertificateTemplate] = useState<string>();
 
   const [courseData, setCourseData] = useState<any>([]);
 
-  const handlePreview = async (id: string) => {
+  const handlePreview = async (id: string, courseCertificateTemplate?: string) => {
     console.log(id);
 
     try {
@@ -44,6 +45,9 @@ const ProfilePage = () => {
       }
       setShowCertificate(false);
       setCertificateId(id);
+      // Course-level template when the course has one; otherwise the modal falls
+      // back to the tenant template in localStorage.
+      setCertificateTemplate(courseCertificateTemplate);
       setTimeout(() => {
         setShowCertificate(true);
       }, 2); // open modal in next tick
@@ -119,7 +123,9 @@ const ProfilePage = () => {
                 <CourseCertificateCard
                   key={index}
                   certificateData={cert}
-                  onPreviewCertificate={() => handlePreview(cert.certificateId)}
+                  onPreviewCertificate={(courseCertificateTemplate) =>
+                    handlePreview(cert.certificateId, courseCertificateTemplate)
+                  }
                 />
               ))}
             </Box>
@@ -128,6 +134,7 @@ const ProfilePage = () => {
       </Grid>
       <CertificateModal
         certificateId={certificateId?.toString()}
+        certificateTemplate={certificateTemplate}
         open={showCertificate}
         setOpen={setShowCertificate}
       />

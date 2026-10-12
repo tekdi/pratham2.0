@@ -6,22 +6,29 @@ import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import {
   applySkipAndHide,
-  buildRetentionSubmission,
   getReadOnlyUiSchema,
   RetentionFormBundle,
   withCallIntervalLocked,
 } from '../../services/retention/RetentionFormService';
+import { RETENTION_MILESTONES, RetentionMilestoneKey } from '../../services/retention/retention.config';
+import { savePlacementRetentionData } from '../../services/placementRetention/PlacementRetentionRepository';
 import {
-  updateCohortMemberStatus,
-  isMutationSuccess,
-} from '../../services/myTeachingCenter/LearnerListService';
-import { RetentionMilestoneKey } from '../../services/retention/retention.config';
+  getActivePlacement,
+  getCurrentActor,
+  isPlacementRetentionComplete,
+  upsertRetentionMilestone,
+} from '../../services/placementRetention/PlacementRetentionDataService';
 
 interface RetentionModalProps {
   onClose: () => void;
-  membershipId: string | number;
+  batchCohortId: string;
   learnerName?: string;
   learnerRow: any;
+  // The placement this follow-up belongs to, and a short label for it
+  // (company · date) so the Coordinator can see which one they're filling.
+  placementId: string;
+  placementLabel?: string;
+  placementSchema: any;
   milestoneKey: RetentionMilestoneKey;
   milestoneLabel?: string;
   isCompleted: boolean;
@@ -40,14 +47,16 @@ interface RetentionModalProps {
 // prefilled data — a race that depended on network timing. The caller
 // (RetentionLearnerTable) only renders this component at all while a
 // Follow-Up box is selected, and computes initialFormData itself (see
-// RetentionFormService's extractRetentionFormData /
-// getFreshRetentionFormData / buildRetentionSchemaWithKnownValues) — this
+// getFreshRetentionFormData / withKnownApiOptionValues) — this
 // component just renders whatever it's given, exactly like PlacementModal.
 const RetentionModal: React.FC<RetentionModalProps> = ({
   onClose,
-  membershipId,
+  batchCohortId,
   learnerName,
   learnerRow,
+  placementId,
+  placementLabel,
+  placementSchema,
   milestoneKey,
   milestoneLabel,
   isCompleted,
@@ -64,28 +73,29 @@ const RetentionModal: React.FC<RetentionModalProps> = ({
     if (saving) return;
     setSaving(true);
     try {
-      const { customFields, allMilestonesCompleted } = buildRetentionSubmission(
+      const month = RETENTION_MILESTONES.find((m) => m.key === milestoneKey)?.months;
+      if (!month) return;
+      // Writes just this one milestone into this one placement (adding it,
+      // or updating it if this month already exists) — everything else in
+      // the learner's Placement + Retention JSON is carried over as-is.
+      const { ok } = await savePlacementRetentionData({
+        batchCohortId,
         learnerRow,
-        milestoneKey,
-        formData
-      );
-      const result = await updateCohortMemberStatus({
-        membershipId,
-        dynamicBody: { customFields },
+        placementSchema,
+        mutate: (current) => ({
+          data: upsertRetentionMilestone(current, placementId, month, formData, getCurrentActor()),
+        }),
+        // The learner's status tracks their *current* placement only.
+        memberStatus: (next) => {
+          const active = getActivePlacement(next);
+          return active?.placementId === placementId && isPlacementRetentionComplete(active)
+            ? 'retention_complete'
+            : undefined;
+        },
       });
-      if (!isMutationSuccess(result)) {
+      if (!ok) {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         return;
-      }
-
-      if (allMilestonesCompleted && learnerRow?.status !== 'retention_complete') {
-        const statusResult = await updateCohortMemberStatus({
-          membershipId,
-          memberStatus: 'retention_complete',
-        });
-        if (!isMutationSuccess(statusResult)) {
-          showToastMessage(t('RETENTION.STATUS_UPDATE_FAILED'), 'error');
-        }
       }
 
       showToastMessage(t('RETENTION.FOLLOW_UP_SAVED_SUCCESS'), 'success');
@@ -133,8 +143,13 @@ const RetentionModal: React.FC<RetentionModalProps> = ({
       id="dynamic-form-id"
     >
       {learnerName && (
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: placementLabel ? 0.5 : 2 }}>
           {learnerName}
+        </Typography>
+      )}
+      {placementLabel && (
+        <Typography variant="caption" display="block" color="text.secondary" sx={{ mb: 2 }}>
+          {t('RETENTION.FOR_PLACEMENT', { placement: placementLabel })}
         </Typography>
       )}
       {/* Stack the Retention Form one field per row. */}

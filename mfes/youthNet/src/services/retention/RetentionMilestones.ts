@@ -1,5 +1,9 @@
-import { addMonths, isBefore, startOfDay } from 'date-fns';
-import { RetentionFollowUpState, RetentionMilestoneKey } from './retention.config';
+import { addMonths, format, isBefore, startOfDay } from 'date-fns';
+import { RETENTION_MILESTONES, RetentionFollowUpState, RetentionMilestoneKey } from './retention.config';
+import {
+  isRetentionMilestoneCompleted,
+  PlacementRecord,
+} from '../placementRetention/PlacementRetentionDataService';
 
 // Placement Date arrives as a plain 'YYYY-MM-DD' string (see
 // PlacementFormService/CustomDateWidget). Parsed as a local date, not UTC,
@@ -36,9 +40,35 @@ export const getFollowUpState = (
   return isBefore(today, startOfDay(targetDate)) ? 'upcoming' : 'due';
 };
 
+// 'YYYY-MM-DD' → "20 Apr 2026" for display; '-' when missing/invalid.
+export const formatPlacementDate = (placementDate: string | null | undefined): string => {
+  const date = placementDate ? parsePlacementDate(placementDate) : null;
+  return date ? format(date, 'dd MMM yyyy') : '-';
+};
+
 export interface RetentionMilestoneView {
   key: RetentionMilestoneKey;
+  months: number;
   labelKey: string;
   targetDate: Date | null;
   state: RetentionFollowUpState;
 }
+
+// All six follow-ups for one placement — target dates from that placement's
+// own Placement Date, completion from that placement's own milestones — so
+// each placement's Retention history is computed independently.
+export const getPlacementMilestoneViews = (
+  placement: PlacementRecord | undefined
+): RetentionMilestoneView[] =>
+  RETENTION_MILESTONES.map((milestone) => {
+    const targetDate = placement?.placementDate
+      ? computeMilestoneTargetDate(placement.placementDate, milestone.months)
+      : null;
+    return {
+      key: milestone.key,
+      months: milestone.months,
+      labelKey: milestone.labelKey,
+      targetDate,
+      state: getFollowUpState(targetDate, isRetentionMilestoneCompleted(placement, milestone.months)),
+    };
+  });

@@ -24,6 +24,7 @@ import SearchBox from '../../../../components/SearchBox';
 import {
   deleteContent,
   getContent,
+  getLiveIdentifiers,
   getfilterList,
   getPosFrameworkList,
   getMediaFilterList,
@@ -432,7 +433,16 @@ const AllContentsPage = () => {
         // guard entries are pruned so a genuinely new state later isn't
         // masked forever.
         const now = Date.now();
-        const contentList = visibleList.filter((item: any) => {
+        const liveIds = await getLiveIdentifiers(
+          visibleList,
+          tenantConfig?.CHANNEL_ID
+        );
+        const contentList = visibleList
+          .map((item: any) => ({
+            ...item,
+            hasLiveVersion: liveIds.has(item?.identifier),
+          }))
+          .filter((item: any) => {
           const mutation = recentlyMutatedRef.current.get(item?.identifier);
           if (!mutation) return true;
           if (now - mutation.ts > RECENT_ACTION_GUARD_MS) {
@@ -474,6 +484,7 @@ const AllContentsPage = () => {
       lastUpdatedBy: item.lastUpdatedBy || item.createdBy,
       lastPublishedBy: item.lastPublishedBy || item.createdBy,
       status: item.status,
+      hasLiveVersion: item.hasLiveVersion,
       identifier: item.identifier,
       mimeType: item.mimeType,
       mode: item.mode,

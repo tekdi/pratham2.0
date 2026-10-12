@@ -5,38 +5,46 @@ import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'next-i18next';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { modalStyles } from '../../styles/modalStyles';
-import {
-  updateCohortMemberStatus,
-  isMutationSuccess,
-} from '../../services/myTeachingCenter/LearnerListService';
 import { UNPLACED_STATUS } from '../../services/placements/placements.config';
-import { deletePlacementFieldValues } from '../../services/placements/PlacementFormService';
+import { savePlacementRetentionData } from '../../services/placementRetention/PlacementRetentionRepository';
+import {
+  getCurrentActor,
+  removePlacement,
+} from '../../services/placementRetention/PlacementRetentionDataService';
 
 interface DeletePlacementModalProps {
   onClose: () => void;
-  membershipId: string | number;
+  batchCohortId: string;
+  learnerRow: any;
   learnerName?: string;
-  // Needed to know every field's own fieldId — see
-  // PlacementFormService.deletePlacementFieldValues.
-  schema: any;
+  // The learner's current (active) placement — the only one this deletes.
+  placementId: string;
+  // Organization of the previous placement that becomes active again after
+  // this delete, if the learner has one — shown in the confirmation text.
+  restoredPlacementName?: string | null;
+  placementSchema: any;
   onDeleted: () => void;
 }
 
 // Confirmation dialog, same Modal shell as DropoutReasonModal.tsx. "Delete"
-// clears the learner's saved Placement field values (DELETE
-// /fields/values/delete — confirmed backend contract, itemId is the
-// cohortMembershipId) and reverts their cohort-membership status back to
-// course_completed — see the plan's "Persisting placement data" section for
-// why this isn't a hard cohort-membership record delete.
+// removes only the learner's current placement (and its own Retention
+// milestones) from the Placement + Retention JSON — every earlier placement
+// stays in the history, and the latest of them becomes active again (see
+// removePlacement). The learner's cohort-membership status goes back to
+// course_completed only when no placement is left; otherwise it stays
+// placed. Both changes go in the same request.
 //
 // No `open` prop — the caller (PlacementLearnerTable) only renders this
 // component at all while a row is selected for delete, same "mount on
 // demand" pattern PlacementModal uses.
 const DeletePlacementModal: React.FC<DeletePlacementModalProps> = ({
   onClose,
-  membershipId,
+  batchCohortId,
+  learnerRow,
   learnerName,
-  schema,
+  placementId,
+  restoredPlacementName,
+  placementSchema,
   onDeleted,
 }) => {
   const { t } = useTranslation();
@@ -47,16 +55,15 @@ const DeletePlacementModal: React.FC<DeletePlacementModalProps> = ({
     if (saving) return;
     setSaving(true);
     try {
-      const fieldsCleared = await deletePlacementFieldValues(schema, membershipId);
-      if (!fieldsCleared) {
-        showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
-        return;
-      }
-      const result = await updateCohortMemberStatus({
-        membershipId,
-        memberStatus: UNPLACED_STATUS,
+      const { ok } = await savePlacementRetentionData({
+        batchCohortId,
+        learnerRow,
+        placementSchema,
+        mutate: (current) => ({ data: removePlacement(current, placementId, getCurrentActor()) }),
+        // Decided from the freshly saved data, not the row's snapshot.
+        memberStatus: (next) => (next.placements.length > 0 ? 'placed' : UNPLACED_STATUS),
       });
-      if (!isMutationSuccess(result)) {
+      if (!ok) {
         showToastMessage(t('COMMON.SOMETHING_WENT_WRONG'), 'error');
         return;
       }
@@ -86,7 +93,12 @@ const DeletePlacementModal: React.FC<DeletePlacementModalProps> = ({
 
         <Box sx={{ padding: '18px' }}>
           <Typography variant="body2">
-            {t('PLACEMENTS.DELETE_PLACEMENT_CONFIRM', { name: learnerName || '' })}
+            {restoredPlacementName !== undefined
+              ? t('PLACEMENTS.DELETE_PLACEMENT_CONFIRM_RESTORE', {
+                  name: learnerName || '',
+                  organization: restoredPlacementName || '-',
+                })
+              : t('PLACEMENTS.DELETE_PLACEMENT_CONFIRM', { name: learnerName || '' })}
           </Typography>
         </Box>
         <Divider />

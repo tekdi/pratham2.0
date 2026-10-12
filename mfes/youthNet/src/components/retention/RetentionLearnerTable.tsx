@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Chip, TextField, MenuItem } from '@mui/material';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Box, Chip, IconButton, TextField, MenuItem, Tooltip } from '@mui/material';
+import HistoryIcon from '@mui/icons-material/History';
 import { useTranslation } from 'next-i18next';
 import CommonDataTable from '@shared-lib-v2/lib/Table/CommonDataTable';
 import Loader from '@shared-lib-v2/DynamicForm/components/Loader';
@@ -9,15 +10,24 @@ import {
   getBatchLearners,
   getLearnerDisplayName,
 } from '../../services/myTeachingCenter/LearnerListService';
-import { getLearnerPlacementValue, PlacementFormBundle } from '../../services/placements/PlacementFormService';
+import { PlacementFormBundle } from '../../services/placements/PlacementFormService';
 import {
-  buildRetentionSchemaWithKnownValues,
-  extractRetentionFormData,
   getFreshRetentionFormData,
-  isMilestoneCompleted,
   RetentionFormBundle,
 } from '../../services/retention/RetentionFormService';
-import { computeMilestoneTargetDate, getFollowUpState } from '../../services/retention/RetentionMilestones';
+import {
+  formatPlacementDate,
+  getPlacementMilestoneViews,
+} from '../../services/retention/RetentionMilestones';
+import {
+  getActivePlacement,
+  getPlacementById,
+  getRetentionMilestone,
+  PlacementRecord,
+  PlacementRetentionData,
+  readLearnerPlacementRetentionData,
+} from '../../services/placementRetention/PlacementRetentionDataService';
+import { withKnownApiOptionValues } from '../../services/placementRetention/formSchemaUtils';
 import {
   RETENTION_LEARNER_STATUSES,
   RETENTION_MILESTONES,
@@ -31,14 +41,14 @@ import {
 } from '../../services/retention/retentionFilterStorage';
 import RetentionFollowUpBox from './RetentionFollowUpBox';
 import RetentionModal from './RetentionModal';
+import PlacementHistoryModal from '../placementRetention/PlacementHistoryModal';
 
 const PAGE_SIZE = 10;
 
 interface RetentionLearnerTableProps {
   batchCohortId: string;
-  // Needed to read a learner's Placement Date (dateOfJoining) — that field
-  // belongs to the Placement Form, not the Retention Form, since Retention
-  // milestones are calculated from it (see spec section 8).
+  // Needed to migrate learners still on the old per-field Placement storage
+  // and to render placement details in the history modal.
   placementForm: PlacementFormBundle | null;
   retentionForm: RetentionFormBundle | null;
 }
@@ -62,8 +72,16 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
 
   const [followUpModal, setFollowUpModal] = useState<{
     row: any;
+    placementId: string;
     milestoneKey: RetentionMilestoneKey;
     isCompleted: boolean;
+    // Opened from the Placement History modal — closing the form goes back
+    // to it instead of to the bare table.
+    fromHistory?: boolean;
+  } | null>(null);
+  const [historyModal, setHistoryModal] = useState<{
+    row: any;
+    expandedPlacementId?: string;
   } | null>(null);
 
   const fetchLearners = async (page: number) => {
@@ -94,28 +112,54 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
 
   const refreshCurrentPage = () => fetchLearners(currentPage);
 
+  // Each row's Placement + Retention JSON, parsed once per fetch (and once
+  // the Placement Form arrives, since legacy rows need its schema to migrate).
+  const placementDataByMembership = useMemo(() => {
+    const map = new Map<string, PlacementRetentionData>();
+    (rows || []).forEach((row) =>
+      map.set(
+        String(row.cohortMembershipId),
+        readLearnerPlacementRetentionData(row, placementForm?.schema)
+      )
+    );
+    return map;
+  }, [rows, placementForm]);
+
+  const getRowData = (row: any): PlacementRetentionData =>
+    placementDataByMembership.get(String(row.cohortMembershipId)) ??
+    readLearnerPlacementRetentionData(row, placementForm?.schema);
+
+  const getPlacementLabel = (placement: PlacementRecord | undefined): string =>
+    placement
+      ? `${placement.companyName || '-'} · ${formatPlacementDate(placement.placementDate)}`
+      : '';
+
+  // The table's follow-up columns always track the learner's *current*
+  // (active) placement; earlier placements' follow-ups are in the history
+  // modal.
   const milestoneColumns = RETENTION_MILESTONES.map((milestone) => ({
     key: `milestone_${milestone.key}`,
     label: t(milestone.labelKey),
     minWidth: 200,
     render: (row: any) => {
-      const placementDate =
-        placementForm?.schema &&
-        getLearnerPlacementValue(placementForm.schema, 'dateOfJoining', row);
-      if (!placementDate || !retentionForm?.schema) return '-';
-
-      const targetDate = computeMilestoneTargetDate(placementDate, milestone.months);
-      const completed = isMilestoneCompleted(row, milestone.key);
-      const state = getFollowUpState(targetDate, completed);
+      const active = getActivePlacement(getRowData(row));
+      if (!active?.placementDate || !retentionForm?.schema) return '-';
+      const view = getPlacementMilestoneViews(active).find((v) => v.key === milestone.key);
+      if (!view) return '-';
 
       return (
         <RetentionFollowUpBox
-          targetDate={targetDate}
-          state={state}
+          targetDate={view.targetDate}
+          state={view.state}
           onClick={
-            state !== 'upcoming'
+            view.state !== 'upcoming'
               ? () =>
-                  setFollowUpModal({ row, milestoneKey: milestone.key, isCompleted: state === 'completed' })
+                  setFollowUpModal({
+                    row,
+                    placementId: active.placementId,
+                    milestoneKey: milestone.key,
+                    isCompleted: view.state === 'completed',
+                  })
               : undefined
           }
         />
@@ -123,24 +167,47 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
     },
   }));
 
+  // The learner's current placement's organization (with its placement
+  // date underneath); earlier placements are in the history modal.
+  const organizationColumn = {
+    key: 'organizationName',
+    label: t('PLACEMENTS.ORGANIZATION_NAME'),
+    minWidth: 220,
+    render: (row: any) => {
+      const active = getActivePlacement(getRowData(row));
+      return (
+        <Box>
+          <Box>{active?.companyName || '-'}</Box>
+          {active && (
+            <Box component="span" sx={{ fontSize: 12, color: 'text.secondary' }}>
+              {formatPlacementDate(active.placementDate)}
+            </Box>
+          )}
+        </Box>
+      );
+    },
+  };
+
   const columns = [
     {
-      key: 'learnerName',
-      label: t('RETENTION.LEARNER'),
-      minWidth: 150,
-      render: (row: any) => (
-        <Box>
-          <Box>{getLearnerDisplayName(row)}</Box>
-          <Box component="span" sx={{ fontSize: 12, color: 'text.secondary' }}>
-            {row?.username || row?.userId || '-'}
-          </Box>
-        </Box>
-      ),
+      key: 'action',
+      label: t('PLACEMENTS.ACTION'),
+      minWidth: 80,
+      render: (row: any) =>
+        getRowData(row).placements.length > 0 ? (
+          <Tooltip title={t('PLACEMENTS.PLACEMENT_HISTORY')}>
+            <IconButton size="small" onClick={() => setHistoryModal({ row })}>
+              <HistoryIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          '-'
+        ),
     },
-    ...milestoneColumns,
     {
       key: 'status',
       label: t('RETENTION.STATUS'),
+      minWidth: 150,
       render: (row: any) => {
         const status = row?.status as RetentionLearnerStatus | undefined;
         return status && RETENTION_STATUS_LABEL_KEYS[status] ? (
@@ -154,6 +221,21 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
         );
       },
     },
+    {
+      key: 'learnerName',
+      label: t('RETENTION.LEARNER'),
+      minWidth: 150,
+      render: (row: any) => (
+        <Box>
+          <Box>{getLearnerDisplayName(row)}</Box>
+          <Box component="span" sx={{ fontSize: 12, color: 'text.secondary' }}>
+            {row?.username || row?.userId || '-'}
+          </Box>
+        </Box>
+      ),
+    },
+    organizationColumn,
+    ...milestoneColumns,
   ];
 
   return (
@@ -215,29 +297,33 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
           for why: a persistently-mounted modal toggling an `open` prop let
           a superseded DynamicForm instance's delayed async option-fetch
           clobber live state, a race that depended on network timing. */}
-      {followUpModal && retentionForm && (() => {
-        const { row, milestoneKey, isCompleted } = followUpModal;
+      {followUpModal && retentionForm && placementForm && (() => {
+        const { row, placementId, milestoneKey, isCompleted, fromHistory } = followUpModal;
         const milestoneDef = RETENTION_MILESTONES.find((m) => m.key === milestoneKey);
+        const placement = getPlacementById(getRowData(row), placementId);
         const initialFormData = isCompleted
-          ? extractRetentionFormData(row, milestoneKey)
+          ? getRetentionMilestone(placement, milestoneDef?.months ?? -1)?.formData || {}
           : getFreshRetentionFormData(retentionForm.schema, milestoneKey);
         // API-driven fields (domain) only show a prefilled value once their
-        // fetched option list actually contains it — a timing race against
-        // DynamicForm's own async option-fetch that's proven unreliable.
-        // buildRetentionSchemaWithKnownValues sidesteps it by injecting the
-        // already-known value as a guaranteed option into a schema clone,
-        // so it resolves immediately regardless of API timing. Only needed
-        // when viewing a Completed Follow-Up — a fresh one has nothing to
-        // prefill yet.
+        // fetched option list contains it — see withKnownApiOptionValues.
+        // Only needed when viewing a Completed Follow-Up.
         const formForModal = isCompleted
-          ? { ...retentionForm, schema: buildRetentionSchemaWithKnownValues(retentionForm.schema, initialFormData) }
+          ? { ...retentionForm, schema: withKnownApiOptionValues(retentionForm.schema, initialFormData) }
           : retentionForm;
         return (
           <RetentionModal
-            onClose={() => setFollowUpModal(null)}
-            membershipId={row.cohortMembershipId}
+            onClose={() => {
+              setFollowUpModal(null);
+              // History reads the row's data by cohortMembershipId, so after
+              // a save it picks up the refreshed data once the refetch lands.
+              if (fromHistory) setHistoryModal({ row, expandedPlacementId: placementId });
+            }}
+            batchCohortId={batchCohortId}
             learnerName={getLearnerDisplayName(row)}
             learnerRow={row}
+            placementId={placementId}
+            placementLabel={getPlacementLabel(placement)}
+            placementSchema={placementForm.schema}
             milestoneKey={milestoneKey}
             milestoneLabel={milestoneDef ? t(milestoneDef.labelKey) : undefined}
             isCompleted={isCompleted}
@@ -247,6 +333,30 @@ const RetentionLearnerTable: React.FC<RetentionLearnerTableProps> = ({
           />
         );
       })()}
+
+      {historyModal && placementForm && (
+        <PlacementHistoryModal
+          onClose={() => setHistoryModal(null)}
+          learnerName={getLearnerDisplayName(historyModal.row)}
+          data={getRowData(historyModal.row)}
+          defaultExpandedPlacementId={historyModal.expandedPlacementId}
+          placementForm={placementForm}
+          onOpenMilestone={
+            retentionForm
+              ? (placementId, milestoneKey, isCompleted) => {
+                  setFollowUpModal({
+                    row: historyModal.row,
+                    placementId,
+                    milestoneKey,
+                    isCompleted,
+                    fromHistory: true,
+                  });
+                  setHistoryModal(null);
+                }
+              : undefined
+          }
+        />
+      )}
     </Box>
   );
 };

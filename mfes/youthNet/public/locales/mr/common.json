@@ -203,7 +203,10 @@
     "COMPLETE_FOLLOW_UP": "{{milestone}} फॉलो-अप",
     "VIEW_FOLLOW_UP": "{{milestone}} फॉलो-अप",
     "FOLLOW_UP_SAVED_SUCCESS": "रिटेंशन फॉलो-अप यशस्वीरित्या सेव्ह झाला",
-    "STATUS_UPDATE_FAILED": "फॉलो-अप सेव्ह झाले, परंतु लर्नरची स्थिती अपडेट करण्यात अयशस्वी"
+    "STATUS_UPDATE_FAILED": "फॉलो-अप सेव्ह झाले, परंतु लर्नरची स्थिती अपडेट करण्यात अयशस्वी",
+    "PLACEMENT": "प्लेसमेंट",
+    "FOR_PLACEMENT": "प्लेसमेंट: {{placement}}",
+    "STATE_NOT_RECORDED": "नोंद नाही"
   },
   "LOGIN_PAGE": {
     "USERNAME": "वापरकर्ता नाव",
@@ -597,6 +600,8 @@
     "SUBJECTS_I_TEACH": "मी शिकवतो ते विषय",
     "GENDER": "लिंग",
     "UNIT_NAME": "युनिट नाव",
+    "BATCH_NAME": "बॅचचे नाव",
+    "ASSESSMENTS": "मूल्यांकन",
     "UNIT_CODE": "युनिट कोड",
     "ENROLLMENT_NUMBER": "नोंदणी क्रमांक",
     "BLOCK_NAME": "ब्लॉक नाव",
