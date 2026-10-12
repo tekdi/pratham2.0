@@ -2,6 +2,11 @@
 import axios from 'axios';
 import { post } from './RestClient';
 import { API_ENDPOINTS } from './EndUrls';
+import {
+  getRecaptchaToken,
+  RECAPTCHA_LOGIN_ACTION,
+} from '@shared-lib-v2/utils/recaptcha';
+import { encryptPassword } from '@shared-lib-v2/utils/passwordEncryption';
 
 interface LoginParams {
   username: string;
@@ -19,7 +24,12 @@ export const login = async ({
   const apiUrl: string = API_ENDPOINTS.accountLogin;
 
   try {
-    const response = await post(apiUrl, { username, password });
+    const captchaToken = await getRecaptchaToken(RECAPTCHA_LOGIN_ACTION);
+    const response = await post(apiUrl, {
+      username,
+      password: await encryptPassword(password),
+      captchaToken,
+    });
     return response?.data;
   } catch (error) {
     console.error('error in login', error);
@@ -81,7 +91,9 @@ export const getUserId = async (): Promise<any> => {
 export const resetPassword = async (newPassword: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.resetPassword;
   try {
-    const response = await post(apiUrl, { newPassword });
+    const response = await post(apiUrl, {
+      newPassword: await encryptPassword(newPassword),
+    });
     return response?.data;
   } catch (error) {
     console.error('error in reset', error);
