@@ -625,6 +625,9 @@ const RegisterationFlow = () => {
                 "var2": password
               }
             }
+          }).catch((error) => {
+            // Account is already created; a failed credentials SMS must not block sign-in
+            console.error('error in sending credentials message', error?.message);
           });
           // Added condition to hide popup based on enroll present or not
           if (enroll) {

@@ -13,6 +13,7 @@ const RECAPTCHA_LOAD_TIMEOUT_MS = 10000;
 
 export const RECAPTCHA_LOGIN_ACTION = 'login';
 export const RECAPTCHA_SEND_OTP_ACTION = 'send_otp';
+export const RECAPTCHA_SEND_MESSAGE_ACTION = 'send_message';
 export const CAPTCHA_TOKEN_ERROR = 'CAPTCHA_TOKEN_GENERATION_FAILED';
 
 let recaptchaLoader: Promise<any> | null = null;
