@@ -358,7 +358,9 @@
     "ENROLLMENT_NUMBER": "नावनोंदणी क्रमांक",
     "SELECT_OPTION": "पर्याय निवडा",
     "PROFILE_UPDATE_SUCCESSFULLY": "प्रोफाईल यशस्वीरित्या अपडेट केले",
-    "UNABLE_TO_PROFILE_UPDATE_": "प्रोफाईल अपडेट करू शकलो नाही"
+    "UNABLE_TO_PROFILE_UPDATE_": "प्रोफाईल अपडेट करू शकलो नाही",
+    "MOCK_TEST": "मॉक टेस्ट",
+    "UNIT_TEST": "युनिट टेस्ट"
   },
   "FIELDS": {
     "DESIGNATION": "पदवी",
@@ -1016,7 +1018,20 @@
     "IMAGE_UPLOADED": "प्रतिमा अपलोड केली",
     "VIEW": "पहा",
     "REUPLOAD": "पुन्हा अपलोड करा",
-    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* स्वरूप: jpg, jpeg. आकार: {{mb}} MB {{count}} पर्यंत प्रतिमा"
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* स्वरूप: jpg, jpeg. आकार: {{mb}} MB {{count}} पर्यंत प्रतिमा",
+    "BATCH": "बॅच",
+    "ATTEMPT_DETAILS": "प्रयत्न तपशील",
+    "ATTEMPT_SUMMARY": "प्रयत्न सारांश",
+    "CORRECT": "बरोबर",
+    "INCORRECT": "चूक",
+    "SCORE": "गुण",
+    "TIME": "वेळ",
+    "ATTEMPTED_ON": "प्रयत्न केला",
+    "PERCENTAGE": "टक्केवारी",
+    "NO_ANSWER": "उत्तर नाही",
+    "ATTEMPT_NOT_FOUND": "मूल्यांकन प्रयत्न सापडला नाही",
+    "SUBMITTING": "सबमिट होत आहे...",
+    "UPDATING": "अपडेट होत आहे..."
   },
   "MOBILIZER": {
     "MOBILIZER": "मार्गदर्शक",

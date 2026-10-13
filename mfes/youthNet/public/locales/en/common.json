@@ -492,7 +492,9 @@
     "ENROLLMENT_NUMBER": "Enrollment Number",
     "SELECT_OPTION": "Select Option",
     "PROFILE_UPDATE_SUCCESSFULLY": "Profile updated successfully",
-    "UNABLE_TO_PROFILE_UPDATE_": "Unable to update profile"
+    "UNABLE_TO_PROFILE_UPDATE_": "Unable to update profile",
+    "MOCK_TEST": "Mock Test",
+    "UNIT_TEST": "Unit Test"
   },
   "FIELDS": {
     "DESIGNATION": "Designation",
@@ -1172,7 +1174,20 @@
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
     "REUPLOAD": "Reupload",
-    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images"
+    "FORMAT_JPG_SIZE_MB_UP_TO_IMAGES": "* Format: jpg, jpeg. Size: {{mb}} MB Up to {{count}} images",
+    "BATCH": "Batch",
+    "ATTEMPT_DETAILS": "Attempt Details",
+    "ATTEMPT_SUMMARY": "Attempt Summary",
+    "CORRECT": "Correct",
+    "INCORRECT": "Incorrect",
+    "SCORE": "Score",
+    "TIME": "Time",
+    "ATTEMPTED_ON": "Attempted on",
+    "PERCENTAGE": "Percentage",
+    "NO_ANSWER": "No Answer",
+    "ATTEMPT_NOT_FOUND": "Assessment attempt not found",
+    "SUBMITTING": "Submitting...",
+    "UPDATING": "Updating..."
   },
   "MOBILIZER": {
     "MOBILIZER": "Mentor",
