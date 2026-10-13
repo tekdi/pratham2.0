@@ -1,6 +1,6 @@
 import { getCohortDetails, getCohortList } from '@/services/CohortServices';
 import { getEventList } from '@/services/EventService';
-import { sessionType } from './app.constant';
+import { sessionType, Status } from './app.constant';
 import { getAfterDate, getBeforeDate, shortDateFormat, toPascalCase } from './helper';
 
 const toUpperString = (value: unknown) =>
@@ -54,6 +54,18 @@ export const getBatchBMG = (customField: any[] | undefined): BatchBMG => ({
   grade: getCustomFieldSingleValue(customField, 'GRADE'),
 });
 
+/**
+ * A cohort node is archived if either status key says so. Which key carries
+ * the real value depends on where the node came from: top-level items from
+ * `mycohorts` use `cohortStatus`, nested `childData` items use `status`, and
+ * `flresponsetotl` (the facilitator path in `getCohortList`) swaps the two
+ * while rebuilding the center hierarchy. Neither key is reliable on its own,
+ * so both are checked.
+ */
+const isArchivedNode = (node: any): boolean =>
+  toUpperString(node?.status) === Status.ARCHIVED.toUpperCase() ||
+  toUpperString(node?.cohortStatus) === Status.ARCHIVED.toUpperCase();
+
 export interface BatchInfo {
   batchId: string;
   batchName: string;
@@ -74,6 +86,11 @@ export const flattenBatches = (
 ): BatchInfo[] => {
   let result: BatchInfo[] = [];
   for (const node of nodes || []) {
+    // An archived node is dropped along with everything under it - an
+    // archived center takes its batches with it. Only the top level of this
+    // tree is status-filtered upstream (`getCohortList`), so archived batches
+    // nested in `childData` reach here for both roles.
+    if (isArchivedNode(node)) continue;
     const children = Array.isArray(node?.childData) ? node.childData : [];
     if (children.length > 0) {
       result = result.concat(
