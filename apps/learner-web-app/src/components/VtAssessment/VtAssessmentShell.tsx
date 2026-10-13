@@ -18,7 +18,7 @@ interface VtAssessmentShellProps {
 }
 
 /**
- * Chrome shared by every /assessment page: the app Layout, a back/title bar, and
+ * Chrome shared by every /l2-courses page: the app Layout, a back/title bar, and
  * the VT eligibility gate. A learner who reaches one of these routes without an
  * active batch (deep link, batch removed mid-session) is sent to their landing
  * page rather than shown an empty screen.

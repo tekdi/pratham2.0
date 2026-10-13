@@ -565,7 +565,11 @@
       "CANNOT_BE_RESUBMITTED": "Re-verify the image after selection. Once submitted for evaluation, it cannot be resubmitted.",
       "RESULT_NOT_SAVED": "Your result could not be saved. Please check your connection and contact support if this continues.",
       "BACK": "Back",
-      "OK": "OK"
+      "OK": "OK",
+      "L2_COURSES": "L2 Courses",
+      "TAB_COURSES": "Courses",
+      "TAB_ASSESSMENT": "Assessment",
+      "NO_COURSES_FOUND": "No courses found"
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",

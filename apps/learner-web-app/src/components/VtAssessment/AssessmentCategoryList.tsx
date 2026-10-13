@@ -13,7 +13,7 @@ import {
   groupByAssessmentType,
   VtQuestionSet,
 } from '@learner/utils/helpers/vtAssessmentHelpers';
-import { CategoryCard, VtAssessmentShell } from '@learner/components/VtAssessment';
+import CategoryCard from './CategoryCard';
 
 interface CategoryRow {
   type: string;
@@ -21,38 +21,48 @@ interface CategoryRow {
   percentage?: number | string;
 }
 
-const AssessmentCategoryList: React.FC = () => {
+/**
+ * Assessment tab of /l2-courses: the categories (Pre Test, Post Test, …) built
+ * from the question sets attached to the learner's batch.
+ */
+const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
+  assessmentIds,
+}) => {
   const { t } = useTranslation();
   const router = useRouter();
 
   const [categories, setCategories] = useState<CategoryRow[] | null>(null);
   const [hasError, setHasError] = useState(false);
 
-  const loadCategories = useCallback(async (assessmentIds: string[]) => {
+  // Keyed on the id list, not the batch object: the eligibility hook re-polls
+  // every 3 seconds and hands back a fresh object each time, which would
+  // otherwise re-run this fetch on every tick.
+  const assessmentIdsKey = assessmentIds.join(',');
+
+  const load = useCallback(async () => {
     const userId =
       typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+    const ids = assessmentIdsKey ? assessmentIdsKey.split(',') : [];
 
     // No assessment attached to the batch → "No data found", and no search call.
-    if (!assessmentIds.length || !userId) {
+    if (!ids.length || !userId) {
       setCategories([]);
       return;
     }
 
     setHasError(false);
     try {
-      const questionSets = (await getAssessmentsByIds(
-        assessmentIds
-      )) as VtQuestionSet[];
+      const questionSets = (await getAssessmentsByIds(ids)) as VtQuestionSet[];
       const groups = groupByAssessmentType(questionSets);
 
       const rows = await Promise.all(
         groups.map(async ({ type, items }) => {
-          const ids = items.map(getQuestionSetId).filter(Boolean);
+          const categoryIds = items.map(getQuestionSetId).filter(Boolean);
           const summary = await getAssessmentStatusSummary({
             userId: [userId],
-            courseId: ids,
-            unitId: ids,
-            contentId: ids,
+            courseId: categoryIds,
+            unitId: categoryIds,
+            contentId: categoryIds,
           });
           return {
             type,
@@ -63,45 +73,15 @@ const AssessmentCategoryList: React.FC = () => {
       );
       setCategories(rows);
     } catch (error) {
-      console.error('Assessment: failed to load categories', error);
+      console.error('AssessmentCategoryList: failed to load categories', error);
       setHasError(true);
       setCategories([]);
     }
-  }, []);
+  }, [assessmentIdsKey]);
 
-  return (
-    <VtAssessmentShell title={t('LEARNER_APP.VT_ASSESSMENT.TITLE')}>
-      {({ assessmentIds }) => (
-        <CategoryListBody
-          assessmentIds={assessmentIds}
-          categories={categories}
-          hasError={hasError}
-          onLoad={loadCategories}
-          onSelect={(type) =>
-            router.push(`/assessment/${encodeURIComponent(type)}`)
-          }
-        />
-      )}
-    </VtAssessmentShell>
-  );
-};
-
-const CategoryListBody: React.FC<{
-  assessmentIds: string[];
-  categories: CategoryRow[] | null;
-  hasError: boolean;
-  onLoad: (ids: string[]) => void;
-  onSelect: (type: string) => void;
-}> = ({ assessmentIds, categories, hasError, onLoad, onSelect }) => {
-  const { t } = useTranslation();
-
-  // Keyed on the id list, not the batch object: the eligibility hook re-polls
-  // every 3 seconds and hands back a fresh object each time, which would
-  // otherwise re-run this fetch on every tick.
-  const assessmentIdsKey = assessmentIds.join(',');
   useEffect(() => {
-    onLoad(assessmentIdsKey ? assessmentIdsKey.split(',') : []);
-  }, [assessmentIdsKey, onLoad]);
+    load();
+  }, [load]);
 
   if (categories === null) {
     return (
@@ -142,7 +122,9 @@ const CategoryListBody: React.FC<{
           type={category.type}
           status={category.status}
           percentage={category.percentage}
-          onClick={() => onSelect(category.type)}
+          onClick={() =>
+            router.push(`/l2-courses/${encodeURIComponent(category.type)}`)
+          }
         />
       ))}
     </Box>
