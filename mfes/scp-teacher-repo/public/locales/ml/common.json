@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "നിങ്ങൾ",
     "LANGUAGE": "ഭാഷ",
     "LOADING": "ലോഡിംഗ്",
     "MARK": "അടയാളപ്പെടുത്തുക",
@@ -375,6 +376,7 @@
     "ERROR_NUMBER": "കേന്ദ്രത്തിന്റെ പേര് സംഖ്യയായിരിക്കരുത്"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "സൃഷ്ടിച്ചത്",
     "THIS_SESSION": "ഈ സെഷൻ",
     "FOLLOWING_SESSIONS": "ഈ സെഷനും തുടര്‍ന്ന് വരുന്ന സെഷനുകളും",
     "MODE_OF_SESSION": "സെഷന്റെ മോഡ്",
