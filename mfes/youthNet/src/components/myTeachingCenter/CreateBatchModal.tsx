@@ -248,6 +248,13 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
       return;
     }
+    // A batch whose saved End Date has already passed is Completed and can
+    // no longer be edited.
+    const savedEndDate = toDateKey(editBatch.endDate);
+    if (savedEndDate && savedEndDate < getToday()) {
+      showToastMessage(t('MY_TEACHING_CENTER.BATCH_COMPLETED_CANNOT_UPDATE'), 'error');
+      return;
+    }
     if (!formData?.name || !formData?.batch_type || !formData?.startdate || !formData?.enddate) {
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
       return;

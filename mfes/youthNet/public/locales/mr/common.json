@@ -1358,6 +1358,7 @@
     "UPDATE": "अपडेट करा",
     "BATCH_UPDATED_SUCCESS": "बॅच यशस्वीरित्या अपडेट झाली",
     "BATCH_UPDATE_FAILED": "बॅच अपडेट करता आली नाही",
+    "BATCH_COMPLETED_CANNOT_UPDATE": "ही बॅच पूर्ण झाली आहे. पूर्ण झालेली बॅच अपडेट करता येत नाही.",
     "DOMAIN_COURSE_NOT_ASSIGNED": "निवडलेले डोमेन/कोर्स तुम्हाला नियुक्त केलेले नाही",
     "LEARNER_COUNT": "{{count}} शिकणारे",
     "LEARNER_LIST": "शिकणाऱ्यांची यादी",

@@ -18,6 +18,7 @@ import { bulkCreateCohortMembers } from '../../services/CohortService';
 import { updateUser } from '../../services/youthNet/Dashboard/UserServices';
 import { getTrainerTaxonomy } from '../../services/myTeachingCenter/TrainerTaxonomyService';
 import { searchBatchesForCenter } from '../../services/myTeachingCenter/BatchListService';
+import { toPascalCase } from '../../utils/helper';
 import {
   buildBatchEnrollCustomFields,
   isUpdateUserSuccess,
@@ -203,7 +204,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
           <Autocomplete
             options={centerOptions || []}
             loading={centerOptions == null}
-            getOptionLabel={(o) => o.label}
+            getOptionLabel={(o) => toPascalCase(o.label)}
             value={selectedCenter}
             onChange={(_, option) => handleCenterChange(option)}
             renderInput={(params) => <TextField {...params} label="Center" />}
@@ -214,7 +215,7 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
             options={batchOptions || []}
             loading={!!selectedCenter && batchOptions == null}
             disabled={!selectedCenter}
-            getOptionLabel={(o) => o.label}
+            getOptionLabel={(o) => toPascalCase(o.label)}
             value={selectedBatch}
             onChange={(_, option) => setSelectedBatch(option)}
             renderInput={(params) => (
