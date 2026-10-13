@@ -252,10 +252,6 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
       return;
     }
-    if (!formData?.assessments?.length) {
-      showToastMessage(t('MY_TEACHING_CENTER.ASSESSMENT_REQUIRED'), 'error');
-      return;
-    }
     // Never send Domain/Skills from the Edit form.
     const editFormData = { ...formData };
     EDIT_HIDDEN_FIELDS.forEach((key) => delete editFormData[key]);
@@ -300,10 +296,6 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
     }
     if (!formData?.name || !formData?.batch_type || !formData?.startdate || !formData?.enddate) {
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_CREATE_FAILED'), 'error');
-      return;
-    }
-    if (!formData?.assessments?.length) {
-      showToastMessage(t('MY_TEACHING_CENTER.ASSESSMENT_REQUIRED'), 'error');
       return;
     }
 
@@ -361,6 +353,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
           uiSchema={{ ...uiSchema, 'ui:submitButtonOptions': { norender: true } }}
           SubmitaFunction={(fd: any) => setFormData(fd)}
           isCallSubmitInHandle={true}
+          showRequiredIndicator
           prefilledFormData={prefilledFormData}
           type={isEdit ? 'my-teaching-center-batch-edit' : 'my-teaching-center-batch-create'}
         />

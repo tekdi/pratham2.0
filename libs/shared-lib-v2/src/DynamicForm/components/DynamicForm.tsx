@@ -68,6 +68,11 @@ const DynamicForm = forwardRef(({
   mobileNumber="",
   onFormDataChange,
   valueSelectedChange=null,
+  // isCallSubmitInHandle renders one <Form> per field, which drops the
+  // schema's `required` list — so widgets never get `required` and show no
+  // "*". Opt-in (to leave existing forms untouched) to carry each field's
+  // required flag into its own per-field schema.
+  showRequiredIndicator = false,
 }: any, ref) => {
   console.log('schema=======>', schema);
   console.log('uiSchema=======>', uiSchema);
@@ -2336,6 +2341,9 @@ const DynamicForm = forwardRef(({
                 schema={{
                   type: 'object',
                   properties: { [key]: formSchema.properties[key] },
+                  ...(showRequiredIndicator && formSchema.required?.includes(key)
+                    ? { required: [key] }
+                    : {}),
                 }}
                 uiSchema={{ [key]: formUiSchema[key] }}
                 formData={formData}

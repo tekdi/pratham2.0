@@ -116,7 +116,7 @@ export const L2BatchCreate = {
         maxSelection: 20,
         isMultiSelect: true,
         uniqueItems: true,
-        isRequired: true,
+        isRequired: false,
         items: {
           type: 'string',
           enum: ['Select'],
@@ -160,7 +160,6 @@ export const L2BatchCreate = {
       'batch_type',
       'domain',
       'skills',
-      'assessments',
       'startdate',
       'enddate',
     ],
