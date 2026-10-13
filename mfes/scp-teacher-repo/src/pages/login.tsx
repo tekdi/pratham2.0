@@ -36,6 +36,7 @@ import { getUserDetails, getUserId } from '../services/ProfileService';
 import loginImg from './../assets/images/login-image.jpg';
 import { UpdateDeviceNotification } from '@/services/NotificationService';
 import { TENANT_DATA } from '../../app.config';
+import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
 
 const LoginPage = () => {
   const { t, i18n } = useTranslation();
@@ -233,11 +234,7 @@ const LoginPage = () => {
               localStorage.setItem('token', token);
             }
 
-            if (rememberMe) {
-              localStorage.setItem('refreshToken', refreshToken);
-            } else {
-              localStorage.removeItem('refreshToken');
-            }
+            await setSecureRefreshToken(refreshToken);
 
             const userResponse = await getUserId();
 

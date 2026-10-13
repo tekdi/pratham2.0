@@ -51,6 +51,7 @@ import {
 import { getVerifiedMobile, clearVerifiedMobile } from '@learner/utils/verifiedMobile';
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
+import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
 
 type UserAccount = {
   name: string;
@@ -758,6 +759,7 @@ const RegisterationFlow = () => {
             } else {
               localStorage.removeItem('refreshTokenForAndroid');
             }
+            await setSecureRefreshToken(refreshToken);
 
             localStorage.setItem('token', token);
 

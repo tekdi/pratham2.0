@@ -33,6 +33,7 @@ import { getUserId, login } from '../services/LoginService';
 
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import { applyLanguage, storeLanguage } from '@shared-lib-v2/utils/languageSync';
+import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
 
 // Toggle back on to restore the login page's language selector.
 const SHOW_LANGUAGE_DROPDOWN = false;
@@ -195,9 +196,7 @@ const LoginPage = () => {
             const token = response.result.access_token;
             const refreshToken = response?.result?.refresh_token;
             localStorage.setItem('token', token);
-            rememberMe
-              ? localStorage.setItem('refreshToken', refreshToken)
-              : localStorage.removeItem('refreshToken');
+            await setSecureRefreshToken(refreshToken);
 
             const userResponse = await getUserId();
             setUserResponse(userResponse);
