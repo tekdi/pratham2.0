@@ -13,6 +13,22 @@ import {
 // the tab appears/disappears as soon as a batch is assigned or removed. Same here.
 const POLL_INTERVAL_MS = 3000;
 
+/**
+ * Do two poll results describe the same batch? Compares the identity and the
+ * fields this feature actually reads (status, membership, custom fields), so a
+ * re-fetch that returns identical data does not churn object identity.
+ */
+const isSameBatch = (a: VtBatch | null, b: VtBatch | null): boolean => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return (
+    a.cohortId === b.cohortId &&
+    a.cohortStatus === b.cohortStatus &&
+    a.cohortMemberStatus === b.cohortMemberStatus &&
+    JSON.stringify(a.customField ?? []) === JSON.stringify(b.customField ?? [])
+  );
+};
+
 export interface VtAssessmentEligibility {
   loading: boolean;
   eligible: boolean;
@@ -74,7 +90,15 @@ export const useVtAssessmentEligibility = (
       const activeBatch = await getActiveVtBatch(userId, {
         programKey: userProgram ?? '',
       });
-      if (mountedRef.current) setBatch(activeBatch);
+      // Keep the previous object when nothing material changed. Every poll tick
+      // returns a freshly parsed response, and handing that new identity down
+      // would re-render consumers 20x a minute — enough to defeat the memo() on
+      // LearnerCourse and re-run the whole content search on each tick.
+      if (mountedRef.current) {
+        setBatch((previous) =>
+          isSameBatch(previous, activeBatch) ? previous : activeBatch
+        );
+      }
     } finally {
       inFlightRef.current = false;
       if (mountedRef.current) setResolvedFor(userProgram);

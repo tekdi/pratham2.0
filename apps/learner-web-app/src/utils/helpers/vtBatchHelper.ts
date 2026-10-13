@@ -129,13 +129,38 @@ const fetchActiveVtBatch = async (userId: string): Promise<VtBatch | null> => {
 };
 
 /**
+ * Read one custom field off the batch as a list of plain strings.
+ * `selectedValues` entries are either bare strings or `{ id, label }` objects,
+ * and which one arrives varies by field, so both are handled.
+ */
+const extractCustomFieldValues = (
+  batch: VtBatch | null | undefined,
+  label: string,
+  prefer: 'label' | 'id' = 'label'
+): string[] => {
+  const field = batch?.customField?.find((item) => item?.label === label);
+  const values = Array.isArray(field?.selectedValues) ? field?.selectedValues : [];
+  return (values ?? [])
+    .map((value) => {
+      if (typeof value === 'string') return value;
+      return prefer === 'id' ? value?.id ?? value?.label : value?.label ?? value?.id;
+    })
+    .filter((value): value is string => Boolean(value));
+};
+
+/**
+ * The batch's SKILLS custom field (e.g. ["Sewing Machine Operator (SMO)"]).
+ *
+ * `skills` is the deepest level of the pos-framework taxonomy
+ * (domain > subDomain > subject > skills) and courses expose it as `se_skills`,
+ * so these values filter the L2 course catalogue directly.
+ */
+export const extractBatchSkills = (batch: VtBatch | null | undefined): string[] =>
+  extractCustomFieldValues(batch, 'SKILLS');
+
+/**
  * Question-set ids attached to the batch via its ASSESSMENTS custom field.
  * These are the only assessments a VT learner may see.
  */
-export const extractAssessmentIds = (batch: VtBatch | null | undefined): string[] => {
-  const field = batch?.customField?.find((item) => item?.label === 'ASSESSMENTS');
-  const values = Array.isArray(field?.selectedValues) ? field?.selectedValues : [];
-  return (values ?? [])
-    .map((value) => (typeof value === 'string' ? value : value?.id))
-    .filter((id): id is string => Boolean(id));
-};
+export const extractAssessmentIds = (batch: VtBatch | null | undefined): string[] =>
+  extractCustomFieldValues(batch, 'ASSESSMENTS', 'id');

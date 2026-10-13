@@ -45,7 +45,7 @@ const TestDetailBody: React.FC = () => {
     ? rawIdentifier[0] ?? ''
     : rawIdentifier ?? '';
   const type = searchParams.get('type') ?? '';
-  const testListUrl = `/assessment/${encodeURIComponent(type)}`;
+  const testListUrl = `/l2-courses/${encodeURIComponent(type)}`;
 
   const [questionSet, setQuestionSet] = useState<VtQuestionSet | null>(null);
   const [isLoading, setIsLoading] = useState(true);

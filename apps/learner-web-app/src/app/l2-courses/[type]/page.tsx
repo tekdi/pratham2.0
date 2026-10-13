@@ -45,7 +45,7 @@ const TestListPage: React.FC = () => {
   return (
     <VtAssessmentShell
       title={t(getAssessmentTypeLabelKey(type), { defaultValue: type })}
-      onBack={() => router.push('/assessment')}
+      onBack={() => router.push('/l2-courses?tab=assessment')}
     >
       {({ assessmentIds }) => (
         <Suspense fallback={<TestListSkeleton />}>
@@ -88,7 +88,7 @@ const TestListBody: React.FC<{ type: string; assessmentIds: string[] }> = ({
   const [completedQuestionSet, setCompletedQuestionSet] =
     useState<VtQuestionSet | null>(null);
 
-  const returnUrl = `/assessment/${encodeURIComponent(type)}`;
+  const returnUrl = `/l2-courses/${encodeURIComponent(type)}`;
 
   // See the category list: key on the joined ids so the 3-second eligibility
   // poll does not re-trigger this fetch.
@@ -208,12 +208,12 @@ const TestListBody: React.FC<{ type: string; assessmentIds: string[] }> = ({
             questionSet={questionSet}
             onStart={() =>
               router.push(
-                `/assessment/detail/${id}?type=${encodeURIComponent(type)}`
+                `/l2-courses/detail/${id}?type=${encodeURIComponent(type)}`
               )
             }
             onOpenAnswerSheet={() =>
               router.push(
-                `/assessment/answersheet/${id}?type=${encodeURIComponent(type)}`
+                `/l2-courses/answersheet/${id}?type=${encodeURIComponent(type)}`
               )
             }
           />

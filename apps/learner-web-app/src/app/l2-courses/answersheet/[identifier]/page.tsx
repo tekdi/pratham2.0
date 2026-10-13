@@ -101,7 +101,7 @@ const AnswerSheetBody: React.FC = () => {
     ? rawIdentifier[0] ?? ''
     : rawIdentifier ?? '';
   const type = searchParams.get('type') ?? '';
-  const testListUrl = `/assessment/${encodeURIComponent(type)}`;
+  const testListUrl = `/l2-courses/${encodeURIComponent(type)}`;
 
   const [data, setData] = useState<AnswerSheetData | null>(null);
   const [solutions, setSolutions] = useState<Record<string, string>>({});

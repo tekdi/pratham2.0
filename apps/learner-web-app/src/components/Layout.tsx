@@ -26,10 +26,11 @@ import MuiThemeProvider from '@learner/assets/theme/MuiThemeProvider';
 import { TenantName } from '../utils/app.constant';
 import { useVtAssessmentEligibility } from '@learner/utils/hooks/useVtAssessmentEligibility';
 
-// Vocational Training only. The Assessment entry is injected here in code rather
+// Vocational Training only. The L2 Courses entry is injected here in code rather
 // than driven by the tenant's uiConfig.navbarItems, because it must also depend on
 // the learner having an active batch — something tenant config cannot express.
-const VT_ASSESSMENT_ROUTE = '/assessment';
+// The page itself holds the Courses and Assessment tabs.
+const VT_ASSESSMENT_ROUTE = '/l2-courses';
 
 // Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
@@ -73,7 +74,7 @@ const getDynamicNavConfig = ({
   const navLinks: NewDrawerItemProp[] = [];
 
   const buildVtAssessmentLink = (): NewDrawerItemProp => ({
-    title: t('LEARNER_APP.VT_ASSESSMENT.TITLE'),
+    title: t('LEARNER_APP.VT_ASSESSMENT.L2_COURSES'),
     icon: <FactCheckOutlined sx={{ width: 28, height: 28 }} />,
     to: () => handleNavClick(() => router.push(VT_ASSESSMENT_ROUTE)),
     isActive: currentPage === VT_ASSESSMENT_ROUTE,
@@ -92,6 +93,7 @@ const getDynamicNavConfig = ({
   const sortedNavItems = [...navbarItems].sort((a, b) => (a.order || 0) - (b.order || 0));
 
   let profileLinkIndex = -1;
+  let lastCourseLinkIndex = -1;
 
   sortedNavItems.forEach((item) => {
     const { key, route, order } = item;
@@ -150,8 +152,15 @@ const getDynamicNavConfig = ({
       }
     };
 
-    if (key.toLowerCase() === 'profile') {
+    const keyLower = key.toLowerCase();
+    if (keyLower === 'profile') {
       profileLinkIndex = navLinks.length;
+    }
+    // L2 Courses sits directly after the L1 Courses entry, so the two course
+    // menus read as a pair. Tracks the last matching item in case a tenant
+    // configures more than one course entry.
+    if (keyLower.includes('course')) {
+      lastCourseLinkIndex = navLinks.length;
     }
 
     // Add navigation item maintaining exact sequence by order
@@ -165,7 +174,14 @@ const getDynamicNavConfig = ({
   });
 
   if (showVtAssessment) {
-    const insertAt = profileLinkIndex === -1 ? navLinks.length : profileLinkIndex;
+    // Preferred slot is immediately after L1 Courses. Falls back to just before
+    // Profile, then to the end, for tenants with no course entry in their navbar.
+    let insertAt = navLinks.length;
+    if (lastCourseLinkIndex !== -1) {
+      insertAt = lastCourseLinkIndex + 1;
+    } else if (profileLinkIndex !== -1) {
+      insertAt = profileLinkIndex;
+    }
     navLinks.splice(insertAt, 0, buildVtAssessmentLink());
   }
 

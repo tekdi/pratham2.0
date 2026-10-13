@@ -268,6 +268,9 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const handleProgramSwitch = async (program: TenantData) => {
     try {
       localStorage.removeItem('learnerCourseFilters');
+      // The L2 Courses tab keeps its own filter state; it is scoped to the
+      // previous program's batch, so it must clear with the rest.
+      localStorage.removeItem('l2CourseFilters');
 
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
@@ -376,6 +379,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
   const handleShowAllPrograms = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     localStorage.removeItem('learnerCourseFilters');
+    localStorage.removeItem('l2CourseFilters');
     onClose();
     router.push('/programs');
   };
