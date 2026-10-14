@@ -139,7 +139,7 @@ export enum RoleId {
 
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
-  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Second Chance Program Pathways',
+  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Pathways',
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
@@ -299,7 +299,7 @@ export enum fieldKeys {
 export const TENANT_DATA = {
   TENANT_NAME: 'tenantName',
   SECOND_CHANCE_PROGRAM: 'Second Chance Program',
-  SECOND_CHANCE_PROGRAM_PATHWAYS: 'Second Chance Program Pathways',
+  SECOND_CHANCE_PROGRAM_PATHWAYS: 'Pathways',
   PRATHAM_SCP: 'pratham SCP',
   YOUTHNET: 'Vocational Training',
   POS : 'Open School',
