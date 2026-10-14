@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "You",
     "LANGUAGE": "Language",
     "LOADING": "Loading",
     "MARK": "Mark",
@@ -472,6 +473,7 @@
     "RENAME_BATCH": "Rename Batch"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "Created by",
     "THIS_SESSION": "This session",
     "FOLLOWING_SESSIONS": "This and following sessions",
     "MODE_OF_SESSION": "Mode of Session",
