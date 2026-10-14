@@ -28,6 +28,7 @@ import useSubmittedButtonStore from '@/utils/useSharedState';
 import TenantService from '@/services/TenantService';
 import { transformLabel } from '@/utils/helper';
 import useStore from '@/store/store';
+import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -206,11 +207,7 @@ const SSOContent = () => {
       const token = response.access_token;
       const refreshToken = response?.refresh_token;
       localStorage.setItem('token', token);
-      if (data?.remember) {
-        localStorage.setItem('refreshToken', refreshToken);
-      } else {
-        localStorage.removeItem('refreshToken');
-      }
+      await setSecureRefreshToken(refreshToken);
 
       const userResponse = await getUserId();
       console.log('userResponse=========>', userResponse);
