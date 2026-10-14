@@ -22,6 +22,7 @@
   "BOARD": "बोर्ड",
   "MEDIUM": "माध्यम",
   "GRADE": "कक्षा",
+  "STREAM": "स्ट्रीम",
   "REGULAR": "नियमित",
   "REMOTE": "दूरस्थ",
   "SKILLING_CENTER_IMAGE": "स्किलिंग सेंटर की फोटो",
@@ -230,6 +231,7 @@
       "EXPLORE_MORE_COURSES": "और भी कोर्स देखें",
       "EXPLORE_ADDITIONAL_RESOURCES": "अतिरिक्त संसाधन और सामग्री देखें",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "सेकंड चांस प्रोग्राम के लिए पंजीकरण करने के लिए धन्यवाद। हमारी टीम जल्द ही आपसे संपर्क करेगी। तब तक, आप उपलब्ध पाठ्यक्रमों के बारे में जानकारी प्राप्त कर सकते हैं।",
+      "SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE": "सेकंड चांस प्रोग्राम पाथवेज़ के लिए पंजीकरण करने के लिए धन्यवाद। हमारी टीम जल्द ही आपसे संपर्क करेगी। तब तक, आप उपलब्ध पाठ्यक्रमों के बारे में जानकारी प्राप्त कर सकते हैं।",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "आप \"डाउनलोड प्ले स्टोर\" बटन पर टैप करके ऐप डाउनलोड कर सकते हैं।",
       "REGISTRATION_SUCCESSFUL_TITLE": "पंजीकरण सफल",
       "REGISTERED": "पंजीकृत",
@@ -835,6 +837,7 @@
     "BOARD": "बोर्ड",
     "MEDIUM": "माध्यम",
     "GRADE": "कक्षा",
+    "STREAM": "स्ट्रीम",
     "USERNAME": "यूज़रनेम",
     "DESCRIPTION": "विवरण",
     "PROGRAM_NAME": "कार्यक्रम का नाम",
@@ -1196,7 +1199,7 @@
     "vocational_training_discription": "सिर्फ 2 महीने के प्रशिक्षण में एंट्री लेवल नौकरी पाने के लिए वोकेशनल ट्रेनिंग लें",
     "Camp to Club": "कैंप टू क्लब",
     "camp_to_club_discription": "कैंप टू क्लब",
-    "Second Chance Program Pathways": "सेकंड चांस प्रोग्राम पाथवेज",
+    "Pathways": "पाथवेज",
     "second_chance_program_pathways_discription": "अपनी 12वीं कक्षा की पढ़ाई पूरी करने के लिए दूसरा मौका पाइए"
   }
 }

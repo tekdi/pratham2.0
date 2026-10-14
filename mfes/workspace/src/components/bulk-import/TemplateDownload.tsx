@@ -17,18 +17,24 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import QuizOutlinedIcon from '@mui/icons-material/QuizOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import useTenantConfig from '@workspace/hooks/useTenantConfig';
 
 interface Props {
   onProceed: () => void;
 }
 
-// ─── Detect framework from localStorage ──────────────────────
+// ─── Detect framework from logged-in user's tenant config ────
+// Workspace/admin login never sets localStorage `collectionFramework`
+// (only the learner app does), so the tenant config is the source of truth.
 
-const getCollectionFramework = (): 'pos-framework' | 'scp-framework' => {
-  if (typeof window === 'undefined') return 'pos-framework';
-  return localStorage.getItem('collectionFramework') === 'scp-framework'
-    ? 'scp-framework'
-    : 'pos-framework';
+const getCollectionFramework = (
+  tenantFramework?: string
+): 'pos-framework' | 'scp-framework' => {
+  let fw = tenantFramework;
+  if (!fw && typeof window !== 'undefined') {
+    fw = localStorage.getItem('collectionFramework') ?? undefined;
+  }
+  return fw === 'scp-framework' ? 'scp-framework' : 'pos-framework';
 };
 
 // ─── Sheet definitions ────────────────────────────────────────
@@ -78,8 +84,11 @@ const FRAMEWORK_META: Record<
 const TemplateDownload: React.FC<Props> = ({ onProceed }) => {
   const router = useRouter();
 
-  // Read on mount (client-side only)
-  const framework = useMemo(() => getCollectionFramework(), []);
+  const tenantConfig = useTenantConfig();
+  const framework = useMemo(
+    () => getCollectionFramework(tenantConfig?.COLLECTION_FRAMEWORK),
+    [tenantConfig]
+  );
   const meta = FRAMEWORK_META[framework] ?? FRAMEWORK_META['pos-framework'];
 
   // Template API lives in the host admin app (same domain, no basePath prefix).

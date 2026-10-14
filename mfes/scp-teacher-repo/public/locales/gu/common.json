@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "તમે",
     "LANGUAGE": "ભાષા",
     "LOADING": "લોડ કરી રહ્યા છીએ",
     "MARK": "ચિન્હ /નિશાની",
@@ -472,6 +473,7 @@
     "RENAME_BATCH": "બેચનું નામ બદલો"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "દ્વારા બનાવેલ",
     "THIS_SESSION": "આ સત્ર",
     "FOLLOWING_SESSIONS": "આ અને નીચેના સત્રો",
     "MODE_OF_SESSION": "સત્રનો મોડ",
