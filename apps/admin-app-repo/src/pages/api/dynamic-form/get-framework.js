@@ -49,7 +49,27 @@ function findAssociatedTermNames(framework, startTerms, targetCategory, allowedN
 export default function handler(req, res) {
   if (req.method === 'POST') {
     try {
-      const { code, fetchUrl, selectedvalue, findcode, allowedValues, useAssociationGraph } = req.body;
+      const {
+        code,
+        fetchUrl,
+        selectedvalue,
+        findcode,
+        allowedValues,
+        useAssociationGraph,
+        directOnly,
+      } = req.body;
+      // directOnly (opt-in): only DIRECT associations of the selected term
+      // (no association-graph walk, which can reach a sibling term's
+      // children - e.g. another domain's skills), and/or every term of
+      // `code` when nothing is selected - in both cases narrowed to
+      // `allowedValues` when given. Used by the YouthNet batch form so
+      // Skills only ever list the selected Domain's own skills.
+      const allowedSet =
+        Array.isArray(allowedValues) && allowedValues.length > 0
+          ? new Set(allowedValues)
+          : null;
+      const keepAllowed = (option) =>
+        !directOnly || !allowedSet || allowedSet.has(option.value);
 
       const axios = require('axios');
 
@@ -93,7 +113,7 @@ export default function handler(req, res) {
                   if (filteredData) {
                     const hasAllowedValues =
                       Array.isArray(allowedValues) && allowedValues.length > 0;
-                    if (hasAllowedValues || useAssociationGraph) {
+                    if (!directOnly && (hasAllowedValues || useAssociationGraph)) {
                       // Target category isn't necessarily a direct association of
                       // the selected term(s) (e.g. stream is only associated with
                       // medium, not board directly) - walk the association graph
@@ -119,6 +139,7 @@ export default function handler(req, res) {
                       );
                     }
                   }
+                  options = options.filter(keepAllowed);
                   // console.log('options', JSON.stringify(options));
                 } else if (selectedvalue != '') {
                   // Transform terms into options
@@ -128,7 +149,8 @@ export default function handler(req, res) {
                     .map((term) => ({
                       label: term.name,
                       value: term.name,
-                    }));
+                    }))
+                    .filter(keepAllowed);
                 }
                 // console.log('option', options);
               }
