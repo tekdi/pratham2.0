@@ -8,7 +8,7 @@ import { useUserIdStore } from '@/store/useUserIdStore';
 import useSubmittedButtonStore from '@/utils/useSharedState';
 import useStore from '@/store/store';
 import { transformLabel } from '@/utils/helper';
-import { Role, Storage, TenantName } from '@/utils/app.constant';
+import { Role, Storage, TenantName, isSecondChanceTenant } from '@/utils/app.constant';
 import { AcademicYear } from '@/utils/Interfaces';
 
 export interface AccountSwitchTarget {
@@ -106,6 +106,10 @@ export const useAccountSwitch = () => {
           console.error('Error overriding role in userInfo:', e);
         }
 
+        const selectedTenantData = userInfo?.tenantData?.find(
+          (tenant: any) => tenant.tenantId === tenantId
+        );
+
         if (typeof window !== 'undefined' && window.localStorage) {
           if (userInfo) {
             if (userInfo?.customFields) {
@@ -129,7 +133,7 @@ export const useAccountSwitch = () => {
             localStorage.setItem('tenantName', tenantName || '');
             localStorage.setItem(
               'uiConfig',
-              JSON.stringify(userInfo?.tenantData?.[0]?.params?.uiConfig || {})
+              JSON.stringify(selectedTenantData?.params?.uiConfig || {})
             );
             localStorage.setItem('roleId', roleId || '');
             localStorage.setItem('roleName', roleName || '');
@@ -153,9 +157,7 @@ export const useAccountSwitch = () => {
 
         setAdminInformation(userInfo);
 
-        const tenantData = userInfo?.tenantData?.find(
-          (tenant: any) => tenant.tenantId === tenantId
-        );
+        const tenantData = selectedTenantData;
 
         if (tenantData?.tenantType === 'elearning') {
           if (
@@ -172,7 +174,8 @@ export const useAccountSwitch = () => {
           if (userInfo?.role === Role.SCTA || userInfo?.role === Role.CCTA) {
             const { locale } = router;
             // To do :- hardcoding to be removed
-            if (tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM) {
+            if (!isSecondChanceTenant(tenantData?.tenantName)) {
+              window.location.href = '/faqs';
               router.push('/faqs');
             } else {
               if (locale) {
@@ -191,12 +194,12 @@ export const useAccountSwitch = () => {
             if (locale) {
               if (
                 userInfo?.role === Role.CENTRAL_ADMIN &&
-                tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 router.push('/programs', undefined, { locale: locale });
               } else if (
                 userInfo?.role === Role.ADMIN &&
-                tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 router.push('/centers', undefined, { locale: locale });
               } else if (
@@ -208,12 +211,12 @@ export const useAccountSwitch = () => {
               }
             } else if (
               userInfo?.role === Role.CENTRAL_ADMIN &&
-              tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/programs');
             } else if (
               userInfo?.role === Role.ADMIN &&
-              tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/centers');
             } else if (
@@ -249,7 +252,7 @@ export const useAccountSwitch = () => {
                 const { locale } = router;
                 // To do :- hardcoding to be removed
                 if (
-                  tenantData?.tenantName != TenantName.SECOND_CHANCE_PROGRAM
+                  !isSecondChanceTenant(tenantData?.tenantName)
                 ) {
                   router.push('/faqs');
                 } else {
@@ -264,12 +267,12 @@ export const useAccountSwitch = () => {
                 if (locale) {
                   if (
                     userInfo?.role === Role.CENTRAL_ADMIN &&
-                    tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                    isSecondChanceTenant(tenantData?.tenantName)
                   ) {
                     router.push('/programs', undefined, { locale: locale });
                   } else if (
                     userInfo?.role === Role.ADMIN &&
-                    tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                    isSecondChanceTenant(tenantData?.tenantName)
                   ) {
                     router.push('/centers', undefined, { locale: locale });
                   } else if (
@@ -283,17 +286,17 @@ export const useAccountSwitch = () => {
                   }
                 } else if (
                   userInfo?.role === Role.CENTRAL_ADMIN &&
-                  tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                  isSecondChanceTenant(tenantData?.tenantName)
                 ) {
                   router.push('/programs');
                 } else if (
                   userInfo?.role === Role.ADMIN &&
-                  tenantData?.tenantName == TenantName.SECOND_CHANCE_PROGRAM
+                  isSecondChanceTenant(tenantData?.tenantName)
                 ) {
                   router.push('/centers');
                 } else if (
                   userInfo?.role === Role.ADMIN &&
-                  userInfo?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+                  tenantData?.tenantName == TenantName.YOUTHNET
                 ) {
                   router.push('/user-leader');
                 }
@@ -339,8 +342,8 @@ export const useAccountSwitch = () => {
 
     localStorage.setItem('name', userResponse?.firstName);
     localStorage.setItem(Storage.USER_DATA, JSON.stringify(userResponse));
-    const frameworkId = userResponse?.tenantData?.[0]?.collectionFramework;
-    const channel = userResponse?.tenantData?.[0]?.channelId;
+    const frameworkId = tenant?.collectionFramework;
+    const channel = tenant?.channelId;
     TenantService.setTenantId(tenantId);
     localStorage.setItem('collectionFramework', frameworkId);
     localStorage.setItem('channelId', channel);

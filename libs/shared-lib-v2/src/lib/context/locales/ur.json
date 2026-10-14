@@ -22,6 +22,7 @@
   "BOARD": "بورڈ",
   "MEDIUM": "ذریعہ تعلیم",
   "GRADE": "گریڈ",
+  "STREAM": "اسٹریم",
   "REGULAR": "باقاعدہ",
   "REMOTE": "ریموٹ",
   "SKILLING_CENTER_IMAGE": "اسکلنگ سینٹر کی تصویر",
@@ -785,6 +786,7 @@
     "BOARD": "بورڈ",
     "MEDIUM": "ذریعہ تعلیم",
     "GRADE": "گریڈ",
+    "STREAM": "اسٹریم",
     "USERNAME": "صارف کا نام",
     "DESCRIPTION": "تفصیل",
     "PROGRAM_NAME": "پروگرام کا نام",
@@ -1145,7 +1147,7 @@
     "vocational_training_discription": "صرف 2 مہینے کی تربیت میں انٹری لیول نوکری حاصل کرنے کے لیے ووکیشنل ٹریننگ لیں",
     "Camp to Club": "کیمپ ٹو کلب",
     "camp_to_club_discription": "کیمپ ٹو کلب",
-    "Second Chance Program Pathways": "سیکنڈ چانس پروگرام پاتھ ویز",
+    "Pathways": "پاتھ ویز",
     "second_chance_program_pathways_discription": "اپنی بارہویں جماعت کی تعلیم مکمل کرنے کے لیے دوسرا موقع حاصل کریں"
   }
 }

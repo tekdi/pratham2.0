@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "आप",
     "LANGUAGE": "भाषा",
     "LOADING": "लोड हो रहा है",
     "MARK": "चिह्नित करें",
@@ -472,6 +473,7 @@
     "RENAME_BATCH": "बैच का नाम बदलें"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "द्वारा बनाया गया",
     "THIS_SESSION": "यह सत्र",
     "FOLLOWING_SESSIONS": "यह और आगे के सत्र",
     "MODE_OF_SESSION": "सत्र का माध्यम",

@@ -469,7 +469,9 @@ const AddEditUser = ({
         Array.isArray(payload.tenantCohortRoleMapping) &&
         payload.tenantCohortRoleMapping[0] &&
         payload.tenantCohortRoleMapping[0]['roleId'] === RoleId.TEAM_LEADER &&
-        localStorage.getItem('program') === TENANT_DATA.SECOND_CHANCE_PROGRAM
+        (localStorage.getItem('program') === TENANT_DATA.SECOND_CHANCE_PROGRAM ||
+          localStorage.getItem('program') ===
+            TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS)
       ) {
         payload.automaticMember = {
           value: true,
