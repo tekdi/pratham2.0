@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "آپ",
     "LANGUAGE": "زبان",
     "LOADING": "لوڈ نگ۔",
     "DATE": "تاریخ",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "بیچ کا نام تبدیل کریں"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "بنانے والا",
     "THIS_SESSION": "یہ سیشن",
     "FOLLOWING_SESSIONS": "یہ اور اگلے سیشنز",
     "MODE_OF_SESSION": "سیشن کا طریقہ",

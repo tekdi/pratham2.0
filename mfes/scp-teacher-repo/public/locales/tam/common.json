@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "நீங்கள்",
     "LANGUAGE": "மொழி",
     "LOADING": "ஏற்றுகிறது",
     "MARK": "குறிக்க",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "பேட்சின் பெயரை மாற்று"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "உருவாக்கியவர்",
     "THIS_SESSION": "இந்த அமர்வு",
     "FOLLOWING_SESSIONS": "இதுவும் பின்வரும் அமர்வுகளும்",
     "MODE_OF_SESSION": "அமர்வு முறை",

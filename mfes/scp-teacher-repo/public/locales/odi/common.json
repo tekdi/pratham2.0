@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "ଆପଣ",
     "LANGUAGE": "ଭାଷା",
     "LOADING": "ଲୋଡ୍ ହେଉଛି (Loading)",
     "DATE": "ତାରିଖ",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "ବ୍ୟାଚର ନାମ ପରିବର୍ତ୍ତନ କରନ୍ତୁ"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "ଦ୍ୱାରା ତିଆରି",
     "THIS_SESSION": "ଏହି ସେସନ୍",
     "FOLLOWING_SESSIONS": "ଏହି ଏବଂ ପରବର୍ତୀ ସେସନ୍",
     "MODE_OF_SESSION": "ସେସନ୍ ମୋଡ୍",

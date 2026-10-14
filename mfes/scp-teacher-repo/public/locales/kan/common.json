@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "ನೀವು",
     "LANGUAGE": "ಭಾಷೆ",
     "LOADING": "ಲೋಡ್ ಆಗುತ್ತಿದೆ",
     "MARK": "ಗುರುತು",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "ಬ್ಯಾಚ್‌ನ ಹೆಸರನ್ನು ಬದಲಾಯಿಸಿ"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "ರಚಿಸಿದವರು",
     "THIS_SESSION": "ಈ ಅವಧಿ",
     "FOLLOWING_SESSIONS": "ಇದು ಮತ್ತು ಮುಂದಿನ ಸೆಷನ್",
     "MODE_OF_SESSION": "ಸೆಷನ್ ನ  ವಿಧಾನ",

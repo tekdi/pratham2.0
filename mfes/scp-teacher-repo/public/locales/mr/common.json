@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "तुम्ही",
     "LANGUAGE": "भाषा",
     "LOADING": "लोड होत आहे",
     "MARK": "मार्क",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "बॅचचे नाव बदला"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "यांनी तयार केले",
     "THIS_SESSION": "या सत्रासाठी",
     "FOLLOWING_SESSIONS": "या आणि पुढील सत्रांसाठी",
     "MODE_OF_SESSION": "सत्राची पद्धत",

@@ -1,5 +1,6 @@
 {
   "COMMON": {
+    "YOU": "మీరు",
     "LANGUAGE": "భాష",
     "LOADING": "లోడ్ అవుతోంది / నింపుతోంది",
     "DATE": "తేదీ",
@@ -475,6 +476,7 @@
     "RENAME_BATCH": "బ్యాచ్ పేరు మార్చండి"
   },
   "CENTER_SESSION": {
+    "CREATED_BY": "సృష్టించినవారు",
     "THIS_SESSION": "ఈ సెషన్",
     "FOLLOWING_SESSIONS": "ఇది మరియు తదుపరి సెషన్‌లు (This is already visible in the image)",
     "MODE_OF_SESSION": "సెషన్ యొక్క విధానం",

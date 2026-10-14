@@ -67,6 +67,13 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   // previous behaviour rather than hiding the edit icon from everyone.
   const sessionCreatorId = data?.createdBy ?? data?.metadata?.createdBy;
   const canEditSession = !sessionCreatorId || sessionCreatorId === currentUserId;
+  // "You" is only shown on an id match. `createdBy` is absent on older events, and
+  // falling back to a name match there would read "You" for any namesake in the center.
+  const isCurrentUserCreator =
+    !!sessionCreatorId && !!currentUserId && sessionCreatorId === currentUserId;
+  const sessionCreatorName = isCurrentUserCreator
+    ? t('COMMON.YOU')
+    : data?.metadata?.teacherName;
 
   const handleEditSelection = (selection: string) => {
     setEditSelection(selection);
@@ -321,14 +328,29 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             )}
             {startTime} - {endTime}
           </Typography>
-          <Typography
-            className="one-line-text"
-            fontWeight={'400'}
-            textAlign={'left'}
-            fontSize={'14px'}
-          >
-            {showCenterName ? data?.location : data?.metadata?.teacherName}
-          </Typography>
+          {showCenterName && (
+            <Typography
+              className="one-line-text"
+              fontWeight={'400'}
+              textAlign={'left'}
+              fontSize={'14px'}
+            >
+              {data?.location}
+            </Typography>
+          )}
+          {/* The creator's name is stamped into the event metadata when the session is
+              scheduled, so sessions created before that stamp existed simply show nothing. */}
+          {sessionCreatorName && (
+            <Typography
+              className="one-line-text"
+              fontWeight={'400'}
+              textAlign={'left'}
+              fontSize={'14px'}
+              sx={{ color: theme.palette.warning['400'] }}
+            >
+              {t('CENTER_SESSION.CREATED_BY')}: {sessionCreatorName}
+            </Typography>
+          )}
         </Box>
         {eventStatus === EventStatus.UPCOMING && canEditSession && (
           <EditOutlined
