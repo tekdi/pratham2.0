@@ -638,7 +638,7 @@ export const getOptionsByCategory = (frameworks: any, categoryCode: string) => {
 
   return (
     category?.terms
-      ?.filter((term: any) => term.status !== "retired") // ✅ exclude retired
+      ?.filter((term: any) => term.status?.toLowerCase() !== "retired") // ✅ exclude retired
       .map((term: any) => ({
         name: term.name,
         code: term.code,
