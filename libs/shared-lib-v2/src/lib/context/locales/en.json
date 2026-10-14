@@ -231,7 +231,7 @@
       "EXPLORE_MORE_COURSES": "Explore More Courses",
       "EXPLORE_ADDITIONAL_RESOURCES": "Explore Additional Resources & Materials",
       "SECOND_CHANCE_REGISTRATION_MESSAGE": "Thank you for registering for the second chance program. Our team will get in touch with you soon. Till then, you can explore the courses available.",
-      "SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE": "Thank you for registering for the Second Chance Program Pathways. Our team will get in touch with you soon. Till then, you can explore the courses available.",
+      "SECOND_CHANCE_PATHWAYS_REGISTRATION_MESSAGE": "Thank you for registering for the Pathways. Our team will get in touch with you soon. Till then, you can explore the courses available.",
       "PLAYSTORE_DOWNLOAD_MESSAGE": "You can download the app by tapping the \"Download Play Store\" button.",
       "REGISTRATION_SUCCESSFUL_TITLE": "Registration successful",
       "REGISTERED": "Registered",
@@ -1207,7 +1207,7 @@
     "vocational_training_discription" : "Get vocational training to land an entry level job with 2 months of training",
     "Camp to Club" : "Camp to Club",
     "camp_to_club_discription" : "Camp to Club",
-    "Second Chance Program Pathways" : "Second Chance Program Pathways",
+    "Pathways" : "Pathways",
     "second_chance_program_pathways_discription" : "Get a second chance to complete your 12th grade education"
   }
 }

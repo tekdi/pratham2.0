@@ -40,7 +40,7 @@ export enum Role {
 
 export enum TenantName {
   SECOND_CHANCE_PROGRAM = 'Second Chance Program',
-  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Second Chance Program Pathways',
+  SECOND_CHANCE_PROGRAM_PATHWAYS = 'Pathways',
   YOUTHNET = 'Vocational Training',
   POS = 'Open School',
   PRAGYANPATH = 'Pragyanpath',
