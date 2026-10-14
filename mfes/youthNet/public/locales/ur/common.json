@@ -1391,6 +1391,7 @@
     "UPDATE": "اپ ڈیٹ کریں",
     "BATCH_UPDATED_SUCCESS": "بیچ کامیابی سے اپ ڈیٹ کیا گیا",
     "BATCH_UPDATE_FAILED": "بیچ اپ ڈیٹ نہیں کیا جا سکا",
+    "BATCH_COMPLETED_CANNOT_UPDATE": "یہ بیچ مکمل ہو چکا ہے۔ مکمل شدہ بیچ کو اپ ڈیٹ نہیں کیا جا سکتا۔",
     "DOMAIN_COURSE_NOT_ASSIGNED": "منتخب کردہ ڈومین/کورس آپ کو تفویض نہیں کیا گیا",
     "LEARNER_COUNT": "{{count}} طلباء",
     "LEARNER_LIST": "طلباء کی فہرست",

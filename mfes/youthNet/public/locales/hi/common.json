@@ -1373,6 +1373,7 @@
     "UPDATE": "अपडेट करें",
     "BATCH_UPDATED_SUCCESS": "बैच सफलतापूर्वक अपडेट किया गया",
     "BATCH_UPDATE_FAILED": "बैच अपडेट नहीं किया जा सका",
+    "BATCH_COMPLETED_CANNOT_UPDATE": "यह बैच पूरा हो चुका है। पूर्ण हो चुके बैच को अपडेट नहीं किया जा सकता।",
     "DOMAIN_COURSE_NOT_ASSIGNED": "चयनित डोमेन/कोर्स आपको सौंपा नहीं गया है",
     "LEARNER_COUNT": "{{count}} शिक्षार्थी",
     "LEARNER_LIST": "शिक्षार्थी सूची",

@@ -54,6 +54,7 @@
     "UPDATE": "Update",
     "BATCH_UPDATED_SUCCESS": "Batch updated successfully",
     "BATCH_UPDATE_FAILED": "Could not update batch",
+    "BATCH_COMPLETED_CANNOT_UPDATE": "This batch is completed. A completed batch cannot be updated.",
     "DOMAIN_COURSE_NOT_ASSIGNED": "Selected domain/course is not assigned to you",
     "LEARNER_COUNT": "{{count}} Learners",
     "LEARNER_LIST": "Learner List",
