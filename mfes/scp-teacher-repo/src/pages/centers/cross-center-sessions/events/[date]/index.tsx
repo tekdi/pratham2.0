@@ -37,8 +37,14 @@ const CrossCenterEventMonthView: React.FC = () => {
   const router = useRouter();
   const { date: dateParam }: any = router.query;
 
-  const { loading, extraSessions, plannedSessions, currentUserId, refresh } =
-    useCrossCenterSessions();
+  const {
+    loading,
+    extraSessions,
+    plannedSessions,
+    currentUserId,
+    currentUserRole,
+    refresh,
+  } = useCrossCenterSessions();
   const [selectedDate, setSelectedDate] = useState<Date>(() =>
     dateParam ? getDateFromMonthName(dateParam) : new Date()
   );
@@ -120,6 +126,7 @@ const CrossCenterEventMonthView: React.FC = () => {
           batchCount={batchCount}
           centerCount={centerCount}
           currentUserId={currentUserId}
+          currentUserRole={currentUserRole}
           primaryBatch={primaryBatch}
           batchDetails={batchDetails}
           onCopy={() => {}}

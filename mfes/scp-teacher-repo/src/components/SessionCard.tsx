@@ -1,6 +1,6 @@
 import { CustomField, SessionsCardProps } from '@/utils/Interfaces';
 import { Box, Snackbar, Typography } from '@mui/material';
-import { convertUTCToIST, toPascalCase } from '@/utils/helper';
+import { canEditSession, convertUTCToIST, toPascalCase } from '@/utils/helper';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import EditOutlined from '@mui/icons-material/EditOutlined';
@@ -51,6 +51,7 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   const [multiBatchConfirmOpen, setMultiBatchConfirmOpen] =
     React.useState(false);
   const [currentUserId, setCurrentUserId] = React.useState<string>('');
+  const [currentUserRole, setCurrentUserRole] = React.useState<string>('');
   const router = useRouter();
   const { cohortId }: any = router.query;
   const dashboard = pathname === '/dashboard';
@@ -59,14 +60,22 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       setCurrentUserId(localStorage.getItem('userId') || '');
+      setCurrentUserRole(
+        localStorage.getItem('role') || localStorage.getItem('roleName') || ''
+      );
     }
   }, []);
 
-  // A session may only be edited by the person who scheduled it. The event list API is
-  // the only source of the creator, so when it does not send `createdBy` we keep the
-  // previous behaviour rather than hiding the edit icon from everyone.
+  // A facilitator may only edit the sessions they scheduled themselves, while a
+  // Team Leader may edit any session on their own centers' batches - see
+  // canEditSession() for the full rule.
   const sessionCreatorId = data?.createdBy ?? data?.metadata?.createdBy;
-  const canEditSession = !sessionCreatorId || sessionCreatorId === currentUserId;
+  const isSessionEditable = canEditSession({
+    creatorId: sessionCreatorId,
+    currentUserId,
+    role: currentUserRole,
+    allowWhenCreatorUnknown: true,
+  });
   // "You" is only shown on an id match. `createdBy` is absent on older events, and
   // falling back to a name match there would read "You" for any namesake in the center.
   const isCurrentUserCreator =
@@ -352,7 +361,7 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
             </Typography>
           )}
         </Box>
-        {eventStatus === EventStatus.UPCOMING && canEditSession && (
+        {eventStatus === EventStatus.UPCOMING && isSessionEditable && (
           <EditOutlined
             onClick={() => handleOpen(data)}
             sx={{ cursor: 'pointer' }}
