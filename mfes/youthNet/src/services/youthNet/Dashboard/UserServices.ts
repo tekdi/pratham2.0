@@ -2,6 +2,7 @@ import { get, post, patch } from '@shared-lib';
 import axios from 'axios';
 import API_ENDPOINTS from 'mfes/youthNet/src/utils/API/APIEndpoints';
 import { Role, Status } from 'mfes/youthNet/src/utils/app.constant';
+import { withEncryptedPassword } from '@shared-lib-v2/utils/passwordEncryption';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
 const MENTOR_DETAILS = {
@@ -206,7 +207,7 @@ export const getVillages = async (userId: any) => {
 export const createUser = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.accountCreate;
   try {
-    const response = await post(apiUrl, userData);
+    const response = await post(apiUrl, await withEncryptedPassword(userData));
     return response?.data?.result;
   } catch (error) {
     console.error('error in getting cohort list', error);
