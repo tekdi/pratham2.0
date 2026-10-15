@@ -1,5 +1,9 @@
 import { API_ENDPOINTS } from './EndUrls';
 import { post } from './RestClient';
+import {
+  getRecaptchaToken,
+  RECAPTCHA_SEND_OTP_ACTION,
+} from '@shared-lib-v2/utils/recaptcha';
 interface SendOTPParams {
   mobile: string;
   reason: string;
@@ -18,7 +22,8 @@ export const sendOTP = async ({
   const apiUrl: string = API_ENDPOINTS.sendOTP;
 
   try {
-    const response = await post(apiUrl, { mobile, reason });
+    const captchaToken = await getRecaptchaToken(RECAPTCHA_SEND_OTP_ACTION);
+    const response = await post(apiUrl, { mobile, reason, captchaToken });
     return response?.data;
   } catch (error) {
     console.error('error in login', error);

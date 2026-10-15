@@ -20,6 +20,10 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { getUserId, login } from '../services/LoginService';
+import {
+  isCaptchaError,
+  preloadRecaptcha,
+} from '@shared-lib-v2/utils/recaptcha';
 import loginImg from '../../assets/images/login-image.jpg';
 import Loader from './components/Loader';
 import { useDirection } from '../hooks/useDirection';
@@ -50,6 +54,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [language, setLanguage] = useState(selectedLanguage);
   const [scrolling, setScrolling] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isCaptchaFailure, setIsCaptchaFailure] = useState(false);
   const { isRTL } = useDirection();
   const router = useRouter();
 
@@ -95,6 +100,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
     event.preventDefault();
   };
 
+  useEffect(() => {
+    preloadRecaptcha();
+  }, []);
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -129,6 +138,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           }
         }
       } catch (error: any) {
+        setIsCaptchaFailure(isCaptchaError(error));
         setOpen(true)
         setLoading(false);
       }
@@ -569,7 +579,10 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           severity="error"
           sx={{ width: "100%", color: "white", backgroundColor: "red" }}
           icon={<ErrorOutlineIcon sx={{ color: "white" }} />} 
-        >          {t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT')}
+        >
+          {isCaptchaFailure
+            ? t('LOGIN_PAGE.CAPTCHA_VERIFICATION_FAILED')
+            : t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT')}
         </Alert>
       </Snackbar>
     </Box>
