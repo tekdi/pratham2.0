@@ -646,6 +646,7 @@
   },
   "LOGIN_PAGE": {
     "USERNAME_PASSWORD_NOT_CORRECT": "Username or Password is not correct",
+    "CAPTCHA_VERIFICATION_FAILED": "CAPTCHA verification failed. Please try again.",
     "DEVICE_FINGERPRINT_SUCCESS": "Device fingerprint generated successfully",
     "DEVICE_FINGERPRINT_ERROR": "Error generating device fingerprint",
     "LOADING": "Loading..."
