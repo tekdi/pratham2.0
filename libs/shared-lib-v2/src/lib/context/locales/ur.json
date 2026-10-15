@@ -1059,6 +1059,10 @@
     "UNEMPLOYED_ANOTHER_PLACEMENT": "دوسری ملازمت کی تلاش",
     "UNEMPLOYED_CURRENTLY_DOING": "فی الحال کیا کر رہے ہیں",
     "UNEMPLOYED_REASON": "بے روزگاری کی وجہ",
+    "REASON_FOR_LEAVING_JOB_OTHER": "نوکری چھوڑنے کی دیگر وجہ",
+    "FOLLOW_UP_MODE_OTHER": "فالو اپ کا دیگر ذریعہ",
+    "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "دیگر غیر مستقل آمدنی کی سرگرمی کی قسم",
+    "UNEMPLOYED_REASON_OTHER": "بے روزگاری کی دیگر وجہ",
     "LOW_SALARY": "کم تنخواہ",
     "RELOCATION": "منتقلی",
     "FAMILY_REASONS": "خاندانی وجوہات",
@@ -1314,5 +1318,9 @@
   "IRREGULAR_INCOME_ACTIVITY_TYPE": "غیر مستقل آمدنی کی سرگرمی کی قسم",
   "UNEMPLOYED_ANOTHER_PLACEMENT": "دوسری ملازمت کی تلاش",
   "UNEMPLOYED_CURRENTLY_DOING": "فی الحال کیا کر رہے ہیں",
-  "UNEMPLOYED_REASON": "بے روزگاری کی وجہ"
+  "UNEMPLOYED_REASON": "بے روزگاری کی وجہ",
+  "REASON_FOR_LEAVING_JOB_OTHER": "نوکری چھوڑنے کی دیگر وجہ",
+  "FOLLOW_UP_MODE_OTHER": "فالو اپ کا دیگر ذریعہ",
+  "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "دیگر غیر مستقل آمدنی کی سرگرمی کی قسم",
+  "UNEMPLOYED_REASON_OTHER": "بے روزگاری کی دیگر وجہ"
 }
