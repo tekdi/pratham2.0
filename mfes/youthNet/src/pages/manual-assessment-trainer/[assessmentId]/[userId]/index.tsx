@@ -243,7 +243,15 @@ const AssessmentDetails = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const router = useRouter();
-  const { assessmentId, userId, parentId , unitId} = router.query;
+  const { assessmentId, userId, parentId, unitId } = router.query;
+
+  // L2 / Vocational Training assessments are standalone question sets created in
+  // the workspace with no parent course, so the list page has no parentId/unitId
+  // to hand on. scp-teacher-repo hits exactly this case and keys every tracking
+  // call off the question-set id; do the same, and keep using the real course +
+  // unit when a course-based assessment does supply them.
+  const effectiveParentId = (parentId as string) || (assessmentId as string);
+  const effectiveUnitId = (unitId as string) || (assessmentId as string);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
@@ -373,7 +381,7 @@ const AssessmentDetails = () => {
       const userData = await getOfflineAssessmentStatus({
         userIds: [userId as string],
         questionSetId: assessmentId as string,
-        parentId: parentId as string,
+        parentId: effectiveParentId,
       });
 
       if (userData?.result?.length > 0) {
@@ -397,8 +405,8 @@ const AssessmentDetails = () => {
             try {
               const userDataAssessmentStatus = await getAssessmentStatus({
                 userId: [userId as string],
-                courseId: [parentId as string],
-                unitId: [unitId as string],
+                courseId: [effectiveParentId],
+                unitId: [effectiveUnitId],
                 contentId: [assessmentId as string],
               });
               console.log('unitId>>>>>:', unitId);
@@ -548,8 +556,8 @@ const AssessmentDetails = () => {
               const response = await getAssessmentTracking({
                 userId: userId as string,
                 contentId: assessmentId as string,
-                courseId: parentId as string,
-                unitId: unitId as string,
+                courseId: effectiveParentId,
+                unitId: effectiveUnitId,
               });
               if (response?.data?.length > 0) {
                 // Find the latest assessment data by comparing timestamps
@@ -645,8 +653,8 @@ const AssessmentDetails = () => {
         }
         const statusResponse = await searchAssessment({
           userId: userId,
-          courseId: parentId as string,
-          unitId: unitId as string,
+          courseId: effectiveParentId,
+          unitId: effectiveUnitId,
           contentId: assessmentId,
         });
         setAssessmentStatusData(statusResponse[0]?.score_details || []);
@@ -656,11 +664,11 @@ const AssessmentDetails = () => {
       }
     };
     fetchUserAssessmentStatus();
-  }, [userId, assessmentId, unitId , parentId]);
+  }, [userId, assessmentId, effectiveUnitId, effectiveParentId]);
 
   useEffect(() => {
     const fetchAssessmentData = async () => {
-      if (assessmentId && userId && unitId && parentId) {
+      if (assessmentId && userId) {
         try {
           if (assessmentId) {
             const response1 = await getAssessmentDetails(
@@ -710,7 +718,7 @@ const AssessmentDetails = () => {
     };
 
     fetchAssessmentData();
-  }, [assessmentId, userId, unitId, parentId]);
+  }, [assessmentId, userId, effectiveUnitId, effectiveParentId]);
 
   const handleBack = () => {
     router.back();
@@ -974,8 +982,8 @@ const AssessmentDetails = () => {
       const response = await getAssessmentTracking({
         userId: userId as string,
         contentId: assessmentId as string,
-        courseId: parentId as string,
-        unitId: unitId as string,
+        courseId: effectiveParentId,
+        unitId: effectiveUnitId,
       });
 
       if (response?.data?.length > 0) {
@@ -1104,6 +1112,10 @@ const AssessmentDetails = () => {
         flexDirection: 'column',
         minHeight: '100vh',
         overflow: 'hidden',
+        // _app.tsx paints every youthNet page on #F3F5F8; this screen is a white
+        // marking sheet like its scp-teacher-repo counterpart, so it opts out
+        // here rather than changing the app-wide shell.
+        bgcolor: '#FFFFFF',
       }}
     >
       <Header />
@@ -1448,8 +1460,8 @@ const AssessmentDetails = () => {
                 assessmentDoId={assessmentId}
                 userId={userId}
                 assessmentStatusData={assessmentStatusData}
-                parentId={parentId}
-                unitId={unitId}
+                parentId={effectiveParentId}
+                unitId={effectiveUnitId}
               />
             </Box>
           </Grid>
@@ -1576,7 +1588,7 @@ const AssessmentDetails = () => {
         isOpen={uploadPopupOpen}
         onClose={handleCloseUploadPopup}
         uploadedImages={uploadedImages}
-        parentId={parentId as string}
+        parentId={effectiveParentId}
         onImageUpload={handleImageUpload}
         onImageRemove={handleImageRemove}
         userId={typeof userId === 'string' ? userId : undefined}

@@ -3,17 +3,31 @@ import DownloadIcon from '@mui/icons-material/Download';
 import ErrorIcon from '@mui/icons-material/Error';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import RemoveIcon from '@mui/icons-material/Remove';
+import SearchIcon from '@mui/icons-material/Search';
+import SortIcon from '@mui/icons-material/Sort';
 import {
   Box,
   Button,
-  Chip,
+  Card,
+  CardContent,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
+  FormControlLabel,
+  InputAdornment,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Radio,
+  RadioGroup,
+  TextField,
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -25,7 +39,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import NoDataFound from '../../../components/common/NoDataFound';
 import Header from '../../../components/Header';
 import Loader from '../../../components/Loader';
-import SearchBar from '../../../components/Searchbar';
 import { showToastMessage } from '../../../components/Toastify';
 import { useDirection } from '../../../hooks/useDirection';
 import {
@@ -44,29 +57,37 @@ import withAccessControl from '../../../utils/hoc/withAccessControl';
 
 type AnswerSheetStatus = 'Not_Started' | 'Image_Uploaded' | 'Completed';
 
+// scp-teacher-repo folds status filtering and sorting into one `sortOption`
+// surfaced by a single "Sort & Filter" dialog, rather than separate chips and a
+// sort dropdown. Matching its UI means matching that model.
 type TabKey = 'all' | 'awaiting_approval' | 'marks_approved' | 'not_submitted';
+
+type SortOption =
+  | 'all'
+  | 'completed'
+  | 'awaiting_approval'
+  | 'not_started'
+  | 'name_asc'
+  | 'name_desc'
+  | 'score_desc'
+  | 'score_asc';
+
+// Which status filter (if any) each option implies; sort-only options filter nothing.
+const STATUS_FILTER_FOR_OPTION: Partial<Record<SortOption, TabKey>> = {
+  completed: 'marks_approved',
+  awaiting_approval: 'awaiting_approval',
+  not_started: 'not_submitted',
+};
 
 interface LearnerRow {
   userId: string;
   name: string;
+  username: string;
   answerSheetStatus: AnswerSheetStatus;
   score: number;
   maxScore: number;
 }
 
-const TABS: { key: TabKey; labelKey: string }[] = [
-  { key: 'all', labelKey: 'AI.ALL_LEARNERS' },
-  { key: 'awaiting_approval', labelKey: 'AI.AWAITING_YOUR_APPROVAL' },
-  { key: 'marks_approved', labelKey: 'AI.MARKS_APPROVED' },
-  { key: 'not_submitted', labelKey: 'AI.NOT_SUBMITTED' },
-];
-
-const SORT_OPTIONS = [
-  { value: 'name_asc', labelKey: 'AI.NAME_A_TO_Z' },
-  { value: 'name_desc', labelKey: 'AI.NAME_Z_TO_A' },
-  { value: 'score_desc', labelKey: 'AI.SCORE_HIGH_TO_LOW' },
-  { value: 'score_asc', labelKey: 'AI.SCORE_LOW_TO_HIGH' },
-];
 
 const statusForTab = (status: AnswerSheetStatus): TabKey => {
   if (status === 'Completed') return 'marks_approved';
@@ -88,8 +109,9 @@ const ManualAssessmentLearners = () => {
   const [unitId, setUnitId] = useState<string>('');
   const [learners, setLearners] = useState<LearnerRow[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState<TabKey>('all');
-  const [sortOption, setSortOption] = useState<string>('name_asc');
+  const [sortOption, setSortOption] = useState<SortOption>('all');
+  const [pendingSortOption, setPendingSortOption] = useState<SortOption>('all');
+  const [showSortPopup, setShowSortPopup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
 
@@ -204,6 +226,9 @@ const ManualAssessmentLearners = () => {
           return {
             userId: user.userId,
             name,
+            // Blank when `name` already fell back to the username, so the card
+            // never prints the same string twice.
+            username: user.username && user.username !== name ? user.username : '',
             answerSheetStatus,
             score: Number(marks?.totalScore ?? 0),
             maxScore: Number(marks?.totalMaxScore ?? 0),
@@ -236,11 +261,44 @@ const ManualAssessmentLearners = () => {
     return counts;
   }, [learners]);
 
+  // The three summary cards above the list, in scp's order.
+  const statusCounts = useMemo(
+    () => [
+      { count: tabCounts.not_submitted, label: t('AI.NOT_SUBMITTED') },
+      { count: tabCounts.awaiting_approval, label: t('ASSESSMENTS.IMAGE_UPLOADED') },
+      { count: tabCounts.marks_approved, label: t('AI.MARKS_APPROVED') },
+    ],
+    [tabCounts, t]
+  );
+
+  const getSortButtonText = () => {
+    switch (sortOption) {
+      case 'completed':
+        return t('AI.MARKS_APPROVED');
+      case 'awaiting_approval':
+        return t('ASSESSMENTS.IMAGE_UPLOADED');
+      case 'not_started':
+        return t('AI.NOT_SUBMITTED');
+      case 'name_asc':
+        return t('AI.NAME_A_TO_Z');
+      case 'name_desc':
+        return t('AI.NAME_Z_TO_A');
+      case 'score_desc':
+        return t('AI.SCORE_HIGH_TO_LOW');
+      case 'score_asc':
+        return t('AI.SCORE_LOW_TO_HIGH');
+      default:
+        return t('AI.ALL_LEARNERS');
+    }
+  };
+
   const visibleLearners = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
+    const statusFilter = STATUS_FILTER_FOR_OPTION[sortOption];
+
     const filtered = learners.filter((learner) => {
-      if (activeTab !== 'all' && statusForTab(learner.answerSheetStatus) !== activeTab) {
+      if (statusFilter && statusForTab(learner.answerSheetStatus) !== statusFilter) {
         return false;
       }
       if (!term) return true;
@@ -270,7 +328,7 @@ const ManualAssessmentLearners = () => {
         break;
     }
     return sorted;
-  }, [learners, searchTerm, activeTab, sortOption]);
+  }, [learners, searchTerm, sortOption]);
 
   const getStatusIcon = (status: AnswerSheetStatus) => {
     switch (status) {
@@ -347,57 +405,172 @@ const ManualAssessmentLearners = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ px: '20px', pb: '10px' }}>
+      {/* Search */}
+      <Box sx={{ px: 2, mb: 2, gap: 2, display: 'flex', flexDirection: 'column' }}>
+        <TextField
+          placeholder={t('ASSESSMENTS.SEARCH_LEARNER')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          fullWidth
+          size="small"
+          sx={{
+            backgroundColor: '#EDEDED',
+            borderRadius: '24px',
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '24px',
+              '& fieldset': { borderColor: '#D0C5B4' },
+              '&:hover fieldset': { borderColor: '#4D4639' },
+              '&.Mui-focused fieldset': { borderColor: '#4D4639' },
+            },
+            '& .MuiInputBase-input': {
+              padding: '10px 16px',
+              fontSize: '14px',
+              height: '28px',
+              color: '#4D4639',
+            },
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton edge="end">
+                  <SearchIcon sx={{ color: '#4D4639' }} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {/* Download question paper */}
         <Button
           variant="contained"
+          color="primary"
           disabled={downloading}
           startIcon={
-            downloading ? <CircularProgress size={16} color="inherit" /> : <DownloadIcon />
+            downloading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <PictureAsPdfIcon sx={{ color: '#D32F2F', width: 24, height: 24 }} />
+            )
           }
+          endIcon={<DownloadIcon sx={{ color: '#4D4639' }} />}
+          sx={{
+            color: '#4D4639',
+            borderRadius: '8px',
+            fontWeight: 500,
+            textTransform: 'none',
+            backgroundColor: '#ECE6F0',
+            border: '1px solid #D0C5B4',
+            boxShadow: 'none',
+            '&:hover': { backgroundColor: '#E1D5E7', boxShadow: 'none' },
+          }}
           onClick={handleDownloadQuestionPaper}
         >
-          {t('AI.DOWNLOAD_QUESTION_PAPER')}
+          {t('AI.DOWNLOAD_QUESTION_PAPER')}.pdf
         </Button>
       </Box>
 
-      <SearchBar onSearch={setSearchTerm} placeholder={t('ASSESSMENTS.SEARCH_LEARNER')} />
-
+      {/* Total learners + sort/filter */}
       <Box
         sx={{
+          px: 2,
+          mb: 2,
           display: 'flex',
-          gap: '8px',
-          flexWrap: 'wrap',
-          px: '20px',
-          mt: 2,
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        {TABS.map((tab) => (
-          <Chip
-            key={tab.key}
-            label={`${t(tab.labelKey)} (${tabCounts[tab.key]})`}
-            onClick={() => setActiveTab(tab.key)}
-            color={activeTab === tab.key ? 'primary' : 'default'}
-            variant={activeTab === tab.key ? 'filled' : 'outlined'}
-          />
-        ))}
+        <Typography sx={{ fontWeight: 500, fontSize: '14px', color: '#7C766F' }}>
+          {t('AI.TOTAL_LEARNERS', {
+            count: visibleLearners.length,
+            total: learners.length,
+          })}
+        </Typography>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<SortIcon />}
+          onClick={() => {
+            setPendingSortOption(sortOption);
+            setShowSortPopup(true);
+          }}
+          sx={{
+            borderColor: '#D0C5B4',
+            color: '#4D4639',
+            fontWeight: 500,
+            fontSize: '14px',
+            textTransform: 'none',
+            borderRadius: '8px',
+            height: '32px',
+            '&:hover': {
+              borderColor: '#4D4639',
+              backgroundColor: 'rgba(77, 70, 57, 0.04)',
+            },
+          }}
+        >
+          {getSortButtonText()}
+        </Button>
       </Box>
 
-      <Box sx={{ px: '20px', mt: 2, maxWidth: '320px' }}>
-        <FormControl fullWidth size="small">
-          <InputLabel id="learner-sort-label">{t('COMMON.SORT_BY')}</InputLabel>
-          <Select
-            labelId="learner-sort-label"
-            label={t('COMMON.SORT_BY')}
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {t(option.labelKey)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      {/* Status summary cards */}
+      <Box sx={{ px: 2, mb: 2 }}>
+        <Box
+          sx={{
+            display: { xs: 'grid', sm: 'grid', md: 'flex' },
+            gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr' },
+            gap: 2,
+            width: '100%',
+            flexWrap: { md: 'wrap' },
+          }}
+        >
+          {statusCounts.map((item) => (
+            <Card
+              key={item.label}
+              sx={{
+                backgroundColor: '#FDF2E5',
+                borderRadius: '12px',
+                minHeight: { xs: 80, md: 'auto' },
+                minWidth: { md: 100 },
+                flex: { md: 1 },
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: 'none',
+              }}
+            >
+              <CardContent
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  p: '16px !important',
+                  flex: 1,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: '20px',
+                    color: '#1F1B13',
+                    mb: 0.5,
+                  }}
+                >
+                  {item.count}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    color: '#7C766F',
+                    textAlign: 'center',
+                    lineHeight: '16px',
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
       </Box>
 
       {loading && (
@@ -427,64 +600,303 @@ const ManualAssessmentLearners = () => {
       )}
 
       {!loading && visibleLearners.length > 0 && (
-        <Box sx={{ background: '#FBF4E4', padding: '20px', mt: 2 }}>
-          <Grid container spacing={2}>
-            {visibleLearners.map((learner) => (
-              <Grid item xs={12} sm={12} md={6} lg={4} key={learner.userId}>
-                <Box
-                  sx={{
-                    border: `1px solid ${theme.palette.warning['A100']}`,
-                    background: theme.palette.warning['A400'],
-                    borderRadius: '8px',
-                    padding: '12px 14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '10px',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleLearnerClick(learner.userId)}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    {getStatusIcon(learner.answerSheetStatus)}
-                    <Box>
-                      <Typography
-                        sx={{
-                          fontSize: '16px',
-                          color: theme.palette.warning['300'],
-                        }}
-                        className="one-line-text"
-                      >
-                        {learner.name}
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: '12px', color: theme.palette.warning['400'] }}
-                      >
-                        {learner.answerSheetStatus === 'Completed'
-                          ? t('AI.MARKS_APPROVED_SCORE', {
-                              score: learner.score,
-                              maxScore: learner.maxScore || maxScore,
-                            })
-                          : t(
-                              learner.answerSheetStatus === 'Image_Uploaded'
-                                ? 'AI.AWAITING_YOUR_APPROVAL'
-                                : 'AI.NOT_SUBMITTED'
-                            )}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <NavigateNextIcon
+        <Box sx={{ px: { xs: 0, md: 2 }, pb: 2 }}>
+          <Card
+            sx={{
+              backgroundColor: '#FBF4E4',
+              borderRadius: { md: '12px' },
+              border: '1px solid #E0E0E0',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            }}
+          >
+            <CardContent sx={{ p: 2 }}>
+              <List sx={{ p: 0 }}>
+                {visibleLearners.map((learner, index) => (
+                  <ListItem
+                    key={learner.userId}
                     sx={{
-                      color: theme.palette.warning['300'],
-                      transform: isRTL ? 'rotate(180deg)' : 'unset',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E0E0E0',
+                      borderRadius: '12px',
+                      mb: index < visibleLearners.length - 1 ? 2 : 0,
+                      cursor: 'pointer',
+                      p: 0,
+                      minHeight: '80px',
+                      overflow: 'hidden',
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': {
+                        backgroundColor: '#F5F5F5',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      },
                     }}
-                  />
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
+                    onClick={() => handleLearnerClick(learner.userId)}
+                  >
+                    {/* Leading status block */}
+                    <Box
+                      sx={{
+                        backgroundColor: '#FFDEA1',
+                        borderRadius: isRTL
+                          ? '0px 12px 12px 0px'
+                          : '12px 0px 0px 12px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 48,
+                        alignSelf: 'stretch',
+                      }}
+                    >
+                      {getStatusIcon(learner.answerSheetStatus)}
+                    </Box>
+
+                    <ListItemText
+                      sx={{ mx: 2, flex: 1 }}
+                      primary={
+                        <>
+                          <Typography
+                            sx={{
+                              fontWeight: 500,
+                              fontSize: '16px',
+                              color: '#1F1B13',
+                              lineHeight: '24px',
+                            }}
+                            className="one-line-text"
+                          >
+                            {learner.name}
+                          </Typography>
+                          {learner.username && (
+                            <Typography
+                              sx={{
+                                fontSize: '12px',
+                                fontWeight: 400,
+                                color: '#FFA726',
+                              }}
+                              className="one-line-text"
+                            >
+                              {learner.username}
+                            </Typography>
+                          )}
+                        </>
+                      }
+                      secondaryTypographyProps={{ component: 'div' }}
+                      secondary={
+                        <Typography
+                          sx={{
+                            fontWeight:
+                              learner.answerSheetStatus === 'Completed' ? 500 : 400,
+                            fontSize: '14px',
+                            color: '#4D4639',
+                            lineHeight: '20px',
+                          }}
+                        >
+                          {learner.answerSheetStatus === 'Completed'
+                            ? // Without a max score there is no marks out of
+                              // anything to report, so show the plain approved
+                              // label rather than a meaningless "0/0".
+                              (learner.maxScore || maxScore)
+                              ? t('AI.MARKS_APPROVED_SCORE', {
+                                  score: learner.score,
+                                  maxScore: learner.maxScore || maxScore,
+                                })
+                              : t('AI.MARKS_APPROVED')
+                            : t(
+                                learner.answerSheetStatus === 'Image_Uploaded'
+                                  ? 'AI.AWAITING_YOUR_APPROVAL'
+                                  : 'AI.NOT_SUBMITTED'
+                              )}
+                        </Typography>
+                      }
+                    />
+
+                    <ListItemIcon sx={{ minWidth: 'auto', mr: 2 }}>
+                      <NavigateNextIcon
+                        sx={{
+                          color: '#4D4639',
+                          transform: isRTL ? 'rotate(180deg)' : 'unset',
+                        }}
+                      />
+                    </ListItemIcon>
+                  </ListItem>
+                ))}
+              </List>
+            </CardContent>
+          </Card>
         </Box>
       )}
+
+      {/* Sort & Filter dialog */}
+      <Dialog
+        open={showSortPopup}
+        onClose={() => setShowSortPopup(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{ sx: { borderRadius: '16px', p: 1, maxWidth: '400px' } }}
+      >
+        <DialogTitle>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 600, fontSize: '18px', color: '#1F1B13' }}
+          >
+            {t('AI.SORT_AND_FILTER_LEARNERS')}
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ pb: 1 }}>
+          <FormControl component="fieldset" fullWidth>
+            <RadioGroup
+              value={pendingSortOption}
+              onChange={(event) =>
+                setPendingSortOption(event.target.value as SortOption)
+              }
+              sx={{ gap: 1 }}
+            >
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 600,
+                  color: '#4D4639',
+                  mt: 1,
+                  mb: 1,
+                  fontSize: '14px',
+                }}
+              >
+                {t('AI.FILTER_BY_STATUS')}
+              </Typography>
+
+              {[
+                { value: 'all', label: t('AI.ALL_LEARNERS'), count: tabCounts.all },
+                {
+                  value: 'completed',
+                  label: t('AI.MARKS_APPROVED'),
+                  count: tabCounts.marks_approved,
+                },
+                {
+                  value: 'awaiting_approval',
+                  label: t('ASSESSMENTS.IMAGE_UPLOADED'),
+                  count: tabCounts.awaiting_approval,
+                },
+                {
+                  value: 'not_started',
+                  label: t('AI.NOT_SUBMITTED'),
+                  count: tabCounts.not_submitted,
+                },
+              ].map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                        {option.label}
+                      </Typography>
+                      <Typography sx={{ fontSize: '14px', color: '#7C766F' }}>
+                        ({option.count})
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{
+                    mx: 0,
+                    width: '100%',
+                    '& .MuiFormControlLabel-label': { width: '100%' },
+                  }}
+                />
+              ))}
+
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 600,
+                  color: '#4D4639',
+                  mt: 2,
+                  mb: 1,
+                  fontSize: '14px',
+                }}
+              >
+                {t('AI.SORT_BY_NAME')}
+              </Typography>
+
+              {[
+                { value: 'name_asc', label: t('AI.NAME_A_TO_Z') },
+                { value: 'name_desc', label: t('AI.NAME_Z_TO_A') },
+              ].map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      {option.label}
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+              ))}
+
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  fontWeight: 600,
+                  color: '#4D4639',
+                  mt: 2,
+                  mb: 1,
+                  fontSize: '14px',
+                }}
+              >
+                {t('AI.SORT_BY_SCORE')}
+              </Typography>
+
+              {[
+                { value: 'score_desc', label: t('AI.SCORE_HIGH_TO_LOW') },
+                { value: 'score_asc', label: t('AI.SCORE_LOW_TO_HIGH') },
+              ].map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio size="small" sx={{ color: '#4D4639' }} />}
+                  label={
+                    <Typography sx={{ fontSize: '14px', color: '#1F1B13' }}>
+                      {option.label}
+                    </Typography>
+                  }
+                  sx={{ mx: 0 }}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button
+            onClick={() => setShowSortPopup(false)}
+            sx={{ color: '#7C766F', textTransform: 'none', fontWeight: 500 }}
+          >
+            {t('AI.CANCEL')}
+          </Button>
+          <Button
+            onClick={() => {
+              setSortOption(pendingSortOption);
+              setShowSortPopup(false);
+            }}
+            variant="contained"
+            sx={{
+              backgroundColor: '#4D4639',
+              color: '#FFFFFF',
+              textTransform: 'none',
+              borderRadius: '8px',
+              fontWeight: 500,
+              '&:hover': { backgroundColor: '#3A3529' },
+            }}
+          >
+            {t('AI.APPLY')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </>
   );
 };
