@@ -1240,6 +1240,40 @@ export const isBlockSetDifferent = (
   return !origBlocks.every((blockId, i) => blockId === newBlocks[i]);
 };
 
+/**
+ * Who is allowed to edit an already-scheduled session:
+ * - Facilitator (Instructor): only the sessions they created themselves, so one
+ *   facilitator cannot change another facilitator's session in the same batch.
+ * - Team Leader (Lead): any session on the batches they can see, whether a
+ *   facilitator or another Team Leader created it. The session lists are already
+ *   built from the logged-in user's own center tree, so "visible to this TL"
+ *   is the same thing as "under their own centers' batches".
+ *
+ * Timing is deliberately not handled here - callers already know the event's
+ * UPCOMING/LIVE/PASSED status and only offer edit while it is UPCOMING, which
+ * is what keeps edit access to before the session starts.
+ *
+ * `allowWhenCreatorUnknown` keeps sessions scheduled before `createdBy` was
+ * stamped onto the event editable, instead of locking every facilitator out of
+ * their own older sessions. Cross-center sessions always carry it, so they pass
+ * false and stay strict.
+ */
+export const canEditSession = ({
+  creatorId,
+  currentUserId,
+  role,
+  allowWhenCreatorUnknown = false,
+}: {
+  creatorId?: string | null;
+  currentUserId?: string | null;
+  role?: string | null;
+  allowWhenCreatorUnknown?: boolean;
+}): boolean => {
+  if (role === Role.TEAM_LEADER) return true;
+  if (!creatorId) return allowWhenCreatorUnknown;
+  return !!currentUserId && creatorId === currentUserId;
+};
+
 // The event list API is filtered by cohort server-side, but not every
 // environment honours the `cohortIds` filter — some return every live event
 // instead. Rendering those builds one session card per event across the whole

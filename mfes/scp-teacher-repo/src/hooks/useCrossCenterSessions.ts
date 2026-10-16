@@ -12,6 +12,7 @@ const useCrossCenterSessions = () => {
   const [extraSessions, setExtraSessions] = useState<CrossCenterSessionItem[]>([]);
   const [plannedSessions, setPlannedSessions] = useState<CrossCenterSessionItem[]>([]);
   const [currentUserId, setCurrentUserId] = useState('');
+  const [currentUserRole, setCurrentUserRole] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -23,6 +24,15 @@ const useCrossCenterSessions = () => {
             ? localStorage.getItem('userId') || ''
             : '';
         setCurrentUserId(userId);
+        // Edit access depends on the role as well as the creator, so the
+        // session cards get it from here alongside the user id.
+        setCurrentUserRole(
+          typeof window !== 'undefined'
+            ? localStorage.getItem('role') ||
+                localStorage.getItem('roleName') ||
+                ''
+            : ''
+        );
         const { extraSessions: extra, plannedSessions: planned } =
           await loadCrossCenterSessions(userId);
         setExtraSessions(extra);
@@ -40,7 +50,14 @@ const useCrossCenterSessions = () => {
 
   const refresh = () => setRefreshKey((prev) => prev + 1);
 
-  return { loading, extraSessions, plannedSessions, currentUserId, refresh };
+  return {
+    loading,
+    extraSessions,
+    plannedSessions,
+    currentUserId,
+    currentUserRole,
+    refresh,
+  };
 };
 
 export default useCrossCenterSessions;
