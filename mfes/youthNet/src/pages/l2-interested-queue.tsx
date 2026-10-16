@@ -1,51 +1,68 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Button, Chip } from '@mui/material';
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { Box, Button, Chip, Typography } from '@mui/material';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { extractMatchingKeys } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
-import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import Loader from '@shared-lib-v2/DynamicForm/components/Loader';
-import CommonDataTable from '@shared-lib-v2/lib/Table/CommonDataTable';
+import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import CommonSidePanel from '@shared-lib-v2/lib/Drawer/CommonSidePanel';
+import CommonDataTable from '@shared-lib-v2/lib/Table/CommonDataTable';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useRouter } from 'next/router';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
-import BackHeader from '../components/youthNet/BackHeader';
+import AllocateToBatchModal from '../components/l2InterestedQueue/AllocateToBatchModal';
 import withRole from '../components/withRole';
-import { TENANT_DATA } from '../utils/app.config';
-import { getLoggedInUserRole } from '../utils/helper';
+import BackHeader from '../components/youthNet/BackHeader';
 import { YOUTHNET_USER_ROLE } from '../components/youthNet/tempConfigs';
 import {
-  fetchUserList,
-  getUserDetails,
-  updateUser,
-} from '../services/youthNet/Dashboard/UserServices';
+  L2QueueAssignSchema,
+  L2QueueAssignUISchema,
+} from '../constant/Forms/L2QueueAssignSchema';
 import {
-  L2_INTERESTED_VALUES,
-} from '../services/l2InterestedQueue/l2Queue.config';
-import {
-  getLearnerDomain,
-  getLearnerSkill,
-  getLearnerNote,
-  getLearnerTaggedByUserId,
-  getLearnerInterestedAt,
-  getLearnerLocationValue,
-  isLearnerTagged,
-  buildTagCustomFields,
-  isUpdateUserSuccess,
-  getUpdateUserErrorMessage,
-} from '../services/l2InterestedQueue/l2QueueHelpers';
+  loadL2QueueFilters,
+  saveL2QueueFilters,
+  clearL2QueueFilters,
+} from '../services/l2InterestedQueue/l2QueueFilterStorage';
 import {
   L2QueueSearchSchema,
   L2QueueSearchUISchema,
 } from '../constant/Forms/L2QueueSearchSchema';
 import {
-  L2QueueAssignSchema,
-  L2QueueAssignUISchema,
-} from '../constant/Forms/L2QueueAssignSchema';
-import AllocateToBatchModal from '../components/l2InterestedQueue/AllocateToBatchModal';
+  L2_INTERESTED_VALUES,
+} from '../services/l2InterestedQueue/l2Queue.config';
+import {
+  buildTagCustomFields,
+  getLearnerDomain,
+  getLearnerInterestedAt,
+  getLearnerLocationValue,
+  getLearnerSkill,
+  getLearnerTaggedByUserId,
+  getUpdateUserErrorMessage,
+  isLearnerTagged,
+  isUpdateUserSuccess
+} from '../services/l2InterestedQueue/l2QueueHelpers';
+import {
+  fetchUserList,
+  getUserDetails,
+  updateUser,
+} from '../services/youthNet/Dashboard/UserServices';
+import { TENANT_DATA } from '../utils/app.config';
+import { getLoggedInUserRole } from '../utils/helper';
 
 const PAGE_SIZE = 10;
+
+// Tagged Domain/Skill widgets are only shown while Status is "tagged".
+const withTaggedWidgets = (base: any, show: boolean) => ({
+  ...base,
+  taggedDomain: {
+    ...base.taggedDomain,
+    'ui:widget': show ? 'AutoCompleteMultiSelectWidget' : 'hidden',
+  },
+  taggedSkill: {
+    ...base.taggedSkill,
+    'ui:widget': show ? 'AutoCompleteMultiSelectWidget' : 'hidden',
+  },
+});
 
 const L2InterestedQueuePage = () => {
   const { t } = useTranslation();
@@ -57,8 +74,17 @@ const L2InterestedQueuePage = () => {
     }
   }, []);
 
-  const [uiSchema, setUiSchema] = useState(L2QueueSearchUISchema);
-  const [prefilledFormData, setPrefilledFormData] = useState<any>({ status: 'all' });
+  // Restored once per mount so a page refresh brings back the last search
+  // selections instead of dropping them — see l2QueueFilterStorage.
+  const [persistedFilters] = useState(() => loadL2QueueFilters());
+  const [uiSchema, setUiSchema] = useState<any>(() =>
+    persistedFilters?.status === 'tagged'
+      ? withTaggedWidgets(L2QueueSearchUISchema, true)
+      : L2QueueSearchUISchema
+  );
+  const [prefilledFormData, setPrefilledFormData] = useState<any>(
+    persistedFilters || { status: 'all' }
+  );
   // DynamicForm only reads `uiSchema`/`prefilledFormData` into its own
   // internal state on first mount (see formUiSchema/formData useState in
   // shared-lib-v2's DynamicForm.tsx) — later prop changes on an already-
@@ -86,6 +112,18 @@ const L2InterestedQueuePage = () => {
 
   const rows: any[] = response?.getUserDetails || [];
 
+  // Clear All only makes sense once something other than the default
+  // "all" status has been picked.
+  const hasActiveFilters = useMemo(
+    () =>
+      Object.entries(prefilledFormData || {}).some(([key, value]) => {
+        if (key === 'status') return !!value && value !== 'all';
+        if (Array.isArray(value)) return value.length > 0;
+        return value !== undefined && value !== null && value !== '';
+      }),
+    [prefilledFormData]
+  );
+
   const visibleRows = useMemo(() => {
     if (prefilledFormData?.status === 'tagged' && !prefilledFormData?.taggedDomain?.[0]) {
       return rows.filter((row) => isLearnerTagged(row));
@@ -106,7 +144,7 @@ const L2InterestedQueuePage = () => {
       role: 'Learner',
       l2_interested: L2_INTERESTED_VALUES.INTERESTED,
     };
-    if (cleaned.state?.[0]) filters.states = cleaned.state[0];
+    if (cleaned.state?.[0]) filters.state = cleaned.state[0];
     if (cleaned.district?.length) filters.district = cleaned.district;
     if (cleaned.block?.length) filters.block = cleaned.block;
     if (cleaned.village?.length) filters.village = cleaned.village;
@@ -139,18 +177,9 @@ const L2InterestedQueuePage = () => {
   const SubmitaFunction = async (formData: any) => {
     const wantTagged = formData?.status === 'tagged';
     const isHidden = (uiSchema as any)?.taggedDomain?.['ui:widget'] === 'hidden';
+    saveL2QueueFilters(formData);
     if (wantTagged === isHidden) {
-      setUiSchema((prev: any) => ({
-        ...prev,
-        taggedDomain: {
-          ...prev.taggedDomain,
-          'ui:widget': wantTagged ? 'AutoCompleteMultiSelectWidget' : 'hidden',
-        },
-        taggedSkill: {
-          ...prev.taggedSkill,
-          'ui:widget': wantTagged ? 'AutoCompleteMultiSelectWidget' : 'hidden',
-        },
-      }));
+      setUiSchema((prev: any) => withTaggedWidgets(prev, wantTagged));
       setPrefilledFormData(formData);
       setSearchFormKey((key) => key + 1);
     } else {
@@ -160,6 +189,7 @@ const L2InterestedQueuePage = () => {
   };
 
   const handleClearAll = () => {
+    clearL2QueueFilters();
     setUiSchema(L2QueueSearchUISchema);
     setPrefilledFormData({ status: 'all' });
     setSearchFormKey((key) => key + 1);
@@ -460,7 +490,7 @@ const L2InterestedQueuePage = () => {
           type="l2-interested-queue"
         />
         <Box display="flex" justifyContent="flex-end" mt={3}>
-          <Button size="small" onClick={handleClearAll}>
+          <Button size="small" onClick={handleClearAll} disabled={!hasActiveFilters}>
             {t('L2_QUEUE.CLEAR_ALL')}
           </Button>
         </Box>

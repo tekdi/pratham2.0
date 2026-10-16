@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import SimpleModal from '@shared-lib-v2/lib/SimpleModal/SimpleModal';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import DynamicFormV2 from '@shared-lib-v2/DynamicForm/components/DynamicFormV2';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import {
-  applySkipAndHide,
   getReadOnlyUiSchema,
   RetentionFormBundle,
   withCallIntervalLocked,
@@ -106,21 +105,12 @@ const RetentionModal: React.FC<RetentionModalProps> = ({
     }
   };
 
-  // applySkipAndHide is only safe to precompute for a Completed (read-only,
-  // never-changes-again) Follow-Up. DynamicForm's own live handleChange
-  // recomputes skip/hide from scratch on every interaction, but only ever
-  // *adds* 'ui:widget': 'hidden' onto whatever uiSchema it was first
-  // mounted with (see hideFieldsInUISchema — it never removes one). Feeding
-  // it an already-hidden uiSchema for the editable case would permanently
-  // wedge monthlySalary/reasonForLeavingJob hidden — DynamicForm's own
-  // per-interaction recompute could add hides but never take one back. So
-  // the editable case is left to start from the untouched uiSchema and
-  // rely entirely on DynamicForm's own (correct, unconditional)
-  // handleChange logic for every skip/hide toggle, accepting that
-  // dependent fields may briefly show before the Coordinator's first
-  // interaction with any field.
+  // skipAndHide / skipAndShow visibility (e.g. currentlyEmployed →
+  // monthlySalary / reasonForLeavingJob, reasonForLeavingJob "other" →
+  // reasonForLeavingJobOther) is derived by DynamicFormV2 from the current
+  // formData, for both the editable and the read-only view.
   const uiSchema = isCompleted
-    ? applySkipAndHide(form.schema, getReadOnlyUiSchema(form.schema, form.uiSchema), initialFormData)
+    ? getReadOnlyUiSchema(form.schema, form.uiSchema)
     : withCallIntervalLocked(form.uiSchema);
 
   return (
@@ -161,7 +151,7 @@ const RetentionModal: React.FC<RetentionModalProps> = ({
           },
         }}
       >
-        <DynamicForm
+        <DynamicFormV2
           schema={form.schema}
           uiSchema={uiSchema}
           // Full-form mode (not isCallSubmitInHandle) so the schema's

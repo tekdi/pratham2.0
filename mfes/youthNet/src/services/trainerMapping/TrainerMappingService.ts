@@ -3,6 +3,8 @@ import {
   fetchForm,
 } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
+import { post } from '@shared-lib';
+import API_ENDPOINTS from '../../utils/API/APIEndpoints';
 import { getCohortList as searchCohorts } from '../youthNet/Dashboard/VillageServices';
 import { fetchCohortMemberList } from '../MyClassDetailsService';
 import {
@@ -171,31 +173,67 @@ export const getCenterHeadCenters = async (): Promise<MyCenter[]> => {
   return getTrainerCenters(userId);
 };
 
+// Ported from admin-app-repo's TrainerCenterService: every Center this user
+// is assigned to, flattened out of /cohort/geographical-hierarchy's
+// State -> District -> Block -> Center tree. This API is USER-scoped, not
+// role-scoped (a multi-role user gets every role's Centers mixed together),
+// so it's only meaningful intersected with the Domain/Skill search below.
+const fetchGeographicalHierarchyCenters = async (
+  userId: string
+): Promise<TrainerCenter[]> => {
+  let response: any = null;
+  try {
+    response = await post(API_ENDPOINTS.cohortGeographicalHierarchy, { userId });
+  } catch (error) {
+    console.error('Error fetching geographical hierarchy:', error);
+  }
+  const geographicalData = response?.data?.result?.data || [];
+
+  const centers: TrainerCenter[] = [];
+  geographicalData.forEach((state: any) => {
+    state.districts?.forEach((district: any) => {
+      district.blocks?.forEach((block: any) => {
+        block.centers?.forEach((center: any) => {
+          centers.push({
+            cohortId: center.centerId,
+            name: center.centerName,
+            state: state.stateName,
+            district: district.districtName,
+            block: block.blockName,
+          });
+        });
+      });
+    });
+  });
+  return centers;
+};
+
 // Reassign Center: same intersection admin-app-repo's
-// getUserAssignedCenters does (the Trainer's own Centers AND Centers
-// matching their Domain/Skill), additionally split by the Center Head's
-// scope. In-scope Centers are editable; everything else is carried through
-// untouched on save, so a Center Head never drops a Trainer from a Center
-// they don't manage.
+// getUserAssignedCenters does (/cohort/geographical-hierarchy Centers AND
+// Centers matching the Trainer's Domain/Skill), additionally split by the
+// Center Head's scope. In-scope Centers are editable; the rest are carried
+// through untouched on save, so a Center Head never drops a Trainer from a
+// Center they don't manage.
 export const getTrainerCentersInScope = async (
   trainerUserId: string,
   domain: string | undefined,
   skills: string[],
   scopeCenterIds: string[]
 ): Promise<{ inScope: TrainerCenter[]; outOfScopeIds: string[] }> => {
-  const [trainerCenters, domainSkillCenters] = await Promise.all([
-    getTrainerCenters(trainerUserId),
+  const [assignedCenters, domainSkillCenters] = await Promise.all([
+    fetchGeographicalHierarchyCenters(trainerUserId),
     getCentersForDomainSkills(domain, skills),
   ]);
-  const trainerCenterIds = new Set(trainerCenters.map((center) => center.id));
+  const domainSkillIds = new Set(domainSkillCenters.map((center) => center.cohortId));
+  const trainerCenters = assignedCenters.filter((center) =>
+    domainSkillIds.has(center.cohortId)
+  );
   const scopeIds = new Set(scopeCenterIds);
   return {
-    inScope: domainSkillCenters.filter(
-      (center) => trainerCenterIds.has(center.cohortId) && scopeIds.has(center.cohortId)
-    ),
+    inScope: trainerCenters.filter((center) => scopeIds.has(center.cohortId)),
     outOfScopeIds: trainerCenters
-      .filter((center) => !scopeIds.has(center.id))
-      .map((center) => center.id),
+      .filter((center) => !scopeIds.has(center.cohortId))
+      .map((center) => center.cohortId),
   };
 };
 

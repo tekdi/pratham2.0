@@ -1,4 +1,4 @@
-import { PlacementCenter } from './PlacementCenterService';
+import { PlacementCenter, SdbvFilters } from './PlacementCenterService';
 import { PlacementBatch } from './PlacementBatchService';
 
 // Persists the Placements page's own filter selections (SDBV, Center,
@@ -8,7 +8,7 @@ import { PlacementBatch } from './PlacementBatchService';
 const STORAGE_KEY = 'placements_filters';
 
 export interface PlacementsPersistedFilters {
-  sdbv?: { state?: string; district?: string; block?: string };
+  sdbv?: SdbvFilters;
   // Raw DynamicForm formData for the SDBV filter bar (state/district/block
   // arrays) — kept separately from `sdbv` above so the filter bar itself can
   // visually restore its selections, not just the derived query values.

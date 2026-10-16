@@ -1111,6 +1111,10 @@
     "UNEMPLOYED_ANOTHER_PLACEMENT": "अन्य प्लेसमेंट की तलाश",
     "UNEMPLOYED_CURRENTLY_DOING": "वर्तमान में क्या कर रहे हैं",
     "UNEMPLOYED_REASON": "बेरोजगारी का कारण",
+    "REASON_FOR_LEAVING_JOB_OTHER": "नौकरी छोड़ने का अन्य कारण",
+    "FOLLOW_UP_MODE_OTHER": "फॉलो-अप का अन्य माध्यम",
+    "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "अन्य अनियमित आय गतिविधि का प्रकार",
+    "UNEMPLOYED_REASON_OTHER": "बेरोजगारी का अन्य कारण",
     "LOW_SALARY": "कम वेतन",
     "RELOCATION": "स्थानांतरण",
     "FAMILY_REASONS": "पारिवारिक कारण",
@@ -1366,5 +1370,9 @@
   "IRREGULAR_INCOME_ACTIVITY_TYPE": "अनियमित आय गतिविधि का प्रकार",
   "UNEMPLOYED_ANOTHER_PLACEMENT": "अन्य प्लेसमेंट की तलाश",
   "UNEMPLOYED_CURRENTLY_DOING": "वर्तमान में क्या कर रहे हैं",
-  "UNEMPLOYED_REASON": "बेरोजगारी का कारण"
+  "UNEMPLOYED_REASON": "बेरोजगारी का कारण",
+  "REASON_FOR_LEAVING_JOB_OTHER": "नौकरी छोड़ने का अन्य कारण",
+  "FOLLOW_UP_MODE_OTHER": "फॉलो-अप का अन्य माध्यम",
+  "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "अन्य अनियमित आय गतिविधि का प्रकार",
+  "UNEMPLOYED_REASON_OTHER": "बेरोजगारी का अन्य कारण"
 }

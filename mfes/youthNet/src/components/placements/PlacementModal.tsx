@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import SimpleModal from '@shared-lib-v2/lib/SimpleModal/SimpleModal';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import DynamicFormV2 from '@shared-lib-v2/DynamicForm/components/DynamicFormV2';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import { PlacementFormBundle } from '../../services/placements/PlacementFormService';
 import { savePlacementRetentionData } from '../../services/placementRetention/PlacementRetentionRepository';
@@ -144,7 +144,7 @@ const PlacementModal: React.FC<PlacementModalProps> = ({
           },
         }}
       >
-        <DynamicForm
+        <DynamicFormV2
           schema={form.schema}
           uiSchema={form.uiSchema}
           // Full-form mode (not isCallSubmitInHandle): the per-field

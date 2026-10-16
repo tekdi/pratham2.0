@@ -36,6 +36,22 @@ const CustomRadioWidget = ({
       required={required}
       fullWidth
     >
+      {/* Hidden text input to force native validation — same approach as
+          shared-lib-v2's CustomRadioWidget (used by the Center form), since
+          a RadioGroup alone never triggers the browser's required check. */}
+      <input
+        value={value ?? ''}
+        required={required}
+        onChange={() => {}}
+        tabIndex={-1}
+        style={{
+          height: 1,
+          padding: 0,
+          border: 0,
+          ...(value && { visibility: 'hidden' }),
+        }}
+        aria-hidden="true"
+      />
       <FormLabel
         component="legend"
         sx={{

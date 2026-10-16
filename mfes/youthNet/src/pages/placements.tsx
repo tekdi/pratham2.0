@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import DynamicFormV2 from '@shared-lib-v2/DynamicForm/components/DynamicFormV2';
 import Header from '../components/Header';
 import BackHeader from '../components/youthNet/BackHeader';
 import withRole from '../components/withRole';
@@ -64,10 +64,10 @@ const PlacementsPage = () => {
   }, []);
 
   const handleSdbvSubmit = (formData: any) => {
-    const nextSdbv = {
-      state: formData?.state?.[0],
-      district: formData?.district?.[0],
-      block: formData?.block?.[0],
+    const nextSdbv: SdbvFilters = {
+      state: formData?.state,
+      district: formData?.district,
+      block: formData?.block,
     };
     setSdbv(nextSdbv);
     savePlacementsFilters({ sdbv: nextSdbv, sdbvFormData: formData });
@@ -130,7 +130,7 @@ const PlacementsPage = () => {
                 gap: 2,
             }}
           >
-            <DynamicForm
+            <DynamicFormV2
               schema={PlacementSearchSchema}
               uiSchema={{
                 ...PlacementSearchUISchema,

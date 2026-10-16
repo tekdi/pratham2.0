@@ -162,7 +162,7 @@ const PlacementProperty = () => {
   const columns = [
     {
       keys: ['propertyName'],
-      label: t('MASTER.PLACEMENT_PROPERTY_NAME'),
+      label: t('MASTER.ORGANIZATION_NAME'),
       minWidth: 200,
       render: (row) => row.propertyName,
     },

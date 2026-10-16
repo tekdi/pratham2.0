@@ -25,7 +25,7 @@ export interface userListParam {
   filters: {
     role?: string;
     tenantStatus?: string[];
-    states?: string;
+    state?: string;
     district?: string[];
     block?: string[];
     fromDate?: string;
