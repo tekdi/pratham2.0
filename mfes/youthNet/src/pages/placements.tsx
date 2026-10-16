@@ -64,10 +64,10 @@ const PlacementsPage = () => {
   }, []);
 
   const handleSdbvSubmit = (formData: any) => {
-    const nextSdbv = {
-      state: formData?.state?.[0],
-      district: formData?.district?.[0],
-      block: formData?.block?.[0],
+    const nextSdbv: SdbvFilters = {
+      state: formData?.state,
+      district: formData?.district,
+      block: formData?.block,
     };
     setSdbv(nextSdbv);
     savePlacementsFilters({ sdbv: nextSdbv, sdbvFormData: formData });

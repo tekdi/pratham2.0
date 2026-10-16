@@ -83,7 +83,7 @@ const CenterBatchSelector: React.FC<CenterBatchSelectorProps> = ({
   useEffect(() => {
     loadCenters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domains.join(','), sdbv.state, sdbv.district, sdbv.block]);
+  }, [domains.join(','), sdbv.state?.join(','), sdbv.district?.join(','), sdbv.block?.join(',')]);
 
   const loadBatches = async (centerId: string, preselectBatch: PlacementBatch | null = null) => {
     setBatchOptions(null);
