@@ -5,6 +5,7 @@ import SessionCardFooter from '@/components/SessionCardFooter';
 import { getEventList } from '@/services/EventService';
 import { logEvent } from '@/utils/googleAnalytics';
 import {
+  eventBelongsToCohort,
   getAfterDate,
   getBeforeDate,
   MONTHS,
@@ -97,10 +98,14 @@ const EventMonthView: React.FC<any> = () => {
             status: ['live'],
           };
 
-          if (showAll === '1' && userId) {
+          const isShowAll = showAll === '1' && userId;
+          if (isShowAll) {
             filters['createdBy'] = userId;
           } else {
-            filters['cohortId'] = activeCohortId;
+            // Backend ignores singular `cohortId`; it needs `cohortIds`
+            // (array). With the old field the day's list came back unfiltered
+            // - every live event of every cohort in the system.
+            filters['cohortIds'] = [activeCohortId];
           }
 
           const response = await getEventList({ limit, offset, filters });
@@ -109,7 +114,15 @@ const EventMonthView: React.FC<any> = () => {
           const extraSessionArray: any = [];
 
           if (response?.events.length > 0) {
-            response?.events.forEach((event: any) => {
+            // Defence in depth: some environments ignore `cohortIds` too, so
+            // the batch's own events are picked out here as well (same guard
+            // as the dashboard's session list).
+            const cohortEvents = isShowAll
+              ? response.events
+              : response.events.filter((event: any) =>
+                  eventBelongsToCohort(event, activeCohortId)
+                );
+            cohortEvents.forEach((event: any) => {
               if (event?.metadata?.type === sessionType.PLANNED) {
                 sessionArray.push(event);
               } else {

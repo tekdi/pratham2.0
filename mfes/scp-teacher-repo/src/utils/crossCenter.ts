@@ -112,6 +112,15 @@ export const flattenBatches = (
   return result;
 };
 
+/**
+ * The batches an event covers. Which metadata key carries them depends on how
+ * the session was scheduled - cross-center sessions write the `cohortIds`
+ * array, older/single-batch ones write a `cohortId` string.
+ */
+const getEventBatchIds = (event: any): string[] =>
+  event?.metadata?.cohortIds ||
+  (event?.metadata?.cohortId ? [event.metadata.cohortId] : []);
+
 export interface CrossCenterBatchDetail {
   batchId: string;
   batchName: string;
@@ -181,19 +190,25 @@ export const loadCrossCenterSessions = async (
   };
   const response = await getEventList({ limit: 0, offset: 0, filters });
   const events: any[] = response?.events || [];
-  const crossCenterEvents = events.filter(
-    (event) => event?.metadata?.multiSession === true
-  );
+  // Defence in depth: some environments ignore the `cohortIds` filter and
+  // return every live event, which here would list other facilitators'
+  // cross-center sessions (and fire a `getCohortDetails` chain for every
+  // unknown batch on them). An event with no batch metadata at all is kept -
+  // there's nothing to match on, and hiding a real session is the worse
+  // failure.
+  const myBatchIds = new Set(cohortIds);
+  const crossCenterEvents = events.filter((event) => {
+    if (event?.metadata?.multiSession !== true) return false;
+    const batchIds = getEventBatchIds(event);
+    return batchIds.length === 0 || batchIds.some((id) => myBatchIds.has(id));
+  });
 
   // Resolve the center for every batch on every cross-center session so
   // "X batches · Y centers" is accurate even for batches taught by other
   // facilitators (not just the ones this facilitator's own tree covers).
   const unresolvedBatchIds = new Set<string>();
   crossCenterEvents.forEach((event) => {
-    const batchIds: string[] =
-      event?.metadata?.cohortIds ||
-      (event?.metadata?.cohortId ? [event.metadata.cohortId] : []);
-    batchIds.forEach((id) => {
+    getEventBatchIds(event).forEach((id) => {
       if (id && !centerIdByBatchId.has(id)) unresolvedBatchIds.add(id);
     });
   });
@@ -237,9 +252,7 @@ export const loadCrossCenterSessions = async (
 
   const withCoverage: CrossCenterSessionItem[] = crossCenterEvents.map(
     (event) => {
-      const batchIds: string[] =
-        event?.metadata?.cohortIds ||
-        (event?.metadata?.cohortId ? [event.metadata.cohortId] : []);
+      const batchIds = getEventBatchIds(event);
       const centerIds = new Set(
         batchIds
           .map((id) => centerIdByBatchId.get(id))
