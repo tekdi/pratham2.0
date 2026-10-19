@@ -229,7 +229,7 @@ export const CrossCenterSessionCard: React.FC<{
         >
           {creatorId === currentUserId
             ? t('CENTER_SESSION.CREATED_BY_YOU')
-            : t('CENTER_SESSION.CREATED_BY', { name: creatorName || '' })}
+            : t('CENTER_SESSION.CREATED_BY_NAME', { name: creatorName || '' })}
         </Typography>
         <Typography
           fontWeight={500}

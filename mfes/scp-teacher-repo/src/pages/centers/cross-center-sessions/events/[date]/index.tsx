@@ -37,6 +37,30 @@ const CrossCenterEventMonthView: React.FC = () => {
   const router = useRouter();
   const { date: dateParam }: any = router.query;
 
+  const [selectedDate, setSelectedDate] = useState<Date>(() =>
+    dateParam ? getDateFromMonthName(dateParam) : new Date()
+  );
+
+  // The grid shows a whole month, past days included, so the fetch covers
+  // 1st-to-last of the displayed month rather than the hook's default
+  // upcoming-only window - same range the single-batch month calendar uses
+  // (`useEventDates`). Changing month moves `selectedDate`, which re-fetches.
+  const monthRange = useMemo(
+    () => ({
+      startDate: new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth(),
+        1
+      ),
+      endDate: new Date(
+        selectedDate.getFullYear(),
+        selectedDate.getMonth() + 1,
+        0
+      ),
+    }),
+    [selectedDate]
+  );
+
   const {
     loading,
     extraSessions,
@@ -44,10 +68,7 @@ const CrossCenterEventMonthView: React.FC = () => {
     currentUserId,
     currentUserRole,
     refresh,
-  } = useCrossCenterSessions();
-  const [selectedDate, setSelectedDate] = useState<Date>(() =>
-    dateParam ? getDateFromMonthName(dateParam) : new Date()
-  );
+  } = useCrossCenterSessions(monthRange);
 
   useEffect(() => {
     if (router.isReady && dateParam) {
@@ -55,10 +76,10 @@ const CrossCenterEventMonthView: React.FC = () => {
     }
   }, [router.isReady, dateParam]);
 
-  // Every cross-center session this facilitator can see is already loaded
-  // (1-year window, see useCrossCenterSessions) - the month grid's dots and
-  // the day's session lists below are both built by filtering what's already
-  // in hand, same approach as the main Cross-Center Sessions page.
+  // The displayed month's cross-center sessions are already loaded in full
+  // (see monthRange above) - the month grid's icons and the day's session
+  // lists below are both built by filtering what's already in hand, same
+  // approach as the main Cross-Center Sessions page.
   const eventDatesMap = useMemo(() => {
     const map: Record<string, { event: boolean }> = {};
     [...extraSessions, ...plannedSessions].forEach(({ event }) => {
