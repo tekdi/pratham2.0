@@ -581,6 +581,7 @@
     "BATCHES_ACROSS_CENTERS": "{{batchCount}} batches across {{centerCount}} centers",
     "NO_BATCHES_FOUND": "No batches found",
     "BATCH_BOARD_MEDIUM_MISMATCH": "Selected batches must have the same Board and Medium to be scheduled together. Please review your selection.",
+    "CROSS_CENTER_MIN_BATCH_ERROR": "This feature is for scheduling session for more than one batch. Please select more than one batch.",
     "CROSS_CENTER_PLANNED_WARNING": "Heads up: planned sessions follow each batch's own fixed timetable slot — cross-center scheduling is best suited to Extra Sessions. You can still continue with a Planned Session.",
     "SCHEDULING_FOR": "Scheduling for",
     "ONE_LINK_NOTE": "One join link will be generated and shared with every batch selected above — this is a single session, not separate sessions per batch.",

@@ -1,6 +1,6 @@
 import { BatchInfo, CrossCenterBatchDetail } from '@/utils/crossCenter';
 import { EventStatus } from '@/utils/app.constant';
-import { convertUTCToIST, toPascalCase } from '@/utils/helper';
+import { canEditSession, convertUTCToIST, toPascalCase } from '@/utils/helper';
 import { isEliminatedFromBuild } from '../../featureEliminationUtil';
 import { DaysOfWeek } from '../../app.config';
 import CenterSessionModal from './CenterSessionModal';
@@ -53,6 +53,7 @@ export const CrossCenterSessionCard: React.FC<{
   batchCount: number;
   centerCount: number;
   currentUserId: string;
+  currentUserRole?: string;
   primaryBatch?: BatchInfo;
   batchDetails?: CrossCenterBatchDetail[];
   onCopy: () => void;
@@ -63,6 +64,7 @@ export const CrossCenterSessionCard: React.FC<{
   batchCount,
   centerCount,
   currentUserId,
+  currentUserRole,
   primaryBatch,
   batchDetails,
   onCopy,
@@ -93,8 +95,11 @@ export const CrossCenterSessionCard: React.FC<{
       : now <= eventEnd
       ? EventStatus.LIVE
       : EventStatus.PASSED;
-  const canEditSession =
-    creatorId === currentUserId && eventStatus === EventStatus.UPCOMING;
+  // Facilitator: own sessions only. Team Leader: any session on their own
+  // centers' batches, including ones another Team Leader created.
+  const isSessionEditable =
+    eventStatus === EventStatus.UPCOMING &&
+    canEditSession({ creatorId, currentUserId, role: currentUserRole });
 
   const handleCopyUrl = () => {
     if (meetingUrl) {
@@ -119,7 +124,7 @@ export const CrossCenterSessionCard: React.FC<{
         >
           {getSessionTitle(subject, sessionTitle)}
         </Typography>
-        {canEditSession && (
+        {isSessionEditable && (
           <EditOutlined
             onClick={() => onEdit(event)}
             sx={{ cursor: 'pointer', fontSize: '20px', flexShrink: 0 }}

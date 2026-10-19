@@ -28,7 +28,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   DaysOfWeek,
@@ -61,7 +60,6 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
-  const router = useRouter();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [batchesLoading, setBatchesLoading] = useState(false);
@@ -223,9 +221,18 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
         }
         setBmgMissing(false);
 
+        // Different tenants (e.g. Pathways vs the main Second Chance Program)
+        // use different taxonomy frameworks - Header.tsx stores the current
+        // tenant's own id in localStorage at login. Falling back to the
+        // hardcoded default here (as this used to) queries the wrong
+        // tenant's board/medium/grade/subject terms, so Course Type (a
+        // generic category present in most frameworks) would still load
+        // while Subject - which requires an exact name match per term -
+        // silently came back empty. Mirrors PlannedSession.tsx and every
+        // other framework-read call site in the app.
         const url =
           process.env.NEXT_PUBLIC_MIDDLEWARE_URL +
-          `/api/framework/v1/read/${frameworkId}`;
+          `/api/framework/v1/read/${localStorage.getItem('collectionFramework') || frameworkId}`;
         const boardData = await fetch(url).then((res) => res.json());
         const frameworks = boardData?.result?.framework;
 
@@ -344,13 +351,13 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
 
   const handleBatchStepNext = () => {
     if (selectedBatchIds.size === 0) return;
-    // Only the create flow redirects a 1-batch selection to the single-batch
-    // page — when editing an existing cross-center session down to 1 batch,
-    // it still gets saved here via PATCH (per US-4 AC), not redirected away.
+    // Only the create flow requires 2+ batches - when editing an existing
+    // cross-center session down to 1 batch, it's still saved here via PATCH
+    // (per US-4 AC), not blocked.
     if (selectedBatchIds.size === 1 && !editingEvent) {
-      const onlyBatchId = Array.from(selectedBatchIds)[0];
-      onClose();
-      router.push(`/centers/${onlyBatchId}?openSchedule=1`);
+      setBatchValidationError(
+        t('CENTER_SESSION.CROSS_CENTER_MIN_BATCH_ERROR')
+      );
       return;
     }
 
@@ -842,6 +849,13 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
             {batchValidationError && (
               <Box
                 sx={{
+                  // Stays visible while the batch list below is scrolled,
+                  // instead of scrolling away with it - this list can run
+                  // long (many centers/batches), and the error is otherwise
+                  // easy to lose track of once dismissed from view.
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 1,
                   mb: 2,
                   padding: '8px 12px',
                   borderRadius: '8px',

@@ -5,6 +5,7 @@ import NoDataFound from '@/components/common/NoDataFound';
 import WeekCalender from '@/components/WeekCalender';
 import useCrossCenterSessions from '@/hooks/useCrossCenterSessions';
 import {
+  canEditSession,
   convertToIST,
   formatSelectedDate,
   getMonthName,
@@ -31,8 +32,14 @@ const CrossCenterSessionsPage = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const router = useRouter();
-  const { loading, extraSessions, plannedSessions, currentUserId, refresh } =
-    useCrossCenterSessions();
+  const {
+    loading,
+    extraSessions,
+    plannedSessions,
+    currentUserId,
+    currentUserRole,
+    refresh,
+  } = useCrossCenterSessions();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<any>(null);
@@ -69,10 +76,17 @@ const CrossCenterSessionsPage = () => {
       (event) => event?.eventRepetitionId === editEventId
     );
     // Defence in depth against a hand-crafted URL: the edit icon this param
-    // is meant to be reached from is already creator-gated, but a direct
-    // visit shouldn't open the editor for anyone else either.
+    // is meant to be reached from is already access-gated, but a direct
+    // visit shouldn't open the editor for anyone who may not edit it either.
     const matchCreatorId = match?.createdBy ?? match?.metadata?.createdBy;
-    if (match && matchCreatorId === currentUserId) {
+    if (
+      match &&
+      canEditSession({
+        creatorId: matchCreatorId,
+        currentUserId,
+        role: currentUserRole,
+      })
+    ) {
       handleEdit(match);
     }
 
@@ -207,6 +221,7 @@ const CrossCenterSessionsPage = () => {
                           batchCount={batchCount}
                           centerCount={centerCount}
                           currentUserId={currentUserId}
+                          currentUserRole={currentUserRole}
                           primaryBatch={primaryBatch}
                           batchDetails={batchDetails}
                           onCopy={() => setSnackbarOpen(true)}
@@ -303,6 +318,7 @@ const CrossCenterSessionsPage = () => {
                     batchCount={batchCount}
                     centerCount={centerCount}
                     currentUserId={currentUserId}
+                    currentUserRole={currentUserRole}
                     primaryBatch={primaryBatch}
                     batchDetails={batchDetails}
                     onCopy={() => setSnackbarOpen(true)}
