@@ -44,76 +44,22 @@ export const getRetentionForm = async (): Promise<RetentionFormBundle | null> =>
 };
 
 // A fresh (not-yet-completed) Retention Form opens with every field blank —
-// nothing pre-selected — rather than the key being absent from formData
-// altogether. That distinction matters for any field driving
-// extra.skipAndHide (e.g. currentlyEmployed, which hides both
-// monthlySalary and reasonForLeavingJob until answered): DynamicForm's own
-// getSkipKeys only ever resolves a skipAndHide branch when `formData[key]`
-// is *truthy* (see DynamicForm.tsx — unmodified; this is worked around at
-// this layer instead, see applySkipAndHide below for the initial-render
-// gap that leaves open regardless), so a genuinely missing key can never
-// trigger the "" branch even though it's a valid skipAndHide entry. An
-// empty array (not [''], see below) is truthy and stringifies to '' for
-// that lookup, so it resolves correctly once the user's first interaction
-// re-evaluates it.
+// nothing pre-selected. DynamicFormV2 treats a blank controlling field as
+// "no value selected", so e.g. currentlyEmployed's "" skipAndHide branch
+// hides monthlySalary and reasonForLeavingJob from the first render.
 //
 // Deliberately [] and not [''] — AutoCompleteMultiSelectWidget disables
 // every remaining option once `selectedValues.length >= maxSelection`
 // (see its own getOptionDisabled). For a maxSelection:1 field like
 // currentlyEmployed, a single placeholder element (even an empty string)
 // already "fills" that one slot, so both Yes/No would render disabled
-// before the Coordinator ever gets to pick one. A truly empty array keeps
-// the count at 0 while still resolving the same '' skipAndHide branch.
+// before the Coordinator ever gets to pick one.
 export const getInitialRetentionFormData = (schema: any): Record<string, any> => {
   const initial: Record<string, any> = {};
   Object.entries(schema?.properties || {}).forEach(([key, property]: [string, any]) => {
     initial[key] = property?.type === 'array' ? [] : '';
   });
   return initial;
-};
-
-// --- skipAndHide resolution -------------------------------------------
-//
-// Generic, schema-driven re-implementation of DynamicForm's own
-// getSkipKeys/hideFieldsInUISchema (see DynamicForm.tsx — left unmodified),
-// applied once up front when building the uiSchema we hand to DynamicForm,
-// rather than relying on its internal effect timing. DynamicForm's own
-// version only recomputes hidden fields on user interaction (handleChange)
-// or, for a prefilled form, inside an effect that (for this form's shape —
-// domain has an 'initial' API field but nothing 'dependent' on it) never
-// actually runs — see getInitialRetentionFormData's comment. Either way,
-// the very first render is left showing every field, including ones that
-// should start hidden. Precomputing the hidden set ourselves from the
-// schema's own extra.skipAndHide (not hardcoded to any particular field —
-// works for currentlyEmployed or any other controlling field a form
-// defines) closes that gap; DynamicForm's own live handleChange logic
-// takes over correctly for every interaction after that.
-export const applySkipAndHide = (
-  schema: any,
-  uiSchema: any,
-  formData: Record<string, any>
-): any => {
-  const updated = { ...uiSchema };
-  Object.entries(schema?.properties || {}).forEach(([key, property]: [string, any]) => {
-    const skipAndHide = property?.extra?.skipAndHide;
-    if (!skipAndHide) return;
-
-    // Same value normalization DynamicForm's own getSkipKeys relies on
-    // implicitly (an array used as an object key coerces via
-    // Array.prototype.toString, which is equivalent to .join(',')) — [] and
-    // [''] both resolve to '', matching skipAndHide's own "" entry for "no
-    // value selected", instead of silently finding no match.
-    const rawValue = formData?.[key];
-    const lookupValue = Array.isArray(rawValue) ? rawValue.join(',') : rawValue ?? '';
-    const fieldsToHide: string[] = skipAndHide[lookupValue] || [];
-
-    fieldsToHide.forEach((hiddenKey) => {
-      if (updated[hiddenKey]) {
-        updated[hiddenKey] = { ...updated[hiddenKey], 'ui:widget': 'hidden' };
-      }
-    });
-  });
-  return updated;
 };
 
 // A read-only view of a Retention Form (used for a Completed Follow-Up):

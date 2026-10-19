@@ -116,7 +116,7 @@ export const L2QueueSearchSchema = {
     },
     name: {
       type: 'string',
-      title: 'Search name or code',
+      title: 'Search name',
     },
     status: {
       type: 'string',

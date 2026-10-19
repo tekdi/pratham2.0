@@ -6,9 +6,9 @@ export interface PlacementCenter {
 }
 
 export interface SdbvFilters {
-  state?: string;
-  district?: string;
-  block?: string;
+  state?: string[];
+  district?: string[];
+  block?: string[];
 }
 
 // ASSUMPTION, not yet confirmed against the real backend (same caveat
@@ -32,9 +32,9 @@ const searchCentersForDomain = async (
       type: 'COHORT',
       status: ['active'],
       customFieldsName: { domain },
-      ...(sdbv.state && { state: sdbv.state }),
-      ...(sdbv.district && { district: sdbv.district }),
-      ...(sdbv.block && { block: sdbv.block }),
+      ...(sdbv.state?.length && { state: sdbv.state }),
+      ...(sdbv.district?.length && { district: sdbv.district }),
+      ...(sdbv.block?.length && { block: sdbv.block }),
     },
   });
   if (!raw || raw?.isAxiosError || raw instanceof Error) return [];

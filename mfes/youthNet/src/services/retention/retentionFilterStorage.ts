@@ -1,4 +1,4 @@
-import { PlacementCenter } from '../placements/PlacementCenterService';
+import { PlacementCenter, SdbvFilters } from '../placements/PlacementCenterService';
 import { PlacementBatch } from '../placements/PlacementBatchService';
 
 // Persists the Retention page's own filter selections (SDBV, Center, Batch,
@@ -9,7 +9,7 @@ import { PlacementBatch } from '../placements/PlacementBatchService';
 const STORAGE_KEY = 'retention_filters';
 
 export interface RetentionPersistedFilters {
-  sdbv?: { state?: string; district?: string; block?: string };
+  sdbv?: SdbvFilters;
   sdbvFormData?: Record<string, any>;
   center?: PlacementCenter | null;
   batch?: PlacementBatch | null;
