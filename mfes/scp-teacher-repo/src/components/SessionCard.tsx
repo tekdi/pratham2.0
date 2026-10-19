@@ -357,7 +357,7 @@ const SessionsCard: React.FC<SessionsCardProps> = ({
               fontSize={'14px'}
               sx={{ color: theme.palette.warning['400'] }}
             >
-              {t('CENTER_SESSION.CREATED_BY')}: {sessionCreatorName} ddd
+              {t('CENTER_SESSION.CREATED_BY')}: {sessionCreatorName}
             </Typography>
           )}
         </Box>
