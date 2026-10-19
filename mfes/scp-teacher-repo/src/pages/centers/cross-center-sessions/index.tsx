@@ -1,7 +1,6 @@
 import CrossCenterSessionCard from '@/components/CrossCenterSessionCard';
 import CrossCenterScheduleWizard from '@/components/CrossCenterScheduleWizard';
 import Header from '@/components/Header';
-import NoDataFound from '@/components/common/NoDataFound';
 import WeekCalender from '@/components/WeekCalender';
 import useCrossCenterSessions from '@/hooks/useCrossCenterSessions';
 import {
@@ -143,8 +142,6 @@ const CrossCenterSessionsPage = () => {
     setInitialSlideIndex(index > 0 ? index : 0);
   }, [extraSessions]);
 
-  const hasSessions = extraSessions.length > 0 || plannedSessions.length > 0;
-
   return (
     <>
       <Header />
@@ -177,8 +174,6 @@ const CrossCenterSessionsPage = () => {
 
         {loading ? (
           <Typography>{t('COMMON.LOADING')}</Typography>
-        ) : !hasSessions ? (
-          <NoDataFound title="CENTER_SESSION.NO_CROSS_CENTER_SESSIONS" />
         ) : (
           <>
             <Box sx={{ marginBottom: '24px' }}>

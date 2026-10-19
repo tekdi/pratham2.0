@@ -126,15 +126,28 @@ export interface CrossCenterSessionItem {
   batchDetails: CrossCenterBatchDetail[];
 }
 
+/** Inclusive calendar-day window to fetch sessions for. */
+export interface CrossCenterDateRange {
+  startDate: Date;
+  endDate: Date;
+}
+
 /**
  * Fetches every cross-center (multi-batch) session this facilitator can see -
  * every batch they teach, resolved batch/center names for batches outside
  * their own tree - and splits the result into Planned vs Extra. Shared by the
  * Cross-Center Sessions list page and its month-calendar view so the two
  * don't duplicate (and risk diverging on) this resolution logic.
+ *
+ * `range` bounds the fetch to the days actually being shown. The month view
+ * passes the displayed month so past days are included, the same way the
+ * single-batch month calendar queries 1st-to-last of the month
+ * (`useEventDates`); the list page omits it and gets the upcoming-only
+ * default below.
  */
 export const loadCrossCenterSessions = async (
-  userId: string
+  userId: string,
+  range?: CrossCenterDateRange
 ): Promise<{
   extraSessions: CrossCenterSessionItem[];
   plannedSessions: CrossCenterSessionItem[];
@@ -154,13 +167,15 @@ export const loadCrossCenterSessions = async (
   if (cohortIds.length === 0) return empty;
 
   // The backend requires startDate and endDate together — there is no
-  // open-ended range, so this uses a generous 1-year window to effectively
-  // mean "all upcoming sessions".
-  const farFuture = new Date();
-  farFuture.setDate(farFuture.getDate() + 365);
+  // open-ended range, so with no explicit range this uses a generous 1-year
+  // window to effectively mean "all upcoming sessions".
+  const defaultEnd = new Date();
+  defaultEnd.setDate(defaultEnd.getDate() + 365);
+  const rangeStart = range?.startDate ?? new Date();
+  const rangeEnd = range?.endDate ?? defaultEnd;
   const filters = {
-    startDate: { after: getAfterDate(shortDateFormat(new Date())) },
-    endDate: { before: getBeforeDate(shortDateFormat(farFuture)) },
+    startDate: { after: getAfterDate(shortDateFormat(rangeStart)) },
+    endDate: { before: getBeforeDate(shortDateFormat(rangeEnd)) },
     cohortIds,
     status: ['live'],
   };

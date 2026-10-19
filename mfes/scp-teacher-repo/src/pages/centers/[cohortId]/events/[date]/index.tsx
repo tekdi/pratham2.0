@@ -41,7 +41,14 @@ const getDateFromMonthName = (monthName: string): Date => {
     (m) => m.toLowerCase() === monthName?.toLowerCase()
   );
   if (monthIndex === -1) return new Date();
-  return new Date(new Date().getFullYear(), monthIndex, 1);
+  const today = new Date();
+  // MonthCalender highlights today by default whenever the current month is
+  // shown (its own internal state defaults to `new Date()`), so the session
+  // lists below must agree with that and start on today too - otherwise they'd
+  // show the 1st of the month's sessions until the user re-clicks the
+  // already-highlighted day.
+  if (monthIndex === today.getMonth()) return today;
+  return new Date(today.getFullYear(), monthIndex, 1);
 };
 
 const EventMonthView: React.FC<any> = () => {
