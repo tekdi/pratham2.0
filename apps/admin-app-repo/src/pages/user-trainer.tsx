@@ -832,6 +832,7 @@ const TrainerMapping = () => {
                 value={selectedCenters}
                 onChange={setSelectedCenters}
                 allowedStateIds={allowedStateIds}
+                requireState
               />
             </Box>
           )}

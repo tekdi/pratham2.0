@@ -64,7 +64,7 @@
     "LEARNER_STATUS": "Status",
     "ALL_STATUSES": "All Status",
     "OJT_ADDRESS": "OJT Address",
-    "OJT_ADDRESS_PLACEHOLDER": "OJT organisation / address",
+    "OJT_ADDRESS_PLACEHOLDER": "OJT (On Job Training) organisation / address",
     "OJT_ADDRESS_SAVED": "OJT address saved",
     "OJT_ADDRESS_SAVE_FAILED": "Could not save OJT address",
     "STATUS_IN_TRAINING": "In Training",
@@ -78,7 +78,7 @@
     "MARK_AS_DROPOUT": "Mark as Dropout",
     "UNMARK_AS_DROPOUT": "Unmark as Dropout",
     "LEARNER_UNMARKED_DROPOUT": "Learner moved back to In Training",
-    "ASSESSMENT_COLUMN_HEADER": "{{name}} ({{marks}} marks)",
+    "ASSESSMENT_TOTAL_MARKS": "({{marks}} marks)",
     "ASSESSMENT_NOT_STARTED": "Not Started",
     "ASSESSMENT_REQUIRED": "Select at least one assessment"
   },

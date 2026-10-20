@@ -14,6 +14,13 @@ interface BatchDetailsHeaderProps {
   onEditBatch?: () => void;
 }
 
+// Batch dates come back as "YYYY-MM-DD" strings; show them as DD-MM-YYYY.
+// Reordered as text (not via Date) so the day can't shift with timezone.
+const formatBatchDate = (value: string) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  return match ? `${match[3]}-${match[2]}-${match[1]}` : value;
+};
+
 // Summary card at the top of the Batch Details page — batch name, center ·
 // domain · course, date range, and learner count, with a helper line above
 // the Learner List below it.
@@ -21,7 +28,7 @@ const BatchDetailsHeader: React.FC<BatchDetailsHeaderProps> = ({ batch, onEditBa
   const { t } = useTranslation();
   const [menuAnchorEl, setMenuAnchorEl] = useState<HTMLElement | null>(null);
   const dateRange =
-    batch.startDate && batch.endDate ? `${batch.startDate} → ${batch.endDate}` : null;
+    batch.startDate && batch.endDate ? `${formatBatchDate(batch.startDate)} → ${formatBatchDate(batch.endDate)}` : null;
 
   return (
     <Box

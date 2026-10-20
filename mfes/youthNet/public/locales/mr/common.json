@@ -1383,7 +1383,7 @@
     "LEARNER_STATUS": "स्थिती",
     "ALL_STATUSES": "सर्व स्थिती",
     "OJT_ADDRESS": "OJT पत्ता",
-    "OJT_ADDRESS_PLACEHOLDER": "OJT संस्था / पत्ता",
+    "OJT_ADDRESS_PLACEHOLDER": "OJT (On Job Training) संस्था / पत्ता",
     "OJT_ADDRESS_SAVED": "OJT पत्ता सेव्ह झाला",
     "OJT_ADDRESS_SAVE_FAILED": "OJT पत्ता सेव्ह करता आला नाही",
     "STATUS_IN_TRAINING": "प्रशिक्षणात",
@@ -1397,7 +1397,7 @@
     "MARK_AS_DROPOUT": "ड्रॉपआउट म्हणून चिन्हांकित करा",
     "UNMARK_AS_DROPOUT": "ड्रॉपआउट चिन्ह काढा",
     "LEARNER_UNMARKED_DROPOUT": "शिकणाऱ्याला पुन्हा प्रशिक्षणात हलवले",
-    "ASSESSMENT_COLUMN_HEADER": "{{name}} ({{marks}} गुण)",
+    "ASSESSMENT_TOTAL_MARKS": "({{marks}} गुण)",
     "ASSESSMENT_NOT_STARTED": "सुरू झाले नाही",
     "ASSESSMENT_REQUIRED": "किमान एक मूल्यांकन निवडा"
   },

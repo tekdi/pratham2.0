@@ -1401,7 +1401,7 @@
     "LEARNER_STATUS": "حالت",
     "ALL_STATUSES": "تمام حالتیں",
     "OJT_ADDRESS": "OJT پتہ",
-    "OJT_ADDRESS_PLACEHOLDER": "OJT ادارہ / پتہ",
+    "OJT_ADDRESS_PLACEHOLDER": "OJT (On Job Training) ادارہ / پتہ",
     "OJT_ADDRESS_SAVED": "OJT پتہ محفوظ ہو گیا",
     "OJT_ADDRESS_SAVE_FAILED": "OJT پتہ محفوظ نہیں ہو سکا",
     "STATUS_IN_TRAINING": "تربیت میں",
@@ -1415,7 +1415,7 @@
     "MARK_AS_DROPOUT": "ڈراپ آؤٹ کے طور پر نشان زد کریں",
     "UNMARK_AS_DROPOUT": "ڈراپ آؤٹ کا نشان ہٹائیں",
     "LEARNER_UNMARKED_DROPOUT": "طالب علم کو واپس تربیت میں منتقل کر دیا گیا",
-    "ASSESSMENT_COLUMN_HEADER": "{{name}} ({{marks}} نمبر)",
+    "ASSESSMENT_TOTAL_MARKS": "({{marks}} نمبر)",
     "ASSESSMENT_NOT_STARTED": "شروع نہیں ہوا",
     "ASSESSMENT_REQUIRED": "کم از کم ایک جائزہ منتخب کریں"
   },

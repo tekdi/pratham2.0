@@ -52,6 +52,10 @@ interface TrainerCenterSelectorProps {
   // no States are assigned, so nothing is browsable). Left undefined for
   // Central Lead, who sees Centers across every State.
   allowedStateIds?: string[];
+  // Map New: don't search or list any Centers until a State is picked, so
+  // the list is always scoped to the chosen State (and refreshes when it
+  // changes) instead of first showing every Center.
+  requireState?: boolean;
 }
 
 // Same three-section layout as MultipleCenterListWidgetNew.tsx (the widget
@@ -69,6 +73,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
   value,
   onChange,
   allowedStateIds,
+  requireState = false,
 }) => {
   // Theme color
   const themeColor = '#FDBE16';
@@ -103,6 +108,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
   const [centerOptions, setCenterOptions] = useState<TrainerCenter[] | null>(
     null
   );
+  const isAwaitingState = requireState && selectedState.length === 0;
 
   // Load State options once on mount.
   useEffect(() => {
@@ -283,6 +289,7 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
         if (
           !domain ||
           skills.length === 0 ||
+          isAwaitingState ||
           (allowedStateIds && allowedStateIds.length === 0)
         ) {
           if (isCurrent) setCenterOptions([]);
@@ -578,7 +585,9 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
                 Centers
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {centerOptions == null
+                {isAwaitingState
+                  ? 'Select a state to view centers'
+                  : centerOptions == null
                   ? 'Loading…'
                   : `${centerOptions.length} center${
                       centerOptions.length === 1 ? '' : 's'
@@ -608,13 +617,20 @@ const TrainerCenterSelector: React.FC<TrainerCenterSelectorProps> = ({
           placeholder="Search centers..."
           value={searchKeyword}
           onChange={(e) => setSearchKeyword(e.target.value)}
+          disabled={isAwaitingState}
           InputProps={{
             startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
           }}
           sx={{ mb: 2 }}
         />
 
-        {loading.centers ? (
+        {isAwaitingState ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <Typography variant="body2" color="text.secondary">
+              Please select a State to view its Centers.
+            </Typography>
+          </Box>
+        ) : loading.centers ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress sx={{ color: themeColor }} />
           </Box>
