@@ -361,6 +361,16 @@ const L2InterestedQueuePage = () => {
 
   const columns = [
     {
+      key: 'action',
+      label: t('L2_QUEUE.ACTION'),
+      minWidth: 140,
+      render: (row: any) => (
+        <Button size="small" variant="outlined" onClick={() => openDrawer([row])}>
+          {isLearnerTagged(row) ? t('L2_QUEUE.REVIEW') : t('L2_QUEUE.INTERACT')}
+        </Button>
+      ),
+    },
+    {
       key: 'learner',
       label: t('L2_QUEUE.LEARNER'),
       minWidth: 220,
@@ -373,16 +383,6 @@ const L2InterestedQueuePage = () => {
             {row?.enrollmentId}
           </Typography>
         </Box>
-      ),
-    },
-    {
-      key: 'action',
-      label: t('L2_QUEUE.ACTION'),
-      minWidth: 140,
-      render: (row: any) => (
-        <Button size="small" variant="outlined" onClick={() => openDrawer([row])}>
-          {isLearnerTagged(row) ? t('L2_QUEUE.REVIEW') : t('L2_QUEUE.INTERACT')}
-        </Button>
       ),
     },
     {
