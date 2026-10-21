@@ -44,7 +44,8 @@ const RenameCenterModal: React.FC<CreateBlockModalProps> = ({
   const [error, setError] = useState<boolean>(false);
   const [enableRenameButton, setEnableRenameButton] = useState<boolean>();
 
-  const pattern = /^[a-zA-Z ]*$/;
+  // Same character set as BatchCreateSchema in admin-app-repo
+  const pattern = /^[a-zA-Z0-9 !@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]*$/;
 
   React.useEffect(() => {
     if (reloadState) {
@@ -140,7 +141,6 @@ const RenameCenterModal: React.FC<CreateBlockModalProps> = ({
             value={centerName}
             onChange={handleTextFieldChange}
             error={!!error}
-            inputProps={{ pattern: pattern }}
           />
           <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
             {t('CENTERS.NOTE')}

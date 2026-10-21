@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation'; // Use Next.js router for navigation
 import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
+import AudiotrackOutlinedIcon from '@mui/icons-material/AudiotrackOutlined';
+import SlideshowOutlinedIcon from '@mui/icons-material/SlideshowOutlined';
 import LensOutlinedIcon from '@mui/icons-material/LensOutlined';
 import LensIcon from '@mui/icons-material/Lens';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
@@ -67,6 +69,37 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
       ),
       text: 'Youtube',
     },
+    'video/youtube': {
+      icon: (
+        <Image src="/images/youtube.svg" alt="youtube" width="18" height="18" />
+      ),
+      text: 'Youtube',
+    },
+    'audio/mp3': {
+      icon: <AudiotrackOutlinedIcon sx={{ fontSize: 18 }} />,
+      text: 'Audio',
+    },
+    'audio/mpeg': {
+      icon: <AudiotrackOutlinedIcon sx={{ fontSize: 18 }} />,
+      text: 'Audio',
+    },
+    'audio/wav': {
+      icon: <AudiotrackOutlinedIcon sx={{ fontSize: 18 }} />,
+      text: 'Audio',
+    },
+    'application/vnd.ekstep.ecml-archive': {
+      icon: <SlideshowOutlinedIcon sx={{ fontSize: 18 }} />,
+      text: 'Interactive',
+    },
+    'application/vnd.ms-powerpoint': {
+      icon: <SlideshowOutlinedIcon sx={{ fontSize: 18 }} />,
+      text: 'Presentation',
+    },
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      {
+        icon: <SlideshowOutlinedIcon sx={{ fontSize: 18 }} />,
+        text: 'Presentation',
+      },
     'application/vnd.sunbird.questionset': {
       icon: <Image src="/images/Qml.svg" alt="quml" width="18" height="18" />,
       text: 'Question Set',
@@ -106,7 +139,7 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
         }}
       >
         {icons?.[mimeType as keyof typeof icons]?.icon || (
-          <TextSnippetOutlinedIcon />
+          <TextSnippetOutlinedIcon sx={{ fontSize: 18 }} />
         )}
         <Typography
           sx={{
@@ -119,7 +152,7 @@ const GetIconByMimeType = React.memo(function GetIconByMimeTypeComponent({
             verticalAlign: 'middle',
           }}
         >
-          {icons?.[mimeType as keyof typeof icons]?.text || 'unknown'}
+          {icons?.[mimeType as keyof typeof icons]?.text || 'Resource'}
         </Typography>
       </Box>
     );

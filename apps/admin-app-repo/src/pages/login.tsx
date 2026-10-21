@@ -1,6 +1,6 @@
 import { showToastMessage } from '@/components/Toastify';
 import { useAccountSwitch } from '@/hooks/useAccountSwitch';
-import { Role, TenantName } from '@/utils/app.constant';
+import { Role, TenantName, isSecondChanceTenant } from '@/utils/app.constant';
 import { logEvent } from '@/utils/googleAnalytics';
 import { telemetryFactory } from '@/utils/telemetry';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -33,6 +33,10 @@ import { getUserId, login } from '../services/LoginService';
 
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import { applyLanguage, storeLanguage } from '@shared-lib-v2/utils/languageSync';
+import {
+  isCaptchaError,
+  preloadRecaptcha,
+} from '@shared-lib-v2/utils/recaptcha';
 
 // Toggle back on to restore the login page's language selector.
 const SHOW_LANGUAGE_DROPDOWN = false;
@@ -82,8 +86,7 @@ const LoginPage = () => {
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               // To do :- hardcoding to be removed
               if (
-                role?.tenantData[0]?.tenantName !=
-                TenantName.SECOND_CHANCE_PROGRAM
+                !isSecondChanceTenant(tenantData?.tenantName)
               ) {
                 // router.push('/workspace');
                 router.push('/faqs');
@@ -92,19 +95,17 @@ const LoginPage = () => {
               }
             } else if (
               role?.role === Role.CENTRAL_ADMIN &&
-              role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/programs', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
-              role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/centers', undefined, { locale: locale });
             } else if (
               role?.role === Role.ADMIN &&
-              role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+              tenantData?.tenantName == TenantName.YOUTHNET
             ) {
               router.push('/user-leader');
             }
@@ -113,25 +114,27 @@ const LoginPage = () => {
           let role;
           if (storedUserData) {
             role = JSON.parse(storedUserData);
+            const tenantId = localStorage.getItem('tenantId');
+            const tenantData = role?.tenantData?.find(
+              (tenant: any) => tenant.tenantId === tenantId
+            );
             if (role?.role === Role.SCTA || role?.role === Role.CCTA) {
               router.push('/course-planner');
             }
             if (
               role?.role === Role.CENTRAL_ADMIN &&
-              role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/programs');
             } else if (
               role?.role === Role.ADMIN &&
-              role?.tenantData[0]?.tenantName ==
-                TenantName.SECOND_CHANCE_PROGRAM
+              isSecondChanceTenant(tenantData?.tenantName)
             ) {
               router.push('/centers');
             } else if (
               (role?.role === Role.CENTRAL_ADMIN ||
                 role?.role === Role.ADMIN) &&
-              role?.tenantData[0]?.tenantName == TenantName.YOUTHNET
+              tenantData?.tenantName == TenantName.YOUTHNET
             ) {
               router.push('/user-leader');
             }
@@ -179,6 +182,10 @@ const LoginPage = () => {
   const [roleId, setRoleId] = useState<string>('');
   const [roleName, setRoleName] = useState<string>('');
 
+  useEffect(() => {
+    preloadRecaptcha();
+  }, []);
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     logEvent({
@@ -223,7 +230,9 @@ const LoginPage = () => {
         telemetryFactory.interact(telemetryInteract);
       } catch (error: any) {
         setLoading(false);
-        const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
+        const errorMessage = isCaptchaError(error)
+          ? t('LOGIN_PAGE.CAPTCHA_VERIFICATION_FAILED')
+          : t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
         showToastMessage(errorMessage, 'error');
       }
     }
