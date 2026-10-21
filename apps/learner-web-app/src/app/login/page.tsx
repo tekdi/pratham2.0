@@ -15,6 +15,10 @@ import { getAcademicYear } from '@learner/utils/API/AcademicYearService';
 import { preserveLocalStorage } from '@learner/utils/helper';
 import Loader from '@learner/components/Loader/Loader';
 import { getDeviceId } from '@shared-lib-v2/DynamicForm/utils/helper';
+import {
+  isCaptchaError,
+  preloadRecaptcha,
+} from '@shared-lib-v2/utils/recaptcha';
 import { getUserDetails, profileComplitionCheck } from '@learner/utils/API/userService';
 import { telemetryFactory } from '@shared-lib-v2/DynamicForm/utils/telemetry';
 import Image from 'next/image';
@@ -778,6 +782,10 @@ const LoginPageContent = () => {
   );
 
   useEffect(() => {
+    preloadRecaptcha();
+  }, []);
+
+  useEffect(() => {
     const init = async () => {
       try {
         const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
@@ -844,9 +852,11 @@ const LoginPageContent = () => {
         telemetryFactory.interact(telemetryInteract);
       }
       // setLoading(false);
-    } catch {
+    } catch (error: any) {
       //   setLoading(false);
-      const errorMessage = t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
+      const errorMessage = isCaptchaError(error)
+        ? t('LOGIN_PAGE.CAPTCHA_VERIFICATION_FAILED')
+        : t('LOGIN_PAGE.USERNAME_PASSWORD_NOT_CORRECT');
       showToastMessage(errorMessage, 'error');
       const telemetryInteract = {
         context: { env: 'sign-in', cdata: [] },

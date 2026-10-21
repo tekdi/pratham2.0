@@ -7,6 +7,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import LocalLibraryOutlinedIcon from '@mui/icons-material/LocalLibraryOutlined';
+import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import {
   Button,
   FormControl,
@@ -66,6 +67,7 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   >([]);
   const [selectedSessionId, setSelectedSessionId] = useState<string>('');
   const [tenantName, setTenantName] = useState<string>('');
+  const [isPathwaysProgram, setIsPathwaysProgram] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const { i18n, t } = useTranslation();
   const router = useRouter();
@@ -80,7 +82,12 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
       const storedTenantName = localStorage.getItem('tenantName');
-      
+
+      setIsPathwaysProgram(
+        storedTenantName?.toLowerCase() ===
+          TENANT_DATA.SECOND_CHANCE_PROGRAM_PATHWAYS.toLowerCase()
+      );
+
       // Always set tenantName to one of the three tenant types
       if (storedTenantName === TENANT_DATA.YOUTHNET) {
         setTenantName(TENANT_DATA.YOUTHNET);
@@ -196,7 +203,10 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     }
   };
 
-  const handleCopyRegistrationLink = async () => {
+  const handleCopyRegistrationLink = async (
+    event?: React.MouseEvent<HTMLElement>
+  ) => {
+    event?.preventDefault();
     try {
       // Get the registration link from environment variable or construct it
       const registrationBase: string =
@@ -233,7 +243,8 @@ const MenuDrawer: React.FC<DrawerProps> = ({
   const navigateToSurveyMfe = () => {
     closeDrawer();
     const surveyMfeBase =
-      process.env.NEXT_PUBLIC_SURVEY_MFE_URL || 'http://localhost:3001';
+      process.env.NEXT_PUBLIC_SURVEY_MFE_URL ||
+      'http://localhost:4115/plp-surveys';
 
     // Same-origin check: if the survey MFE is on the same origin (production
     // behind Nginx), localStorage is already shared — no need to pass tokens
@@ -283,7 +294,11 @@ const MenuDrawer: React.FC<DrawerProps> = ({
     '/attendance-history',
     '/attendance-overview',
   ].includes(router.pathname);
-  const isTeacherCenter = router.pathname.includes('/centers');
+  const isCrossCenterSessions = router.pathname.includes(
+    '/centers/cross-center-sessions'
+  );
+  const isTeacherCenter =
+    router.pathname.includes('/centers') && !isCrossCenterSessions;
   const isCoursePlanner = [
     '/curriculum-planner',
     '/topic-detail-view',
@@ -659,6 +674,43 @@ const MenuDrawer: React.FC<DrawerProps> = ({
                 ? t('DASHBOARD.TEACHING_CENTERS')
                 : t('DASHBOARD.MY_TEACHING_CENTERS')}
             </Button>
+            <Button
+              className="fs-14"
+              sx={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'flex-start',
+                background: isCrossCenterSessions
+                  ? theme.palette.primary.main
+                  : 'transparent',
+
+                padding: isCrossCenterSessions
+                  ? '16px 18px !important'
+                  : '0px 18px !important',
+                color: isCrossCenterSessions
+                  ? '#2E1500'
+                  : theme.palette.warning.A200,
+                fontWeight: isCrossCenterSessions ? '600' : 500,
+                '&:hover': {
+                  background: isCrossCenterSessions
+                    ? theme.palette.primary.main
+                    : 'transparent',
+                },
+                marginTop: '15px',
+                gap: '10px',
+              }}
+              startIcon={
+                <HubOutlinedIcon sx={{ fontSize: '24px !important' }} />
+              }
+              onClick={() => {
+                closeDrawer();
+                router.push('/centers/cross-center-sessions');
+              }}
+              component="a"
+              href={withBasePath('/centers/cross-center-sessions')}
+            >
+              {t('DASHBOARD.CROSS_CENTER_SESSIONS')}
+            </Button>
           </Box>
         )}
         {/* Survey Forms menu item commented out
@@ -817,47 +869,49 @@ const MenuDrawer: React.FC<DrawerProps> = ({
               >
                 {t('ASSESSMENTS.ASSESSMENTS')}
               </Button>
-              <Button
-                className="fs-14 joyride-step-10"
-                sx={{
-                  width: '100%',
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  background: isAiAssessment
-                    ? theme.palette.primary.main
-                    : 'transparent',
-
-                  padding: isAiAssessment
-                    ? '16px 18px !important'
-                    : '0px 18px !important',
-                  color: isAiAssessment
-                    ? '#2E1500'
-                    : theme.palette.warning.A200,
-                  fontWeight: isAiAssessment ? '600' : 500,
-                  '&:hover': {
+              {!isPathwaysProgram && (
+                <Button
+                  className="fs-14 joyride-step-10"
+                  sx={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'flex-start',
                     background: isAiAssessment
                       ? theme.palette.primary.main
                       : 'transparent',
-                  },
-                  marginTop: '15px',
-                  gap: '10px',
-                }}
-                startIcon={
-                  <Image
-                    src={aiAssessment}
-                    alt="Assessment Icon"
-                    width={24}
-                    height={24}
-                  />
-                }
-                onClick={() => {
-                  router.push(`/ai-assessments`);
-                }}
-                component="a"
-                href={withBasePath('/ai-assessments')}  
-              >
-                {t('ASSESSMENTS.AI_ASSESSMENT')}
-              </Button>
+
+                    padding: isAiAssessment
+                      ? '16px 18px !important'
+                      : '0px 18px !important',
+                    color: isAiAssessment
+                      ? '#2E1500'
+                      : theme.palette.warning.A200,
+                    fontWeight: isAiAssessment ? '600' : 500,
+                    '&:hover': {
+                      background: isAiAssessment
+                        ? theme.palette.primary.main
+                        : 'transparent',
+                    },
+                    marginTop: '15px',
+                    gap: '10px',
+                  }}
+                  startIcon={
+                    <Image
+                      src={aiAssessment}
+                      alt="Assessment Icon"
+                      width={24}
+                      height={24}
+                    />
+                  }
+                  onClick={() => {
+                    router.push(`/ai-assessments`);
+                  }}
+                  component="a"
+                  href={withBasePath('/ai-assessments')}
+                >
+                  {t('ASSESSMENTS.AI_ASSESSMENT')}
+                </Button>
+              )}
               <Button
                 // className="fs-14 joyride-step-10"
                 sx={{

@@ -9,7 +9,7 @@ import {
 } from '../constant/Forms/StateLeadSearch';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName } from '@/utils/app.constant';
+import { Role, ROLE_LOGIN_URL_MAP, RoleId, RoleName, Status, TenantName, isSecondChanceTenant, getSelectedTenantData } from '@/utils/app.constant';
 import { userList } from '@/services/UserList';
 import {
   Box,
@@ -105,6 +105,10 @@ const StateLead = () => {
       : {};
 
   const storedUserData = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+  const selectedTenantData = getSelectedTenantData(
+    storedUserData?.tenantData,
+    localStorage.getItem('tenantId')
+  );
 
   console.log(
     '########### type state lead process.env.NEXT_PUBLIC_TEACHER_SBPLAYER',
@@ -455,7 +459,7 @@ const StateLead = () => {
   const failureCreateMessage = 'STATE_LEADS.NOT_ABLE_CREATE_STATE_LEAD';
   // const notificationKey = 'onStateLeadCreate';
   const notificationKey =
-    storedUserData.tenantData[0].tenantName === TenantName.SECOND_CHANCE_PROGRAM
+    isSecondChanceTenant(selectedTenantData?.tenantName)
       ? 'onScpStateLeadCreate'
       : 'onYouthnetStateLeadCreate';
   const notificationMessage = 'STATE_LEADS.USER_CREDENTIALS_WILL_BE_SEND_SOON';
