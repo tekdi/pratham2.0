@@ -16,7 +16,7 @@ interface ConfirmationModalProps {
 
 interface ButtonNames {
   primary: string;
-  secondary: string;
+  secondary?: string;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -65,28 +65,30 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent: buttonNames.secondary ? 'flex-end' : 'center',
             gap: '18px',
             p: 2,
           }}
         >
-          <Button
-            sx={{
-              border: 'none',
-              color: theme.palette.secondary.main,
-              fontSize: '14px',
-              fontWeight: '500',
-              '&:hover': {
+          {buttonNames.secondary && (
+            <Button
+              sx={{
                 border: 'none',
-                backgroundColor: 'transparent',
-              },
-            }}
-            className="one-line-text"
-            variant="outlined"
-            onClick={handleCloseModal}
-          >
-            {buttonNames.secondary}
-          </Button>
+                color: theme.palette.secondary.main,
+                fontSize: '14px',
+                fontWeight: '500',
+                '&:hover': {
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                },
+              }}
+              className="one-line-text"
+              variant="outlined"
+              onClick={handleCloseModal}
+            >
+              {buttonNames.secondary}
+            </Button>
+          )}
           <Button
             sx={{
               width: 'auto',

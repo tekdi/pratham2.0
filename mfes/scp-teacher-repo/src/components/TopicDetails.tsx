@@ -24,6 +24,8 @@ interface TopicDetailsProps {
   handleOpen: any;
   handleRemove: any;
   eventStatus?: string;
+  /** False when the viewer may not edit this session (see canEditSession). */
+  canEdit?: boolean;
 }
 
 const TopicDetails: React.FC<TopicDetailsProps> = ({
@@ -33,9 +35,13 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
   handleOpen,
   handleRemove,
   eventStatus,
+  canEdit = true,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
+  // The topic and its resources stay readable for everyone; changing or
+  // removing them additionally needs edit access on the session itself.
+  const isEditable = eventStatus === EventStatus.UPCOMING && canEdit;
   const [contentData, setContentData] = useState<LearningResource[]>([]);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
 
@@ -115,7 +121,7 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
                 {topic?.join(', ')}
               </Box>
             </Box>
-            {eventStatus === EventStatus.UPCOMING && (
+            {isEditable && (
               <CreateOutlinedIcon
                 sx={{ fontSize: '18px', color: '#0D599E', cursor: 'pointer' }}
                 onClick={openTopicModal}
@@ -144,24 +150,17 @@ const TopicDetails: React.FC<TopicDetailsProps> = ({
             gap: '5px',
             mt: 2,
             alignItems: 'center',
-            cursor:
-              eventStatus === EventStatus.UPCOMING ? 'pointer' : 'not-allowed',
-            pointerEvents:
-              eventStatus === EventStatus.UPCOMING ? 'auto' : 'none',
+            cursor: isEditable ? 'pointer' : 'not-allowed',
+            pointerEvents: isEditable ? 'auto' : 'none',
           }}
-          onClick={
-            eventStatus === EventStatus.UPCOMING
-              ? onRemoveTopicSubtopic
-              : undefined
-          }
+          onClick={isEditable ? onRemoveTopicSubtopic : undefined}
         >
           <Box
             sx={{
               fontSize: '14px',
-              color:
-                eventStatus === EventStatus.UPCOMING
-                  ? theme?.palette?.secondary.main
-                  : theme?.palette?.grey[500],
+              color: isEditable
+                ? theme?.palette?.secondary.main
+                : theme?.palette?.grey[500],
               fontWeight: '500',
             }}
           >
