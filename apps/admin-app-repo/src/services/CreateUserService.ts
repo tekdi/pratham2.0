@@ -6,6 +6,7 @@ import { TENANT_ID } from '../../app.config';
 import TenantService from './TenantService';
 
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
+import { withEncryptedPassword } from '@shared-lib-v2/utils/passwordEncryption';
 
 export interface UserDetailParam {
   userData?: object;
@@ -62,7 +63,7 @@ export const getFormRead = async (
 export const createUser = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.accountCreate;
   try {
-    const response = await post(apiUrl, userData);
+    const response = await post(apiUrl, await withEncryptedPassword(userData));
     return response?.data?.result;
   } catch (error) {
     console.error('error in getting cohort list', error);

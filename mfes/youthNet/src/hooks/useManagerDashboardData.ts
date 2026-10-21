@@ -73,7 +73,7 @@ const loadManagerDashboardData = (): Promise<void> => {
       const managerUserId = getCurrentManagerUserId();
       cachedManagerUserId = managerUserId;
       if (managerUserId) {
-        const response = await fetchUserList({ filters: { emp_manager: managerUserId, role: 'Learner' } });
+        const response = await fetchUserList({ filters: { emp_manager: managerUserId, role: 'Learner', status: ['active'] } });
         fetchedUsers = (response?.getUserDetails || []).filter(hasManagerDashboardCustomField);
         user_custom_family=getManagerDashboardCustomFieldValues(fetchedUsers);
       }

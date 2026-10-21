@@ -19,6 +19,7 @@ import {
   shortDateFormat,
   sortSessions,
   toPascalCase,
+  eventBelongsToCohort,
 } from '../utils/helper';
 import {
   AttendancePercentageProps,
@@ -857,6 +858,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
   }
   const presentPercentage = parseFloat(currentAttendance?.present_percentage);
   const pathColor = determinePathColor(presentPercentage);
+  // At 0% the progress path is not drawn at all, so the circle would show only
+  // the grey trail. Draw a full ring instead so it renders in the 0% colour.
+  const progressValue =
+    presentPercentage === 0 ? 100 : currentAttendance?.present_percentage;
 
   const handleMoreDetailsClicked = () => {
     logEvent({
@@ -937,7 +942,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
               after: afterDate,
               before: beforeDate,
             },
-            cohortId: classId,
+            // Backend ignores singular `cohortId`; it needs `cohortIds` (array)
+            cohortIds: [classId],
             status: ['live'],
           };
 
@@ -945,7 +951,13 @@ const Dashboard: React.FC<DashboardProps> = () => {
           const sessionArray: any[] = [];
           const extraSessionArray: any[] = [];
           if (response?.events?.length > 0) {
-            response?.events.forEach((event: any) => {
+            // Defence in depth: some environments ignore the `cohortIds`
+            // filter and return every live event, which would render a card
+            // (and its course-plan API chain) for every cohort in the system.
+            const cohortEvents = response.events.filter((event: any) =>
+              eventBelongsToCohort(event, classId)
+            );
+            cohortEvents.forEach((event: any) => {
               if (event?.metadata?.type === sessionType.PLANNED) {
                 sessionArray.push(event);
               }
@@ -1188,9 +1200,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                   currentAttendance !== 'futureDate' && (
                                     <>
                                       <CircularProgressbar
-                                        value={
-                                          currentAttendance?.present_percentage
-                                        }
+                                        value={progressValue}
                                         background
                                         backgroundPadding={8}
                                         styles={buildStyles({
@@ -1302,6 +1312,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
                                     currentAttendance === 'notMarked' ||
                                     currentAttendance === 'futureDate' ||
                                     classId === 'all' ||
+                                    formattedFifteenDaysAgo > selectedDate ||
                                     Number(
                                       attendanceData?.numberOfCohortMembers &&
                                         attendanceData.numberOfCohortMembers !==

@@ -7,6 +7,7 @@ import { useTranslation } from '@shared-lib';
 import { ContentSearch } from '@learner/utils/API/contentService';
 import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
 import { TenantName } from '@learner/utils/app.constant';
+import { useUserProgram } from '@learner/utils/hooks/useUserProgram';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 
 declare global {
@@ -20,20 +21,17 @@ declare global {
 const AttemptAssessmentButton: React.FC = () => {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const userProgram = useUserProgram();
   const [showButton, setShowButton] = useState(false);
   const [questionSetIdentifier, setQuestionSetIdentifier] = useState<string | null>(null);
   const [isContentAvailable, setIsContentAvailable] = useState(false);
   const [showUnavailableModal, setShowUnavailableModal] = useState(false);
 
   const checkPendingAssessment = useCallback(async () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !userProgram) return;
 
-    const userProgram = localStorage.getItem('userProgram');
-    if (userProgram !== TenantName.SECOND_CHANCE_PROGRAM) {
-      setShowButton(false);
-      return;
-    }
-
+    // Driven by the currently selected program's own tenant config, not a
+    // hardcoded program name, so this stays correct for future programs too.
     const uiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
     const isRegistrationTestEnabled =
       uiConfig?.RegisterationTest === true ||
@@ -113,7 +111,7 @@ const AttemptAssessmentButton: React.FC = () => {
       setIsContentAvailable(false);
       setShowButton(true);
     }
-  }, []);
+  }, [userProgram]);
 
   useEffect(() => {
     checkPendingAssessment();
