@@ -361,6 +361,16 @@ const L2InterestedQueuePage = () => {
 
   const columns = [
     {
+      key: 'action',
+      label: t('L2_QUEUE.ACTION'),
+      minWidth: 140,
+      render: (row: any) => (
+        <Button size="small" variant="outlined" onClick={() => openDrawer([row])}>
+          {isLearnerTagged(row) ? t('L2_QUEUE.REVIEW') : t('L2_QUEUE.INTERACT')}
+        </Button>
+      ),
+    },
+    {
       key: 'learner',
       label: t('L2_QUEUE.LEARNER'),
       minWidth: 220,
@@ -374,30 +384,6 @@ const L2InterestedQueuePage = () => {
           </Typography>
         </Box>
       ),
-    },
-    {
-      key: 'state',
-      label: t('L2_QUEUE.STATE'),
-      minWidth: 240,
-      render: (row: any) => getLearnerLocationValue(row, 'STATE'),
-    },
-    {
-      key: 'district',
-      label: t('L2_QUEUE.DISTRICT'),
-      minWidth: 140,
-      render: (row: any) => getLearnerLocationValue(row, 'DISTRICT'),
-    },
-    {
-      key: 'block',
-      label: t('L2_QUEUE.BLOCK'),
-      minWidth: 140,
-      render: (row: any) => getLearnerLocationValue(row, 'BLOCK'),
-    },
-    {
-      key: 'village',
-      label: t('L2_QUEUE.VILLAGE'),
-      minWidth: 140,
-      render: (row: any) => getLearnerLocationValue(row, 'VILLAGE'),
     },
     {
       key: 'interestedAt',
@@ -453,14 +439,28 @@ const L2InterestedQueuePage = () => {
       ),
     },
     {
-      key: 'action',
-      label: t('L2_QUEUE.ACTION'),
+      key: 'state',
+      label: t('L2_QUEUE.STATE'),
+      minWidth: 240,
+      render: (row: any) => getLearnerLocationValue(row, 'STATE'),
+    },
+    {
+      key: 'district',
+      label: t('L2_QUEUE.DISTRICT'),
       minWidth: 140,
-      render: (row: any) => (
-        <Button size="small" variant="outlined" onClick={() => openDrawer([row])}>
-          {isLearnerTagged(row) ? t('L2_QUEUE.REVIEW') : t('L2_QUEUE.INTERACT')}
-        </Button>
-      ),
+      render: (row: any) => getLearnerLocationValue(row, 'DISTRICT'),
+    },
+    {
+      key: 'block',
+      label: t('L2_QUEUE.BLOCK'),
+      minWidth: 140,
+      render: (row: any) => getLearnerLocationValue(row, 'BLOCK'),
+    },
+    {
+      key: 'village',
+      label: t('L2_QUEUE.VILLAGE'),
+      minWidth: 140,
+      render: (row: any) => getLearnerLocationValue(row, 'VILLAGE'),
     },
   ];
 
@@ -629,6 +629,7 @@ const L2InterestedQueuePage = () => {
             uiSchema={{ ...L2QueueAssignUISchema, 'ui:submitButtonOptions': { norender: true } }}
             SubmitaFunction={(formData: any) => setAssignFormData(formData)}
             isCallSubmitInHandle={true}
+            showRequiredIndicator
             prefilledFormData={assignFormData}
             type="l2-interested-queue-assign"
           />

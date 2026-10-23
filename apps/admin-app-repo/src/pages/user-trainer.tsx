@@ -18,7 +18,12 @@ import {
   IconButton,
   CircularProgress,
   TextField,
+  Autocomplete,
+  Checkbox,
+  Chip,
 } from '@mui/material';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import PaginatedTable from '@/components/PaginatedTable/PaginatedTable';
 import { Button } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -26,6 +31,7 @@ import { deleteUser } from '@shared-lib-v2/MapUser/DeleteUser';
 import editIcon from '../../public/images/editIcon.svg';
 import deleteIcon from '../../public/images/deleteIcon.svg';
 import apartment from '../../public/images/apartment.svg';
+import restoreIcon from '../../public/images/restore_user.svg';
 import Image from 'next/image';
 import { searchListData } from '@/components/DynamicForm/DynamicFormCallback';
 import TenantService from '@/services/TenantService';
@@ -47,7 +53,12 @@ import {
   pageActionBarSx,
   pageTableSectionSx,
 } from '@/utils/filterTableActionsForAcademicYear';
-import { bulkCreateCohortMembers } from '@/services/CohortService/cohortService';
+import {
+  bulkCreateCohortMembers,
+  updateCohortMemberStatus,
+} from '@/services/CohortService/cohortService';
+import { getCohortList } from '@/services/GetCohortList';
+import { updateUserTenantStatus } from '@/services/UserService';
 import {
   disableDomainSkillFields,
   extractDomainSkillValues,
@@ -196,10 +207,8 @@ const TrainerMapping = () => {
           ([_, value]) => !Array.isArray(value) || value.length > 0
         )
       );
-      delete formData.status;
-      if (formData.tenantStatus === 'all') {
-        delete formData.tenantStatus;
-      }
+      // Filters saved before Status switched from `tenantStatus` to `status`.
+      delete formData.tenantStatus;
       const staticFilter: any = {
         role: Role.TEACHER,
         tenantId: TenantService.getTenantId(),
@@ -247,9 +256,9 @@ const TrainerMapping = () => {
     {
       key: 'status',
       label: 'Status',
-      render: (row: any) => transformLabel(row.tenantStatus),
+      render: (row: any) => transformLabel(row.status),
       getStyle: (row: any) => ({
-        color: row.tenantStatus === 'active' ? 'green' : 'red',
+        color: row.status === 'active' ? 'green' : 'red',
       }),
     },
     {
@@ -516,6 +525,95 @@ const TrainerMapping = () => {
   const [actionUserName, setActionUserName] = useState('');
   const [reason, setReason] = useState('');
 
+  // ---- Reactivate (archived -> active) state ----
+  // Same flow as user-leader.tsx's Reactivate: pick which of the user's
+  // archived Center memberships to restore, activate each membership, then
+  // set the user's tenant status back to active.
+  const [archiveToActiveOpen, setArchiveToActiveOpen] = useState(false);
+  const [archivedCenters, setArchivedCenters] = useState<any[]>([]);
+  const [centersToActivate, setCentersToActivate] = useState<any[]>([]);
+  const [loadingArchivedCenters, setLoadingArchivedCenters] = useState(false);
+
+  const closeArchiveToActive = () => {
+    setArchiveToActiveOpen(false);
+    setArchivedCenters([]);
+    setCentersToActivate([]);
+  };
+
+  const openArchiveToActive = async (row: any) => {
+    setActionUserId(row?.userId);
+    setActionUserName(`${row.firstName || ''} ${row.lastName || ''}`.trim());
+    setArchivedCenters([]);
+    setCentersToActivate([]);
+    setLoadingArchivedCenters(true);
+    setArchiveToActiveOpen(true);
+
+    try {
+      const cohortResponse = await getCohortList(row?.userId);
+      const cohortList = cohortResponse?.result || [];
+
+      // Archived memberships of still-active Centers, deduped by cohortId.
+      const seenCohortIds = new Set();
+      const filteredCenters = cohortList.filter((cohort: any) => {
+        if (
+          cohort.cohortMemberStatus !== 'archived' ||
+          cohort.cohortStatus !== 'active' ||
+          (cohort.type !== 'CENTER' && cohort.type !== 'COHORT') ||
+          seenCohortIds.has(cohort.cohortId)
+        ) {
+          return false;
+        }
+        seenCohortIds.add(cohort.cohortId);
+        return true;
+      });
+      setArchivedCenters(filteredCenters);
+    } catch (error) {
+      console.error('Error fetching cohort list:', error);
+      showToastMessage('Failed to load centers', 'error');
+    } finally {
+      setLoadingArchivedCenters(false);
+    }
+  };
+
+  const handleArchiveToActive = async () => {
+    if (!actionUserId) return;
+    if (centersToActivate.length === 0) {
+      showToastMessage('Please select at least one center', 'error');
+      return;
+    }
+    try {
+      for (const center of centersToActivate) {
+        const updateResponse = await updateCohortMemberStatus({
+          memberStatus: 'active',
+          membershipId: center.cohortMembershipId,
+        });
+        if (updateResponse?.responseCode !== 200) {
+          console.error('Failed to activate center membership:', updateResponse);
+          showToastMessage(
+            `Failed to activate center membership ${center.cohortMembershipId}`,
+            'error'
+          );
+          return;
+        }
+      }
+
+      const resp = await updateUserTenantStatus(actionUserId, tenantId, {
+        status: 'active',
+      });
+      if (resp?.responseCode === 200) {
+        showToastMessage(t('LEARNERS.ACTIVATE_USER_SUCCESS'), 'success');
+        closeArchiveToActive();
+        searchData(prefilledFormData, currentPage);
+      } else {
+        console.error('Failed to activate Trainer:', resp);
+        showToastMessage('Failed to activate user', 'error');
+      }
+    } catch (error) {
+      console.error('Error activating Trainer:', error);
+      showToastMessage('Error activating user', 'error');
+    }
+  };
+
   const actions = [
     {
       icon: (
@@ -533,7 +631,7 @@ const TrainerMapping = () => {
         setSelectedUserRow(row);
         setIsEditInProgress(false);
       },
-      show: (row: any) => row.tenantStatus !== 'archived',
+      show: (row: any) => row.status !== 'archived',
     },
     {
       icon: (
@@ -550,7 +648,7 @@ const TrainerMapping = () => {
         setReason('');
         setDeleteConfirmOpen(true);
       },
-      show: (row: any) => row.tenantStatus !== 'archived',
+      show: (row: any) => row.status !== 'archived',
     },
     {
       icon: (
@@ -562,7 +660,19 @@ const TrainerMapping = () => {
         </Box>
       ),
       callback: openReassignModal,
-      show: (row: any) => row.tenantStatus !== 'archived',
+      show: (row: any) => row.status !== 'archived',
+    },
+    {
+      icon: (
+        <Box
+          sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', justifyContent: 'center', padding: '10px' }}
+          title="Reactivate Trainer"
+        >
+          <Image src={restoreIcon} alt="" />
+        </Box>
+      ),
+      callback: openArchiveToActive,
+      show: (row: any) => row.status !== 'active',
     },
   ];
 
@@ -722,6 +832,7 @@ const TrainerMapping = () => {
                 value={selectedCenters}
                 onChange={setSelectedCenters}
                 allowedStateIds={allowedStateIds}
+                requireState
               />
             </Box>
           )}
@@ -921,6 +1032,75 @@ const TrainerMapping = () => {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
+      </ConfirmationPopup>
+
+      <ConfirmationPopup
+        checked={true}
+        open={archiveToActiveOpen}
+        onClose={closeArchiveToActive}
+        title={t('COMMON.ACTIVATE_USER')}
+        primary={t('COMMON.ACTIVATE')}
+        secondary={t('COMMON.CANCEL')}
+        reason={centersToActivate.length > 0 ? 'yes' : ''}
+        onClickPrimary={handleArchiveToActive}
+      >
+        <Box sx={{ border: '1px solid #ddd', borderRadius: 2, mb: 2, p: 1 }}>
+          <Typography>
+            {actionUserName} {t('FORM.WAS_BELONG_TO')}
+          </Typography>
+          {loadingArchivedCenters ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Autocomplete
+              multiple
+              options={archivedCenters}
+              value={centersToActivate}
+              onChange={(event, newValue) => setCentersToActivate(newValue)}
+              getOptionLabel={(option: any) => option.cohortName || ''}
+              isOptionEqualToValue={(option: any, value: any) =>
+                option.cohortMembershipId === value.cohortMembershipId
+              }
+              renderTags={(value, getTagProps) =>
+                value.map((option: any, index) => (
+                  <Chip
+                    label={option.cohortName}
+                    {...getTagProps({ index })}
+                    key={option.cohortMembershipId}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select Centers"
+                  placeholder="Select centers to activate"
+                  sx={{ mt: 1 }}
+                />
+              )}
+              renderOption={(props, option: any, { selected }) => (
+                <li {...props} key={option.cohortMembershipId}>
+                  <Checkbox
+                    icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                    checkedIcon={<CheckBoxIcon fontSize="small" />}
+                    style={{ marginRight: 8 }}
+                    checked={selected}
+                  />
+                  {option.cohortName}
+                </li>
+              )}
+              disableCloseOnSelect
+              disabled={archivedCenters.length === 0}
+            />
+          )}
+          {!loadingArchivedCenters && archivedCenters.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              No archived centers found for this user
+            </Typography>
+          )}
+        </Box>
+        <Typography fontWeight="bold">{t('FORM.CONFIRM_TO_ACTIVATE')}</Typography>
       </ConfirmationPopup>
     </>
   );

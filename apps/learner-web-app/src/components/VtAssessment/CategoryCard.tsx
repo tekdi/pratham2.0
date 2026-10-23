@@ -28,6 +28,8 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       onClick={onClick}
       sx={{
         width: '100%',
+        height: '100%',
+        minHeight: '56px',
         display: 'flex',
         alignItems: 'stretch',
         border: '1px solid #D0C5B4',
@@ -35,7 +37,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         bgcolor: '#FFFFFF',
         overflow: 'hidden',
         textAlign: 'left',
-        mb: 1.5,
       }}
     >
       <Box
@@ -44,14 +45,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           bgcolor: '#FFDEA1',
-          px: { xs: 2, md: 3 },
-          py: 2.5,
+          width: '56px',
           flexShrink: 0,
         }}
       >
         <VtStatusIcon status={status} />
       </Box>
-      <Box sx={{ flex: 1, px: 2, py: 1.5, minWidth: 0 }}>
+      <Box sx={{ flex: 1, px: 1.25, py: 1, minWidth: 0 }}>
         <Typography
           sx={{ fontSize: '16px', fontWeight: 500, color: '#1E1B16' }}
         >
@@ -59,8 +59,8 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         </Typography>
         <AssessmentStatusLine status={status} percentage={percentage} />
       </Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', pr: 1.5 }}>
-        <NavigateNextIcon sx={{ fontSize: 32, color: '#1E1B16' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', pr: 1 }}>
+        <NavigateNextIcon sx={{ fontSize: 24, color: '#1E1B16' }} />
       </Box>
     </ButtonBase>
   );

@@ -112,6 +112,35 @@ export const PlacementRetentionCoordinatorSearchSchema = {
       isMultiSelect: true,
       maxSelection: 5,
     },
+    // Sent as filters.domain (array of domain names) to /user/list.
+    domain: {
+      type: 'array',
+      title: 'Domain',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      api: {
+        url: `/api/dynamic-form/get-framework`,
+        method: 'POST',
+        options: {
+          label: 'label',
+          value: 'value',
+          optionObj: 'options',
+        },
+        payload: {
+          code: 'subDomain',
+          fetchUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
+          findcode: 'subject',
+          selectedvalue: ['Career Exploration'],
+        },
+        callType: 'initial',
+      },
+      //for multiselect
+      uniqueItems: true,
+      isMultiSelect: true,
+    },
     name: {
       type: 'string',
       title: 'Search Placement Retention Coordinator',
@@ -137,6 +166,7 @@ export const PlacementRetentionCoordinatorUISchema = {
     'district',
     'block',
     'village',
+    'domain',
     'name',
     'sortBy',
     'tenantStatus',
@@ -164,6 +194,13 @@ export const PlacementRetentionCoordinatorUISchema = {
     },
   },
   village: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': {
+      multiple: true,
+      uniqueItems: true,
+    },
+  },
+  domain: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': {
       multiple: true,

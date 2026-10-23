@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, TextField, MenuItem } from '@mui/material';
+import { Box, Button, TextField, MenuItem, Tooltip } from '@mui/material';
 import { useTranslation } from 'next-i18next';
 import CommonDataTable from '@shared-lib-v2/lib/Table/CommonDataTable';
 import Loader from '@shared-lib-v2/DynamicForm/components/Loader';
@@ -157,13 +157,30 @@ const LearnerListTable: React.FC<LearnerListTableProps> = ({
     return {
       key: `assessment_${assessment.identifier}`,
       minWidth: 250,
-      label:
-        totalMarks != null
-          ? t('MY_TEACHING_CENTER.ASSESSMENT_COLUMN_HEADER', {
-              name: assessment.name,
-              marks: totalMarks,
-            })
-          : assessment.name,
+      // Long names are ellipsized (full name on hover) so they can't stretch
+      // the column; the "(N marks)" suffix always stays fully visible.
+      label: (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Tooltip title={assessment.name} arrow>
+            <Box
+              component="span"
+              sx={{
+                maxWidth: 160,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {assessment.name}
+            </Box>
+          </Tooltip>
+          {totalMarks != null && (
+            <Box component="span" sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+              {t('MY_TEACHING_CENTER.ASSESSMENT_TOTAL_MARKS', { marks: totalMarks })}
+            </Box>
+          )}
+        </Box>
+      ),
       render: (row: any) => {
         const attempt = assessmentResults[row.userId]?.[assessment.identifier];
         if (!attempt) return t('MY_TEACHING_CENTER.ASSESSMENT_NOT_STARTED');

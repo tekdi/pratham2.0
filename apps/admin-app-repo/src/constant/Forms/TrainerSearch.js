@@ -1,6 +1,6 @@
 // Search/filter bar for the Trainer listing (user-trainer.tsx). Same
-// geographic filter set (state/district/block/village) + name/sortBy/status
-// as PlacementRetentionCoordinatorSearch.js's own search schema — Domain and
+// geographic filter set (state/district/block/village) + Center + name/
+// sortBy/status as TeamLeaderSearch.js (/user-leader) — Domain and
 // Skill are shown as read-only table columns instead of search filters here,
 // since (unlike /cohort/search's confirmed customFieldsName contract) there
 // is no confirmed contract yet for filtering /user/list by those two
@@ -131,6 +131,44 @@ export const TrainerSearchSchema = {
       isMultiSelect: true,
       maxSelection: 5,
     },
+    center: {
+      type: 'array',
+      title: 'CENTER',
+      items: {
+        type: 'string',
+        enum: ['Select'],
+        enumNames: ['Select'],
+      },
+      field_type: 'drop_down',
+      api: {
+        url: `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/cohort/search`,
+        header: {
+          tenantId: '**',
+          Authorization: '**',
+          academicyearid: '**',
+        },
+        method: 'POST',
+        options: {
+          label: 'name',
+          value: 'cohortId',
+          optionObj: 'result.results.cohortDetails',
+        },
+        payload: {
+          limit: 200,
+          offset: 0,
+          filters: {
+            type: 'COHORT',
+            status: ['active'],
+            block: '**',
+          },
+        },
+        callType: 'dependent',
+        dependent: 'block',
+      },
+      uniqueItems: true,
+      isMultiSelect: true,
+      maxSelection: 1000,
+    },
     name: {
       type: 'string',
       title: 'Search Trainer',
@@ -141,11 +179,11 @@ export const TrainerSearchSchema = {
       enum: ['asc', 'desc'],
       enumNames: ['A-Z', 'Z-A'],
     },
-    tenantStatus: {
+    status: {
       type: 'string',
       title: 'Status',
-      enum: ['all', 'active', 'archived'],
-      enumNames: ['All', 'Active', 'Archived'],
+      enum: ['active', 'archived'],
+      enumNames: ['Active', 'Archived'],
     },
   },
 };
@@ -156,9 +194,10 @@ export const TrainerSearchUISchema = {
     'district',
     'block',
     'village',
+    'center',
     'name',
     'sortBy',
-    'tenantStatus',
+    'status',
   ],
   state: {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
@@ -177,10 +216,17 @@ export const TrainerSearchUISchema = {
     'ui:widget': 'AutoCompleteMultiSelectWidget',
     'ui:options': { multiple: true, uniqueItems: true },
   },
+  center: {
+    'ui:widget': 'AutoCompleteMultiSelectWidget',
+    'ui:options': { multiple: true, uniqueItems: true },
+  },
   name: {
     'ui:widget': 'SearchTextFieldWidget',
   },
   sortBy: {
+    'ui:widget': 'select',
+  },
+  status: {
     'ui:widget': 'select',
   },
 };
