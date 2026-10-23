@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import { useTranslation } from 'next-i18next';
+import { customizeValidator } from '@rjsf/validator-ajv8';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
 import { showToastMessage } from '@shared-lib-v2/DynamicForm/components/Toastify';
 import SimpleModal from '../SimpleModal';
@@ -47,6 +48,10 @@ interface CreateBatchModalProps {
 }
 
 const EDIT_HIDDEN_FIELDS = ['domain', 'skills'];
+
+// Same validator setup DynamicForm uses ($data for enddate's reference to
+// startdate), so the submit check matches the errors shown inline.
+const batchFormValidator = customizeValidator({ ajvOptionsOverrides: { $data: true } });
 
 // The batch's own current values, in the form's field keys.
 const getEditPrefill = (batch: MyTeachingCenterBatch | null): Record<string, any> => {
@@ -243,6 +248,23 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
   }
   if (centerType === 'regular') prefilledFormData.batch_type = 'regular';
 
+  // Field errors (date order, past dates, patterns, ...) only show inline —
+  // the per-field form never blocks the modal's own Create/Update button, so
+  // the whole form is re-validated here against the same schema before
+  // submitting. `enum` errors are skipped: some options (e.g. assessments)
+  // are pushed into the form at runtime and aren't in this schema copy.
+  const hasFormErrors = () => {
+    const { errors } = batchFormValidator.validateFormData(formData, schema as any);
+    if (errors.every((error) => error.name === 'enum')) return false;
+    showToastMessage(
+      t('MY_TEACHING_CENTER.FIX_FORM_ERRORS', {
+        defaultValue: 'Please fix the errors in the form before submitting.',
+      }),
+      'error'
+    );
+    return true;
+  };
+
   const handleUpdate = async () => {
     if (!editBatch?.cohortId) {
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
@@ -259,6 +281,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_UPDATE_FAILED'), 'error');
       return;
     }
+    if (hasFormErrors()) return;
     // Never send Domain/Skills from the Edit form.
     const editFormData = { ...formData };
     EDIT_HIDDEN_FIELDS.forEach((key) => delete editFormData[key]);
@@ -305,6 +328,7 @@ const CreateBatchModal: React.FC<CreateBatchModalProps> = ({
       showToastMessage(t('MY_TEACHING_CENTER.BATCH_CREATE_FAILED'), 'error');
       return;
     }
+    if (hasFormErrors()) return;
 
     setSaving(true);
     try {
