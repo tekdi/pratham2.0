@@ -391,7 +391,10 @@ const L2InterestedQueuePage = () => {
       minWidth: 240,
       render: (row: any) => {
         const value = getLearnerInterestedAt(row);
-        return value ? new Date(value).toLocaleString() : '-';
+        const date = value ? new Date(value) : null;
+        if (!date || isNaN(date.getTime())) return '-';
+        // D/M/YYYY, h:mm:ss AM/PM — e.g. 18/9/2026, 2:23:18 PM
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}, ${date.toLocaleTimeString('en-US')}`;
       },
     },
     {
