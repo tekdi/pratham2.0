@@ -1177,7 +1177,26 @@ const DynamicForm = forwardRef(({
     const initialApis = extractApiProperties(schema, 'initial');
     // // console.log('initialApis', initialApis);
     // console.log('dependentFields', dependentApis);
-    if (dependentApis.length > 0 && initialApis.length > 0) {
+    // A prefilled dependent field can be controlled by a field with a static
+    // enum and no `api` (e.g. BatchFlow's stream -> board, where board's api
+    // is replaced by the center's own values), leaving no `initial` APIs at
+    // all - its options still need fetching here or the saved value can't
+    // render on edit.
+    const hasPrefilledStaticControlledDependent = dependentApis.some(
+      (field) => {
+        const controllingKey = field?.api?.dependent;
+        return (
+          controllingKey &&
+          !schema.properties[controllingKey]?.api &&
+          temp_prefilled_form[controllingKey] !== undefined &&
+          temp_prefilled_form[field.key] !== undefined
+        );
+      }
+    );
+    if (
+      dependentApis.length > 0 &&
+      (initialApis.length > 0 || hasPrefilledStaticControlledDependent)
+    ) {
       let initialKeys = initialApis.map((item) => item.key);
       let dependentKeys = dependentApis.map((item) => item.key);
       dependentKeys = [...initialKeys, ...dependentKeys];
