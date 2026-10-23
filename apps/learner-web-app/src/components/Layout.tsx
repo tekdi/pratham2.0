@@ -32,6 +32,20 @@ import { useVtAssessmentEligibility } from '@learner/utils/hooks/useVtAssessment
 // The page itself holds the Courses and Assessment tabs.
 const VT_ASSESSMENT_ROUTE = '/l2-courses';
 
+// L2 Courses stays highlighted on its own sub-pages (an assessment category,
+// question set detail, answersheet) and on content opened from its Courses
+// tab, which lands on /content-details/... with returnUrl=/l2-courses.
+const isVtAssessmentPage = (currentPage: string) => {
+  const isL2Route = (path: string) =>
+    path === VT_ASSESSMENT_ROUTE ||
+    path.startsWith(`${VT_ASSESSMENT_ROUTE}/`) ||
+    path.startsWith(`${VT_ASSESSMENT_ROUTE}?`);
+  if (isL2Route(currentPage)) return true;
+  if (typeof window === 'undefined') return false;
+  const returnUrl = new URLSearchParams(window.location.search).get('returnUrl');
+  return !!returnUrl && isL2Route(returnUrl);
+};
+
 // Custom DrawerItem interface
 interface NewDrawerItemProp extends DrawerItemProp {
   variant?: 'contained' | 'text';
@@ -77,8 +91,8 @@ const getDynamicNavConfig = ({
     title: t('LEARNER_APP.VT_ASSESSMENT.L2_COURSES'),
     icon: <FactCheckOutlined sx={{ width: 28, height: 28 }} />,
     to: () => handleNavClick(() => router.push(VT_ASSESSMENT_ROUTE)),
-    isActive: currentPage === VT_ASSESSMENT_ROUTE,
-    customStyle: getLinkStyle(currentPage === VT_ASSESSMENT_ROUTE),
+    isActive: isVtAssessmentPage(currentPage),
+    customStyle: getLinkStyle(isVtAssessmentPage(currentPage)),
   });
 
   // Check if navbarItems exists and has entries
@@ -281,7 +295,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   });
 
   setDefaultNavLinks(navLinks);
-}, [t, router, isMobile, showVtAssessment]);
+}, [t, router, isMobile, showVtAssessment, pathname]);
 
   useEffect(() => {
     let currentPage = '';
@@ -306,7 +320,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
     });
 
     setDefaultNavLinks(navLinks);
-  }, [t, router, isMobile, showVtAssessment]);
+  }, [t, router, isMobile, showVtAssessment, pathname]);
 
   const onLanguageChange = (val: string) => setLanguage(val);
 

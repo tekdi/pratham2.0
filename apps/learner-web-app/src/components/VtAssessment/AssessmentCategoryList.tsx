@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Skeleton, Typography } from '@mui/material';
+import { Grid, Skeleton, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@shared-lib';
 import {
@@ -85,16 +85,13 @@ const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
 
   if (categories === null) {
     return (
-      <Box>
+      <Grid container spacing={2}>
         {[0, 1, 2].map((index) => (
-          <Skeleton
-            key={index}
-            variant="rounded"
-            height={76}
-            sx={{ mb: 1.5, borderRadius: '8px' }}
-          />
+          <Grid item xs={12} md={6} lg={4} key={index}>
+            <Skeleton variant="rounded" height={56} sx={{ borderRadius: '8px' }} />
+          </Grid>
         ))}
-      </Box>
+      </Grid>
     );
   }
 
@@ -114,20 +111,23 @@ const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
     );
   }
 
+  // Same responsive card grid as youthNet's My Teaching Center batch list:
+  // one card per row on mobile, two on tablet, three on desktop.
   return (
-    <Box>
+    <Grid container spacing={2}>
       {categories.map((category) => (
-        <CategoryCard
-          key={category.type}
-          type={category.type}
-          status={category.status}
-          percentage={category.percentage}
-          onClick={() =>
-            router.push(`/l2-courses/${encodeURIComponent(category.type)}`)
-          }
-        />
+        <Grid item xs={12} md={6} lg={4} key={category.type}>
+          <CategoryCard
+            type={category.type}
+            status={category.status}
+            percentage={category.percentage}
+            onClick={() =>
+              router.push(`/l2-courses/${encodeURIComponent(category.type)}`)
+            }
+          />
+        </Grid>
       ))}
-    </Box>
+    </Grid>
   );
 };
 
