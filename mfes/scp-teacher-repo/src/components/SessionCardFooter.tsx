@@ -6,7 +6,11 @@ import {
 } from '@/services/CoursePlannerService';
 import { editEvent } from '@/services/EventService';
 import { fetchBulkContents } from '@/services/PlayerService';
-import { convertUTCToIST, getDayMonthYearFormat } from '@/utils/helper';
+import {
+  canEditSession,
+  convertUTCToIST,
+  getDayMonthYearFormat,
+} from '@/utils/helper';
 import { EventStatus } from '@/utils/app.constant';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -71,9 +75,32 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   const [endTime, setEndTime] = React.useState('');
   const [startDate, setStartDate] = React.useState('');
   const [eventStatus, setEventStatus] = React.useState('');
+  const [currentUserId, setCurrentUserId] = React.useState('');
+  const [currentUserRole, setCurrentUserRole] = React.useState('');
 
   const EventDate = getDayMonthYearFormat(item?.startDateTime);
   let removeTopic = false;
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      setCurrentUserId(localStorage.getItem('userId') || '');
+      setCurrentUserRole(
+        localStorage.getItem('role') || localStorage.getItem('roleName') || ''
+      );
+    }
+  }, []);
+
+  // Choosing, changing or removing a topic edits the session, so it follows the
+  // same access rule as the card's edit icon: a facilitator may only touch the
+  // sessions they created, a Team Leader may touch any session on their own
+  // centers' batches. Everyone else can still read the topic that was set -
+  // only the pencil, the remove link and the "Select Topic" CTA go away.
+  const isSessionEditable = canEditSession({
+    creatorId: item?.createdBy ?? item?.metadata?.createdBy,
+    currentUserId,
+    role: currentUserRole,
+    allowWhenCreatorUnknown: true,
+  });
 
   // The dashboard already resolves board/medium/grade for the selected batch and
   // passes them down, so no per-card cohort fetch is needed. Those values can
@@ -282,6 +309,9 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   };
 
   const updateTopicSubtopic = async () => {
+    // The Save button and the remove link are both hidden when the session
+    // isn't editable; this keeps the write itself from firing even so.
+    if (!isSessionEditable) return;
     try {
       let erMetaData;
       if (removeTopic) {
@@ -346,6 +376,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   };
 
   const handleOpenSelectTopic = () => {
+    if (!isSessionEditable) return;
     setOpen(true);
     setEditTopic(true);
   };
@@ -385,6 +416,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
   };
 
   const handleClick = () => {
+    if (!isSessionEditable) return;
     if (needsCrossCenterRedirect()) {
       setMultiBatchConfirmOpen(true);
       return;
@@ -509,40 +541,44 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
           </Accordion>
         </Box>
       ) : (
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            background: theme.palette.background.default,
-            padding: '8px 16px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            alignItems: 'center',
-          }}
-          onClick={handleClick}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <PriorityHighIcon
-              sx={{ color: theme.palette.error.main, fontSize: '18px' }}
-            />
-            <Box
-              fontSize={'14px'}
-              fontWeight={500}
-              color={theme.palette.secondary.main}
-              ml={1}
-              className="one-line-text"
-            >
-              {t('COMMON.SELECT_TOPIC')}
-            </Box>
-          </Box>
-          <ArrowForwardIcon
+        // No topic chosen yet: the row is purely a call to action, so it is
+        // left out entirely for anyone who isn't allowed to choose one.
+        isSessionEditable && (
+          <Box
             sx={{
-              color: theme.palette.secondary.main,
-              fontSize: '18px',
-              transform: isRTL ? ' rotate(180deg)' : 'unset',
+              display: 'flex',
+              justifyContent: 'space-between',
+              background: theme.palette.background.default,
+              padding: '8px 16px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              alignItems: 'center',
             }}
-          />
-        </Box>
+            onClick={handleClick}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <PriorityHighIcon
+                sx={{ color: theme.palette.error.main, fontSize: '18px' }}
+              />
+              <Box
+                fontSize={'14px'}
+                fontWeight={500}
+                color={theme.palette.secondary.main}
+                ml={1}
+                className="one-line-text"
+              >
+                {t('COMMON.SELECT_TOPIC')}
+              </Box>
+            </Box>
+            <ArrowForwardIcon
+              sx={{
+                color: theme.palette.secondary.main,
+                fontSize: '18px',
+                transform: isRTL ? ' rotate(180deg)' : 'unset',
+              }}
+            />
+          </Box>
+        )
       )}
       <CenterSessionModal
         open={open}
@@ -550,8 +586,8 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
         title={item?.metadata?.framework?.subject || item?.metadata?.subject}
         center={cohortName}
         date={EventDate}
-        primary={t('COMMON.SAVE')}
-        handlePrimaryModel={updateTopicSubtopic}
+        primary={isSessionEditable ? t('COMMON.SAVE') : undefined}
+        handlePrimaryModel={isSessionEditable ? updateTopicSubtopic : undefined}
         handleBack={editTopic ? () => setEditTopic(false) : undefined}
       >
         {item?.erMetaData?.topic && !editTopic ? (
@@ -562,6 +598,7 @@ const SessionCardFooter: React.FC<SessionCardFooterProps> = ({
             handleOpen={handleOpenSelectTopic}
             handleRemove={handleRemovetTopicSubTopic}
             eventStatus={eventStatus}
+            canEdit={isSessionEditable}
           />
         ) : (
           <SelectTopic
