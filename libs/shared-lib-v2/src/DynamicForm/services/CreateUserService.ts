@@ -1,5 +1,10 @@
 import API_ENDPOINTS from '../utils/API/APIEndpoints';
 import { post, patch } from '../services/RestClient';
+import { withEncryptedPassword } from '../../utils/passwordEncryption';
+import {
+  getRecaptchaToken,
+  RECAPTCHA_SEND_MESSAGE_ACTION,
+} from '../../utils/recaptcha';
 
 //     const sortedFields = response?.data?.result.fields?.sort(
 //       (a: { order: string }, b: { order: string }) =>
@@ -20,7 +25,7 @@ import { post, patch } from '../services/RestClient';
 export const createUser = async (userData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.accountCreate;
   try {
-    const response = await post(apiUrl, userData);
+    const response = await post(apiUrl, await withEncryptedPassword(userData));
     return response?.data?.result;
   } catch (error) {
     console.error('error in getting cohort list', error);
@@ -43,7 +48,8 @@ export const userNameExist = async (userData: any): Promise<any> => {
 export const sendMessage = async (messageData: any): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.sendMessage;
   try {
-    const response = await post(apiUrl, messageData);
+    const captchaToken = await getRecaptchaToken(RECAPTCHA_SEND_MESSAGE_ACTION);
+    const response = await post(apiUrl, { ...messageData, captchaToken });
     return response?.data?.result;
   } catch (error) {
     console.error('error in sending message', error);

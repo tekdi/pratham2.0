@@ -1,6 +1,11 @@
 import { API_ENDPOINTS } from '@/utils/API/APIEndpoints';
 import { get, post } from "./RestClient";
 import axios from 'axios';
+import {
+  getRecaptchaToken,
+  RECAPTCHA_LOGIN_ACTION,
+} from '@shared-lib-v2/utils/recaptcha';
+import { encryptPassword } from '@shared-lib-v2/utils/passwordEncryption';
 
 interface LoginParams {
   username: string;
@@ -19,7 +24,12 @@ export const login = async ({
   
 
   try {
-    const response = await post(apiUrl, { username, password });
+    const captchaToken = await getRecaptchaToken(RECAPTCHA_LOGIN_ACTION);
+    const response = await post(apiUrl, {
+      username,
+      password: await encryptPassword(password),
+      captchaToken,
+    });
     return response?.data;
   } catch (error) {
     console.error("error in login", error);
@@ -75,7 +85,10 @@ export const resetPassword = async (
   newPassword: any, username?:string): Promise<any> => {
   const apiUrl: string = API_ENDPOINTS.resetPassword
   try {
-    const payload = username ? { newPassword, username } : { newPassword };
+    const encryptedPassword = await encryptPassword(newPassword);
+    const payload = username
+      ? { newPassword: encryptedPassword, username }
+      : { newPassword: encryptedPassword };
     const response = await post(apiUrl, payload);
     return response?.data;
   } catch (error) {

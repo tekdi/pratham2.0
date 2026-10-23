@@ -36,6 +36,10 @@ import { getUserDetails, getUserId } from '../services/ProfileService';
 import loginImg from './../assets/images/login-image.jpg';
 import { UpdateDeviceNotification } from '@/services/NotificationService';
 import { TENANT_DATA } from '../../app.config';
+import {
+  isCaptchaError,
+  preloadRecaptcha,
+} from '@shared-lib-v2/utils/recaptcha';
 
 const LoginPage = () => {
   const { t, i18n } = useTranslation();
@@ -209,6 +213,10 @@ const LoginPage = () => {
     });
   };
 
+  useEffect(() => {
+    preloadRecaptcha();
+  }, []);
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -375,7 +383,9 @@ const LoginPage = () => {
         telemetryOnSubmit();
       } catch (error: any) {
         setLoading(false);
-        if (error?.response?.status === 404) {
+        if (isCaptchaError(error)) {
+          showToastMessage(t('LOGIN_PAGE.CAPTCHA_VERIFICATION_FAILED'), 'error');
+        } else if (error?.response?.status === 404) {
           handleInvalidUsernameOrPassword();
         } else {
           console.error('Error:', error);
