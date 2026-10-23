@@ -913,7 +913,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     try {
       const dateStr = dayjs(newStart).format('YYYY-MM-DD');
       const filters = {
-        cohortId,
+        cohortIds: [cohortId],
         startDate: { after: getAfterDate(dateStr) },
         endDate: { before: getBeforeDate(dateStr) },
         status: ['live'],
@@ -986,12 +986,12 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       let title = '';
       if (clickedBox === 'PLANNED_SESSION') {
         title =
-          mode === t('CENTER_SESSION.ONLINE')
+          mode === sessionMode.ONLINE
             ? t('CENTER_SESSION.RECURRING_ONLINE')
             : t('CENTER_SESSION.RECURRING_OFFLINE');
       } else if (clickedBox === 'EXTRA_SESSION') {
         title =
-          mode === t('CENTER_SESSION.ONLINE')
+          mode === sessionMode.ONLINE
             ? t('CENTER_SESSION.EXTRA_ONLINE')
             : t('CENTER_SESSION.EXTRA_OFFLINE');
       }
@@ -1024,7 +1024,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             courseType: block?.courseType || '',
             subject: block?.subject || '',
             teacherName: userName,
-            cohortId: cohortId || '',
+            cohortIds: cohortId ? [cohortId] : [],
             cycleId: '',
             tenantId: '',
             type:
@@ -1051,7 +1051,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         }
 
         // Add meetingDetails only if sessionMode is 'online'
-        if (block?.sessionMode === t('CENTER_SESSION.ONLINE')) {
+        if (block?.sessionMode === sessionMode.ONLINE) {
           (baseBody.onlineProvider = block?.onlineProvider || ''),
             (baseBody.isMeetingNew = false),
             (baseBody.meetingDetails = {
@@ -1389,7 +1389,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             courseType: eventData?.metadata?.courseType || '',
             subject: eventData?.metadata?.subject || '',
             teacherName: eventData?.metadata?.teacherName || '',
-            cohortId: eventData?.metadata?.cohortId || '',
+            cohortIds:
+              eventData?.metadata?.cohortIds ||
+              (eventData?.metadata?.cohortId
+                ? [eventData.metadata.cohortId]
+                : []),
             cycleId: eventData?.metadata?.cycleId || '',
             tenantId: eventData?.metadata?.tenantId || '',
             type: eventData?.metadata?.type || '',
