@@ -51,6 +51,7 @@ import {
 import { getVerifiedMobile, clearVerifiedMobile } from '@learner/utils/verifiedMobile';
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
+import { getInterestedToJoinFieldId } from '@shared-lib-v2/utils/helper';
 
 type UserAccount = {
   name: string;
@@ -123,6 +124,7 @@ const RegisterationFlow = () => {
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
   const [tenantName, setTenantName] = useState('');
+  const [tenantUiConfig, setTenantUiConfig] = useState<any>(null);
 
   const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
   const [userResponse, setUserResponse] = useState<any>(null);
@@ -136,10 +138,11 @@ const RegisterationFlow = () => {
   // const [schema, setSchema] = useState(facilitatorSearchSchema);
   // const [uiSchema, setUiSchema] = useState(facilitatorSearchUISchema);
   function checkTenantId(tenantIdToCheck: any, tenantData: any) {
-    const name = tenantData?.find(
+    const tenant = tenantData?.find(
       (item: any) => item.tenantId === tenantIdToCheck
-    ).name;
-    setTenantName(name);
+    );
+    setTenantName(tenant.name);
+    setTenantUiConfig(tenant?.params?.uiConfig || null);
     return tenantData?.some((item: any) => item.tenantId === tenantIdToCheck);
   }
   useEffect(() => {
@@ -575,6 +578,18 @@ const RegisterationFlow = () => {
           delete formData?.parent_phone;
           delete formData?.guardian_relation;
           delete formData?.guardian_name;
+        }
+
+        //custom field for pending status (SCP and Pathways only)
+        const interestedToJoinFieldId = getInterestedToJoinFieldId(tenantName);
+        if (tenantUiConfig?.isTenantPendingStatus && interestedToJoinFieldId) {
+          updated_payload = {
+            ...updated_payload,
+            customFields: [
+              ...(updated_payload.customFields || []),
+              { fieldId: interestedToJoinFieldId, value: 'pending' },
+            ],
+          };
         }
 
         const createuserPayload = {
