@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { TenantName } from '@learner/utils/app.constant';
 import { useUserProgram } from '@learner/utils/hooks/useUserProgram';
 import {
@@ -9,15 +10,11 @@ import {
   VtBatch,
 } from '@learner/utils/helpers/vtBatchHelper';
 
-// Mobile (`useActiveBatchEligibility`) re-checks every 3 seconds while focused so
-// the tab appears/disappears as soon as a batch is assigned or removed. Same here.
-const POLL_INTERVAL_MS = 3000;
+// The program's landing page, where the batch is re-checked on every visit.
+const getLandingPage = () =>
+  (typeof window !== 'undefined' && localStorage.getItem('landingPage')) || '/home';
 
-/**
- * Do two poll results describe the same batch? Compares the identity and the
- * fields this feature actually reads (status, membership, custom fields), so a
- * re-fetch that returns identical data does not churn object identity.
- */
+// Same batch? Compared so an identical re-fetch doesn't churn object identity.
 const isSameBatch = (a: VtBatch | null, b: VtBatch | null): boolean => {
   if (a === b) return true;
   if (!a || !b) return false;
@@ -39,15 +36,17 @@ export interface VtAssessmentEligibility {
 
 /**
  * Active-batch eligibility for the Vocational Training Assessment feature.
- *
- * Inert for every other program: no timer, no listener, no API call — so SCP,
- * Pragyanpath, Camp to Club and public users are untouched.
+ * Resolved once per page load; inert (no API call) for every other program.
  */
 export const useVtAssessmentEligibility = (
   enabled = true
 ): VtAssessmentEligibility => {
   const userProgram = useUserProgram();
+  const pathname = usePathname();
   const isVt = enabled && userProgram === TenantName.YOUTHNET;
+  // Landing the learner on the VT home page is the one moment worth re-checking;
+  // every other page reuses what that visit stored.
+  const isLandingPage = pathname === getLandingPage();
 
   const [batch, setBatch] = useState<VtBatch | null>(null);
   // Which program the current `batch` was resolved for. `loading` is derived from
@@ -58,8 +57,7 @@ export const useVtAssessmentEligibility = (
   const [resolvedFor, setResolvedFor] = useState<string | null>(null);
   const loading = isVt && resolvedFor !== userProgram;
 
-  // A tick that lands while the previous request is still open is dropped rather
-  // than queued, so a slow network can never pile up overlapping checks.
+  // Drops a second call that lands while the first is still open.
   const inFlightRef = useRef(false);
   const mountedRef = useRef(true);
 
@@ -89,11 +87,10 @@ export const useVtAssessmentEligibility = (
     try {
       const activeBatch = await getActiveVtBatch(userId, {
         programKey: userProgram ?? '',
+        forceRefresh: isLandingPage,
       });
-      // Keep the previous object when nothing material changed. Every poll tick
-      // returns a freshly parsed response, and handing that new identity down
-      // would re-render consumers 20x a minute — enough to defeat the memo() on
-      // LearnerCourse and re-run the whole content search on each tick.
+      // Keep the previous object when nothing material changed, so a re-fetch
+      // can't defeat the memo() on LearnerCourse and re-run its content search.
       if (mountedRef.current) {
         setBatch((previous) =>
           isSameBatch(previous, activeBatch) ? previous : activeBatch
@@ -103,7 +100,7 @@ export const useVtAssessmentEligibility = (
       inFlightRef.current = false;
       if (mountedRef.current) setResolvedFor(userProgram);
     }
-  }, [isVt, userProgram]);
+  }, [isVt, userProgram, isLandingPage]);
 
   useEffect(() => {
     if (!isVt) {
@@ -112,41 +109,6 @@ export const useVtAssessmentEligibility = (
     }
 
     refresh();
-
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-
-    const stopPolling = () => {
-      if (intervalId !== null) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
-    };
-
-    const startPolling = () => {
-      if (intervalId !== null) return;
-      intervalId = setInterval(refresh, POLL_INTERVAL_MS);
-    };
-
-    // Only poll while the tab is actually being looked at — a backgrounded tab
-    // would otherwise keep hitting /cohort/mycohorts every 3 seconds forever.
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        stopPolling();
-      } else {
-        refresh();
-        startPolling();
-      }
-    };
-
-    if (document.visibilityState !== 'hidden') startPolling();
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', refresh);
-
-    return () => {
-      stopPolling();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', refresh);
-    };
   }, [isVt, refresh]);
 
   return {
