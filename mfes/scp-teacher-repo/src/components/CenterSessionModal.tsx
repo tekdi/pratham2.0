@@ -25,6 +25,8 @@ const CenterSessionModal: React.FC<SessionsModalProps> = ({
   handleEditModal,
   disable = false,
   handleBack,
+  width,
+  maxHeight = '626px',
 }) => {
   const theme = useTheme<any>();
 
@@ -57,8 +59,8 @@ const CenterSessionModal: React.FC<SessionsModalProps> = ({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
-      <Box sx={modalStyles} 
-        maxHeight =  {'626px'}
+      <Box sx={(t: any) => modalStyles(t, width)}
+        maxHeight={maxHeight}
          border= {'none'}
       >
         <Box
