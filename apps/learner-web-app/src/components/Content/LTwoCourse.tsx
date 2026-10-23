@@ -60,18 +60,15 @@ const LTwoCourse: React.FC = () => {
               ...(result.userData || {}),
               ...customFieldsJson,
             });
-            const interestField = result?.userData?.customFields?.find(
-              (field: any) => field?.fieldId === L2_INTEREST_FIELD_ID
+            // The L2_INTERESTED field only appears in customFields once the
+            // learner has shown interest, so its presence alone hides the
+            // section — its value is not checked.
+            const hasInterestField = (result?.userData?.customFields ?? []).some(
+              (field: any) =>
+                field?.fieldId === L2_INTEREST_FIELD_ID ||
+                field?.label === 'L2_INTERESTED'
             );
-            // selectedValues comes back as plain strings for text fields
-            // (["yes"]) but as { value } objects for others — accept both.
-            const selected = interestField?.selectedValues?.[0];
-            const interestStatus =
-              interestField?.value ??
-              (typeof selected === 'string' ? selected : selected?.value);
-            setIsInterested(
-              String(interestStatus ?? '').trim().toLowerCase() === 'yes'
-            );
+            setIsInterested(hasInterestField);
             const courses = await fetchUserCoursesWithContent(userId, tenantId);
             setTopics(courses);
           } catch (error) {
