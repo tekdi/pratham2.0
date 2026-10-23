@@ -629,6 +629,7 @@ const L2InterestedQueuePage = () => {
             uiSchema={{ ...L2QueueAssignUISchema, 'ui:submitButtonOptions': { norender: true } }}
             SubmitaFunction={(formData: any) => setAssignFormData(formData)}
             isCallSubmitInHandle={true}
+            showRequiredIndicator
             prefilledFormData={assignFormData}
             type="l2-interested-queue-assign"
           />

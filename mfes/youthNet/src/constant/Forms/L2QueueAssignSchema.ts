@@ -18,6 +18,7 @@ import { L2_FIELD_IDS } from '../../services/l2InterestedQueue/l2Queue.config';
 
 export const L2QueueAssignSchema = {
   type: 'object',
+  required: ['domain', 'skill'],
   properties: {
     domain: {
       type: 'array',
