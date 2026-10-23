@@ -179,6 +179,10 @@ export interface SessionsModalProps {
   handleEditModal?: () => void;
   disable?: boolean;
   handleBack?: () => void;
+  /** Desktop (>=600px) modal width override; defaults to 450px when omitted. */
+  width?: string;
+  /** Modal max-height override; defaults to 626px when omitted. */
+  maxHeight?: string;
 }
 
 export interface PlannedModalProps {
@@ -551,6 +555,7 @@ export interface eventFilters {
   title?: string;
   status?: string[];
   cohortId?: string;
+  cohortIds?: string[];
   createdBy?: string;
 }
 
@@ -653,6 +658,8 @@ export interface MetaData {
   subject?: string;
   teacherName?: string;
   cohortId?: string;
+  cohortIds?: string[];
+  multiSession?: boolean;
   cycleId?: string;
   tenantId?: string;
   type?: string;
@@ -706,6 +713,7 @@ export interface GetUserProjectDetailsParams {
 export interface EditEvent {
   isMainEvent: boolean;
   status?: string;
+  updatedBy?: string;
 }
 
 export interface ISearchAssessment {
