@@ -117,6 +117,10 @@ export const formatPlacementValueForDisplay = (
   if (Array.isArray(value)) {
     return value.length ? value.map(resolveLabel).join(', ') : '-';
   }
+  // Dates (e.g. dateOfJoining) are stored as 'YYYY-MM-DD' — show them as
+  // 'DD-MM-YYYY', same as CustomDateWidget displays them in the form.
+  const isoDate = typeof value === 'string' && value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoDate) return `${isoDate[3]}-${isoDate[2]}-${isoDate[1]}`;
   return resolveLabel(value);
 };
 
