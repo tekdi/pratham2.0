@@ -41,6 +41,7 @@ import Header from '../Header/Header';
 
 //volunteer onboarding
 import VolunteerOnboard from '@shared-lib-v2/VolunteerOnboard/VolunteerOnboard';
+import { getInterestedToJoinFieldId } from '@shared-lib-v2/utils/helper';
 
 declare global {
   interface Window {
@@ -608,13 +609,12 @@ const EditProfile = ({ completeProfile, enrolledProgram, uponEnrollCompletion }:
     const { userData, customFields = [] } = splitUserData(payload);
     //custom field hardcoded for pending status
     const data = {
-      fieldId:
-        'f8dc1d5f-9b2b-412e-a22a-351bd8f14963',
+      fieldId: getInterestedToJoinFieldId(),
       value: 'pending'
     }
     const storedUiConfig = JSON.parse(localStorage.getItem('uiConfig') || '{}');
     const userTenantStatus = storedUiConfig?.isTenantPendingStatus;
-    if (enrolledProgram && userTenantStatus) {
+    if (enrolledProgram && userTenantStatus && data.fieldId) {
       customFields.push(data);
     }
 
