@@ -517,7 +517,8 @@
       "L2_COURSES": "ایل 2 کورسز",
       "TAB_COURSES": "کورسز",
       "TAB_ASSESSMENT": "تشخیص",
-      "NO_COURSES_FOUND": "کوئی کورس نہیں ملا"
+      "NO_COURSES_FOUND": "کوئی کورس نہیں ملا",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "آپ نے اپنا بیچ مکمل کر لیا ہے، اس لیے کوئی تشخیص دستیاب نہیں ہے۔"
     }
   },
   "Login with Newton ERP": "نیوٹن ERP کے ساتھ لاگ ان کریں۔",

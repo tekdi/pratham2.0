@@ -568,7 +568,8 @@
       "L2_COURSES": "एल2 अभ्यासक्रम",
       "TAB_COURSES": "अभ्यासक्रम",
       "TAB_ASSESSMENT": "मूल्यांकन",
-      "NO_COURSES_FOUND": "कोणताही अभ्यासक्रम आढळला नाही"
+      "NO_COURSES_FOUND": "कोणताही अभ्यासक्रम आढळला नाही",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "तुम्ही तुमचा बॅच पूर्ण केला असल्यामुळे कोणतेही मूल्यांकन उपलब्ध नाही."
     }
   },
   "Login with Newton ERP": "Newton ERP वापरून लॉगिन करा",

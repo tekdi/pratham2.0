@@ -569,7 +569,8 @@
       "L2_COURSES": "L2 Courses",
       "TAB_COURSES": "Courses",
       "TAB_ASSESSMENT": "Assessment",
-      "NO_COURSES_FOUND": "No courses found"
+      "NO_COURSES_FOUND": "No courses found",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "No assessments are available because you have completed your batch."
     }
   },
   "Login with Newton ERP": "Login with Newton ERP",

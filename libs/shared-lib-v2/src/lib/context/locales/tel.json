@@ -568,7 +568,8 @@
       "L2_COURSES": "ఎల్2 కోర్సులు",
       "TAB_COURSES": "కోర్సులు",
       "TAB_ASSESSMENT": "మూల్యాంకనం",
-      "NO_COURSES_FOUND": "కోర్సులు ఏవీ కనబడలేదు"
+      "NO_COURSES_FOUND": "కోర్సులు ఏవీ కనబడలేదు",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "మీరు మీ బ్యాచ్‌ను పూర్తి చేసినందున మూల్యాంకనాలు ఏవీ అందుబాటులో లేవు."
     }
   },
   "Login with Newton ERP": "న్యూటన్ ERP తో లాగిన్ అవ్వండి",

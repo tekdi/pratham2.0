@@ -7,6 +7,7 @@ import { useUserProgram } from '@learner/utils/hooks/useUserProgram';
 import {
   extractAssessmentIds,
   getActiveVtBatch,
+  isBatchEnded,
   VtBatch,
 } from '@learner/utils/helpers/vtBatchHelper';
 
@@ -30,6 +31,7 @@ export interface VtAssessmentEligibility {
   loading: boolean;
   eligible: boolean;
   batch: VtBatch | null;
+  batchEnded: boolean;
   assessmentIds: string[];
   refresh: () => void;
 }
@@ -117,6 +119,9 @@ export const useVtAssessmentEligibility = (
     // from: while `loading` is true the batch belongs to a different program.
     eligible: isVt && !loading && Boolean(batch),
     batch,
+    // Courses stay open after the batch ends; only assessments are withheld,
+    // so this is reported separately instead of failing `eligible`.
+    batchEnded: isBatchEnded(batch),
     assessmentIds: extractAssessmentIds(batch),
     refresh,
   };

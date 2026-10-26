@@ -25,16 +25,16 @@ const TestDetailPage: React.FC = () => {
 
   return (
     <VtAssessmentShell title={t('LEARNER_APP.VT_ASSESSMENT.TITLE')}>
-      {() => (
+      {({ batchEnded }) => (
         <Suspense fallback={<Skeleton variant="rounded" height={240} />}>
-          <TestDetailBody />
+          <TestDetailBody batchEnded={batchEnded} />
         </Suspense>
       )}
     </VtAssessmentShell>
   );
 };
 
-const TestDetailBody: React.FC = () => {
+const TestDetailBody: React.FC<{ batchEnded: boolean }> = ({ batchEnded }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const params = useParams();
@@ -51,6 +51,11 @@ const TestDetailBody: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
+    // Batch over → the test can't be started, so don't fetch it either.
+    if (batchEnded) {
+      setIsLoading(false);
+      return;
+    }
     if (!identifier) {
       setIsLoading(false);
       return;
@@ -63,7 +68,7 @@ const TestDetailBody: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [identifier]);
+  }, [identifier, batchEnded]);
 
   useEffect(() => {
     load();
@@ -79,6 +84,15 @@ const TestDetailBody: React.FC = () => {
         `&exitLink=${encodeURIComponent(exitLink)}`
     );
   };
+
+  // Deep link into a test after the batch ended — no instructions, no Start.
+  if (batchEnded) {
+    return (
+      <Typography sx={{ color: '#7C766F' }}>
+        {t('LEARNER_APP.VT_ASSESSMENT.BATCH_COMPLETED_NO_ASSESSMENTS')}
+      </Typography>
+    );
+  }
 
   if (isLoading) return <Skeleton variant="rounded" height={240} />;
 

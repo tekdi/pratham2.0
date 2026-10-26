@@ -109,7 +109,19 @@ const AllocateToBatchModal: React.FC<AllocateToBatchModalProps> = ({
     }
     const taxonomy = await getTrainerTaxonomy(userId);
     const list = await searchBatchesForCenter(centerId, taxonomy.domains, taxonomy.skills);
-    setBatchOptions(list.map((b) => ({ label: b.name, value: b.cohortId })));
+    // Hide batches whose end date has already passed (a batch ending today
+    // is still allocatable). Batch dates are stored as YYYY-MM-DD.
+    const now = new Date();
+    const today = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0'),
+    ].join('-');
+    setBatchOptions(
+      list
+        .filter((b) => !b.endDate || String(b.endDate).slice(0, 10) >= today)
+        .map((b) => ({ label: b.name, value: b.cohortId }))
+    );
   };
 
   const handleCenterChange = (option: Option | null) => {
