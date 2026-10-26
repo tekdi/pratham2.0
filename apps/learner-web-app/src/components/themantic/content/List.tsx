@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
+import KnowledgePartners from '../knowledgePartners/KnowledgePartners';
 import { usePageViewCount } from '@learner/hooks/usePageViewCount';
 import { usePathname } from 'next/navigation';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
@@ -243,8 +244,9 @@ const List: React.FC<ListProps> = ({
                 hasMoreData={false}
               />
             </Box>
-           
+
           </Box>
+          <KnowledgePartners />
         {pageViews != null && (
           <Box
             sx={{
