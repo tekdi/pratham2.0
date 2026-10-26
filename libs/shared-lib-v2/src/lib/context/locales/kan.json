@@ -568,7 +568,8 @@
       "L2_COURSES": "ಎಲ್2 ಕೋರ್ಸ್‌ಗಳು",
       "TAB_COURSES": "ಕೋರ್ಸ್‌ಗಳು",
       "TAB_ASSESSMENT": "ಮೌಲ್ಯಮಾಪನ",
-      "NO_COURSES_FOUND": "ಯಾವುದೇ ಕೋರ್ಸ್ ಕಂಡುಬಂದಿಲ್ಲ"
+      "NO_COURSES_FOUND": "ಯಾವುದೇ ಕೋರ್ಸ್ ಕಂಡುಬಂದಿಲ್ಲ",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "ನೀವು ನಿಮ್ಮ ಬ್ಯಾಚ್ ಪೂರ್ಣಗೊಳಿಸಿರುವುದರಿಂದ ಯಾವುದೇ ಮೌಲ್ಯಮಾಪನ ಲಭ್ಯವಿಲ್ಲ."
     }
   },
   "Login with Newton ERP": "ನ್ಯೂಟನ್ ERP ಯೊಂದಿಗೆ ಲಾಗಿನ್ ಮಾಡಿ",

@@ -21,11 +21,15 @@ const L2CoursesPage: React.FC = () => {
 
   return (
     <VtAssessmentShell title={t('LEARNER_APP.VT_ASSESSMENT.L2_COURSES')}>
-      {({ batch, assessmentIds }) => (
+      {({ batch, assessmentIds, batchEnded }) => (
         <Suspense
           fallback={<Skeleton variant="rounded" height={320} sx={{ borderRadius: '8px' }} />}
         >
-          <L2CoursesTabs batch={batch} assessmentIds={assessmentIds} />
+          <L2CoursesTabs
+            batch={batch}
+            assessmentIds={assessmentIds}
+            batchEnded={batchEnded}
+          />
         </Suspense>
       )}
     </VtAssessmentShell>
@@ -35,7 +39,8 @@ const L2CoursesPage: React.FC = () => {
 const L2CoursesTabs: React.FC<{
   batch: VtBatch | null;
   assessmentIds: string[];
-}> = ({ batch, assessmentIds }) => {
+  batchEnded: boolean;
+}> = ({ batch, assessmentIds, batchEnded }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -118,7 +123,10 @@ const L2CoursesTabs: React.FC<{
             (tab.key === 'courses' ? (
               <L2CourseList batch={batch} />
             ) : (
-              <AssessmentCategoryList assessmentIds={assessmentIds} />
+              <AssessmentCategoryList
+                assessmentIds={assessmentIds}
+                batchEnded={batchEnded}
+              />
             ))}
         </Box>
       ))}

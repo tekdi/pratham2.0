@@ -568,7 +568,8 @@
       "L2_COURSES": "એલ2 અભ્યાસક્રમો",
       "TAB_COURSES": "અભ્યાસક્રમો",
       "TAB_ASSESSMENT": "મૂલ્યાંકન",
-      "NO_COURSES_FOUND": "કોઈ અભ્યાસક્રમ મળ્યો નથી"
+      "NO_COURSES_FOUND": "કોઈ અભ્યાસક્રમ મળ્યો નથી",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "તમે તમારી બેચ પૂર્ણ કરી હોવાથી કોઈ મૂલ્યાંકન ઉપલબ્ધ નથી."
     }
   },
   "Login with Newton ERP": "ન્યૂટન ERP સાથે લોગિન કરો",

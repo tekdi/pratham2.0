@@ -170,3 +170,34 @@ export const extractBatchSkills = (batch: VtBatch | null | undefined): string[] 
  */
 export const extractAssessmentIds = (batch: VtBatch | null | undefined): string[] =>
   extractCustomFieldValues(batch, 'ASSESSMENTS', 'id');
+
+/**
+ * The batch's END_DATE custom field as `YYYY-MM-DD`, or null when unset.
+ * Same label the admin Batch list reads (BatchFlow.tsx) and the same
+ * `YYYY-MM-DD` string youthNet's batch form writes.
+ */
+export const extractBatchEndDate = (
+  batch: VtBatch | null | undefined
+): string | null => {
+  const [value] = extractCustomFieldValues(batch, 'END_DATE');
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)
+    ? value.slice(0, 10)
+    : null;
+};
+
+const getTodayKey = (): string => {
+  const now = new Date();
+  const month = `${now.getMonth() + 1}`.padStart(2, '0');
+  const day = `${now.getDate()}`.padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+};
+
+/**
+ * True once the batch's end date has passed. The end date itself still counts
+ * as in-batch, and a batch with no end date never ends. String comparison on
+ * the date key, like CreateBatchModal's own past-date check — no timezone shift.
+ */
+export const isBatchEnded = (batch: VtBatch | null | undefined): boolean => {
+  const endDate = extractBatchEndDate(batch);
+  return Boolean(endDate && endDate < getTodayKey());
+};
