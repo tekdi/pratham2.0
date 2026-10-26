@@ -52,6 +52,21 @@ import {
   removeHiddenFieldValues,
 } from '../utils/conditionalVisibility';
 
+// API-sourced options can repeat a value (e.g. two placement properties
+// with the same propertyName). Duplicate entries make `enum` invalid JSON
+// Schema, and AJV then rejects validation of the whole form — so keep only
+// the first option for each value.
+const uniqueOptionsByValue = (data: any, valueKey: string) => {
+  if (!Array.isArray(data)) return data;
+  const seen = new Set<string>();
+  return data.filter((item) => {
+    const optionValue = String(item?.[valueKey]);
+    if (seen.has(optionValue)) return false;
+    seen.add(optionValue);
+    return true;
+  });
+};
+
 // DynamicFormV2: same behaviour as DynamicForm, except conditional field
 // visibility. Instead of pushing 'hidden' into formUiSchema from individual
 // handlers, visibility is derived from the current formData on every render
@@ -1043,6 +1058,7 @@ const DynamicFormV2 = forwardRef(({
               // // console.log('fieldKey:', fieldKey);
               let label = prevSchema.properties[fieldKey].api.options.label;
               let value = prevSchema.properties[fieldKey].api.options.value;
+              data = uniqueOptionsByValue(data, value);
               if (updatedProperties[fieldKey]?.isMultiSelect === true) {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
@@ -1392,6 +1408,7 @@ const DynamicFormV2 = forwardRef(({
                             prevSchema.properties[fieldKey].api.options.label;
                           let value =
                             prevSchema.properties[fieldKey].api.options.value;
+                          data = uniqueOptionsByValue(data, value);
                           if (
                             updatedProperties[fieldKey]?.isMultiSelect === true
                           ) {
@@ -1472,6 +1489,7 @@ const DynamicFormV2 = forwardRef(({
               // console.log('fieldKey:', fieldKey);
               let label = prevSchema.properties[fieldKey].api.options.label;
               let value = prevSchema.properties[fieldKey].api.options.value;
+              data = uniqueOptionsByValue(data, value);
               if (updatedProperties[fieldKey]?.isMultiSelect === true) {
                 updatedProperties[fieldKey] = {
                   ...updatedProperties[fieldKey],
@@ -1833,6 +1851,7 @@ const DynamicFormV2 = forwardRef(({
                       prevSchema.properties[fieldKey].api.options.label;
                     let value =
                       prevSchema.properties[fieldKey].api.options.value;
+                    data = uniqueOptionsByValue(data, value);
                     if (updatedProperties[fieldKey]?.isMultiSelect === true) {
                       updatedProperties[fieldKey] = {
                         ...updatedProperties[fieldKey],

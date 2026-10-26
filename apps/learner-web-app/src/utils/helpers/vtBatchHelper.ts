@@ -34,63 +34,69 @@ const findActiveBatch = (response: any): VtBatch | null => {
   return (response.result as VtBatch[]).find(isActiveBatch) ?? null;
 };
 
-interface CachedLookup {
-  key: string;
-  at: number;
-  pending: boolean;
-  promise: Promise<VtBatch | null>;
-}
+let cachedLookup: { key: string; promise: Promise<VtBatch | null> } | null = null;
 
-let cachedLookup: CachedLookup | null = null;
+// Survives reloads so the lookup runs when the learner enters VT, not every
+// page load. ProgramSwitchModal clears it, so re-entering VT re-checks.
+export const VT_BATCH_STORAGE_KEY = 'vtActiveBatch';
+
+const readStoredBatch = (key: string): { batch: VtBatch | null } | null => {
+  try {
+    const raw = localStorage.getItem(VT_BATCH_STORAGE_KEY);
+    if (!raw) return null;
+    const stored = JSON.parse(raw);
+    return stored?.key === key ? { batch: stored.batch ?? null } : null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Resolve the learner's active VT batch, or null.
  *
- * Deliberately NOT `checkUserHasActiveBatch` from cohortAssignmentHelper: that
- * one returns a bare boolean, ignores member status (so it would never see a VT
- * learner's `in_training`), and caches for the whole page load. It is used by the
- * SCP Assessment Attempts card and must keep behaving exactly as it does.
- *
- * The academic-year header is set by the axios interceptor from
- * `localStorage.academicYearId`, so covering other years means temporarily
- * rewriting that key. Because this runs on a 3-second poll, the currently
- * selected year is tried *first* without touching localStorage — the common case
- * therefore costs one request and mutates nothing. Only a miss falls back to
- * sweeping the remaining years, and the original value is always restored.
- *
- * @param maxAgeMs reuse a result younger than this (0 = always refetch). In-flight
- *                 requests are shared regardless, so a poll tick and a page mount
- *                 firing together never produce two calls.
+ * Deliberately NOT `checkUserHasActiveBatch` from cohortAssignmentHelper: that one
+ * returns a bare boolean and ignores member status, so it would never see a VT
+ * learner's `in_training`. It backs the SCP Assessment Attempts card, unchanged.
  */
 export const getActiveVtBatch = (
   userId: string,
-  { maxAgeMs = 0, programKey = '' }: { maxAgeMs?: number; programKey?: string } = {}
+  {
+    programKey = '',
+    forceRefresh = false,
+  }: { programKey?: string; forceRefresh?: boolean } = {}
 ): Promise<VtBatch | null> => {
   const key = `${userId}:${programKey}`;
-
-  // A still-pending request is always shared, whatever maxAgeMs says: both the
-  // nav item and the page body run this hook, so two pollers would otherwise
-  // issue two /cohort/mycohorts calls per tick.
-  if (
-    cachedLookup?.key === key &&
-    (cachedLookup.pending || Date.now() - cachedLookup.at <= maxAgeMs)
-  ) {
+  if (!forceRefresh && cachedLookup?.key === key) {
     return cachedLookup.promise;
   }
 
-  const promise = fetchActiveVtBatch(userId);
-  const entry: CachedLookup = { key, at: Date.now(), pending: true, promise };
-  cachedLookup = entry;
-  promise.finally(() => {
-    entry.pending = false;
-    entry.at = Date.now();
+  const stored = forceRefresh ? null : readStoredBatch(key);
+  if (stored) {
+    const promise = Promise.resolve(stored.batch);
+    cachedLookup = { key, promise };
+    return promise;
+  }
+
+  const promise = fetchActiveVtBatch(userId).then((batch) => {
+    try {
+      localStorage.setItem(VT_BATCH_STORAGE_KEY, JSON.stringify({ key, batch }));
+    } catch {
+      // Storage unavailable (private mode / quota) — fall back to memory only.
+    }
+    return batch;
   });
+  cachedLookup = { key, promise };
   return promise;
 };
 
-/** Drop the memoised batch — call after anything that can change enrolment. */
+/** Drop the batch so the next VT visit re-checks. */
 export const clearActiveVtBatchCache = () => {
   cachedLookup = null;
+  try {
+    localStorage.removeItem(VT_BATCH_STORAGE_KEY);
+  } catch {
+    // Ignore: nothing to clear if storage is unavailable.
+  }
 };
 
 const fetchActiveVtBatch = async (userId: string): Promise<VtBatch | null> => {

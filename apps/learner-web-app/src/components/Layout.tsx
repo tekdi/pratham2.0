@@ -229,10 +229,7 @@ const App: React.FC<LayoutProps> = ({ children, ...props }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Inert for every non-VT program, so no other program sees a behaviour change.
-  // Re-checks every 3 seconds while the tab is visible, which is what makes the
-  // Assessment item appear/disappear without a reload when a batch is
-  // assigned or removed.
+  // Resolved once per page load; inert for every non-VT program.
   const { eligible: showVtAssessment } = useVtAssessmentEligibility();
 
   const handleClose = () => setAnchorEl(null);
