@@ -47,9 +47,13 @@ const TestListPage: React.FC = () => {
       title={t(getAssessmentTypeLabelKey(type), { defaultValue: type })}
       onBack={() => router.push('/l2-courses?tab=assessment')}
     >
-      {({ assessmentIds }) => (
+      {({ assessmentIds, batchEnded }) => (
         <Suspense fallback={<TestListSkeleton />}>
-          <TestListBody type={type} assessmentIds={assessmentIds} />
+          <TestListBody
+            type={type}
+            assessmentIds={assessmentIds}
+            batchEnded={batchEnded}
+          />
         </Suspense>
       )}
     </VtAssessmentShell>
@@ -69,10 +73,11 @@ const TestListSkeleton: React.FC = () => (
   </Box>
 );
 
-const TestListBody: React.FC<{ type: string; assessmentIds: string[] }> = ({
-  type,
-  assessmentIds,
-}) => {
+const TestListBody: React.FC<{
+  type: string;
+  assessmentIds: string[];
+  batchEnded: boolean;
+}> = ({ type, assessmentIds, batchEnded }) => {
   const { t } = useTranslation();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -98,6 +103,12 @@ const TestListBody: React.FC<{ type: string; assessmentIds: string[] }> = ({
     const userId =
       typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
     const ids = assessmentIdsKey ? assessmentIdsKey.split(',') : [];
+
+    // Batch over → the list is withheld, so skip the search entirely.
+    if (batchEnded) {
+      setData({ online: [], offline: [], total: 0 });
+      return;
+    }
 
     if (!ids.length || !userId) {
       setData({ online: [], offline: [], total: 0 });
@@ -170,11 +181,20 @@ const TestListBody: React.FC<{ type: string; assessmentIds: string[] }> = ({
       setHasError(true);
       setData({ online: [], offline: [], total: 0 });
     }
-  }, [assessmentIdsKey, type, completedId]);
+  }, [assessmentIdsKey, type, completedId, batchEnded]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  // Reached by deep link once the batch has ended — same message as the tab.
+  if (batchEnded) {
+    return (
+      <Typography sx={{ color: '#7C766F' }}>
+        {t('LEARNER_APP.VT_ASSESSMENT.BATCH_COMPLETED_NO_ASSESSMENTS')}
+      </Typography>
+    );
+  }
 
   if (data === null) return <TestListSkeleton />;
 

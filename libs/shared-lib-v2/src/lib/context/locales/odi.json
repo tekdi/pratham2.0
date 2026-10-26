@@ -568,7 +568,8 @@
       "L2_COURSES": "ଏଲ୍2 ପାଠ୍ୟକ୍ରମ",
       "TAB_COURSES": "ପାଠ୍ୟକ୍ରମ",
       "TAB_ASSESSMENT": "ମୂଲ୍ୟାଙ୍କନ",
-      "NO_COURSES_FOUND": "କୌଣସି ପାଠ୍ୟକ୍ରମ ମିଳିଲା ନାହିଁ"
+      "NO_COURSES_FOUND": "କୌଣସି ପାଠ୍ୟକ୍ରମ ମିଳିଲା ନାହିଁ",
+      "BATCH_COMPLETED_NO_ASSESSMENTS": "ଆପଣ ଆପଣଙ୍କର ବ୍ୟାଚ୍ ସମ୍ପୂର୍ଣ୍ଣ କରିଥିବାରୁ କୌଣସି ମୂଲ୍ୟାଙ୍କନ ଉପଲବ୍ଧ ନାହିଁ।"
     }
   },
   "Login with Newton ERP": "ନ୍ୟୁଟନ୍ ERP ସହିତ ଲଗଇନ୍ କରନ୍ତୁ",

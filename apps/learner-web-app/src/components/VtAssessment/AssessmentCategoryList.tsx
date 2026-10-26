@@ -25,9 +25,10 @@ interface CategoryRow {
  * Assessment tab of /l2-courses: the categories (Pre Test, Post Test, …) built
  * from the question sets attached to the learner's batch.
  */
-const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
-  assessmentIds,
-}) => {
+const AssessmentCategoryList: React.FC<{
+  assessmentIds: string[];
+  batchEnded?: boolean;
+}> = ({ assessmentIds, batchEnded = false }) => {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -43,6 +44,12 @@ const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
     const userId =
       typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
     const ids = assessmentIdsKey ? assessmentIdsKey.split(',') : [];
+
+    // Batch over → nothing to list and nothing to fetch.
+    if (batchEnded) {
+      setCategories([]);
+      return;
+    }
 
     // No assessment attached to the batch → "No data found", and no search call.
     if (!ids.length || !userId) {
@@ -77,11 +84,19 @@ const AssessmentCategoryList: React.FC<{ assessmentIds: string[] }> = ({
       setHasError(true);
       setCategories([]);
     }
-  }, [assessmentIdsKey]);
+  }, [assessmentIdsKey, batchEnded]);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  if (batchEnded) {
+    return (
+      <Typography sx={{ color: '#7C766F' }}>
+        {t('LEARNER_APP.VT_ASSESSMENT.BATCH_COMPLETED_NO_ASSESSMENTS')}
+      </Typography>
+    );
+  }
 
   if (categories === null) {
     return (
