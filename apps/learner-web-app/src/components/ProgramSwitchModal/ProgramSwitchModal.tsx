@@ -18,6 +18,7 @@ import { getAssessmentStatus } from '@learner/utils/API/AssesmentService';
 import { getCohortList } from '@learner/utils/API/CohortService';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 import { setUserProgram as setActiveUserProgram } from '@learner/utils/hooks/useUserProgram';
+import { clearActiveVtBatchCache } from '@learner/utils/helpers/vtBatchHelper';
 
 type RegistrationTestStatus =
   | 'clear'
@@ -271,6 +272,8 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
       // The L2 Courses tab keeps its own filter state; it is scoped to the
       // previous program's batch, so it must clear with the rest.
       localStorage.removeItem('l2CourseFilters');
+      // Forces a fresh batch lookup the next time the learner enters VT.
+      clearActiveVtBatchCache();
 
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
@@ -380,6 +383,7 @@ const ProgramSwitchModal: React.FC<ProgramSwitchModalProps> = ({
     event.preventDefault();
     localStorage.removeItem('learnerCourseFilters');
     localStorage.removeItem('l2CourseFilters');
+    clearActiveVtBatchCache();
     onClose();
     router.push('/programs');
   };
