@@ -163,7 +163,7 @@ const Learning = ({
             >
               <Typography
                 variant={mediaMD ? 'body5' : 'body4'}
-                component="h1"
+                component="h2"
                 sx={{
                   mt: 2,
                   fontFamily: 'Poppins',
@@ -177,7 +177,7 @@ const Learning = ({
               </Typography>
               <Typography
                 variant={mediaMD ? 'body9' : 'body7'}
-                component="h1"
+                component="p"
                 sx={{
                   mt: 1,
                   fontFamily: 'Poppins',
@@ -308,7 +308,7 @@ const Learning = ({
                     {/* First line - normal text */}
                     <Typography
                       variant="body1"
-                      component="h1"
+                      component="p"
                       sx={{
                         fontWeight: 400,
                         color: '#7C766F',
@@ -331,7 +331,7 @@ const Learning = ({
                           {/* Heading for each description */}
                           <Typography
                             variant="body1"
-                            component="h1"
+                            component="p"
                             sx={{
                               fontWeight: 600,
                               color: '#1F1B13',
@@ -345,7 +345,7 @@ const Learning = ({
                           {/* Description text */}
                           <Typography
                             variant="body1"
-                            component="h1"
+                            component="p"
                             sx={{
                               fontWeight: 400,
                               color: '#7C766F',
@@ -361,7 +361,7 @@ const Learning = ({
                 ) : (
                   <Typography
                     variant="body1"
-                    component="h1"
+                    component="p"
                     sx={{
                       fontWeight: 400,
                       color: '#7C766F',
@@ -376,7 +376,7 @@ const Learning = ({
             ) : (
               <Typography
                 variant={mediaMD ? 'h5' : 'body1'}
-                component="h1"
+                component="p"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
@@ -424,7 +424,7 @@ const Learning = ({
                 >
                   <Typography
                     variant="body1"
-                    component="h1"
+                    component="h3"
                     sx={{
                       fontWeight: 600,
                       color: '#7C766F',
@@ -485,7 +485,7 @@ const Learning = ({
                   >
                     <Typography
                       variant="body1"
-                      component="h1"
+                      component="p"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 500,

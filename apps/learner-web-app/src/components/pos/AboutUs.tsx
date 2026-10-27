@@ -80,7 +80,7 @@ const AboutUsPage = () => {
           <Box>
             <Typography
               variant={mediaMD ? 'h2' : 'body8'}
-              component="h1"
+              component="p"
               sx={{
                 fontWeight: 700,
                 textAlign: 'center',
@@ -91,7 +91,7 @@ const AboutUsPage = () => {
             </Typography>
             <Typography
               variant={mediaMD ? 'h1' : 'body6'}
-              component="h1"
+              component="p"
               sx={{
                 fontWeight: 700,
                 textAlign: 'center',
@@ -114,7 +114,7 @@ const AboutUsPage = () => {
             <Grid item xs={12} md={6}>
               <Typography
                 variant={mediaMD ? 'h1' : 'body9'}
-                component="h1"
+                component="h2"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 600,
@@ -288,7 +288,7 @@ const AboutUsPage = () => {
           </Box>
           <Typography
             variant={mediaMD ? 'h3' : 'h1'}
-            component="h1"
+            component="p"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
@@ -343,7 +343,7 @@ const AboutUsPage = () => {
           </Box>
           <Typography
             variant={mediaMD ? 'h3' : 'h1'}
-            component="h1"
+            component="p"
             sx={{
               fontFamily: 'Poppins',
               fontWeight: 400,
