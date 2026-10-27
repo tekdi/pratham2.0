@@ -33,7 +33,7 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        py: '48px',
+        py: '20px !important',
       }}
     >
       <Box className="bs-container bs-px-5">
@@ -101,7 +101,7 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
             <SpeakableText>{partner.partnerType}</SpeakableText>
           </Typography>
 
-          <Box sx={{ pt: 6 }}>
+          <Box sx={{ pt: '30px !important' }}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 3, md: 5 }}>
               <Grid item xs={12} sm={5} md={3.5} lg={3}>
                 <PartnerImage
