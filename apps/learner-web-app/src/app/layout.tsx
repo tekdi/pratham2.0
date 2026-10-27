@@ -9,7 +9,7 @@ import ClientLayout from './ClientLayout';
 import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 import { FooterWrapper } from '@learner/components/Footer';
 import ChunkReloadGuard from '@shared-lib-v2/lib/ChunkReloadGuard/ChunkReloadGuard';
-import { SITE_URL } from '@learner/utils/seo';
+import { SITE_URL, absoluteImage } from '@learner/utils/seo';
 
 export const metadata = {
   // Resolves relative og:image and canonical URLs against the real site instead
@@ -24,7 +24,7 @@ export const metadata = {
       'Learner web app is a platform for users to learn and grow by consuming educational content',
     images: [
       {
-        url: `/logo.png`,
+        url: absoluteImage('/logo.png'),
         width: 800,
         height: 600,
       },

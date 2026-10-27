@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
-import { absoluteUrl } from '@learner/utils/seo';
+import { absoluteUrl, absoluteImage } from '@learner/utils/seo';
 import { TenantName } from '../../../utils/app.constant';
 
 export function generateMetadata({
@@ -39,7 +39,7 @@ export function generateMetadata({
       description,
       images: [
         {
-          url: `/images/pos_program.jpg`,
+          url: absoluteImage('/images/pos_program.jpg'),
           width: 800,
           height: 600,
         },

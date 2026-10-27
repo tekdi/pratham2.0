@@ -24,5 +24,13 @@ export const SITE_URL = stripTrailingSlash(
 export const absoluteUrl = (path = '/') =>
   `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 
+// og:image/twitter:image must be absolute. metadataBase does not resolve these in
+// this app, so build them here instead. Already-absolute CDN URLs pass through.
+export const absoluteImage = (url?: string) => {
+  const trimmed = (url || '').trim();
+  if (!trimmed) return absoluteUrl('/logo.png');
+  return /^https?:\/\//i.test(trimmed) ? trimmed : absoluteUrl(trimmed);
+};
+
 export const isIndexableHost = (host?: string | null) =>
   !!host && INDEXABLE_HOSTS.includes(host.split(':')[0].trim().toLowerCase());

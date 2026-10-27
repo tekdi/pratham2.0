@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { absoluteUrl } from '../seo';
+import { absoluteImage, absoluteUrl } from '../seo';
 import { fetchContent, hierarchyAPI } from './contentService';
 
 // The content fetchers swallow errors and hand back the rejection, so inspect it
@@ -35,10 +35,14 @@ export async function getMetadata(
     openGraph: {
       title: product?.name,
       description: product?.description,
+      // og:url mirrors the canonical (audit section 4).
+      ...(canonicalPath ? { url: absoluteUrl(canonicalPath) } : {}),
       images: [
         {
-          url:
-            product?.posterImage || product?.appIcon || '/images/image_ver.png',
+          // Item thumbnail when the API has one, else the site banner. Always absolute.
+          url: absoluteImage(
+            product?.posterImage || product?.appIcon || '/images/image_ver.png'
+          ),
           width: 1200,
           height: 630,
           alt: product?.name,

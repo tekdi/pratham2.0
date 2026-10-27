@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { absoluteUrl } from '@learner/utils/seo';
+import { absoluteUrl, absoluteImage } from '@learner/utils/seo';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
 import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
 import { getPillarSeoData } from '@learner/utils/API/seoContent';
@@ -25,7 +25,7 @@ export function generateMetadata({
       description,
       images: [
         {
-        url: `/images/pos_work.jpg`,
+        url: absoluteImage('/images/pos_work.jpg'),
         width: 800,
         height: 600,
       },

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { absoluteUrl } from '@learner/utils/seo';
+import { absoluteUrl, absoluteImage } from '@learner/utils/seo';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
 import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
 import { getHomeSeoData } from '@learner/utils/API/seoContent';
@@ -19,7 +19,7 @@ export const metadata = {
     description,
     images: [
       {
-        url: `/images/home-page-banner.png`,
+        url: absoluteImage('/images/home-page-banner.png'),
         width: 800,
         height: 600,
       },
