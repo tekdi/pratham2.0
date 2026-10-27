@@ -1,4 +1,11 @@
 import { ContentSearch, fetchContent, hierarchyAPI } from './contentService';
+import {
+  buildBreadcrumbJsonLd,
+  buildCourseJsonLd,
+  buildOrganizationJsonLd,
+  buildVideoJsonLd,
+  buildWebSiteJsonLd,
+} from '../seoJsonLd';
 
 // Server-side data for the crawlable block rendered before the client app mounts.
 // Every helper returns null on failure: SEO markup is additive and must never
@@ -19,6 +26,7 @@ export interface SeoBlockData {
     page: number;
     totalPages: number;
   };
+  jsonLd?: (object | null)[];
 }
 
 const MAX_LINKS = 50;
@@ -75,6 +83,12 @@ export async function getPillarSeoData(
       heading: `Learning for ${pillar}`,
       description: clean(description),
       links,
+      jsonLd: [
+        buildBreadcrumbJsonLd(
+          [{ name: 'Home', href: '/pos' }],
+          `Learning for ${pillar}`
+        ),
+      ],
       pagination: {
         basePath: `/pos/${pillar.toLowerCase()}`,
         page: safePage,
@@ -98,6 +112,7 @@ export function getHomeSeoData(heading: string, description?: string): SeoBlockD
       { name: 'Programs', href: '/pos/program' },
       { name: 'About Us', href: '/pos/about-us' },
     ],
+    jsonLd: [buildOrganizationJsonLd(), buildWebSiteJsonLd()],
   };
 }
 
@@ -124,6 +139,10 @@ export async function getCourseSeoData(
       description: clean(course.description),
       breadcrumbs: buildBreadcrumbs(course),
       links: links.slice(0, MAX_LINKS),
+      jsonLd: [
+        buildBreadcrumbJsonLd(buildBreadcrumbs(course), clean(course.name)),
+        buildCourseJsonLd(course, `/pos/content/${courseId}`),
+      ],
     };
   } catch {
     return null;
@@ -141,6 +160,10 @@ export async function getResourceSeoData(
       heading: clean(resource.name),
       description: clean(resource.description),
       breadcrumbs: buildBreadcrumbs(resource),
+      jsonLd: [
+        buildBreadcrumbJsonLd(buildBreadcrumbs(resource), clean(resource.name)),
+        buildVideoJsonLd(resource, `/pos/player/${identifier}`),
+      ],
     };
   } catch {
     return null;

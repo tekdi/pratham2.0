@@ -4,6 +4,7 @@ import React from 'react';
 import dynamic from 'next/dynamic';
 import { absoluteUrl } from '@learner/utils/seo';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
 import { getHomeSeoData } from '@learner/utils/API/seoContent';
 
 const title = 'Pratham Open School Home';
@@ -33,6 +34,7 @@ const Home = dynamic(() => import('@learner/components/pos/Home'), {
 const App = () => {
   return (
     <>
+      <SeoJsonLd items={getHomeSeoData(title, description).jsonLd} />
       <SeoSsrContent data={getHomeSeoData(title, description)} />
       <Home />
     </>

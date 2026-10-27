@@ -3,6 +3,7 @@ import React from 'react';
 import Layout from '@learner/components/pos/Layout';
 import dynamic from 'next/dynamic';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
 import { getCourseSeoData } from '@learner/utils/API/seoContent';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
@@ -21,6 +22,7 @@ const App = async ({ params }: any) => {
   const seoData = await getCourseSeoData(params.courseId);
   return (
     <>
+      <SeoJsonLd items={seoData?.jsonLd} />
       <SeoSsrContent data={seoData} />
       <Layout>
       <CourseUnitDetails

@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import { absoluteUrl } from '@learner/utils/seo';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
 import { getPillarSeoData } from '@learner/utils/API/seoContent';
 
 const title = 'Learning for Work';
@@ -51,6 +52,7 @@ export default async function PosPage({
 
   return (
     <>
+      <SeoJsonLd items={seoData?.jsonLd} />
       <SeoSsrContent data={seoData} />
       <List
       pagename="Work"
