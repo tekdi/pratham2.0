@@ -30,6 +30,8 @@ export interface SeoBlockData {
   jsonLd?: (object | null)[];
   /** BCP 47 code for the content's own language. */
   lang?: string;
+  /** Item thumbnail, so the media is visible to a crawler before JS runs. */
+  image?: { url: string; alt: string };
 }
 
 const MAX_LINKS = 50;
@@ -142,6 +144,12 @@ export async function getCourseSeoData(
       description: clean(course.description),
       breadcrumbs: buildBreadcrumbs(course),
       lang: toIsoLanguage(course?.contentLanguage),
+      image: course?.posterImage || course?.appIcon
+        ? {
+            url: course.posterImage || course.appIcon,
+            alt: clean(course.name),
+          }
+        : undefined,
       links: links.slice(0, MAX_LINKS),
       jsonLd: [
         buildBreadcrumbJsonLd(buildBreadcrumbs(course), clean(course.name)),
@@ -165,6 +173,12 @@ export async function getResourceSeoData(
       description: clean(resource.description),
       breadcrumbs: buildBreadcrumbs(resource),
       lang: toIsoLanguage(resource?.contentLanguage),
+      image: resource?.posterImage || resource?.appIcon
+        ? {
+            url: resource.posterImage || resource.appIcon,
+            alt: clean(resource.name),
+          }
+        : undefined,
       jsonLd: [
         buildBreadcrumbJsonLd(buildBreadcrumbs(resource), clean(resource.name)),
         buildVideoJsonLd(resource, `/pos/player/${identifier}`),

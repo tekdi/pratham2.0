@@ -13,7 +13,8 @@ export default function SeoSsrContent({ data }: { data: SeoBlockData | null }) {
 
   if (!data || hydrated) return null;
 
-  const { heading, description, breadcrumbs, links, pagination, lang } = data;
+  const { heading, description, breadcrumbs, links, pagination, lang, image } =
+    data;
 
   // A short window around the current page plus first/last, so a crawler can walk
   // the whole pillar without any one page emitting hundreds of links.
@@ -49,6 +50,18 @@ export default function SeoSsrContent({ data }: { data: SeoBlockData | null }) {
       ) : null}
 
       <h1>{heading}</h1>
+
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={image.url}
+          alt={image.alt}
+          width={320}
+          height={180}
+          loading="lazy"
+          style={{ maxWidth: '100%', height: 'auto' }}
+        />
+      ) : null}
 
       {description ? <p>{description}</p> : null}
 
