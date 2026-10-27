@@ -9,8 +9,12 @@ import ClientLayout from './ClientLayout';
 import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 import { FooterWrapper } from '@learner/components/Footer';
 import ChunkReloadGuard from '@shared-lib-v2/lib/ChunkReloadGuard/ChunkReloadGuard';
+import { SITE_URL } from '@learner/utils/seo';
 
 export const metadata = {
+  // Resolves relative og:image and canonical URLs against the real site instead
+  // of http://localhost, which is what Next falls back to when this is unset.
+  metadataBase: new URL(SITE_URL),
   title: 'Welcome to learner-web-app',
   description:
     'Learner web app is a platform for users to learn and grow by consuming educational content',

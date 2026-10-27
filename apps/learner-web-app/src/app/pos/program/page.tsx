@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { absoluteUrl } from '@learner/utils/seo';
 import { TenantName } from '../../../utils/app.constant';
 
 export function generateMetadata({
@@ -24,6 +25,13 @@ export function generateMetadata({
     `Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.`;
 
   return {
+    // `program` selects the content, so it stays in the canonical;
+    // only UI/tracking params are stripped.
+    alternates: {
+      canonical: absoluteUrl(
+        program ? `/pos/program?program=${encodeURIComponent(program)}` : '/pos/program'
+      ),
+    },
     title,
     description,
     openGraph: {

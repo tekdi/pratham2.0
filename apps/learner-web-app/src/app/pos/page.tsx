@@ -2,11 +2,13 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { absoluteUrl } from '@learner/utils/seo';
 
 const title = 'Pratham Open School Home';
 const description = `Pratham Open School offers free, downloadable videos, games, reading material and stories in 15 languages for ages 1 to 18+, designed to support self-led learning and group learning through activities and projects.`;
 
 export const metadata = {
+  alternates: { canonical: absoluteUrl('/pos') },
   title,
   description,
   openGraph: {

@@ -9,7 +9,11 @@ import { Box } from '@mui/material';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.identifier);
+  return await getMetadata(
+    params.identifier,
+    undefined,
+    `/pos/content/${params.identifier}`
+  );
 }
 const ContentEnrollDetails = dynamic(() => import('@ContentEnrollDetails'), {
   ssr: false,

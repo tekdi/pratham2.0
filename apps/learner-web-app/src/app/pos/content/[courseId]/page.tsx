@@ -7,7 +7,11 @@ import { getCourseSeoData } from '@learner/utils/API/seoContent';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  return await getMetadata(
+    params.courseId,
+    undefined,
+    `/pos/content/${params.courseId}`
+  );
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {

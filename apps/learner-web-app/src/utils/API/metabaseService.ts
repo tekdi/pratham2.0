@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { absoluteUrl } from '../seo';
 import { fetchContent, hierarchyAPI } from './contentService';
 
 // The content fetchers swallow errors and hand back the rejection, so inspect it
@@ -11,7 +12,11 @@ const isResourceNotFound = (product: any) => {
   );
 };
 
-export async function getMetadata(identifier: any, unitId?: any) {
+export async function getMetadata(
+  identifier: any,
+  unitId?: any,
+  canonicalPath?: string
+) {
   let product = { name: '', description: '', appIcon: '', posterImage: '' };
   if (unitId) {
     product = await hierarchyAPI(unitId);
@@ -22,6 +27,9 @@ export async function getMetadata(identifier: any, unitId?: any) {
     notFound();
   }
   return {
+    ...(canonicalPath
+      ? { alternates: { canonical: absoluteUrl(canonicalPath) } }
+      : {}),
     title: product?.name,
     description: product?.description,
     openGraph: {

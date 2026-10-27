@@ -2,11 +2,13 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { absoluteUrl } from '@learner/utils/seo';
 
 const title = 'About Us';
 const description = `Pratham undertook an exploratory study for children to understand the problem of plastic waste management in rural India. This study is a part of Pratham's Learning for Life curriculum. In this study, we covered 8400 households, in 700 villages across 70 districts, in 15 states. Findings to be released in July 2022.`;
 
 export const metadata = {
+  alternates: { canonical: absoluteUrl('/pos/about-us') },
   title,
   description,
   openGraph: {

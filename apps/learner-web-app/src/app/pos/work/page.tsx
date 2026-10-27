@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import { absoluteUrl } from '@learner/utils/seo';
 import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
 import { getPillarSeoData } from '@learner/utils/API/seoContent';
 
@@ -6,6 +7,7 @@ const title = 'Learning for Work';
 const description = `Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods`;
 
 export const metadata = {
+  alternates: { canonical: absoluteUrl('/pos/work') },
   title,
   description,
   openGraph: {

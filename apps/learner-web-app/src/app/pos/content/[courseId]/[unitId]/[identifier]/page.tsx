@@ -8,7 +8,11 @@ import { getMetadata } from '@learner/utils/API/metabaseService';
 import Layout from '@learner/components/pos/Layout';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.identifier);
+  return await getMetadata(
+    params.identifier,
+    undefined,
+    `/pos/player/${params.identifier}`
+  );
 }
 
 const Player = dynamic(() => import('@learner/components/Content/Player'), {
