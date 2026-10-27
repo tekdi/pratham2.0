@@ -1,4 +1,6 @@
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { getPillarSeoData } from '@learner/utils/API/seoContent';
 
 const title = 'Learning for Work';
 const description = `Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods`;
@@ -24,9 +26,13 @@ const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,
 });
 
-export default function PosPage() {
+export default async function PosPage() {
+  const seoData = await getPillarSeoData('Work', description);
+
   return (
-    <List
+    <>
+      <SeoSsrContent data={seoData} />
+      <List
       pagename="Work"
       _content={{ isOpenColapsed: ['contentLanguage', 'se_subDomains', 'se_subjects'] }}
       _infoCard={{
@@ -35,6 +41,7 @@ export default function PosPage() {
             'Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods',
         },
       }}
-    />
+      />
+    </>
   );
 }

@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
 import { TenantName } from '../../../utils/app.constant';
 
 export function generateMetadata({
@@ -44,9 +45,20 @@ const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,
 });
 
-export default function PosPage() {
+export default function PosPage({
+  searchParams,
+}: {
+  searchParams: { program: string };
+}) {
+  // Reuse generateMetadata so the heading never drifts from the title.
+  const meta = generateMetadata({ searchParams }) as any;
+
   return (
-    <List
+    <>
+      <SeoSsrContent
+        data={{ heading: meta?.title, description: meta?.description }}
+      />
+      <List
       pagename={{
         'Vocational Training': TenantName.YOUTHNET,
         "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
@@ -84,6 +96,7 @@ At Pratham, we believe that a combination of activities helps children engage an
           },
         },
       }}
-    />
+      />
+    </>
   );
 }

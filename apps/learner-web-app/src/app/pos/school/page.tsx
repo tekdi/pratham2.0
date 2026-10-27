@@ -1,4 +1,6 @@
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { getPillarSeoData } from '@learner/utils/API/seoContent';
 
 const title = 'Learning for School';
 const description = `Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.`;
@@ -24,17 +26,23 @@ const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,
 });
 
-export default function PosPage() {
+export default async function PosPage() {
+  const seoData = await getPillarSeoData('School', description);
+
   return (
-    <List
-      pagename="School"
-      _content={{ isOpenColapsed: ['contentLanguage', 'se_subDomains', 'se_subjects'] }}
-      _infoCard={{
-        item: {
-          description:
-            "Learning for School focuses on scholastic subjects, which include early years education and learning to read, write, and think. These skills are crucial for building children's confidence and dignity among their peers.",
-        },
-      }}
-    />
+    <>
+      <SeoSsrContent data={seoData} />
+      <List
+        pagename="School"
+        _content={{
+          isOpenColapsed: ['contentLanguage', 'se_subDomains', 'se_subjects'],
+        }}
+        _infoCard={{
+          item: {
+            description,
+          },
+        }}
+      />
+    </>
   );
 }

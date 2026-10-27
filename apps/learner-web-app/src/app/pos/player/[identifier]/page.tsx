@@ -1,5 +1,7 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { getResourceSeoData } from '@learner/utils/API/seoContent';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
@@ -10,9 +12,12 @@ const Player = dynamic(() => import('@learner/components/Content/Player'), {
   ssr: false,
 });
 
-const App: React.FC = () => {
+const App = async ({ params }: any) => {
+  const seoData = await getResourceSeoData(params.identifier);
   return (
-    <Player
+    <>
+      <SeoSsrContent data={seoData} />
+      <Player
       userIdLocalstorageName="did"
       contentBaseUrl="/pos/content"
       _config={{
@@ -21,6 +26,7 @@ const App: React.FC = () => {
         },
       }}
     />
+    </>
   );
 };
 

@@ -2,6 +2,8 @@
 import React from 'react';
 import Layout from '@learner/components/pos/Layout';
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { getCourseSeoData } from '@learner/utils/API/seoContent';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
@@ -11,9 +13,12 @@ export async function generateMetadata({ params }: any) {
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
   ssr: false,
 });
-const App = () => {
+const App = async ({ params }: any) => {
+  const seoData = await getCourseSeoData(params.courseId);
   return (
-    <Layout>
+    <>
+      <SeoSsrContent data={seoData} />
+      <Layout>
       <CourseUnitDetails
         isShowLayout={false}
         _config={{
@@ -30,6 +35,7 @@ const App = () => {
         }}
       />
     </Layout>
+    </>
   );
 };
 
