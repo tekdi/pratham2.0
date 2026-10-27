@@ -5,10 +5,9 @@ export interface KnowledgePartner {
   id: string;
   name: string;
   kind: PartnerKind;
-  /** Shown under the name on the carousel card */
-  role: string;
+  /** "Type of Partner" from the partners sheet; shown under the name */
   partnerType: string;
-  /** One-line descriptor on the details page */
+  /** Location / qualification line on the details page */
   descriptor?: string;
   expertise: string[];
   /** Path under /public; the grey box stays empty when absent */

@@ -61,7 +61,9 @@ const PartnerCard = ({ partner }: { partner: KnowledgePartner }) => (
         lineHeight: 1.4,
       }}
     >
-      <SpeakableText text={partner.role}>{partner.role}</SpeakableText>
+      <SpeakableText text={partner.partnerType}>
+        {partner.partnerType}
+      </SpeakableText>
     </Typography>
   </Box>
 );

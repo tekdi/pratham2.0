@@ -3,7 +3,6 @@
     "id": "sampurna-murti",
     "name": "Dr. Sampurna Murti",
     "kind": "individual",
-    "role": "Subject Matter Expert",
     "partnerType": "Subject Matter Expert",
     "descriptor": "Mumbai, Maharashtra · M.Sc, Ph.D. Biochemistry, The Institute of Science, (Bombay University), Mumbai, India",
     "expertise": [
@@ -28,7 +27,6 @@
     "id": "jagadish-shrinivasavadhani",
     "name": "Jagadish Shrinivasavadhani",
     "kind": "individual",
-    "role": "Subject Matter Expert",
     "partnerType": "Subject Matter Expert",
     "descriptor": "Mysore, Karnataka · M.Tech in Computer Engineering from IIT Kharagpur",
     "expertise": [
@@ -54,7 +52,6 @@
     "id": "kedar-sohoni",
     "name": "Kedar Sohoni",
     "kind": "individual",
-    "role": "Founder, Green Communities Foundation",
     "partnerType": "Knowledge / Organisation Partner",
     "descriptor": "Founder, Green Communities Foundation",
     "expertise": [
@@ -77,7 +74,6 @@
     "id": "jyoti-shinde",
     "name": "Dr. Jyoti Shinde",
     "kind": "individual",
-    "role": "Subject Matter Expert",
     "partnerType": "Subject Matter Expert",
     "descriptor": "Family Physician and MD in Ayurveda with over 24 years of experience",
     "expertise": [
@@ -93,19 +89,17 @@
       "Experience and knowledge strongly complement the objectives of this project.",
       "Aligns well with our requirements for creating accurate and impactful health education resources."
     ],
-    "website": "https://www.shreesiddhiclinic.com",
+    "website": "http://www.shreesiddhiclinic.com/",
     "status": "Done"
   },
   {
     "id": "vandana-garg",
     "name": "Dr. Vandana Garg",
     "kind": "individual",
-    "role": "Subject Matter Expert",
     "partnerType": "Subject Matter Expert",
     "descriptor": "Ph.D. in Food and Nutrition",
     "expertise": [
-      "Nutrition",
-      "Food Sciences"
+      "Nutrition and Food Sciences"
     ],
     "image": "/knowledge/Dr.Vandana-Garg.jpg",
     "about": [
@@ -121,7 +115,6 @@
     "id": "vigyan-ashram",
     "name": "Vigyan Ashram",
     "kind": "organisation",
-    "role": "Organisation",
     "partnerType": "Organisation",
     "expertise": [
       "Science",
@@ -138,7 +131,6 @@
     "id": "mudit-verma",
     "name": "Mudit Verma",
     "kind": "individual",
-    "role": "Subject Matter Expert",
     "partnerType": "Subject Matter Expert",
     "expertise": [
       "STEM Curriculum Development and Teacher Training"
@@ -153,7 +145,6 @@
     "id": "beacon-tv",
     "name": "Beacon TV",
     "kind": "organisation",
-    "role": "Organisation / Media Partner",
     "partnerType": "Organisation / Media Partner",
     "expertise": [],
     "image": "/knowledge/Beacon-TV-LOGO-Updated.jpg",
@@ -166,7 +157,6 @@
     "id": "abhivyakti",
     "name": "Abhivyakti",
     "kind": "organisation",
-    "role": "Organisation",
     "partnerType": "Organisation",
     "expertise": [
       "Abhivyakti Health and Education Services"

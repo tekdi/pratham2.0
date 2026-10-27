@@ -26,7 +26,7 @@ const bodyTextSx = {
 
 const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
   <Layout>
-    <SubHeader showFilter={false} />
+    <SubHeader showFilter={false} showSearch={false} />
     <Box
       sx={{
         backgroundImage: `url('/images/mainpagebig.png')`,
@@ -90,18 +90,16 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
           >
             <SpeakableText>{partner.name}</SpeakableText>
           </Typography>
-          {partner.descriptor && (
-            <Typography
-              sx={{
-                fontSize: scaledFontSize(15),
-                fontWeight: 600,
-                color: '#212529',
-                mt: 0.75,
-              }}
-            >
-              <SpeakableText>{partner.descriptor}</SpeakableText>
-            </Typography>
-          )}
+          <Typography
+            sx={{
+              fontSize: scaledFontSize(15),
+              fontWeight: 600,
+              color: '#212529',
+              mt: 0.75,
+            }}
+          >
+            <SpeakableText>{partner.partnerType}</SpeakableText>
+          </Typography>
 
           <Box sx={{ pt: 6 }}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 3, md: 5 }}>
@@ -143,20 +141,19 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
               </Grid>
 
               <Grid item xs={12} sm={7} md={8.5} lg={9}>
-                <Typography
-                  sx={{
-                    fontSize: scaledFontSize(15),
-                    color: '#6c757d',
-                    pb: 1.5,
-                    mb: 2,
-                    borderBottom: '1px solid #e5e7eb',
-                  }}
-                >
-                  Partner type{' '}
-                  <Box component="strong" sx={{ color: '#212529' }}>
-                    {partner.partnerType}
-                  </Box>
-                </Typography>
+                {partner.descriptor && (
+                  <Typography
+                    sx={{
+                      fontSize: scaledFontSize(15),
+                      color: '#6c757d',
+                      pb: 1.5,
+                      mb: 2,
+                      borderBottom: '1px solid #e5e7eb',
+                    }}
+                  >
+                    <SpeakableText>{partner.descriptor}</SpeakableText>
+                  </Typography>
+                )}
 
                 {partner.about.map((paragraph) => (
                   <Typography key={paragraph} sx={{ ...bodyTextSx, mb: 1.5 }}>
