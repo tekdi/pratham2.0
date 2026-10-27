@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { absoluteImage, absoluteUrl } from '../seo';
+import { buildSeoDescription, buildSeoTitle } from '../seoMeta';
 import { fetchContent, hierarchyAPI } from './contentService';
 
 // The content fetchers swallow errors and hand back the rejection, so inspect it
@@ -26,15 +27,22 @@ export async function getMetadata(
   if (isResourceNotFound(product)) {
     notFound();
   }
+  // Only the POS routes pass canonicalPath, so the section 4 templates (and the
+  // "| Pratham Open School" suffix) apply there and leave other apps untouched.
+  const title = canonicalPath ? buildSeoTitle(product) : product?.name;
+  const description = canonicalPath
+    ? buildSeoDescription(product)
+    : product?.description;
+
   return {
     ...(canonicalPath
       ? { alternates: { canonical: absoluteUrl(canonicalPath) } }
       : {}),
-    title: product?.name,
-    description: product?.description,
+    title,
+    description,
     openGraph: {
-      title: product?.name,
-      description: product?.description,
+      title,
+      description,
       // og:url mirrors the canonical (audit section 4).
       ...(canonicalPath ? { url: absoluteUrl(canonicalPath) } : {}),
       images: [

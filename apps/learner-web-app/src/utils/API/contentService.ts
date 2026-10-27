@@ -37,7 +37,7 @@ export const fetchContent = async (identifier: any) => {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
     // createdOn/lastPublishedOn/se_* feed the JSON-LD and breadcrumbs.
     const FIELDS =
-      'description,name,appIcon,posterImage,artifactUrl,mimeType,contentLanguage,program,createdOn,lastPublishedOn,primaryCategory,se_subjects,se_domains';
+      'description,name,englishName,appIcon,posterImage,artifactUrl,mimeType,contentLanguage,program,createdOn,lastPublishedOn,primaryCategory,se_subjects,se_subDomains,se_domains,leafNodesCount';
     const LICENSE_DETAILS = 'name,description,url';
     const MODE = 'edit';
     const response = await get(
