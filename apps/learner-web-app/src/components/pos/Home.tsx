@@ -380,7 +380,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
             </Typography>
             <Typography
               variant={mediaMD ? 'body10' : 'body3'}
-              component="h1"
+              component="p"
               sx={{
                 fontWeight: 800,
                 // fontSize: '72px',
@@ -397,7 +397,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
 
             <Typography
               variant={mediaMD ? 'body1' : 'body4'}
-              component="h1"
+              component="p"
               sx={{
                 my: 2,
                 fontFamily: 'Poppins',
@@ -415,7 +415,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
 
             <Typography
               variant={mediaMD ? 'body1' : 'h1'}
-              component="h1"
+              component="p"
               sx={{
                 fontWeight: 400,
                 lineHeight: '28px',
@@ -436,7 +436,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
 
             <Typography
               variant={mediaMD ? 'body1' : 'body5'}
-              component="h1"
+              component="p"
               sx={{
                 mb: 3,
                 fontFamily: 'Poppins',
@@ -522,7 +522,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
         >
           <Typography
             variant={mediaMD ? 'body8' : 'body7'}
-            component="h1"
+            component="p"
             sx={{
               // fontFamily: 'Poppins',
               fontWeight: 700,
@@ -539,7 +539,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
           </Typography>
           <Typography
             variant="body8"
-            component="h1"
+            component="h2"
             sx={{
               fontWeight: 400,
               // fontSize: '24px',
@@ -585,7 +585,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
               >
                 <Typography
                   variant={mediaMD ? 'body8' : 'body6'}
-                  component="h1"
+                  component="p"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 700,
@@ -600,7 +600,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
                 </Typography>
                 <Typography
                   variant={mediaMD ? 'h2' : 'body8'}
-                  component="h1"
+                  component="p"
                   sx={{
                     fontFamily: 'Poppins',
                     fontWeight: 400,
@@ -623,7 +623,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       <Box>
         <Typography
           variant="body7"
-          component="h1"
+          component="h2"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
@@ -674,7 +674,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       <Box>
         <Typography
           variant="body6"
-          component="h1"
+          component="h2"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
@@ -707,7 +707,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
           <Grid item xs={12} md={5}>
             <Typography
               variant={mediaMD ? 'h1' : 'body6'}
-              component="h1"
+              component="h2"
               sx={{
                 fontFamily: 'Poppins',
                 fontWeight: 700,
@@ -742,7 +742,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       >
         <Typography
           variant={mediaMD ? 'h1' : 'body6'}
-          component="h1"
+          component="h2"
           sx={{
             fontWeight: 700,
             fontSize: '36px',
@@ -773,7 +773,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       >
         <Typography
           variant={mediaMD ? 'h1' : 'body6'}
-          component="h1"
+          component="h2"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,
@@ -806,7 +806,7 @@ const rangeLength = contentLanguageField?.range?.length || 0;
       >
         <Typography
           variant={mediaMD ? 'h1' : 'body6'}
-          component="h1"
+          component="h2"
           sx={{
             fontFamily: 'Poppins',
             fontWeight: 700,

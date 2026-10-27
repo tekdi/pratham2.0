@@ -132,8 +132,9 @@ export default function App({
             `/pos/player/${content?.identifier}?activeLink=${window.location.pathname}`
           );
         } else {
+          // Link straight to the canonical course URL; /pos/content-details now 301s here.
           router.push(
-            `/pos/content-details/${content?.identifier}?activeLink=${window.location.pathname}`
+            `/pos/content/${content?.identifier}?activeLink=${window.location.pathname}`
           );
         }
       } catch (error) {

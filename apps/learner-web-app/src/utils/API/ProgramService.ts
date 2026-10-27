@@ -2,12 +2,16 @@ import axios from 'axios';
 import { API_ENDPOINTS } from './EndUrls';
 import { post } from '@shared-lib';
 
-export const getTenantInfo = async (): Promise<any> => {
+// originOverride lets server components pass the request origin, since
+// window.location is unavailable there and the filter below would match nothing.
+export const getTenantInfo = async (originOverride?: string): Promise<any> => {
   const apiUrl = API_ENDPOINTS.program;
 
   try {
     const response = await axios.get(apiUrl);
-    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    const currentOrigin =
+      originOverride ??
+      (typeof window !== 'undefined' ? window.location.origin : '');
     const devOrigins = ['http://172.132.44.161:3003'];
     const matchingTenants =
       response?.data?.result?.filter((tenant: any) =>
