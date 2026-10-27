@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { scaledFontSize } from '@learner/utils/scaledFontSize';
-import { getKnowledgePartnerById } from '@learner/utils/API/KnowledgePartnerService';
+import { getKnowledgePartners } from '@learner/utils/API/KnowledgePartnerService';
 import Layout from '../layout/Layout';
 import SubHeader from '../subHeader/SubHeader';
 import PartnerDetails from './PartnerDetails';
@@ -25,7 +25,8 @@ const PartnerDetailsPage = ({ partnerId }: { partnerId: string }) => {
       setLoading(true);
       setError(false);
       try {
-        const data = await getKnowledgePartnerById(partnerId);
+        const partners = await getKnowledgePartners();
+        const data = partners.find((item) => item.id === partnerId) ?? null;
         if (!cancelled) setPartner(data);
       } catch {
         if (!cancelled) setError(true);

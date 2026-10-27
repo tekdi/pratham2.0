@@ -1,33 +1,8 @@
-import axios from 'axios';
 import { KnowledgePartner } from '@learner/components/themantic/knowledgePartners/partnersData';
+import knowledgePartnersData from '@learner/components/themantic/knowledgePartners/knowledgePartners.json';
 
-// Served by this app's route handlers in src/app/api/knowledge-partners
-const KNOWLEDGE_PARTNERS_API_URL = '/api/knowledge-partners';
+// Static mock data; images are served from /public/knowledge
+const knowledgePartners = knowledgePartnersData as KnowledgePartner[];
 
-export const getKnowledgePartners = async (): Promise<KnowledgePartner[]> => {
-  try {
-    const response = await axios.get(KNOWLEDGE_PARTNERS_API_URL);
-    return response?.data?.result ?? [];
-  } catch (error) {
-    console.error('Error in fetching knowledge partners', error);
-    throw error;
-  }
-};
-
-// Resolves to null when the partner does not exist (404)
-export const getKnowledgePartnerById = async (
-  partnerId: string
-): Promise<KnowledgePartner | null> => {
-  try {
-    const response = await axios.get(
-      `${KNOWLEDGE_PARTNERS_API_URL}/${encodeURIComponent(partnerId)}`
-    );
-    return response?.data?.result ?? null;
-  } catch (error: any) {
-    if (error?.response?.status === 404) {
-      return null;
-    }
-    console.error('Error in fetching knowledge partner', error);
-    throw error;
-  }
-};
+export const getKnowledgePartners = async (): Promise<KnowledgePartner[]> =>
+  knowledgePartners;
