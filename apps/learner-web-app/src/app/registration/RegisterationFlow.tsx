@@ -12,6 +12,7 @@ import {
 import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
 // import { userCheck } from '@learner/utils/API/userService';
+import { userNameExist } from '@learner/utils/API/userService';
 // import AccountExistsCard from '@learner/components/AccountExistsCard/AccountExistsCard';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 // import OtpVerificationComponent from '@learner/components/OtpVerificationComponent/OtpVerificationComponent';
@@ -723,13 +724,23 @@ const RegisterationFlow = () => {
   //   try { const response = await sendOTP({ mobile, reason: 'signup' }); setHash(response?.result?.data?.hash); } catch {}
   // };
 
-  const onCloseSuccessModal = (currentFormData?: any) => {
+  const onCloseSuccessModal = async (currentFormData?: any) => {
     const data = currentFormData || formData;
-    setUsername(
-      (data?.firstName || '') +
-        (data?.lastName || '') +
-        Math.floor(10 + Math.random() * 90)
-    );
+    try {
+      const result = await userNameExist({
+        firstName: data?.firstName || '',
+        middleName: data?.middleName || '',
+        lastName: data?.lastName || '',
+      });
+      setUsername(result?.suggestedUsername || '');
+    } catch (error) {
+      // Fallback to locally generated username if the suggestion API fails
+      setUsername(
+        (data?.firstName || '') +
+          (data?.lastName || '') +
+          Math.floor(10 + Math.random() * 90)
+      );
+    }
     // setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
   };
