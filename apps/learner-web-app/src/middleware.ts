@@ -29,6 +29,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url), 301);
   }
 
+  // One URL per course. POS passes isEnrollmentRequired: false, so this page always
+  // did router.replace to the same target client-side; a 301 makes that crawlable.
+  // Scoped to /pos: the non-POS /content-details route does require enrollment.
+  if (url.pathname.startsWith('/pos/content-details/')) {
+    const courseUrl = request.nextUrl.clone();
+    courseUrl.pathname = url.pathname.replace(
+      '/pos/content-details/',
+      '/pos/content/'
+    );
+    return NextResponse.redirect(courseUrl, 301);
+  }
+
   const isGone =
     GONE_PATHS.includes(lowerPath) ||
     GONE_PREFIXES.some((prefix) => lowerPath.startsWith(prefix));
