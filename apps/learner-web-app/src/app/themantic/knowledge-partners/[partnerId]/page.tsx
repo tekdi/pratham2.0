@@ -1,17 +1,27 @@
-import React, { Suspense } from 'react';
-import PartnerDetailsPage from '@learner/components/themantic/knowledgePartners/PartnerDetailsPage';
+import React from 'react';
+import { notFound } from 'next/navigation';
+import PartnerDetails from '@learner/components/themantic/knowledgePartners/PartnerDetails';
+import { getKnowledgePartners } from '@learner/utils/API/KnowledgePartnerService';
 
-// The partner-specific title is set client-side once the API responds
-export const metadata = {
-  title: 'Experimento India',
+const getPartner = async (partnerId: string) =>
+  (await getKnowledgePartners()).find((partner) => partner.id === partnerId);
+
+export async function generateMetadata({ params }: any) {
+  const partner = await getPartner(params?.partnerId);
+  return {
+    title: partner ? `${partner.name} | Experimento India` : 'Experimento India',
+  };
+}
+
+const Page = async ({ params }: any) => {
+  const partner = await getPartner(params?.partnerId);
+  if (!partner) notFound();
+
+  return (
+    <div className="thematic-page">
+      <PartnerDetails partner={partner} />
+    </div>
+  );
 };
-
-const Page = ({ params }: any) => (
-  <div className="thematic-page">
-    <Suspense fallback={<div>Loading...</div>}>
-      <PartnerDetailsPage partnerId={params?.partnerId} />
-    </Suspense>
-  </div>
-);
 
 export default Page;
