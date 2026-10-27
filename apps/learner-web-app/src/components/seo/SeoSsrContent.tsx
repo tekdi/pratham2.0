@@ -13,7 +13,7 @@ export default function SeoSsrContent({ data }: { data: SeoBlockData | null }) {
 
   if (!data || hydrated) return null;
 
-  const { heading, description, breadcrumbs, links, pagination } = data;
+  const { heading, description, breadcrumbs, links, pagination, lang } = data;
 
   // A short window around the current page plus first/last, so a crawler can walk
   // the whole pillar without any one page emitting hundreds of links.
@@ -31,7 +31,11 @@ export default function SeoSsrContent({ data }: { data: SeoBlockData | null }) {
     n <= 1 ? pagination?.basePath ?? '' : `${pagination?.basePath}?page=${n}`;
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
+    // lang marks this subtree's language; <html lang> is owned by the root layout.
+    <div
+      lang={lang}
+      style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}
+    >
       {breadcrumbs?.length ? (
         <nav aria-label="breadcrumb">
           <ol style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', listStyle: 'none', padding: 0 }}>

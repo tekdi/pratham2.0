@@ -9,6 +9,35 @@ const DESC_MAX = 155;
 
 const VIDEO_MIME_TYPES = ['video/mp4', 'video/webm', 'video/x-youtube'];
 
+// BCP 47 codes for every contentLanguage value the content API actually returns.
+// Khasi and Rabha have no ISO 639-1 code, so their 639-3 codes are used.
+const LANGUAGE_CODES: Record<string, string> = {
+  assamese: 'as',
+  bengali: 'bn',
+  english: 'en',
+  gujarati: 'gu',
+  hindi: 'hi',
+  kannada: 'kn',
+  khasi: 'kha',
+  malayalam: 'ml',
+  marathi: 'mr',
+  odia: 'or',
+  punjabi: 'pa',
+  'rabha (rongdani)': 'rah',
+  rabha: 'rah',
+  tamil: 'ta',
+  telugu: 'te',
+  urdu: 'ur',
+};
+
+/** Returns undefined for an unrecognised language: better no lang than a wrong one. */
+export const toIsoLanguage = (value?: unknown): string | undefined => {
+  const key = String(Array.isArray(value) ? value[0] : value ?? '')
+    .trim()
+    .toLowerCase();
+  return LANGUAGE_CODES[key];
+};
+
 const clean = (value?: unknown) =>
   String(value ?? '')
     .replace(/<[^>]*>/g, ' ')

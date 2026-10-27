@@ -6,6 +6,7 @@ import {
   buildVideoJsonLd,
   buildWebSiteJsonLd,
 } from '../seoJsonLd';
+import { toIsoLanguage } from '../seoMeta';
 
 // Server-side data for the crawlable block rendered before the client app mounts.
 // Every helper returns null on failure: SEO markup is additive and must never
@@ -27,6 +28,8 @@ export interface SeoBlockData {
     totalPages: number;
   };
   jsonLd?: (object | null)[];
+  /** BCP 47 code for the content's own language. */
+  lang?: string;
 }
 
 const MAX_LINKS = 50;
@@ -138,6 +141,7 @@ export async function getCourseSeoData(
       heading: clean(course.name),
       description: clean(course.description),
       breadcrumbs: buildBreadcrumbs(course),
+      lang: toIsoLanguage(course?.contentLanguage),
       links: links.slice(0, MAX_LINKS),
       jsonLd: [
         buildBreadcrumbJsonLd(buildBreadcrumbs(course), clean(course.name)),
@@ -160,6 +164,7 @@ export async function getResourceSeoData(
       heading: clean(resource.name),
       description: clean(resource.description),
       breadcrumbs: buildBreadcrumbs(resource),
+      lang: toIsoLanguage(resource?.contentLanguage),
       jsonLd: [
         buildBreadcrumbJsonLd(buildBreadcrumbs(resource), clean(resource.name)),
         buildVideoJsonLd(resource, `/pos/player/${identifier}`),
