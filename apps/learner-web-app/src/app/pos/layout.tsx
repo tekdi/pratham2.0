@@ -1,7 +1,6 @@
 import 'react-toastify/dist/ReactToastify.css';
 import POSMuiThemeProvider from '@learner/assets/theme/POSMuiThemeProvider';
 import { GlobalProvider } from '@learner/components/Provider/GlobalProvider';
-import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 import { absoluteImage } from '@learner/utils/seo';
 
 export const metadata = {
@@ -27,11 +26,10 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
+    // The root layout already mounts GoogleAnalyticsTracker, and it wraps this
+    // one; a second instance sent a duplicate page_view on every POS navigation.
     <GlobalProvider>
-      <POSMuiThemeProvider>
-        <GoogleAnalyticsTracker />
-        {children}
-      </POSMuiThemeProvider>
+      <POSMuiThemeProvider>{children}</POSMuiThemeProvider>
     </GlobalProvider>
   );
 }
