@@ -14,9 +14,18 @@ export interface SeoBlockData {
   description?: string;
   breadcrumbs?: SeoLink[];
   links?: SeoLink[];
+  pagination?: {
+    basePath: string;
+    page: number;
+    totalPages: number;
+  };
 }
 
 const MAX_LINKS = 50;
+export const PILLAR_PAGE_SIZE = 20;
+// The search API serves deep offsets, but cap the crawlable range so a pillar
+// cannot emit an unbounded number of paginated URLs.
+const MAX_PILLAR_PAGES = 500;
 
 const clean = (value?: string) =>
   (value || '')
@@ -30,13 +39,21 @@ const isContent = (value: any) => Boolean(value?.identifier);
 
 export async function getPillarSeoData(
   pillar: string,
-  description?: string
+  description?: string,
+  page = 1
 ): Promise<SeoBlockData | null> {
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
   try {
     const res = await ContentSearch({
-      filters: { se_domains: [`Learning for ${pillar}`], status: ['Live'] },
+      // Mirrors the filters pos/List.tsx applies, so these links match the listing.
+      filters: {
+        se_domains: [`Learning for ${pillar}`],
+        status: ['Live'],
+        program: ['Open School'],
+      },
       fields: ['name', 'identifier', 'description'],
-      limit: 20,
+      limit: PILLAR_PAGE_SIZE,
+      offset: (safePage - 1) * PILLAR_PAGE_SIZE,
     });
     const items = res?.result?.content ?? [];
     const links = items
@@ -48,10 +65,21 @@ export async function getPillarSeoData(
 
     if (!links.length) return null;
 
+    const total = Number(res?.result?.count) || links.length;
+    const totalPages = Math.min(
+      Math.ceil(total / PILLAR_PAGE_SIZE),
+      MAX_PILLAR_PAGES
+    );
+
     return {
       heading: `Learning for ${pillar}`,
       description: clean(description),
       links,
+      pagination: {
+        basePath: `/pos/${pillar.toLowerCase()}`,
+        page: safePage,
+        totalPages,
+      },
     };
   } catch {
     return null;
