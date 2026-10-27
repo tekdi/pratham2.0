@@ -227,6 +227,10 @@ const Learning = ({
                 {domainData[index]?.map((theme: any) => (
                   <Box key={theme.title} sx={{ mb: 1 }}>
                     <Typography
+                      component="a"
+                      href={`/pos/${pillar.toLowerCase()}?se_subDomains=${encodeURIComponent(
+                        theme.title
+                      )}`}
                       variant="body5"
                       sx={{
                         fontFamily: 'Poppins',
@@ -234,6 +238,7 @@ const Learning = ({
                         lineHeight: '24px',
                         letterSpacing: '0.15px',
                         color: '#F17B06',
+                        textDecoration: 'none',
                       }}
                     >
                       <SpeakableText>{theme.title}</SpeakableText>
@@ -263,8 +268,13 @@ const Learning = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
-                  onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
-                  style={{ cursor: 'pointer' }}
+                  component="a"
+                  href={`/pos/${pillar.toLowerCase()}`}
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    router.push(`/pos/${pillar.toLowerCase()}`);
+                  }}
+                  style={{ cursor: 'pointer', textDecoration: 'none' }}
                 >
                   <Typography
                     variant="body5"
@@ -428,12 +438,17 @@ const Learning = ({
                     <Box key={theme.title} sx={{ mb: 2 }}>
                       <Typography
                         variant="body1"
-                        component="h1"
+                        component="a"
+                        href={`/pos/${pillar.toLowerCase()}?se_subDomains=${encodeURIComponent(
+                          theme.title
+                        )}`}
                         sx={{
                           fontFamily: 'Poppins',
                           fontWeight: 600,
                           color: '#F17B06',
                           mb: 0.2,
+                          display: 'block',
+                          textDecoration: 'none',
                         }}
                       >
                         <SpeakableText>{theme.title}</SpeakableText>
@@ -460,8 +475,13 @@ const Learning = ({
                       alignItems: 'center',
                       mt: 1,
                     }}
-                    onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
-                    style={{ cursor: 'pointer' }}
+                    component="a"
+                    href={`/pos/${pillar.toLowerCase()}`}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      router.push(`/pos/${pillar.toLowerCase()}`);
+                    }}
+                    style={{ cursor: 'pointer', textDecoration: 'none' }}
                   >
                     <Typography
                       variant="body1"

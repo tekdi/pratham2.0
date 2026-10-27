@@ -86,6 +86,21 @@ export async function getPillarSeoData(
   }
 }
 
+// Static: the pillar set is fixed, so no API call is needed for the home block.
+export function getHomeSeoData(heading: string, description?: string): SeoBlockData {
+  return {
+    heading,
+    description: clean(description),
+    links: [
+      { name: 'Learning for School', href: '/pos/school' },
+      { name: 'Learning for Work', href: '/pos/work' },
+      { name: 'Learning for Life', href: '/pos/life' },
+      { name: 'Programs', href: '/pos/program' },
+      { name: 'About Us', href: '/pos/about-us' },
+    ],
+  };
+}
+
 export async function getCourseSeoData(
   courseId: string
 ): Promise<SeoBlockData | null> {
