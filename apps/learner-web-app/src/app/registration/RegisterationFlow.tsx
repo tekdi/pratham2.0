@@ -729,7 +729,6 @@ const RegisterationFlow = () => {
     try {
       const result = await userNameExist({
         firstName: data?.firstName || '',
-        middleName: data?.middleName || '',
         lastName: data?.lastName || '',
       });
       setUsername(result?.suggestedUsername || '');
