@@ -66,7 +66,7 @@ export const L2BatchCreate = {
           payload: {
             code: 'subDomain',
             fetchUrl:
-              'https://dev-middleware.prathamdigital.org/api/framework/v1/read/pos-framework',
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
             findcode: 'subject',
             selectedvalue: ['Career Exploration'],
           },
@@ -99,7 +99,7 @@ export const L2BatchCreate = {
           payload: {
             code: 'subject',
             fetchUrl:
-              'https://dev-middleware.prathamdigital.org/api/framework/v1/read/pos-framework',
+              `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
             findcode: 'skills',
             selectedvalue: '**',
           },
