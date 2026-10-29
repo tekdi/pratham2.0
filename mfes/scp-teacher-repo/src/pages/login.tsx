@@ -37,6 +37,7 @@ import loginImg from './../assets/images/login-image.jpg';
 import { UpdateDeviceNotification } from '@/services/NotificationService';
 import { TENANT_DATA } from '../../app.config';
 import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
+import { startSessionTimer } from '@shared-lib-v2/utils/sessionTimeout';
 
 const LoginPage = () => {
   const { t, i18n } = useTranslation();
@@ -235,6 +236,7 @@ const LoginPage = () => {
             }
 
             await setSecureRefreshToken(refreshToken);
+            startSessionTimer();
 
             const userResponse = await getUserId();
 

@@ -29,6 +29,7 @@ import TenantService from '@/services/TenantService';
 import { transformLabel } from '@/utils/helper';
 import useStore from '@/store/store';
 import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
+import { startSessionTimer } from '@shared-lib-v2/utils/sessionTimeout';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -208,6 +209,7 @@ const SSOContent = () => {
       const refreshToken = response?.refresh_token;
       localStorage.setItem('token', token);
       await setSecureRefreshToken(refreshToken);
+      startSessionTimer();
 
       const userResponse = await getUserId();
       console.log('userResponse=========>', userResponse);
