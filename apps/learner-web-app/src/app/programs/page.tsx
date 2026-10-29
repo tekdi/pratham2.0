@@ -34,16 +34,29 @@ function ProgramsContent() {
     const processData = async () => {
       // Safely access localStorage only on client side
       const storedUserId = localStorage.getItem('userId');
+
+      // Hide Explore tab for pratham.org users (match on username or email).
+      // Resolved before setUserId so the Explore tab never flashes for them.
+      const isPrathamOrgEmail = (value?: string | null) =>
+        (value || '').trim().toLowerCase().endsWith('@pratham.org');
+      let isPrathamOrgUser = isPrathamOrgEmail(localStorage.getItem('userIdName'));
+      if (!isPrathamOrgUser && storedUserId) {
+        try {
+          const userDetails = await getUserDetails(storedUserId, true);
+          isPrathamOrgUser = isPrathamOrgEmail(userDetails?.result?.userData?.email);
+        } catch (error) {
+          console.error('Failed to fetch user email:', error);
+        }
+      }
+      setHideExploreTab(isPrathamOrgUser);
+      if (isPrathamOrgUser) {
+        setCurrentTab(1);
+      }
       setUserId(storedUserId);
-      
+
       // Check if user is on Android app
       const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       setIsAndroidApp(isAndroid);
-
-      // Hide Explore tab for pratham.org users
-      const userIdName = localStorage.getItem('userIdName') || '';
-      const isPrathamOrgUser = userIdName.toLowerCase().endsWith('@pratham.org');
-      setHideExploreTab(isPrathamOrgUser);
 
       // Check if enrollTenantId exists in localStorage
       const enrollTenantId = localStorage.getItem('enrollTenantId');
