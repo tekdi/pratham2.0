@@ -57,11 +57,6 @@ function ProgramsContent() {
       const isAndroid = localStorage.getItem('isAndroidApp') === 'yes';
       setIsAndroidApp(isAndroid);
 
-      // Hide Explore tab for pratham.org users
-      const userIdName = localStorage.getItem('userIdName') || '';
-      const isPrathamOrgUser = userIdName.toLowerCase().endsWith('@pratham.org');
-      setHideExploreTab(isPrathamOrgUser);
-
       // Check if enrollTenantId exists in localStorage
       const enrollTenantId = localStorage.getItem('enrollTenantId');
       if (enrollTenantId && storedUserId) {
