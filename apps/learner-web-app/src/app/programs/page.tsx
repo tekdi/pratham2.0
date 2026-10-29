@@ -35,15 +35,14 @@ function ProgramsContent() {
       // Safely access localStorage only on client side
       const storedUserId = localStorage.getItem('userId');
 
-      // Hide Explore tab for pratham.org users (match on username or email).
+      // Hide Explore tab for pratham.org users (email from user read API).
       // Resolved before setUserId so the Explore tab never flashes for them.
-      const isPrathamOrgEmail = (value?: string | null) =>
-        (value || '').trim().toLowerCase().endsWith('@pratham.org');
-      let isPrathamOrgUser = isPrathamOrgEmail(localStorage.getItem('userIdName'));
-      if (!isPrathamOrgUser && storedUserId) {
+      let isPrathamOrgUser = false;
+      if (storedUserId) {
         try {
           const userDetails = await getUserDetails(storedUserId, true);
-          isPrathamOrgUser = isPrathamOrgEmail(userDetails?.result?.userData?.email);
+          const email = userDetails?.result?.userData?.email || '';
+          isPrathamOrgUser = email.trim().toLowerCase().endsWith('@pratham.org');
         } catch (error) {
           console.error('Failed to fetch user email:', error);
         }
