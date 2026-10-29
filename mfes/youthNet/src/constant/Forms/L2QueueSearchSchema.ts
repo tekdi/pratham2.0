@@ -147,8 +147,8 @@ export const L2QueueSearchSchema = {
         payload: {
           code: 'subDomain',
           fetchUrl:
-            'https://dev-middleware.prathamdigital.org/api/framework/v1/read/youthnet-framework',
-          findcode: 'stream',
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
+          findcode: 'subject',
           selectedvalue: ['Career Exploration'],
         },
         callType: 'initial',
@@ -181,7 +181,7 @@ export const L2QueueSearchSchema = {
         payload: {
           code: 'subject',
           fetchUrl:
-            'https://dev-middleware.prathamdigital.org/api/framework/v1/read/pos-framework',
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/framework/v1/read/pos-framework`,
           findcode: 'skills',
           selectedvalue: '**',
         },
