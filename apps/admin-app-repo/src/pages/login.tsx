@@ -38,6 +38,7 @@ import {
   preloadRecaptcha,
 } from '@shared-lib-v2/utils/recaptcha';
 import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
+import { startSessionTimer } from '@shared-lib-v2/utils/sessionTimeout';
 
 // Toggle back on to restore the login page's language selector.
 const SHOW_LANGUAGE_DROPDOWN = false;
@@ -204,6 +205,7 @@ const LoginPage = () => {
             const refreshToken = response?.result?.refresh_token;
             localStorage.setItem('token', token);
             await setSecureRefreshToken(refreshToken);
+            startSessionTimer();
 
             const userResponse = await getUserId();
             setUserResponse(userResponse);
