@@ -19,14 +19,17 @@ import PartnerImage from './PartnerImage';
 import { KnowledgePartner } from './partnersData';
 
 const bodyTextSx = {
-  fontSize: scaledFontSize(16),
-  color: '#444',
+  fontSize: scaledFontSize(15),
+  color: 'rgb(31, 41, 55)',
   lineHeight: 1.7,
 };
 
 const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
   <Layout>
-    <SubHeader showFilter={false} showSearch={false} />
+    {/* Search row is hidden here, so add the gap it normally provides */}
+    <Box sx={{ backgroundColor: '#fff', pb: '24px' }}>
+      <SubHeader showFilter={false} showSearch={false} />
+    </Box>
     <Box
       sx={{
         backgroundImage: `url('/images/mainpagebig.png')`,
@@ -54,14 +57,19 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
             <Link
               component={NextLink}
               href="/themantic"
-              underline="always"
+              underline="hover"
               sx={{ color: 'secondary.main', fontSize: 'inherit' }}
             >
               <SpeakableText>Home</SpeakableText>
             </Link>
-            <Typography sx={{ fontSize: 'inherit', color: '#555' }}>
+            <Link
+              component={NextLink}
+              href="/themantic#knowledge-partners"
+              underline="hover"
+              sx={{ color: 'secondary.main', fontSize: 'inherit' }}
+            >
               <SpeakableText>Knowledge Partners</SpeakableText>
-            </Typography>
+            </Link>
             <Typography
               sx={{ fontSize: 'inherit', color: '#000', fontWeight: 600 }}
             >
@@ -107,9 +115,7 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
                 <PartnerImage
                   partner={partner}
                   sx={{
-                    height: { xs: 240, md: 310 },
-                    border: '1px solid rgba(0, 0, 0, .125)',
-                    borderRadius: '2px',
+                    height: '280px',
                   }}
                 />
                 {partner.website && (
@@ -121,17 +127,25 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
                     rel="noopener noreferrer"
                     sx={{
                       mt: 1.5,
-                      py: 1.25,
-                      backgroundColor: '#3A8DDB',
-                      color: '#fff',
+                      minHeight: '44px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'rgb(56, 145, 206)',
+                      color: 'rgb(255, 255, 255)',
+                      textDecoration: 'none',
                       borderRadius: '4px',
                       boxShadow: 'none',
                       textTransform: 'none',
-                      fontSize: scaledFontSize(15),
+                      transition:
+                        'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                      fontSize: scaledFontSize(14),
                       fontWeight: 600,
                       '&:hover': {
-                        backgroundColor: 'secondary.main',
-                        boxShadow: 'none',
+                        backgroundColor: 'rgb(56, 145, 206)',
+                        textDecoration: 'none',
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
                       },
                     }}
                   >
@@ -203,13 +217,16 @@ const PartnerDetails = ({ partner }: { partner: KnowledgePartner }) => (
                         variant="outlined"
                         size="small"
                         sx={{
-                          borderColor: '#A9CBEB',
+                          border: '1px solid rgb(185, 211, 236)',
                           color: '#1F6FB8',
                           fontSize: scaledFontSize(13),
                           fontWeight: 600,
                           height: 'auto',
-                          py: 0.5,
-                          '& .MuiChip-label': { whiteSpace: 'normal' },
+                          padding: '6px 14px',
+                          borderRadius: '16px',
+                          textDecoration: 'none',
+                          '&:hover': { color: '#124f86' },
+                          '& .MuiChip-label': { whiteSpace: 'normal', p: 0 },
                         }}
                       />
                     ))}
