@@ -17,16 +17,9 @@ export interface VtBatch {
   [key: string]: unknown;
 }
 
-// Vocational Training learners sit at `in_training` for as long as they are
-// enrolled, where Second Chance learners sit at `active`. Both count as an
-// active batch member — same rule as the mobile app's
-// `useActiveBatchEligibility` (learner-app/src/utils/Helper/useActiveBatchEligibility.js).
-const ACTIVE_MEMBER_STATUSES = ['active', 'in_training'];
-
+// Any active batch the learner belongs to counts, whatever their member status.
 const isActiveBatch = (cohort: VtBatch | undefined | null): boolean =>
-  cohort?.type === 'BATCH' &&
-  cohort?.cohortStatus === 'active' &&
-  ACTIVE_MEMBER_STATUSES.includes(cohort?.cohortMemberStatus ?? '');
+  cohort?.type === 'BATCH' && cohort?.cohortStatus === 'active';
 
 const findActiveBatch = (response: any): VtBatch | null => {
   if (!Array.isArray(response?.result)) return null;
@@ -54,9 +47,9 @@ const readStoredBatch = (key: string): { batch: VtBatch | null } | null => {
 /**
  * Resolve the learner's active VT batch, or null.
  *
- * Deliberately NOT `checkUserHasActiveBatch` from cohortAssignmentHelper: that one
- * returns a bare boolean and ignores member status, so it would never see a VT
- * learner's `in_training`. It backs the SCP Assessment Attempts card, unchanged.
+ * Not `checkUserHasActiveBatch` from cohortAssignmentHelper: that one returns a
+ * bare boolean, and the batch itself is needed here for its custom fields. It
+ * backs the SCP Assessment Attempts card, unchanged.
  */
 export const getActiveVtBatch = (
   userId: string,
