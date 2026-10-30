@@ -636,10 +636,10 @@ const RegisterationFlow = () => {
             "sms": {
               "to": [updated_payload.mobile],
               "body":"Hey",
-              "templateId": "6948f41681326042a2454bb2", 
+              "templateId": "6ae2e2adba35dbc54409b3f2", 
               "replacements": {
-                "var1": username,
-                "var2": password
+                "username": username,
+                "password": password
               }
             }
           }).catch((error) => {
