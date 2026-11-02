@@ -19,15 +19,29 @@ const navButtonSx = {
   bgcolor: 'white',
   borderRadius: '16px',
   position: 'absolute',
-  top: 'calc(50% - 20px)',
+  top: '50%',
   zIndex: 2,
   transform: 'translateY(-50%)',
   color: 'primary.main',
-  '&:hover': { bgcolor: 'white' },
+  '@media (hover: hover)': {
+    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
+  },
+  // Touch screens keep the arrow background instead of a sticky hover state
+  '@media (hover: none)': { '&:hover': { backgroundColor: 'white' } },
+  // Smaller arrows below md so they sit beside the cards
+  '@media (max-width:899.95px)': {
+    padding: '4px',
+    '& .MuiSvgIcon-root': { fontSize: '20px' },
+  },
   '&.swiper-button-disabled': { opacity: 0.4 },
 };
 
-const KnowledgePartners = () => {
+// Carousel dots are off for now; pass showPagination to enable them
+const KnowledgePartners = ({
+  showPagination = false,
+}: {
+  showPagination?: boolean;
+}) => {
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
   const paginationRef = useRef<HTMLDivElement>(null);
@@ -68,8 +82,10 @@ const KnowledgePartners = () => {
       id="knowledge-partners"
       sx={{
         backgroundColor: '#fff',
-        p: { xs: 2, md: 3.5 },
+        py: 3,
+        px: 1,
         position: 'relative',
+        zIndex: 1000,
         borderRadius: '0px 6px 6px 6px',
         mt: '110px',
       }}
@@ -112,26 +128,25 @@ const KnowledgePartners = () => {
         </Typography>
       ) : (
         <>
-          <Box sx={{ position: 'relative', px: { xs: 3.5, md: 7 } }}>
+          <Box sx={{ position: 'relative', px: 3 }}>
             <IconButton
               ref={prevRef}
               aria-label="Previous partners"
-              sx={{ ...navButtonSx, left: { xs: -12, md: 16 } }}
+              sx={{ ...navButtonSx, left: 0 }}
             >
               <ArrowBackIcon />
             </IconButton>
             <IconButton
               ref={nextRef}
               aria-label="Next partners"
-              sx={{ ...navButtonSx, right: { xs: -12, md: 16 } }}
+              sx={{ ...navButtonSx, right: 0 }}
             >
               <ArrowForwardIcon />
             </IconButton>
 
             <Box
               sx={{
-                '& .swiper': { py: '8px' },
-                '& .swiper-slide': { height: 'auto' },
+                '& .swiper-slide': { height: 'auto', pb: '0 !important' },
               }}
             >
               <Swiper
@@ -142,31 +157,40 @@ const KnowledgePartners = () => {
                 watchOverflow={false}
                 autoplay={{
                   delay: 3000,
-                  disableOnInteraction: false,
+                  // On touch screens stop autoplay once a card is touched
+                  disableOnInteraction:
+                    typeof window !== 'undefined' &&
+                    window.matchMedia('(hover: none)').matches,
                   pauseOnMouseEnter: true,
                 }}
                 navigation={{
                   prevEl: prevRef.current,
                   nextEl: nextRef.current,
                 }}
-                pagination={{ el: paginationRef.current, clickable: true }}
+                pagination={
+                  showPagination
+                    ? { el: paginationRef.current, clickable: true }
+                    : false
+                }
                 onBeforeInit={(swiper: any) => {
                   swiper.params.navigation.prevEl = prevRef.current;
                   swiper.params.navigation.nextEl = nextRef.current;
-                  swiper.params.pagination.el = paginationRef.current;
+                  if (showPagination) {
+                    swiper.params.pagination.el = paginationRef.current;
+                  }
                 }}
-                // The carousel is much narrower than the window on this page,
-                // so size slides from its own width to keep cards readable
-                breakpointsBase="container"
+                // Same breakpoints as New Arrivals, capped at 4 cards
                 breakpoints={{
-                  400: { slidesPerView: 2 },
-                  640: { slidesPerView: 3 },
-                  840: { slidesPerView: 4 },
-                  1040: { slidesPerView: 5 },
+                  640: { slidesPerView: 2 },
+                  900: { slidesPerView: 3 },
+                  1200: { slidesPerView: 4 },
                 }}
               >
                 {partners.map((partner) => (
-                  <SwiperSlide key={partner.id}>
+                  <SwiperSlide
+                    key={partner.id}
+                    style={{ height: 'auto', paddingBottom: '8px' }}
+                  >
                     <PartnerCard partner={partner} />
                   </SwiperSlide>
                 ))}
@@ -174,26 +198,28 @@ const KnowledgePartners = () => {
             </Box>
           </Box>
 
-          <Box
-            ref={paginationRef}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              gap: '12px',
-              mt: 3,
-              '& .swiper-pagination-bullet': {
-                width: '8px',
-                height: '8px',
-                m: '0 !important',
-                backgroundColor: '#D0D4DA',
-                opacity: 1,
-              },
-              '& .swiper-pagination-bullet-active': {
-                backgroundColor: 'primary.main',
-              },
-            }}
-          />
+          {showPagination && (
+            <Box
+              ref={paginationRef}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                gap: '12px',
+                mt: 3,
+                '& .swiper-pagination-bullet': {
+                  width: '8px',
+                  height: '8px',
+                  m: '0 !important',
+                  backgroundColor: '#D0D4DA',
+                  opacity: 1,
+                },
+                '& .swiper-pagination-bullet-active': {
+                  backgroundColor: 'primary.main',
+                },
+              }}
+            />
+          )}
         </>
       )}
     </Box>

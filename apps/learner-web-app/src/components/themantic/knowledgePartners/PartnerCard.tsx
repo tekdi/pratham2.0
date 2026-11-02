@@ -1,95 +1,124 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Box, Tooltip, Typography } from '@mui/material';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { scaledFontSize } from '@learner/utils/scaledFontSize';
-import PartnerImage from './PartnerImage';
 import { KNOWLEDGE_PARTNERS_BASE_URL, KnowledgePartner } from './partnersData';
 
+// Card shell, image area and hover match the New Arrivals CardComponent
 const PartnerCard = ({ partner }: { partner: KnowledgePartner }) => {
-  const nameRef = useRef<HTMLParagraphElement>(null);
-  const [showFullName, setShowFullName] = useState(false);
-
-  // Only offer the full-name tooltip when the 2-line clamp actually cut the name
-  const handleNameTooltipOpen = () => {
-    const el = nameRef.current;
-    setShowFullName(!!el && el.scrollHeight > el.clientHeight);
-  };
-
   return (
     <Box
       component={Link}
       href={`${KNOWLEDGE_PARTNERS_BASE_URL}/${partner.id}`}
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '240px',
-        boxSizing: 'border-box',
-        p: '10px',
-        pb: 3,
         backgroundColor: '#fff',
+        position: 'relative',
+        cursor: 'pointer',
+        transition: 'transform 0.2s ease-in-out',
+        boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
         border: '1px solid rgba(0, 0, 0, .125)',
+        minHeight: '286px',
         borderRadius: '.25rem',
-        boxShadow: '0 0.15rem 0.6rem 0 rgba(33, 40, 50, 0.1)',
         textDecoration: 'none',
         color: 'inherit',
-        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        display: 'block',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: '0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15)',
+          transform: 'scale(1.07)',
         },
       }}
     >
-      <PartnerImage partner={partner} sx={{ height: '130px', flexShrink: 0 }} />
-      <Tooltip
-        title={partner.name}
-        arrow
-        placement="top"
-        componentsProps={{
-          tooltip: {
-            sx: {
-              bgcolor: '#fff',
-              color: '#000',
-              border: '1px solid rgba(0, 0, 0, .125)',
-              borderRadius: '4px',
-              boxShadow: '0 0.15rem 0.6rem 0 rgba(33, 40, 50, 0.1)',
-              fontSize: scaledFontSize(10),
-              fontWeight: 500,
-              lineHeight: 1.4,
-              px: 0.5,
-              py: 0.5,
-              maxWidth: 210,
-              textAlign: 'center',
-              marginBottom: '5px !important',
-            },
-          },
-          arrow: {
-            sx: {
-              color: '#fff',
-              '&::before': { border: '1px solid rgba(0, 0, 0, .125)' },
-            },
-          },
+      <Box
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          position: 'relative',
+          zIndex: 1,
         }}
-        open={showFullName}
-        onOpen={handleNameTooltipOpen}
-        onClose={() => setShowFullName(false)}
       >
+        <Box sx={{ margin: '8px', width: 'calc(100% - 16px)' }}>
+          {partner.image && (
+            <img
+              src={partner.image}
+              alt={partner.name}
+              style={{
+                display: 'block',
+                width: '100%',
+                height: '200px',
+                objectFit: 'contain',
+              }}
+            />
+          )}
+        </Box>
+
+        <Tooltip
+          title={partner.name}
+          arrow
+          componentsProps={{
+            tooltip: {
+              sx: {
+                bgcolor: '#ffffff',
+                color: '#000000',
+                border: '1px solid rgba(0, 0, 0, .125)',
+                boxShadow: '0 0.15rem 0.6rem 0 rgba(33, 40, 50, 0.1)',
+                fontSize: scaledFontSize(11),
+                lineHeight: 1.4,
+                px: 0.75,
+                py: 0.5,
+                marginTop: '10px !important',
+              },
+            },
+            arrow: {
+              sx: {
+                color: '#ffffff',
+                '&::before': { border: '1px solid rgba(0, 0, 0, .125)' },
+              },
+            },
+          }}
+        >
+          <Typography
+            sx={{
+              mt: 0.3,
+              mb: 0.3,
+              px: '16px',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              fontSize: scaledFontSize(16),
+              lineHeight: '22px',
+              minHeight: '44px',
+              wordBreak: 'break-word',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontWeight: 600,
+              color: 'black',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              letterSpacing: '0px',
+            }}
+          >
+            <SpeakableText text={partner.name}>{partner.name}</SpeakableText>
+          </Typography>
+        </Tooltip>
+
         <Typography
-          ref={nameRef}
           sx={{
-            mt: 2,
-            flexShrink: 0,
-            fontSize: `${scaledFontSize(16)} !important`,
-            lineHeight: '20px !important',
-            fontWeight: '600 !important',
-            color: '#000',
+            fontSize: scaledFontSize(12),
+            color: 'rgb(75, 85, 99)',
             textAlign: 'center',
-            textTransform: 'uppercase !important',
-            letterSpacing: '0.5px',
-            overflowWrap: 'break-word',
-            hyphens: 'auto',
+            lineHeight: 1.4,
+            letterSpacing: '0px',
+            px: '16px',
+            mb: 2,
+            minHeight: '34px',
+            wordBreak: 'break-word',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -97,22 +126,11 @@ const PartnerCard = ({ partner }: { partner: KnowledgePartner }) => {
             textOverflow: 'ellipsis',
           }}
         >
-          <SpeakableText text={partner.name}>{partner.name}</SpeakableText>
+          <SpeakableText text={partner.partnerType}>
+            {partner.partnerType}
+          </SpeakableText>
         </Typography>
-      </Tooltip>
-      <Typography
-        sx={{
-          mt: 0.75,
-          fontSize: `${scaledFontSize(12)} !important`,
-          color: 'rgb(75, 85, 99) !important',
-          textAlign: 'center',
-          lineHeight: 1.4,
-        }}
-      >
-        <SpeakableText text={partner.partnerType}>
-          {partner.partnerType}
-        </SpeakableText>
-      </Typography>
+      </Box>
     </Box>
   );
 };

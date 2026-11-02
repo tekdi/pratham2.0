@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Box } from '@mui/material';
+import { scaledFontSize } from '@learner/utils/scaledFontSize';
 import { KnowledgePartner } from './partnersData';
 
 // Grey box showing the partner's photo/logo, scaled to fit without cropping
@@ -14,14 +15,19 @@ const PartnerImage = ({
 }) => (
   <Box
     sx={{
-      backgroundColor: '#F4F5F7',
+      backgroundColor: 'rgb(246, 247, 249)',
+      border: '1px solid rgba(0, 0, 0, 0.125)',
+      borderRadius: '4px',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       textAlign: 'center',
       overflow: 'hidden',
-      px: 1.5,
+      boxSizing: 'border-box',
+      p: '16px',
+      fontSize: scaledFontSize(12),
+      color: 'rgb(75, 85, 99)',
       ...sx,
     }}
   >

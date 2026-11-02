@@ -149,7 +149,8 @@ const List: React.FC<ListProps> = ({
           <Box
             sx={{
               backgroundColor: '#fff',
-              padding: 3.5,
+              py: 3,
+              px: 1,
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
@@ -195,11 +196,9 @@ const List: React.FC<ListProps> = ({
                 '& .css-17kujh3': {
                   overflowY: 'unset !important',
                 },
-                '& .swiper': {
-                  paddingBottom: '20px',
-                },
                 '& .swiper-slide': {
                   height: 'auto',
+                  pb: '0 !important',
                 },
               }}
             >
@@ -224,14 +223,33 @@ const List: React.FC<ListProps> = ({
                   _subBox: {
                     sx: {
                       position: 'relative',
-                      px: { xs: 0, md: 4 },
+                      px: 3,
+                      // Smaller arrows below md so they sit beside the cards
+                      '& > .MuiIconButton-root': {
+                        '@media (hover: hover)': {
+                          '&:hover': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                          },
+                        },
+                        // Touch screens keep the arrow background (no sticky hover)
+                        '@media (hover: none)': {
+                          '&:hover': { backgroundColor: 'white' },
+                        },
+                        '@media (max-width:899.95px)': {
+                          padding: '4px',
+                          '& .MuiSvgIcon-root': { fontSize: '20px' },
+                        },
+                      },
                     },
                   },
                   _carousel: {
                     slidesPerView: 1,
                     autoplay: {
                       delay: 3000,
-                      disableOnInteraction: false,
+                      // On touch screens stop autoplay once a card is touched
+                      disableOnInteraction:
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(hover: none)').matches,
                       pauseOnMouseEnter: true,
                     },
                     loop: true,
@@ -246,6 +264,7 @@ const List: React.FC<ListProps> = ({
             </Box>
 
           </Box>
+          <KnowledgePartners />
         {pageViews != null && (
           <Box
             sx={{
@@ -266,7 +285,6 @@ const List: React.FC<ListProps> = ({
             </SpeakableText>
           </Box>
         )}
-          <KnowledgePartners />
         </Box>
       </Box>
     </Layout>
