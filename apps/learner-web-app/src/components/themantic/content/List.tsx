@@ -149,7 +149,8 @@ const List: React.FC<ListProps> = ({
           <Box
             sx={{
               backgroundColor: '#fff',
-              padding: 3.5,
+              py: 3,
+              px: 1,
               position: 'relative',
               zIndex: 1000,
               borderRadius: '0px 6px 6px 6px',
@@ -195,11 +196,9 @@ const List: React.FC<ListProps> = ({
                 '& .css-17kujh3': {
                   overflowY: 'unset !important',
                 },
-                '& .swiper': {
-                  paddingBottom: '20px',
-                },
                 '& .swiper-slide': {
                   height: 'auto',
+                  pb: '0 !important',
                 },
               }}
             >
@@ -224,7 +223,7 @@ const List: React.FC<ListProps> = ({
                   _subBox: {
                     sx: {
                       position: 'relative',
-                      px: 4,
+                      px: 3,
                       // Smaller arrows below md so they sit beside the cards
                       '& > .MuiIconButton-root': {
                         '@media (hover: hover)': {

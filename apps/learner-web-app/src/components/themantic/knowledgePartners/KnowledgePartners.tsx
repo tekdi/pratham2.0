@@ -82,7 +82,8 @@ const KnowledgePartners = ({
       id="knowledge-partners"
       sx={{
         backgroundColor: '#fff',
-        p: 3.5,
+        py: 3,
+        px: 1,
         position: 'relative',
         zIndex: 1000,
         borderRadius: '0px 6px 6px 6px',
@@ -127,7 +128,7 @@ const KnowledgePartners = ({
         </Typography>
       ) : (
         <>
-          <Box sx={{ position: 'relative', px: 4 }}>
+          <Box sx={{ position: 'relative', px: 3 }}>
             <IconButton
               ref={prevRef}
               aria-label="Previous partners"
@@ -145,8 +146,7 @@ const KnowledgePartners = ({
 
             <Box
               sx={{
-                '& .swiper': { paddingBottom: '20px' },
-                '& .swiper-slide': { height: 'auto' },
+                '& .swiper-slide': { height: 'auto', pb: '0 !important' },
               }}
             >
               <Swiper
