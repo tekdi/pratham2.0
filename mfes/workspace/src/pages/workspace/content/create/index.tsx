@@ -177,7 +177,7 @@ const CreatePage = () => {
       },
     },
     {
-      title: 'Course Shell Manage',
+      title: 'Manage Course Shell',
       description: 'Create and manage course shells',
       icon: <ViewQuiltOutlinedIcon fontSize="large" />,
       onClick: () => router.push('/workspace/content/shell-manage'),
