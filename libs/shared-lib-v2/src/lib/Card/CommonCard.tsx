@@ -222,7 +222,12 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             title={title}
             component="img"
             image={image || '/assets/images/default.png'}
-            alt={imageAlt || 'Image'}
+            // No caller passes imageAlt, so fall back to the content name
+            // rather than the useless literal "Image".
+            alt={imageAlt || title || ''}
+            // Gives the browser an aspect ratio before the image loads.
+            width={320}
+            height={180}
             sx={{
               width: '100%',
               height: orientation === 'horizontal' ? '140px' : 'auto',

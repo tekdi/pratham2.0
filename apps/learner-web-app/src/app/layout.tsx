@@ -9,24 +9,19 @@ import ClientLayout from './ClientLayout';
 import GoogleAnalyticsTracker from '@learner/components/GoogleAnalyticsTracker/GoogleAnalyticsTracker';
 import { FooterWrapper } from '@learner/components/Footer';
 import ChunkReloadGuard from '@shared-lib-v2/lib/ChunkReloadGuard/ChunkReloadGuard';
+import { siteConfig } from '@learner/utils/seo/siteConfig';
+import { buildMetadata } from '@learner/utils/seo/buildMetadata';
+import {
+  organizationJsonLd,
+  webSiteJsonLd,
+} from '@learner/utils/seo/jsonLd';
+import JsonLd from '@learner/components/seo/JsonLd';
 
 export const metadata = {
-  title: 'Welcome to learner-web-app',
-  description:
-    'Learner web app is a platform for users to learn and grow by consuming educational content',
-  openGraph: {
-    title: 'Welcome to learner-web-app',
-    description:
-      'Learner web app is a platform for users to learn and grow by consuming educational content',
-    images: [
-      {
-        url: `/logo.png`,
-        width: 800,
-        height: 600,
-      },
-    ],
-    type: 'website',
-  },
+  // metadataBase makes every relative OG/canonical URL absolute; without it
+  // they resolved against localhost in production.
+  ...(siteConfig.baseUrl ? { metadataBase: new URL(siteConfig.baseUrl) } : {}),
+  ...buildMetadata(),
 };
 
 export default function RootLayout({
@@ -75,6 +70,16 @@ export default function RootLayout({
         />
       </head>
       <body>
+          {siteConfig.baseUrl && (
+            <JsonLd
+              data={[
+                organizationJsonLd(),
+                webSiteJsonLd(
+                  siteConfig.variant === 'pos' ? '/pos/search' : undefined
+                ),
+              ]}
+            />
+          )}
           <ChunkReloadGuard />
           <ClientLayout>
 

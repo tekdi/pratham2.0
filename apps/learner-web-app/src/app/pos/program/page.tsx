@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import { TenantName } from '../../../utils/app.constant';
+import { buildMetadata } from '@learner/utils/seo/buildMetadata';
 
 export function generateMetadata({
   searchParams: { program },
@@ -22,22 +23,13 @@ export function generateMetadata({
     (descriptions as Record<string, string>)[program] ||
     `Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.`;
 
-  return {
+  // Canonical drops ?program= so the variants do not compete as separate URLs.
+  return buildMetadata({
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      images: [
-        {
-          url: `/images/pos_program.jpg`,
-          width: 800,
-          height: 600,
-        },
-      ],
-      type: 'website',
-    },
-  };
+    image: '/images/pos_program.jpg',
+    path: '/pos/program',
+  });
 }
 
 const List = dynamic(() => import('@learner/components/pos/List'), {

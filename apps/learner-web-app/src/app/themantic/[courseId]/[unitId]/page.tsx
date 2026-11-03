@@ -8,9 +8,20 @@ import { CardComponent } from '@learner/components/themantic/content/List';
 import { Box, Container } from '@mui/material';
 import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
+import { getContentTrail, childrenOf } from '@learner/utils/seo/contentData';
+import { itemListJsonLd, breadcrumbJsonLd } from '@learner/utils/seo/jsonLd';
+import JsonLd from '@learner/components/seo/JsonLd';
+import SeoShell from '@learner/components/seo/SeoShell';
+import SeoFallback from '@learner/components/seo/SeoFallback';
+
+// Cache the rendered page for an hour instead of re-fetching per request.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  // Was describing the course; the unit's own title belongs on a unit page.
+  return await getMetadata(params.courseId, params.unitId, {
+    path: `/themantic/${params.courseId}/${params.unitId}`,
+  });
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
@@ -55,8 +66,35 @@ const App = async ({ params }: { params: { courseId: string; unitId: string } })
   }
 }
 
+  const { unit, crumbs, unitPath } = await getContentTrail({
+    homePath: '/themantic',
+    homeName: 'Experimento India',
+    coursePathBase: '/themantic',
+    courseId: params?.courseId,
+    unitId: params?.unitId,
+  });
+
+  const items = childrenOf(unit).map((item: any) => ({
+    name: item.name,
+    path: `${unitPath}/${item.identifier}`,
+  }));
+
   return (
     <div className="thematic-page">
+      {unit && (
+        <JsonLd
+          data={[itemListJsonLd(items), breadcrumbJsonLd(crumbs)]}
+        />
+      )}
+      <SeoFallback>
+        <SeoShell
+          title={unit?.name}
+          description={unit?.description}
+          crumbs={crumbs}
+          items={items}
+          itemsLabel="In this unit"
+        />
+      </SeoFallback>
       <Layout sx={backgroundSx}>
         <SubHeader showFilter={false} />
         <Box className='bs-container' sx={{ px: { xs: 1, sm: 2, md: 3 } }}>

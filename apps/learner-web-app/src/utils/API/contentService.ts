@@ -32,14 +32,20 @@ export const hierarchyAPI = async (doId: string, params?: object) => {
   }
 };
 
-export const fetchContent = async (identifier: any) => {
+// mode defaults to 'edit' for existing callers; pass null for the public read
+// so SEO metadata never picks up an unpublished draft.
+export const fetchContent = async (
+  identifier: any,
+  { mode = 'edit' }: { mode?: string | null } = {}
+) => {
   try {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
     const FIELDS = 'description,name,appIcon,posterImage,artifactUrl,mimeType,contentLanguage,program';
     const LICENSE_DETAILS = 'name,description,url';
-    const MODE = 'edit';
     const response = await get(
-      `${API_URL}?fields=${FIELDS}&mode=${MODE}&licenseDetails=${LICENSE_DETAILS}`
+      `${API_URL}?fields=${FIELDS}${
+        mode ? `&mode=${mode}` : ''
+      }&licenseDetails=${LICENSE_DETAILS}`
     );
 
     return response?.data?.result?.content;

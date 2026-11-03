@@ -19,7 +19,9 @@ import {
   KeyboardArrowDown,
   KeyboardArrowUp,
 } from '@mui/icons-material';
-import { useTranslation } from 'next-i18next';
+// next-i18next resolves to undefined when this tree is rendered from a Server
+// Component, which 500s the route. Use the app's own translation context.
+import { useTranslation } from '@shared-lib';
 import Image from 'next/image';
 import SpeakableText from '@shared-lib-v2/lib/textToSpeech/SpeakableText';
 import { useColorInversion } from '../../context/ColorInversionContext';

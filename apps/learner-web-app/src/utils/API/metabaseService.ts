@@ -1,27 +1,27 @@
-import { fetchContent, hierarchyAPI } from './contentService';
+import { buildMetadata } from '../seo/buildMetadata';
+import { getContent, getHierarchy } from '../seo/contentData';
 
-export async function getMetadata(identifier: any, unitId?: any) {
-  let product = { name: '', description: '', appIcon: '', posterImage: '' };
-  if (unitId) {
-    product = await hierarchyAPI(unitId);
-  } else {
-    product = await fetchContent(identifier);
-  }
-  return {
+type MetadataOptions = {
+  /** Path on this site, used for the canonical URL. */
+  path?: string;
+  type?: 'website' | 'article' | 'video.other';
+  noindex?: boolean;
+};
+
+export async function getMetadata(
+  identifier: any,
+  unitId?: any,
+  options: MetadataOptions = {}
+) {
+  // Cached, so the page body can reuse the same response for JSON-LD.
+  const product = unitId
+    ? await getHierarchy(unitId)
+    : await getContent(identifier);
+
+  return buildMetadata({
     title: product?.name,
     description: product?.description,
-    openGraph: {
-      title: product?.name,
-      description: product?.description,
-      images: [
-        {
-          url:
-            product?.posterImage || product?.appIcon || '/images/image_ver.png',
-          width: 1200,
-          height: 630,
-          alt: product?.name,
-        },
-      ],
-    },
-  };
+    image: product?.posterImage || product?.appIcon,
+    ...options,
+  });
 }
