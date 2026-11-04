@@ -3,6 +3,10 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
+import { getCourseSeoData } from '@learner/utils/API/seoContent';
+
 import Layout from '@learner/components/themantic/layout/Layout';
 import { CardComponent } from '@learner/components/themantic/content/List';
 import { Box, Container } from '@mui/material';
@@ -11,7 +15,11 @@ import { cookies } from 'next/headers';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  return await getMetadata(
+    params.courseId,
+    undefined,
+    `/themantic/${params.courseId}`
+  );
 }
 
 
@@ -56,8 +64,12 @@ if (courseId) {
 }
 
 
+  const seoData = await getCourseSeoData(params?.courseId);
+
   return (
     <div className="thematic-page">
+      <SeoJsonLd items={seoData?.jsonLd} />
+      <SeoSsrContent data={seoData} />
       <Layout sx={backgroundSx}>
         <SubHeader showFilter={false} />
         <Box className='bs-container bs-px-5'>

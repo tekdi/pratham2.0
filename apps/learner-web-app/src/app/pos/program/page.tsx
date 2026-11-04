@@ -1,68 +1,11 @@
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import { absoluteUrl, absoluteImage } from '@learner/utils/seo';
 import { TenantName } from '../../../utils/app.constant';
 
-export function generateMetadata({
-  searchParams: { program },
-}: {
-  searchParams: { program: string };
-}) {
-  const titles = {
-    "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
-    'Vocational Training': 'Vocational Training',
-  };
-
-  const descriptions = {
-      "Second Chance": `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
-    'Vocational Training': `Pratham's Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.`,
-  };
-
-  const title =
-    (titles as Record<string, string>)[program] || 'Learning for Life';
-  const description =
-    (descriptions as Record<string, string>)[program] ||
-    `Learning for Life encompasses skills and knowledge that are a part of lifelong learning like transferable skills, interests, hobbies, and creativity. These also include life skills but are not limited to them.  It emphasises environmental awareness, physical and mental well-being, and extends learning beyond scholastic subjects.`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      images: [
-        {
-          url: `/images/pos_program.jpg`,
-          width: 800,
-          height: 600,
-        },
-      ],
-      type: 'website',
-    },
-  };
-}
-
-const List = dynamic(() => import('@learner/components/pos/List'), {
-  ssr: false,
-});
-
-export default function PosPage() {
-  return (
-    <List
-      pagename={{
-        'Vocational Training': TenantName.YOUTHNET,
-        "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
-        'Creativity Club': TenantName.CREATIVITY_CLUB,
-        'Early Childhood Education': TenantName.EARLY_CHILDHOOD_EDUCATION,
-        'Inclusive Education (ENABLE)': TenantName.INCLUSIVE_EDUCATION,
-        'Elementary': TenantName.ELEMENTARY,
-        'Annual Status of Education Report': TenantName.ANNUAL_STATUS_OF_EDUCATION_REPORT,
-      }}
-      _content={{
-        contentTabs: ['content'],
-        isOpenColapsed: ['contentLanguage', 'se_domains', 'se_subDomains', 'se_subjects'],
-      }}
-      _infoCard={{
-        item: {
-          description: {
+// One source for both the page metadata and the on-page copy, so the two
+// cannot drift apart. Keys match the `program` query parameter.
+const PROGRAM_DESCRIPTIONS: Record<string, string> = {
             "Second Chance": `The ${TenantName.SECOND_CHANCE_PROGRAM} by Pratham is a powerful initiative that helps young girls and women who dropped out of school complete their Grade 10 education. By bringing learning closer to home and offering the support they need, the program breaks barriers like early marriage, household responsibilities, and lack of access. It opens doors to higher education, skills training, and better job opportunities, giving women a real shot at a brighter future.`,
             'Vocational Training':
               'Pratham\'s Vocational Skilling Program, launched in 2005, empowers youth from underprivileged backgrounds by equipping them with practical, job-ready skills. With a presence across India, it opens doors to employment in over 10 key sectors, supported by affiliations like NSDC. In response to changing times, the program evolved into a Hybrid Skilling model, blending digital tools with training to help young people thrive in a post-pandemic world.',
@@ -81,9 +24,93 @@ Pratham has developed the CAMaL pedagogy, which stands for Combined Activities f
 At Pratham, we believe that a combination of activities helps children engage and learn. For example, reading aloud, participating in discussions on what they have read or heard, activities with phonetic charts, playing a variety of word games, expressing their own views orally and on paper – are all part of the process of learning to read. We do activities with children in large groups, small groups and individually`,
               "Annual Status of Education Report": `ASER Centre is the measurement, assessment, and research unit of Pratham Education Foundation. The unit uses simple yet rigorous methods to generate evidence at scale on the impact of social sector programs and policies, focusing mainly on the education sector. More info: https://asercentre.org/
 `
-          },
+          };
+
+const PROGRAM_TITLES: Record<string, string> = {
+  'Second Chance': TenantName.SECOND_CHANCE_PROGRAM,
+  'Vocational Training': 'Vocational Training',
+  'Creativity Club': 'Creativity Club',
+  'Early Childhood Education': 'Early Childhood Education',
+  'Inclusive Education (ENABLE)': 'Inclusive Education (ENABLE)',
+  Elementary: 'Elementary',
+  'Annual Status of Education Report': 'Annual Status of Education Report',
+};
+
+// /pos/program with no program selected is its own page, not a copy of /pos/life.
+const DEFAULT_TITLE = 'Our Programs';
+const DEFAULT_DESCRIPTION =
+  'Explore Pratham\u2019s education programs \u2014 Second Chance, Vocational Training, Creativity Club, Early Childhood Education, Inclusive Education, Elementary and ASER \u2014 with free learning resources for every stage.';
+
+export function generateMetadata({
+  searchParams: { program },
+}: {
+  searchParams: { program: string };
+}) {
+  const title = PROGRAM_TITLES[program] || DEFAULT_TITLE;
+  const description = PROGRAM_DESCRIPTIONS[program] || DEFAULT_DESCRIPTION;
+
+  return {
+    // `program` selects the content, so it stays in the canonical;
+    // only UI/tracking params are stripped.
+    alternates: {
+      canonical: absoluteUrl(
+        program ? `/pos/program?program=${encodeURIComponent(program)}` : '/pos/program'
+      ),
+    },
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: absoluteImage('/images/pos_program.jpg'),
+          width: 800,
+          height: 600,
+        },
+      ],
+      type: 'website',
+    },
+  };
+}
+
+const List = dynamic(() => import('@learner/components/pos/List'), {
+  ssr: false,
+});
+
+export default function PosPage({
+  searchParams,
+}: {
+  searchParams: { program: string };
+}) {
+  // Reuse generateMetadata so the heading never drifts from the title.
+  const meta = generateMetadata({ searchParams }) as any;
+
+  return (
+    <>
+      <SeoSsrContent
+        data={{ heading: meta?.title, description: meta?.description }}
+      />
+      <List
+      pagename={{
+        'Vocational Training': TenantName.YOUTHNET,
+        "Second Chance": TenantName.SECOND_CHANCE_PROGRAM,
+        'Creativity Club': TenantName.CREATIVITY_CLUB,
+        'Early Childhood Education': TenantName.EARLY_CHILDHOOD_EDUCATION,
+        'Inclusive Education (ENABLE)': TenantName.INCLUSIVE_EDUCATION,
+        'Elementary': TenantName.ELEMENTARY,
+        'Annual Status of Education Report': TenantName.ANNUAL_STATUS_OF_EDUCATION_REPORT,
+      }}
+      _content={{
+        contentTabs: ['content'],
+        isOpenColapsed: ['contentLanguage', 'se_domains', 'se_subDomains', 'se_subjects'],
+      }}
+      _infoCard={{
+        item: {
+          description: PROGRAM_DESCRIPTIONS,
         },
       }}
-    />
+      />
+    </>
   );
 }

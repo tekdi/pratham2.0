@@ -603,6 +603,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
                     >
                       {isDropdownMulti && (
                         <Checkbox
+                          // No FormControlLabel here, so name it from the option
+                          // or screen readers announce an unlabelled checkbox.
+                          inputProps={{
+                            'aria-label': String(item.name ?? item.code ?? item),
+                          }}
                           checked={selected.some(
                             (s: any) =>
                               (s?.code &&

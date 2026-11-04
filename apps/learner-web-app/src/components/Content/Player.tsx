@@ -1015,7 +1015,11 @@ const PlayerBox = ({
       width="100%"
       height="100%"
           
-            title="Embedded Localhost"
+            title={
+              item?.content?.name
+                ? `${item.content.name} player`
+                : 'Content player'
+            }
             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
           
             sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"

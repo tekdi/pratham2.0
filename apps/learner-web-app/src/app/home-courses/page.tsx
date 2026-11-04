@@ -1,6 +1,7 @@
 import React from 'react';
 import HomeCoursesClient from './HomeCoursesClient';
 import dynamic from 'next/dynamic';
+import { absoluteImage } from '@learner/utils/seo';
  import StaticFilterFields from '@learner/components/staticFilterFields/StaticFilterFields';
 
 
@@ -15,7 +16,7 @@ export const metadata = {
     description,
     images: [
       {
-        url: `/logo.png`,
+        url: absoluteImage('/logo.png'),
         width: 800,
         height: 600,
       },

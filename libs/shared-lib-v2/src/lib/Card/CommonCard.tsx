@@ -222,7 +222,9 @@ export const CommonCard: React.FC<CommonCardProps> = ({
             title={title}
             component="img"
             image={image || '/assets/images/default.png'}
-            alt={imageAlt || 'Image'}
+            // Fall back to the item title, not a generic "Image"; empty when
+            // there is no title, which marks it decorative.
+            alt={imageAlt || title || ''}
             sx={{
               width: '100%',
               height: orientation === 'horizontal' ? '140px' : 'auto',

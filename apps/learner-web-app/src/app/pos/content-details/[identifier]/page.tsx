@@ -3,18 +3,29 @@
 import React from 'react';
 import Layout from '@learner/components/pos/Layout';
 import dynamic from 'next/dynamic';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
+import { getCourseSeoData } from '@learner/utils/API/seoContent';
 import { Box } from '@mui/material';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.identifier);
+  return await getMetadata(
+    params.identifier,
+    undefined,
+    `/pos/content/${params.identifier}`
+  );
 }
 const ContentEnrollDetails = dynamic(() => import('@ContentEnrollDetails'), {
   ssr: false,
 });
-const App = () => {
+const App = async ({ params }: any) => {
+  const seoData = await getCourseSeoData(params.identifier);
   return (
-    <Layout>
+    <>
+      <SeoJsonLd items={seoData?.jsonLd} />
+      <SeoSsrContent data={seoData} />
+      <Layout>
       <Box sx={{ paddingBottom: '32px' }}>
         <ContentEnrollDetails
           isShowLayout={false}
@@ -31,6 +42,7 @@ const App = () => {
         />
       </Box>
     </Layout>
+    </>
   );
 };
 

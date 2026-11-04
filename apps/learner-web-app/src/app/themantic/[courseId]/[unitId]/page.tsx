@@ -3,6 +3,10 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
+import { getUnitSeoData } from '@learner/utils/API/seoContent';
+
 import Layout from '@learner/components/themantic/layout/Layout';
 import { CardComponent } from '@learner/components/themantic/content/List';
 import { Box, Container } from '@mui/material';
@@ -10,7 +14,12 @@ import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  // Was describing the course; a unit page must describe its own unit.
+  return await getMetadata(
+    params.courseId,
+    params.unitId,
+    `/themantic/${params.courseId}/${params.unitId}`
+  );
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
@@ -55,8 +64,12 @@ const App = async ({ params }: { params: { courseId: string; unitId: string } })
   }
 }
 
+  const seoData = await getUnitSeoData(params?.courseId, params?.unitId);
+
   return (
     <div className="thematic-page">
+      <SeoJsonLd items={seoData?.jsonLd} />
+      <SeoSsrContent data={seoData} />
       <Layout sx={backgroundSx}>
         <SubHeader showFilter={false} />
         <Box className='bs-container' sx={{ px: { xs: 1, sm: 2, md: 3 } }}>

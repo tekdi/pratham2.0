@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "fetch_shiksha": ""
+    "fetch_shiksha": "",
+    "verify:sitemap": "node apps/learner-web-app/scripts/verify-sitemap.mjs"
   },
   "private": true,
   "dependencies": {

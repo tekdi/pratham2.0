@@ -2,11 +2,16 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
+import { absoluteUrl, absoluteImage } from '@learner/utils/seo';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
+import { getHomeSeoData } from '@learner/utils/API/seoContent';
 
 const title = 'Pratham Open School Home';
 const description = `Pratham Open School offers free, downloadable videos, games, reading material and stories in 15 languages for ages 1 to 18+, designed to support self-led learning and group learning through activities and projects.`;
 
 export const metadata = {
+  alternates: { canonical: absoluteUrl('/pos') },
   title,
   description,
   openGraph: {
@@ -14,7 +19,7 @@ export const metadata = {
     description,
     images: [
       {
-        url: `/images/home-page-banner.png`,
+        url: absoluteImage('/images/home-page-banner.png'),
         width: 800,
         height: 600,
       },
@@ -29,6 +34,8 @@ const Home = dynamic(() => import('@learner/components/pos/Home'), {
 const App = () => {
   return (
     <>
+      <SeoJsonLd items={getHomeSeoData(title, description).jsonLd} />
+      <SeoSsrContent data={getHomeSeoData(title, description)} />
       <Home />
     </>
   );

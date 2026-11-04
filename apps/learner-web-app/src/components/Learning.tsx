@@ -163,7 +163,7 @@ const Learning = ({
             >
               <Typography
                 variant={mediaMD ? 'body5' : 'body4'}
-                component="h1"
+                component="h2"
                 sx={{
                   mt: 2,
                   fontFamily: 'Poppins',
@@ -177,7 +177,7 @@ const Learning = ({
               </Typography>
               <Typography
                 variant={mediaMD ? 'body9' : 'body7'}
-                component="h1"
+                component="p"
                 sx={{
                   mt: 1,
                   fontFamily: 'Poppins',
@@ -227,6 +227,10 @@ const Learning = ({
                 {domainData[index]?.map((theme: any) => (
                   <Box key={theme.title} sx={{ mb: 1 }}>
                     <Typography
+                      component="a"
+                      href={`/pos/${pillar.toLowerCase()}?se_subDomains=${encodeURIComponent(
+                        theme.title
+                      )}`}
                       variant="body5"
                       sx={{
                         fontFamily: 'Poppins',
@@ -234,6 +238,7 @@ const Learning = ({
                         lineHeight: '24px',
                         letterSpacing: '0.15px',
                         color: '#F17B06',
+                        textDecoration: 'none',
                       }}
                     >
                       <SpeakableText>{theme.title}</SpeakableText>
@@ -263,8 +268,13 @@ const Learning = ({
                     alignItems: 'center',
                     justifyContent: 'space-between',
                   }}
-                  onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
-                  style={{ cursor: 'pointer' }}
+                  component="a"
+                  href={`/pos/${pillar.toLowerCase()}`}
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    router.push(`/pos/${pillar.toLowerCase()}`);
+                  }}
+                  style={{ cursor: 'pointer', textDecoration: 'none' }}
                 >
                   <Typography
                     variant="body5"
@@ -298,7 +308,7 @@ const Learning = ({
                     {/* First line - normal text */}
                     <Typography
                       variant="body1"
-                      component="h1"
+                      component="p"
                       sx={{
                         fontWeight: 400,
                         color: '#7C766F',
@@ -321,7 +331,7 @@ const Learning = ({
                           {/* Heading for each description */}
                           <Typography
                             variant="body1"
-                            component="h1"
+                            component="p"
                             sx={{
                               fontWeight: 600,
                               color: '#1F1B13',
@@ -335,7 +345,7 @@ const Learning = ({
                           {/* Description text */}
                           <Typography
                             variant="body1"
-                            component="h1"
+                            component="p"
                             sx={{
                               fontWeight: 400,
                               color: '#7C766F',
@@ -351,7 +361,7 @@ const Learning = ({
                 ) : (
                   <Typography
                     variant="body1"
-                    component="h1"
+                    component="p"
                     sx={{
                       fontWeight: 400,
                       color: '#7C766F',
@@ -366,7 +376,7 @@ const Learning = ({
             ) : (
               <Typography
                 variant={mediaMD ? 'h5' : 'body1'}
-                component="h1"
+                component="p"
                 sx={{
                   fontFamily: 'Poppins',
                   fontWeight: 400,
@@ -414,7 +424,7 @@ const Learning = ({
                 >
                   <Typography
                     variant="body1"
-                    component="h1"
+                    component="h3"
                     sx={{
                       fontWeight: 600,
                       color: '#7C766F',
@@ -428,12 +438,17 @@ const Learning = ({
                     <Box key={theme.title} sx={{ mb: 2 }}>
                       <Typography
                         variant="body1"
-                        component="h1"
+                        component="a"
+                        href={`/pos/${pillar.toLowerCase()}?se_subDomains=${encodeURIComponent(
+                          theme.title
+                        )}`}
                         sx={{
                           fontFamily: 'Poppins',
                           fontWeight: 600,
                           color: '#F17B06',
                           mb: 0.2,
+                          display: 'block',
+                          textDecoration: 'none',
                         }}
                       >
                         <SpeakableText>{theme.title}</SpeakableText>
@@ -460,12 +475,17 @@ const Learning = ({
                       alignItems: 'center',
                       mt: 1,
                     }}
-                    onClick={() => router.push(`/pos/${pillar.toLowerCase()}`)}
-                    style={{ cursor: 'pointer' }}
+                    component="a"
+                    href={`/pos/${pillar.toLowerCase()}`}
+                    onClick={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      router.push(`/pos/${pillar.toLowerCase()}`);
+                    }}
+                    style={{ cursor: 'pointer', textDecoration: 'none' }}
                   >
                     <Typography
                       variant="body1"
-                      component="h1"
+                      component="p"
                       sx={{
                         fontFamily: 'Poppins',
                         fontWeight: 500,

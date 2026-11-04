@@ -3,13 +3,21 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
+import SeoSsrContent from '@learner/components/seo/SeoSsrContent';
+import SeoJsonLd from '@learner/components/seo/SeoJsonLd';
+import { getResourceSeoData } from '@learner/utils/API/seoContent';
+
 import Layout from '@learner/components/themantic/layout/Layout';
 import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
 import { Box } from '@mui/material';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.identifier);
+  return await getMetadata(
+    params.identifier,
+    undefined,
+    `/themantic/player/${params.identifier}`
+  );
 }
 
 const Player = dynamic(
@@ -56,8 +64,12 @@ const HomePage = async ({ params }: { params: { courseId: string; unitId: string
 
 
 
+  const seoData = await getResourceSeoData(params?.identifier);
+
   return (
     <Box className="thematic-page">
+      <SeoJsonLd items={seoData?.jsonLd} />
+      <SeoSsrContent data={seoData} />
       <Layout sx={backgroundSx}>
         <SubHeader showFilter={false} />
         <Player
