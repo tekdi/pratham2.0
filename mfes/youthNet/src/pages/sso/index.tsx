@@ -25,6 +25,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import welcomeGIF from '../../../public/images/welcome.gif';
 import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
+import { startSessionTimer } from '@shared-lib-v2/utils/sessionTimeout';
 
 interface SSOAuthParams {
   accessToken: string;
@@ -257,6 +258,7 @@ const SSOContent = () => {
       const refreshToken = response?.refresh_token;
       localStorage.setItem('token', token);
       await setSecureRefreshToken(refreshToken);
+      startSessionTimer();
 
       const userResponse = await getUserId();
         if (userResponse?.tenantData) {

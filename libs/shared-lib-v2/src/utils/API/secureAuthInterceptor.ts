@@ -18,6 +18,12 @@
  * Refresh = decrypt `secure_rt` → call the refresh API → store `token`, `secure_rt` and the
  * `authToken` cookie. If the refresh token is missing/expired the user goes to `<origin>/login`.
  *
+ * Idle timeout: a session started with `startSessionTimer()` at login ends once the user has
+ * not interacted with the site for SESSION_TIMEOUT_MINUTES (see sessionTimeout.ts). User
+ * interactions in the page and its same-origin iframes keep it alive; API calls and token
+ * refreshes do not. Checked on page load, every 30s, on tab focus, on every interaction and
+ * before every refresh.
+ *
  * How axios is reached: each instance reads its interceptors via
  * `InterceptorManager.prototype.forEach` on every request. We wrap that shared prototype
  * method to yield one extra handler; `runWhen: () => false` keeps it out of the request chain
@@ -33,6 +39,11 @@ import {
   getSecureRefreshToken,
   setSecureRefreshToken,
 } from '../secureTokenStorage';
+import {
+  clearSessionTimer,
+  isSessionExpired,
+  touchSessionTimer,
+} from '../sessionTimeout';
 
 type RetryableConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 type HeaderGetter = (name: string) => string | null | undefined;
@@ -49,10 +60,13 @@ const AUTH_TOKEN_HEADER = 'X-auth-token';
 const AUTH_COOKIE = 'authToken';
 const PROACTIVE_CHECK_MS = 30_000;
 const PROACTIVE_MARGIN_MS = 60 * 60_000; // 1 hour
+const ACTIVITY_EVENTS = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'wheel', 'scroll'];
+const ACTIVITY_THROTTLE_MS = 1_000;
 
 let refreshPromise: Promise<string | null> | null = null;
 let redirecting = false;
 let lastProactiveToken: string | null = null;
+let lastActivityHandledAt = 0;
 
 // ---------------------------------------------------------------------------------------
 // Token helpers
@@ -154,6 +168,7 @@ const callRefreshApi = async (): Promise<string | null> => {
 const getFreshAccessToken = (failedToken: string): Promise<string | null> => {
   if (!refreshPromise) {
     const run = async () => {
+      if (isSessionExpired()) return null;
       const current = localStorage.getItem('token');
       if (current && current !== failedToken) {
         syncAuthCookie(current);
@@ -171,6 +186,7 @@ const getFreshAccessToken = (failedToken: string): Promise<string | null> => {
 
 const redirectToLogin = () => {
   clearSecureRefreshToken();
+  clearSessionTimer();
   localStorage.removeItem('token');
   if (redirecting || window.location.pathname === '/login') return;
   redirecting = true;
@@ -184,12 +200,29 @@ const renewOrLogout = async (failedToken: string): Promise<string | null> => {
   return accessToken;
 };
 
+/** Ends the session once SESSION_TIMEOUT_MINUTES have passed since login. */
+const logoutIfSessionExpired = (): boolean => {
+  if (!isSessionExpired()) return false;
+  redirectToLogin();
+  return true;
+};
+
+/** User interaction: log out if the idle limit was already hit, otherwise extend the session. */
+const onUserActivity = () => {
+  const now = Date.now();
+  if (now - lastActivityHandledAt < ACTIVITY_THROTTLE_MS) return;
+  lastActivityHandledAt = now;
+  if (logoutIfSessionExpired()) return;
+  touchSessionTimer();
+};
+
 /**
  * Local expiry check (no network) that renews the token once it expires within
  * PROACTIVE_MARGIN_MS. The window is capped at half the token lifetime: for tokens living
  * <= 1 hour every fresh token would otherwise count as "expiring" and refresh on every tick.
  */
 const refreshIfExpiringSoon = () => {
+  if (logoutIfSessionExpired()) return;
   if (document.visibilityState !== 'visible') return;
   const token = localStorage.getItem('token');
   if (!token || token === lastProactiveToken) return;
@@ -343,6 +376,9 @@ const installInWindow = (win: any) => {
     if (!win || win[PATCH_FLAG]) return;
     patchFetch(win);
     patchXhr(win);
+    ACTIVITY_EVENTS.forEach((type) =>
+      win.addEventListener(type, onUserActivity, { capture: true, passive: true })
+    );
     win[PATCH_FLAG] = true;
   } catch {
     // Cross-origin frame: not ours to patch.

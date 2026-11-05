@@ -34,6 +34,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Telemetry } from '../utils/app.constant';
 import { telemetryFactory } from '../utils/telemetry';
 import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
+import { startSessionTimer } from '@shared-lib-v2/utils/sessionTimeout';
 
 
 type LoginPageProps = {
@@ -124,6 +125,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
             }
 
             await setSecureRefreshToken(refreshToken);
+            startSessionTimer();
 
             const userResponse = await getUserId();
 
