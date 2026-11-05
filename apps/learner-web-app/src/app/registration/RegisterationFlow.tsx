@@ -12,6 +12,7 @@ import {
 import Header from '@learner/components/Header/Header';
 import dynamic from 'next/dynamic';
 // import { userCheck } from '@learner/utils/API/userService';
+import { userNameExist } from '@learner/utils/API/userService';
 // import AccountExistsCard from '@learner/components/AccountExistsCard/AccountExistsCard';
 import SimpleModal from '@learner/components/SimpleModal/SimpleModal';
 // import OtpVerificationComponent from '@learner/components/OtpVerificationComponent/OtpVerificationComponent';
@@ -21,6 +22,8 @@ import { showToastMessage } from '@learner/components/ToastComponent/Toastify';
 // import MobileVerificationSuccess from '@learner/components/MobileVerificationSuccess/MobileVerificationSuccess';
 import CreateAccountForm from '@learner/components/CreateAccountForm/CreateAccountForm';
 import DynamicForm from '@shared-lib-v2/DynamicForm/components/DynamicForm';
+import DynamicFormV3 from '@shared-lib-v2/DynamicForm/components/DynamicFormV3';
+import { applyYearPickerFields } from '@shared-lib-v2/DynamicForm/components/RJSFWidget/CustomYearPickerWidget';
 import { fetchForm } from '@shared-lib-v2/DynamicForm/components/DynamicFormCallback';
 import { FormContext } from '@shared-lib-v2/DynamicForm/components/DynamicFormConstant';
 import { useRouter } from 'next/navigation';
@@ -52,6 +55,8 @@ import { getVerifiedMobile, clearVerifiedMobile } from '@learner/utils/verifiedM
 import Image from 'next/image';
 import SwitchAccountDialog from '@shared-lib-v2/SwitchAccount/SwitchAccount';
 import { getInterestedToJoinFieldId } from '@shared-lib-v2/utils/helper';
+import { TenantName } from '@learner/utils/app.constant';
+import { setSecureRefreshToken } from '@shared-lib-v2/utils/secureTokenStorage';
 
 type UserAccount = {
   name: string;
@@ -124,6 +129,15 @@ const RegisterationFlow = () => {
   const [password, setPassword] = useState('');
   const [mobile, setMobile] = useState('');
   const [tenantName, setTenantName] = useState('');
+  // Pathways registration uses DynamicFormV3; other programs keep DynamicForm
+  // `enroll` is known before the tenant is resolved, so the form fetch below
+  // can already tell it is building the Pathways form
+  const isPathwaysProgram = [tenantName, enroll].some(
+    (name) =>
+      name?.toLowerCase() ===
+      TenantName.SECOND_CHANCE_PROGRAM_PATHWAYS.toLowerCase()
+  );
+  const LearnerForm = isPathwaysProgram ? DynamicFormV3 : DynamicForm;
   const [tenantUiConfig, setTenantUiConfig] = useState<any>(null);
 
   const [switchDialogOpen, setSwitchDialogOpen] = useState(false);
@@ -337,6 +351,17 @@ const RegisterationFlow = () => {
           'mobile',
           'parent_phone'
         );
+
+        // Pathways asks for the Class 10 passing year through a year picker
+        if (isPathwaysProgram) {
+          const yearPickerForm = applyYearPickerFields(
+            alterSchema,
+            updatedUiSchema,
+            ['inWhichYearDidYouPassClass10']
+          );
+          alterSchema = yearPickerForm.schema;
+          updatedUiSchema = yearPickerForm.uiSchema;
+        }
 
         setAddSchema(alterSchema);
         setAddUiSchema(updatedUiSchema);
@@ -634,10 +659,10 @@ const RegisterationFlow = () => {
             "sms": {
               "to": [updated_payload.mobile],
               "body":"Hey",
-              "templateId": "6948f41681326042a2454bb2", 
+              "templateId": "6ae2e2adba35dbc54409b3f2", 
               "replacements": {
-                "var1": username,
-                "var2": password
+                "username": username,
+                "password": password
               }
             }
           }).catch((error) => {
@@ -723,13 +748,22 @@ const RegisterationFlow = () => {
   //   try { const response = await sendOTP({ mobile, reason: 'signup' }); setHash(response?.result?.data?.hash); } catch {}
   // };
 
-  const onCloseSuccessModal = (currentFormData?: any) => {
+  const onCloseSuccessModal = async (currentFormData?: any) => {
     const data = currentFormData || formData;
-    setUsername(
-      (data?.firstName || '') +
-        (data?.lastName || '') +
-        Math.floor(10 + Math.random() * 90)
-    );
+    try {
+      const result = await userNameExist({
+        firstName: data?.firstName || '',
+        lastName: data?.lastName || '',
+      });
+      setUsername(result?.suggestedUsername || '');
+    } catch (error) {
+      // Fallback to locally generated username if the suggestion API fails
+      setUsername(
+        (data?.firstName || '') +
+          (data?.lastName || '') +
+          Math.floor(10 + Math.random() * 90)
+      );
+    }
     // setVerificationSuccessModal(false);
     setUsernamePasswordForm(true);
   };
@@ -771,6 +805,7 @@ const RegisterationFlow = () => {
             } else {
               localStorage.removeItem('refreshTokenForAndroid');
             }
+            await setSecureRefreshToken(refreshToken);
 
             localStorage.setItem('token', token);
 
@@ -1069,7 +1104,7 @@ const RegisterationFlow = () => {
               )}
             </Alert>
             {addSchema && addUiSchema && (
-              <DynamicForm
+              <LearnerForm
                 schema={addSchema}
                 uiSchema={
                   mobileFromQuery
