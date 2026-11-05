@@ -997,6 +997,8 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "प्रथम रीड इंडिया इनिशिएटिव आरआईआई",
     "GOVERNMENT_PARTNERSHIP": "सरकारी साझेदारी",
     "SUMMER_CAMP_VOLUNTEER": "समर कैंप स्वयंसेवक",
+    "CREATIVITY_CLUB": "क्रिएटिविटी क्लब",
+    "PCVC": "पीसीवीसी",
     "ITC": "आईटीसी",
     "ADP": "एडीपी",
     "STANDALONE_UPPER_PRIMARY": "स्वतंत्र उच्च प्राथमिक",
@@ -1153,7 +1155,13 @@
     "FAMILY_PERSONAL_CONCERS": "पारिवारिक/व्यक्तिगत चिंताएं",
     "MARRAIGE": "विवाह",
     "START_OWN_BUSINESS": "स्वयं का व्यवसाय शुरू करना",
-    "STUDY_FURTHER": "आगे की पढ़ाई"
+    "STUDY_FURTHER": "आगे की पढ़ाई",
+    "DISTINCTION_75_100": "विशेष योग्यता (75% – 100%)",
+    "FIRST_DIVISION_60_74_99": "प्रथम श्रेणी (60% – 74.99%)",
+    "SECOND_DIVISION_45_59_99": "द्वितीय श्रेणी (45% – 59.99%)",
+    "THIRD_DIVISION_33_44_99": "तृतीय श्रेणी (33% – 44.99%)",
+    "YES_2025_26_ONWARDS": "हाँ, 2025-26 से आगे",
+    "YES_BEFORE_2025_26": "हाँ, 2025-26 से पहले"
   },
   "ORGANISATION_NAME": "संगठन का नाम",
   "FORM_ERROR_MESSAGES": {
@@ -1375,5 +1383,10 @@
   "REASON_FOR_LEAVING_JOB_OTHER": "नौकरी छोड़ने का अन्य कारण",
   "FOLLOW_UP_MODE_OTHER": "फॉलो-अप का अन्य माध्यम",
   "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "अन्य अनियमित आय गतिविधि का प्रकार",
-  "UNEMPLOYED_REASON_OTHER": "बेरोजगारी का अन्य कारण"
+  "UNEMPLOYED_REASON_OTHER": "बेरोजगारी का अन्य कारण",
+  "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10": "आपने कक्षा 10 किस बोर्ड से पास की?",
+  "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10_OTHER": "यदि अन्य, तो कृपया उस बोर्ड का नाम बताएं जिससे आपने कक्षा 10 पास की",
+  "What_DIVISION_/_PERCENTAGE_DID_YOU_GET_IN_CLASS_10": "कक्षा 10 में आपको कौन सी श्रेणी / कितने प्रतिशत अंक मिले?",
+  "HAVE_YOU_STUDIED_IN_PRATHAM'S_SECOND_CHANCE_PROGRAM": "क्या आपने प्रथम के सेकंड चांस प्रोग्राम में पढ़ाई की है?",
+  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "आपने कक्षा 10 किस वर्ष में पास की?"
 }

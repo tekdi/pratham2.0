@@ -997,6 +997,8 @@
     "PRATHAM_READ_INDIA_INITIATIVE_RII": "प्रथम रीड इंडिया इनिशिएटिव्ह आरआयआय",
     "GOVERNMENT_PARTNERSHIP": "सरकारी भागीदारी",
     "SUMMER_CAMP_VOLUNTEER": "उन्हाळी शिबिर स्वयंसेवक",
+    "CREATIVITY_CLUB": "क्रिएटिव्हिटी क्लब",
+    "PCVC": "पीसीव्हीसी",
     "ITC": "आयटीसी",
     "ADP": "एडीपी",
     "STANDALONE_UPPER_PRIMARY": "स्वतंत्र उच्च प्राथमिक",
@@ -1153,7 +1155,13 @@
     "FAMILY_PERSONAL_CONCERS": "कौटुंबिक/वैयक्तिक चिंता",
     "MARRAIGE": "विवाह",
     "START_OWN_BUSINESS": "स्वतःचा व्यवसाय सुरू करणे",
-    "STUDY_FURTHER": "पुढील शिक्षण"
+    "STUDY_FURTHER": "पुढील शिक्षण",
+    "DISTINCTION_75_100": "विशेष प्राविण्य (75% – 100%)",
+    "FIRST_DIVISION_60_74_99": "प्रथम श्रेणी (60% – 74.99%)",
+    "SECOND_DIVISION_45_59_99": "द्वितीय श्रेणी (45% – 59.99%)",
+    "THIRD_DIVISION_33_44_99": "तृतीय श्रेणी (33% – 44.99%)",
+    "YES_2025_26_ONWARDS": "होय, 2025-26 पासून पुढे",
+    "YES_BEFORE_2025_26": "होय, 2025-26 पूर्वी"
   },
   "ORGANISATION_NAME": "संस्थेचे नाव",
   "FORM_ERROR_MESSAGES": {
@@ -1375,5 +1383,10 @@
   "REASON_FOR_LEAVING_JOB_OTHER": "नोकरी सोडण्याचे इतर कारण",
   "FOLLOW_UP_MODE_OTHER": "फॉलो-अपचे इतर माध्यम",
   "IRREGULAR_INCOME_ACTIVITY_TYPE_OTHER": "इतर अनियमित उत्पन्न कार्याचा प्रकार",
-  "UNEMPLOYED_REASON_OTHER": "बेरोजगारीचे इतर कारण"
+  "UNEMPLOYED_REASON_OTHER": "बेरोजगारीचे इतर कारण",
+  "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10": "तुम्ही इयत्ता 10 वी कोणत्या बोर्डातून उत्तीर्ण झालात?",
+  "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10_OTHER": "इतर असल्यास, कृपया तुम्ही इयत्ता 10 वी ज्या बोर्डातून उत्तीर्ण झालात त्याचे नाव लिहा",
+  "What_DIVISION_/_PERCENTAGE_DID_YOU_GET_IN_CLASS_10": "इयत्ता 10 वी मध्ये तुम्हाला कोणती श्रेणी / किती टक्के गुण मिळाले?",
+  "HAVE_YOU_STUDIED_IN_PRATHAM'S_SECOND_CHANCE_PROGRAM": "तुम्ही प्रथमच्या सेकंड चान्स प्रोग्राममध्ये शिक्षण घेतले आहे का?",
+  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "तुम्ही इयत्ता 10 वी कोणत्या वर्षी उत्तीर्ण झालात?"
 }
