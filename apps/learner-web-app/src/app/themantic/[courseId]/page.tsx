@@ -11,7 +11,11 @@ import { cookies } from 'next/headers';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  return await getMetadata(
+    params.courseId,
+    undefined,
+    `/themantic/${params.courseId}`
+  );
 }
 
 

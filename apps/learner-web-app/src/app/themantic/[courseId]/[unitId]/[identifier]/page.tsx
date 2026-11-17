@@ -9,7 +9,11 @@ import { Box } from '@mui/material';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.identifier);
+  return await getMetadata(
+    params.identifier,
+    undefined,
+    `/themantic/player/${params.identifier}`
+  );
 }
 
 const Player = dynamic(
