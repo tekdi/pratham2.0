@@ -9,6 +9,7 @@ import {
 } from '@/utils/helper';
 import { CreateEvent } from '@/utils/Interfaces';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
@@ -19,6 +20,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -155,7 +157,17 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
       setSubTopic(editingEvent.shortDescription || '');
       setMeetingLink(editingEvent.meetingDetails?.url || '');
       setMeetingPasscode(editingEvent.meetingDetails?.password || '');
-      if (editingEvent.isRecurring && editingEvent.recurrencePattern) {
+      // A daily session carries all 7 days in its pattern - show it back as
+      // "no day picked", which is what the user actually chose.
+      const isDailyPattern =
+        editingEvent.recurrencePattern?.frequency === 'daily' ||
+        (editingEvent.recurrencePattern?.daysOfWeek || []).length ===
+          eventDaysLimit;
+      if (
+        editingEvent.isRecurring &&
+        editingEvent.recurrencePattern &&
+        !isDailyPattern
+      ) {
         const dayNameByIndex: Record<number, string> = {};
         Object.entries(DaysOfWeek).forEach(([name, idx]) => {
           dayNameByIndex[idx] = name;
@@ -495,11 +507,6 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
     const isRecurring =
       isPlannedType && !!recurEndDate && !recurEndDate.isSame(date, 'day');
 
-    if (isRecurring && selectedWeekDays.length === 0) {
-      showError(t('CENTER_SESSION.WEEKDAY_ERROR'));
-      return;
-    }
-
     const startDatetime = date
       .hour(startTime.hour())
       .minute(startTime.minute())
@@ -604,13 +611,16 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
                 .minute(endTime.minute())
                 .second(0)
                 .toISOString();
+              // No weekday picked = every day of the range. Sent as weekly
+              // over all 7 days: the backend rejects frequency 'daily'
+              // ("not implemented yet").
               return {
-                frequency:
-                  daysOfWeekNumeric.length === eventDaysLimit
-                    ? 'daily'
-                    : 'weekly',
+                frequency: 'weekly',
                 interval: 1,
-                daysOfWeek: daysOfWeekNumeric,
+                daysOfWeek:
+                  daysOfWeekNumeric.length === 0
+                    ? Object.values(DaysOfWeek)
+                    : daysOfWeekNumeric,
                 endCondition: { type: 'endDate', value: endConditionValue },
                 recurringStartDate: startDatetime,
               };
@@ -1121,14 +1131,32 @@ const CrossCenterScheduleWizard: React.FC<CrossCenterScheduleWizardProps> = ({
 
             {sessionTypeKey === 'PLANNED_SESSION' && (
               <Box sx={{ mt: 2 }}>
-                <Typography
-                  fontSize={'14px'}
-                  color={theme.palette.warning['A200']}
-                >
-                  {t('COMMON.HELD_EVERY_WEEK_ON', {
-                    days: selectedWeekDays.join(', '),
-                  })}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Typography
+                    fontSize={'14px'}
+                    color={theme.palette.warning['A200']}
+                  >
+                    {selectedWeekDays.length
+                      ? t('COMMON.HELD_EVERY_WEEK_ON', {
+                          days: selectedWeekDays.join(', '),
+                        })
+                      : t('CENTER_SESSION.HELD_DAILY')}
+                  </Typography>
+                  <Tooltip
+                    title={t('CENTER_SESSION.WEEKDAY_SELECTION_INFO')}
+                    arrow
+                    enterTouchDelay={0}
+                    leaveTouchDelay={5000}
+                  >
+                    <InfoOutlinedIcon
+                      fontSize="small"
+                      sx={{
+                        color: theme?.palette?.warning['300'],
+                        cursor: 'pointer',
+                      }}
+                    />
+                  </Tooltip>
+                </Box>
                 <WeekDays
                   multiselect
                   selectedDays={selectedWeekDays.map(
