@@ -151,7 +151,9 @@ export async function buildPageMetadata({
       siteName,
       type,
       locale: 'en_IN',
-      images: [{ url: ogImage, width: 1200, height: 630, alt: title }],
+      // No width/height: a declared size that does not match the real file
+      // makes Slack and other crawlers drop the preview image.
+      images: [{ url: ogImage, alt: title }],
     },
     // Set explicitly rather than relying on Next deriving them from openGraph,
     // so X/Twitter previews are guaranteed.

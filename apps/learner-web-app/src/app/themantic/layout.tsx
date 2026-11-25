@@ -23,7 +23,7 @@ export const metadata = {
     type: 'website',
     locale: 'en_IN',
     // Absolute: social crawlers cannot resolve a relative path.
-    images: [{ url: FALLBACK_IMAGE, width: 1200, height: 630 }],
+    images: [{ url: FALLBACK_IMAGE }],
   },
   twitter: {
     card: 'summary_large_image',
