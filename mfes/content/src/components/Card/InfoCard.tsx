@@ -115,7 +115,10 @@ const InfoCard: React.FC<InfoCardProps> = ({
               ? item.appIcon
               : _infoCard?.default_img
           }
-          alt={item?.name}
+          alt={item?.name || ''}
+          // Gives the browser an aspect ratio before the image loads.
+          width={320}
+          height={180}
         />
         <Box
           sx={{

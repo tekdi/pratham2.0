@@ -10,7 +10,11 @@ import SubHeader from '@learner/components/themantic/subHeader/SubHeader';
 import { hierarchyAPI } from '@content-mfes/services/Hierarchy';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId);
+  return await getMetadata(
+    params.courseId,
+    params.unitId,
+    `/themantic/${params.courseId}/${params.unitId}`
+  );
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {
