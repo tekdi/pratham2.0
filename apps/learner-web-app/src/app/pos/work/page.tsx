@@ -1,24 +1,17 @@
 import dynamic from 'next/dynamic';
+import { buildPageMetadata } from '@learner/utils/seoMeta';
 
 const title = 'Learning for Work';
 const description = `Learning for Work equips adolescents and youth with the skills and knowledge needed for employment and livelihoods`;
 
-export const metadata = {
-  title,
-  description,
-  openGraph: {
+export async function generateMetadata() {
+  return await buildPageMetadata({
     title,
     description,
-    images: [
-      {
-        url: `/images/pos_work.jpg`,
-        width: 800,
-        height: 600,
-      },
-    ],
-    type: 'website',
-  },
-};
+    image: '/images/pos_work.jpg',
+    path: '/pos/work',
+  });
+}
 
 const List = dynamic(() => import('@learner/components/pos/List'), {
   ssr: false,

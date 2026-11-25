@@ -35,7 +35,10 @@ export const hierarchyAPI = async (doId: string, params?: object) => {
 export const fetchContent = async (identifier: any) => {
   try {
     const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
-    const FIELDS = 'description,name,appIcon,posterImage,artifactUrl,mimeType,contentLanguage,program';
+    // se_subjects, primaryCategory and leafNodesCount feed the title and
+    // description templates; the read API omits them unless asked for.
+    const FIELDS =
+      'description,name,appIcon,posterImage,artifactUrl,mimeType,contentLanguage,program,se_subjects,primaryCategory,leafNodesCount';
     const LICENSE_DETAILS = 'name,description,url';
     const MODE = 'edit';
     const response = await get(
@@ -45,7 +48,21 @@ export const fetchContent = async (identifier: any) => {
     return response?.data?.result?.content;
   } catch (error) {
     console.error('Error fetching content:', error);
-    return error;
+    return null;
+  }
+};
+
+// Analytics-only read: no mode=edit, so it also succeeds for anonymous visitors.
+export const fetchContentMeta = async (identifier: string) => {
+  try {
+    const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
+    const FIELDS = 'name,mimeType,contentLanguage,program';
+    const response = await get(`${API_URL}?fields=${FIELDS}`);
+
+    return response?.data?.result?.content ?? null;
+  } catch (error) {
+    console.error('Error fetching content meta:', error);
+    return null;
   }
 };
 

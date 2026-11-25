@@ -167,6 +167,7 @@
     "NO_CONTENT_CREATOR_FOUND": "No Content Creator (SCTA) Found",
     "NO_CONTENT_REVIEWER_FOUND": "No Content Reviewer (CCTA) Found",
     "LOADING": "Loading",
+    "SUPPORT_DESK_UNAVAILABLE": "We could not open the support desk. Please sign in again and retry.",
     "SURE_REASSIGN_CENTER": "Are you sure you want to re-assign Center to this user?",
     "SORT": "Sort",
     "ARE_YOU_SURE_DELETE_STATE": "There are {{district}} active districts in this state you cannot delete it.",
