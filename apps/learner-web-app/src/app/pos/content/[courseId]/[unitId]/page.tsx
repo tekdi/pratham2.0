@@ -6,7 +6,11 @@ import dynamic from 'next/dynamic';
 import { getMetadata } from '@learner/utils/API/metabaseService';
 
 export async function generateMetadata({ params }: any) {
-  return await getMetadata(params.courseId, params.unitId);
+  return await getMetadata(
+    params.courseId,
+    params.unitId,
+    `/pos/content/${params.courseId}/${params.unitId}`
+  );
 }
 
 const CourseUnitDetails = dynamic(() => import('@CourseUnitDetails'), {

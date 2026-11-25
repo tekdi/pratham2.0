@@ -169,3 +169,12 @@ export const BOTTOM_DRAWER_CONSTANTS = {
   DELETE: 'Delete User',
   UNKNOWN_ACTION: 'Unknown Action',
 };
+
+// Google Apps Script web app URL for the support request form
+export const supportRequestAppScriptUrl =
+  process.env.NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL || '';
+if (!supportRequestAppScriptUrl) {
+  console.warn(
+    'NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL is not set in the environment variables.'
+  );
+}
