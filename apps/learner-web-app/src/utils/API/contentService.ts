@@ -45,7 +45,21 @@ export const fetchContent = async (identifier: any) => {
     return response?.data?.result?.content;
   } catch (error) {
     console.error('Error fetching content:', error);
-    return error;
+    return null;
+  }
+};
+
+// Analytics-only read: no mode=edit, so it also succeeds for anonymous visitors.
+export const fetchContentMeta = async (identifier: string) => {
+  try {
+    const API_URL = `${process.env.NEXT_PUBLIC_MIDDLEWARE_URL}/api/content/v1/read/${identifier}`;
+    const FIELDS = 'name,mimeType,contentLanguage,program';
+    const response = await get(`${API_URL}?fields=${FIELDS}`);
+
+    return response?.data?.result?.content ?? null;
+  } catch (error) {
+    console.error('Error fetching content meta:', error);
+    return null;
   }
 };
 
