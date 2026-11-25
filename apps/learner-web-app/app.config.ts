@@ -13,6 +13,15 @@ if (!jotFormId) {
   );
 }
 
+// Google Apps Script web app URL for the support request form
+export const supportRequestAppScriptUrl =
+  process.env.NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL || '';
+if (!supportRequestAppScriptUrl) {
+  console.warn(
+    'NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL is not set in the environment variables.'
+  );
+}
+
 // JotForm ID for content download form
 export const CONTENT_DOWNLOAD_JOTFORM_ID =
   process.env.NEXT_PUBLIC_CONTENT_DOWNLOAD_JOTFORM_ID || '';

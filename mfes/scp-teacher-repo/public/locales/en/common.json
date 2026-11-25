@@ -3,6 +3,7 @@
     "YOU": "You",
     "LANGUAGE": "Language",
     "LOADING": "Loading",
+    "SUPPORT_DESK_UNAVAILABLE": "We could not open the support desk. Please sign in again and retry.",
     "DATE": "Date",
     "CONTINUE": "Continue",
     "MARK": "Mark",
@@ -203,7 +204,7 @@
     "MOVED_TO_DIFFERENT_ROLE": "Moved to Different Role",
     "DELETE_FROM_BATCH_WARNING": "I confirm I want to remove this user from batches as well",
     "COPY_REGISTRATION_LINK": "Copy Registration Link",
-    "REGISTRATION_LINK_COPIED":"Registration link copied!\nShare this link with learners for program registration.",
+    "REGISTRATION_LINK_COPIED": "Registration link copied!\nShare this link with learners for program registration.",
     "REASSIGN": "Re-assign",
     "REASSIGN_LEARNER_TO_BATCH": "Reassign Learner to Batch",
     "LOADING_ELLIPSIS": "Loading...",
@@ -370,8 +371,8 @@
     "AT_REQUIRED_LETTER": "At least one letter or underscore is required",
     "ENTER_NUMBER": "Please enter a number",
     "ENTER_CHARACTER": "Please enter at least one character",
-    "CONTACT_NUMBER": "Phone Number",   
-     "ENROLLMENT_NUMBER": "User Name",
+    "CONTACT_NUMBER": "Phone Number",
+    "ENROLLMENT_NUMBER": "User Name",
     "SELECT_OPTION": "Select Option",
     "HINDI": "Hindi",
     "MOCK_TEST": "Mock Test",
@@ -500,7 +501,7 @@
     "TOPIC": "Topic",
     "SUBTOPIC": "Sub Topic",
     "FACILITATORS": "Facilitators Prepare",
-"LEARNERS": "Learners Prepare",
+    "LEARNERS": "Learners Prepare",
     "DELETE_SESSION": "Delete Session",
     "SCHEDULE": "Schedule",
     "PLANNED_SESSIONS": "Planned Sessions",
@@ -531,7 +532,7 @@
     "TOPIC_SUBTOPIC_ADDED_SUCCESSFULLY": "Topic and Subtopic added successfully!",
     "TOPIC_SUBTOPIC_REMOVED_SUCCESSFULLY": "Topic and Subtopic removed successfully!",
     "FACILITATOR_REQUISITES": "Facilitator's Requisites",
-   "PREREQUISITES": "Prepare",
+    "PREREQUISITES": "Prepare",
     "POST_REQUISITES": "Practice",
     "DURING_COURSE": "Learn",
     "CANT_SELECT_AS_EVENT_PASSED_LIVE": "Can not select topic and subtopic as event is already passed or live.",
@@ -750,7 +751,6 @@
     "DO_YOU_WANT_TO_DELETE": "Do you want to delete from center as well?",
     "DO_YOU_WANT_TO_DELETE_MULTIPLE_CENTERS": "Do you want to delete from centers as well?",
     "CONSENT_FILE": "Consent File"
-
   },
   "FORM_ERROR_MESSAGES": {
     "INVALID_INPUT": "Invalid Input.",
@@ -797,7 +797,6 @@
     "SEARCH_STUDENT": "Search student",
     "NO_ASSESSMENTS_FOUND": "No assessments found",
     "ASSESSMENTS_FOUND": "{{count}} assessment found",
-
     "ASSESSMENT_STATUS": "Assessment Status",
     "NOT_STARTED": "Not Started",
     "IN_PROGRESS": "In Progress",
@@ -842,7 +841,7 @@
     "UPDATE_MARKS": "Update Marks",
     "SUBMIT_MARKS": "Submit Marks",
     "ASSESSMENTS_FOUND_PLURAL": "{{count}} assessments found",
-    "NO_ASSESSMENT_TYPE_FOUND":"No Assessment Type Found",
+    "NO_ASSESSMENT_TYPE_FOUND": "No Assessment Type Found",
     "IMAGE_UPLOADED": "Image Uploaded",
     "VIEW": "View",
     "REUPLOAD": "Reupload",
@@ -920,7 +919,6 @@
     "SUBJECTS_I_TEACH": "Subjects I Teach",
     "MY_MAIN_SUBJECTS": "My Main Subjects",
     "WHAT_IS_YOUR_PREFERRED_MODE_OF_LEARNING": "What is Your Preferred Mode of Learning?"
-
   },
   "YOUTHNET_USERS_AND_VILLAGES": {
     "MENTORS": "Mentors",
@@ -940,7 +938,6 @@
     "ASSIGN_VILLAGES_FROM_BLOCK": "Assign Villages from Block",
     "ASSIGN_VILLAGES_FROM_BLOCK_INFO": "You can complete this later at your own pace. However, the villages will only be assigned once you click on ‘Finish.’",
     "PLEASE_GO_BACK_MSG": "Please go back after selection to proceed further"
-
   },
   "SURVEYS": {
     "SURVEYS": "Surveys",
@@ -1067,7 +1064,7 @@
     "VLLAGE": "गाव",
     "YOUTH_VOLUNTEERS": "Youth / Volunteer",
     "VILLAGES_AND_YOUTH": "Village and Youth",
-     "VLLAGE_18": "Today's New Registrations"
+    "VLLAGE_18": "Today's New Registrations"
   },
   "YOUTHNET_VOLUNTEERLIST": {
     "ENTRIES": "Entries",

@@ -10,3 +10,12 @@ if (!jotFormId) {
     'NEXT_PUBLIC_JOTFORM_ID is not set in the environment variables.'
   );
 }
+
+// Google Apps Script web app URL for the support request form
+export const supportRequestAppScriptUrl =
+  process.env.NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL || '';
+if (!supportRequestAppScriptUrl) {
+  console.warn(
+    'NEXT_PUBLIC_SUPPORT_APPSCRIPT_URL is not set in the environment variables.'
+  );
+}

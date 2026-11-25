@@ -1,22 +1,19 @@
 'use client';
 import Header from '../../components/Header/Header';
-import JotFormEmbed from '../../components/JotFormEmbed/JotFormEmbed';
+import AppScriptEmbed from '../../components/AppScriptEmbed/AppScriptEmbed';
+import Loader from '../../components/Loader/Loader';
 import KeyboardBackspaceOutlinedIcon from '@mui/icons-material/KeyboardBackspaceOutlined';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Layout from '../../components/Layout';
 import { useEffect, useState } from 'react';
-import { jotFormId } from '../../../app.config';
+import { supportRequestAppScriptUrl } from '../../../app.config';
 import { useDirection } from '../../utils/hooks/useDirection';
-import { toPascalCase } from '../../utils/helper';
 import { useTranslation } from '@shared-lib';
 
 type QueryParams = {
-  fullName: string;
-  userName: string;
-  userId: string;
-  email: string;
+  t?: string;
   deviceInfo?: string;
 };
 
@@ -24,19 +21,14 @@ const SupportRequest = () => {
   const { t } = useTranslation();
   const theme = useTheme<any>();
   const { isRTL } = useDirection();
-  const [queryParams, setQueryParams] = useState<QueryParams>({
-    fullName: '',
-    userName: '',
-    userId: '',
-    email: '',
-  });
+  const [queryParams, setQueryParams] = useState<QueryParams | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-      const name = toPascalCase(localStorage.getItem('userfullname') || '');
-      const loginUserName = localStorage.getItem('userIdName') || '';
-      const userid = localStorage.getItem('userId') || '';
-      const email = localStorage.getItem('userEmail') || '';
+    const run = async () => {
+      if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+        return;
+      }
 
       const {
         userAgent,
@@ -87,14 +79,44 @@ const SupportRequest = () => {
         Referrer: ${referrer}
       `.trim();
 
-      setQueryParams({
-        fullName: name,
-        userName: loginUserName,
-        userId: userid,
-        email,
-        deviceInfo,
-      });
-    }
+      // Identity is minted server-side from /user/auth, so a value edited in
+      // the browser can no longer decide who the support desk thinks you are.
+      try {
+        const authToken = localStorage.getItem('token');
+        if (!authToken) {
+          setFailed(true);
+          return;
+        }
+        const response = await fetch('/api/support-token', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            tenantId: localStorage.getItem('tenantId') || '',
+            academicYearId: localStorage.getItem('academicYearId') || '',
+            // ?src=android when opened from the mobile app's web view.
+            src: new URLSearchParams(window.location.search).get('src') || '',
+          }),
+        });
+        if (!response.ok) {
+          setFailed(true);
+          return;
+        }
+        const { token } = await response.json();
+        if (!token) {
+          setFailed(true);
+          return;
+        }
+        setQueryParams({ t: token, deviceInfo });
+      } catch (error) {
+        console.error('Unable to start the support desk session', error);
+        setFailed(true);
+      }
+    };
+
+    run();
   }, []);
 
   return (
@@ -103,10 +125,6 @@ const SupportRequest = () => {
       <Box display={'flex'} sx={{ marginBottom: '1.2rem' }}>
         <Box
           onClick={() => {
-            setQueryParams((prev) => ({
-              ...prev,
-              reset: Date.now().toString(), // Force re-render with a unique key
-            }));
             window.history.back();
           }}
           ml={'1rem'}
@@ -130,7 +148,19 @@ const SupportRequest = () => {
         </Box>
       </Box>
       <Box>
-        <JotFormEmbed formId={jotFormId} queryParams={queryParams} />
+        {failed ? (
+          <Typography variant="h5" sx={{ p: '1rem' }}>
+            {t('COMMON.SUPPORT_DESK_UNAVAILABLE')}
+          </Typography>
+        ) : queryParams ? (
+          // Mounted only once the pass exists, so the iframe loads once.
+          <AppScriptEmbed
+            scriptUrl={supportRequestAppScriptUrl}
+            queryParams={queryParams}
+          />
+        ) : (
+          <Loader showBackdrop={false} loadingText={t('COMMON.LOADING')} />
+        )}
       </Box>
       </Layout> 
     </>
