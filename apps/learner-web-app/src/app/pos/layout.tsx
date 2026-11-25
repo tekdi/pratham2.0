@@ -20,11 +20,7 @@ export const metadata = {
     locale: 'en_IN',
     // Absolute: social crawlers cannot resolve a relative path.
     images: [
-      {
-        url: 'https://www.prathamopenschool.org/images/home-page-banner.png',
-        width: 1200,
-        height: 630,
-      },
+      { url: 'https://www.prathamopenschool.org/images/home-page-banner.png' },
     ],
   },
   twitter: {

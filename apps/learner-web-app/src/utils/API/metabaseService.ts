@@ -68,8 +68,6 @@ export async function getMetadata(
               product?.posterImage ||
               product?.appIcon ||
               '/images/image_ver.png',
-            width: 1200,
-            height: 630,
             alt: product?.name,
           },
         ],
@@ -98,7 +96,16 @@ export async function getMetadata(
       title,
       description,
       url: canonical,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: product?.name }],
+      // No width/height: content thumbnails are not 1200x630, and a declared size
+      // that does not match the file makes Slack drop the preview image.
+      images: [{ url: ogImage, alt: product?.name }],
+    },
+    // Without this the page inherits the site-wide banner instead of the item image.
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
     },
   };
 }
