@@ -105,9 +105,9 @@
     "NO_SCHOOLING": "کبھی اسکول نہیں گیا"
   },
   "COMMON": {
-    "SUBMIT_REGISTRATION":"رجسٹریشن جمع کریں",
-    "SUBMIT_POC_REQUEST":"POC درخواست جمع کریں",
-    "REGISTER_ORGANISATION":"تنظیم رجسٹر کریں",
+    "SUBMIT_REGISTRATION": "رجسٹریشن جمع کریں",
+    "SUBMIT_POC_REQUEST": "POC درخواست جمع کریں",
+    "REGISTER_ORGANISATION": "تنظیم رجسٹر کریں",
     "STATUS": {
       "completed": "مکمل",
       "in_progress": "جاری ہے۔",
@@ -119,7 +119,8 @@
     "FETCH_USER": "صارف بازیافت کریں۔",
     "SEARCH_USER_BY_EMAIL_DESCRIPTION": "ای میل کے ذریعے موجودہ صارف کو تلاش کریں اور ان کے لیے کام کرنے والا گاؤں مختص کریں۔",
     "RESET_USER": "یوزر کو دوبارہ ترتیب دیں۔",
-    "CONTINUE": "جاری رکھیں"
+    "CONTINUE": "جاری رکھیں",
+    "SUPPORT_DESK_UNAVAILABLE": "ہم سپورٹ ڈیسک نہیں کھول سکے۔ براہ کرم دوبارہ سائن ان کریں اور دوبارہ کوشش کریں۔"
   },
   "SWITCH_ACCOUNT": {
     "TITLE": "اکاؤنٹ منتخب کریں",

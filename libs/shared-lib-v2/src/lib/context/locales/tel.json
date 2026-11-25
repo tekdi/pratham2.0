@@ -105,9 +105,9 @@
     "NO_SCHOOLING": "పాఠశాల విద్య లేదు"
   },
   "COMMON": {
-    "SUBMIT_REGISTRATION":"నమోదు సమర్పించండి",
-    "SUBMIT_POC_REQUEST":"POC అభ్యర్థన సమర్పించండి",
-    "REGISTER_ORGANISATION":"సంస్థను నమోదు చేయండి",
+    "SUBMIT_REGISTRATION": "నమోదు సమర్పించండి",
+    "SUBMIT_POC_REQUEST": "POC అభ్యర్థన సమర్పించండి",
+    "REGISTER_ORGANISATION": "సంస్థను నమోదు చేయండి",
     "L1_COURSES": "ఎల్1 కోర్సులు",
     "EXPLORE": "అన్వేషించు",
     "SURVEYS": "సర్వేలు",
@@ -126,6 +126,7 @@
     "SURE_LOGOUT": "మీరు నిజంగా లాగౌట్ చేయాలనుకుంటున్నారా?",
     "LOGOUT": "లాగౌట్",
     "LOADING": "లోడ్ అవుతోంది..",
+    "SUPPORT_DESK_UNAVAILABLE": "మేము సపోర్ట్ డెస్క్‌ను తెరవలేకపోయాము. దయచేసి మళ్లీ సైన్ ఇన్ చేసి మళ్లీ ప్రయత్నించండి.",
     "FAQS": "తరచుగా అడిగే ప్రశ్నలు",
     "SHOW_MORE": "మరిన్ని చూపించు ▼",
     "SHOW_LESS": "తక్కువ చూపించు ▲",

@@ -105,9 +105,9 @@
     "NO_SCHOOLING": "ક્યારેય શાળા એ ગયેલ નથી"
   },
   "COMMON": {
-    "SUBMIT_REGISTRATION":"નોંધણી સબમિટ કરો",
-    "SUBMIT_POC_REQUEST":"POC વિનંતી સબમિટ કરો",
-    "REGISTER_ORGANISATION":"સંસ્થા નોંધો",
+    "SUBMIT_REGISTRATION": "નોંધણી સબમિટ કરો",
+    "SUBMIT_POC_REQUEST": "POC વિનંતી સબમિટ કરો",
+    "REGISTER_ORGANISATION": "સંસ્થા નોંધો",
     "L1_COURSES": "L1 કોર્સ",
     "EXPLORE": "એક્સ્પ્લોર કરો",
     "SURVEYS": "સર્વેક્ષણ",
@@ -126,6 +126,7 @@
     "SURE_LOGOUT": "શું તમે ખરેખર લોગઆઉટ કરવા માંગો છો?",
     "LOGOUT": "લોગઆઉટ",
     "LOADING": "લોડ થઈ રહ્યું છે..",
+    "SUPPORT_DESK_UNAVAILABLE": "અમે સપોર્ટ ડેસ્ક ખોલી શક્યા નથી. કૃપા કરીને ફરીથી સાઇન ઇન કરો અને ફરી પ્રયાસ કરો.",
     "FAQS": "આવશ્યક પ્રશ્નો",
     "SHOW_MORE": "વધારે દર્શાવો ▼",
     "SHOW_LESS": "ઓછું દર્શાવો ▲",
