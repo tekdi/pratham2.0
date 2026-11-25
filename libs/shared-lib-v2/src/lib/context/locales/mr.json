@@ -204,7 +204,12 @@
       "ENROLL_IN_TO": "यामध्ये नोंदणी करा",
       "PERSONAL_DATA_CONSENT_BEFORE_LINK": "मी",
       "CONSENT_FORM": "संमती पत्र",
-      "PERSONAL_DATA_CONSENT_AFTER_LINK": "तथा गोपनीयता सूचना यानुसार वैयक्तिक माहितीचे (वर *अनिवार्य म्हणून चिन्हांकित) संकलन आणि त्यावरील प्रक्रियेस संमती देतो/देते."
+      "PERSONAL_DATA_CONSENT_AFTER_LINK": "तथा गोपनीयता सूचना यानुसार वैयक्तिक माहितीचे (वर *अनिवार्य म्हणून चिन्हांकित) संकलन आणि त्यावरील प्रक्रियेस संमती देतो/देते.",
+      "PERSONAL_DATA_CONSENT_ADULT_BEFORE_LINK": "मी संमती देतो/देते: मी या",
+      "PERSONAL_DATA_CONSENT_ADULT_AFTER_LINK": "मधील परिच्छेद 1 मध्ये वर्णन केल्याप्रमाणे माझ्या वैयक्तिक माहितीचे संकलन आणि त्यावरील प्रक्रियेस सहमत आहे.",
+      "PERSONAL_DATA_CONSENT_MINOR_BEFORE_LINK": "मी, मुलाचे/मुलीचे पालक/कायदेशीर संरक्षक म्हणून, या",
+      "PERSONAL_DATA_CONSENT_MINOR_AFTER_LINK": "मधील परिच्छेद 1 मध्ये वर्णन केल्याप्रमाणे माझ्या पाल्याच्या वैयक्तिक माहितीचे संकलन आणि त्यावरील प्रक्रियेस याद्वारे संमती देतो/देते.",
+      "CONSENT_FORM_AND_PRIVACY_NOTICE": "संमती पत्र आणि गोपनीयता सूचना"
     },
     "PROGRAM_SWITCH_MODAL": {
       "REGISTERED_ON": "नोंदणी दिनांक",
@@ -705,6 +710,7 @@
     "WRITE_TO_US_AT": "आम्हाला येथे लिहा"
   },
   "LOGIN_PAGE": {
+    "SET_PASSWORD": "पासवर्ड सेट करा",
     "USERNAME_PASSWORD_NOT_CORRECT": "युजर नाव  किंवा पासवर्ड योग्य नाही",
     "DEVICE_FINGERPRINT_SUCCESS": "डिव्हाइस फिंगरप्रिंट यशस्वीरित्या तयार केला",
     "DEVICE_FINGERPRINT_ERROR": "डिव्हाइस फिंगरप्रिंट तयार करण्यात त्रुटी",
@@ -1433,5 +1439,8 @@
   "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10_OTHER": "इतर असल्यास, कृपया तुम्ही इयत्ता 10 वी ज्या बोर्डातून उत्तीर्ण झालात त्याचे नाव लिहा",
   "What_DIVISION_/_PERCENTAGE_DID_YOU_GET_IN_CLASS_10": "इयत्ता 10 वी मध्ये तुम्हाला कोणती श्रेणी / किती टक्के गुण मिळाले?",
   "HAVE_YOU_STUDIED_IN_PRATHAM'S_SECOND_CHANCE_PROGRAM": "तुम्ही प्रथमच्या सेकंड चान्स प्रोग्राममध्ये शिक्षण घेतले आहे का?",
-  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "तुम्ही इयत्ता 10 वी कोणत्या वर्षी उत्तीर्ण झालात?"
+  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "तुम्ही इयत्ता 10 वी कोणत्या वर्षी उत्तीर्ण झालात?",
+  "DASHBOARD": {
+    "ATTENDANCE_SYNC_INFO": "ऑनलाइन (Zoom) सत्राची उपस्थिती मध्यरात्रीनंतर आपोआप सिंक होते. प्रत्यक्ष (इन-पर्सन) सत्राची उपस्थिती तुम्ही नोंदवताच दिसते."
+  }
 }
