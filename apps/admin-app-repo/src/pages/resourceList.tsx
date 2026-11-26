@@ -18,6 +18,9 @@ const ResourceList = () => {
   const tstore = taxonomyStore();
   const { t } = useTranslation();
 function reorderByIdentifiers(dataArray: any, idOrder: any) {
+  if (!Array.isArray(dataArray) || !Array.isArray(idOrder)) {
+    return Array.isArray(dataArray) ? dataArray : [];
+  }
   const dataCopy = [...dataArray]; // Clone to avoid mutating original array
   return idOrder.map((id: any) => {
     const index = dataCopy.findIndex(item => item.identifier === id);
@@ -41,6 +44,9 @@ function reorderByIdentifiers(dataArray: any, idOrder: any) {
         let contents = await fetchBulkContents(
           fetchedLearningResources?.map((item: any) => item.id)
         );
+        if (!Array.isArray(contents)) {
+          contents = [];
+        }
         const hasDuplicateIds = fetchedLearningResources.some(
           (resource: { id: any }, index: any, array: any[]) => {
             return array.findIndex((r) => r.id === resource.id) !== index;
