@@ -70,6 +70,7 @@ const ImportCsv = () => {
   const [openAddTopicModal, setOpenAddTopicModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [expandedPanels, setExpandedPanels] = useState<{
     [key: string]: boolean;
   }>({
@@ -471,7 +472,15 @@ const ImportCsv = () => {
       yesText: t('Yes, Delete'),
       noText: t('No, Cancel'),
       onYes: async () => {
-        const response = await deleteContent(solutionId, externalId);
+        let response = null;
+        setIsDeleting(true);
+        try {
+          response = await deleteContent(solutionId, externalId);
+        } catch (error) {
+          console.error('Error deleting content:', error);
+        } finally {
+          setIsDeleting(false);
+        }
         if (response) {
           showSnackbar({
             text: t(`${type} has been successfully deleted`),
@@ -497,6 +506,9 @@ const ImportCsv = () => {
 
   return (
     <Box sx={{ padding: isSmallScreen ? '16px' : '32px' }}>
+      {isDeleting && (
+        <Loader showBackdrop={true} loadingText={t('COMMON.LOADING')} />
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -533,7 +545,15 @@ const ImportCsv = () => {
                   yesText: t('Yes, Delete'),
                   noText: t('No, Cancel'),
                   onYes: async () => {
-                    const response = await deletePlanner(solutionId);
+                    let response = null;
+                    setIsDeleting(true);
+                    try {
+                      response = await deletePlanner(solutionId);
+                    } catch (error) {
+                      console.error('Error deleting planner:', error);
+                    } finally {
+                      setIsDeleting(false);
+                    }
                     if (response) {
                       showSnackbar({
                         text: t('Planner has been successfully deleted'),

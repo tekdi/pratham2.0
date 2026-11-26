@@ -204,7 +204,12 @@
       "ENROLL_IN_TO": "નોંધણી કરો",
       "PERSONAL_DATA_CONSENT_BEFORE_LINK": "હું આ",
       "CONSENT_FORM": "સંમતિ પત્રક",
-      "PERSONAL_DATA_CONSENT_AFTER_LINK": "સહ ગોપનીયતા સૂચના મુજબ વ્યક્તિગત ડેટા (ઉપર *ફરજિયાત તરીકે ચિહ્નિત) ના સંગ્રહ અને પ્રક્રિયા માટે સંમતિ આપું છું."
+      "PERSONAL_DATA_CONSENT_AFTER_LINK": "સહ ગોપનીયતા સૂચના મુજબ વ્યક્તિગત ડેટા (ઉપર *ફરજિયાત તરીકે ચિહ્નિત) ના સંગ્રહ અને પ્રક્રિયા માટે સંમતિ આપું છું.",
+      "PERSONAL_DATA_CONSENT_ADULT_BEFORE_LINK": "હું સંમતિ આપું છું: હું આ",
+      "PERSONAL_DATA_CONSENT_ADULT_AFTER_LINK": "ના ફકરા 1 માં વર્ણવ્યા મુજબ મારા વ્યક્તિગત ડેટાના સંગ્રહ અને પ્રક્રિયા માટે સંમત છું.",
+      "PERSONAL_DATA_CONSENT_MINOR_BEFORE_LINK": "હું, બાળકના માતા-પિતા/કાનૂની વાલી તરીકે, આ",
+      "PERSONAL_DATA_CONSENT_MINOR_AFTER_LINK": "ના ફકરા 1 માં વર્ણવ્યા મુજબ મારા બાળકના વ્યક્તિગત ડેટાના સંગ્રહ અને પ્રક્રિયા માટે આથી મારી સંમતિ આપું છું.",
+      "CONSENT_FORM_AND_PRIVACY_NOTICE": "સંમતિ પત્રક અને ગોપનીયતા સૂચના"
     },
     "PROGRAM_SWITCH_MODAL": {
       "REGISTERED_ON": "નોંધણી તારીખ",
@@ -1328,5 +1333,8 @@
   "FROM_WHICH_BOARD_DID_YOU_PASS_CLASS_10_OTHER": "જો અન્ય હોય, તો કૃપા કરીને તે બોર્ડનું નામ જણાવો જેમાંથી તમે ધોરણ 10 પાસ કર્યું",
   "What_DIVISION_/_PERCENTAGE_DID_YOU_GET_IN_CLASS_10": "ધોરણ 10 માં તમને કયો વર્ગ / કેટલા ટકા મળ્યા?",
   "HAVE_YOU_STUDIED_IN_PRATHAM'S_SECOND_CHANCE_PROGRAM": "શું તમે પ્રથમના સેકન્ડ ચાન્સ પ્રોગ્રામમાં અભ્યાસ કર્યો છે?",
-  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "તમે ધોરણ 10 કયા વર્ષમાં પાસ કર્યું?"
+  "IN_WHICH_YEAR_DID_YOU_PASS_CLASS_10": "તમે ધોરણ 10 કયા વર્ષમાં પાસ કર્યું?",
+  "DASHBOARD": {
+    "ATTENDANCE_SYNC_INFO": "ઑનલાઇન (Zoom) સત્રની હાજરી મધ્યરાત્રિ પછી આપમેળે સિંક થાય છે. રૂબરૂ (ઇન-પર્સન) સત્રની હાજરી તમે નોંધો કે તરત જ દેખાય છે."
+  }
 }
