@@ -21,6 +21,7 @@ import {
 import { telemetryFactory } from '@/utils/telemetry';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   Box,
   Button,
@@ -34,6 +35,7 @@ import {
   RadioGroup,
   Select,
   TextField,
+  Tooltip,
   Typography,
   styled,
 } from '@mui/material';
@@ -143,6 +145,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
   const [shortDescription, setShortDescription] = useState<string>('');
   const [meetingPasscode, setMeetingPasscode] = useState<string>();
   const [selectedDays, setSelectedDays] = useState<number[]>();
+  const [daysSelectionTouched, setDaysSelectionTouched] = useState(false);
   dayjs.extend(utc);
   const [startDates, setStartDates] = useState<Dayjs[]>([]);
   const [endDates, setEndDates] = useState<Dayjs[]>([]);
@@ -346,8 +349,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
 
       setEndTimes([localEndDateTime]);
 
-      const recurrencePattern = eventData?.recurrencePattern?.daysOfWeek;
-      setSelectedDays(recurrencePattern);
+      setSelectedDays(getEventWeekDays(eventData));
       setSessionBlocks([
         {
           id: 0,
@@ -832,6 +834,36 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
     );
   };
 
+  const WEEK_DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  // A daily session carries all 7 days in its pattern - show it back as
+  // "no day picked", which is what the user actually chose.
+  const getEventWeekDays = (event: any): number[] => {
+    const pattern = event?.recurrencePattern;
+    const days = pattern?.daysOfWeek || [];
+    return pattern?.frequency === 'daily' || days.length === eventDaysLimit
+      ? []
+      : days;
+  };
+
+  const getWeekDaysHeading = (block: any) => {
+    const days =
+      block?.selectedWeekDays ??
+      getEventWeekDays(editSession).map(
+        (dayIndex: number) => WEEK_DAY_LABELS[dayIndex]
+      );
+    return days?.length
+      ? t('COMMON.HELD_EVERY_WEEK_ON', { days: days.join(', ') })
+      : t('CENTER_SESSION.HELD_DAILY');
+  };
+
+  // No weekday selected = every day of the range. Sent as weekly over all 7
+  // days: the backend rejects frequency 'daily' ("not implemented yet").
+  const getRecurrenceDays = (days: number[] = []) => ({
+    frequency: 'weekly',
+    daysOfWeek: days.length === 0 ? Object.values(DaysOfWeek) : days,
+  });
+
   const handleSelectionChange = (
     id: string | number | undefined,
     newSelectedDays: string[]
@@ -1035,13 +1067,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
         };
 
         if (block?.isRecurring) {
+          const recurrenceDays = getRecurrenceDays(block?.DaysOfWeek || []);
           baseBody.recurrencePattern = {
-            frequency:
-              block?.selectedWeekDays?.length === eventDaysLimit
-                ? 'daily'
-                : 'weekly',
+            frequency: recurrenceDays.frequency,
             interval: 1,
-            daysOfWeek: block?.DaysOfWeek || [],
+            daysOfWeek: recurrenceDays.daysOfWeek,
             endCondition: {
               type: 'endDate',
               value: block?.endDateValue || '',
@@ -1209,12 +1239,7 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
       return showError(t('CENTER_SESSION.MEETING_URL_ERROR'));
     }
     if (eventBody.isRecurring) {
-      if (
-        !eventBody?.recurrencePattern?.daysOfWeek ||
-        eventBody.recurrencePattern.daysOfWeek.length === 0
-      ) {
-        return showError(t('CENTER_SESSION.WEEKDAY_ERROR'));
-      }
+      // No weekday picked is valid now - it means "schedule daily"
       if (
         eventBody.startDatetime.slice(0, 10) !==
         eventBody.endDatetime.slice(0, 10)
@@ -1338,9 +1363,13 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
           };
 
           if (editSelection === t('CENTER_SESSION.EDIT_FOLLOWING_SESSIONS')) {
-            const DaysOfWeek =
-              sessionBlocks?.[0]?.DaysOfWeek ||
-              eventData?.recurrencePattern?.daysOfWeek;
+            // Keep the event's own days unless the user touched the picker,
+            // so an untouched edit can't silently turn weekly into daily.
+            const DaysOfWeek = daysSelectionTouched
+              ? sessionBlocks?.[0]?.DaysOfWeek || []
+              : eventData?.recurrencePattern?.daysOfWeek ||
+                sessionBlocks?.[0]?.DaysOfWeek ||
+                [];
             const RecurringEndDate = sessionBlocks?.[0]?.endDateValue;
             const RecurringstartDate =
               sessionBlocks?.[0]?.recurringStartDate ??
@@ -1351,10 +1380,11 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             const timePart = sessionBlocks?.[0]?.startDatetime?.split('T')[1];
             const startDateValue = `${datePart}T${timePart}`;
             apiBody['startDatetime'] = sessionBlocks?.[0]?.startDatetime;
+            const recurrenceDays = getRecurrenceDays(DaysOfWeek);
             apiBody['recurrencePattern'] = {
               interval: 1,
-              frequency: 'weekly',
-              daysOfWeek: DaysOfWeek,
+              frequency: recurrenceDays.frequency,
+              daysOfWeek: recurrenceDays.daysOfWeek,
               endCondition: {
                 type: 'endDate',
                 value: RecurringEndDate,
@@ -1363,24 +1393,21 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
             };
           } else if (editSelection === t('CENTER_SESSION.EDIT_THIS_SESSION')) {
             const startDateTime = sessionBlocks?.[0]?.startDatetime;
-
-            if (startDateTime && eventData?.startDateTime) {
-              const startDateTimeDate = new Date(startDateTime);
-              const eventDateTimeDate = new Date(eventData.startDateTime);
-
-              if (startDateTimeDate.getTime() !== eventDateTimeDate.getTime()) {
-                apiBody['startDatetime'] = startDateTime;
-              }
-            }
-
             const endDateTime = sessionBlocks?.[0]?.endDatetime;
-            if (endDateTime && eventData?.endDateTime) {
-              const endDateTimeDate = new Date(endDateTime);
-              const eventDateTimeDate = new Date(eventData.endDateTime);
 
-              if (endDateTimeDate.getTime() !== eventDateTimeDate.getTime()) {
-                apiBody['endDatetime'] = endDateTime;
-              }
+            const hasMoved = (next?: string, current?: string) =>
+              !!next &&
+              !!current &&
+              new Date(next).getTime() !== new Date(current).getTime();
+
+            // The API validates start and end together, so when either one
+            // moved both have to be sent.
+            if (
+              hasMoved(startDateTime, eventData?.startDateTime) ||
+              hasMoved(endDateTime, eventData?.endDateTime)
+            ) {
+              apiBody['startDatetime'] = startDateTime;
+              apiBody['endDatetime'] = endDateTime;
             }
           }
 
@@ -1869,36 +1896,45 @@ const PlannedSession: React.FC<PlannedModalProps> = ({
                 t('CENTER_SESSION.EDIT_FOLLOWING_SESSIONS'))) && (
             <Box sx={{ mt: 2 }}>
               <Box sx={{ overflow: 'none' }}>
-                <Typography variant="h2" component="h2">
-                  {t('COMMON.HELD_EVERY_WEEK_ON', {
-                    // days:
-                    //   block?.selectedWeekDays?.join(', ') ||
-                    //   editSession?.recurrencePattern?.daysOfWeek,
-                    days:
-                      block?.selectedWeekDays?.join(', ') ??
-                      (editSession?.recurrencePattern?.daysOfWeek)
-                        .map(
-                          (dayIndex: any) =>
-                            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][
-                              dayIndex
-                            ]
-                        )
-                        .join(', '),
-                  })}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Typography variant="h2" component="h2">
+                    {getWeekDaysHeading(block)}
+                  </Typography>
+                  <Tooltip
+                    title={t('CENTER_SESSION.WEEKDAY_SELECTION_INFO')}
+                    arrow
+                    enterTouchDelay={0}
+                    leaveTouchDelay={5000}
+                  >
+                    <InfoOutlinedIcon
+                      fontSize="small"
+                      sx={{
+                        color: theme?.palette?.warning['300'],
+                        cursor: 'pointer',
+                      }}
+                    />
+                  </Tooltip>
+                </Box>
 
-                <WeekDays
-                  // useAbbreviation={true}
-                  multiselect={true}
-                  selectedDays={
-                    selectedDays?.length
-                      ? editSession?.recurrencePattern?.daysOfWeek
-                      : block?.selectedWeekDays
-                  }
-                  onSelectionChange={(newSelectedDays) => {
-                    handleSelectionChange(block?.id, newSelectedDays);
-                  }}
-                />
+                {/* Click anywhere on the day strip counts as the user
+                    choosing the days (see edit flow above). */}
+                <Box
+                  onClickCapture={() => setDaysSelectionTouched(true)}
+                  sx={{ display: 'inline-block', width: '100%' }}
+                >
+                  <WeekDays
+                    // useAbbreviation={true}
+                    multiselect={true}
+                    selectedDays={
+                      selectedDays?.length
+                        ? selectedDays
+                        : block?.selectedWeekDays
+                    }
+                    onSelectionChange={(newSelectedDays) => {
+                      handleSelectionChange(block?.id, newSelectedDays);
+                    }}
+                  />
+                </Box>
               </Box>
 
               <Grid container spacing={2} sx={{ mb: 2 }}>

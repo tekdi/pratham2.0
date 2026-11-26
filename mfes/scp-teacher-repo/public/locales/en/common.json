@@ -542,6 +542,8 @@
     "SELECT_SESSION": "Please select type of session",
     "MEETING_LINK_REQUIRED": "Please Enter Meeting Link!",
     "WEEKDAY_ERROR": "Please select at least one weekday for the recurring event.",
+    "WEEKDAY_SELECTION_INFO": "Select days if you want to schedule a session on a specific day. Do not select a day if you want to schedule sessions daily.",
+    "HELD_DAILY": "Held daily",
     "MULTIDAY_EVENT_ERROR": "Recurring events cannot span multiple days.",
     "EXTRA_SESSION_DATE_TIME_REQUIRED_ERROR": "Start and end times are required for extra sessions.",
     "PLANNED_SESSION_DATE_TIME_REQUIRED_ERROR": "Both start and end date/time are required for planned sessions.",
