@@ -18,6 +18,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
@@ -69,6 +70,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
   const { CustomSnackbar, showSnackbar } = useCustomSnackbar();
   const { AlertDialog, openAlert } = useAlertDialog();
   const formRef = useRef<HTMLFormElement>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // showSnackbar({
   //   text: 'Operation successful!',
@@ -367,6 +369,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
   const handleSave = async (e: any) => {
     e.preventDefault(); // Prevent default form submission
+    if (isSaving) return;
     if (formRef.current?.checkValidity()) {
       // All required fields are filled
       console.log('Form valid. Submit here.', topics);
@@ -374,14 +377,22 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
       //create course planner
       let response = null;
-      if (formType == 'editTopic') {
-        response = await updateContent(
-          projectId,
-          payload?.tasks[0]?.externalId,
-          payload
-        );
-      } else {
-        response = await createTopic(projectId, payload);
+      setIsSaving(true);
+      try {
+        if (formType == 'editTopic') {
+          response = await updateContent(
+            projectId,
+            payload?.tasks[0]?.externalId,
+            payload
+          );
+        } else {
+          response = await createTopic(projectId, payload);
+        }
+      } catch (error) {
+        console.error('Error saving course plan:', error);
+        response = null;
+      } finally {
+        setIsSaving(false);
       }
 
       if (response) {
@@ -460,6 +471,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
 
   //confirm box
   const onCloseDialog = () => {
+    if (isSaving) return;
     const hasAnyData = isAnyFieldFilled(topics);
 
     console.log('Topic Object', topics);
@@ -571,7 +583,11 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
         open={open}
         onClose={(event, reason) => {
           // Prevent closing on backdrop click or escape key
-          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+          if (
+            !isSaving &&
+            reason !== 'backdropClick' &&
+            reason !== 'escapeKeyDown'
+          ) {
             onClose();
           }
         }}
@@ -603,7 +619,7 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
           <Typography variant="h1" sx={{ fontWeight: 500 }}>
             {title}
           </Typography>
-          <IconButton onClick={onCloseDialog}>
+          <IconButton onClick={onCloseDialog} disabled={isSaving}>
             <CloseIcon sx={{ color: 'black', fontWeight: 'bold' }} />
           </IconButton>
         </DialogTitle>
@@ -1162,6 +1178,10 @@ const CoursePlanForm: React.FC<CoursePlanFormProps> = ({
             variant="contained"
             fullWidth
             onClick={handleSave}
+            disabled={isSaving}
+            startIcon={
+              isSaving ? <CircularProgress size={20} color="inherit" /> : null
+            }
             sx={{
               fontSize: 'large',
               borderRadius: '5px',
