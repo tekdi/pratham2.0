@@ -12,7 +12,7 @@ import Loader from './Loader';
 import SearchBar from './Searchbar';
 import { showToastMessage } from './Toastify';
 import axios from 'axios';
-import CustomPagination from './CustomPagination';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 
 interface UserDataProps {
   name: string;
@@ -348,7 +348,7 @@ const CohortLearnerList: React.FC<CohortLearnerListProp> = ({
                 justifyContent: 'end',
               }}
             >
-              <CustomPagination
+              <NewPagination
                 count={Math.ceil(totalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE)}
                 page={page}
                 onPageChange={handlePageChange}

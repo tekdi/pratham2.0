@@ -20,6 +20,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Button, Grid, IconButton, InputBase, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { useTranslation } from 'next-i18next';
 import { useDirection } from '../../hooks/useDirection';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -30,6 +32,7 @@ import {
   FormContext,
   FormContextType,
   limit,
+  pagesLimit,
   Status,
 } from '@/utils/app.constant';
 import { useQueryClient } from '@tanstack/react-query';
@@ -95,6 +98,10 @@ const BoardEnrollment = () => {
   const [displayStudentList, setDisplayStudentList] = React.useState<
     Array<user>
   >([]);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [page, setPage] = useState(1);
+  // Mobile uses infinite scroll instead of pages, so it tracks how many are shown.
+  const [mobileVisibleCount, setMobileVisibleCount] = useState(pagesLimit);
   const [searchWord, setSearchWord] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [open, setOpen] = React.useState(false);
@@ -475,6 +482,23 @@ const BoardEnrollment = () => {
     setDisplayStudentList(filteredData);
   };
 
+  // Search, sort and filter all rebuild the list, so go back to the first page.
+  useEffect(() => {
+    setPage(1);
+    setMobileVisibleCount(pagesLimit);
+  }, [displayStudentList]);
+
+  const totalStudentCount = displayStudentList?.length || 0;
+  const totalPages = Math.ceil(totalStudentCount / pagesLimit);
+  // The whole list is already in memory, so paginate client-side.
+  const paginatedStudentList = isMobile
+    ? displayStudentList?.slice(0, mobileVisibleCount)
+    : displayStudentList?.slice((page - 1) * pagesLimit, page * pagesLimit);
+
+  const fetchMoreData = () => {
+    setMobileVisibleCount((prev) => prev + pagesLimit);
+  };
+
   return (
     <>
       <Header />
@@ -617,7 +641,7 @@ const BoardEnrollment = () => {
       <Grid container sx={{ my: 4, px: '16px' }} spacing={2}>
         {displayStudentList.length >= 1 ? (
           <>
-            {displayStudentList?.map((item: any, index: any) => {
+            {paginatedStudentList?.map((item: any, index: any) => {
               return (
                 <Grid key={index} item xs={12} sm={12} md={6} lg={4}>
                   <Box
@@ -766,6 +790,23 @@ const BoardEnrollment = () => {
           <NoDataFound />
         )}
       </Grid>
+
+      {totalStudentCount >= 1 && (
+        <Box
+          sx={{ display: 'flex', justifyContent: 'end', px: '16px', pb: 4 }}
+        >
+          <NewPagination
+            count={totalPages}
+            page={page}
+            onPageChange={(value: number) => setPage(value)}
+            fetchMoreData={fetchMoreData}
+            hasMore={mobileVisibleCount < totalStudentCount}
+            TotalCount={totalStudentCount}
+            pageSize={pagesLimit}
+            dataLength={paginatedStudentList?.length || 0}
+          />
+        </Box>
+      )}
 
       <SortingModal
         isModalOpen={modalOpen}

@@ -9,6 +9,7 @@ import NoDataFound from '../../components/common/NoDataFound';
 import { getOfflineAssessmentDetails } from '../../services/AssesmentService';
 import { getAssessmentType } from '../../utils/helper';
 import { ICohort } from '../../utils/Interfaces';
+import { pagesLimit } from '../../utils/app.constant';
 import withAccessControl from '../../utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -23,6 +24,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -38,6 +41,10 @@ const AssessmentList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [assessmentList, setAssessmentList] = useState([]);
   const [filteredAssessments, setFilteredAssessments] = useState([]);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [page, setPage] = useState(1);
+  // Mobile uses infinite scroll instead of pages, so it tracks how many are shown.
+  const [mobileVisibleCount, setMobileVisibleCount] = useState(pagesLimit);
   const [classId, setClassId] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -310,6 +317,23 @@ const AssessmentList = () => {
     };
   }, [router]);
 
+  // Search, sort and filter all rebuild the list, so go back to the first page.
+  useEffect(() => {
+    setPage(1);
+    setMobileVisibleCount(pagesLimit);
+  }, [filteredAssessments]);
+
+  const totalAssessmentCount = filteredAssessments?.length || 0;
+  const totalPages = Math.ceil(totalAssessmentCount / pagesLimit);
+  // The whole list is already in memory, so paginate client-side.
+  const paginatedAssessments = isMobile
+    ? filteredAssessments?.slice(0, mobileVisibleCount)
+    : filteredAssessments?.slice((page - 1) * pagesLimit, page * pagesLimit);
+
+  const fetchMoreData = () => {
+    setMobileVisibleCount((prev) => prev + pagesLimit);
+  };
+
   return (
     <>
       <Box>
@@ -495,7 +519,7 @@ const AssessmentList = () => {
             }}
           >
             <Grid container spacing={{ xs: 2, sm: 2, md: 3 }}>
-              {filteredAssessments?.map((assessment: any) => (
+              {paginatedAssessments?.map((assessment: any) => (
                 <Grid
                   item
                   xs={12}
@@ -584,6 +608,19 @@ const AssessmentList = () => {
                 </Grid>
               ))}
             </Grid>
+
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+              <NewPagination
+                count={totalPages}
+                page={page}
+                onPageChange={(value: number) => setPage(value)}
+                fetchMoreData={fetchMoreData}
+                hasMore={mobileVisibleCount < totalAssessmentCount}
+                TotalCount={totalAssessmentCount}
+                pageSize={pagesLimit}
+                dataLength={paginatedAssessments?.length || 0}
+              />
+            </Box>
           </Box>
         </>
       )}

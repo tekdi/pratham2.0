@@ -23,6 +23,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
+import { Pagination } from '../../utils/app.constant';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -99,6 +101,7 @@ const AssessmentList = () => {
   // Course accordion state
   const [courseData, setCourseData] = useState<any[]>([]);
   const [filteredCourseData, setFilteredCourseData] = useState<any[]>([]);
+  const [coursePage, setCoursePage] = useState(1);
   const [expandedAccordions, setExpandedAccordions] = useState<Set<string>>(new Set());
   const [courseAssessments, setCourseAssessments] = useState<{ [courseId: string]: any[] }>({});
 
@@ -802,6 +805,16 @@ const AssessmentList = () => {
     });
   };
 
+  // Search, filters and assessment type all rebuild the list, so reset to page 1.
+  useEffect(() => setCoursePage(1), [filteredCourseData]);
+
+  const COURSE_PAGE_SIZE = Pagination.ITEMS_PER_PAGE;
+  // The whole course list is already in memory, so paginate client-side.
+  const paginatedCourseData = filteredCourseData?.slice(
+    (coursePage - 1) * COURSE_PAGE_SIZE,
+    coursePage * COURSE_PAGE_SIZE
+  );
+
   return (
     <>
       <Box>
@@ -1182,7 +1195,7 @@ const AssessmentList = () => {
               mb: 2,
             }}
           >
-            {filteredCourseData.map((course: any) => (
+            {paginatedCourseData.map((course: any) => (
               <Accordion
                 key={course.identifier}
                 expanded={expandedAccordions.has(course.identifier)}
@@ -1382,6 +1395,17 @@ const AssessmentList = () => {
                 </AccordionDetails>
               </Accordion>
             ))}
+
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+              <NewPagination
+                count={Math.ceil(filteredCourseData.length / COURSE_PAGE_SIZE)}
+                page={coursePage}
+                onPageChange={(value: number) => setCoursePage(value)}
+                TotalCount={filteredCourseData.length}
+                pageSize={COURSE_PAGE_SIZE}
+                dataLength={paginatedCourseData?.length || 0}
+              />
+            </Box>
           </Box>
         </>
       )}

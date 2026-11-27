@@ -21,7 +21,7 @@ import {
   getMediaFilterList,
 } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
-import PaginationComponent from '@workspace/components/PaginationComponent';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import NoDataFound from '@workspace/components/NoDataFound';
 import { LIMIT } from '@workspace/utils/app.constant';
 import { useRouter } from 'next/router';
@@ -362,12 +362,15 @@ const DraftPage = () => {
               </>
             )}
             {totalCount > LIMIT && (
-              <PaginationComponent
-                count={Math.ceil(totalCount / LIMIT)}
-                page={page}
-                setPage={setPage}
-                onPageChange={(event, newPage) => setPage(newPage - 1)}
-              />
+              <Box sx={{ px: 2, py: 2 }}>
+                <NewPagination
+                  count={Math.ceil(totalCount / LIMIT)}
+                  page={page + 1}
+                  onPageChange={(value: number) => setPage(value - 1)}
+                  TotalCount={totalCount}
+                  pageSize={LIMIT}
+                />
+              </Box>
             )}
           </Box>
         </Box>

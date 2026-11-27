@@ -37,6 +37,7 @@ import {
   Telemetry,
   FormContext,
   FormContextType,
+  pagesLimit,
 } from '@/utils/app.constant';
 import { fetchUserData, getUserFullName, toPascalCase } from '@/utils/helper';
 import { telemetryFactory } from '@/utils/telemetry';
@@ -57,7 +58,7 @@ import { useRouter } from 'next/router';
 import { setTimeout } from 'timers';
 import { useDirection } from '../hooks/useDirection';
 import manageUserStore from '../store/manageUserStore';
-import CustomPagination from './CustomPagination';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import Loader from './Loader';
 import ReassignModal from './ReassignModal';
 import SearchBar from './Searchbar';
@@ -214,6 +215,10 @@ const ManageUser: React.FC<ManageUsersProps> = ({
   const [TotalCount, setTotalCount] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
   const [allFacilitatorsData, setAllFacilitatorsData] = useState<any>([]);
+  // Center-detail facilitator list is fetched whole, so it pages client-side.
+  const [facilitatorPage, setFacilitatorPage] = useState(1);
+  const [facilitatorMobileCount, setFacilitatorMobileCount] =
+    useState(pagesLimit);
 
   //reassign modal variables
   // const [reassignModalOpen, setReassignModalOpen] = useState(false);
@@ -1227,6 +1232,21 @@ const ManageUser: React.FC<ManageUsersProps> = ({
     setOffSet((newPage - 1) * PAGINATION_CONFIG.ITEMS_PER_PAGE);
   };
 
+  // Center-detail facilitator list: the whole list is already in memory.
+  useEffect(() => {
+    setFacilitatorPage(1);
+    setFacilitatorMobileCount(pagesLimit);
+  }, [filteredUsers]);
+
+  const facilitatorCount = filteredUsers?.length || 0;
+  const facilitatorPages = Math.ceil(facilitatorCount / pagesLimit);
+  const paginatedFacilitators = isMobile
+    ? filteredUsers?.slice(0, facilitatorMobileCount)
+    : filteredUsers?.slice(
+        (facilitatorPage - 1) * pagesLimit,
+        facilitatorPage * pagesLimit
+      );
+
   return (
     <div>
       <Box>
@@ -1384,7 +1404,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                           <Box>
                             <Grid container spacing={2} >
                               {filteredUsers?.length > 0 ? (
-                                filteredUsers?.map((user) => (
+                                paginatedFacilitators?.map((user) => (
                                   <Grid
                                     item
                                     xs={12}
@@ -1568,6 +1588,32 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                               )}
                             </Grid>
                           </Box>
+                          {facilitatorCount > 0 && (
+                            <Box
+                              sx={{
+                                mt: 2,
+                                display: 'flex',
+                                justifyContent: 'end',
+                              }}
+                            >
+                              <NewPagination
+                                count={facilitatorPages}
+                                page={facilitatorPage}
+                                onPageChange={(value: number) =>
+                                  setFacilitatorPage(value)
+                                }
+                                fetchMoreData={() =>
+                                  setFacilitatorMobileCount(
+                                    (prev) => prev + pagesLimit
+                                  )
+                                }
+                                hasMore={facilitatorMobileCount < facilitatorCount}
+                                TotalCount={facilitatorCount}
+                                pageSize={pagesLimit}
+                                dataLength={paginatedFacilitators?.length || 0}
+                              />
+                            </Box>
+                          )}
                         </>
                       ) : (
                         <>
@@ -1780,7 +1826,7 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                   justifyContent: 'end',
                                 }}
                               >
-                                <CustomPagination
+                                <NewPagination
                                   count={Math.ceil(
                                     TotalCount / PAGINATION_CONFIG.ITEMS_PER_PAGE
                                   )}
@@ -1789,9 +1835,8 @@ const ManageUser: React.FC<ManageUsersProps> = ({
                                   fetchMoreData={() => fetchData()}
                                   hasMore={hasMore}
                                   TotalCount={TotalCount}
-                                  items={infiniteData.map((user) => (
-                                    <Box key={user.userId}></Box>
-                                  ))}
+                                  pageSize={PAGINATION_CONFIG.ITEMS_PER_PAGE}
+                                  dataLength={infiniteData?.length || 0}
                                 />
                               </Box>
                             )}

@@ -1,6 +1,6 @@
 import KaTableComponent from '@workspace/components/KaTableComponent';
 import Loader from '@workspace/components/Loader';
-import PaginationComponent from '@workspace/components/PaginationComponent';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import WorkspaceText from '@workspace/components/WorkspaceText';
 import { timeAgo } from '@workspace/utils/helper';
 import { LIMIT } from '@workspace/utils/app.constant';
@@ -403,12 +403,15 @@ const ContentsPage = () => {
               </>
             )}
             {totalCount > LIMIT && (
-              <PaginationComponent
-                count={Math.ceil(totalCount / LIMIT)}
-                page={page}
-                setPage={setPage}
-                onPageChange={(event, newPage) => setPage(newPage - 1)}
-              />
+              <Box sx={{ px: 2, py: 2 }}>
+                <NewPagination
+                  count={Math.ceil(totalCount / LIMIT)}
+                  page={page + 1}
+                  onPageChange={(value: number) => setPage(value - 1)}
+                  TotalCount={totalCount}
+                  pageSize={LIMIT}
+                />
+              </Box>
             )}
           </Box>
         </Box>

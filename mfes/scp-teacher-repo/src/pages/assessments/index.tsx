@@ -13,7 +13,7 @@ import {
 import { getMyCohortMemberList } from '@/services/MyClassDetailsService';
 import { getAssessmentType, toPascalCase } from '@/utils/helper';
 import { ICohort } from '@/utils/Interfaces';
-import { AssessmentStatus, Role, Status } from '@/utils/app.constant';
+import { AssessmentStatus, Role, Status, pagesLimit } from '@/utils/app.constant';
 import withAccessControl from '@/utils/hoc/withAccessControl';
 import ArrowDropDownSharpIcon from '@mui/icons-material/ArrowDropDownSharp';
 import {
@@ -27,6 +27,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -71,6 +73,10 @@ const Assessments = () => {
   const [cohortMembers, setCohortMembers] = useState<any>([]);
   const [learnerList, setLearnerList] = useState<any>([]);
   const [filteredLearnerList, setFilteredLearnerList] = useState<any>([]);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [page, setPage] = useState(1);
+  // Mobile uses infinite scroll instead of pages, so it tracks how many are shown.
+  const [mobileVisibleCount, setMobileVisibleCount] = useState(pagesLimit);
   const [testCompletionCount, setTestCompletionCount] = useState<any>({
     completionCount: 0,
     totalCount: 0,
@@ -485,6 +491,23 @@ const Assessments = () => {
     };
   }, [router]);
 
+  // Search, sort and filter all rebuild the list, so go back to the first page.
+  useEffect(() => {
+    setPage(1);
+    setMobileVisibleCount(pagesLimit);
+  }, [filteredLearnerList]);
+
+  const totalLearnerCount = filteredLearnerList?.length || 0;
+  const totalPages = Math.ceil(totalLearnerCount / pagesLimit);
+  // The whole list is already in memory, so paginate client-side.
+  const paginatedLearnerList = isMobile
+    ? filteredLearnerList?.slice(0, mobileVisibleCount)
+    : filteredLearnerList?.slice((page - 1) * pagesLimit, page * pagesLimit);
+
+  const fetchMoreData = () => {
+    setMobileVisibleCount((prev) => prev + pagesLimit);
+  };
+
   return (
     <>
       <Box>
@@ -663,7 +686,7 @@ const Assessments = () => {
       {!isLoading && filteredLearnerList?.length > 0 && (
         <Box sx={{ background: '#FBF4E4', padding: '20px' }}>
           <Grid container spacing={2}>
-            {filteredLearnerList?.map((member: any) => (
+            {paginatedLearnerList?.map((member: any) => (
               <AssessmentReportCard
                 key={member.userId}
                 assessmentStatus={member.status}
@@ -677,6 +700,19 @@ const Assessments = () => {
               />
             ))}
           </Grid>
+
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+            <NewPagination
+              count={totalPages}
+              page={page}
+              onPageChange={(value: number) => setPage(value)}
+              fetchMoreData={fetchMoreData}
+              hasMore={mobileVisibleCount < totalLearnerCount}
+              TotalCount={totalLearnerCount}
+              pageSize={pagesLimit}
+              dataLength={paginatedLearnerList?.length || 0}
+            />
+          </Box>
         </Box>
       )}
 

@@ -69,11 +69,13 @@ import {
 import { fetchUserList, updateUserTenantStatus } from '../../services/youthNet/Dashboard/UserServices';
 import {
   cohortHierarchy,
+  Pagination,
   Role,
   SortOrder,
   Status,
   VolunteerField,
 } from '../../utils/app.constant';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { fetchCohortMemberList } from '../../services/MyClassDetailsService';
 import { editEditUser } from '../../services/ProfileService';
 import { showToastMessage } from '@/components/Toastify';
@@ -162,6 +164,10 @@ const Index = () => {
   const [filteredvillageListWithUsers, setFilteredVillageListWithUsers] =
     useState<any>([]);
   const [filteredyouthList, setFilteredYouthList] = useState<any>([]);
+  // One page index per tab; all three lists are filtered client-side.
+  const [mentorPage, setMentorPage] = useState(1);
+  const [villagePage, setVillagePage] = useState(1);
+  const [youthPage, setYouthPage] = useState(1);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedMentorId, setSelectedMentorId] = useState('');
   const [open, setOpen] = useState(false);
@@ -1649,6 +1655,23 @@ const Index = () => {
     }
   }, [value, villageList, selectedVillageValue]);
 
+  // Search, sort and filters rebuild each list, so go back to that tab's first page.
+  useEffect(() => setMentorPage(1), [filteredmentorList]);
+  useEffect(() => setVillagePage(1), [filteredvillageListWithUsers]);
+  useEffect(() => setYouthPage(1), [filteredyouthList]);
+
+  const PAGE_SIZE = Pagination.ITEMS_PER_PAGE;
+  // All three lists are already in memory, so they paginate client-side.
+  const sliceForPage = (list: any[], currentPage: number) =>
+    list?.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const paginatedMentorList = sliceForPage(filteredmentorList, mentorPage);
+  const paginatedVillageList = sliceForPage(
+    filteredvillageListWithUsers,
+    villagePage
+  );
+  const paginatedYouthList = sliceForPage(filteredyouthList, youthPage);
+
   return (
     <Box minHeight="100vh">
       <Box>
@@ -1802,15 +1825,27 @@ const Index = () => {
               {mobilizerListLoading ? (
                 <Loader showBackdrop={true} />
               ) : filteredmentorList.length !== 0 ? (
-                <UserList
-                  layout="list"
-                  users={filteredmentorList.map((user: any) => ({
-                    ...user,
-                    showMore: true,
-                  }))}
-                  onUserClick={handleUserClick}
-                  onToggleUserClick={handleToggledMentorClick}
-                />
+                <>
+                  <UserList
+                    layout="list"
+                    users={paginatedMentorList.map((user: any) => ({
+                      ...user,
+                      showMore: true,
+                    }))}
+                    onUserClick={handleUserClick}
+                    onToggleUserClick={handleToggledMentorClick}
+                  />
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+                    <NewPagination
+                      count={Math.ceil(filteredmentorList.length / PAGE_SIZE)}
+                      page={mentorPage}
+                      onPageChange={(value: number) => setMentorPage(value)}
+                      TotalCount={filteredmentorList.length}
+                      pageSize={PAGE_SIZE}
+                      dataLength={paginatedMentorList?.length || 0}
+                    />
+                  </Box>
+                </>
               ) : (
                 <Typography
                   sx={{
@@ -3003,11 +3038,25 @@ const Index = () => {
               }}
             >
               {filteredvillageListWithUsers.length !== 0 ? (
-                <UserList
-                  layout="list"
-                  users={filteredvillageListWithUsers}
-                  onUserClick={handleLocationClick}
-                />
+                <>
+                  <UserList
+                    layout="list"
+                    users={paginatedVillageList}
+                    onUserClick={handleLocationClick}
+                  />
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+                    <NewPagination
+                      count={Math.ceil(
+                        filteredvillageListWithUsers.length / PAGE_SIZE
+                      )}
+                      page={villagePage}
+                      onPageChange={(value: number) => setVillagePage(value)}
+                      TotalCount={filteredvillageListWithUsers.length}
+                      pageSize={PAGE_SIZE}
+                      dataLength={paginatedVillageList?.length || 0}
+                    />
+                  </Box>
+                </>
               ) : filteredvillageListWithUsers.length === 0 && !loading ? (
                 <>
                   <Typography
@@ -3210,13 +3259,25 @@ const Index = () => {
               }}
             >
               {filteredyouthList.length !== 0 ? (
-                <UserList
-                  layout="list"
-                  users={filteredyouthList}
-                  onUserClick={handleUserClick}
-                  onToggleUserClick={handleToggledUserClick}
-                  showMore={true}
-                />
+                <>
+                  <UserList
+                    layout="list"
+                    users={paginatedYouthList}
+                    onUserClick={handleUserClick}
+                    onToggleUserClick={handleToggledUserClick}
+                    showMore={true}
+                  />
+                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'end' }}>
+                    <NewPagination
+                      count={Math.ceil(filteredyouthList.length / PAGE_SIZE)}
+                      page={youthPage}
+                      onPageChange={(value: number) => setYouthPage(value)}
+                      TotalCount={filteredyouthList.length}
+                      pageSize={PAGE_SIZE}
+                      dataLength={paginatedYouthList?.length || 0}
+                    />
+                  </Box>
+                </>
               ) : filteredyouthList.length === 0 && !loading ? (
                 <>
                   <Typography

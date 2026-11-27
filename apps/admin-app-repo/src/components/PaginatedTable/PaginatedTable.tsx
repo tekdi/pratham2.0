@@ -108,11 +108,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
   Paper,
   IconButton,
   Box,
 } from '@mui/material';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import useStore from '@/store/store';
 import { getVisibleTableActions } from '@/utils/filterTableActionsForAcademicYear';
 
@@ -238,15 +238,21 @@ const PaginatedTable = ({
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={rowsPerPageOptions}
-        component="div"
-        count={count}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {/* Page state stays 0-indexed here; NewPagination is 1-indexed. */}
+      <Box sx={{ p: 2 }}>
+        <NewPagination
+          count={Math.max(1, Math.ceil(count / rowsPerPage))}
+          page={page + 1}
+          onPageChange={(value) => handleChangePage(null, value - 1)}
+          TotalCount={count}
+          pageSize={rowsPerPage}
+          pageSizeOptions={rowsPerPageOptions}
+          onPageSizeChange={(size) =>
+            handleChangeRowsPerPage({ target: { value: size } })
+          }
+          dataLength={data?.length || 0}
+        />
+      </Box>
     </Paper>
   );
 };

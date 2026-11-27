@@ -15,7 +15,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getContent } from '@workspace/services/ContentService';
 import SearchBox from '../../../../components/SearchBox';
-import PaginationComponent from '@workspace/components/PaginationComponent';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import NoDataFound from '@workspace/components/NoDataFound';
 import { LIMIT } from '@workspace/utils/app.constant';
 import { MIME_TYPE } from '@workspace/utils/app.config';
@@ -259,12 +259,15 @@ const SubmittedForReviewPage = () => {
               </Box>
             )}
             {totalCount > LIMIT && (
-              <PaginationComponent
-                count={Math.ceil(totalCount / LIMIT)}
-                page={page}
-                setPage={setPage}
-                onPageChange={(event, newPage) => setPage(newPage - 1)}
-              />
+              <Box sx={{ px: 2, py: 2 }}>
+                <NewPagination
+                  count={Math.ceil(totalCount / LIMIT)}
+                  page={page + 1}
+                  onPageChange={(value: number) => setPage(value - 1)}
+                  TotalCount={totalCount}
+                  pageSize={LIMIT}
+                />
+              </Box>
             )}
           </Box>
         </Box>

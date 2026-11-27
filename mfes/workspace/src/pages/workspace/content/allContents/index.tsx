@@ -34,7 +34,7 @@ import Loader from '@workspace/components/Loader';
 import NoDataFound from '@workspace/components/NoDataFound';
 import { MIME_TYPE } from '@workspace/utils/app.config';
 import { useRouter } from 'next/router';
-import PaginationComponent from '@workspace/components/PaginationComponent';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { LIMIT } from '@workspace/utils/app.constant';
 import WorkspaceText from '@workspace/components/WorkspaceText';
 import { Table as KaTable } from 'ka-table';
@@ -631,12 +631,15 @@ const AllContentsPage = () => {
               </>
             )}
             {totalCount > LIMIT && (
-              <PaginationComponent
-                count={Math.ceil(totalCount / LIMIT)}
-                page={page}
-                setPage={setPage}
-                onPageChange={(event, newPage) => setPage(newPage - 1)}
-              />
+              <Box sx={{ px: 2, py: 2 }}>
+                <NewPagination
+                  count={Math.ceil(totalCount / LIMIT)}
+                  page={page + 1}
+                  onPageChange={(value: number) => setPage(value - 1)}
+                  TotalCount={totalCount}
+                  pageSize={LIMIT}
+                />
+              </Box>
             )}
           </Box>
         </Box>

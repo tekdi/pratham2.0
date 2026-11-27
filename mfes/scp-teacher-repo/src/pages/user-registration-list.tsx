@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, TextField, InputAdornment, Pagination, CircularProgress, Checkbox, FormControlLabel, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Grid, Typography, TextField, InputAdornment, CircularProgress, Checkbox, FormControlLabel, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'next-i18next';
 import Header from '../components/Header';
@@ -704,7 +705,7 @@ const UserRegistrationList = () => {
     }
   }, []);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (value: number) => {
     setCurrentPage(value);
     setSelectedUsers(new Set());
   };
@@ -893,65 +894,32 @@ const UserRegistrationList = () => {
                         mb: 2,
                         gap: 2
                     }}>
-                        {/* Page Info */}
-                        <Typography sx={{ 
-                            color: '#7C766F', 
-                            fontSize: '14px',
-                            fontWeight: 500
-                        }}>
-                            {totalCount > 0 ? (
-                                <>
-                                    {t('USER_REGISTRATION.SHOWING_LEARNERS', {
-                                        start: (currentPage - 1) * limit + 1,
-                                        end: Math.min(currentPage * limit, totalCount),
-                                        total: totalCount
-                                    })}
-                                    {Math.ceil(totalCount / limit) === 1 && t('USER_REGISTRATION.SINGLE_PAGE')}
-                                </>
-                            ) : (
-                                t('USER_REGISTRATION.NO_RECORDS_FOUND')
-                            )}
-                        </Typography>
-                        
-                        {/* Pagination Controls */}
-                        {totalCount > 0 && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Pagination
-                                    count={Math.max(1, Math.ceil(totalCount / limit))}
-                                    page={currentPage}
-                                    onChange={handlePageChange}
-                                    color="primary"
-                                    size="medium"
-                                    showFirstButton
-                                    showLastButton
-                                    siblingCount={1}
-                                    boundaryCount={1}
-                                    sx={{
-                                        '& .MuiPaginationItem-root': {
-                                            color: '#1E1B16',
-                                            fontSize: '14px',
-                                            fontWeight: 500,
-                                            '&:hover': {
-                                                backgroundColor: '#F5F5F5',
-                                            },
-                                            '&.Mui-disabled': {
-                                                opacity: 0.5,
-                                            },
-                                        },
-                                        '& .Mui-selected': {
-                                            backgroundColor: '#FDBE16 !important',
-                                            color: '#1E1B16 !important',
-                                            fontWeight: 600,
-                                            '&:hover': {
-                                                backgroundColor: '#FDBE16 !important',
-                                            },
-                                        },
-                                        '& .MuiPaginationItem-ellipsis': {
-                                            color: '#7C766F',
-                                        },
-                                    }}
-                                />
-                            </Box>
+                        {totalCount > 0 ? (
+                            <NewPagination
+                                count={Math.max(1, Math.ceil(totalCount / limit))}
+                                page={currentPage}
+                                onPageChange={handlePageChange}
+                                TotalCount={totalCount}
+                                dataLength={users?.length || 0}
+                                rangeLabel={
+                                    <>
+                                        {t('USER_REGISTRATION.SHOWING_LEARNERS', {
+                                            start: (currentPage - 1) * limit + 1,
+                                            end: Math.min(currentPage * limit, totalCount),
+                                            total: totalCount
+                                        })}
+                                        {Math.ceil(totalCount / limit) === 1 && t('USER_REGISTRATION.SINGLE_PAGE')}
+                                    </>
+                                }
+                            />
+                        ) : (
+                            <Typography sx={{
+                                color: '#7C766F',
+                                fontSize: '14px',
+                                fontWeight: 500
+                            }}>
+                                {t('USER_REGISTRATION.NO_RECORDS_FOUND')}
+                            </Typography>
                         )}
                     </Box>
                 </>

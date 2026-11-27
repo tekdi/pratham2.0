@@ -12,6 +12,7 @@ import {
   TelemetryEventType,
   FormContext,
   FormContextType,
+  pagesLimit,
 } from '@/utils/app.constant';
 import { accessGranted, toPascalCase } from '@/utils/helper';
 import withAccessControl from '@/utils/hoc/withAccessControl';
@@ -31,6 +32,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import NewPagination from '@shared-lib-v2/lib/NewPagination/NewPagination';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
@@ -142,6 +145,11 @@ const CentersPage = () => {
   const isActiveYear = store.isActiveYearSelected;
   const [selectedCenter, setSelectedCenter] = useState('');
   const [filteredBatches, setFilteredBatches] = useState<any[]>([]);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [batchPage, setBatchPage] = useState(1);
+  // Mobile uses infinite scroll instead of pages, so it tracks how many are shown.
+  const [batchMobileVisibleCount, setBatchMobileVisibleCount] =
+    useState(pagesLimit);
   const [batchSearchInput, setBatchSearchInput] = useState(''); // Search for batches
   const [batchLoading, setBatchLoading] = useState(false);
   const [centerList, setCenterList] = useState<any[]>([]);
@@ -793,6 +801,26 @@ const CentersPage = () => {
     });
   }, [filteredBatches, batchSearchInput]);
 
+  // Search and centre switching both rebuild the list, so go back to the first page.
+  useEffect(() => {
+    setBatchPage(1);
+    setBatchMobileVisibleCount(pagesLimit);
+  }, [filteredBatchList]);
+
+  const totalBatchCount = filteredBatchList?.length || 0;
+  const totalBatchPages = Math.ceil(totalBatchCount / pagesLimit);
+  // The whole list is already in memory, so paginate client-side.
+  const paginatedBatchList = isMobile
+    ? filteredBatchList?.slice(0, batchMobileVisibleCount)
+    : filteredBatchList?.slice(
+        (batchPage - 1) * pagesLimit,
+        batchPage * pagesLimit
+      );
+
+  const fetchMoreBatches = () => {
+    setBatchMobileVisibleCount((prev) => prev + pagesLimit);
+  };
+
   // Add empty form data for required props
   const emptyUserId = '';
   const emptyCallback = () => {};
@@ -946,14 +974,35 @@ const CentersPage = () => {
               {batchLoading ? (
                 <Typography>Loading Batches...</Typography>
               ) : filteredBatchList && filteredBatchList.length > 0 ? (
-                <BatchList
-                  title={''}
-                  cohortId={selectedCenter}
-                  batches={filteredBatchList}
-                  router={router}
-                  theme={theme}
-                  t={t}
-                />
+                <>
+                  <BatchList
+                    title={''}
+                    cohortId={selectedCenter}
+                    batches={paginatedBatchList}
+                    router={router}
+                    theme={theme}
+                    t={t}
+                  />
+                  <Box
+                    sx={{
+                      mt: 2,
+                      px: 2,
+                      display: 'flex',
+                      justifyContent: 'end',
+                    }}
+                  >
+                    <NewPagination
+                      count={totalBatchPages}
+                      page={batchPage}
+                      onPageChange={(value: number) => setBatchPage(value)}
+                      fetchMoreData={fetchMoreBatches}
+                      hasMore={batchMobileVisibleCount < totalBatchCount}
+                      TotalCount={totalBatchCount}
+                      pageSize={pagesLimit}
+                      dataLength={paginatedBatchList?.length || 0}
+                    />
+                  </Box>
+                </>
               ) : (
                 <NoDataFound />
               )}
